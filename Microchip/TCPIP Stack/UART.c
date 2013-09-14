@@ -7,8 +7,8 @@
  * Dependencies:    Hardware UART module
  * Processor:       PIC18, PIC24F, PIC24H, dsPIC30F, dsPIC33F
  * Compiler:        Microchip C30 v3.12 or higher
- *					Microchip C18 v3.30 or higher
- *					HI-TECH PICC-18 PRO 9.63PL2 or higher
+ *                  Microchip C18 v3.30 or higher
+ *                  HI-TECH PICC-18 PRO 9.63PL2 or higher
  * Company:         Microchip Technology, Inc.
  *
  * Software License Agreement
@@ -22,9 +22,9 @@
  *      digital signal controller product ("Device") which is
  *      integrated into Licensee's product; or
  * (ii) ONLY the Software driver source files ENC28J60.c, ENC28J60.h,
- *		ENCX24J600.c and ENCX24J600.h ported to a non-Microchip device
- *		used in conjunction with a Microchip ethernet controller for
- *		the sole purpose of interfacing with the ethernet controller.
+ *      ENCX24J600.c and ENCX24J600.h ported to a non-Microchip device
+ *      used in conjunction with a Microchip ethernet controller for
+ *      the sole purpose of interfacing with the ethernet controller.
  *
  * You should refer to the license agreement accompanying this
  * Software for additional information regarding your rights and
@@ -43,10 +43,10 @@
  * (INCLUDING NEGLIGENCE), BREACH OF WARRANTY, OR OTHERWISE.
  *
  *
- * Author               Date   		Comment
+ * Author               Date        Comment
  *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Howard Schlunder		4/04/06		Copied from dsPIC30 libraries
- * Howard Schlunder		6/16/06		Added PIC18
+ * Howard Schlunder     4/04/06     Copied from dsPIC30 libraries
+ * Howard Schlunder     6/16/06     Added PIC18
 ********************************************************************/
 #define __UART_C
 
@@ -81,20 +81,20 @@ BYTE ReadStringUART(BYTE *Dest, BYTE BufferLen)
 */
 
 
-#if defined(__18CXX)	// PIC18
+#if defined(__18CXX)    // PIC18
 	char BusyUSART(void)
 	{
 		return !TXSTAbits.TRMT;
 	}
-	
+
 	void CloseUSART(void)
 	{
-	  RCSTA &= 0x4F;  // Disable the receiver
-	  TXSTAbits.TXEN = 0;   // and transmitter
-	
-	  PIE1 &= 0xCF;   // Disable both interrupts
+		RCSTA &= 0x4F;          // Disable the receiver
+		TXSTAbits.TXEN = 0;     // and transmitter
+
+		PIE1 &= 0xCF;           // Disable both interrupts
 	}
-	
+
 	char DataRdyUSART(void)
 	{
 		if(RCSTAbits.OERR)
@@ -102,51 +102,51 @@ BYTE ReadStringUART(BYTE *Dest, BYTE BufferLen)
 			RCSTAbits.CREN = 0;
 			RCSTAbits.CREN = 1;
 		}
-	  return PIR1bits.RCIF;
+		return PIR1bits.RCIF;
 	}
-	
+
 	char ReadUSART(void)
 	{
-	  return RCREG;                     // Return the received data
+		return RCREG;               // Return the received data
 	}
-	
+
 	void WriteUSART(char data)
 	{
-	  TXREG = data;      // Write the data byte to the USART
+		TXREG = data;               // Write the data byte to the USART
 	}
-	
+
 	void getsUSART(char *buffer, unsigned char len)
 	{
-	  char i;    // Length counter
-	  unsigned char data;
-	
-	  for(i=0;i<len;i++)  // Only retrieve len characters
-	  {
-	    while(!DataRdyUSART());// Wait for data to be received
-	
-	    data = getcUART();    // Get a character from the USART
-	                           // and save in the string
-	    *buffer = data;
-	    buffer++;              // Increment the string pointer
-	  }
+		char i;                     // Length counter
+		unsigned char data;
+
+		for(i = 0; i < len; i++)    // Only retrieve len characters
+		{
+			while(!DataRdyUSART()); // Wait for data to be received
+
+			data = getcUART();      // Get a character from the USART
+			                        // and save in the string
+			*buffer = data;
+			buffer++;               // Increment the string pointer
+		}
 	}
-	
-	void putsUSART( char *data)
+
+	void putsUSART(char *data)
 	{
-	  do
-	  {  // Transmit a byte
-	    while(BusyUSART());
-	    putcUART(*data);
-	  } while( *data++ );
+		do
+		{  // Transmit a byte
+			while(BusyUSART());
+			putcUART(*data);
+		} while( *data++ );
 	}
 	
 	void putrsUSART(const rom char *data)
 	{
-	  do
-	  {  // Transmit a byte
-	    while(BusyUSART());
-	    putcUART(*data);
-	  } while( *data++ );
+		do
+		{  // Transmit a byte
+			while(BusyUSART());
+			putcUART(*data);
+		} while( *data++ );
 	}
 
 
@@ -155,15 +155,15 @@ BYTE ReadStringUART(BYTE *Dest, BYTE BufferLen)
 /***************************************************************************
 * Function Name     : putsUART2                                            *
 * Description       : This function puts the data string to be transmitted *
-*                     into the transmit buffer (till NULL character)       * 
+*                     into the transmit buffer (till NULL character)       *
 * Parameters        : unsigned int * address of the string buffer to be    *
 *                     transmitted                                          *
-* Return Value      : None                                                 *  
+* Return Value      : None                                                 *
 ***************************************************************************/
 
 void putsUART2(unsigned int *buffer)
 {
-    char * temp_ptr = (char *) buffer;
+    char * temp_ptr = (char *)buffer;
 
     /* transmit till NULL character is encountered */
 
@@ -184,9 +184,10 @@ void putsUART2(unsigned int *buffer)
         }
     }
 }
+#if defined(__dsPIC33E__)
 void putsUART3(unsigned int *buffer)
 {
-    char * temp_ptr = (char *) buffer;
+    char * temp_ptr = (char *)buffer;
 
     /* transmit till NULL character is encountered */
 
@@ -207,25 +208,25 @@ void putsUART3(unsigned int *buffer)
         }
     }
 }
+#endif
 
 /******************************************************************************
 * Function Name     : getsUART2                                               *
-* Description       : This function gets a string of data of specified length * 
+* Description       : This function gets a string of data of specified length *
 *                     if available in the UxRXREG buffer into the buffer      *
 *                     specified.                                              *
 * Parameters        : unsigned int length the length expected                 *
-*                     unsigned int *buffer  the received data to be           * 
+*                     unsigned int *buffer  the received data to be           *
 *                                  recorded to this array                     *
 *                     unsigned int uart_data_wait timeout value               *
-* Return Value      : unsigned int number of data bytes yet to be received    * 
+* Return Value      : unsigned int number of data bytes yet to be received    *
 ******************************************************************************/
 
 unsigned int getsUART2(unsigned int length,unsigned int *buffer,
                        unsigned int uart_data_wait)
-
 {
     unsigned int wait = 0;
-    char *temp_ptr = (char *) buffer;
+    char *temp_ptr = (char *)buffer;
 
     while(length)                         /* read till length is 0 */
     {
@@ -239,12 +240,10 @@ unsigned int getsUART2(unsigned int length,unsigned int *buffer,
         wait=0;
         if(U2MODEbits.PDSEL == 3)         /* check if TX/RX is 8bits or 9bits */
             *buffer++ = U2RXREG;          /* data word from HW buffer to SW buffer */
-		else
+        else
             *temp_ptr++ = U2RXREG & 0xFF; /* data byte from HW buffer to SW buffer */
-
         length--;
     }
-
     return(length);                       /* number of data yet to be received i.e.,0 */
 }
 
@@ -262,15 +261,16 @@ char DataRdyUART2(void)
 {
     return(U2STAbits.URXDA);
 }
+#if defined(__dsPIC33E__)
 char DataRdyUART3(void)
 {
     return(U3STAbits.URXDA);
 }
-
+#endif
 
 /*************************************************************************
 * Function Name     : BusyUART2                                          *
-* Description       : This returns status whether the transmission       *  
+* Description       : This returns status whether the transmission       *
 *                     is in progress or not, by checking Status bit TRMT *
 * Parameters        : None                                               *
 * Return Value      : char info whether transmission is in progress      *
@@ -280,17 +280,18 @@ char BusyUART2(void)
 {  
     return(!U2STAbits.TRMT);
 }
+#if defined(__dsPIC33E__)
 char BusyUART3(void)
-{  
+{
     return(!U3STAbits.TRMT);
 }
-
+#endif
 
 /***************************************************************************
 * Function Name     : ReadUART2                                            *
 * Description       : This function returns the contents of UxRXREG buffer *
-* Parameters        : None                                                 *  
-* Return Value      : unsigned int value from UxRXREG receive buffer       * 
+* Parameters        : None                                                 *
+* Return Value      : unsigned int value from UxRXREG receive buffer       *
 ***************************************************************************/
 
 unsigned int ReadUART2(void)
@@ -300,6 +301,7 @@ unsigned int ReadUART2(void)
     else
         return (U2RXREG & 0xFF);
 }
+#if defined(__dsPIC33E__)
 unsigned int ReadUART3(void)
 {
     if(U3MODEbits.PDSEL == 3)
@@ -307,7 +309,7 @@ unsigned int ReadUART3(void)
     else
         return (U3RXREG & 0xFF);
 }
-
+#endif
 
 /*********************************************************************
 * Function Name     : WriteUART2                                     *
@@ -323,6 +325,7 @@ void WriteUART2(unsigned int data)
     else
         U2TXREG = data & 0xFF;  
 }
+#if defined(__dsPIC33E__)
 void WriteUART3(unsigned int data)
 {
     if(U3MODEbits.PDSEL == 3)
@@ -330,6 +333,7 @@ void WriteUART3(unsigned int data)
     else
         U3TXREG = data & 0xFF;  
 }
+#endif
 
 #endif
 

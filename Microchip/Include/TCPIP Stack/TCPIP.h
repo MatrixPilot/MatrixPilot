@@ -4,12 +4,12 @@
  *
  *********************************************************************
  * FileName:        TCPIP.h
- * Dependencies:    
+ * Dependencies:
  * Processor:       PIC18, PIC24F, PIC24H, dsPIC30F, dsPIC33F, PIC32
  * Compiler:        Microchip C32 v1.05 or higher
- *					Microchip C30 v3.12 or higher
- *					Microchip C18 v3.30 or higher
- *					HI-TECH PICC-18 PRO 9.63PL2 or higher
+ *                  Microchip C30 v3.12 or higher
+ *                  Microchip C18 v3.30 or higher
+ *                  HI-TECH PICC-18 PRO 9.63PL2 or higher
  * Company:         Microchip Technology, Inc.
  *
  * Software License Agreement
@@ -49,7 +49,7 @@
 #ifndef __TCPIP_HITECH_WORKAROUND_H
 #define __TCPIP_HITECH_WORKAROUND_H
 
-#define TCPIP_STACK_VERSION 		"v5.42"		// TCP/IP stack version
+#define TCPIP_STACK_VERSION     "v5.42" // TCP/IP stack version
 
 #include <string.h>
 #include <stdlib.h>
@@ -61,7 +61,7 @@
 // fully implemented yet.
 // Defines the number of different network interfaces to support (ex: 2 for 
 // Wifi and Ethernet simultaneously).
-#define NETWORK_INTERFACES		(1u)	
+#define NETWORK_INTERFACES      (1u)
 
 /*******************************************************************
  * Memory Configuration
@@ -71,11 +71,11 @@
 	// Represents data stored in Ethernet buffer RAM
 	#define TCP_ETH_RAM	0u
 	// The base address for TCP data in Ethernet RAM
-	#define TCP_ETH_RAM_BASE_ADDRESS			(BASE_TCB_ADDR)
+	#define TCP_ETH_RAM_BASE_ADDRESS    (BASE_TCB_ADDR)
 	// Represents data stored in local PIC RAM
 	#define TCP_PIC_RAM	1u
 	// The base address for TCP data in PIC RAM
-	#define TCP_PIC_RAM_BASE_ADDRESS			((PTR_BASE)&TCPBufferInPIC[0])
+	#define TCP_PIC_RAM_BASE_ADDRESS    ((PTR_BASE)&TCPBufferInPIC[0])
 	// Represents data stored in external SPI RAM
 	#define TCP_SPI_RAM	2u
 
@@ -83,7 +83,7 @@
  * User Configuration
  *   Load the user-specific configuration from TCPIPConfig.h
  *******************************************************************/
-#include "TCPIPConfig.h"
+#include "../../TCPIPConfig.h"
 
 /*******************************************************************
  * Configuration Rules Enforcement
@@ -93,8 +93,6 @@
 
 #ifndef STACK_USE_MDD
 
-	
-	
 	#if defined(STACK_USE_HTTP2_SERVER) || defined(STACK_USE_FTP_SERVER)
 		#define STACK_USE_MPFS2
 	#endif
@@ -111,21 +109,22 @@
 		#define STACK_USE_MD5
 		#define STACK_USE_SHA1
 	#endif
+
 #endif
-	
+
 	// FTP is not supported in MPFS2 or when MPFS is stored in internal program 
 	// memory (instead of external EEPROM).
 	#if ( (!defined(MPFS_USE_EEPROM) && !defined(MPFS_USE_SPI_FLASH)) || defined(STACK_USE_MPFS2) ) && defined(STACK_USE_FTP)
 		#error FTP server is not supported with HTTP2 / MPFS2, or with internal Flash memory storage
 	#endif
-	
+
 	// When IP Gleaning is enabled, ICMP must also be enabled.
 	#if defined(STACK_USE_IP_GLEANING)
-	    #if !defined(STACK_USE_ICMP_SERVER)
-	        #define STACK_USE_ICMP_SERVER
-	    #endif
+		#if !defined(STACK_USE_ICMP_SERVER)
+			#define STACK_USE_ICMP_SERVER
+		#endif
 	#endif
-	
+
 	// Include modules required by specific HTTP demos
 	#if !defined(STACK_USE_HTTP2_SERVER)
 		#undef STACK_USE_HTTP_EMAIL_DEMO
@@ -142,25 +141,25 @@
 			#define STACK_USE_MD5
 		#endif
 	#endif
-	
+
 	// Can't do MPFS upload without POST or external memory
 	#if defined(HTTP_MPFS_UPLOAD)
 		#if !defined(HTTP_USE_POST) || (!defined(MPFS_USE_EEPROM) && !defined(MPFS_USE_SPI_FLASH))
 			#undef HTTP_MPFS_UPLOAD
 		#endif
 	#endif
-	
+
 	// Make sure that the DNS client is enabled if services require it
 	#if defined(STACK_USE_GENERIC_TCP_CLIENT_EXAMPLE) || \
 		defined(STACK_USE_SNTP_CLIENT) || \
 		defined(STACK_USE_DYNAMICDNS_CLIENT) || \
 		defined(STACK_USE_SMTP_CLIENT) || \
 		defined(STACK_USE_AUTOUPDATE_TCPCLIENT)
-	    #if !defined(STACK_USE_DNS)
-	        #define STACK_USE_DNS
-	    #endif
+		#if !defined(STACK_USE_DNS)
+			#define STACK_USE_DNS
+		#endif
 	#endif
-	
+
 	// Make sure that STACK_CLIENT_MODE is defined if a service 
 	// depends on it
 	#if defined(STACK_USE_FTP_SERVER) || \
@@ -174,12 +173,12 @@
 		defined(STACK_USE_SNTP_CLIENT) || \
 		defined(STACK_USE_BERKELEY_API) || \
 		defined(STACK_USE_SSL_CLIENT) || \
-        defined(STACK_USE_AUTO_IP)
+		defined(STACK_USE_AUTO_IP)
 		#if !defined(STACK_CLIENT_MODE)
-		    #define STACK_CLIENT_MODE
+			#define STACK_CLIENT_MODE
 		#endif
 	#endif
-	
+
 	// Make sure that STACK_USE_TCP is defined if a service 
 	// depends on it
 	#if defined(STACK_USE_UART2TCP_BRIDGE) || \
@@ -194,11 +193,11 @@
 		defined(STACK_USE_BERKELEY_API) || \
 		defined(STACK_USE_SSL_CLIENT) || \
 		defined(STACK_USE_SSL_SERVER)
-	    #if !defined(STACK_USE_TCP)
-	        #define STACK_USE_TCP
-	    #endif
+		#if !defined(STACK_USE_TCP)
+			#define STACK_USE_TCP
+		#endif
 	#endif
-	
+
 	// If TCP is not enabled, clear all memory allocations
 	#if !defined(STACK_USE_TCP)
 		#undef TCP_ETH_RAM_SIZE
@@ -208,7 +207,7 @@
 		#define TCP_PIC_RAM_SIZE 0u
 		#define TCP_SPI_RAM_SIZE 0u
 	#endif
-	
+
 	// If PIC RAM is used to store TCP socket FIFOs and TCBs, 
 	// let's allocate it so the linker dynamically chooses 
 	// where to locate it and prevents other variables from 
@@ -222,7 +221,7 @@
 			#pragma udata
 		#endif
 	#endif
-	
+
 	// Make sure that STACK_USE_UDP is defined if a service 
 	// depends on it
 	#if defined(STACK_USE_DHCP_CLIENT) || \
@@ -235,9 +234,9 @@
 		defined(STACK_USE_UDP_PERFORMANCE_TEST) || \
 		defined(STACK_USE_SNTP_CLIENT) || \
 		defined(STACK_USE_BERKELEY_API)
-	    #if !defined(STACK_USE_UDP)
-	        #define STACK_USE_UDP
-	    #endif
+		if !defined(STACK_USE_UDP)
+			#define STACK_USE_UDP
+		#endif
 	#endif
 
 	// When using SSL server, enable RSA decryption
@@ -245,7 +244,7 @@
 		#define STACK_USE_RSA_DECRYPT
 		#define STACK_USE_SSL
 	#endif
-	
+
 	// When using SSL client, enable RSA encryption
 	#if defined(STACK_USE_SSL_CLIENT)
 		#define STACK_USE_RSA_ENCRYPT
@@ -270,13 +269,13 @@
 	#if defined(LCD_DATA_IO) || defined(LCD_DATA0_IO)
 		#define USE_LCD
 	#endif
-	
+
 	// SPI Flash MPFS images must start on a block boundary
 	#if (defined(STACK_USE_MPFS2)) && \
 		defined(MPFS_USE_SPI_FLASH) && ((MPFS_RESERVE_BLOCK & 0x0fff) != 0)
 		#error MPFS_RESERVE_BLOCK must be a multiple of 4096 for SPI Flash storage
 	#endif
-	
+
 	// HTTP2 requires 2 MPFS2 handles per connection, plus one spare
 	#if defined(STACK_USE_HTTP2_SERVER)
 		#if MAX_MPFS_HANDLES < ((MAX_HTTP_CONNECTIONS * 2) + 1)
@@ -305,7 +304,7 @@
 #endif
 
 #if defined(STACK_USE_AUTO_IP)
-    #include "TCPIP Stack/AutoIP.h"
+	#include "TCPIP Stack/AutoIP.h"
 #endif
 
 #if defined(STACK_USE_RANDOM)
@@ -359,7 +358,6 @@
 #if defined(STACK_USE_FTP_SERVER)
 	#include "TCPIP Stack/FTP.h"
 #endif
-
 
 #if defined(STACK_USE_HTTP2_SERVER)
 	#ifdef STACK_USE_MDD
@@ -428,6 +426,7 @@
 #endif
 
 #if defined(WF_CS_TRIS)
-    #include "TCPIP Stack/WFMac.h"
+	#include "TCPIP Stack/WFMac.h"
 #endif
+
 #endif

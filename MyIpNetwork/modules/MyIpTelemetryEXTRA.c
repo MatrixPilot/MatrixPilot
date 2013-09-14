@@ -136,7 +136,8 @@ void SendTelemetryEXTRAPacket(uint8_t s)
     StringToSocket(s, ":WIND_EST=");      uitoaSocket(s, WIND_ESTIMATION);
     StringToSocket(s, ":GPS_TYPE=");      uitoaSocket(s, GPS_TYPE);
     StringToSocket(s, ":DR=");            uitoaSocket(s, DEADRECKONING);
-    StringToSocket(s, ":BOARD_TYPE=");    uitoaSocket(s, BOARD_TYPE);
+//    StringToSocket(s, ":BOARD_TYPE=");    uitoaSocket(s, BOARD_TYPE);
+    StringToSocket(s, ":BOARD_TYPE=");    uitoaSocket(s, 0);
     StringToSocket(s, ":AIRFRAME=");      uitoaSocket(s, AIRFRAME_TYPE);
     StringToSocket(s, ":RCON=0x");        ToHexToSocket(s, get_reset_flags(), 16);
     StringToSocket(s, ":TRAP_FLAGS=0x");  ToHexToSocket(s, trap_flags, 16);

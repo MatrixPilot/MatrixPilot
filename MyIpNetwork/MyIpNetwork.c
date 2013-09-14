@@ -139,32 +139,28 @@ void DisplayIPValue(const IP_ADDR IPVal)
 static void InitializeBoard(void)
 {
 #if (NETWORK_INTERFACE == NETWORK_INTERFACE_WIFI_MRF24WG)
-
-  #if (BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD)
-    AD1PCFGHbits.PCFG17 = 1;	// Make AN17/RC2 a digital pin for MRF24WG0M Hibernate
-    AD1PCFGHbits.PCFG18 = 1;	// Make AN18/RC3 a digital pin for MRF24WG0M Reset
-    AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
+  #if defined(__dsPIC33E__)
+  #else
+	AD1PCFGHbits.PCFG17 = 1;    // Make AN17/RC2 a digital pin for MRF24WG0M Hibernate
+	AD1PCFGHbits.PCFG18 = 1;    // Make AN18/RC3 a digital pin for MRF24WG0M Reset
+	AD1PCFGHbits.PCFG20 = 1;    // Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
   #endif
-  
-    WF_CS_IO = 1;
-    WF_CS_TRIS = 0;
-
+	WF_CS_IO = 1;
+	WF_CS_TRIS = 0;
 #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC28J60)
-  #if (BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD)
-    AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
+  #if defined(__dsPIC33E__)
+  #else
+	AD1PCFGHbits.PCFG20 = 1;    // Make AN20/RA12/INT1 a digital for ENC interrupt
   #endif
-
-    ENC_CS_IO = 1;
-    ENC_CS_TRIS = 0;
-
+	ENC_CS_IO = 1;
+	ENC_CS_TRIS = 0;
 #elif (NETWORK_INTERFACE == NETWORK_INTERFACE_ETHERNET_ENC624J600)
-
-  #if (BOARD_TYPE == UDB4_BOARD) || (BOARD_TYPE == UDB5_BOARD)
-    AD1PCFGHbits.PCFG20 = 1;	// Make AN20/RA12/INT1 a digital for MRF24WG0M interrupt
+  #if defined(__dsPIC33E__)
+  #else
+	AD1PCFGHbits.PCFG20 = 1;    // Make AN20/RA12/INT1 a digital for ENC interrupt
   #endif
-
-    ENC100_CS_IO = 1;
-    ENC100_CS_TRIS = 0;
+	ENC100_CS_IO = 1;
+	ENC100_CS_TRIS = 0;
 #endif
 }
 

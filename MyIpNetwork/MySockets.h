@@ -39,5 +39,9 @@ typedef struct
 	WORD wRXBufferSize;
 } TCPSocketInitializer_t;
 
-	
+
+WORD getMySocketCount(void);
+TCPSocketInitializer_t* getMySocketInitializer(WORD i);
+
+
 #endif // _MYSOCKETS_H_

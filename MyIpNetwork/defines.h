@@ -26,11 +26,6 @@
 #include <stdint.h>
 //#include "NetConfig.h"
 
-// Build for the specific board type
-#define AUAV3_BOARD		9	// Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
-#define BOARD_TYPE 							AUAV3_BOARD
-
-
 // Types
 typedef uint8_t boolean;
 #define true	1

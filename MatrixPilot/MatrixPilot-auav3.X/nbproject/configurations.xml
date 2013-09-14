@@ -345,6 +345,7 @@
         <itemPath>../minim_osd.c</itemPath>
         <itemPath>../remzibi_osd.c</itemPath>
         <itemPath>../flight_state.c</itemPath>
+        <itemPath>../network.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
@@ -382,6 +383,8 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
+            <linkerLibFileItem>../MatrixPilot-myip-auav3.X/dist/default/production/MatrixPilot-myip-auav3.X.a</linkerLibFileItem>
+            <linkerLibFileItem>../MatrixPilot-tcpip-auav3.X/dist/default/production/MatrixPilot-tcpip-auav3.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>

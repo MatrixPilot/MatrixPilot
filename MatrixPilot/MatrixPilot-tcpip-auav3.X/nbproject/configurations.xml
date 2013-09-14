@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>../../Microchip/Include/TCPIP Stack/AES.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/AES_CBC.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/AES_CFB.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/AES_CTR.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/AES_ECB.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/AES_ECB_PIC32.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/AES_OFB.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ARCFOUR.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ARP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Announce.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/AutoIP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/BerkeleyAPI.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/BigInt.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/DHCP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/DNS.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Delay.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/DynDNS.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ENC28J60.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ENCX24J600.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ETH97J60.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhy.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyDP83640.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyDP83848.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyRegs.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhySMSC8700.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhySMSC8720.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/FTP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/FileSystem.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/HTTP2.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Hashes.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Helpers.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ICMP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/IP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/LCDBlocking.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/MAC.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/MPFS2.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/NBNS.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/RSA.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Random.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Reboot.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SMTP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SNMP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SNMPv3.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SNTP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SPIFlash.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SPIRAM.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SSL.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/SSLClientSize.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/StackTsk.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/TCP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/TCPIP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/TCPPerformanceTest.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/TFTPc.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Telnet.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/Tick.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/UART.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/UART2TCPBridge.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/UDP.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/UDPPerformanceTest.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFApi.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsole.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIfconfig.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIwconfig.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIwpriv.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleMsgHandler.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleMsgs.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFDebugStrings.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFDriverPrv_24G.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFEasyConfig.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFMac.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFMgmtMsg.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WFRaw_24G.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/WF_pbkdf2.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/XEEPROM.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ZeroconfHelper.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ZeroconfLinkLocal.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/ZeroconfMulticastDNS.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/_HTTP2.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/aes_pic24f.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/eth_pic32_ext_phy_rtl8201FL.h</itemPath>
+      <itemPath>../../Microchip/Include/TCPIP Stack/regdef.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>../../Microchip/TCPIP Stack/ARCFOUR.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/ARP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Announce.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/AutoIP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/BerkeleyAPI.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/BigInt.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/DHCP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/DHCPs.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/DNS.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/DNSs.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Delay.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/DynDNS.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/ENC28J60.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/ENCX24J600.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/FTP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/FileSystem.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/HTTP2.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Hashes.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Helpers.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/ICMP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/IP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/MPFS2.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/NBNS.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/RSA.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Random.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Reboot.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/SMTP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/SNMP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/SNMPv3.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/SNMPv3USM.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/SNTP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/SSL.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/StackTsk.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/TCP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/TCPPerformanceTest.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/TFTPc.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Telnet.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/Tick.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/UART.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/UART2TCPBridge.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/UDP.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/UDPPerformanceTest.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/ZeroconfHelper.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/ZeroconfLinkLocal.c</itemPath>
+      <itemPath>../../Microchip/TCPIP Stack/ZeroconfMulticastDNS.c</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../Microchip/TCPIP Stack</Elem>
+    <Elem>../Microchip/Include/TCPIP Stack</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="default" type="3">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>dsPIC33EP512MU810</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>PICkit3PlatformTool</platformTool>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <platform>3</platform>
+      </toolsSet>
+      <compileType>
+        <archiverTool>
+        </archiverTool>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C30>
+        <property key="code-model" value="large-code"/>
+        <property key="const-model" value="default"/>
+        <property key="data-model" value="large-data"/>
+        <property key="enable-all-warnings" value="true"/>
+        <property key="enable-ansi-std" value="false"/>
+        <property key="enable-ansi-warnings" value="false"/>
+        <property key="enable-fatal-warnings" value="false"/>
+        <property key="enable-large-arrays" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-procedural-abstraction" value="false"/>
+        <property key="enable-short-double" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="extra-include-directories"
+                  value="C:\DATA-ROB\PROJECTS\RCIO\MatrixPilot_AUAV3\Microchip\Include;C:\DATA-ROB\PROJECTS\RCIO\MatrixPilot_AUAV3\Microchip"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
+        <property key="oXC16gcc-align-arr" value="false"/>
+        <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
+        <property key="oXC16gcc-data-sects" value="false"/>
+        <property key="oXC16gcc-errata" value=""/>
+        <property key="oXC16gcc-fillupper" value=""/>
+        <property key="oXC16gcc-large-aggregate" value="false"/>
+        <property key="oXC16gcc-mauxflash" value="false"/>
+        <property key="oXC16gcc-mpa-lvl" value=""/>
+        <property key="oXC16gcc-name-text-sec" value=""/>
+        <property key="oXC16gcc-near-chars" value="false"/>
+        <property key="oXC16gcc-no-isr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-smar-io-lvl" value="1"/>
+        <property key="oXC16gcc-smart-io-fmt" value=""/>
+        <property key="optimization-level" value="0"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="scalar-model" value="default"/>
+        <property key="use-cci" value="false"/>
+      </C30>
+      <C30-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+      </C30-AS>
+      <C30-LD>
+      </C30-LD>
+      <C30Global>
+        <property key="fast-math" value="false"/>
+        <property key="generic-16-bit" value="false"/>
+        <property key="legacy-libc" value="true"/>
+        <property key="oXC16glb-macros" value=""/>
+        <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
+      </C30Global>
+      <PICkit3PlatformTool>
+      </PICkit3PlatformTool>
+    </conf>
+  </confs>
+</configurationDescriptor>
