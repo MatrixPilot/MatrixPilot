@@ -48,11 +48,9 @@ struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channel
 struct ADchannel mpu_temp;
 int16_t vref_adj;
 
-#define MPU_SMPLRT_DIV      7                       // Sample rate = 1KHz  Fsample= 8Khz/(N+1)
-
 #define MPU_PWR_MGMT_1      MPU_CLK_SEL_PLLGYROZ
 #define MPU_USER_CTRL       BIT_I2C_IF_DIS
-#define MPU_SMPLRT_DIV      4
+#define MPU_SMPLRT_DIV      4                       // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
 #define MPU_CONFIG          BITS_DLPF_CFG_42HZ
 #define MPU_GYRO_CONFIG     BITS_FS_500DPS
 #if (ACCEL_RANGE == 2)
@@ -64,7 +62,6 @@ int16_t vref_adj;
 #endif
 #define MPU_INT_PIN_CFG     (BIT_INT_LEVEL | BIT_INT_RD_CLEAR)
 #define MPU_INT_ENABLE      BIT_DATA_RDY_EN
-
 
 void dumpMPUregs(void)
 {
@@ -99,7 +96,6 @@ int checkMPUregs(void)  // returns 0 if the registers read back correctly
 		(readMPUSPIreg16(MPUREG_INT_ENABLE)   !=  BIT_DATA_RDY_EN)
 	   );
 }
-
 
 // MPU6000 Initialization and configuration
 

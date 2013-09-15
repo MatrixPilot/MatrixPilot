@@ -59,6 +59,8 @@ extern void (*gps_startup_sequence)(int16_t gpscount);
 extern boolean (*gps_nav_valid)(void);
 extern void (*gps_commit_data)(void);
 
+void gps_init(void);
+
 int32_t get_gps_date(void);
 int32_t get_gps_time(void);
 

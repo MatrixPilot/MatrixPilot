@@ -30,15 +30,15 @@
 #define TCP_PURPOSE_MYIPDATA_GROUND_STATION 24
 #define TCP_PURPOSE_MYIPDATA_AIRCRAFT_CONFIG 25
 
-
+/*
 typedef struct
 {
 	BYTE vSocketPurpose;
 	BYTE vMemoryMedium;
 	WORD wTXBufferSize;
 	WORD wRXBufferSize;
-} TCPSocketInitializer_t;
-
+} TCPSocketInitializer_t_foo;
+ */
 
 WORD getMySocketCount(void);
 TCPSocketInitializer_t* getMySocketInitializer(WORD i);

@@ -201,7 +201,8 @@ typedef struct
 	Function Declarations
   ***************************************************************************/
 
-void TCPInit(void);
+void TCPInit(BYTE numSockets, TCPSocketInitializer_t* pTCPSocketInitializer);
+//void TCPInit(void);
 SOCKET_INFO* TCPGetRemoteInfo(TCP_SOCKET hTCP);
 BOOL TCPWasReset(TCP_SOCKET hTCP);
 BOOL TCPIsConnected(TCP_SOCKET hTCP);

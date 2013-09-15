@@ -9,12 +9,12 @@
  *********************************************************************
  * FileName:        StackTsk.c
  * Dependencies:    ARP, IP, Network layer interface (ENC28J60.c, 
- *					ETH97J60.c, ENCX24J600.c, or WFMac.c)
+ *                  ETH97J60.c, ENCX24J600.c, or WFMac.c)
  * Processor:       PIC18, PIC24F, PIC24H, dsPIC30F, dsPIC33F, PIC32
  * Compiler:        Microchip C32 v1.05 or higher
- *					Microchip C30 v3.12 or higher
- *					Microchip C18 v3.30 or higher
- *					HI-TECH PICC-18 PRO 9.63PL2 or higher
+ *                  Microchip C30 v3.12 or higher
+ *                  Microchip C18 v3.30 or higher
+ *                  HI-TECH PICC-18 PRO 9.63PL2 or higher
  * Company:         Microchip Technology, Inc.
  *
  * Software License Agreement
@@ -28,9 +28,9 @@
  *      digital signal controller product ("Device") which is
  *      integrated into Licensee's product; or
  * (ii) ONLY the Software driver source files ENC28J60.c, ENC28J60.h,
- *		ENCX24J600.c and ENCX24J600.h ported to a non-Microchip device
- *		used in conjunction with a Microchip ethernet controller for
- *		the sole purpose of interfacing with the ethernet controller.
+ *      ENCX24J600.c and ENCX24J600.h ported to a non-Microchip device
+ *      used in conjunction with a Microchip ethernet controller for
+ *      the sole purpose of interfacing with the ethernet controller.
  *
  * You should refer to the license agreement accompanying this
  * Software for additional information regarding your rights and
@@ -56,12 +56,12 @@
 #include "TCPIP Stack/TCPIP.h"
 
 #if defined( WF_CS_TRIS )
-    #if defined( WF_CONFIG_CONSOLE )
-        #include "TCPIP Stack/WFConsole.h"
-    #endif
-    #if defined( STACK_USE_EZ_CONFIG ) || defined( EZ_CONFIG_SCAN )
-        #include "TCPIP Stack/WFEasyConfig.h"
-    #endif
+	#if defined( WF_CONFIG_CONSOLE )
+		#include "TCPIP Stack/WFConsole.h"
+	#endif
+	#if defined( STACK_USE_EZ_CONFIG ) || defined( EZ_CONFIG_SCAN )
+		#include "TCPIP Stack/WFEasyConfig.h"
+	#endif
 	#include "TCPIP Stack/WFApi.h"
 	
 	#if defined(CONFIG_WPA_ENTERPRISE)
@@ -72,12 +72,12 @@
 // Stack FSM states.
 typedef enum
 {
-    SM_STACK_IDLE,
-    SM_STACK_MAC,
-    SM_STACK_IP,
-    SM_STACK_ARP,
-    SM_STACK_TCP,
-    SM_STACK_UDP
+	SM_STACK_IDLE,
+	SM_STACK_MAC,
+	SM_STACK_IP,
+	SM_STACK_ARP,
+	SM_STACK_TCP,
+	SM_STACK_UDP
 } SM_STACK;
 static SM_STACK smStack;
 
@@ -88,7 +88,6 @@ BOOL g_DhcpRenew = FALSE;
 extern void SetDhcpProgressState(void);
 UINT32 g_DhcpRetryTimer = 0;
 #endif
-
 
 /*********************************************************************
  * Function:        void StackInit(void)
@@ -105,17 +104,18 @@ UINT32 g_DhcpRetryTimer = 0;
  *                  stack or its component routines are used.
  *
  ********************************************************************/
-void StackInit(void)
+void StackInit(BYTE numSockets, TCPSocketInitializer_t* pTCPSocketInitializer)
+//void StackInit(void)
 {
 	static BOOL once = FALSE;
-    smStack                     = SM_STACK_IDLE;
+	smStack = SM_STACK_IDLE;
 
 #if defined(STACK_USE_IP_GLEANING) || defined(STACK_USE_DHCP_CLIENT)
-    /*
-     * If DHCP or IP Gleaning is enabled,
-     * startup in Config Mode.
-     */
-    AppConfig.Flags.bInConfigMode = TRUE;
+	/*
+	 * If DHCP or IP Gleaning is enabled,
+	 * startup in Config Mode.
+	 */
+	AppConfig.Flags.bInConfigMode = TRUE;
 
 #endif
 
@@ -130,24 +130,25 @@ void StackInit(void)
 		once = TRUE;
 	}
 
-  MACInit();
+	MACInit();
 
 #if defined (WF_AGGRESSIVE_PS) && defined (WF_CS_TRIS)
 	WFEnableAggressivePowerSave();
 #endif
 
 #if defined(WF_CS_TRIS) && defined(STACK_USE_EZ_CONFIG) && !defined(__18CXX)
-    WFEasyConfigInit();
-#endif    
+	WFEasyConfigInit();
+#endif
 
-    ARPInit();
+	ARPInit();
 
 #if defined(STACK_USE_UDP)
-    UDPInit();
+	UDPInit();
 #endif
 
 #if defined(STACK_USE_TCP)
-    TCPInit();
+	TCPInit(numSockets, pTCPSocketInitializer);
+//	TCPInit();
 #endif
 
 #if defined(STACK_USE_BERKELEY_API)
@@ -155,7 +156,7 @@ void StackInit(void)
 #endif
 
 #if defined(STACK_USE_HTTP2_SERVER)
-    HTTPInit();
+	HTTPInit();
 #endif
 
 #if defined(STACK_USE_RSA)
@@ -163,11 +164,11 @@ void StackInit(void)
 #endif
 
 #if defined(STACK_USE_SSL)
-    SSLInit();
+	SSLInit();
 #endif
 
 #if defined(STACK_USE_FTP_SERVER) && defined(STACK_USE_MPFS2)
-    FTPInit();
+	FTPInit();
 #endif
 
 #if defined(STACK_USE_SNMP_SERVER)
@@ -176,14 +177,14 @@ void StackInit(void)
 
 #if defined(STACK_USE_DHCP_CLIENT)
 	DHCPInit(0);
-    if(!AppConfig.Flags.bIsDHCPEnabled)
-    {
-        DHCPDisable(0);
-    }
+	if(!AppConfig.Flags.bIsDHCPEnabled)
+	{
+		DHCPDisable(0);
+	}
 #endif
 
 #if defined(STACK_USE_AUTO_IP)
-    AutoIPInit(0);
+	AutoIPInit(0);
 #endif
 
 #if defined(STACK_USE_DYNAMICDNS_CLIENT)
@@ -194,7 +195,6 @@ void StackInit(void)
 	RandomInit();
 #endif
 }
-
 
 /*********************************************************************
  * Function:        void StackTask(void)
@@ -217,56 +217,54 @@ void StackInit(void)
  ********************************************************************/
 void StackTask(void)
 {
-    WORD dataCount;
-    IP_ADDR tempLocalIP;
+	WORD dataCount;
+	IP_ADDR tempLocalIP;
 	BYTE cFrameType;
 	BYTE cIPFrameType;
 
-   
-    #if defined( WF_CS_TRIS )
-        // This task performs low-level MAC processing specific to the MRF24W
-        MACProcess();
-        #if defined( STACK_USE_EZ_CONFIG ) && !defined(__18CXX)
-            WFEasyConfigMgr();
-        #endif
-        
-    	#if defined(STACK_USE_DHCP_CLIENT)
-        	// Normally, an application would not include  DHCP module
-        	// if it is not enabled. But in case some one wants to disable
-        	// DHCP module at run-time, remember to not clear our IP
-        	// address if link is removed.
-        	if(AppConfig.Flags.bIsDHCPEnabled)
-        	{
-        		if(g_DhcpRenew == TRUE)
-        		{
-        			g_DhcpRenew = FALSE;
-            		AppConfig.MyIPAddr.Val = AppConfig.DefaultIPAddr.Val;
-        			AppConfig.MyMask.Val = AppConfig.DefaultMask.Val;
-        			AppConfig.Flags.bInConfigMode = TRUE;
-        			DHCPInit(0);
+	#if defined( WF_CS_TRIS )
+		// This task performs low-level MAC processing specific to the MRF24W
+		MACProcess();
+		#if defined( STACK_USE_EZ_CONFIG ) && !defined(__18CXX)
+			WFEasyConfigMgr();
+		#endif
+
+		#if defined(STACK_USE_DHCP_CLIENT)
+			// Normally, an application would not include  DHCP module
+			// if it is not enabled. But in case some one wants to disable
+			// DHCP module at run-time, remember to not clear our IP
+			// address if link is removed.
+			if(AppConfig.Flags.bIsDHCPEnabled)
+			{
+				if(g_DhcpRenew == TRUE)
+				{
+					g_DhcpRenew = FALSE;
+					AppConfig.MyIPAddr.Val = AppConfig.DefaultIPAddr.Val;
+					AppConfig.MyMask.Val = AppConfig.DefaultMask.Val;
+					AppConfig.Flags.bInConfigMode = TRUE;
+					DHCPInit(0);
 					g_DhcpRetryTimer = (UINT32)TickGet();
-        		} else {
-        			if (g_DhcpRetryTimer && TickGet() - g_DhcpRetryTimer >= TICKS_PER_SECOND * 8) {
+				} else {
+					if (g_DhcpRetryTimer && TickGet() - g_DhcpRetryTimer >= TICKS_PER_SECOND * 8) {
 						DHCPInit(0);
 						g_DhcpRetryTimer = (UINT32)TickGet();
-        			}
-        		}
-        	
-        		// DHCP must be called all the time even after IP configuration is
-        		// discovered.
-        		// DHCP has to account lease expiration time and renew the configuration
-        		// time.
-        		DHCPTask();
-        		
-        		if(DHCPIsBound(0)) {
-        			AppConfig.Flags.bInConfigMode = FALSE;
-					g_DhcpRetryTimer = 0;
-        		}
-        	}
-    	#endif // STACK_USE_DHCP_CLIENT
-        
-    #endif // WF_CS_TRIS
+					}
+				}
 
+				// DHCP must be called all the time even after IP configuration is
+				// discovered.
+				// DHCP has to account lease expiration time and renew the configuration
+				// time.
+				DHCPTask();
+
+				if(DHCPIsBound(0)) {
+					AppConfig.Flags.bInConfigMode = FALSE;
+					g_DhcpRetryTimer = 0;
+				}
+			}
+		#endif // STACK_USE_DHCP_CLIENT
+
+	#endif // WF_CS_TRIS
 
 	#if defined(STACK_USE_DHCP_CLIENT) && !defined(WF_CS_TRIS)
 	// Normally, an application would not include  DHCP module
@@ -302,16 +300,14 @@ void StackTask(void)
 	}
 	#endif
 	
-
-    #if defined (STACK_USE_AUTO_IP)
-    AutoIPTasks();
-    #endif
+	#if defined (STACK_USE_AUTO_IP)
+	AutoIPTasks();
+	#endif
 
 	#if defined(STACK_USE_TCP)
 	// Perform all TCP time related tasks (retransmit, send acknowledge, close connection, etc)
 	TCPTick();
 	#endif
-
 
 	#if defined(STACK_USE_UDP)
 	UDPTask();
@@ -365,7 +361,7 @@ void StackTask(void)
 			case MAC_ARP:
 				ARPProcess();
 				break;
-	
+
 			case MAC_IP:
 				if(!IPGetHeader(&tempLocalIP, &remoteNode, &cIPFrameType, &dataCount))
 					break;
@@ -393,7 +389,7 @@ void StackTask(void)
 					if( (tempLocalIP.Val == AppConfig.MyIPAddr.Val) ||
 						(tempLocalIP.Val == 0xFFFFFFFF) ||
 #if defined(STACK_USE_ZEROCONF_LINK_LOCAL) || defined(STACK_USE_ZEROCONF_MDNS_SD)
-                                                (tempLocalIP.Val == 0xFB0000E0) ||
+						(tempLocalIP.Val == 0xFB0000E0) ||
 #endif
 						(tempLocalIP.Val == ((AppConfig.MyIPAddr.Val & AppConfig.MyMask.Val) | ~AppConfig.MyMask.Val)))
 					{
@@ -446,59 +442,59 @@ void StackApplications(void)
 	#if defined(STACK_USE_HTTP2_SERVER)
 	HTTPServer();
 	#endif
-	
+
 	#if defined(STACK_USE_FTP_SERVER) && defined(STACK_USE_MPFS2)
 	FTPServer();
 	#endif
-	
+
 	#if defined(STACK_USE_SNMP_SERVER)
 	SNMPTask();
 	#endif
-	
+
 	#if defined(STACK_USE_ANNOUNCE)
 	DiscoveryTask();
 	#endif
-	
+
 	#if defined(STACK_USE_NBNS)
 	NBNSTask();
 	#endif
-	
+
 	#if defined(STACK_USE_DHCP_SERVER)
 	DHCPServerTask();
 	#endif
-	
+
 	#if defined(STACK_USE_DNS_SERVER)
 	DNSServerTask();
 	#endif
-	
+
 	#if defined (STACK_USE_DYNAMICDNS_CLIENT)
 	DDNSTask();
 	#endif
-	
+
 	#if defined(STACK_USE_TELNET_SERVER)
 	TelnetTask();
 	#endif
-	
+
 	#if defined(STACK_USE_REBOOT_SERVER)
 	RebootTask();
 	#endif
-	
+
 	#if defined(STACK_USE_SNTP_CLIENT)
 	SNTPClient();
 	#endif
-	
+
 	#if defined(STACK_USE_UDP_PERFORMANCE_TEST)
 	UDPPerformanceTask();
 	#endif
-	
+
 	#if defined(STACK_USE_TCP_PERFORMANCE_TEST)
 	TCPPerformanceTask();
 	#endif
-	
+
 	#if defined(STACK_USE_SMTP_CLIENT)
 	SMTPTask();
 	#endif
-	
+
 	#if defined(STACK_USE_UART2TCP_BRIDGE)
 	UART2TCPBridgeTask();
 	#endif
@@ -507,11 +503,8 @@ void StackApplications(void)
 #if defined(WF_CS_TRIS) && defined(STACK_USE_DHCP_CLIENT)
 void RenewDhcp(void)
 {
-    g_DhcpRenew = TRUE;
-    SetDhcpProgressState();
-}    
-    
+	g_DhcpRenew = TRUE;
+	SetDhcpProgressState();
+}
+
 #endif
-
-
-

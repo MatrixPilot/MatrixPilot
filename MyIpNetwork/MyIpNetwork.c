@@ -1,13 +1,12 @@
-
-#ifndef _MYIPNETWORK_C_
-#define _MYIPNETWORK_C_
-
+//#ifndef _MYIPNETWORK_C_
+//#define _MYIPNETWORK_C_
 
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "HardwareProfile.h"
 #include "MyIpData.h"
 #include "TCPIP Stack/TCPIP.h"
+#include "MySockets.h"
 APP_CONFIG AppConfig;
 
 
@@ -48,6 +47,7 @@ void init_MyIpNetwork(void)
     // Initialize application specific hardware
     InitializeBoard();
     TickInit();
+
     #if defined(STACK_USE_MPFS2)
     MPFSInit();
     #endif
@@ -56,7 +56,8 @@ void init_MyIpNetwork(void)
     InitAppConfig();
     // Initialize core stack layers (MAC, ARP, TCP, UDP) and
     // application modules (HTTP, SNMP, etc.)
-    StackInit();
+//    StackInit();
+    StackInit(getMySocketCount(), getMySocketInitializer(0));
 
     #if defined(WF_CS_TRIS)
     #if defined(DERIVE_KEY_FROM_PASSPHRASE_IN_HOST)
@@ -566,4 +567,4 @@ void ServiceMyIpNetwork(void)
 }
 
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-#endif // _MYIPNETWORK_C_
+//#endif // _MYIPNETWORK_C_

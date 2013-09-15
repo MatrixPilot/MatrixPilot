@@ -234,7 +234,7 @@
 		defined(STACK_USE_UDP_PERFORMANCE_TEST) || \
 		defined(STACK_USE_SNTP_CLIENT) || \
 		defined(STACK_USE_BERKELEY_API)
-		if !defined(STACK_USE_UDP)
+		#if !defined(STACK_USE_UDP)
 			#define STACK_USE_UDP
 		#endif
 	#endif
@@ -283,6 +283,7 @@
 		#endif
 	#endif
 
+#include "../Sockets.h"
 #include "TCPIP Stack/StackTsk.h"
 #include "TCPIP Stack/Helpers.h"
 #include "TCPIP Stack/Delay.h"
@@ -324,6 +325,7 @@
 #endif
 
 #if defined(STACK_USE_TCP)
+//    #include "../Sockets.h"
 	#include "TCPIP Stack/TCP.h"
 #endif
 

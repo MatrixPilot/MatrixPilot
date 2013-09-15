@@ -3,6 +3,7 @@
 
 #include "defines.h"
 #include "TCPIP Stack/TCPIP.h"
+#include "Sockets.h"
 #include "MySockets.h"
 /*
 	// Define names of socket types
@@ -158,7 +159,6 @@
 			//{TCP_PURPOSE_BERKELEY_CLIENT, TCP_ETH_RAM, 125, 100},
 		};
 		#define END_OF_TCP_CONFIGURATION
-
 
 WORD getMySocketCount(void)
 {

@@ -22,16 +22,7 @@
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "TCPIP Stack/TCPIP.h"
-#include "../MyIpNetwork/MySockets.h"
+//#include "../MyIpNetwork/MySockets.h"
 
-WORD getSocketCount(void)
-{
-	return getMySocketCount();
-}
-
-TCPSocketInitializer_t* getSocketInitializer(WORD i)
-{
-	return getMySocketInitializer(i);
-}
 
 #endif // NETWORK_INTERFACE

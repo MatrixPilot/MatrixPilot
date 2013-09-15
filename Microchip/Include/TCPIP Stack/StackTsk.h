@@ -136,11 +136,12 @@ typedef struct __attribute__((__packed__)) appConfigStruct
 } APP_CONFIG;
 
 #ifndef THIS_IS_STACK_APPLICATION
-    extern APP_CONFIG AppConfig;
+	extern APP_CONFIG AppConfig;
 #endif
 
 
-void StackInit(void);
+void StackInit(BYTE numSockets, TCPSocketInitializer_t* pTCPSocketInitializer);
+//void StackInit(void);
 void StackTask(void);
 void StackApplications(void);
 #endif

@@ -207,13 +207,15 @@ static WORD NextPort __attribute__((persistent));	// Tracking variable for next 
 	TCB Definitions
   ***************************************************************************/
 
-WORD getSocketCount(void);
-TCPSocketInitializer_t* getSocketInitializer(WORD i);
+//WORD getSocketCount(void);
+//TCPSocketInitializer_t* getSocketInitializer(WORD i);
 
 // Determines the number of defined TCP sockets
 //#define TCP_SOCKET_COUNT	(sizeof(TCPSocketInitializer)/sizeof(TCPSocketInitializer[0]))
 #define TCP_SOCKET_COUNT_MAX    20
-#define TCP_SOCKET_COUNT        getSocketCount()
+//#define TCP_SOCKET_COUNT        getSocketCount()
+BYTE tcp_socket_count = 0;
+#define TCP_SOCKET_COUNT        tcp_socket_count
 
 
 #if defined(HI_TECH_C)
@@ -375,7 +377,8 @@ static void SyncTCB(void)
   Remarks:
 	This function is called only one during lifetime of the application.
   ***************************************************************************/
-void TCPInit(void)
+void TCPInit(BYTE numSockets, TCPSocketInitializer_t* pTCPSocketInitializer)
+//void TCPInit(void)
 {
 	BYTE i;
 	BYTE vSocketsAllocated;
@@ -410,13 +413,15 @@ void TCPInit(void)
 	
 	// Allocate all socket FIFO addresses
 	vSocketsAllocated = 0;
-	for(i = 0; i < TCP_SOCKET_COUNT; i++)
+	tcp_socket_count = numSockets;
+//	for(i = 0; i < TCP_SOCKET_COUNT; i++)
+	for(i = 0; i < numSockets; i++)
 	{
 		// Generate all needed sockets of each type (TCP_PURPOSE_*)
 		SyncTCBStub(i);
 	
-		TCPSocketInitializer_t* pSockInit = getSocketInitializer(i);
-
+//		TCPSocketInitializer_t* pSockInit = getSocketInitializer(i);
+		TCPSocketInitializer_t* pSockInit = pTCPSocketInitializer + i * sizeof(TCPSocketInitializer_t);
 		vMedium = pSockInit->vMemoryMedium;
 		wTXSize = pSockInit->wTXBufferSize;
 		wRXSize = pSockInit->wRXBufferSize;

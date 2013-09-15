@@ -4,13 +4,51 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>../../Microchip/Include/TCPIP Stack/AES.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/AES_CBC.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/AES_CFB.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/AES_CTR.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/AES_ECB.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/AES_ECB_PIC32.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/AES_OFB.h</itemPath>
+      <logicalFolder name="f5" displayName="AES Files" projectFiles="true">
+        <itemPath>../../Microchip/Include/TCPIP Stack/AES.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/AES_CBC.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/AES_CFB.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/AES_CTR.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/AES_ECB.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/AES_ECB_PIC32.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/AES_OFB.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/aes_pic24f.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f1" displayName="Configuration Files" projectFiles="true">
+        <itemPath>../../Microchip/HardwareProfile.h</itemPath>
+        <itemPath>../../Microchip/NetConfig.h</itemPath>
+        <itemPath>../../Microchip/TCPIPConfig.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="ENC Files" projectFiles="true">
+        <itemPath>../../Microchip/Include/TCPIP Stack/ENC28J60.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/ENCX24J600.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="Ethernet Files" projectFiles="true">
+        <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhy.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyDP83640.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyDP83848.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyRegs.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhySMSC8700.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhySMSC8720.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/ETH97J60.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/eth_pic32_ext_phy_rtl8201FL.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="WiFi Files" projectFiles="true">
+        <itemPath>../../Microchip/Include/TCPIP Stack/WF_pbkdf2.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFApi.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFConsole.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIfconfig.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIwconfig.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIwpriv.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleMsgHandler.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleMsgs.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFDebugStrings.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFDriverPrv_24G.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFEasyConfig.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFMac.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFMgmtMsg.h</itemPath>
+        <itemPath>../../Microchip/Include/TCPIP Stack/WFRaw_24G.h</itemPath>
+      </logicalFolder>
       <itemPath>../../Microchip/Include/TCPIP Stack/ARCFOUR.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/ARP.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/Announce.h</itemPath>
@@ -21,15 +59,6 @@
       <itemPath>../../Microchip/Include/TCPIP Stack/DNS.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/Delay.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/DynDNS.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ENC28J60.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ENCX24J600.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ETH97J60.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhy.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyDP83640.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyDP83848.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhyRegs.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhySMSC8700.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/ETHPIC32ExtPhySMSC8720.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/FTP.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/FileSystem.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/HTTP2.h</itemPath>
@@ -37,7 +66,6 @@
       <itemPath>../../Microchip/Include/TCPIP Stack/Helpers.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/ICMP.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/IP.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/LCDBlocking.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/MAC.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/MPFS2.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/NBNS.h</itemPath>
@@ -63,27 +91,11 @@
       <itemPath>../../Microchip/Include/TCPIP Stack/UART2TCPBridge.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/UDP.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/UDPPerformanceTest.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFApi.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsole.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIfconfig.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIwconfig.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleIwpriv.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleMsgHandler.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFConsoleMsgs.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFDebugStrings.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFDriverPrv_24G.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFEasyConfig.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFMac.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFMgmtMsg.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WFRaw_24G.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/WF_pbkdf2.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/XEEPROM.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/ZeroconfHelper.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/ZeroconfLinkLocal.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/ZeroconfMulticastDNS.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/_HTTP2.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/aes_pic24f.h</itemPath>
-      <itemPath>../../Microchip/Include/TCPIP Stack/eth_pic32_ext_phy_rtl8201FL.h</itemPath>
       <itemPath>../../Microchip/Include/TCPIP Stack/regdef.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -148,6 +160,7 @@
   <sourceRootList>
     <Elem>../Microchip/TCPIP Stack</Elem>
     <Elem>../Microchip/Include/TCPIP Stack</Elem>
+    <Elem>../../Microchip</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

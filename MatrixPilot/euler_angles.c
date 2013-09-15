@@ -24,6 +24,7 @@
 
 #include "defines.h"
 #include "euler_angles.h"
+#include "../libDCM/mathlibNAV.h"
 #include "../libUDB/magnetometerOptions.h"
 
 /**
