@@ -262,7 +262,11 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _T1Interrupt(void) {
     _T1IF = 0; // clear the interrupt
 
 //    _LATD6 = 1;
-
+#if AIRFRAME_TYPE != AIRFRAME_MULTI
+    // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
+    udb_set_dc();
+#endif
+    
     if (++telCounter >= (HEARTBEAT_HZ / TELEMETRY_HZ)) {
         telCounter = 0;
         // 32 bit counter TMR8/9 is already off so the following 5 lines execute
