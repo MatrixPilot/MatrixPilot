@@ -26,7 +26,7 @@
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 
-#include "options.h"
+#include "../Configuration/options.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type

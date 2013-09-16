@@ -21,6 +21,11 @@
 
 // used for the UDB4
 
+//#define VREF
+
+#define SCALEGYRO           4.95
+#define SCALEACCEL          2.64
+
 #define xrateBUFF           2
 #define yrateBUFF           1
 #define zrateBUFF           3
@@ -32,17 +37,16 @@
 #define analogInput3BUFF    9
 #define analogInput4BUFF    10
 
+#define A_VOLT_BUFF         7       // V, pin label Bat Volt
+#define A_AMPS_BUFF         8       // I, pin label CS Curr
+#define A_RSSI_BUFF         9       // RS, pin label RSSI
+
 #define XRATE_SIGN          -
 #define YRATE_SIGN          -
 #define ZRATE_SIGN          -
 #define XACCEL_SIGN         -
 #define YACCEL_SIGN         -
 #define ZACCEL_SIGN         +
-
-//#define VREF
-
-#define SCALEGYRO           4.95
-#define SCALEACCEL          2.64
 
 // Max inputs and outputs
 #define MAX_INPUTS          8

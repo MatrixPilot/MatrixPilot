@@ -1,63 +1,22 @@
-#ifndef _MYSOCKETS_C_
-#define _MYSOCKETS_C_
-
-#include "defines.h"
+#include "MyIpConfig.h"
 #include "TCPIP Stack/TCPIP.h"
 #include "Sockets.h"
-#include "MySockets.h"
-/*
-	// Define names of socket types
-	#define TCP_SOCKET_TYPES
-		#define TCP_PURPOSE_GENERIC_TCP_CLIENT 0
-		#define TCP_PURPOSE_GENERIC_TCP_SERVER 1
-		#define TCP_PURPOSE_TELNET 2
-		#define TCP_PURPOSE_FTP_COMMAND 3
-		#define TCP_PURPOSE_FTP_DATA 4
-		#define TCP_PURPOSE_TCP_PERFORMANCE_TX 5
-		#define TCP_PURPOSE_TCP_PERFORMANCE_RX 6
-		#define TCP_PURPOSE_UART_2_TCP_BRIDGE 7
-		#define TCP_PURPOSE_HTTP_SERVER 8
-		#define TCP_PURPOSE_DEFAULT 9
-		#define TCP_PURPOSE_BERKELEY_SERVER 10
-		#define TCP_PURPOSE_BERKELEY_CLIENT 11
-		#define TCP_PURPOSE_MYIPDATA_UART1 12
-		#define TCP_PURPOSE_MYIPDATA_UART2 13
-		#define TCP_PURPOSE_MYIPDATA_FLYBYWIRE 14
-		#define TCP_PURPOSE_MYIPDATA_MAVLINK 15
-		#define TCP_PURPOSE_MYIPDATA_DEBUG 16
-		#define TCP_PURPOSE_MYIPDATA_ADSB 17
-		#define TCP_PURPOSE_MYIPDATA_LOGO 18
-		#define TCP_PURPOSE_MYIPDATA_CAM_TRACK 19
-		#define TCP_PURPOSE_MYIPDATA_GPSTEST 20
-		#define TCP_PURPOSE_MYIPDATA_PWMREPORT 21
-		#define TCP_PURPOSE_MYIPDATA_XPLANE 22
-		#define TCP_PURPOSE_MYIPDATA_TELEMETRY_EXTRA 23
-		#define TCP_PURPOSE_MYIPDATA_GROUND_STATION 24
-		#define TCP_PURPOSE_MYIPDATA_AIRCRAFT_CONFIG 25
-	#define END_OF_TCP_SOCKET_TYPES
+#include "MyIpSockets.h"
 
-		typedef struct
-		{
-			BYTE vSocketPurpose;
-			BYTE vMemoryMedium;
-			WORD wTXBufferSize;
-			WORD wRXBufferSize;
-		} TCPSocketInitializer_t;
+// Define what types of sockets are needed, how many of
+// each to include, where their TCB, TX FIFO, and RX FIFO
+// should be stored, and how big the RX and TX FIFOs should
+// be.  Making this initializer bigger or smaller defines
+// how many total TCP sockets are available.
+//
+// Each socket requires up to 56 bytes of PIC RAM and
+// 48+(TX FIFO size)+(RX FIFO size) bytes of TCP_*_RAM each.
+//
+// Note: The RX FIFO must be at least 1 byte in order to
+// receive SYN and FIN messages required by TCP.  The TX
+// FIFO can be zero if desired.
+#define TCP_CONFIGURATION
 
- */
-		// Define what types of sockets are needed, how many of
-		// each to include, where their TCB, TX FIFO, and RX FIFO
-		// should be stored, and how big the RX and TX FIFOs should
-		// be.  Making this initializer bigger or smaller defines
-		// how many total TCP sockets are available.
-		//
-		// Each socket requires up to 56 bytes of PIC RAM and
-		// 48+(TX FIFO size)+(RX FIFO size) bytes of TCP_*_RAM each.
-		//
-		// Note: The RX FIFO must be at least 1 byte in order to
-		// receive SYN and FIN messages required by TCP.  The TX
-		// FIFO can be zero if desired.
-		#define TCP_CONFIGURATION
 //		ROM struct
 //		{
 //			BYTE vSocketPurpose;
@@ -66,7 +25,7 @@
 //			WORD wRXBufferSize;
 //		} TCPSocketInitializer[] =
 
-		TCPSocketInitializer_t TCPSocketInitializer[] =
+TCPSocketInitializer_t TCPSocketInitializer[] =
 		{
 		#if (NETWORK_USE_UART1 == 1)
 			{TCP_PURPOSE_MYIPDATA_UART1, TCP_ETH_RAM, BUFFER_BIG, BUFFER_BIG},
@@ -78,7 +37,7 @@
 			{TCP_PURPOSE_MYIPDATA_UART2, TCP_ETH_RAM, BUFFER_BIG, BUFFER_SMALL},
 		#endif
 		
-		#if (NETWORK_USE_FLYBYWIRE == 1)
+		#if (NETWORK_USE_FLYBYDATALINK == 1)
 			{TCP_PURPOSE_MYIPDATA_FLYBYWIRE, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_SMALL},
 			{TCP_PURPOSE_MYIPDATA_FLYBYWIRE, TCP_ETH_RAM, BUFFER_SMALL, BUFFER_SMALL},
 		#endif
@@ -157,8 +116,8 @@
 			//{TCP_PURPOSE_BERKELEY_SERVER, TCP_ETH_RAM, 25, 20},
 			//{TCP_PURPOSE_BERKELEY_SERVER, TCP_ETH_RAM, 25, 20},
 			//{TCP_PURPOSE_BERKELEY_CLIENT, TCP_ETH_RAM, 125, 100},
-		};
-		#define END_OF_TCP_CONFIGURATION
+};
+#define END_OF_TCP_CONFIGURATION
 
 WORD getMySocketCount(void)
 {
@@ -169,5 +128,3 @@ TCPSocketInitializer_t* getMySocketInitializer(WORD i)
 {
 	return &TCPSocketInitializer[i];
 }
-
-#endif // _MYSOCKETS_C_

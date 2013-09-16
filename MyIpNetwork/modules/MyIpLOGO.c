@@ -1,15 +1,16 @@
 #ifndef _MYIPLOGO_C_
 #define _MYIPLOGO_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1) && (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpLOGO.h"
-#include "euler_angles.h"
+#include "../MatrixPilot/euler_angles.h"
 #include "MyIpHelpers.h"
-#include "flightplan-logoMsgFormat.h"
+#include "../MatrixPilot/flightplan-logoMsgFormat.h"
+#include "../Configuration/telemetry_config.h"
 
 //////////////////////////
 // Module Variables

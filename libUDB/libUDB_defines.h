@@ -222,12 +222,6 @@ struct udb_flag_bits {
 extern int16_t magMessage;
 extern int16_t vref_adj;
 
-#define NETWORK_INTERFACE_NONE                  0
-#define NETWORK_INTERFACE_WIFI_MRF24WG          1
-#define NETWORK_INTERFACE_ETHERNET_ENC624J600   2
-#define NETWORK_INTERFACE_ETHERNET_ENC28J60     3
-
-
 typedef enum
 {
 	smUNKNOWN = 0,

@@ -1,14 +1,14 @@
 #ifndef _MYIPXPLANE_C_
 #define _MYIPXPLANE_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_XPLANE == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpXPlane.h"
 #include "MyIpHelpers.h"
-#include "euler_angles.h"
+#include "../MatrixPilot/euler_angles.h"
 #include <string.h>
 
 void CalculateGPS_Orientation(uint8_t select);

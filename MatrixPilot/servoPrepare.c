@@ -20,12 +20,10 @@
 
 
 #include "defines.h"
-#include "camera_config.h"
-
-#include "../libUDB/heartbeat.h"
-#include "../libUDB/osd.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
+#include "../libUDB/heartbeat.h"
+#include "../libUDB/osd.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -42,7 +40,7 @@ void init_servoPrepare(void) // initialize the PWM
 	int16_t i;
 
 #if (USE_NV_MEMORY == 1)
-	if(udb_skip_flags.skip_radio_trim == 1)
+	if (udb_skip_flags.skip_radio_trim == 1)
 		return;
 #endif
 
@@ -93,9 +91,7 @@ void dcm_servo_callback_prepare_outputs(void)
 		altitudeCntrl();
 		pitchCntrl();
 		servoMix();
-#if (USE_CAMERA_STABILIZATION == 1)
 		cameraCntrl();
-#endif
 		cameraServoMix();
 		updateTriggerAction();
 	}
@@ -107,12 +103,10 @@ void dcm_servo_callback_prepare_outputs(void)
 	
 	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 	{
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 		{
 			mavlink_output_40hz();
 		}
-#else
 		// This is a simple check to send telemetry at 8hz
 //		if (udb_heartbeat_counter % 5 == 0)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
@@ -120,7 +114,6 @@ void dcm_servo_callback_prepare_outputs(void)
 			flight_state_8hz();
 			serial_output_8hz();
 		}
-#endif
 	}
 
 	osd_run_step();

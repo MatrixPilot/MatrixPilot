@@ -1,21 +1,23 @@
 #ifndef _MYIPADSB_C_
 #define _MYIPADSB_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_ADSB == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpADSB.h"
-#include "euler_angles.h"
+#include "../MatrixPilot/euler_angles.h"
 #include "MyIpHelpers.h"
+#include "../Configuration/telemetry_config.h"
+#include "../libDCM/libDCM.h"
 
 //////////////////////////
 // Module Variables
 ROM uint8_t CALLSIGN[] = "CaBs-MatrixPilot";
 
 typedef struct {
-    int8_t callSign[sizeof (CALLSIGN)];
+    char callSign[sizeof (CALLSIGN)];
     int32_t gpsLat;
     int32_t gpsLong;
     int32_t heading;
@@ -27,7 +29,8 @@ typedef struct {
 uint32_t taskTimer1_ADSB[MAX_NUM_INSTANCES_OF_MODULES];
 MyIpADSBtype ADSB_logicalData;
 
-void MyIpOnConnect_ADSB(uint8_t s) {
+void MyIpOnConnect_ADSB(uint8_t s)
+{
     // Print any one-time connection annoucement text
     StringToSocket(s, "\r\nYou've connected to ADSB on "); // 33 chars
     StringToSocket(s, ID_LEAD_PILOT); // 15ish chars
@@ -37,7 +40,8 @@ void MyIpOnConnect_ADSB(uint8_t s) {
     MyIpData[s].sendPacket = TRUE; // send right away
 }
 
-void MyIpInit_ADSB(uint8_t s) {
+void MyIpInit_ADSB(uint8_t s)
+{
     // This gets called once for every socket we're configured to use for this module.
     uint8_t i = MyIpData[s].instance;
     taskTimer1_ADSB[i] = GenerateRandomDWORD() % (TICK_SECOND);
@@ -46,7 +50,8 @@ void MyIpInit_ADSB(uint8_t s) {
     memcpy(ADSB_logicalData.callSign, CALLSIGN, sizeof (CALLSIGN));
 }
 
-void MyIpService_ADSB(uint8_t s) {
+void MyIpService_ADSB(uint8_t s)
+{
     // don't bother queuing data if no one is listening
     if (FALSE == MyIpIsConnectedSocket(s))
         return;
@@ -79,7 +84,6 @@ void MyIpService_ADSB(uint8_t s) {
         ADSB_logicalData.climbRate = 156; //climb_gps.BB;
         // -------------------------------------------
 
-
         StringToSocket(s, ADSB_logicalData.callSign); ByteToSocket(s, ',');
         ltoaSocket(s, ADSB_logicalData.gpsLat); ByteToSocket(s, ',');
         ltoaSocket(s, ADSB_logicalData.gpsLong); ByteToSocket(s, ',');
@@ -87,12 +91,11 @@ void MyIpService_ADSB(uint8_t s) {
         ltoaSocket(s, ADSB_logicalData.altitude); ByteToSocket(s, ',');
         ltoaSocket(s, ADSB_logicalData.groundSpeed); ByteToSocket(s, ',');
         ltoaSocket(s, ADSB_logicalData.climbRate); StringToSocket(s, "\r\n");
-
     }
-
 }
 
-boolean MyIpThreadSafeSendPacketCheck_ADSB(uint8_t s, boolean doClearFlag) {
+boolean MyIpThreadSafeSendPacketCheck_ADSB(uint8_t s, boolean doClearFlag)
+{
     // since this data comes from, and goes to, the idle thread we
     // don't need to deal with any thread issues
     boolean sendpacket = MyIpData[s].sendPacket;
@@ -102,13 +105,15 @@ boolean MyIpThreadSafeSendPacketCheck_ADSB(uint8_t s, boolean doClearFlag) {
     return sendpacket;
 }
 
-int16_t MyIpThreadSafeReadBufferHead_ADSB(uint8_t s) {
+int16_t MyIpThreadSafeReadBufferHead_ADSB(uint8_t s)
+{
     // since this data comes from, and goes to, the idle thread we
     //  don't need to deal with any thread issues
     return MyIpData[s].buffer_head;
 }
 
-void MyIpProcessRxData_ADSB(uint8_t s) {
+void MyIpProcessRxData_ADSB(uint8_t s)
+{
     uint8_t rxData;
     boolean successfulRead;
 
@@ -119,7 +124,6 @@ void MyIpProcessRxData_ADSB(uint8_t s) {
         {
             successfulRead = UDPGet(&rxData);
         }
-
         if (successfulRead) {
             // do something with rxData
             // No Rx data parsing implemented
@@ -127,7 +131,5 @@ void MyIpProcessRxData_ADSB(uint8_t s) {
     } while (successfulRead);
 }
 
-
 #endif // #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_ADSB == 1)
 #endif // _MYIPADSB_C_
-

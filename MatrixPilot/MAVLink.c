@@ -38,6 +38,8 @@
 
 #include <string.h>
 #include "defines.h"
+#include "altitude_config.h"
+#include "telemetry_config.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
@@ -1894,5 +1896,11 @@ void mavlink_output_40hz(void)
 }
 
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
+
+#else
+
+void mavlink_output_40hz(void)
+{
+}
 
 #endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)

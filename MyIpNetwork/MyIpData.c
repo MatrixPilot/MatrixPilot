@@ -2,11 +2,11 @@
 #ifndef _MYIPDATA_C_
 #define _MYIPDATA_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "TCPIP Stack/TCPIP.h"
-#include "MySockets.h"
+#include "MyIpSockets.h"
 #include "MyIpData.h"
 
 #if (NETWORK_USE_UART1 == 1)
@@ -15,7 +15,7 @@
 #if (NETWORK_USE_UART2 == 1)
 #include "MyIpUART2.h"
 #endif
-#if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+#if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
 #include "MyIpFlyByWire.h"
 #endif
 #if (NETWORK_USE_MAVLINK == 1)
@@ -143,7 +143,7 @@ void InitMyIpData(void)
             break;
         #endif
 
-        #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+        #if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
         case eSourceFlyByWire:
             MyIpData[s].instance = instanceCount[eSourceFlyByWire]++;
             MyIpInit_FlyByWire(s);
@@ -275,7 +275,7 @@ int16_t MyIpThreadSafeReadBufferHead(const uint8_t s)
         break;
     #endif
 
-    #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+    #if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
     case eSourceFlyByWire:
         head = MyIpThreadSafeReadBufferHead_FlyByWire(s);
         break;
@@ -399,7 +399,7 @@ boolean MyIpThreadSafeSendPacketCheck(const uint8_t s, const boolean doClearFlag
         break;
     #endif
 
-    #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+    #if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
     case eSourceFlyByWire:
         sendpacket = MyIpThreadSafeSendPacketCheck_FlyByWire(s, doClearFlag);
         break;
@@ -495,7 +495,7 @@ void ServiceMyIpData(const uint8_t s)
         break;
     #endif
 
-    #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+    #if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
     case eSourceFlyByWire:
         MyIpService_FlyByWire(s);
         break;
@@ -835,7 +835,7 @@ void MyIpOnConnect(const uint8_t s)
         break;
     #endif
 
-    #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+    #if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
     case eSourceFlyByWire:
         MyIpData[s].buffer_tail = MyIpThreadSafeReadBufferHead_FlyByWire(s);
         MyIpOnConnect_FlyByWire(s);
@@ -945,7 +945,7 @@ void MyIpProcessRxData(const uint8_t s)
         break;
     #endif
 
-    #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+    #if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
     case eSourceFlyByWire:
         MyIpProcessRxData_FlyByWire(s);
         break;

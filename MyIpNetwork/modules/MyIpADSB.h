@@ -1,4 +1,3 @@
-
 #ifndef _MYIPADSB_H_
 #define _MYIPADSB_H_
 
@@ -10,4 +9,3 @@ void MyIpProcessRxData_ADSB(const uint8_t s);
 void MyIpOnConnect_ADSB(const uint8_t s);
 
 #endif // _MYIPADSB_H_
-

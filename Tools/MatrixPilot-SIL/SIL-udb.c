@@ -60,7 +60,7 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 #include <sys/time.h>
 #include <unistd.h>
 
-#endif
+#endif // WIN
 
 #include "libUDB.h"
 #include "magnetometer.h"

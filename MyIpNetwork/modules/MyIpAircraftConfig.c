@@ -1,7 +1,7 @@
 #ifndef _MYIPAIRCRAFTCONFIG_C_
 #define _MYIPAIRCRAFTCONFIG_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_AIRCRAFT_CONFIG == 1)
 
 #include "TCPIP Stack/TCPIP.h"
@@ -279,7 +279,7 @@ void SendOptionsH(const uint8_t s)
     StringToSocket(s, ",NETWORK_INTERFACE:"); itoaSocket(s, NETWORK_INTERFACE);
     StringToSocket(s, ",NETWORK_USE_UART1:"); itoaSocket(s, NETWORK_USE_UART1);
     StringToSocket(s, ",NETWORK_USE_UART2:"); itoaSocket(s, NETWORK_USE_UART2);
-    StringToSocket(s, ",NETWORK_USE_FLYBYWIRE:"); itoaSocket(s, NETWORK_USE_FLYBYWIRE);
+    StringToSocket(s, ",NETWORK_USE_FLYBYDATALINK:"); itoaSocket(s, NETWORK_USE_FLYBYDATALINK);
     StringToSocket(s, ",NETWORK_USE_MAVLINK:"); itoaSocket(s, NETWORK_USE_MAVLINK);
     StringToSocket(s, ",NETWORK_USE_DEBUG:"); itoaSocket(s, NETWORK_USE_DEBUG);
     StringToSocket(s, ",NETWORK_USE_ADSB:"); itoaSocket(s, NETWORK_USE_ADSB);

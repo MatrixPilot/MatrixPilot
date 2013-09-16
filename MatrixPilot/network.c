@@ -22,7 +22,7 @@
 #include "defines.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "TCPIP Stack/TCPIP.h"
-//#include "../MyIpNetwork/MySockets.h"
+//#include "../MyIpNetwork/MyIpSockets.h"
 
 
 #endif // NETWORK_INTERFACE

@@ -32,18 +32,14 @@
 //	angle of the vector from the origin to the location of the plane.
 
 //	The origin is recorded as the location of the plane during power up of the control.
+
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
-	uint16_t yawkpail;
-	uint16_t yawkprud;
-#elif ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-	uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
-	uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
-#else 
-	const uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
-	const uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
-#endif
+#endif // USE_CONFIGFILE
+
+uint16_t yawkpail;
+uint16_t yawkprud;
 
 struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };
@@ -57,13 +53,11 @@ int16_t desired_bearing_over_ground_vector[2];
 extern union longww IMUintegralAccelerationx;
 extern union longww IMUintegralAccelerationy;
 
-#if (USE_CONFIGFILE == 1)
 void init_navigation(void)
 {
 	uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
 	uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 }
-#endif
 
 static void setup_origin(void)
 {

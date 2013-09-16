@@ -26,30 +26,17 @@
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
+#endif // USE_CONFIGFILE
 
-	uint16_t yawkdrud;
-	uint16_t rollkprud;
-	uint16_t rollkdrud;
-	uint16_t hoveryawkp;
-	uint16_t hoveryawkd;
-#elif ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-	uint16_t yawkdrud         = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
-	uint16_t rollkprud        = (uint16_t)(ROLLKP_RUDDER*RMAX);
-	uint16_t rollkdrud        = (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
-	uint16_t hoveryawkp       = (uint16_t)(HOVER_YAWKP*RMAX);
-	uint16_t hoveryawkd       = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
-#else
-	const uint16_t yawkdrud   = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
-	const uint16_t rollkprud  = (uint16_t)(ROLLKP_RUDDER*RMAX);
-	const uint16_t rollkdrud  = (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
-	const uint16_t hoveryawkp = (uint16_t)(HOVER_YAWKP*RMAX);
-	const uint16_t hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
-#endif
+uint16_t yawkdrud;
+uint16_t rollkprud;
+uint16_t rollkdrud;
+uint16_t hoveryawkp;
+uint16_t hoveryawkd;
 
 void normalYawCntrl(void);
 void hoverYawCntrl(void);
 
-#if (USE_CONFIGFILE == 1)
 void init_yawCntrl(void)
 {
 	yawkdrud   = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
@@ -58,7 +45,6 @@ void init_yawCntrl(void)
 	hoveryawkp = (uint16_t)(HOVER_YAWKP*RMAX);
 	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
-#endif
 
 void yawCntrl(void)
 {

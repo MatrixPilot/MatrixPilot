@@ -20,6 +20,11 @@
 
 
 #include "defines.h"
+#include "altitude_config.h"
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#include "redef.h"
+#endif // USE_CONFIGFILE
 #include "../libDCM/mathlibNAV.h"
 #include <stdlib.h>
 
@@ -289,8 +294,7 @@ void process_instructions(void);
 
 
 ////
-
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1)
+//#if (USE_NETWORK != 0) && (NETWORK_USE_LOGO == 1)
 extern struct logoInstructionDef* getLogoMission(const uint8_t mission);
 extern uint8_t getLogoMissionLength(const uint8_t mission);
 extern uint8_t getLogoMissionIndex();
@@ -317,7 +321,7 @@ uint8_t getLogoCmdIndex(const uint8_t mission)
 void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd)
 {
 }
-#endif
+//#endif
 ////
 
 
@@ -478,7 +482,7 @@ void run_flightplan(void)
 
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
+		if (abs(IMUheight - goal.height) < ((int16_t)HEIGHT_MARGIN)) // reached altitude goal
 		{
 			process_instructions();
 		}

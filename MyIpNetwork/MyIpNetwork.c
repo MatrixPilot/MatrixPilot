@@ -1,12 +1,12 @@
 //#ifndef _MYIPNETWORK_C_
 //#define _MYIPNETWORK_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 #include "HardwareProfile.h"
 #include "MyIpData.h"
 #include "TCPIP Stack/TCPIP.h"
-#include "MySockets.h"
+#include "MyIpSockets.h"
 APP_CONFIG AppConfig;
 
 

@@ -72,6 +72,9 @@ void altitudeCntrl(void);
 void setTargetAltitude(int16_t targetAlt);
 
 void init_yawCntrl(void);void init_rollCntrl(void);void init_pitchCntrl(void);
+void init_airspeedCntrl(void);
+void init_altitudeCntrl(void);
+void init_altitudeCntrlVariable(void);
 
 
 // wind gain adjustment
@@ -140,7 +143,7 @@ void init_flightplan(int16_t flightplanNum);
 void init_flightmission(uint8_t mission, uint8_t startIndex);
 boolean use_fixed_origin(void);
 struct absolute3D get_fixed_origin(void);
-int32_t get_fixed_altitude(void);
+//int32_t get_fixed_altitude(void);
 void run_flightplan(void);
 
 void flightplan_live_begin(void);
@@ -158,7 +161,7 @@ void flightplan_live_commit(void);
 #define FP_WAYPOINTS                1
 #define FP_LOGO                     2
 
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_LOGO == 1) && (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#if (USE_NETWORK != 0) && (NETWORK_USE_LOGO == 1) && (FLIGHT_PLAN_TYPE == FP_LOGO)
 // instruction list loaded from remote connection
 #define LOGO_USER_MISSION_MAX             (20)
 #define LOGO_USER_INSTRUCTIONS_MAX_LENGTH (50)
@@ -167,7 +170,7 @@ uint8_t getLogoMissionLength(const uint8_t mission);
 uint8_t getLogoMissionIndex();
 uint8_t getLogoCmdIndex(const uint8_t mission);
 void setLogoCmd(const uint8_t mission, const uint8_t cmdIndex, struct logoInstructionDef cmd);
-#endif
+//#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////

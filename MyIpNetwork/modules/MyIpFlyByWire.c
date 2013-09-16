@@ -2,8 +2,8 @@
 #ifndef _MYIPFLYBYWIRE_C_
 #define _MYIPFLYBYWIRE_C_
 
-#include "defines.h"
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 1)
+#include "MyIpConfig.h"
+#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"

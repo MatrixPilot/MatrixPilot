@@ -22,9 +22,10 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#if (USE_NETWORK != 0)
 #include "../MyIpNetwork/MyIpData.h"
 #include "../MyIpNetwork/MyIpHelpers.h"
+#include "../MyIpNetwork/MyIpConfig.h"
 #endif
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
@@ -119,7 +120,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	if (txchar != -1)
 	{
 		U1TXREG = (uint8_t)txchar;
-		#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART1 == 1)
+		#if (USE_NETWORK != 0) && (NETWORK_USE_UART1 == 1)
 		ByteToSrc(eSourceUART1, txchar);
 		// TODO figure out a better way to trigger this for binary data
 		if ('\n' == txchar)
@@ -226,7 +227,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 	if (txchar != -1)
 	{
 		U2TXREG = (uint8_t)txchar;
-		#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
+		#if (USE_NETWORK != 0) && (NETWORK_USE_UART2 == 1)
 		ByteToSrc(eSourceUART2, txchar);
 		// TODO figure out a better way to trigger this for binary data
 		if ('\n' == txchar)

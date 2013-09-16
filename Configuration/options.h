@@ -43,13 +43,15 @@
 #include "gains_config.h" // or tuning.h
 
 // optional camera setup
-#include "camera_config.h"
+//#include "camera_config.h"
 
 // TCP/IP network configuration and options
-#include "network_config.h"
+//#include "network_config.h"
+
+//#include "telemetry_config.h"
 
 // Want to integrate this with existing mavlink_options.h
-#include "mavlink_config.h" // and the other consideration is telemetry.h
+//#include "mavlink_config.h" // and the other consideration is telemetry.h
 
 ////////////////////////////////////////////////////////////////////////////////
 // Developers may wish to override options above in a local working copy

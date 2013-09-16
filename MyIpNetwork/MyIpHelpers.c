@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
 
 #include "MyIpHelpers.h"

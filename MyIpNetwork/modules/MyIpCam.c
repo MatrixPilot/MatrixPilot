@@ -1,13 +1,16 @@
 #ifndef _MYIPCAM_TRACKING_C_
 #define _MYIPCAM_TRACKING_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
+#include "../Configuration/camera_config.h"
+#include "../Configuration/telemetry_config.h"
+
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpCam.h"
-#include "euler_angles.h"
+#include "../MatrixPilot/euler_angles.h"
 #include "MyIpHelpers.h"
 
 //////////////////////////

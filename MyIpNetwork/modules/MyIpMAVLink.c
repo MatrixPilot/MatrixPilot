@@ -1,13 +1,15 @@
 #ifndef _MYIPMAVLink_C_
 #define _MYIPMAVLink_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_MAVLINK == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpMAVLink.h"
 #include "MyIpHelpers.h"
+#include "../Configuration/telemetry_config.h"
+//#include "../libDCM/libDCM.h"
 
 //////////////////////////////////////
 // Local Functions

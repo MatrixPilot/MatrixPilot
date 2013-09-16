@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "defines.h" 
+#include "defines.h"
 #include "camera_config.h"
 
 // servo_ratios are used to convert degrees of rotation into servo pulse code lengths
@@ -59,7 +59,7 @@ int16_t cam_test_timer          = CAM_TEST_TIMER;
 
 #if (CAM_PITCH_TEST_GRANULARITY == 1) // Used to test the smallest movement possible by pitch servo.
 int16_t pitch_servo_out = 500;
-uint8_t  counter_slow_down = 40;
+uint8_t counter_slow_down = 40;
 #endif
 
 int32_t cam_pitchServoLimit(int32_t pwm_pulse)
@@ -223,7 +223,7 @@ void cameraCntrl(void)
 		cam.WW = __builtin_mulss(cam_yaw16 , yaw_servo_high_ratio) + 0x8000; 		
 		cam_yaw_servo_pwm_delta = cam._.W1 - yaw_offset_centred_pwm; 	
 	}
-#endif
+#endif // USE_CAMERA_STABILIZATION
 }
 
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
@@ -254,7 +254,6 @@ void camera_live_received_byte(uint8_t inbyte)
 		cam_inject_pos++;
 	}
 }
-
 
 void camera_live_commit(void)
 {

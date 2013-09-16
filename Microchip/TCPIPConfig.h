@@ -51,7 +51,6 @@
 
 #include "HardwareProfile.h"
 #include "Compiler.h"
-//#include "MyIpData.h"
 //#include "NetConfig.h"
 
 #define GENERATED_BY_TCPIPCONFIG "Version 1.0.3383.23374"

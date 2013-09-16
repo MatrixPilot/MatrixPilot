@@ -20,7 +20,7 @@ MyIpDataType MyIpData[] __attribute__ ((far)) =
       { {},0,0,0,0,0,0,0,0,       eSourceUART2,eTCP, NULL, MYIP_UART2_PORT_1},
 //    { {},0,0,0,0,0,0,0,0,       eSourceUART2,eUDP, "192.168.1.109", MYIP_QGROUND_CONTROL_UDP_PORT},
     #endif
-    #if (NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED)
+    #if (NETWORK_USE_FLYBYDATALINK == 1) && (FLYBYWIRE_ENABLED)
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, "76.102.60.245", MYIP_FLYBYWIRE_PORT_1},
     //{ {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eTCP, NULL, MYIP_FLYBYWIRE_PORT_1},
 //    { {},0,0,0,0,0,0,0,0,     eSourceFlyByWire,eUDP, "192.168.1.108", MYIP_FLYBYWIRE_PORT_1}, //Phil AlienWare PC

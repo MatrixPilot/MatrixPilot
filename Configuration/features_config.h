@@ -62,15 +62,15 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED             AH_PITCH_ONLY
-#define ALTITUDEHOLD_WAYPOINT               AH_FULL
+//#define ALTITUDEHOLD_STABILIZED             AH_PITCH_ONLY
+//#define ALTITUDEHOLD_WAYPOINT               AH_FULL
 
 // Speed Control
 // If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
-#define SPEED_CONTROL                       0
-#define DESIRED_SPEED                       50.00 // meters/second
+//#define SPEED_CONTROL                       0
+//#define DESIRED_SPEED                       50.00 // meters/second
  */
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -168,6 +168,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable the new power saving idle mode of the MCU during mainloop
 #define USE_MCU_IDLE                        1
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Optionally enable TCP/IP network support
+#define USE_NETWORK                         1
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Fly-By-Datalink Configure
+// This allows the FlyByDatalink module to use either IP or the UART Rx pins for flight control.
+#define FLY_BY_DATALINK_ENABLED             0
 
 
 ////////////////////////////////////////////////////////////////////////////////

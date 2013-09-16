@@ -1,7 +1,7 @@
 #ifndef _MYIPTELEMETRYEXTRA_C_
 #define _MYIPTELEMETRYEXTRA_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_TELEMETRY_EXTRA == 1)
 
 #include "TCPIP Stack/TCPIP.h"
@@ -9,6 +9,8 @@
 #include "MyIpHelpers.h"
 #include "../libUDB/libUDB_internal.h"
 #include "../libDCM/libDCM_internal.h"
+#include "../Configuration/telemetry_config.h"
+#include "../MatrixPilot/defines.h"
 
 //////////////////////////
 // Module Variables

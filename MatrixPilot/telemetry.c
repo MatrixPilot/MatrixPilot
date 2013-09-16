@@ -21,6 +21,9 @@
 
 #include "defines.h"
 #include "osd_config.h"
+#include "camera_config.h"
+#include "altitude_config.h"
+#include "telemetry_config.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif

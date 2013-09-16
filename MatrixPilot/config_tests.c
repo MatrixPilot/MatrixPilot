@@ -26,9 +26,9 @@
 #include "altitude_config.h"
 #include "simulate_config.h"
 #include "gains_config.h"
-#include "camera_config.h"
-#include "network_config.h"
-#include "mavlink_config.h"
+//#include "camera_config.h"
+//#include "network_config.h"
+#include "telemetry_config.h"
 #include "osd_config.h"
 
 // This file should generate no code.
@@ -157,10 +157,10 @@
 
 
 // UDB4
-#if ((NUM_ANALOG_INPUTS > 4) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("Only 4 extra Analog Inputs are available the UDB.")
+#if (((NUM_ANALOG_INPUTS-analogInput1BUFF) > 4) && (BOARD_TYPE == UDB4_BOARD))
+	#error("Only 4 extra Analog Inputs are available the UDB4.")
 #endif
-
+/*
 // Check Analog Inputs
 #if (ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
 	#error("ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
@@ -177,7 +177,7 @@
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
 	#error("ANALOG_AIRSPEED_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
-
+ */
 // Ensure a valid GPS option has been specified
 #if (GPS_TYPE != GPS_STD && GPS_TYPE != GPS_UBX_2HZ && \
      GPS_TYPE != GPS_UBX_4HZ && GPS_TYPE != GPS_MTEK && \
@@ -243,23 +243,23 @@
 	#error("USE_USB only supported on AUAV3 board"
 #endif
 
-#ifndef NETWORK_INTERFACE
-	#error ("NETWORK_INTERFACE must be assigned in options.h. If not used, set to NETWORK_INTERFACE_NONE")
-#elif (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
-	
-	#if ((NETWORK_INTERFACE != NETWORK_INTERFACE_WIFI_MRF24WG) && \
-		(NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC624J600) && \
-		(NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC28J60))
-		#error("NETWORK_INTERFACE is configured incorrectly.")
-	#elif (BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD) && (BOARD_TYPE != AUAV3_BOARD)
-		#error("The IP Stack and WiFi interface requires a UDB4_BOARD")
-	#elif ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
-		#error("For Network Cam Tracking to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
-	#elif ((NETWORK_USE_FLYBYWIRE == 1) && (FLYBYWIRE_ENABLED == 0))
-		#error("For Network FlyByWire to work you must enable FLYBYWIRE_ENABLED in options.h")
-	#endif
-#endif
-
+/*
+//#ifndef NETWORK_INTERFACE
+//	#error ("NETWORK_INTERFACE must be assigned in options.h. If not used, set to NETWORK_INTERFACE_NONE")
+//#elif (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+//	#if ((NETWORK_INTERFACE != NETWORK_INTERFACE_WIFI_MRF24WG) && \
+//		 (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC624J600) && \
+//		 (NETWORK_INTERFACE != NETWORK_INTERFACE_ETHERNET_ENC28J60))
+//		#error("NETWORK_INTERFACE is configured incorrectly.")
+//	#elif (BOARD_TYPE != UDB4_BOARD) && (BOARD_TYPE != UDB5_BOARD) && (BOARD_TYPE != AUAV3_BOARD)
+//		#error("The IP Stack and WiFi interface requires a UDB4_BOARD")
+//	#elif ((NETWORK_USE_CAM_TRACKING == 1) && (CAM_USE_EXTERNAL_TARGET_DATA == 0))
+//		#error("For Network Cam Tracking to work you must enable CAM_USE_EXTERNAL_TARGET_DATA in options.h")
+////	#elif ((NETWORK_USE_FLYBYDATALINK == 1) && (FLY_BY_DATALINK_ENABLED == 0))
+////		#error("For Network FlyByDatalink to work you must enable FLY_BY_DATALINK_ENABLED in options.h")
+//	#endif
+//#endif
+ */
 #if ((USE_MSD == 1) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("USE_MSD only supported on AUAV3 board"
 #endif

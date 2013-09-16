@@ -5,16 +5,30 @@
                    displayName="Header Files"
                    projectFiles="true">
       <logicalFolder name="f1" displayName="Modules" projectFiles="true">
+        <itemPath>../../MyIpNetwork/modules/MyIpADSB.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpAircraftConfig.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpCam.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpDebug.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpFlyByWire.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpGPStest.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpGroundStation.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpLOGO.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpMAVLink.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpPWMreport.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpTelemetryEXTRA.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpUART1.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpUART2.h</itemPath>
+        <itemPath>../../MyIpNetwork/modules/MyIpXPlane.h</itemPath>
       </logicalFolder>
       <itemPath>../../MyIpNetwork/MyIpData.h</itemPath>
       <itemPath>../../MyIpNetwork/MyIpHelpers.h</itemPath>
       <itemPath>../../MyIpNetwork/MyIpKnownPorts.h</itemPath>
       <itemPath>../../MyIpNetwork/MyIpNetwork.h</itemPath>
       <itemPath>../../MyIpNetwork/MyIpOptions.h</itemPath>
-      <itemPath>../../MyIpNetwork/MySockets.h</itemPath>
       <itemPath>../../MyIpNetwork/TCPIPConfig.h</itemPath>
       <itemPath>../../MyIpNetwork/WF_Config.h</itemPath>
-      <itemPath>../../MyIpNetwork/defines.h</itemPath>
+      <itemPath>../../MyIpNetwork/MyIpConfig.h</itemPath>
+      <itemPath>../../MyIpNetwork/MyIpSockets.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -42,8 +56,8 @@
       <itemPath>../../MyIpNetwork/MyIpData.c</itemPath>
       <itemPath>../../MyIpNetwork/MyIpHelpers.c</itemPath>
       <itemPath>../../MyIpNetwork/MyIpNetwork.c</itemPath>
-      <itemPath>../../MyIpNetwork/MySockets.c</itemPath>
       <itemPath>../../MyIpNetwork/WF_Config.c</itemPath>
+      <itemPath>../../MyIpNetwork/MyIpSockets.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -95,7 +109,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../..;../../Microchip;../../Microchip/Include/TCPIP_Stack;../../MyIpNetwork;../../MyIpNetwork/modules;../../Microchip/Include"/>
+                  value="../..;../../MatrixPilot;../../Microchip;../../Microchip/Include/TCPIP_Stack;../../MyIpNetwork;../../MyIpNetwork/modules;../../Microchip/Include"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

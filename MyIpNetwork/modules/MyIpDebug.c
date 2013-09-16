@@ -1,13 +1,14 @@
 #ifndef _MYIPDEBUG_C_
 #define _MYIPDEBUG_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_DEBUG == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpDebug.h"
 #include "MyIpHelpers.h"
+#include "../Configuration/telemetry_config.h"
 
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL != CHANNEL_UNUSED)
 #include "airspeedPitot.h"
@@ -19,7 +20,7 @@ void DebugAirspeedPitotTerminalInput(const uint8_t s, const uint8_t rxData);
     void DebugWiFiStatusTerminalOutput(const uint8_t s);
 #endif
 
-#if (NETWORK_USE_FLYBYWIRE == 1)
+#if (NETWORK_USE_FLYBYDATALINK == 1)
 void DebugFlyByWireTerminalOutput(const uint8_t s);
 #endif
 #if (NETWORK_USE_XPLANE == 1)
@@ -61,7 +62,7 @@ void MyIpService_Debug(const uint8_t s)
   //  DebugWiFiStatusTerminalOutput(s);
 #endif
 
-#if (NETWORK_USE_FLYBYWIRE == 1)
+#if (NETWORK_USE_FLYBYDATALINK == 1)
 //    DebugFlyByWireTerminalOutput(s);
 #endif
 
@@ -159,7 +160,7 @@ void MyIpProcessRxData_Debug(const uint8_t s)
     } while (successfulRead);
 }
 
-#if (NETWORK_USE_FLYBYWIRE == 1)
+#if (NETWORK_USE_FLYBYDATALINK == 1)
 void DebugFlyByWireTerminalOutput(const uint8_t s)
 {
     uint8_t allS, connectionCount;
@@ -179,11 +180,11 @@ void DebugFlyByWireTerminalOutput(const uint8_t s)
 
         #else
         dwTime_Debug[i]++;
-        StringToSocket(s, (int8_t*)"\r\nCounter = ");
+        StringToSocket(s, "\r\nCounter = ");
         #endif
 
         uitoaSocket(s, dwTime_Debug[i]);
-        StringToSocket(s, (int8_t*)"\r\n");
+        StringToSocket(s, "\r\n");
 
         connectionCount = 0;
         for (allS = 0; allS < NumSockets(); allS++)
@@ -194,12 +195,12 @@ void DebugFlyByWireTerminalOutput(const uint8_t s)
             }
         }
 
-        StringToSocket(s, (int8_t*)"\r\nIsConnected = "); itoaSocket(s,connectionCount);
-        StringToSocket(s, (int8_t*)"\r\nAileron  = "); itoaSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL]);
-        StringToSocket(s, (int8_t*)"\r\nElevator = "); itoaSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL]);
-        StringToSocket(s, (int8_t*)"\r\nMode     = "); itoaSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL]);
-        StringToSocket(s, (int8_t*)"\r\nRudder   = "); itoaSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL]);
-        StringToSocket(s, (int8_t*)"\r\nThrottle = "); itoaSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nIsConnected = "); itoaSocket(s,connectionCount);
+        StringToSocket(s, "\r\nAileron  = "); itoaSocket(s,udb_pwIn[AILERON_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nElevator = "); itoaSocket(s,udb_pwIn[ELEVATOR_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nMode     = "); itoaSocket(s,udb_pwIn[MODE_SWITCH_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nRudder   = "); itoaSocket(s,udb_pwIn[RUDDER_INPUT_CHANNEL]);
+        StringToSocket(s, "\r\nThrottle = "); itoaSocket(s,udb_pwIn[THROTTLE_INPUT_CHANNEL]);
 
         MyIpData[s].sendPacket = TRUE;
     }

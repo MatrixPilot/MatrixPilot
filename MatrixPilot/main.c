@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "config.h"
 #include "../libDCM/gpsParseCommon.h"
 
 #if (USE_TELELOG == 1)
@@ -30,15 +31,11 @@
 #include "preflight.h"
 #endif
 
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#endif
-
 #if (CONSOLE_UART != 0)
 #include "console.h"
 #endif
 
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#if (USE_NETWORK != 0)
 #define THIS_IS_STACK_APPLICATION
 #include "../MyIpNetwork/MyIpNetwork.h"
 #endif
@@ -68,15 +65,13 @@ int main(void)
 	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();
 	dcm_init();
-#if (USE_CONFIGFILE == 1)
 	init_config();  // this will need to be moved up in order to support runtime hardware options
-#endif
 	init_servoPrepare();
 	init_states();
 	init_behavior();
 	init_serial();
 
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#if (USE_NETWORK != 0)
 	init_MyIpNetwork();
 #endif
 
@@ -97,7 +92,7 @@ int main(void)
 #if (CONSOLE_UART != 0 && SILSIM == 0)
 		console();
 #endif
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#if (USE_NETWORK != 0)
 		ServiceMyIpNetwork();
 #endif
 		udb_run();

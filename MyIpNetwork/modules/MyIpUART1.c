@@ -1,7 +1,7 @@
 #ifndef _MYIPUART1_C_
 #define _MYIPUART1_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART1 == 1)
 
 #include "TCPIP Stack/TCPIP.h"

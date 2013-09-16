@@ -1,13 +1,14 @@
 #ifndef _MYIPUART2_C_
 #define _MYIPUART2_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_UART2 == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpUART2.h"
 #include "MyIpHelpers.h"
+#include "../Configuration/telemetry_config.h"
 
 //////////////////////////////////////
 // Local Functions

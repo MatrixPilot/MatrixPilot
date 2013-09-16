@@ -2,7 +2,7 @@
 #ifndef _MYIPGPSTEST_H_
 #define _MYIPGPSTEST_H_
 
-#include "libUDB_defines.h"
+#include "../libUDB/libUDB_defines.h"
 
 typedef enum {
     GpsSpoofMode_Disabled = 0,

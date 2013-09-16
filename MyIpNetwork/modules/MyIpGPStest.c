@@ -1,13 +1,14 @@
 #ifndef _MYIPGPSTEST_C_
 #define _MYIPGPSTEST_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_GPSTEST == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpGPStest.h"
 #include "MyIpHelpers.h"
+#include "../Configuration/telemetry_config.h"
 
 //////////////////////////
 // Module Variables

@@ -3,7 +3,7 @@
 #define _MYIPLOGO_H_
 
 //#include "defines.h"
-#include "flightplan-logoMsgFormat.h"
+#include "../MatrixPilot/flightplan-logoMsgFormat.h"
 
 #define LOGO_INST_SIZE                  (6)
 #define LOGO_HEADER_SIZE                (4)

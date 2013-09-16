@@ -1,13 +1,15 @@
 #ifndef _MYIPPWMREPORT_C_
 #define _MYIPPWMREPORT_C_
 
-#include "defines.h"
+#include "MyIpConfig.h"
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE) && (NETWORK_USE_PWMREPORT == 1)
 
 #include "TCPIP Stack/TCPIP.h"
 #include "MyIpData.h"
 #include "MyIpPWMreport.h"
 #include "MyIpHelpers.h"
+#include "../Configuration/telemetry_config.h"
+//#include "../libDCM/libDCM.h"
 
 //////////////////////////
 // Module Variables

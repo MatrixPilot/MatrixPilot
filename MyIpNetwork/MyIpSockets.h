@@ -1,5 +1,5 @@
-#ifndef _MYSOCKETS_H_
-#define _MYSOCKETS_H_
+#ifndef _MYIPSOCKETS_H_
+#define _MYIPSOCKETS_H_
 
 
 // Define names of socket types
@@ -44,4 +44,4 @@ WORD getMySocketCount(void);
 TCPSocketInitializer_t* getMySocketInitializer(WORD i);
 
 
-#endif // _MYSOCKETS_H_
+#endif // _MYIPSOCKETS_H_
