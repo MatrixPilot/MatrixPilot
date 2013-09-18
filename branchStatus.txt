@@ -70,3 +70,5 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 3 September: moved macro definitions for USE_RING_BUFFER, USE_MAVLINK_DBGIO and
 	board type from project settings to options.h to avoid confusion. This change
 	deletes macros UDB4, UDB5 and AUAV3 which were redundant to BOARD_TYPE.
+
+18 September: upgrade to MPLAB X v1.90
