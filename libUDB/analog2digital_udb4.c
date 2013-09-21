@@ -43,9 +43,16 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 
+// The following code configures the ADC to achieve approximately the same
+// sample rate and integrate and dump filter length as in earlier MatrixPilot
+// versions, but with FCY, NUM_AD_CHAN and HEARTBEAT_HZ as parameters.
 
-// desired adc clock is 1.1MHz and conversion rate is 25KHz
-// (1.1MHz is the lowest rate achievable at FCY = 70MHz
+// legacy ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/16M)*(11+1) = 0.75us (1.333 Mhz)
+// legacy ADC Conversion Time for 12-bit Tc=14*Tad = 10.5us
+// legacy ADC conversion rate (ADC_CLK / (14 + 1) = 88.7 KHz
+
+// To match the legacy code, desired adc clock is 1.33MHz and conversion rate is 88KHz
+// Note that 1.1MHz is the lowest clock rate achievable at FCY = 70MHz
 #define DES_ADC_CLK (1330000LL)
 #define DES_ADC_RATE (88000LL)
 
@@ -68,7 +75,9 @@ const uint32_t adc_clk = ADC_CLK;
 #define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
 const uint32_t adc_rate = ADC_RATE;
 
-//legacy: there are 222 or 223 samples in a sum
+// It is extremely reassuring to note that for HEARTBEAT_HZ = 200,
+// ALMOST_ENOUGH_SAMPLES works out to 42 which just happens to be...
+// the answer to life, the universe and everything.
 #define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
 const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
@@ -119,11 +128,8 @@ void udb_init_ADC(void)
 
 	AD1CON3bits.ADRC = 0;		// ADC Clock is derived from System Clock
 	AD1CON3bits.ADCS = ADCLK_DIV_N_MINUS_1;
-	// legacy ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/16M)*(11+1) = 0.75us (1.333 Mhz)
-	// legacy ADC Conversion Time for 12-bit Tc=14*Tad = 10.5us
 	AD1CON3bits.SAMC = ADSAMP_TIME_N;		// wait between samples
-	// legacy ADC conversion rate (ADC_CLK / (14 + 1) = 88.7 KHz
-
+	
 	AD1CON2bits.VCFG = 0;		// use supply as reference voltage
 
 	AD1CON1bits.ADDMABM = 1; 	// DMA buffers are built in sequential mode
