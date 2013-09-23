@@ -27,8 +27,8 @@
 	modified cpu load measurement to use 32 bit timer 8/9 when USE_MCU_IDLE==1
 	tested with USE_MCU_IDLE==1 at:
 	70MIPS: load 2.6%
-	64MIPS: load 2.9%	2.6 * (70/64) = 2.84
-	16MIPS: load 11.4%	2.5 * (70/16) = 11.38
+	64MIPS: load 2.9%	check: 2.6 * (70/64) = 2.84
+	16MIPS: load 11.4%	check: 2.6 * (70/16) = 11.38 => cpu load scales linearly with MIPS
 
 Bug??? using COF linker output format, linking with static lib VectorMatrix.a doesn't work
 
@@ -53,7 +53,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	bench test on AUAV3
 
 4 August: flight tested AUAV3 with latest rev: 200 Hz heartbeat and 70MIPS
-	TODO: look for problems with estimated airspeed; there seems to be an slow
+	TODO: look for problems with estimated airspeed; there seems to be a slow
 	(period of several seconds) oscillation about the GPS groundspeed.
 
 8 August: road tested fix to IMUvelocity and estimated airspeed; modified a drift
