@@ -8,7 +8,7 @@ dir_src=
 dir_bin=
 dir_tmp=build/udb4
 dir_sin=..\libVectorMatrix
-dir_inc=..\MAVLink\include;.
+dir_inc=..\MAVLink\include;.;..\Microchip\Include;..\Microchip
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
 [CAT_FILTERS]

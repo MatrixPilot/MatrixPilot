@@ -23,15 +23,15 @@
 
 
 #ifndef EULER_ANGLES_H
-#define	EULER_ANGLES_H
+#define EULER_ANGLES_H
 
 
 /**
- * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative
- * to geographic north.
+ * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees 
+ * relative to geographic north.
  * Values returned range from 0 - 360 degrees, positive clockwise.
  */
-uint16_t get_geo_heading_angle();
+uint16_t get_geo_heading_angle(void);
 
 
-#endif	// EULER_ANGLES_H
+#endif // EULER_ANGLES_H

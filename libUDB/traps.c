@@ -121,11 +121,12 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 	if (dmaErrFlag &0x1)
 		dmaPWErrLoc = DMA0STAL;
 
-	dmaErrFlag=	DMARQC;
+	dmaErrFlag= DMARQC;
 
 // DMA RAM Write Collision Error Location
 	if (dmaErrFlag & 0x2)
 		dmaRWErrLoc = DMA1STAL;
+
 	DMARQC = 0;                     // Clear the DMA Request Collision Flag Bit
 	DMAPWC = 0;                     // Clear the Peripheral Write Collision Flag Bit
 #endif // __dsPIC33E__

@@ -33,8 +33,6 @@
 // A first order digital lowpass filter with a time constant of about 32 milliseconds
 // is applied to improve signal to noise.
 
-#define ALMOST_ENOUGH_SAMPLES 216 // there are 222 or 223 samples in a sum
-
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;  // x, y, and z accelerometer channels
 struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;   // x, y, and z gyro channels
 struct ADchannel udb_vref;                            // reference voltage
@@ -49,9 +47,23 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 
-#if 0 // this needs to be confirmed good before enabling in trunk
-// desired adc clock is 1.1MHz and conversion rate is 25KHz
-// (1.1MHz is the lowest rate achievable at FCY = 70MHz
+
+#if 0   // these are the original/legacy values, switch this off to test Mark's new timing constants
+#define ALMOST_ENOUGH_SAMPLES   216 // there are 222 or 223 samples in a sum
+#define ADCLK_DIV_N_MINUS_1     11  // ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
+                                    // ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
+#define ADSAMP_TIME_N           1   // No waiting between samples
+#else
+// The following code configures the ADC to achieve approximately the same
+// sample rate and integrate and dump filter length as in earlier MatrixPilot
+// versions, but with FCY, NUM_AD_CHAN and HEARTBEAT_HZ as parameters.
+
+// legacy ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/16M)*(11+1) = 0.75us (1.333 Mhz)
+// legacy ADC Conversion Time for 12-bit Tc=14*Tad = 10.5us
+// legacy ADC conversion rate (ADC_CLK / (14 + 1) = 88.7 KHz
+
+// To match the legacy code, desired adc clock is 1.33MHz and conversion rate is 88KHz
+// Note that 1.1MHz is the lowest clock rate achievable at FCY = 70MHz
 #define DES_ADC_CLK (1330000LL)
 #define DES_ADC_RATE (88000LL)
 
@@ -74,7 +86,9 @@ const uint32_t adc_clk = ADC_CLK;
 #define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
 const uint32_t adc_rate = ADC_RATE;
 
-//legacy: there are 222 or 223 samples in a sum
+// It is extremely reassuring to note that for HEARTBEAT_HZ = 200,
+// ALMOST_ENOUGH_SAMPLES works out to 42 which just happens to be...
+// the answer to life, the universe and everything.
 #define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
 const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
@@ -84,7 +98,7 @@ const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 #pragma warning (SELECTED_VALUE(ADC_CLK))
 #pragma warning (SELECTED_VALUE(ADC_RATE))
 #pragma warning (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))
-#endif // 0
+#endif // 0/1
 
 int16_t vref_adj;
 int16_t sample_count;
@@ -128,9 +142,8 @@ void udb_init_ADC(void)
 	AD1CON2bits.CHPS  = 0;      // Converts CH0
 
 	AD1CON3bits.ADRC = 0;       // ADC Clock is derived from System Clock
-	AD1CON3bits.ADCS = 11;      // ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
-	                            // ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
-	AD1CON3bits.SAMC = 1;       // No waiting between samples
+	AD1CON3bits.ADCS = ADCLK_DIV_N_MINUS_1;
+	AD1CON3bits.SAMC = ADSAMP_TIME_N;
 
 	AD1CON2bits.VCFG = 0;       // use supply as reference voltage
 
@@ -140,8 +153,11 @@ void udb_init_ADC(void)
 
 	AD1CSSL = 0x0000;
 	AD1CSSH = 0x0000;
+
+// set all ADC 1 and 2 inputs to digital mode
 	AD1PCFGL= 0xFFFF;
 	AD1PCFGH= 0xFFFF;
+	AD2PCFGL= 0xFFFF;
 
 // include the 110 degree/second scale, gyro
 /*
@@ -221,9 +237,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (HILSIM != 1)
 	int16_t *CurBuffer = (DmaBuffer == 0) ? BufferA : BufferB;
 
-	udb_xrate.input = CurBuffer[xrateBUFF-1];
-	udb_yrate.input = CurBuffer[yrateBUFF-1];
-	udb_zrate.input = CurBuffer[zrateBUFF-1];
+	udb_xrate.input  = CurBuffer[xrateBUFF-1];
+	udb_yrate.input  = CurBuffer[yrateBUFF-1];
+	udb_zrate.input  = CurBuffer[zrateBUFF-1];
 	udb_xaccel.input = CurBuffer[xaccelBUFF-1];
 	udb_yaccel.input = CurBuffer[yaccelBUFF-1];
 	udb_zaccel.input = CurBuffer[zaccelBUFF-1];
@@ -269,15 +285,16 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	}
 
 	// perform the integration:
-	udb_xrate.sum += udb_xrate.input;
-	udb_yrate.sum += udb_yrate.input;
-	udb_zrate.sum += udb_zrate.input;
-#ifdef VREF
-	udb_vref.sum  += udb_vref.input;
-#endif
+	udb_xrate.sum  += udb_xrate.input;
+	udb_yrate.sum  += udb_yrate.input;
+	udb_zrate.sum  += udb_zrate.input;
 	udb_xaccel.sum += udb_xaccel.input;
 	udb_yaccel.sum += udb_yaccel.input;
 	udb_zaccel.sum += udb_zaccel.input;
+#ifdef VREF
+#warning Use of VREF in ADC module is incomplete and won't work
+	udb_vref.sum   += udb_vref.input;   // WARNING: this has not been set
+#endif
 #if (NUM_ANALOG_INPUTS >= 1)
 	udb_analogInputs[0].sum += udb_analogInputs[0].input;
 #endif
@@ -296,16 +313,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	// have the new average values ready.
 	if (sample_count > ALMOST_ENOUGH_SAMPLES)
 	{
-		udb_xrate.value = __builtin_divsd(udb_xrate.sum , sample_count);
-		udb_yrate.value = __builtin_divsd(udb_yrate.sum , sample_count);
-		udb_zrate.value = __builtin_divsd(udb_zrate.sum , sample_count);
+		udb_xrate.value  = __builtin_divsd(udb_xrate.sum,  sample_count);
+		udb_yrate.value  = __builtin_divsd(udb_yrate.sum,  sample_count);
+		udb_zrate.value  = __builtin_divsd(udb_zrate.sum,  sample_count);
+		udb_xaccel.value = __builtin_divsd(udb_xaccel.sum, sample_count);
+		udb_yaccel.value = __builtin_divsd(udb_yaccel.sum, sample_count);
+		udb_zaccel.value = __builtin_divsd(udb_zaccel.sum, sample_count);
 #ifdef VREF
-		udb_vref.value = __builtin_divsd(udb_vref.sum , sample_count);
+		udb_vref.value   = __builtin_divsd(udb_vref.sum, sample_count);
 #endif
-		udb_xaccel.value =  __builtin_divsd(udb_xaccel.sum , sample_count);
-		udb_yaccel.value =  __builtin_divsd(udb_yaccel.sum , sample_count);
-		udb_zaccel.value =  __builtin_divsd(udb_zaccel.sum , sample_count);
-
 #if (NUM_ANALOG_INPUTS >= 1)
 		udb_analogInputs[0].value = __builtin_divsd(udb_analogInputs[0].sum, sample_count);
 #endif

@@ -406,6 +406,4 @@ void mcu_init(void)
 			osc_fail_count);
 	}
 #endif // CONSOLE_UART
-
-	// TODO: is the LPRC disabled?
 }

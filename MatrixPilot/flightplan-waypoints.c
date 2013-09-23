@@ -54,7 +54,7 @@ const uint8_t wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15
 struct relWaypointDef wp_to_relative(struct waypointDef wp)
 {
 	struct relWaypointDef rel;
-	
+
 	if (wp.flags & F_ABSOLUTE)
 	{
 		rel.loc = dcm_absolute_to_relative(wp.loc);
@@ -79,12 +79,12 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
 void init_flightplan(int16_t flightplanNum)
 {
-	if (flightplanNum == 1) // RTL waypoint set
+	if (flightplanNum == 1)         // RTL waypoint set
 	{
 		currentWaypointSet = (struct waypointDef*)rtlWaypoints;
 		numPointsInCurrentSet = NUMBER_RTL_POINTS;
 	}
-	else if (flightplanNum == 0) // Main waypoint set
+	else if (flightplanNum == 0)    // Main waypoint set
 	{
 		currentWaypointSet = (struct waypointDef*)waypoints;
 		numPointsInCurrentSet = NUMBER_POINTS;
@@ -94,7 +94,7 @@ void init_flightplan(int16_t flightplanNum)
 	set_goal(GPSlocation, current_waypoint.loc);
 	set_camera_view(current_waypoint.viewpoint);
 	setBehavior(current_waypoint.flags);
-	// udb_background_trigger();			// trigger navigation immediately
+	// udb_background_trigger();    // trigger navigation immediately
 }
 
 boolean use_fixed_origin(void)
@@ -109,7 +109,7 @@ boolean use_fixed_origin(void)
 struct absolute3D get_fixed_origin(void)
 {
 	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
-	
+
 	struct absolute3D standardizedOrigin;
 	standardizedOrigin.x = origin.x;
 	standardizedOrigin.y = origin.y;
@@ -117,7 +117,7 @@ struct absolute3D get_fixed_origin(void)
 	return standardizedOrigin;
 }
 
-static void next_waypoint(void) 
+static void next_waypoint(void)
 {
 	waypointIndex++;
 	if (waypointIndex >= numPointsInCurrentSet) waypointIndex = 0;
@@ -149,7 +149,7 @@ static void next_waypoint(void)
 		set_camera_view(current_waypoint.viewpoint);
 		setBehavior(current_waypoint.flags);
 	}
-#if	(DEADRECKONING == 0)
+#if (DEADRECKONING == 0)
 #error DEADRECKONING is now always enabled
 	compute_bearing_to_goal();
 #endif
@@ -171,9 +171,9 @@ void run_flightplan(void)
 
 	// steering is based on cross track error.
 	// waypoint arrival is detected computing distance to the "finish line".
-	
+
 	// note: locations are measured in meters
-	//		 velocities are in centimeters per second
+	//       velocities are in centimeters per second
 
 	// locations have a range of +-32000 meters (20 miles) from origin
 	

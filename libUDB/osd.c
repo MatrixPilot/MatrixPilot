@@ -30,7 +30,6 @@
 
 void osd_reset(void)
 {
-
 	osd_spi_write(MAX7456_VM0, 0x42);   // VM0: enable display of PAL OSD image, force software reset
 	delay_us(200);                      // The register reset process requires 100µs
 
