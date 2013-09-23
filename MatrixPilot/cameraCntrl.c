@@ -219,7 +219,7 @@ void cameraCntrl(void)
 		cam.WW = __builtin_mulss(cam_yaw16 , yaw_servo_high_ratio) + 0x8000;
 		cam_yaw_servo_pwm_delta = cam._.W1 - yaw_offset_centred_pwm;
 	}
-#endif
+#endif // USE_CAMERA_STABILIZATION
 }
 
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)

@@ -61,9 +61,7 @@ int main(void)
 	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();
 	dcm_init();
-#if (USE_CONFIGFILE == 1)
 	init_config();  // this will need to be moved up in order to support runtime hardware options
-#endif
 	init_servoPrepare();
 	init_states();
 	init_behavior();

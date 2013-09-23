@@ -33,37 +33,22 @@
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
+#endif // USE_CONFIGFILE
 
-	uint16_t pitchgain;
-	uint16_t pitchkd;
-	uint16_t hoverpitchgain;
-	uint16_t hoverpitchkd;
-	uint16_t rudderElevMixGain;
-	uint16_t rollElevMixGain;
-#elif ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-	uint16_t pitchgain = (uint16_t)(PITCHGAIN*RMAX);
-	uint16_t pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX);
-	uint16_t hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX);
-	uint16_t hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX);
-	uint16_t rudderElevMixGain = (uint16_t)(RMAX*RUDDER_ELEV_MIX);
-	uint16_t rollElevMixGain = (uint16_t)(RMAX*ROLL_ELEV_MIX);
-#else
-	const uint16_t pitchgain = (uint16_t)(PITCHGAIN*RMAX);
-	const uint16_t pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX);
-	const uint16_t hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX);
-	const uint16_t hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX);
-	const uint16_t rudderElevMixGain = (uint16_t)(RMAX*RUDDER_ELEV_MIX);
-	const uint16_t rollElevMixGain = (uint16_t)(RMAX*ROLL_ELEV_MIX);
-#endif
+uint16_t pitchgain;
+uint16_t pitchkd;
+uint16_t hoverpitchgain;
+uint16_t hoverpitchkd;
+uint16_t rudderElevMixGain;
+uint16_t rollElevMixGain;
 
 int16_t pitchrate;
 int16_t navElevMix;
 int16_t elevInput;
 
-void normalPitchCntrl(void);
-void hoverPitchCntrl(void);
+static void normalPitchCntrl(void);
+static void hoverPitchCntrl(void);
 
-#if (USE_CONFIGFILE == 1)
 void init_pitchCntrl(void)
 {
 	pitchgain = (uint16_t)(PITCHGAIN*RMAX);
@@ -73,7 +58,6 @@ void init_pitchCntrl(void)
 	rudderElevMixGain = (uint16_t)(RMAX*RUDDER_ELEV_MIX);
 	rollElevMixGain = (uint16_t)(RMAX*ROLL_ELEV_MIX);
 }
-#endif
 
 void pitchCntrl(void)
 {
@@ -87,7 +71,7 @@ void pitchCntrl(void)
 	}
 }
 
-void normalPitchCntrl(void)
+static void normalPitchCntrl(void)
 {
 	union longww pitchAccum;
 	int16_t rtlkick;
@@ -167,7 +151,7 @@ void normalPitchCntrl(void)
 	pitch_control = (int32_t)pitchAccum._.W1 + navElevMix;
 }
 
-void hoverPitchCntrl(void)
+static void hoverPitchCntrl(void)
 {
 	union longww pitchAccum;
 

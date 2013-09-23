@@ -319,18 +319,18 @@ void mcu_init(void)
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #if (MIPS == 16)
 #warning 16 MIPS selected
-	CLKDIVbits.PLLPRE = 0;	// PLL prescaler: N1 = 2 (default)
-	CLKDIVbits.PLLPOST = 1;	// PLL postscaler: N2 = 4 (default)
+	CLKDIVbits.PLLPRE = 0;  // PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 1; // PLL postscaler: N2 = 4 (default)
 	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XTAL=8MHz, N1=2, N2=4, M = 32)
 #elif (MIPS == 32)
 #warning 32 MIPS selected
-	CLKDIVbits.PLLPRE = 0;	// PLL prescaler: N1 = 2 (default)
-	CLKDIVbits.PLLPOST = 0;	// PLL postscaler: N2 = 2
+	CLKDIVbits.PLLPRE = 0;  // PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 0; // PLL postscaler: N2 = 2
 	PLLFBDbits.PLLDIV = 30; // FOSC = 64 MHz (XTAL=8MHz, N1=2, N2=2, M = 32)
 #elif (MIPS == 40)
 #warning 40 MIPS selected
-	CLKDIVbits.PLLPRE = 0;	// PLL prescaler: N1 = 2 (default)
-	CLKDIVbits.PLLPOST = 0;	// PLL postscaler: N2 = 2
+	CLKDIVbits.PLLPRE = 0;  // PLL prescaler: N1 = 2 (default)
+	CLKDIVbits.PLLPOST = 0; // PLL postscaler: N2 = 2
 	PLLFBDbits.PLLDIV = 38; // FOSC = 80 MHz (XTAL=8MHz, N1=2, N2=2, M = 40)
 #else
 #error "invalid MIPS Configuration"

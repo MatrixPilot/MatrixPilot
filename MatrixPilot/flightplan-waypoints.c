@@ -33,14 +33,13 @@ struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D vie
 #define NUMBER_POINTS ((sizeof waypoints) / sizeof (struct waypointDef))
 #define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints;
+int16_t numPointsInCurrentSet = NUMBER_POINTS;
 uint16_t number_of_waypoints = NUMBER_POINTS;
-#endif
 
 int16_t waypointIndex = 0;
 
-struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints;
-int16_t numPointsInCurrentSet = NUMBER_POINTS;
+
 
 struct waypointDef wp_inject;
 uint8_t wp_inject_pos = 0;
@@ -166,7 +165,7 @@ void run_flightplan(void)
 		setBehavior(current_waypoint.flags);
 		compute_bearing_to_goal();
 		wp_inject_pos = 0;
-		return;     // TODO: check if we really want this here
+		return;
 	}
 
 	// steering is based on cross track error.

@@ -22,65 +22,89 @@
 
 
 #include "defines.h"
+#include "airspeedCntrl.h"
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#include "redef.h"
+#endif // USE_CONFIGFILE
 
 #if(ALTITUDE_GAINS_VARIABLE == 1)
 
-#include "airspeedCntrl.h"
-
-union longww throttleFiltered = { 0 };
 
 #define THROTTLEFILTSHIFT 12
-
 #define DEADBAND 150
-
 #define MAXTHROTTLE         (2.0*SERVORANGE*ALT_HOLD_THROTTLE_MAX)
 #define FIXED_WP_THROTTLE   (2.0*SERVORANGE*RACING_MODE_WP_THROTTLE)
-
 #define THROTTLEHEIGHTGAIN (((ALT_HOLD_THROTTLE_MAX - ALT_HOLD_THROTTLE_MIN)*2.0*SERVORANGE)/(HEIGHT_MARGIN*2.0))
-
 #define PITCHATMAX (ALT_HOLD_PITCH_MAX*(RMAX/57.3))
 #define PITCHATMIN (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
 #define PITCHATZERO (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
 #define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (HEIGHT_MARGIN*2.0))
-
 #define HEIGHTTHROTTLEGAIN ((1.5*(HEIGHT_TARGET_MAX-HEIGHT_TARGET_MIN)* 1024.0) / (SERVORANGE*SERVOSAT))
 
+union longww throttleFiltered = { 0 };
 int16_t pitchAltitudeAdjust = 0;
 boolean filterManual = false;
+int32_t speed_height = 0;
 int16_t desiredHeight;
 
-void normalAltitudeCntrl(void);
-void manualThrottle(int16_t throttleIn);
-void hoverAltitudeCntrl(void);
+static void normalAltitudeCntrl(void);
+static void manualThrottle(int16_t throttleIn);
+static void hoverAltitudeCntrl(void);
 
 // External variables
-int16_t height_target_min           = HEIGHT_TARGET_MIN;
-int16_t height_target_max           = HEIGHT_TARGET_MAX;
-int16_t height_margin               = HEIGHT_MARGIN;
-fractional alt_hold_throttle_min    = ALT_HOLD_THROTTLE_MIN * RMAX;
-fractional alt_hold_throttle_max    = ALT_HOLD_THROTTLE_MAX * RMAX;
-int16_t alt_hold_pitch_min          = ALT_HOLD_PITCH_MIN;
-int16_t alt_hold_pitch_max          = ALT_HOLD_PITCH_MAX;
-int16_t alt_hold_pitch_high         = ALT_HOLD_PITCH_HIGH;
-int16_t rtl_pitch_down              = RTL_PITCH_DOWN;
+int16_t height_target_min;
+int16_t height_target_max;
+int16_t height_margin;
+fractional alt_hold_throttle_min;
+fractional alt_hold_throttle_max;
+int16_t alt_hold_pitch_min;
+int16_t alt_hold_pitch_max;
+int16_t alt_hold_pitch_high;
+int16_t rtl_pitch_down;
+
+// Internal computed variables.
+int16_t max_throttle;
+int16_t throttle_height_gain;
+int16_t pitch_at_max;
+int16_t pitch_at_min;
+int16_t pitch_at_zero;
+int16_t pitch_height_gain;
+int16_t height_throttle_gain;
+
+int16_t desiredSpeed;
+boolean speed_control;
+
+void init_altitudeCntrlVariable(void)
+{
+
+// External variables
+	height_target_min     = HEIGHT_TARGET_MIN;
+	height_target_max     = HEIGHT_TARGET_MAX;
+	height_margin         = HEIGHT_MARGIN;
+	alt_hold_throttle_min = ALT_HOLD_THROTTLE_MIN * RMAX;
+	alt_hold_throttle_max = ALT_HOLD_THROTTLE_MAX * RMAX;
+	alt_hold_pitch_min    = ALT_HOLD_PITCH_MIN;
+	alt_hold_pitch_max    = ALT_HOLD_PITCH_MAX;
+	alt_hold_pitch_high   = ALT_HOLD_PITCH_HIGH;
+	rtl_pitch_down        = RTL_PITCH_DOWN;
 
 // Internal computed variables.  Values defined above.
-int16_t max_throttle                = MAXTHROTTLE;
-int16_t throttle_height_gain        = THROTTLEHEIGHTGAIN;
-int16_t pitch_at_max                = PITCHATMAX;
-int16_t pitch_at_min                = PITCHATMIN;
-int16_t pitch_at_zero               = PITCHATZERO;
-int16_t pitch_height_gain           = PITCHHEIGHTGAIN;
-int16_t height_throttle_gain        = HEIGHTTHROTTLEGAIN;
+	max_throttle          = MAXTHROTTLE;
+	throttle_height_gain  = THROTTLEHEIGHTGAIN;
+	pitch_at_max          = PITCHATMAX;
+	pitch_at_min          = PITCHATMIN;
+	pitch_at_zero         = PITCHATZERO;
+	pitch_height_gain     = PITCHHEIGHTGAIN;
+	height_throttle_gain  = HEIGHTTHROTTLEGAIN;
 
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
-int16_t desiredSpeed = (DESIRED_SPEED*10);
-boolean speed_control = SPEED_CONTROL;
-int32_t speed_height = 0;
+	desiredSpeed = (DESIRED_SPEED*10);
+	speed_control = SPEED_CONTROL;
+}
 
-
-int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
+static int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
 {
 	union longww accum;
 
@@ -111,7 +135,7 @@ void altitudeCntrl(void)
 	}
 }
 
-void set_throttle_control(int16_t throttle)
+static void set_throttle_control(int16_t throttle)
 {
 	int16_t throttleIn;
 
@@ -150,7 +174,7 @@ void setTargetAltitude(int16_t targetAlt)
 	desiredHeight = targetAlt;
 }
 
-void normalAltitudeCntrl(void)
+static void normalAltitudeCntrl(void)
 {
 	union longww throttleAccum;
 	union longww pitchAccum;
@@ -217,7 +241,7 @@ void normalAltitudeCntrl(void)
 	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch)
 	{
 		if (THROTTLE_CHANNEL_REVERSED) throttleInOffset = - throttleInOffset;
-		
+
 		if (flags._.GPS_steering)
 		{
 			if (desired_behavior._.takeoff || desired_behavior._.altitude)
@@ -328,7 +352,7 @@ void normalAltitudeCntrl(void)
 	}
 }
 
-void manualThrottle(int16_t throttleIn)
+static void manualThrottle(int16_t throttleIn)
 {
 	int16_t throttle_control_pre;
 
@@ -352,7 +376,7 @@ void manualThrottle(int16_t throttleIn)
 
 // For now, hovering does not attempt to control the throttle, and instead
 // gives manual throttle control back to the pilot.
-void hoverAltitudeCntrl(void)
+static void hoverAltitudeCntrl(void)
 {
 	int16_t throttle_control_pre;
 	int16_t throttleIn = (udb_flags._.radio_on == 1) ? udb_pwIn[THROTTLE_INPUT_CHANNEL] : udb_pwTrim[THROTTLE_INPUT_CHANNEL];
@@ -374,6 +398,12 @@ void hoverAltitudeCntrl(void)
 	}
 
 	set_throttle_control(throttle_control_pre);
+}
+
+#else
+
+void init_altitudeCntrlVariable(void)
+{
 }
 
 #endif //(ALTITUDE_GAINS_VARIABLE == 1)

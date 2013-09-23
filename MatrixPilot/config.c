@@ -21,10 +21,11 @@
 
 #include "defines.h"
 #include "config.h"
-#include "minIni.h"
 #include <stdio.h>
 
 #if (USE_CONFIGFILE == 1)
+
+#include "minIni.h"
 
 union config_word config;
 struct gains_variables gains;
@@ -232,17 +233,24 @@ void load_gains(void)
 
 }
 
+#endif // USE_CONFIGFILE
+
 void init_config(void)
 {
+#if (USE_CONFIGFILE == 1)
 	load_settings();
 	load_config();
 	load_gains();
+#endif // USE_CONFIGFILE
 
 	init_yawCntrl();
 	init_rollCntrl();
 	init_pitchCntrl();
 
 	init_navigation();
+	init_airspeedCntrl();
+	init_altitudeCntrl();
+	init_altitudeCntrlVariable();
 }
 
 /*
@@ -252,4 +260,3 @@ int   ini_puts(const mTCHAR *Section, const mTCHAR *Key, const mTCHAR *Value, co
 int   ini_putf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL Value, const mTCHAR *Filename);
  */
 
-#endif // USE_CONFIGFILE

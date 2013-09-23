@@ -69,14 +69,18 @@
 #define BAUD_ERROR_PERCENT  ((BAUD_ERROR*100+BAUDRATEX/2)/BAUDRATEX)
 
 #if defined (__C30__)
-
 	#if (BAUD_ERROR_PERCENT > 3)
 		#error UART frequency error is worse than 3%
 	#elif (BAUD_ERROR_PERCENT > 2)
 		#warning UART frequency error is worse than 2%
 	#endif
-
 #endif // #if defined (__C30__)
+
+#if defined (__dsPIC33F__)
+#undef BAUDRATEREG
+//#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
+#define BAUDRATEREG ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * BAUDRATEX) - 1))
+#endif
 
 #define _INIT(x, y) \
 void Init(void) \
