@@ -240,6 +240,7 @@
         <itemPath>../../libDCM/estAltitude.c</itemPath>
         <itemPath>../../libDCM/estAirspeed.c</itemPath>
         <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
+        <itemPath>../../libDCM/fbcl.s</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.c</itemPath>

@@ -711,6 +711,11 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Optionally enable experimental extended range navigation support (merged from ballon launch branch)
+#define USE_EXTENDED_NAV                    0
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Debugging defines
 
 // The following can be used to do a ground check of stabilization without a GPS.

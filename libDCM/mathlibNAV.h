@@ -29,6 +29,13 @@ void rotate_2D_vector_by_angle(int16_t vector[2], int8_t angle);
 void rotate(struct relative2D *xy, int8_t angle);
 int8_t rect_to_polar(struct relative2D *xy);
 int16_t rect_to_polar16(struct relative2D *xy);
+
+// first changed bit location functions
+int16_t FindFirstBitChangeFromLeft(int16_t);    // applies raw FBCL instruction and returns result
+int16_t FindFirstBitFromLeft(int16_t);          // applies raw FF1L instruction and returns result
+int16_t find_first_bit_int16(int16_t);          // finds first bit position in the absolute value of a 16 bit signed integer
+int16_t find_first_bit_int32(int32_t);          // finds first bit position in the absolute value of a 32 bit signed integer
+
 uint16_t sqrt_int(uint16_t sqr);
 uint16_t sqrt_long(uint32_t sqr);
 uint16_t vector2_mag(int16_t x, int16_t y);

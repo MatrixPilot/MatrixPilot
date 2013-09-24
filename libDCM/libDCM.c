@@ -179,7 +179,8 @@ void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)
 	// scale the latitude from GPS units to gentleNAV units
 	accum_nav.WW = __builtin_mulss(LONGDEG_2_BYTECIR, lat_origin._.W1);
 
-	unsigned char lat_cir;	lat_cir = accum_nav.__.B2;
+	unsigned char lat_cir;
+	lat_cir = accum_nav.__.B2;
 	// estimate the cosine of the latitude, which is used later computing desired course
 	cos_lat = cosine(lat_cir);
 }
@@ -193,6 +194,18 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 	rel.x = long_scale((absolute.x - lon_origin.WW)/90, cos_lat);
 	return rel;
 }
+
+#ifdef USE_EXTENDED_NAV
+struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute)
+{
+	struct relative3D_32 rel;
+
+	rel.z = absolute.z;
+	rel.y = (absolute.y - lat_origin.WW) / 90; // in meters
+	rel.x = long_scale((absolute.x - lon_origin.WW) / 90, cos_lat);
+	return rel;
+}
+#endif // USE_EXTENDED_NAV
 
 #if (HILSIM == 1)
 

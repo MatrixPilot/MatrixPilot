@@ -45,7 +45,10 @@ int main (void)
 	LED_GREEN = LED_OFF;
 
 	// Start it up!
-	udb_run();  // This never returns.
+	while (1)
+	{
+		udb_run();
+	}
 
 	return 0;
 }
