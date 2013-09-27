@@ -2,7 +2,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>RollPitchYaw-udb4</name>
+            <name>RollPitchYaw-udb4-TRUNK</name>
             <creation-uuid>1094df3e-0a0a-468e-be2a-882a9f497300</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

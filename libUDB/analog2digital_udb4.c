@@ -292,7 +292,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	udb_yaccel.sum += udb_yaccel.input;
 	udb_zaccel.sum += udb_zaccel.input;
 #ifdef VREF
-#warning Use of VREF in ADC module is incomplete and won't work
+#warning Use of VREF in ADC module is incomplete and will not work
 	udb_vref.sum   += udb_vref.input;   // WARNING: this has not been set
 #endif
 #if (NUM_ANALOG_INPUTS >= 1)
