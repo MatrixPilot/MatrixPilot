@@ -1,0 +1,11 @@
+airspeed_options.h
+flightplan-logo.h
+gain_variables.h
+magnetometerOptions.h
+mavlink_options.h
+nv_memory_options.h
+options.h
+osd_layout.h
+projectStatus.txt
+waypoints_1000x50_westField.h
+waypoints.h

@@ -30,12 +30,12 @@ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 IMAGE_TYPE=debug
 OUTPUT_SUFFIX=elf
 DEBUGGABLE_SUFFIX=elf
-FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 else
 IMAGE_TYPE=production
 OUTPUT_SUFFIX=hex
 DEBUGGABLE_SUFFIX=elf
-FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 endif
 
 # Object Directory
@@ -73,14 +73,14 @@ FIXDEPS=fixDeps
 
 # The following macros may be used in the pre and post step lines
 Device=dsPIC33FJ256GP710A
-ProjectDir=/home/markw/MPLABXProjects/MatrixPilot_mw4/MatrixPilot/MatrixPilot-udb5.X
+ProjectDir=/home/markw/MPLABXProjects/MatrixPilot_mw4/MatrixPilot/MatrixPilot-udb5-hilsim
 ConfName=default
-ImagePath=dist/default/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+ImagePath=dist/default/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 ImageDir=dist/default/${IMAGE_TYPE}
-ImageName=MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+ImageName=MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
 .build-conf:  .pre ${BUILD_SUBPROJECTS}
-	${MAKE}  -f nbproject/Makefile-default.mk dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+	${MAKE}  -f nbproject/Makefile-default.mk dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
 MP_PROCESSOR_OPTION=33FJ256GP710A
 MP_LINKER_FILE_OPTION=,--script=p33FJ256GP710A.gld
@@ -987,15 +987,15 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a  
+dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a  
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a  -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,$(MP_LINKER_FILE_OPTION),--heap=200,--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${IMAGE_TYPE}.map"$(MP_EXTRA_LD_POST) 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a  -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -omf=elf -legacy-libc -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,$(MP_LINKER_FILE_OPTION),--heap=200,--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${IMAGE_TYPE}.map"$(MP_EXTRA_LD_POST) 
 	
 else
-dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a 
+dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a 
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a  -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -legacy-libc -Wl,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--heap=200,--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${IMAGE_TYPE}.map"$(MP_EXTRA_LD_POST) 
-	${MP_CC_DIR}/xc16-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} -a  -omf=elf 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a  -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -legacy-libc -Wl,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--heap=200,--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${IMAGE_TYPE}.map"$(MP_EXTRA_LD_POST) 
+	${MP_CC_DIR}/xc16-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/MatrixPilot-udb5-hilsim.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} -a  -omf=elf 
 	
 endif
 

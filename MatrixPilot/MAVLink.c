@@ -315,13 +315,13 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 		memcpy(&serial_buffer[start_index], buf, len);
 		end_index = start_index + len ;
 	}
-#endif
 	if (serial_interrupt_stopped == 1)
 	{
 		serial_interrupt_stopped  = 0;
 		udb_serial_start_sending_data();
 	}
 	return(1) ;
+#endif
 }
 
 //int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)

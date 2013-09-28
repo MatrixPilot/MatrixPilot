@@ -31,20 +31,20 @@
 #  THIS SETUP WILL NOT DO INTER-CHANNEL MIXING.  This feature is to be added if needed. 
 #  This might be a problem for some heli setups.
 
-Comm,COM4, 38400
-#Comm,/dev/ttyUSB0,38400
+#Comm,COM4, 38400
+Comm,/dev/ttyUSB0,38400
 #Comm,/dev/cu.usbserial-A600dP4v,38400
 Port,14551
 Overide,sim/operation/override/override_control_surfaces
-Control,1,sim/flightmodel/controls/wing1l_ail1def,3000,1000,1000,-25,-10
-Control,1,sim/flightmodel/controls/wing1r_ail1def,3000,1000,1000,10,25
-Control,1,sim/flightmodel/controls/wing1l_ail2def,3000,1000,1000,-25,-10
-Control,1,sim/flightmodel/controls/wing1r_ail2def,3000,1000,1000,10,25
-Control,1,sim/flightmodel/controls/wing2l_ail1def,3000,1000,1000,-25,-10
-Control,1,sim/flightmodel/controls/wing2r_ail1def,3000,1000,1000,10,25
-Control,1,sim/flightmodel/controls/wing2l_ail2def,3000,1000,1000,-25,-10
-Control,1,sim/flightmodel/controls/wing2r_ail2def,3000,1000,1000,10,25
-Control,2,sim/flightmodel/controls/hstab1_elv1def,3000,1000,1000,20,20
-Control,2,sim/flightmodel/controls/hstab2_elv1def,3000,1000,1000,20,20
+Control,2,sim/flightmodel/controls/wing1l_ail1def,3000,1000,1000,-25,-10
+Control,2,sim/flightmodel/controls/wing1r_ail1def,3000,1000,1000,10,25
+Control,2,sim/flightmodel/controls/wing1l_ail2def,3000,1000,1000,-25,-10
+Control,2,sim/flightmodel/controls/wing1r_ail2def,3000,1000,1000,10,25
+Control,2,sim/flightmodel/controls/wing2l_ail1def,3000,1000,1000,-25,-10
+Control,2,sim/flightmodel/controls/wing2r_ail1def,3000,1000,1000,10,25
+Control,2,sim/flightmodel/controls/wing2l_ail2def,3000,1000,1000,-25,-10
+Control,2,sim/flightmodel/controls/wing2r_ail2def,3000,1000,1000,10,25
+Control,3,sim/flightmodel/controls/hstab1_elv1def,3000,1000,1000,20,20
+Control,3,sim/flightmodel/controls/hstab2_elv1def,3000,1000,1000,20,20
 Control,4,sim/flightmodel/controls/vstab1_rud1def,3000,1000,1000,-20,-20
-Engine,3,255,2200,1800,0,1,-1
+Engine,1,255,2200,1800,0,1,-1
