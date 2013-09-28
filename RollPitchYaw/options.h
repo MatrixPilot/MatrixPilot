@@ -23,27 +23,9 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
+// This file includes most of the user-configuration for this firmware,
+// one of the exceptions being waypoints, which live in the waypoints.h file.
 //
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type
-// See the MatrixPilot wiki for more details on different board types.
-#ifdef UDB4
-#define BOARD_TYPE                          UDB4_BOARD
-#endif
-#ifdef UDB5
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-#ifdef AUAV3
-#define BOARD_TYPE                          AUAV3_BOARD
-#endif
-
-#ifndef BOARD_TYPE
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
