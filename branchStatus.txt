@@ -1,3 +1,5 @@
+Branch MatrixPilot_mw4 status: created July 2013
+
 16 July: successful test flight in manual, stabilized and auto (waypoints) mode
 	Addiction aircraft with production sample UDB5 and 3DR LEA6 GPS module using
 	the same options.h settings as AVC, but with race mode off
@@ -72,3 +74,13 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	deletes macros UDB4, UDB5 and AUAV3 which were redundant to BOARD_TYPE.
 
 18 September: upgrade to MPLAB X v1.90
+
+28 September: turn off heartbeat timer T1 for UDB5 and AUAV3. Instead set T1
+	interrupt flag in the MPU6000 ISR to make it the heartbeat timer and sync
+	the heartbeat loop to MPU6000 sensor data updates. This leaves the UDB4
+	logic unchanged and still driven by T1 at HEARTBEAT_HZ. Note that a heartrate
+	of 200Hz is currently hardwired in MPU6000_init16() (this is the maximum available
+	rate from the MPU6000 when using its internal digital filters).
+
+	modify udb_servo_callback_prepare_outputs() to call send_HILSIM_outputs() at 40Hz.
+	This fixes waypoint following using Xplane10.

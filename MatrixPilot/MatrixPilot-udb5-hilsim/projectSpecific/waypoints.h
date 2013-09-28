@@ -47,7 +47,7 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		1
+#define USE_FIXED_ORIGIN		0
 #define FIXED_ORIGIN_LOCATION	{ -1223178100, 474634556, 98.0 }	// KSEA runway 16R
 
 // AAM East Field runway center 39°50'31.83"N  105°12'44.81"W
@@ -151,14 +151,22 @@
 //		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
 //};
 
+//const struct waypointDef waypoints[] = {
+//    {{ 0, 500, 50}, F_CROSS_TRACK + F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{ 0, -1000, 50}, F_CROSS_TRACK + F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 1
+//    {{ 0, -500, 5}, F_CROSS_TRACK + F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 2
+//    // this results in a decent flare in the simulator
+//    {{ 0, 0, 500}, F_CROSS_TRACK + F_LAND, CAM_VIEW_LAUNCH}, //Waypoint 3
+//};
+
 const struct waypointDef waypoints[] = {
-    {{   0, -100, 100}, F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, -300, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, -500, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, -700, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, -2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{ -1000, -2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
-    {{ -1000,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
+    {{   0, 100, 100}, F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{   0, 300, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{   0, 500, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{   0, 700, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{   0, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{ 1000, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
+    {{ 1000,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
     {{   0,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
 };
 

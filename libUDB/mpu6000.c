@@ -211,16 +211,8 @@ void process_MPU_data(void)
 	}
 	*/
 
-//  Initial version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
-//  This was the fastest way to revise the software.
-//  MPU data was being read at 200 Hz, IMU and control loop ran at 40 Hz.
-//  4 out of 5 samples were being ignored. IMU got the most recent set of samples.
-
-//  Now, we want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
-//  to run the IMU at 200 Hz, turn the following back on
-	if (dcm_flags._.calib_finished) {
-		dcm_run_imu_step();
-	}
+	//  trigger synchronous processing of sensor data
+	_T1IF = 1;              // trigger the heartbeat interrupt
 }
 
 void MPU6000_read(void)

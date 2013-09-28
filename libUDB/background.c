@@ -57,11 +57,13 @@ void udb_run_init_step(void);
 
 void udb_init_clock(void)   // initialize timers
 {
+#if (BOARD_TYPE == UDB4_BOARD)
+	// Legacy code for analog IMU sensors
+
 	// Initialize Timer1, used as the HEARTBEAT_HZ heartbeat of libUDB.
 	// FCY is 70MHz max: prescaler = 64, timer clock max 70/64 MHz
 	// For 40Hz heartbeat, PR1 max = 70e6/64/40 = 27,344 < 65,535
 	// At lowest FCY of 16 MHz, PR1 = 6,250
-
 	TMR1 = 0;
 	T1CONbits.TCKPS = 2; // prescaler = 64
 	PR1 = (FCY / 64) / HEARTBEAT_HZ; // period 1/HEARTBEAT_HZ
@@ -70,6 +72,18 @@ void udb_init_clock(void)   // initialize timers
 	_T1IF = 0;              // clear the interrupt
 	_T1IE = 1;              // enable the interrupt
 	T1CONbits.TON = 1;      // turn on timer 1
+#else
+	// MPU6000 interrupt is used as the HEARTBEAT_HZ heartbeat of libUDB.
+	// Timer1 is not used for heartbeat, but its interrupt flag is set in the
+	// MPU6000 ISR.
+
+	T1CONbits.TON = 0;      // turn off timer 1
+	TMR1 = 0;
+	_T1IP = INT_PRI_T1;     // set interrupt priority
+	_T1IF = 0;              // clear the interrupt
+	_T1IE = 1;              // enable the interrupt
+#endif
+
 
 	// Two load measuring techniques are supported, depending on whether USE_MCU_IDLE is selected
 #if (USE_MCU_IDLE == 0)
@@ -272,17 +286,17 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	udb_servo_callback_prepare_outputs();
 
 #if (USE_I2C1_DRIVER == 1)
-	I2C1_trigger_service();
+		I2C1_trigger_service();
 #endif
 
 #if (USE_NV_MEMORY == 1)
-	nv_memory_service_trigger();
-	storage_service_trigger();
-	data_services_trigger();
+		nv_memory_service_trigger();
+		storage_service_trigger();
+		data_services_trigger();
 #endif	
 
 #if (USE_FLEXIFUNCTION_MIXING == 1)
-	flexiFunctionServiceTrigger();
+		flexiFunctionServiceTrigger();
 #endif
 
 	interrupt_restore_corcon;

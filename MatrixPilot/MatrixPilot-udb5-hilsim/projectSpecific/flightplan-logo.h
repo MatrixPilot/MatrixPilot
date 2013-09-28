@@ -269,18 +269,18 @@
 //
 // Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
 
-/*
+
 #define SQUARE 1
 
 const struct logoInstructionDef instructions[] = {
 	
-	//SET_ALT(100)
+	SET_ALT(50)
 	
 	// Go Home and point North
-	//HOME
+	HOME
 	
 	REPEAT_FOREVER
-		DO_ARG(SQUARE, 100)
+		DO_ARG(SQUARE, 1000)
 	END
 	
 	
@@ -291,7 +291,7 @@ const struct logoInstructionDef instructions[] = {
 		END
 	END
 } ;
-*/
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
@@ -509,7 +509,6 @@ TO (INT_HANDLER)
 	END
 END
 */
-
 /*
 // Simple Example of using LOGO to fly an OVAL pattern
 
@@ -530,8 +529,8 @@ TO (RIGHT_180)
 END
 
 } ;
-
 */
+/*
 //////////////////////////////////////////////////
 // UDB LOGO Navigation Parameters
 
@@ -599,3 +598,4 @@ TO (FLIGHT)
 	DO(LEFT_90)
 END
 } ;
+*/

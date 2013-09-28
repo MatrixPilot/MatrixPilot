@@ -135,13 +135,11 @@ void udb_servo_callback_prepare_outputs(void)
 #endif
 #endif // BAROMETER_ALTITUDE
 
-#if (BOARD_TYPE == UDB4_BOARD)
-//  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
+	//  run IMU code
 	if (dcm_flags._.calib_finished)
 	{
 		dcm_run_imu_step();
 	}
-#endif
 
 	dcm_servo_callback_prepare_outputs();
 
@@ -151,7 +149,11 @@ void udb_servo_callback_prepare_outputs(void)
 	}
 
 #if (HILSIM == 1)
-	send_HILSIM_outputs();
+	// 40 Hz
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+	{
+		send_HILSIM_outputs();
+	}
 #endif
 }
 

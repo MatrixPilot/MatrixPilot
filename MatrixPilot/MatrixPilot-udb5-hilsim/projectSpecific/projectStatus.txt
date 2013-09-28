@@ -19,3 +19,7 @@
 
 25 September 2013: copied from UDB5 project
 	HILSIM badly broken: problems with throttle control and waypoint following
+
+28 September: waypoints and Logo navigation working properly now with Xplane10
+	Throttle "problem" was apparently due to ALT_HOLD_THROTTLE_MIN set to 0.8.
+	Changed to 0.25 and HILSIM throttle seems good.

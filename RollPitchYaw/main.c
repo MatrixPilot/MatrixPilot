@@ -105,8 +105,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 	}
 	
-	// Serial output at 2Hz  (40Hz / 20)
-	if (udb_heartbeat_counter % 20 == 0)
+	// Serial output at 10Hz
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/10)) == 0)
 	{
 		if (dcm_flags._.calib_finished)
 		{
