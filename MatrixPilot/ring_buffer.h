@@ -16,7 +16,7 @@ int16_t ring_putn(const char* b, int16_t n);
 int16_t ring_available();
 int16_t ring_space();
 int16_t queue_data(const char* buff, int16_t nbytes);
-void queue_string(const char* string);
+int16_t queue_string(const char* string);
 void queue_prepend(const char* buff, int16_t nbytes);
 
 #endif	/* RING_BUFFER_H */
