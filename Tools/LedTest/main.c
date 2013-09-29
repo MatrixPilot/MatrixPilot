@@ -27,14 +27,14 @@
 #include <libpic30.h>
 
 #if (BOARD_TYPE == UDB4_BOARD)
-#define RATE_THRESHOLD_LED		120
-#define ACCEL_THRESHOLD_LED		40
+#define RATE_THRESHOLD_LED      120
+#define ACCEL_THRESHOLD_LED     40
 #else
-#define RATE_THRESHOLD_LED		200
-#define ACCEL_THRESHOLD_LED		120
+#define RATE_THRESHOLD_LED      200
+#define ACCEL_THRESHOLD_LED     120
 #endif
 
-int x_rate, y_rate, z_rate;
+int x_rate,  y_rate,  z_rate;
 int x_accel, y_accel, z_accel;
 char calib_countdown = 10;
 char eepromFailureFlashCount = 32;
@@ -46,13 +46,16 @@ extern void IOTest(void);
 int main(void)
 {
 	mcu_init();
-    IOTest();
-    udb_init();
+	IOTest();
+	udb_init();
 #if (BOARD_TYPE != AUAV3_BOARD)
-    udb_eeprom_init();  // using legacy eeprom driver
+	udb_eeprom_init();  // using legacy eeprom driver
 #endif
-    udb_run(); // This never returns.
-    return 0;
+	while (1)
+	{
+		udb_run();
+	}
+	return 0;
 }
 
 // Called every 1/40 second at low priority
@@ -243,3 +246,4 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 void udb_serial_callback_received_byte(uint8_t rxchar) { };
 
 void init_events(void) { }
+void udb_init_osd(void) { }

@@ -92,7 +92,8 @@ const uint32_t adc_clk = ADC_CLK;
 #define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
 const uint32_t adc_rate = ADC_RATE;
 
-#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+//#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+#define ALMOST_ENOUGH_SAMPLES 20
 const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
 //#define _SELECTED_VALUE(l,v) #l#v
@@ -119,8 +120,8 @@ ALMOST_ENOUGH_SAMPLES = 88
  */
 	sample_count = 0;
 
-//	AD1CON1bits.FORM  = 3;      // Data Output Format: Signed Fraction (Q15 format)
-	AD1CON1bits.FORM  = 0;      // Data Output Format: Integer
+	AD1CON1bits.FORM  = 3;      // Data Output Format: Signed Fraction (Q15 format)
+//	AD1CON1bits.FORM  = 0;      // Data Output Format: Integer
 	AD1CON1bits.SSRC  = 7;      // Sample Clock Source: Auto-conversion
 	AD1CON1bits.ASAM  = 1;      // ADC Sample Control: Sampling begins immediately after conversion
 	AD1CON1bits.AD12B = 1;      // 12-bit ADC operation

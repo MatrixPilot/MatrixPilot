@@ -30,6 +30,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
 // See the MatrixPilot wiki for more details on different board types.
+/*
 #ifdef UDB4
 #define BOARD_TYPE                          UDB4_BOARD
 #endif
@@ -43,7 +44,7 @@
 #ifndef BOARD_TYPE
 #define BOARD_TYPE                          UDB5_BOARD
 #endif
-
+ */
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // On Screen Display
 // USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD                             1
+//#define USE_OSD                             1
 
 // NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2

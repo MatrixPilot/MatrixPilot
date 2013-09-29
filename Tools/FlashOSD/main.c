@@ -113,8 +113,10 @@ int main(void)
 	mcu_init();
 	udb_init();
 
-	udb_run();
-
+	while (1)
+	{
+		udb_run();
+	}
 	return 0;
 }
 

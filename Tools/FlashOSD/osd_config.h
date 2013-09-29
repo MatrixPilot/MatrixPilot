@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2012 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -19,13 +19,14 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// USE_OSD enables the OSD system
-#define USE_OSD         OSD_NONE
-//#define USE_OSD         OSD_NATIVE
-//#define USE_OSD         OSD_REMZIBI
+////////////////////////////////////////////////////////////////////////////////
+// On Screen Display
+//   OSD_NONE    disable the OSD system
+//   OSD_NATIVE  enable native OSD
+//   OSD_REMZIBI enable support for Remzibi OSD
+//   OSD_MINIM   enable minim OSD (under development)
+//
+// Customize the OSD Layout in the osd_layout.h file.
+//
+#define USE_OSD                             OSD_NATIVE
 
-#define USE_OSD_SPI     1   // set this to 1 to use the SPI peripheral, 0 to bit-bash
-#define OSD_SF          5   // scale factor for SPI delays - TODO: get rid of
-
-#define OSD_NTSC        0
-#define OSD_PAL         1

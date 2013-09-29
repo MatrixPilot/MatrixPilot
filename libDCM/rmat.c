@@ -361,14 +361,14 @@ static void normalize(void)
 static void roll_pitch_drift(void)
 {
 	VectorCross(errorRP, gplane, &rmat[6]);
-#ifdef CATAPULT_LAUNCH_ENABLE
+//#ifdef CATAPULT_LAUNCH_ENABLE
 #define MAXIMUM_PITCH_ERROR ((fractional)(GRAVITY*0.25))
 	// the following is done to limit the pitch error during a catapult launch
-	// it has no effect during normal conditions, because acceleration compensated gplane
-	// is approximately aligned with rmat[6] vector
+	// it has no effect during normal conditions, because acceleration
+	// compensated gplane is approximately aligned with rmat[6] vector
 	if (errorRP[0] >  MAXIMUM_PITCH_ERROR) errorRP[0] =  MAXIMUM_PITCH_ERROR;
 	if (errorRP[0] < -MAXIMUM_PITCH_ERROR) errorRP[0] = -MAXIMUM_PITCH_ERROR;
-#endif // CATAPULT_LAUNCH_ENABLE
+//#endif // CATAPULT_LAUNCH_ENABLE
 }
 
 static void yaw_drift(void)
