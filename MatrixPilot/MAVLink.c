@@ -295,7 +295,7 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 {
 	// Note at the moment, all channels lead to the one serial port
 #ifdef USE_RING_BUFFER
-        queue_data((char*)buf, len);
+	return queue_data((char*) buf, len);
 #else
 	if (serial_interrupt_stopped == 1)
 	{

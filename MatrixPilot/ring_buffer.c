@@ -160,20 +160,24 @@ int16_t ring_space()
 	return space;
 }
 
-void queue_data(const char* buff, int16_t nbytes)
+int16_t queue_data(const char* buff, int16_t nbytes)
 {
 	if (ring_space() > nbytes)
 	{
 		ring_putn(buff, nbytes);
+		return(1);
+	}
+	else
+	{
+		return(-1);
 	}
 }
 
 // send string out telemetry port
 
-void queue_string(const char* string)
+int16_t queue_string(const char* string)
 {
-	//    db_index = 0;
-	queue_data(string, strlen(string));
+	return queue_data(string, strlen(string));
 }
 
 // queue a string without null terminator
