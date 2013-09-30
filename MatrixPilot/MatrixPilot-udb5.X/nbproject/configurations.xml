@@ -47,6 +47,7 @@
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../config.h</itemPath>
+        <itemPath>../ring_buffer.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -261,7 +262,6 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
-        <itemPath>../ring_buffer.h</itemPath>
         <itemPath>../ring_buffer.c</itemPath>
       </logicalFolder>
     </logicalFolder>

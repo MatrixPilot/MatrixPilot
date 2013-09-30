@@ -169,7 +169,7 @@ int16_t queue_data(const char* buff, int16_t nbytes)
 	}
 	else
 	{
-		return(-1);
+		return(0);
 	}
 }
 

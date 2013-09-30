@@ -31,7 +31,8 @@
 
 #define UDB_BAUD(x) ((int16_t)(FCY / ((int32_t)4 * x) - 1))
 
-// currently unimplemented; to be used with OpenLog for software flow control
+// to be used with OpenLog for software flow control
+// Warning: imcompatible with mavlink binary uplink
 boolean pauseSerial = false;
 
 

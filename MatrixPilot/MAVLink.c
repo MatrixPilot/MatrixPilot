@@ -256,8 +256,10 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 #else
 #include "ring_buffer.h"
 
-// currently unimplemented; to be used with OpenLog for software flow control
+// to be used with OpenLog for software flow control
+// Warning: imcompatible with mavlink binary uplink
 extern boolean pauseSerial;
+#define SOFTWARE_FLOW_CONTROL 0
 
 // compiler built_in mechanism to set and restore IPL
 static int current_cpu_ipl;
@@ -280,8 +282,12 @@ boolean udb_serial_callback_get_binary_to_send(char *c)
 {
 	boolean status = false;
 
+#if (SOFTWARE_FLOW_CONTROL != 0)
 	if (!pauseSerial)
+#endif
+	{
 		status = ring_get(c);
+	}
 
 	if (!status)
 		serial_interrupt_stopped = 1;
@@ -295,7 +301,14 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 {
 	// Note at the moment, all channels lead to the one serial port
 #ifdef USE_RING_BUFFER
-	return queue_data((char*) buf, len);
+	int status = queue_data((char*) buf, len);
+
+	if (status && (serial_interrupt_stopped == 1))
+	{
+		serial_interrupt_stopped  = 0;
+		udb_serial_start_sending_data();
+	}
+	return status;
 #else
 	if (serial_interrupt_stopped == 1)
 	{
@@ -443,6 +456,7 @@ mavlink_status_t r_mavlink_status;
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 #ifdef USE_RING_BUFFER
+#if (SOFTWARE_FLOW_CONTROL == 1)
 	// check for XON/XOFF
 	if (rxchar == XON)
 	{
@@ -457,6 +471,7 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 		pauseSerial = true;
 	}
 	else
+#endif
 #endif
 	{
 		// parse character

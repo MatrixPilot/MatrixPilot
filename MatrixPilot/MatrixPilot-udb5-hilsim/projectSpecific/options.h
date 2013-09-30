@@ -39,7 +39,8 @@
 // TODO: add option to use separate UART for mavlink uplink
 // TODO: port gimbal parameter setting code for use instead of mavlink uplink
 //       (could use "console" instead)
-//#define USE_RING_BUFFER
+//#undef USE_RING_BUFFER
+#define USE_RING_BUFFER
 
 // define this to add debug text messages to mavlink stream
 #undef USE_MAVLINK_DBGIO
