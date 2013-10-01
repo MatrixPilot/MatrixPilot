@@ -33,6 +33,8 @@ int16_t rawMagCalib[3] = { 0 , 0 , 0 };
 int16_t magFieldRaw[3];
 int16_t magMessage = 0;                         // message type
 
+static magnetometer_callback_funcptr magnetometer_callback = NULL;
+
 #if (MAG_YAW_DRIFT == 1)
 
 #define HMC5883_COMMAND 0x3C
@@ -71,7 +73,6 @@ static uint8_t magreg[6];       // magnetometer read-write buffer
 static int16_t mrindex;         // index into the read write buffer 
 static int16_t magCalibPause = 0;
 static int16_t I2messages = 0;
-static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 // forward declarations
 static void I2C_callback(boolean I2CtrxOK);
@@ -202,6 +203,13 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 	magnetometer_callback = callback;
 	magMessage = 7;     // indicate valid magnetometer data
 	I2C_callback(true); // run the magnetometer computations
+}
+
+#else
+
+void rxMagnetometer(magnetometer_callback_funcptr callback)
+{
+	magnetometer_callback = callback;
 }
 
 #endif // MAG_YAW_DRIFT

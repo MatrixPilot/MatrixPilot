@@ -830,7 +830,6 @@ void gps_commit_data(void)
 	svs             = svs_;
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
-	extern void HILSIM_MagData(magnetometer_callback_funcptr callback);
 	HILSIM_MagData(udb_magnetometer_callback); // run the magnetometer computations
 #endif // HILSIM
 }

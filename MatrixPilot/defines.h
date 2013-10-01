@@ -75,6 +75,8 @@ void setTargetAltitude(int16_t targetAlt);
 void init_yawCntrl(void);
 void init_rollCntrl(void);
 void init_pitchCntrl(void);
+void init_altitudeCntrl(void);
+void init_altitudeCntrlVariable(void);
 
 
 // wind gain adjustment
@@ -121,6 +123,7 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 ////////////////////////////////////////////////////////////////////////////////
 // navigation.c
+void init_navigation(void);
 #ifdef USE_EXTENDED_NAV
 void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
 #else
@@ -245,7 +248,7 @@ void camera_live_received_byte(uint8_t inbyte);
 void camera_live_commit(void);
 void camera_live_commit_values(const struct relative3D target);
 
-#define CAM_VIEW_LAUNCH     { 0, 0, 0 }
+//#define CAM_VIEW_LAUNCH     { 0, 0, 0 }
 
 
 ////////////////////////////////////////////////////////////////////////////////

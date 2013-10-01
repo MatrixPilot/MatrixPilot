@@ -17,6 +17,11 @@
 #include <Windows.h>
 #include <Time.h>
 
+#include "libUDB.h"
+#include "../../libUDB/magnetometer.h"
+#include "../../libUDB/heartbeat.h"
+#include "SIL-config.h"
+
 struct timezone
 {
 	int tz_minuteswest; // of Greenwich
@@ -103,9 +108,9 @@ uint8_t rc_signal_strength;                     // rc_signal_strength is 0-100 a
 int16_t magMessage;
 int16_t vref_adj;
 
-volatile int16_t trap_flags;
-volatile int32_t trap_source;
-volatile int16_t osc_fail_count;
+volatile uint16_t trap_flags;
+volatile uint32_t trap_source;
+volatile uint16_t osc_fail_count;
 uint16_t mp_rcon = 3;                           // default RCON state at normal powerup
 
 extern int mp_argc;
@@ -153,19 +158,23 @@ void udb_init(void)
 #define UDB_STEP_TIME 25
 #define UDB_WRAP_TIME 1000
 
+int initialised = 0;
+
 void udb_run(void)
 {
 	uint16_t currentTime;
 	uint16_t nextHeartbeatTime;
 
-	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
-		udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
-		udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
+	if (!initialised) {
+		initialised = 1;
+		if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
+			udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
+			udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
+		}
+		nextHeartbeatTime = get_current_milliseconds();
 	}
 
-	nextHeartbeatTime = get_current_milliseconds();
-
-	while (1) {
+//	while (1) {
 		if (!handleUDBSockets()) {
 			sleep_milliseconds(1);
 		}
@@ -190,7 +199,7 @@ void udb_run(void)
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
 		}
 		process_queued_events();
-	}
+//	}
 }
 
 void udb_background_trigger(void)
@@ -367,7 +376,15 @@ boolean handleUDBSockets(void)
 	return didRead;
 }
 
-#if  (MAG_YAW_DRIFT == 1)
+#if (MAG_YAW_DRIFT == 1)
+
+static magnetometer_callback_funcptr magnetometer_callback = NULL;
+
+void rxMagnetometer(magnetometer_callback_funcptr callback)
+{
+	magnetometer_callback = callback;
+}
+
 void I2C_doneReadMagData(void)
 {
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1];
@@ -384,7 +401,15 @@ void I2C_doneReadMagData(void)
 			(abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM) &&
 			(abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM))
 		{
-			udb_magnetometer_callback();
+//			udb_magnetometer_callback();
+			if (magnetometer_callback != NULL)
+			{
+				magnetometer_callback();
+			}
+			else
+			{
+				printf("ERROR: magnetometer_callback function pointer not set\r\n");
+			}
 		}
 		else
 		{
@@ -393,10 +418,16 @@ void I2C_doneReadMagData(void)
 	}
 }
 
-void HILSIM_MagData(void)
+void HILSIM_MagData(magnetometer_callback_funcptr callback)
 {
+//	magnetometer_callback = callback;
 	magMessage = 7;                 // indicate valid magnetometer data
 	I2C_doneReadMagData();          // run the magnetometer computations
 }
 
-#endif
+#endif // MAG_YAW_DRIFT
+
+int setjmp(void)
+{
+	return 0;
+}

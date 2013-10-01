@@ -397,6 +397,12 @@
 #define ANALOG_VOLTAGE_INPUT_CHANNEL        CHANNEL_UNUSED
 #define ANALOG_RSSI_INPUT_CHANNEL           CHANNEL_UNUSED
 
+#define MAX_CURRENT                         900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define CURRENT_SENSOR_OFFSET               10  // Add 1.0 Amp to whatever value we sense
+
+#define MAX_VOLTAGE                         543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define VOLTAGE_SENSOR_OFFSET               0   // Add 0.0 Volts to whatever value we sense
+
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE             0.5     // Voltage when RSSI should show 0%
 #define RSSI_MAX_SIGNAL_VOLTAGE             3.3     // Voltage when RSSI should show 100%
@@ -637,25 +643,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Software In the Loop Simulation
-// Only set this to 1 when building for simulation directly on your computer instead of
-// running on a UDB.
-// See the MatrixPilot wiki for more info on using SILSIM.
-// Below are settings to configure the simulated UDB UARTs.
-// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
-// passing RC inputs through to the simulated UDB.
-#define SILSIM                              0
-#define SILSIM_GPS_RUN_AS_SERVER            0
-#define SILSIM_GPS_PORT                     14551       // default port to connect to XPlane HILSIM plugin
-#define SILSIM_GPS_HOST                     "127.0.0.1"
-#define SILSIM_TELEMETRY_RUN_AS_SERVER      0
-#define SILSIM_TELEMETRY_PORT               14550       // default port to connect to QGroundControl
-#define SILSIM_TELEMETRY_HOST               "127.0.0.1"
-#define SILSIM_SERIAL_RC_INPUT_DEVICE       ""          // i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
-#define SILSIM_SERIAL_RC_INPUT_BAUD         38400
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Flight Plan handling
 //
 // You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
@@ -712,7 +699,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable experimental extended range navigation support (merged from ballon launch branch)
-#define USE_EXTENDED_NAV                    0
+//#define USE_EXTENDED_NAV
 
 
 ////////////////////////////////////////////////////////////////////////////////

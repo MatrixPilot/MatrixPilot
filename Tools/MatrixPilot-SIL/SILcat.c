@@ -15,6 +15,7 @@
 
 #include "UDBSocket.h"
 #include "options.h"
+#include "SIL-config.h"
 
 UDBSocket stdioSocket;
 UDBSocket transportSocket;

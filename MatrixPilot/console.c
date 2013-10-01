@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "defines.h"
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
@@ -179,26 +180,26 @@ void printbin16(int a)
 
 const char *byte_to_binary(int x)
 {
-    static char b[9];
-    int z;
+	static char b[9];
+	int z;
 
-    b[0] = '\0';
-    for (z = 128; z > 0; z >>= 1) {
-        strcat(b, ((x & z) == z) ? "1" : "0");
-    }
-    return b;
+	b[0] = '\0';
+	for (z = 128; z > 0; z >>= 1) {
+		strcat(b, ((x & z) == z) ? "1" : "0");
+	}
+	return b;
 }
 
 const char *word_to_binary(int x)
 {
-    static char b[17];
-    unsigned int z;
+	static char b[17];
+	unsigned int z;
 
-    b[0] = '\0';
-    for (z = 0x8000; z > 0; z >>= 1) {
-        strcat(b, ((x & z) == z) ? "1" : "0");
-    }
-    return b;
+	b[0] = '\0';
+	for (z = 0x8000; z > 0; z >>= 1) {
+		strcat(b, ((x & z) == z) ? "1" : "0");
+	}
+	return b;
 }
 
 void gentrap(void);
@@ -333,10 +334,10 @@ void console(void)
 			cmdstr[cmdlen] = ch;
 			if ((ch == '\r') || (ch == '\n')) {
 				cmdstr[cmdlen] = '\0';
+				cmdlen = 0;
 				if (strlen(cmdstr) > 0) {
 					putch('\r');
 					command(cmdstr);
-					cmdlen = 0;
 				}
 			} else {
 				putch(ch);

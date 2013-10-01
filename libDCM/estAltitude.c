@@ -22,6 +22,7 @@
 #include "libDCM.h"
 #include "../libUDB/barometer.h"
 #include "estAltitude.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 

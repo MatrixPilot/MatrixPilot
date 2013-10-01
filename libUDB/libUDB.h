@@ -28,6 +28,26 @@
 
 #include "options.h"
 
+#if (WIN == 1)
+#define SILSIM                              1
+#undef  HILSIM
+#define HILSIM                              1
+#undef  MODE_SWITCH_TWO_POSITION
+#define MODE_SWITCH_TWO_POSITION            0
+#undef  USE_TELELOG
+#define USE_TELELOG                         0
+#undef  USE_CONFIGFILE
+#define USE_CONFIGFILE                      0
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
+#include "SIL-udb.h"
+#else
+#define SILSIM                              0
+#include <dsp.h>
+#endif // WIN
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
 // The UDB4, UDB5, or AUAV3 definition now comes from the project, or if not
@@ -44,22 +64,17 @@
 #endif
 
 #ifndef BOARD_TYPE
+#if (SILSIM == 0)
 #pragma warning BOARD_TYPE defaulting to UDB4_BOARD
+#endif // SILSIM
 #define BOARD_TYPE                          UDB4_BOARD
-#endif
-
+#endif // BOARD_TYPE
 
 #ifdef USE_DEBUG_IO
 #define DPRINT printf
 #else
 #define DPRINT(args...)
-#endif
-
-#if (SILSIM == 1)
-#include "SIL-udb.h"
-#else
-#include <dsp.h>
-#endif
+#endif // USE_DEBUG_IO
 
 #include "fixDeps.h"
 #include "libUDB_defines.h"
@@ -102,6 +117,7 @@ void udb_init(void);
 // Your code should respond to the Callbacks below.
 void udb_run(void);
 
+int setjmp(void);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks

@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "../libDCM/gpsParseCommon.h"
+#include "config.h"
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -28,10 +29,6 @@
 
 #if (USE_USB == 1)
 #include "preflight.h"
-#endif
-
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
 #endif
 
 #if (CONSOLE_UART != 0)

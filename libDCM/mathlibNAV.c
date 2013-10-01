@@ -404,6 +404,8 @@ int32_t long_scale(int32_t arg1, int16_t arg2)
 	}
 }
 
+#ifdef USE_EXTENDED_NAV
+
 int16_t find_first_bit_int16(int16_t argument)
 {
 	// finds first bit position in the absolute value of a 16 bit signed integer
@@ -463,3 +465,5 @@ int16_t find_first_bit_int32(int32_t argument)
 		return binw1 - 1;
 	}
 }
+
+#endif // USE_EXTENDED_NAV

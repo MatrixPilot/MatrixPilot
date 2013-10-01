@@ -23,6 +23,8 @@
 #include "config.h"
 #include <stdio.h>
 
+#include "airspeedCntrl.h"
+
 #if (USE_CONFIGFILE == 1)
 
 #include "minIni.h"
@@ -256,7 +258,6 @@ void init_config(void)
 /*
 int   ini_putl(const mTCHAR *Section, const mTCHAR *Key, long Value, const mTCHAR *Filename);
 int   ini_puts(const mTCHAR *Section, const mTCHAR *Key, const mTCHAR *Value, const mTCHAR *Filename);
-#if defined INI_REAL
 int   ini_putf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL Value, const mTCHAR *Filename);
  */
 

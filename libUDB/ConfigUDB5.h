@@ -28,12 +28,16 @@
 #define SCALEACCEL          1.29    // 4 g range
 
 // A/D channels:
-#define A_VCC_BUFF          1
-#define A_5V_BUFF           2
 #define analogInput1BUFF    3
 #define analogInput2BUFF    4
 #define analogInput3BUFF    5
 #define analogInput4BUFF    6
+#define A_VOLT_BUFF         7       // V, pin label Bat Volt
+#define A_AMPS_BUFF         8       // I, pin label CS Curr
+#define A_RSSI_BUFF         9       // RS, pin label RSSI
+
+#define A_VCC_BUFF          1
+#define A_5V_BUFF           2
 
 // MPU6000 configuration
 // device is rotated 90 degrees clockwise from breakout board/AUAV3
