@@ -23,6 +23,7 @@
 #include "I2C.h"
 #include "magnetometer.h"
 #include "magnetometerOptions.h"
+#include "rmat.h"
 #include <stdio.h>
 
 int16_t udb_magFieldBody[3];                    // magnetic field in the body frame of reference 
@@ -200,6 +201,7 @@ void HILSIM_MagData(void)
 {
 	magMessage = 7;     // indicate valid magnetometer data
 	I2C_callback(true); // run the magnetometer computations
+	udb_magnetometer_callback();
 }
 
 #endif // MAG_YAW_DRIFT
