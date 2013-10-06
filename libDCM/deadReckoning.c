@@ -23,7 +23,7 @@
 #include "../libUDB/heartbeat.h"
 
 
-// seconds
+// heartbeats
 #define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4)
 
 // seconds
@@ -50,16 +50,19 @@
 #define DR_FILTER_GAIN (int16_t) (DR_TIMESTEP*MAX16/DR_TAU)
 
 // 1/seconds
-#define DRFG_OVER_TAU (uint16_t) (DR_FILTER_GAIN/DR_TAU)
+#define ONE_OVER_TAU (uint16_t) (MAX16/DR_TAU)
+//#define ENABLE_VEL_OFFSET
+#undef ENABLE_VEL_OFFSET
 
 int16_t dead_reckon_clock = DR_PERIOD;
 
-//      velocity, as estimated by the IMU
+//      velocity, as estimated by the IMU: high word is cm/sec
 union longww IMUvelocityx =  { 0 };
 union longww IMUvelocityy =  { 0 };
 union longww IMUvelocityz =  { 0 };
 
 //      location, as estimated by the IMU
+// high word is meters, low word is fractional meters
 union longww IMUlocationx =  { 0 };
 union longww IMUlocationy =  { 0 };
 union longww IMUlocationz =  { 0 };
@@ -72,7 +75,7 @@ union longww IMUintegralAccelerationz = { 0 };
 uint16_t air_speed_3DIMU = 0;
 int16_t total_energy = 0;
 
-//	GPSlocation - IMUlocation
+//	GPSlocation - IMUlocation: meters
 fractional locationErrorEarth[] = { 0 , 0 , 0 };
 //	GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0 , 0 , 0 };
@@ -107,13 +110,15 @@ void dead_reckon(void)
 			IMUlocationy.WW += __builtin_mulss(DR_FILTER_GAIN ,  locationErrorEarth[1]);
 			IMUlocationz.WW += __builtin_mulss(DR_FILTER_GAIN ,  locationErrorEarth[2]);
 
-			IMUvelocityx.WW = IMUintegralAccelerationx.WW +
-								__builtin_mulus(DRFG_OVER_TAU , 100*locationErrorEarth[0]);
-			IMUvelocityy.WW = IMUintegralAccelerationy.WW +
-								__builtin_mulus(DRFG_OVER_TAU , 100*locationErrorEarth[1]);
-			IMUvelocityz.WW = IMUintegralAccelerationz.WW +
-								__builtin_mulus(DRFG_OVER_TAU , 100*locationErrorEarth[2]);
+			IMUvelocityx.WW = IMUintegralAccelerationx.WW;
+			IMUvelocityy.WW = IMUintegralAccelerationy.WW;
+			IMUvelocityz.WW = IMUintegralAccelerationz.WW;
 
+#ifdef ENABLE_VEL_OFFSET
+			IMUvelocityx.WW += __builtin_mulus(ONE_OVER_TAU , 100*locationErrorEarth[0]);
+			IMUvelocityy.WW += __builtin_mulus(ONE_OVER_TAU , 100*locationErrorEarth[1]);
+			IMUvelocityz.WW += __builtin_mulus(ONE_OVER_TAU , 100*locationErrorEarth[2]);
+#endif
 		}
 		else  // GPS has gotten disconnected
 		{
