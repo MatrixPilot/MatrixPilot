@@ -364,12 +364,8 @@
 //#define USE_OSD                             0   // moved to osd.h
 
 // NUM_ANALOG_INPUTS:
-// For classic boards: Set to 0, 1, or 2
-//   1 enables Radio In 1 as an analog Input
-//   2 also enables Radio In 2 as another analog Input
-//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS                   0
+//#define NUM_ANALOG_INPUTS                   0 // moved to board specific config files
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
