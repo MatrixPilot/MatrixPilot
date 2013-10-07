@@ -38,6 +38,7 @@ SIL-events.o \
 ../../MatrixPilot/altitudeCntrlVariable.o \
 ../../MatrixPilot/behavior.o \
 ../../MatrixPilot/cameraCntrl.o \
+../../MatrixPilot/config.o \
 ../../MatrixPilot/config_tests.o \
 ../../MatrixPilot/data_services.o \
 ../../MatrixPilot/data_storage.o \

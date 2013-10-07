@@ -25,6 +25,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
@@ -197,11 +198,16 @@ void process_MPU_data(void)
 
 //  Now, we want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
 //  to run the IMU at 200 Hz, turn the following back on
+
 /*
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step();
 	}
-*/
+ */
+#if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
+	//  trigger synchronous processing of sensor data
+	_T1IF = 1;              // trigger the heartbeat interrupt
+#endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 
 void MPU6000_read(void)
