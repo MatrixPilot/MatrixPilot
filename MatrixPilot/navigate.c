@@ -390,17 +390,14 @@ int16_t determine_navigation_deflection(char navType)
 		actualY = actualXY[1];
 		if (navType == 'y')
 		{
-printf("using yawkprud (%u) at line %u\r\n", yawkprud, LINE);
 			yawkp = yawkprud;
 		}
 		else if (navType == 'a')
 		{
-printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 		}
 		else if (navType == 'h')
 		{
-printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 		}
 		else
@@ -412,21 +409,18 @@ printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 	{
 		if (navType == 'y')
 		{
-printf("using yawkprud (%u) at line %u\r\n", yawkprud, LINE);
 			yawkp = yawkprud ;
 			actualX = rmat[1];
 			actualY = rmat[4];
 		}
 		else if (navType == 'a')
 		{
-printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 			actualX = rmat[1];
 			actualY = rmat[4];
 		}
 		else if (navType == 'h')
 		{
-printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 			actualX = rmat[2];
 			actualY = rmat[5];
