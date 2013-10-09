@@ -38,8 +38,10 @@
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
-uint16_t yawkpail;
-uint16_t yawkprud;
+//uint16_t yawkpail;
+//uint16_t yawkprud;
+uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
+uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 
 struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };
@@ -388,14 +390,17 @@ int16_t determine_navigation_deflection(char navType)
 		actualY = actualXY[1];
 		if (navType == 'y')
 		{
+printf("using yawkprud (%u) at line %u\r\n", yawkprud, LINE);
 			yawkp = yawkprud;
 		}
 		else if (navType == 'a')
 		{
+printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 		}
 		else if (navType == 'h')
 		{
+printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 		}
 		else
@@ -407,18 +412,21 @@ int16_t determine_navigation_deflection(char navType)
 	{
 		if (navType == 'y')
 		{
+printf("using yawkprud (%u) at line %u\r\n", yawkprud, LINE);
 			yawkp = yawkprud ;
 			actualX = rmat[1];
 			actualY = rmat[4];
 		}
 		else if (navType == 'a')
 		{
+printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 			actualX = rmat[1];
 			actualY = rmat[4];
 		}
 		else if (navType == 'h')
 		{
+printf("using yawkpail (%u) at line %u\r\n", yawkpail, LINE);
 			yawkp = yawkpail;
 			actualX = rmat[2];
 			actualY = rmat[5];
