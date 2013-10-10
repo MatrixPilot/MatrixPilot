@@ -38,10 +38,8 @@
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
-//uint16_t yawkpail;
-//uint16_t yawkprud;
-uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
-uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
+uint16_t yawkpail;
+uint16_t yawkprud;
 
 struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };
@@ -58,8 +56,8 @@ extern union longww IMUintegralAccelerationy;
 
 void init_navigation(void)
 {
-	uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
-	uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
+	yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
+	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 }
 
 static void setup_origin(void)
