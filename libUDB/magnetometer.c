@@ -36,6 +36,7 @@ int16_t magMessage = 0;                         // message type
 static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 #if (MAG_YAW_DRIFT == 1)
+//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 
 #define HMC5883_COMMAND 0x3C
 
@@ -82,6 +83,7 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)     // service the m
 {
 	magnetometer_callback = callback;
 
+#if (HILSIM != 1)
 	I2messages++;
 #if (LED_RED_MAG_CHECK == 1)
 	if (magMessage == 7)
@@ -143,6 +145,7 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)     // service the m
 	{
 		magCalibPause--;
 	}
+#endif  // (HILSIM != 1)
 }
 
 // this is the callback function for when the I2C transaction is complete
@@ -205,11 +208,11 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 	I2C_callback(true); // run the magnetometer computations
 }
 
-#else
-
-void rxMagnetometer(magnetometer_callback_funcptr callback)
-{
-	magnetometer_callback = callback;
-}
-
+//#else
+//
+//void rxMagnetometer(magnetometer_callback_funcptr callback)
+//{
+//	magnetometer_callback = callback;
+//}
+//
 #endif // MAG_YAW_DRIFT

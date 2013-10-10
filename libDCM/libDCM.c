@@ -104,7 +104,8 @@ void do_I2C_stuff(void)
 
 	if (toggle) {
 		if (counter++ > 0) {
-#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#if (MAG_YAW_DRIFT == 1)
 //			printf("rxMag %u\r\n", udb_heartbeat_counter);
 			rxMagnetometer(udb_magnetometer_callback);
 #endif
@@ -127,7 +128,8 @@ void udb_servo_callback_prepare_outputs(void)
 #if (BAROMETER_ALTITUDE == 1)
 	do_I2C_stuff();
 #else
-#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz
 //	if (udb_heartbeat_counter % 10 == 0)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
