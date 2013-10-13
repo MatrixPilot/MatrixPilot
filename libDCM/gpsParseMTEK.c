@@ -179,60 +179,6 @@ void msg_CS1(uint8_t gpschar)
 	msg_parse = &msg_start;
 }
 
-const uint8_t days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-#define MS_PER_DAY 86400000 // = (24 * 60 * 60 * 1000)
-
-void calculate_week_num(void)
-{
-	// Convert date from DDMMYY to week_num and day_of_week
-	int32_t date = date_gps_.WW;
-	uint8_t year = date % 100;
-	date /= 100;
-	uint8_t month = date % 100;
-	date /= 100;
-	int16_t day = date % 100;
-
-	// Wait until we have real date data
-	if (day == 0 || month == 0) return;
-
-	// Begin counting at May 1, 2011 since this 1st was a Sunday
-	uint8_t m = 5;  // May
-	uint8_t y = 11; // 2011
-	int16_t c = 0;  // loop counter
-
-	while (m < month || y < year) {
-		day += days_in_month[m-1];          // (m == 1) means Jan, so use days_in_month[0]
-		if ((m == 2) && (y % 4 == 0) && (y % 100 != 0)) day += 1; // Add leap day
-		m++;
-		if (m == 13)
-		{
-			m = 1;
-			y++;
-		}
-
-		if (++c > 1200) break; // Emergency escape from this loop.  Works correctly until May 2111.
-	}
-
-	// We started at week number 1634
-	week_no.BB  = 1634 + (day / 7);
-	day_of_week = (day % 7) - 1;
-}
-
-void calculate_time_of_week(void)
-{
-	// Convert time from HHMMSSmil to time_of_week in ms
-	uint32_t time = time_gps_.WW;
-	int16_t ms = time % 1000;
-	time /= 1000;
-	uint8_t s = time % 100;
-	time /= 100;
-	uint8_t m = time % 100;
-	time /= 100;
-	uint8_t h = time % 100;
-	time = (((((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms;
-	tow.WW = time + (((int32_t)day_of_week) * MS_PER_DAY);
-}
-
 void commit_gps_data(void) 
 {
 	if (week_no.BB == 0) calculate_week_num();
