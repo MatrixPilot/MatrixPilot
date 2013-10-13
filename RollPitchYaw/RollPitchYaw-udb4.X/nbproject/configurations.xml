@@ -46,6 +46,7 @@
         <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
