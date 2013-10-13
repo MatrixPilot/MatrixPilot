@@ -10,6 +10,7 @@
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
         <itemPath>../../libDCM/estAltitude.h</itemPath>
         <itemPath>../../libDCM/rmat.h</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/libUDB.h</itemPath>
@@ -186,6 +187,7 @@
         <itemPath>projectSpecific/gain_variables.h</itemPath>
         <itemPath>projectSpecific/magnetometerOptions.h</itemPath>
         <itemPath>projectSpecific/osd_layout.h</itemPath>
+        <itemPath>projectSpecific/gpsParseUBX_57600.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -200,7 +202,6 @@
         <itemPath>../../libDCM/estYawDrift.c</itemPath>
         <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
         <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
-        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
         <itemPath>../../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../../libDCM/rmat.c</itemPath>
         <itemPath>../../libDCM/libDCM.c</itemPath>
@@ -217,6 +218,7 @@
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>
@@ -262,11 +264,6 @@
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
-        <itemPath>../stack.S</itemPath>
-        <itemPath>../telemetry_log.c</itemPath>
-        <itemPath>../telemetry_log.h</itemPath>
-        <itemPath>../config.c</itemPath>
-        <itemPath>../preflight.c</itemPath>
         <itemPath>../ring_buffer.c</itemPath>
       </logicalFolder>
     </logicalFolder>
@@ -275,8 +272,6 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>../../SensorAxes_MPQ_dual.pdf</itemPath>
-    <itemPath>../../Readme.txt</itemPath>
     <itemPath>../../branchStatus.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
@@ -287,19 +282,18 @@
     <conf name="default" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>dsPIC33EP512MU810</targetDevice>
+        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>../VectorMatrix.X/dist/AUAV3/production/VectorMatrix.X.a</linkerLibFileItem>
-            <linkerLibFileItem>../Microchip_Library_Apps.X/dist/AUAV3/production/Microchip_Library_Apps.X.a</linkerLibFileItem>
+            <linkerLibFileItem>../VectorMatrix.X/dist/UDB4_5/production/VectorMatrix.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
@@ -309,7 +303,7 @@
       </compileType>
       <makeCustomizationType>
         <makeCustomizationPreStepEnabled>true</makeCustomizationPreStepEnabled>
-        <makeCustomizationPreStep>touch ../../MatrixPilot/console.c; touch ../../MatrixPilot/config_tests.c</makeCustomizationPreStep>
+        <makeCustomizationPreStep>touch ../../MatrixPilot/config_tests.c</makeCustomizationPreStep>
         <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
         <makeCustomizationPostStep></makeCustomizationPostStep>
         <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
@@ -318,8 +312,8 @@
       </makeCustomizationType>
       <C30>
         <property key="code-model" value="large-code"/>
-        <property key="const-model" value="const-in-code"/>
-        <property key="data-model" value="large-data"/>
+        <property key="const-model" value="default"/>
+        <property key="data-model" value="default"/>
         <property key="enable-all-warnings" value="true"/>
         <property key="enable-ansi-std" value="false"/>
         <property key="enable-ansi-warnings" value="false"/>
@@ -331,7 +325,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="./projectSpecific;../../MAVLink/include;..;../../libUDB;../../libDCM;../../libFlashFS;../../MAVLink/include/common;../../MAVLink/include/matrixpilot;../../Microchip/Include"/>
+                  value="./projectSpecific;../../MAVLink/include;..;../../libUDB;../../libDCM;../../MAVLink/include/common;../../MAVLink/include/matrixpilot"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -345,7 +339,7 @@
         <property key="oXC16gcc-name-text-sec" value=""/>
         <property key="oXC16gcc-near-chars" value="false"/>
         <property key="oXC16gcc-no-isr-warn" value="false"/>
-        <property key="oXC16gcc-sfr-warn" value="true"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
         <property key="oXC16gcc-smar-io-lvl" value="1"/>
         <property key="oXC16gcc-smart-io-fmt" value=""/>
         <property key="optimization-level" value="0"/>

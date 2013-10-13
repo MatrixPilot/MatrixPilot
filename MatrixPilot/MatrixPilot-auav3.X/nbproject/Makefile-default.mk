@@ -73,7 +73,7 @@ FIXDEPS=fixDeps
 
 # The following macros may be used in the pre and post step lines
 Device=dsPIC33EP512MU810
-ProjectDir=/home/markw/MPLABXProjects/MatrixPilot_mw4/MatrixPilot/MatrixPilot-auav3.X
+ProjectDir=/home/markw/MPLABXProjects/MatrixPilot_mw4fbw/MatrixPilot/MatrixPilot-auav3.X
 ConfName=default
 ImagePath=dist/default/${IMAGE_TYPE}/MatrixPilot-auav3.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 ImageDir=dist/default/${IMAGE_TYPE}
