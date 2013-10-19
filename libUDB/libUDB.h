@@ -28,7 +28,7 @@
 
 #include "options.h"
 
-#if (WIN == 1)
+#if (WIN == 1 || NIX == 1)
 #define SILSIM                              1
 #undef  HILSIM
 #define HILSIM                              1
@@ -46,7 +46,7 @@
 #else
 #define SILSIM                              0
 #include <dsp.h>
-#endif // WIN
+#endif // (WIN == 1 || NIX == 1)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
