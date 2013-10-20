@@ -20,7 +20,7 @@
 
 
 #include "dcmTypes.h"
-#include "mathlibNav.h"
+#include "mathlibNAV.h"
 
 //  math libraray
 
