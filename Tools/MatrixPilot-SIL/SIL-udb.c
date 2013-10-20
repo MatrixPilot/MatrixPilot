@@ -11,16 +11,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libUDB.h"
+#include "../../libUDB/magnetometer.h"
+#include "../../libUDB/heartbeat.h"
+#include "SIL-config.h"
+
 #ifdef WIN
 
 #define SIL_WINDOWS_INCS
 #include <Windows.h>
 #include <Time.h>
-
-#include "libUDB.h"
-#include "../../libUDB/magnetometer.h"
-#include "../../libUDB/heartbeat.h"
-#include "SIL-config.h"
 
 struct timezone
 {
