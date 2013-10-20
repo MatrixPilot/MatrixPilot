@@ -89,5 +89,5 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	added macro SOFTWARE_FLOW_CONTROL in MAVLink.c to disable software flow control
   This allows using the ring buffer with 2-way binary telemetry, but OpenLog will
 	drop bytes at high throughput rates. For high speed logging, set SOFTWARE_FLOW_CONTROL
-  nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog
+  nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog/tree/master/OpenLog_v3_Light
   and DON'T uplink binary data.
