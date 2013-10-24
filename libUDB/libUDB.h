@@ -42,6 +42,8 @@
 #define USE_USB                             0
 #undef  USE_MSD
 #define USE_MSD                             0
+#undef  FAILSAFE_INPUT_MIN
+#define FAILSAFE_INPUT_MIN                  1500
 #include "SIL-udb.h"
 #else
 #define SILSIM                              0
@@ -65,7 +67,7 @@
 
 #ifndef BOARD_TYPE
 #if (SILSIM == 0)
-#pragma warning BOARD_TYPE defaulting to UDB4_BOARD
+#warning BOARD_TYPE defaulting to UDB4_BOARD
 #endif // SILSIM
 #define BOARD_TYPE                          UDB4_BOARD
 #endif // BOARD_TYPE
