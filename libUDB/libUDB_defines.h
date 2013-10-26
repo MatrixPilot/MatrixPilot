@@ -31,6 +31,7 @@ struct wwww { int16_t W0; int16_t W1; int16_t W2; int16_t W3; };
 struct LL { int32_t L0; int32_t L1; };
 
 union intbb { int16_t BB; struct bb _; };
+union uintbb { uint16_t BB; struct bb _; };
 union longbbbb { int32_t WW; struct ww _; struct bbbb __; };
 union longww { int32_t  WW; struct ww _; };
 union longlongLL { int64_t LL; struct LL _; struct wwww __; };
