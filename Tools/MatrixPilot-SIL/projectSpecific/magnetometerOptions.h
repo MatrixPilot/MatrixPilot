@@ -39,7 +39,7 @@
 //  Mississauga, ON is Lat 45.58 N and Long 79.65 W, Mag. Decl. therefore is 10deg21' W or -10.35 degrees
 //  Bennet Field Springvale, ON is Lat 42deg58' N and Long 80deg9' W, Mag. Decl. therefore is 9deg48' W or -9.48 degrees
   //Salinas, CA Magnetic Variation: 16E (1980), http://www.airport-data.com/airport/SNS/
-#define MAGNETICDECLINATION                 8
+#define MAGNETICDECLINATION                 8.0
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
 #define DECLINATIONANGLE_VARIABLE           0

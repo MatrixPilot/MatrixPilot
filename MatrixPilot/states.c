@@ -92,7 +92,7 @@ void udb_callback_radio_did_turn_off(void)
 
 void udb_background_callback_periodic(void)
 {
-	// read flight mode switch (sets flags bits) at 40Hz
+	// read flight mode switch (sets flags bits)
 	flight_mode_switch_check_set();
 	// Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 	// For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
@@ -292,7 +292,7 @@ static void calibrateS(void)
 			int len = snprintf((char*) dbg_buff, 50, "calibrateS %d\r\n", calib_timer);
 			mavlink_serial_send(0, dbg_buff, len);
 #endif
-			}
+		}
 		calib_timer--;
 		if (calib_timer <= 0)
 			ent_acquiringS();
@@ -347,7 +347,7 @@ static void acquiringS(void)
 				ent_manualS();
 			}
 		}
-//		else
+		//		else
 //		{
 //			waggle = 0;
 //		}

@@ -91,3 +91,5 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	drop bytes at high throughput rates. For high speed logging, set SOFTWARE_FLOW_CONTROL
   nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog/tree/master/OpenLog_v3_Light
   and DON'T uplink binary data.
+
+26 October: HILSIM and SILSIM working with Xplane9

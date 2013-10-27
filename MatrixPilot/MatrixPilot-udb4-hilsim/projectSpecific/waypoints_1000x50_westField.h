@@ -18,14 +18,14 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma message "2000x1000m pattern at 100m"
+#pragma message "100x50m pattern at 50m, west field"
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		50
+#define WAYPOINT_RADIUS 		25
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -47,15 +47,15 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1223178100, 474634556, 98.0 }	// KSEA runway 16R
+#define USE_FIXED_ORIGIN		1
+//#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
 
 // AAM East Field runway center 39°50'31.83"N  105°12'44.81"W
 //#define FIXED_ORIGIN_LOCATION	{ -1052124472, 398421750, 1808.0 }
 
 // AAM West Field runway center  39°50'31.97"N  105°13'10.17"W (105.2194917, 39.842213889)
 // altitude estimated from LEA-6 GPS readings in Polaris Ultra log2228
-//#define FIXED_ORIGIN_LOCATION	{ -1052194917, 398422138, 1820.0 }
+#define FIXED_ORIGIN_LOCATION	{ -1052194917, 398422138, 1820.0 }
 
 // bench location
 //#define FIXED_ORIGIN_LOCATION	{ -1050979310,  397501990, 1695.0 }
@@ -152,36 +152,11 @@
 //};
 
 const struct waypointDef waypoints[] = {
-    {{   0, 500, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{ 500, 500, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 1
-    {{ 500,   0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 2
-    {{   0,   0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 3
-    {{   0, 500, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{ 500, 500, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
-    {{ 500,   0, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
-    {{   0,   0, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
+    {{  100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{  100, 50, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 1
+    {{ -100, 50, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 2
+    {{ -100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 3
 };
-
-//const struct waypointDef waypoints[] = {
-//    {{ 0,   500, 50}, F_CROSS_TRACK + F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
-//    {{ 200, 500, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
-//    {{ 200,   0, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
-//    {{ 0,     0, 20}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
-//    {{ 0,   100,  2}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 4
-//    // this results in a decent flare in the simulator
-//    {{ 0, 1000, 500}, F_CROSS_TRACK + F_LAND, CAM_VIEW_LAUNCH}, //Waypoint 5
-//};
-
-//const struct waypointDef waypoints[] = {
-//    {{   0, 100, 100}, F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
-//    {{   0, 300, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-//    {{   0, 500, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-//    {{   0, 700, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-//    {{   0, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-//    {{ 1000, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
-//    {{ 1000,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
-//    {{   0,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
-//};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,12 +171,8 @@ const struct waypointDef waypoints[] = {
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
 const struct waypointDef rtlWaypoints[] = {
-    {{   0, 1000, 50}, CAM_VIEW_LAUNCH}, //Waypoint start final
-    {{   0, 500, 20}, CAM_VIEW_LAUNCH}, //Waypoint mid final
-    {{   0, 0, 10}, CAM_VIEW_LAUNCH}, //Waypoint land
-    {{   0, -500, 5}, F_LAND, CAM_VIEW_LAUNCH}, //Waypoint land
-    {{   0, -1000, 50}, F_LAND, CAM_VIEW_LAUNCH}, //Waypoint land
-};
+		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
+} ;
 
 
 

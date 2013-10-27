@@ -39,7 +39,8 @@
 // TODO: add option to use separate UART for mavlink uplink
 // TODO: port gimbal parameter setting code for use instead of mavlink uplink
 //       (could use "console" instead)
-#define USE_RING_BUFFER
+//#define USE_RING_BUFFER
+#undef USE_RING_BUFFER
 
 // define this to add debug text messages to mavlink stream
 #undef USE_MAVLINK_DBGIO
@@ -85,9 +86,9 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE GPS_MTEK
-
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_NMEA or GPS_MTEK)
+#define GPS_TYPE GPS_UBX_4HZ
+//#define DEFAULT_GPS_BAUD 57600
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enable/Disable core features of this firmware
@@ -316,7 +317,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN	2050
+#define FAILSAFE_INPUT_MIN	1050
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter

@@ -48,11 +48,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
 // See the MatrixPilot wiki for more details on different board types.
-//#define BOARD_TYPE                          UDB4_BOARD
-#define BOARD_TYPE                          UDB5_BOARD
+#define BOARD_TYPE                          UDB4_BOARD
+//#define BOARD_TYPE                          UDB5_BOARD
 //#define BOARD_TYPE                          AUAV3_BOARD
-
-//#pragma message "mw"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -104,7 +102,7 @@
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
 #define AILERON_NAVIGATION                  1
-#define RUDDER_NAVIGATION                   0
+#define RUDDER_NAVIGATION                   1
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -115,7 +113,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN                  64
+#define CROSS_TRACK_MARGIN                  32
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -133,8 +131,8 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED				AH_NONE
-#define ALTITUDEHOLD_WAYPOINT				AH_FULL
+#define ALTITUDEHOLD_STABILIZED             AH_NONE
+#define ALTITUDEHOLD_WAYPOINT               AH_FULL
 
 // Speed Control
 // If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
@@ -221,7 +219,7 @@
 #define AILERON_INPUT_CHANNEL               CHANNEL_2
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_3
 #define RUDDER_INPUT_CHANNEL                CHANNEL_4
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_6
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -239,7 +237,7 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS				4
+#define NUM_OUTPUTS							5
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -317,7 +315,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN	2150
+#define FAILSAFE_INPUT_MIN                  1800
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -335,7 +333,7 @@
 // again, the UDB will still continue following the main flight plan without restarting.  If
 // the UDB loses signal while not in waypoint mode, it will start the main flight plan from the
 // beginning.
-#define FAILSAFE_TYPE                       FAILSAFE_MAIN_FLIGHTPLAN
+#define FAILSAFE_TYPE                       FAILSAFE_RTL
 
 // When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
 // regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
@@ -460,14 +458,14 @@
 #define SERVOSAT                            1.0
 
 // Aileron/Roll Control Gains
-// ROLLKP is the proportional gain, approximately 0.25
-// ROLLKD is the derivative (gyro) gain, approximately 0.125
+// ROLLKP is the proportional gain
+// ROLLKD is the derivative (gyro) gain
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP				0.03 //0.22
 #define ROLLKD				0.01 //0.02
-#define YAWKP_AILERON		0.025 // 0.05
+#define YAWKP_AILERON		0.01 // 0.05
 #define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
 
@@ -598,7 +596,7 @@
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN                   25.0
+#define HEIGHT_TARGET_MIN                    25.0
 #define HEIGHT_TARGET_MAX                    100.0
 
 // The range of altitude within which to linearly vary the throttle
@@ -611,8 +609,8 @@
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN 0.0
-#define ALT_HOLD_THROTTLE_MAX                .75
+#define ALT_HOLD_THROTTLE_MIN 0.25
+#define ALT_HOLD_THROTTLE_MAX                1.0
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when

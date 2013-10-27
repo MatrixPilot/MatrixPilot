@@ -10,8 +10,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+//#include <Windows.h>
+//#include <Time.h>
+
 #include "UDBSocket.h"
 #include "options.h"
+#include "SIL-config.h"
 
 UDBSocket stdioSocket;
 UDBSocket transportSocket;
@@ -31,6 +35,12 @@ void printHelp(void)
 	printf("       (With no arguments, will connect to MatrixPilot-SIL's telemetry port.)\n");
 }
 
+//int __cdecl __MINGW_NOTHROW usleep(useconds_t useconds)
+////void usleep(int useconds)
+//{
+//	Sleep((useconds + 999) / 1000);
+//	return 0; // 0 on success, -1 on error. 
+//}
 
 int main(int argc, char** argv)
 {
@@ -39,9 +49,9 @@ int main(int argc, char** argv)
 	char *udpHost = SILSIM_TELEMETRY_HOST;
 	char *serialPort = NULL;
 	uint32_t serialBaud = 0;
-	
+
 	uint8_t argPos = 0;
-	
+
 	int i;
 	for (i = 1; i < argc; i++) {
 		if (argv[i][0] == '-') {
@@ -83,7 +93,7 @@ int main(int argc, char** argv)
 			argPos++;
 		}
 	}
-	
+
 	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
 	
 	transportSocket = UDBSocket_init(socketType, udpPort, udpHost, serialPort, serialBaud);
@@ -91,14 +101,13 @@ int main(int argc, char** argv)
 		printf("ERROR: UDBSocket_init failed: %s\n", UDBSocketLastErrorMessage());
 		exit(1);
 	}
-	
+
 	while (1) {
 		if (!readSockets()) {
 			usleep(1000);
 		}
 	}
 }
-
 
 #define BUFLEN 512
 
@@ -107,7 +116,7 @@ uint8_t readSockets(void)
 	uint8_t buffer[BUFLEN];
 	int32_t bytesRead;
 	uint8_t didRead = 0;
-	
+
 	if (transportSocket) {
 		bytesRead = UDBSocket_read(transportSocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
@@ -121,7 +130,7 @@ uint8_t readSockets(void)
 			didRead = 1;
 		}
 	}
-	
+
 	if (stdioSocket) {
 		bytesRead = UDBSocket_read(stdioSocket, buffer, BUFLEN);
 		if (bytesRead > 0) {
@@ -135,6 +144,6 @@ uint8_t readSockets(void)
 			didRead = 1;
 		}
 	}
-		
+
 	return didRead;
 }

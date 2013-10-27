@@ -23,7 +23,7 @@
 // UDB LOGO Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		20
+#define WAYPOINT_RADIUS 		25
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -149,7 +149,7 @@
 // F_TRIGGER		- Trigger an action to happen at this point in the flight.  (See the Trigger Action section of the options.h file.) 
 // F_ALTITUDE_GOAL	- Climb or descend to the given altitude.
 // F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer flight legs.
-// F_LAND			- Fly with the throttle off
+// F_LAND			- Fly with the throttle off.
 
 
 // Commands for Creating and Calling Subroutines
@@ -223,13 +223,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Notes:
-//	- Altitudes are relative to the starting point, and the initial altitude goal is 100 meters up.
-//	- All angles are in degrees.
-//	- Repeat commands and subroutines can be nested up to 12-deep.
-//	- If the end of the list of instructions is reached, we start over at the top from the current location and angle.
+//  - Altitudes are relative to the starting point, and the initial altitude goal is 100 meters up.
+//  - All angles are in degrees.
+//  - Repeat commands and subroutines can be nested up to 12-deep.
+//  - If the end of the list of instructions is reached, we start over at the top from the current location and angle.
 //    This does not take up one of the 12 nested repeat levels.
-//	- If you use many small FD() commands to make curves, I suggest enabling cross tracking: FLAG_ON(F_CROSS_TRACK)
-//	- All Subroutines have to appear after the end of your main logo program.
+//  - If you use many small FD() commands to make curves, I suggest enabling cross tracking: FLAG_ON(F_CROSS_TRACK)
+//  - All Subroutines have to appear after the end of your main logo program.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -246,7 +246,7 @@
 //		TO (FOO)
 //			etc.
 //		END
-//	} ;
+//	};
 // 
 // and the Failsafe RTL course as:
 // 
@@ -261,7 +261,7 @@
 //		TO (BAR)
 //			etc.
 //		END
-//	} ;
+//	};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -269,19 +269,17 @@
 //
 // Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
 
-/*
 #define SQUARE 1
 
 const struct logoInstructionDef instructions[] = {
 	
-	FLAG_ON(F_CROSS_TRACK)
-	SET_ALT(300)
+	SET_ALT(100)
 	
 	// Go Home and point North
-	//HOME
+	HOME
 	
 	REPEAT_FOREVER
-		DO_ARG(SQUARE, 250)
+		DO_ARG(SQUARE, 100)
 	END
 	
 	
@@ -291,8 +289,8 @@ const struct logoInstructionDef instructions[] = {
 			RT(90)
 		END
 	END
-} ;
-*/
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
@@ -301,55 +299,30 @@ const struct logoInstructionDef instructions[] = {
 
 const struct logoInstructionDef rtlInstructions[] = {
 	
+	// Use cross-tracking for navigation
 	FLAG_ON(F_CROSS_TRACK)
-
-	SET_ALT(32)
-
-	PEN_UP
-	HOME
-	USE_ANGLE_TO_GOAL
-	BK(250)
-	PEN_DOWN
-
-	FLAG_ON(F_LAND)
-
-	PEN_UP
-	HOME
-	USE_ANGLE_TO_GOAL
-	BK(200)
-	PEN_DOWN
-
-	SET_ALT(-32)
-
-	PEN_UP
-	HOME
-	USE_ANGLE_TO_GOAL
-	FD(200)
-	PEN_DOWN
 	
-};
-/*
- 	// Use cross-tracking for navigation
-	//FLAG_ON(F_CROSS_TRACK)
-
 	// Turn off engine for RTL
 	// Move this line down below the HOME to return home with power before circling unpowered.
-	//FLAG_ON(F_LAND)
-	SET_ALT(50)
-	// Fly home
-	SET_POS(0,-50)
 	FLAG_ON(F_LAND)
+	
+	// Fly home
+	HOME
+	
 	// Once we arrive home, aim the turtle in the
 	// direction that the plane is already moving.
-	//USE_CURRENT_ANGLE
-        SET_ANGLE(160)
-
+	USE_CURRENT_ANGLE
+	
 	REPEAT_FOREVER
-		// Fly straight ahead
-                FD(100)
+		// Fly a circle (36-point regular polygon)
+		REPEAT(36)
+			RT(10)
+			FD(8)
+		END
 	END
+	
+};
 
- */
 
 ////////////////////////////////////////////////////////////////////////////////
 // More Examples
@@ -510,111 +483,56 @@ TO (INT_HANDLER)
 	END
 END
 */
-/*
-// Simple Example of using LOGO to fly an OVAL pattern
 
-#define RIGHT_180			1
+/*
+// Example of using an interrupt handler to toggle between 2 flight plans.
+// When starting the flightplan, decide whether to circle left or right, based on which direction
+// initially turns towards home.  From then on, the circling direction can be changed by moving the
+// rudder input channel to one side or the other.
+
+#define CIRCLE_RIGHT				1
+#define CIRCLE_LEFT					2
+#define INT_HANDLER_RIGHT			3
+#define INT_HANDLER_LEFT			4
 
 const struct logoInstructionDef instructions[] = {
-FD(100)
-DO(RIGHT_180)
-FD(100)
-DO(RIGHT_180)
+
+IF_GT(REL_ANGLE_TO_HOME, 0)
+	EXEC(CIRCLE_RIGHT)
+ELSE
+	EXEC(CIRCLE_LEFT)
 END
 
-TO (RIGHT_180)
-	REPEAT(18)
+
+TO (CIRCLE_RIGHT)
+	USE_CURRENT_POS
+	SET_INTERRUPT(INT_HANDLER_RIGHT)
+	REPEAT_FOREVER
 		FD(10)
 		RT(10)
 	END
 END
 
-} ;
-*/
-
-//////////////////////////////////////////////////
-// UDB LOGO Navigation Parameters
-
-//////////////////////////////////////////////////
-// UDB LOGO Program
-
-#define SQUARE	     1
-#define CIRCLE	     2
-#define RIGHT_90     3
-#define LEFT_270     4
-#define LEFT_90      5
-#define FLIGHT       6
-const struct logoInstructionDef instructions[] = {
-
-REPEAT_FOREVER
-    FLAG_ON(F_CROSS_TRACK)
-    FLAG_ON(F_TAKEOFF)
-    DO(FLIGHT)
-//FLAG_OFF(F_CROSS_TRACK)
-//DO(FLIGHT)
-END
-
-TO (SQUARE)
-	REPEAT(4)
-		FD_PARAM
-		RT(90)
-	END
-END
-
-
-TO (CIRCLE)
-	PARAM_DIV(5)
-	REPEAT(18)
-		FD_PARAM
-		RT(20)
-	END
-END
-
-TO (LEFT_90)
-	REPEAT(9)
-		FD(7)
+TO (CIRCLE_LEFT)
+	USE_CURRENT_POS
+	SET_INTERRUPT(INT_HANDLER_LEFT)
+	REPEAT_FOREVER
+		FD(10)
 		LT(10)
 	END
 END
 
-TO (RIGHT_90)
-	REPEAT(9)
-		FD(7)
-		RT(10)
+
+TO (INT_HANDLER_RIGHT)
+	IF_LT(RUDDER_INPUT_CHANNEL, 2800)
+		EXEC(CIRCLE_LEFT)
 	END
 END
 
-TO (FLIGHT)
-//	SET_ABS_POS(-1223178100, 474634556)
-//	SET_ABS_POS(-1223178100, 474615401)
-//	USE_CURRENT_ANGLE
-//        //USE_CURRENT_POS
-        SET_ALT(32)
-//        //SET_ANGLE(0)
-//        //FD(500)
-        SET_ANGLE(0)
-        FD(900)
-	//DO(RIGHT_90)
-        //FD(100)
-	//DO(LEFT_90)
-        //FD(100)
-	DO(RIGHT_90)
-        FD(200)
-	DO(RIGHT_90)
-        FD(200)
-//	SET_ABS_POS(-1223178100, 474615401)
-        SET_ANGLE(180)
-        FD(900)
-//	USE_CURRENT_ANGLE
-//	SET_ABS_POS(-1223178100, 474634556)
-	//DO(RIGHT_90)
-        //FD(100)
-	//DO(LEFT_90)
-        //FD(100)
-	DO(RIGHT_90)
-        FD(200)
-	DO(RIGHT_90)
-        FD(200)
+TO (INT_HANDLER_LEFT)
+	IF_GT(RUDDER_INPUT_CHANNEL, 3200)
+		EXEC(CIRCLE_RIGHT)
+	END
 END
-} ;
-
+};
+*/

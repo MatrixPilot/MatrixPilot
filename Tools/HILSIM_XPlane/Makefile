@@ -3,7 +3,8 @@ CPP      = g++
 CFLAGS   = -pipe -Wall -W -O2 -DLIN=1 -fPIC
 INCPATH  = -Iinclude 
 #LFLAGS   = -shared -Wl,-rpath  -Llib/XPLM.lib
-LFLAGS   =  -shared -Llib/XPLM.lib
+LFLAGS   =  -shared -rdynamic -nodefaultlibs -undefined_warning -lGL -lGLU
+#-Llib/XPLM.lib
 XFLAGS  = -DLIN -m32
 RM_FILE  = rm -f
 
