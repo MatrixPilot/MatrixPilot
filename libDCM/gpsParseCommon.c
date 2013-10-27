@@ -29,7 +29,8 @@ struct relative3D GPSlocation = { 0, 0, 0 };
 struct relative3D GPSvelocity = { 0, 0, 0 };
 
 union longbbbb lat_gps, long_gps, alt_sl_gps, tow;  // latitude, longitude, altitude
-union intbb sog_gps, cog_gps, climb_gps, week_no;   // speed over ground, course over ground, climb
+union intbb sog_gps, climb_gps, week_no;   // speed over ground, climb
+union uintbb cog_gps;   // course over ground, units: degrees * 100, range [0-35999]
 union intbb as_sim;
 uint8_t hdop;                                       // horizontal dilution of precision
 union longbbbb lat_origin, long_origin, alt_origin;
@@ -118,6 +119,7 @@ void udb_background_callback_triggered(void)
 
 	if (gps_nav_valid())
 	{
+		LED_BLUE = LED_ON;
 		commit_gps_data();
 
 		gps_data_age = 0;
@@ -138,7 +140,7 @@ void udb_background_callback_triggered(void)
 		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East
 		cog_circular = -accum.__.B2 + 64;
 
-		// compensate for GPS reporting latency.
+                // compensate for GPS reporting latency.
 		// The dynamic model of the EM406 and uBlox is not well known.
 		// However, it seems likely much of it is simply reporting latency.
 		// This section of the code compensates for reporting latency.
@@ -219,6 +221,7 @@ void udb_background_callback_triggered(void)
 #if (DEADRECKONING == 0)
 		process_flightplan();
 #endif
+		LED_BLUE = LED_OFF;
 	}
 	else
 	{

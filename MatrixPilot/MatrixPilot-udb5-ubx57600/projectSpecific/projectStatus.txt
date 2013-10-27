@@ -18,4 +18,6 @@
 17 August: need to flight test UDB5 at 40MIPS/200Hz
 
 13 October: copied from MatrixPilot-udb5.X
-	modified projectSpecific gpsParseUBX_57600.c to operate at 57.6K baud with 2Hz LEA-5H module
+	modified projectSpecific gpsParseUBX_57600.c to operate at 57.6K baud with 
+	2Hz LEA-5H module. Module must be configured using u-center; driver makes no
+	attempt to configure it. Required UBX messages are NAV-SOL, VELNED, POSLLH, DOP.

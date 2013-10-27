@@ -365,8 +365,9 @@ uint8_t* const msg_BODYRATES_parse[] = {
 // ublox lea-5h preconfigured for ubx binary protocol at 57.6K baud
 void gps_startup_sequence(int16_t gpscount)
 {
-	if (gpscount == (int)(24.5 * HEARTBEAT_HZ))
+	if (gpscount == (int)(1 * HEARTBEAT_HZ))
 	{
+		nav_valid_ = 0;
 #if (HILSIM == 1)
 		udb_gps_set_rate(HILSIM_BAUD);
 #else

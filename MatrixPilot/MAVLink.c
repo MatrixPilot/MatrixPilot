@@ -456,7 +456,7 @@ mavlink_status_t r_mavlink_status;
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 #ifdef USE_RING_BUFFER
-#if (SOFTWARE_FLOW_CONTROL == 1)
+#if (SOFTWARE_FLOW_CONTROL != 0)
 	// check for XON/XOFF
 	if (rxchar == XON)
 	{

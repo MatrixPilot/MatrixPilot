@@ -84,3 +84,10 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 
 	modify udb_servo_callback_prepare_outputs() to call send_HILSIM_outputs() at 40Hz.
 	This fixes waypoint following using Xplane10.
+
+29 September:
+	added macro SOFTWARE_FLOW_CONTROL in MAVLink.c to disable software flow control
+  This allows using the ring buffer with 2-way binary telemetry, but OpenLog will
+	drop bytes at high throughput rates. For high speed logging, set SOFTWARE_FLOW_CONTROL
+  nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog/tree/master/OpenLog_v3_Light
+  and DON'T uplink binary data.
