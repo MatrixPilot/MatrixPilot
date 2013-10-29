@@ -111,6 +111,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for status messages
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+#define SERIAL_BAUDRATE                     19200 // default
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Control gains.
 // All gains should be positive real numbers.
 
