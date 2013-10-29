@@ -1107,13 +1107,13 @@ static void handleMessage(void)
 			if (mavlink_check_target(packet.target_system, packet.target_component)) break;
 
 			// set current waypoint
-			set(PARAM_WP_INDEX, packet.seq);
+			//set(PARAM_WP_INDEX, packet.seq);
 			{
 				//Location temp;	// XXX this is gross
 				//temp = get_wp_with_index(packet.seq);
 				//set_next_WP(&temp);
 			}
-			mavlink_msg_mission_current_send(chan, get(PARAM_WP_INDEX));
+			//mavlink_msg_mission_current_send(chan, get(PARAM_WP_INDEX));
 			}
 			break;
 

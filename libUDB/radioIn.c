@@ -254,7 +254,7 @@ IC_TIME(PPM_IC, REGTOK1);
 #define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
 #define IC_INTERRUPT(x) _IC_INTERRUPT(x)
 
-// PPM Input on Channel 1
+// PPM Input on Channel PPM_IC
 void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 {
 	indicate_loading_inter;
@@ -317,4 +317,4 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 }
 
 #endif // USE_PPM_INPUT
-#endif // NOARADIO !=1
+#endif // NORADIO !=1

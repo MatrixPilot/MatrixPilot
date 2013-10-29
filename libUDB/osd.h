@@ -53,7 +53,7 @@
 
 void udb_init_osd(void);
 void osd_reset(void);
-void osd_run_step(void);
+//void osd_run_step(void);
 void osd_spi_init(void);
 
 void osd_spi_write(int8_t address, int8_t byte);
