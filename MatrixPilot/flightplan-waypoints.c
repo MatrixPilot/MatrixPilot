@@ -106,6 +106,11 @@ void init_flightplan(int16_t flightplanNum)
 	// udb_background_trigger();    // trigger navigation immediately
 }
 
+struct waypoint3D getWaypoint3D(uint16_t wp)
+{
+	return currentWaypointSet[wp].loc;
+}
+
 boolean use_fixed_origin(void)
 {
 #if (USE_FIXED_ORIGIN == 1)
@@ -126,14 +131,27 @@ struct absolute3D get_fixed_origin(void)
 	return standardizedOrigin;
 }
 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+void mavlink_waypoint_reached(int16_t waypoint);
+void mavlink_waypoint_changed(int16_t waypoint);
+#endif
+
 static void next_waypoint(void)
 {
 	if (extended_range == 0)
 	{
+
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+		mavlink_waypoint_reached(waypointIndex);
+#endif
+
 		waypointIndex++;
 		if (waypointIndex >= numPointsInCurrentSet) waypointIndex = 0;
 
-		DPRINT("next_waypoint() waypointIndex %u\r\n", waypointIndex);
+		DPRINT("\nnext_waypoint() waypointIndex %u\r\n", waypointIndex);
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+		mavlink_waypoint_changed(waypointIndex);
+#endif
 
 		if (waypointIndex == 0)
 		{
@@ -166,7 +184,6 @@ static void next_waypoint(void)
 		set_goal(GPSlocation, current_waypoint.loc);
 	}
 #if (DEADRECKONING == 0)
-#error DEADRECKONING is now always enabled
 	compute_bearing_to_goal();
 #endif
 }
