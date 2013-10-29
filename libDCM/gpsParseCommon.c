@@ -36,7 +36,8 @@ struct relative3D GPSvelocity = { 0, 0, 0 };
 
 union longbbbb lat_origin, lon_origin, alt_origin;
 union longbbbb lat_gps, lon_gps, alt_sl_gps;        // latitude, longitude, altitude
-union intbb sog_gps, cog_gps, climb_gps;            // speed over ground, course over ground, climb
+union intbb sog_gps, climb_gps, week_no;            // speed over ground, climb
+union uintbb cog_gps;                               // course over ground, units: degrees * 100, range [0-35999]
 union intbb week_no;
 union intbb as_sim;
 union longbbbb tow;
@@ -292,7 +293,6 @@ void udb_background_callback_triggered(void)
 		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
-#error DEADRECKONING is now always enabled
 		process_flightplan();
 #endif
 	}

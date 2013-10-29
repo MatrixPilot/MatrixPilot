@@ -431,3 +431,18 @@ int setjmp(void)
 {
 	return 0;
 }
+
+int16_t FindFirstBitFromLeft(int16_t val)
+{
+	int16_t i;
+
+	if (val == 0) return 0;
+
+	for (i = 1; i <= 16; i++)
+	{
+		if (val & 0x8000) break;
+		val <<= 1;
+	}
+	return i;
+}
+

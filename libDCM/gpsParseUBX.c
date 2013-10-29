@@ -812,7 +812,7 @@ void gps_commit_data(void)
 #if (HILSIM == 1)
 	as_sim.BB       = as_sim_._.W0;                 // provided by HILSIM, simulated airspeed
 #endif
-	cog_gps.BB      = (int16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
+	cog_gps.BB      = (uint16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 
 	climb_gps.BB    = - climb_gps_._.W0;            // SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop            = (uint8_t)(hdop_.BB / 20);     // SIRF scales HDOP by 5, UBX by 10^-2

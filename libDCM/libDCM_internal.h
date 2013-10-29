@@ -45,7 +45,8 @@ extern fractional magFieldEarth[3];
 #endif
 
 extern union longbbbb tow;
-extern union intbb sog_gps, cog_gps, climb_gps, week_no;
+extern union intbb sog_gps, climb_gps, week_no;
+extern union uintbb cog_gps;
 extern union intbb as_sim;
 //extern union longbbbb as_sim_;
 extern uint8_t hdop;
