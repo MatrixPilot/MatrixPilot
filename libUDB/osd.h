@@ -25,6 +25,15 @@
 // Customize the OSD Layout in the osd_layout.h file.
 //
 
+#define OSD_NTSC            0
+#define OSD_PAL             1
+
+// new OSD types
+#define OSD_NONE            0   // OSD disabled
+#define OSD_NATIVE          1   // native OSD
+#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
+#define OSD_MINIM           3   // Output data formatted for minim OSD
+
 /*
 //#define USE_OSD         0              // USE_OSD enables the OSD system
 #define USE_OSD         OSD_NATIVE   // USE_OSD enables the OSD system

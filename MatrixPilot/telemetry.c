@@ -24,6 +24,8 @@
 #include "telemetry_log.h"
 #endif
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/osd.h"
+#include "osd_config.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
