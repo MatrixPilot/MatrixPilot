@@ -149,8 +149,8 @@ void udb_servo_callback_prepare_outputs(void)
 	}
 
 #if (HILSIM == 1)
-	// 40 Hz
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+	// 100 Hz
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 100) == 0)
 	{
 		send_HILSIM_outputs();
 	}

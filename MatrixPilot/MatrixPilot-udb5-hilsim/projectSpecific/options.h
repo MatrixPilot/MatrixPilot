@@ -39,11 +39,12 @@
 // TODO: add option to use separate UART for mavlink uplink
 // TODO: port gimbal parameter setting code for use instead of mavlink uplink
 //       (could use "console" instead)
-//#undef USE_RING_BUFFER
+#undef USE_RING_BUFFER
 #define USE_RING_BUFFER
 
 // define this to add debug text messages to mavlink stream
 #undef USE_MAVLINK_DBGIO
+//#define USE_MAVLINK_DBGIO
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -115,7 +116,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN                  64
+#define CROSS_TRACK_MARGIN                  48
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -465,10 +466,10 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP				0.03 //0.22
-#define ROLLKD				0.01 //0.02
-#define YAWKP_AILERON		0.025 // 0.05
-#define YAWKD_AILERON		0.0 //0.11 //0.05
+#define ROLLKP			0.04 //0.22
+#define ROLLKD			0.01 //0.02
+#define YAWKP_AILERON		0.015 // 0.05
+#define YAWKD_AILERON		0.01 //0.11 //0.05
 #define AILERON_BOOST		0.5
 
 // Elevator/Pitch Control Gains
@@ -477,10 +478,10 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN			0.03 // 0.150
-#define PITCHKD				0.01 //0.015 // 0.075
+#define PITCHGAIN		0.03 // 0.150
+#define PITCHKD			0.01 //0.015 // 0.075
 #define RUDDER_ELEV_MIX		0.04
-#define ROLL_ELEV_MIX		0.5
+#define ROLL_ELEV_MIX		0.6
 #define ELEVATOR_BOOST		1.0
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted

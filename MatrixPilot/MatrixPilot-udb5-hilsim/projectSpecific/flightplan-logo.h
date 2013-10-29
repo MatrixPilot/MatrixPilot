@@ -537,7 +537,7 @@ END
 
 //////////////////////////////////////////////////
 // UDB LOGO Program
-
+/*
 #define SQUARE	     1
 #define CIRCLE	     2
 #define RIGHT_90     3
@@ -617,4 +617,20 @@ TO (FLIGHT)
         FD(200)
 END
 } ;
+ * */
 
+const struct logoInstructionDef instructions[] = {
+
+
+// Fly a giant, 2.5km diameter, 10-pointed star with external loops at each point
+
+	FLAG_ON(F_CROSS_TRACK)
+	REPEAT(10)
+		FD(150)  // Forward 150 meters
+
+		REPEAT(18)
+			LT(12) // Left Turn 12 degrees
+			FD(10) // Forward 10 meters
+		END
+	END
+} ;

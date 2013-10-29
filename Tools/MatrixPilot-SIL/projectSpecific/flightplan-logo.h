@@ -531,7 +531,7 @@ END
 
 } ;
 */
-
+/*
 //////////////////////////////////////////////////
 // UDB LOGO Navigation Parameters
 
@@ -617,4 +617,23 @@ TO (FLIGHT)
         FD(200)
 END
 } ;
+*/
 
+const struct logoInstructionDef instructions[] = {
+
+
+// Fly a giant, 2.5km diameter, 10-pointed star with external loops at each point
+
+	SET_ALT(30)
+	//FLAG_ON(F_NORMAL)
+	FLAG_ON(F_CROSS_TRACK)
+        FD(500)
+	REPEAT(10)
+		FD(150)  // Forward 150 meters
+
+		REPEAT(18)
+			LT(12) // Turn 12 degrees
+			FD(10) // Forward 10 meters
+		END
+	END
+} ;

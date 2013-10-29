@@ -271,6 +271,16 @@ PLUGIN_API int XPluginStart(
     fTextColour[1] = 1.0;
     fTextColour[2] = 1.0;
 
+    // GetBodyRates contains the main loop for the HILSIM plugin
+    // It reads the simulated accelerations and rotation rates and sends message
+    // NAV_BODYRATES at intervals of MIN_INTERVAL. It also reads the GPS data
+    // and sends 4 UBX messages containing that info at 4Hz.
+    // Note that in branch MatrixPilot_mw4, either the onboard Timer1 or the MPU6000
+    // is generating a 200Hz (HEARTBEAT_HZ) clock (setting the INT1 flag) and this
+    // runs asynchronously to the NAV_BODYRATES messaging. With Xplane9 running
+    // on an AMD FX6300 cpu under Ubuntu 12.10, it appears that the simulation
+    // runs in realtime with MAX_RATE set to 100Hz.
+
     XPLMRegisterFlightLoopCallback(GetBodyRates, 1.0, NULL);
     XPLMRegisterDrawCallback(
             DrawStrings,
@@ -365,7 +375,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 
     ReceiveFromComPort();
 
-    if (pendingElapsedTime < MIN_INTERVAL) { // Don't run faster than 200Hz
+    if (pendingElapsedTime < MIN_INTERVAL) { // Don't run faster than MAX_RATE
         return -1;
     }
 
@@ -460,17 +470,18 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
     CalculateChecksum(NAV_BODYRATES);
     SendToComPort(sizeof (NAV_BODYRATES), NAV_BODYRATES);
 
-    while (pendingElapsedTime >= MIN_INTERVAL) { // Don't run slower than 40Hz
+    while (pendingElapsedTime >= MIN_INTERVAL) { // Don't run slower than MAX_RATE
         GPSCount++;
         if (!IsConnected()) {
             ConnectionCount++;
-            if (ConnectionCount % 160 == 0) { // attempt reconnection every 4 seconds when disconnected
+            if (ConnectionCount % int(4 / MIN_INTERVAL) == 0) { // attempt reconnection every 4 seconds when disconnected
                 AttemptConnection();
                 ConnectionCount = 0;
             }
         }
 
-        if (GPSCount % 10 == 0) {
+        // get GPS data at 4 Hz
+        if (GPSCount % int(0.25 / MIN_INTERVAL) == 0) {
             GetGPSData();
             GPSCount = 0;
         }

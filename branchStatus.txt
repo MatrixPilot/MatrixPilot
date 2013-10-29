@@ -93,3 +93,19 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
   and DON'T uplink binary data.
 
 26 October: HILSIM and SILSIM working with Xplane9
+
+28 October: 
+        Modified HILSIM plugin to run at 100Hz and tested using Xplane9 with
+    the GP-PT60 RC model. Looks OK with both waypoints and Logo flightplan types.
+        Also modified udb_servo_callback_prepare_outputs() to send servo output
+    data to the HILSIM plugin at 100Hz.
+        There is an outstanding issue with the Linux makefile; on Ubuntu 12.x there
+    are undefined references to the GNU SSP library when the plugin is linked
+    using the g++ command. (There is no SSP library available for installation,
+    and an attempt to build gcc from source failed) Problem goes away when linking
+    using gcc instead, but it is not clear why, or whether this may introduce other
+    as yet unobserved problems.
+        Fixed navigation bug in SILSIM. Cause of problem was use of a signed 16 bit
+    quantity to represent COG as range [0,35999]. This caused an overflow which
+    was inconsequential with 16 bit hardware, but manifested on 32 bit
+    architectures. Fix was simply to declare the variable as uint16_t.

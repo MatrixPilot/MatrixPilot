@@ -129,7 +129,7 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 }
 
 
-#define KEYPRESS_INPUT_DELTA 50
+#define KEYPRESS_INPUT_DELTA 10
 
 void sil_handle_key_input(char c)
 {
@@ -179,6 +179,7 @@ void sil_handle_key_input(char c)
 					udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
 					udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
 					udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
+					printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
 					break;
 					
 				case '1':

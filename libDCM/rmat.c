@@ -66,10 +66,15 @@ fractional spin_axis[] = { 0, 0, RMAX };
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
 
-// rmat is the matrix of direction cosines relating
-// the body and earth coordinate systems.
+// rmat is the matrix of direction cosines relating the body and Earth coordinate systems.
 // The columns of rmat are the axis vectors of the plane,
 // as measured in the earth reference frame.
+// The rows of rmat are the unit vectors defining the body frame in the earth frame.
+// rmat therefore describes the body frame B relative to the Earth frame E
+// and in Craig's notation is represented as (B->E)R: LateX format: presupsub{E}{B}R
+// To transform a point from body frame to Earth frame, multiply from the left
+// with rmat.
+
 // rmat is initialized to the identity matrix in 2.14 fractional format
 
 #ifdef INITIALIZE_VERTICAL  // for VTOL vertical initialization
@@ -209,6 +214,9 @@ void read_accel(void)
 	gplane[2] = ZACCEL_VALUE;
 #endif
 
+	// transform gplane from body frame to earth frame
+	// x component in earth frame is earth x unit vector (rmat[0,1,2]) dotted with gplane
+	//FIXME: But why are the y and z components negated?
 	accelEarth[0] =  VectorDotProduct(3, &rmat[0], gplane)<<1;
 	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane)<<1;
 	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane)<<1);

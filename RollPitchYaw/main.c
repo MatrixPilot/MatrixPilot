@@ -101,7 +101,7 @@ void dcm_servo_callback_prepare_outputs(void)
 		accum.WW = __builtin_mulss(rmat[7], 4000);
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 		
-		accum.WW = __builtin_mulss(rmat[4], 4000);
+		accum.WW = __builtin_mulss(rmat[1], 4000);
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 	}
 	

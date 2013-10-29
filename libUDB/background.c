@@ -35,6 +35,12 @@
 #include "data_services.h"
 #endif
 
+#ifdef USE_MAVLINK_DBGIO
+#include "mavlink_types.h"
+int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+extern uint8_t dbg_buff[50];
+#endif
+
 #if (USE_MCU_IDLE == 0)
 //      65536 to move result into upper 16 bits of 32 bit word
 //      100 to make a percentage
@@ -143,6 +149,13 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	interrupt_save_set_corcon;
 
 	_T1IF = 0;              // clear the interrupt
+
+#if (HILSIM == 1)
+#ifdef USE_MAVLINK_DBGIO
+	int len = snprintf((char*)dbg_buff, 50, "T1 ISR heartbeat: %i\n", udb_heartbeat_counter);
+	mavlink_serial_send(0, dbg_buff, len);
+#endif
+#endif
 
 		// Start the sequential servo pulses at frequency SERVO_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
