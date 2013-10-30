@@ -28,20 +28,20 @@ void sil_checkForLedUpdates(void);
 
 void print_help(void)
 {
-	printf("1/2/3 = mode manual/stabilized/waypoint\n");
-	printf("w/s   = throttle up/down\n");
-	printf("a/d   = rudder left/right\n");
-	printf("i/k   = elevator forward/back\n");
-	printf("j/l   = aileron left/right\n");
+	printf("1/2/3/4 = mode manual/stabilized/waypoint/signal-lost\n");
+	printf("w/s     = throttle up/down\n");
+	printf("a/d     = rudder left/right\n");
+	printf("i/k     = elevator forward/back\n");
+	printf("j/l     = aileron left/right\n");
 	printf("\n");
-	printf("z     = zero the sticks\n");
-	printf("L     = toggle LEDs\n");
-	printf("0     = toggle RC Radio connection on/off\n");
+	printf("z       = zero the sticks\n");
+	printf("L       = toggle LEDs\n");
+	printf("0       = toggle RC Radio connection on/off\n");
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
-	printf("xN    = execute LOGO subroutine N(0-9)\n");
+	printf("xN      = execute LOGO subroutine N(0-9)\n");
 #endif
-	printf("r     = reset\n");
-	printf("?     = show this help message\n");
+	printf("r       = reset\n");
+	printf("?       = show this help message\n");
 }
 
 
@@ -92,7 +92,7 @@ void sil_ui_update(void)
 
 void print_LED_status(void)
 {
-	printf("LEDs: %c %c %c %c\n",
+	printf("LEDs: %c %c %c %c\r",
 		   (leds[0] == LED_ON) ? 'R' : '-',
 		   (leds[1] == LED_ON) ? 'G' : '-',
 		   (leds[2] == LED_ON) ? 'O' : '-',
@@ -129,7 +129,7 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 }
 
 
-#define KEYPRESS_INPUT_DELTA 50
+#define KEYPRESS_INPUT_DELTA 10
 
 void sil_handle_key_input(char c)
 {
@@ -179,6 +179,7 @@ void sil_handle_key_input(char c)
 					udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
 					udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
 					udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
+					printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
 					break;
 					
 				case '1':
@@ -191,6 +192,10 @@ void sil_handle_key_input(char c)
 					
 				case '3':
 					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
+					break;
+					
+				case '4':
+					udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
 					break;
 					
 				case '0':

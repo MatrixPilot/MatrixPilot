@@ -86,8 +86,37 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	This fixes waypoint following using Xplane10.
 
 29 September:
-	added macro SOFTWARE_FLOW_CONTROL in MAVLink.c to disable software flow control
-  This allows using the ring buffer with 2-way binary telemetry, but OpenLog will
-	drop bytes at high throughput rates. For high speed logging, set SOFTWARE_FLOW_CONTROL
-  nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog/tree/master/OpenLog_v3_Light
-  and DON'T uplink binary data.
+        added macro SOFTWARE_FLOW_CONTROL in MAVLink.c to disable software flow control
+    This allows using the ring buffer with 2-way binary telemetry, but OpenLog will
+    drop bytes at high throughput rates. For high speed logging, set SOFTWARE_FLOW_CONTROL
+    nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog/tree/master/OpenLog_v3_Light
+    and DON'T uplink binary data.
+
+26 October: HILSIM and SILSIM working with Xplane9
+
+28 October: 
+        Modified HILSIM plugin to run at 100Hz and tested using Xplane9 with
+    the GP-PT60 RC model. Looks OK with both waypoints and Logo flightplan types.
+        Also modified udb_servo_callback_prepare_outputs() to send servo output
+    data to the HILSIM plugin at 100Hz.
+        There is an outstanding issue with the Linux makefile; on Ubuntu 12.x there
+    are undefined references to the GNU SSP library when the plugin is linked
+    using the g++ command. (There is no SSP library available for installation,
+    and an attempt to build gcc from source failed) Problem goes away when linking
+    using gcc instead, but it is not clear why, or whether this may introduce other
+    as yet unobserved problems.
+        Fixed navigation bug in SILSIM. Cause of problem was use of a signed 16 bit
+    quantity to represent COG as range [0,35999]. This caused an overflow which
+    was inconsequential with 16 bit hardware, but manifested on 32 bit
+    architectures. Fix was simply to declare the variable as uint16_t.
+
+30 October:
+        Noticed that state stabilizedS was being entered before GPS 3D fix.
+    Found bugs in handling of gps_data_age introduced when parameterizing on
+    HEARTBEAT_HZ. Bench tested with LEA6 and UBLOX parser.
+        Note that loss of GPS while in state waypointS does not trigger fallback
+    to stabilizedS, not sure if this is the best choice...
+        Also noted that disconnect/reconnect of LEA6 while nav_capable seems to
+    break the GPS parser. It appears that commit_gps_data is never called after
+    reconnection.
+

@@ -668,7 +668,7 @@ void commit_gps_data(void)
 	long_gps      = long_gps_;
 	alt_sl_gps   = alt_sl_gps_;             // Altitude
 	sog_gps      = sog_gps_;                // Speed over ground
-	cog_gps      = cog_gps_;                // Course over ground
+	cog_gps.BB      = cog_gps_.BB;                // Course over ground
 
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
 	hdop         = hdop_._.B0;

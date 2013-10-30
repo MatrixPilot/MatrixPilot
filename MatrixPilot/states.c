@@ -41,11 +41,10 @@ static int wagInterval = 0;
 
 //uint8_t counter = 0;
 
-//#define CALIB_PAUSE (5 * FSM_CLK)    // wait for 5 seconds of runs through the state machine
+//#define CALIB_PAUSE (5 * HEARTBEAT_HZ)    // wait for 5 seconds of runs through the state machine
 //#define STANDBY_PAUSE 8		// pause for 4 seconds
 
-#define FSM_CLK HEARTBEAT_HZ  // clock frequency for state machine
-#define CALIB_PAUSE (10 * FSM_CLK)    // wait for 10 seconds of runs through the state machine
+#define CALIB_PAUSE (10 * HEARTBEAT_HZ)    // wait for 10 seconds of runs through the state machine
 
 #define STANDBY_PAUSE 48		// pause for 24 seconds after first GPS fix
 #define NUM_WAGGLES   4     // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
@@ -79,7 +78,7 @@ void init_states(void)
 #endif
 	flags.WW = 0;
 	waggle = 0;
-	gps_data_age = GPS_DATA_MAX_AGE + 1;
+	gps_data_age = HEARTBEAT_HZ * (GPS_DATA_MAX_AGE + 1);
 	dcm_flags._.dead_reckon_enable = 0;
 	stateS = &startS;
 }
@@ -92,16 +91,24 @@ void udb_callback_radio_did_turn_off(void)
 
 void udb_background_callback_periodic(void)
 {
-	// read flight mode switch (sets flags bits) at 40Hz
+	// read flight mode switch (sets flags bits)
 	flight_mode_switch_check_set();
 	// Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 	// For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
 #if (AIRFRAME_TYPE != AIRFRAME_HELI)
-	if (gps_data_age < (FSM_CLK * GPS_DATA_MAX_AGE)) gps_data_age++;
-	dcm_flags._.nav_capable = (gps_data_age < (FSM_CLK * GPS_DATA_MAX_AGE));
+	if (gps_data_age < (HEARTBEAT_HZ * GPS_DATA_MAX_AGE)) gps_data_age++;
+	dcm_flags._.nav_capable = (gps_data_age < (HEARTBEAT_HZ * GPS_DATA_MAX_AGE));
 #endif
 
-	// Execute the activities for the current state.
+#ifdef USE_MAVLINK_DBGIO
+    static int xcnt = 0;
+    if (xcnt++ > HEARTBEAT_HZ) {
+        xcnt = 0;
+        int len = snprintf((char*) dbg_buff, 50, "gps_data_age: %i, nav_capable: %i\r\n", gps_data_age, dcm_flags._.nav_capable);
+        mavlink_serial_send(0, dbg_buff, len);
+    }
+#endif
+        // Execute the activities for the current state.
 	(*stateS)();
 }
 
@@ -286,13 +293,13 @@ static void calibrateS(void)
 	if (udb_flags._.radio_on)
 #endif
 	{
-		if ((calib_timer % (FSM_CLK / 2)) == 0) {
+		if ((calib_timer % (HEARTBEAT_HZ / 2)) == 0) {
 			udb_led_toggle(LED_RED);
 #ifdef USE_MAVLINK_DBGIO
 			int len = snprintf((char*) dbg_buff, 50, "calibrateS %d\r\n", calib_timer);
 			mavlink_serial_send(0, dbg_buff, len);
 #endif
-			}
+		}
 		calib_timer--;
 		if (calib_timer <= 0)
 			ent_acquiringS();
@@ -320,7 +327,7 @@ static void acquiringS(void)
 		if (udb_flags._.radio_on)
 #endif
 		{
-			if (wagInterval >= (FSM_CLK / 2))
+			if (wagInterval >= (HEARTBEAT_HZ / 2))
 			{
 				wagInterval = 0;
 				standby_timer--;
@@ -347,14 +354,14 @@ static void acquiringS(void)
 				ent_manualS();
 			}
 		}
-//		else
+		//		else
 //		{
 //			waggle = 0;
 //		}
 	}
 	else
 	{
-			if (wagInterval >= (FSM_CLK / 2))
+			if (wagInterval >= (HEARTBEAT_HZ / 2))
 			{
 				wagInterval = 0;
 				waggle = 0;
@@ -399,7 +406,7 @@ static void stabilizedS(void)
 static void waypointS(void)
 {
 	static int blinkInterval = 0;
-	if (blinkInterval++ >= (FSM_CLK / 2))
+	if (blinkInterval++ >= (HEARTBEAT_HZ / 2))
 	{
 		blinkInterval = 0;
 		udb_led_toggle(LED_RED);

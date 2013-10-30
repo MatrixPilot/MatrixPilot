@@ -218,7 +218,6 @@
         <itemPath>../../libUDB/osd.c</itemPath>
         <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
-        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/mpu6000.c</itemPath>

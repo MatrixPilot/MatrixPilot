@@ -269,19 +269,19 @@
 //
 // Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
 
-
+/*
 #define SQUARE 1
 
 const struct logoInstructionDef instructions[] = {
 	
 	FLAG_ON(F_CROSS_TRACK)
-	SET_ALT(30)
+	SET_ALT(300)
 	
 	// Go Home and point North
-	HOME
+	//HOME
 	
 	REPEAT_FOREVER
-		DO_ARG(SQUARE, 500)
+		DO_ARG(SQUARE, 250)
 	END
 	
 	
@@ -292,7 +292,7 @@ const struct logoInstructionDef instructions[] = {
 		END
 	END
 } ;
-
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
@@ -531,13 +531,13 @@ END
 
 } ;
 */
-/*
+
 //////////////////////////////////////////////////
 // UDB LOGO Navigation Parameters
 
 //////////////////////////////////////////////////
 // UDB LOGO Program
-
+/*
 #define SQUARE	     1
 #define CIRCLE	     2
 #define RIGHT_90     3
@@ -546,10 +546,12 @@ END
 #define FLIGHT       6
 const struct logoInstructionDef instructions[] = {
 
-FLAG_ON(F_CROSS_TRACK)
-DO(FLIGHT)
-FLAG_OFF(F_CROSS_TRACK)
-DO(FLIGHT)
+REPEAT_FOREVER
+    FLAG_ON(F_CROSS_TRACK)
+    FLAG_ON(F_TAKEOFF)
+    DO(FLIGHT)
+//FLAG_OFF(F_CROSS_TRACK)
+//DO(FLIGHT)
 END
 
 TO (SQUARE)
@@ -583,26 +585,52 @@ TO (RIGHT_90)
 END
 
 TO (FLIGHT)
-	SET_ABS_POS(-1223178100, 474634556)
-	SET_ABS_POS(-1223178100, 474615401)
-	USE_CURRENT_ANGLE
-        //USE_CURRENT_POS
-        //SET_ALT(32)
-        //SET_ANGLE(0)
-        //FD(500)
+//	SET_ABS_POS(-1223178100, 474634556)
+//	SET_ABS_POS(-1223178100, 474615401)
+//	USE_CURRENT_ANGLE
+//        //USE_CURRENT_POS
+        SET_ALT(32)
+//        //SET_ANGLE(0)
+//        //FD(500)
+        SET_ANGLE(0)
+        FD(900)
+	//DO(RIGHT_90)
+        //FD(100)
+	//DO(LEFT_90)
+        //FD(100)
 	DO(RIGHT_90)
-	DO(LEFT_90)
-	DO(LEFT_90)
-	DO(LEFT_90)
-	SET_ABS_POS(-1223178100, 474615401)
-        //SET_ANGLE(180)
-        //FD(500)
-	USE_CURRENT_ANGLE
-	SET_ABS_POS(-1223178100, 474634556)
+        FD(200)
 	DO(RIGHT_90)
-	DO(LEFT_90)
-	DO(LEFT_90)
-	DO(LEFT_90)
+        FD(200)
+//	SET_ABS_POS(-1223178100, 474615401)
+        SET_ANGLE(180)
+        FD(900)
+//	USE_CURRENT_ANGLE
+//	SET_ABS_POS(-1223178100, 474634556)
+	//DO(RIGHT_90)
+        //FD(100)
+	//DO(LEFT_90)
+        //FD(100)
+	DO(RIGHT_90)
+        FD(200)
+	DO(RIGHT_90)
+        FD(200)
 END
 } ;
-*/
+ * */
+
+const struct logoInstructionDef instructions[] = {
+
+
+// Fly a giant, 2.5km diameter, 10-pointed star with external loops at each point
+
+	FLAG_ON(F_CROSS_TRACK)
+	REPEAT(10)
+		FD(150)  // Forward 150 meters
+
+		REPEAT(18)
+			LT(12) // Left Turn 12 degrees
+			FD(10) // Forward 10 meters
+		END
+	END
+} ;

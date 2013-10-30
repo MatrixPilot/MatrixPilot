@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=MatrixPilot-udb5.X
+PROJECTNAME=MatrixPilot-udb4-hilsim
 
 # Active Configuration
 DEFAULTCONF=default

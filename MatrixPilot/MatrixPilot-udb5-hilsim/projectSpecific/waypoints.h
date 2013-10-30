@@ -151,24 +151,37 @@
 //		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
 //};
 
+const struct waypointDef waypoints[] = {
+    {{   0, 500, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{ 500, 500, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 1
+    {{ 500,   0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 2
+    {{   0,   0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 3
+    {{   0, 500, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+    {{ 500, 500, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
+    {{ 500,   0, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
+    {{   0,   0, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
+};
+
 //const struct waypointDef waypoints[] = {
-//    {{ 0, 500, 50}, F_CROSS_TRACK + F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
-//    {{ 0, -1000, 50}, F_CROSS_TRACK + F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 1
-//    {{ 0, -500, 5}, F_CROSS_TRACK + F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 2
+//    {{ 0,   500, 50}, F_CROSS_TRACK + F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{ 200, 500, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
+//    {{ 200,   0, 50}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
+//    {{ 0,     0, 20}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
+//    {{ 0,   100,  2}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 4
 //    // this results in a decent flare in the simulator
-//    {{ 0, 0, 500}, F_CROSS_TRACK + F_LAND, CAM_VIEW_LAUNCH}, //Waypoint 3
+//    {{ 0, 1000, 500}, F_CROSS_TRACK + F_LAND, CAM_VIEW_LAUNCH}, //Waypoint 5
 //};
 
-const struct waypointDef waypoints[] = {
-    {{   0, 100, 100}, F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, 300, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, 500, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, 700, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{   0, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
-    {{ 1000, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
-    {{ 1000,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
-    {{   0,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
-};
+//const struct waypointDef waypoints[] = {
+//    {{   0, 100, 100}, F_TAKEOFF, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{   0, 300, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{   0, 500, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{   0, 700, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{   0, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 0
+//    {{ 1000, 2000, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 1
+//    {{ 1000,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 2
+//    {{   0,  0, 100}, F_CROSS_TRACK, CAM_VIEW_LAUNCH}, //Waypoint 3
+//};
 
 
 ////////////////////////////////////////////////////////////////////////////////

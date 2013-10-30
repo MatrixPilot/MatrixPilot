@@ -335,7 +335,7 @@ void commit_gps_data(void)
 	long_gps    = long_gps_;
 	alt_sl_gps  = alt_sl_gps_;
 	sog_gps     = sog_gps_;
-	cog_gps     = cog_gps_;
+	cog_gps.BB     = cog_gps_.BB;
 	climb_gps   = climb_gps_;
 	hdop        = hdop_;
 	//xpg         = xpg_;

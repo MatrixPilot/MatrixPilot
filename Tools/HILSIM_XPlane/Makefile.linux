@@ -1,9 +1,9 @@
-CC 	 = gcc
+CC 	 = g++
 CPP      = g++
 CFLAGS   = -pipe -Wall -W -O2 -DLIN=1 -fPIC
-INCPATH  = -Iinclude 
+INCPATH  = -Iinclude -I../../libUDB
 #LFLAGS   = -shared -Wl,-rpath  -Llib/XPLM.lib
-LFLAGS   =  -shared -Llib/XPLM.lib
+LFLAGS   =  -shared -rdynamic -nodefaultlibs -undefined_warning -lGL -lGLU
 XFLAGS  = -DLIN -m32
 RM_FILE  = rm -f
 
@@ -28,7 +28,7 @@ first: all
 all: Makefile $(TARGET)
 
 $(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC)  
-	$(CPP) $(XFLAGS) $(INCPATH) -o $(TARGET) $(SOURCES) $(LFLAGS)
+	gcc $(XFLAGS) $(INCPATH) -o $(TARGET) $(SOURCES) $(LFLAGS)
 
 clean:
 	-$(RM_FILE) $(OBJECTS)

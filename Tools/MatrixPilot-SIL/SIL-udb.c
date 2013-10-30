@@ -103,64 +103,72 @@ void udb_init(void)
 	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0) {
 		mp_rcon = 128; // enable just the external/MCLR reset bit
 	}
-	
+
 	int16_t i;
 	for (i=0; i<4; i++) {
 		leds[i] = LED_OFF;
 	}
-	
+
 	udb_heartbeat_counter = 0;
-	
+
 	udb_flags.B = 0;
 	sil_radio_on = 1;
-	
+
 	sil_ui_init(mp_rcon);
-	
+
 	gpsSocket = UDBSocket_init((SILSIM_GPS_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_GPS_PORT, SILSIM_GPS_HOST, NULL, 0);
 	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_TELEMETRY_PORT, SILSIM_TELEMETRY_HOST, NULL, 0);
-	
+
 	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) > 0) {
 		serialSocket = UDBSocket_init(UDBSocketSerial, 0, NULL, SILSIM_SERIAL_RC_INPUT_DEVICE, SILSIM_SERIAL_RC_INPUT_BAUD);
 	}
 }
 
 
-#define UDB_STEP_TIME 25
+#define UDB_STEP_TIME 5
+#define HEARTRATE_HZ 200
 #define UDB_WRAP_TIME 1000
 
 void udb_run(void)
 {
 	uint16_t currentTime;
 	uint16_t nextHeartbeatTime;
-	
-	
+
+
 	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
 		udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
 		udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
 	}
-	
+
 	nextHeartbeatTime = get_current_milliseconds();
-	
+
 	while (1) {
 		if (!handleUDBSockets()) {
 			sleep_milliseconds(1);
 		}
-		
+
 		currentTime = get_current_milliseconds();
-		
+
 		if (currentTime >= nextHeartbeatTime && !(nextHeartbeatTime <= UDB_STEP_TIME && currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME)) {
 			udb_callback_read_sensors();
-			
+
 			udb_flags._.radio_on = (sil_radio_on && udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF ;
 
-			udb_background_callback_periodic(); // Run at 40Hz
-			udb_servo_callback_prepare_outputs();
-			
-			sil_ui_update();
-			
-			if (udb_heartbeat_counter % 80 == 0) writeEEPROMFileIfNeeded(); // Run at 0.5Hz
-			
+                        udb_background_callback_periodic(); // Run at heartrate
+                        udb_servo_callback_prepare_outputs();
+
+                        // call at 40Hz
+                        if (udb_heartbeat_counter % (HEARTRATE_HZ / 40) == 0) {
+
+                            sil_ui_update();
+                        }
+
+                        // Run at 0.5Hz
+			if (udb_heartbeat_counter % (2 * HEARTRATE_HZ) == 0) {
+                            writeEEPROMFileIfNeeded();
+                        }
+
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
@@ -181,6 +189,11 @@ uint8_t udb_cpu_load(void)
 	return 5; // sounds reasonable for a fake cpu%
 }
 
+uint16_t udb_cpu_ratio(void)
+{
+	return 5; // sounds reasonable for a fake cpu%
+}
+
 
 int16_t  udb_servo_pulsesat(int32_t pw)
 {
@@ -195,7 +208,7 @@ void udb_servo_record_trims(void)
 	int16_t i;
 	for (i=1; i <= NUM_INPUTS; i++)
 		udb_pwTrim[i] = udb_pwIn[i] ;
-	
+
 	return ;
 }
 
@@ -228,11 +241,11 @@ uint16_t get_reset_flags(void)
 void sil_reset(void)
 {
 	sil_ui_will_reset();
-	
+
 	if (gpsSocket) UDBSocket_close(gpsSocket);
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket) UDBSocket_close(serialSocket);
-	
+
 	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 	execv(mp_argv[0], args);
 	fprintf(stderr, "Failed to reset UDB %s\n", mp_argv[0]);
@@ -247,7 +260,7 @@ uint16_t get_current_milliseconds()
 	// *nix / mac implementation
 	struct timeval tv;
 	struct timezone tz;
-	
+
 	gettimeofday(&tv,&tz);
 	return tv.tv_usec / 1000;
 }
@@ -258,7 +271,7 @@ void sleep_milliseconds(uint16_t ms)
 #ifdef WIN
 	// windows implementation
 	Sleep(ms);
-	
+
 #else
 	// *nix / mac implementation
 	usleep(1000*ms);
@@ -269,13 +282,13 @@ void sleep_milliseconds(uint16_t ms)
 void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 {
 	int i;
-	
+
 	uint8_t CK_A = 0 ;
 	uint8_t CK_B = 0 ;
-	
+
 	uint8_t headerBytes = 0;
 	uint8_t numServos = 0;
-	
+
 	if (bytesRead >= 2 && buffer[0]==0xFF && buffer[1]==0xEE) {
 		headerBytes = 2;
 		numServos = 8;
@@ -284,7 +297,7 @@ void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 		headerBytes = 3;
 		numServos = buffer[2];
 	}
-	
+
 	if (numServos && bytesRead >= headerBytes + numServos*2 + 2) {
 		for (i=headerBytes; i < headerBytes + numServos*2; i++)
 		{
@@ -308,7 +321,7 @@ boolean handleUDBSockets(void)
 	int32_t bytesRead;
 	int16_t i;
 	boolean didRead = false;
-	
+
 	// Handle GPS Socket
 	if (gpsSocket) {
 		bytesRead = UDBSocket_read(gpsSocket, buffer, BUFLEN);
@@ -323,7 +336,7 @@ boolean handleUDBSockets(void)
 			if (bytesRead>0) didRead = true;
 		}
 	}
-	
+
 	// Handle Telemetry Socket
 	if (telemetrySocket) {
 		bytesRead = UDBSocket_read(telemetrySocket, buffer, BUFLEN);
@@ -338,7 +351,7 @@ boolean handleUDBSockets(void)
 			if (bytesRead>0) didRead = true;
 		}
 	}
-	
+
 	// Handle optional Serial RC input Socket
 	if (serialSocket) {
 		bytesRead = UDBSocket_read(serialSocket, buffer, BUFLEN);
@@ -353,7 +366,7 @@ boolean handleUDBSockets(void)
 			}
 		}
 	}
-	
+
 	return didRead;
 }
 
@@ -364,13 +377,13 @@ void I2C_doneReadMagData(void)
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1] ;
 	magFieldRaw[1] = (magreg[2]<<8)+magreg[3] ;
 	magFieldRaw[2] = (magreg[4]<<8)+magreg[5] ;
-	
+
 	if ( magMessage == 7 )
 	{
 		udb_magFieldBody[0] = MAG_X_SIGN((__builtin_mulsu((magFieldRaw[MAG_X_AXIS]), magGain[MAG_X_AXIS] ))>>14)-(udb_magOffset[0]>>1) ;
 		udb_magFieldBody[1] = MAG_Y_SIGN((__builtin_mulsu((magFieldRaw[MAG_Y_AXIS]), magGain[MAG_Y_AXIS] ))>>14)-(udb_magOffset[1]>>1) ;
 		udb_magFieldBody[2] = MAG_Z_SIGN((__builtin_mulsu((magFieldRaw[MAG_Z_AXIS]), magGain[MAG_Z_AXIS] ))>>14)-(udb_magOffset[2]>>1) ;
-		
+
 		if ( ( abs(udb_magFieldBody[0]) < MAGNETICMAXIMUM ) &&
 			( abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM ) &&
 			( abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM ) )

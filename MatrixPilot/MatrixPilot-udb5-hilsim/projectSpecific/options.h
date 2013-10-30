@@ -39,11 +39,12 @@
 // TODO: add option to use separate UART for mavlink uplink
 // TODO: port gimbal parameter setting code for use instead of mavlink uplink
 //       (could use "console" instead)
-//#undef USE_RING_BUFFER
+#undef USE_RING_BUFFER
 #define USE_RING_BUFFER
 
 // define this to add debug text messages to mavlink stream
 #undef USE_MAVLINK_DBGIO
+//#define USE_MAVLINK_DBGIO
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -104,7 +105,7 @@
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
 #define AILERON_NAVIGATION                  1
-#define RUDDER_NAVIGATION                   1
+#define RUDDER_NAVIGATION                   0
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -115,7 +116,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN                  32
+#define CROSS_TRACK_MARGIN                  48
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -221,7 +222,7 @@
 #define AILERON_INPUT_CHANNEL               CHANNEL_2
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_3
 #define RUDDER_INPUT_CHANNEL                CHANNEL_4
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_6
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -335,7 +336,7 @@
 // again, the UDB will still continue following the main flight plan without restarting.  If
 // the UDB loses signal while not in waypoint mode, it will start the main flight plan from the
 // beginning.
-#define FAILSAFE_TYPE                       FAILSAFE_RTL
+#define FAILSAFE_TYPE                       FAILSAFE_MAIN_FLIGHTPLAN
 
 // When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
 // regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
@@ -465,10 +466,10 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP				0.05 //0.22
-#define ROLLKD				0.01 //0.02
-#define YAWKP_AILERON		0.04 // 0.05
-#define YAWKD_AILERON		0 //0.11 //0.05
+#define ROLLKP			0.04 //0.22
+#define ROLLKD			0.01 //0.02
+#define YAWKP_AILERON		0.015 // 0.05
+#define YAWKD_AILERON		0.01 //0.11 //0.05
 #define AILERON_BOOST		0.5
 
 // Elevator/Pitch Control Gains
@@ -477,10 +478,10 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN			0.08 // 0.150
-#define PITCHKD				0 //0.015 // 0.075
+#define PITCHGAIN		0.03 // 0.150
+#define PITCHKD			0.01 //0.015 // 0.075
 #define RUDDER_ELEV_MIX		0.04
-#define ROLL_ELEV_MIX		0.5
+#define ROLL_ELEV_MIX		0.6
 #define ELEVATOR_BOOST		1.0
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
@@ -495,9 +496,9 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER				0.05 // 0.1
-#define YAWKD_RUDDER				0 //0.03 // 0.1
-#define ROLLKP_RUDDER				0.04
+#define YAWKP_RUDDER				0.02 // 0.1
+#define YAWKD_RUDDER				0.01 //0.03 // 0.1
+#define ROLLKP_RUDDER				0.01
 #define ROLLKD_RUDDER				0 //0.05
 #define MANUAL_AILERON_RUDDER_MIX	0.0
 #define RUDDER_BOOST				0.5
@@ -604,15 +605,15 @@
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN                        10
+#define HEIGHT_MARGIN                        50
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN 0.25
-#define ALT_HOLD_THROTTLE_MAX                1.0
+#define ALT_HOLD_THROTTLE_MIN 0.0
+#define ALT_HOLD_THROTTLE_MAX                .75
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when

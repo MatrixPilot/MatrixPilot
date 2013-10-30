@@ -113,6 +113,7 @@ void udb_init(void)
 #if (USE_I2C1_DRIVER == 1)
 	I2C1_Init();
 #endif
+//FIXME: add AUAV3 support
 #if (USE_NV_MEMORY == 1)
 	nv_memory_init();
 	data_storage_init();
@@ -135,11 +136,6 @@ void udb_init(void)
 	udb_init_pwm();
 #if (USE_OSD == 1)
 	udb_init_osd();
-#endif
-
-//FIXME: add AUAV3 support
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-//	udb_eeprom_init();
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
