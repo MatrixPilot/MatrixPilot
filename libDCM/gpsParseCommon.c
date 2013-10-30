@@ -22,6 +22,7 @@
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 #include "estAltitude.h"
+#include "heartbeat.h"
 #include <string.h>
 
 
@@ -223,7 +224,7 @@ void udb_background_callback_triggered(void)
 	}
 	else
 	{
-		gps_data_age = GPS_DATA_MAX_AGE+1;
+		gps_data_age = HEARTBEAT_HZ * (GPS_DATA_MAX_AGE + 1);
 		dirovergndHGPS[0] = dirovergndHRmat[0];
 		dirovergndHGPS[1] = dirovergndHRmat[1];
 		dirovergndHGPS[2] = 0;

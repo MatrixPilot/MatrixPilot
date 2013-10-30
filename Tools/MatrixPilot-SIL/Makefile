@@ -1,7 +1,7 @@
 CC       = gcc
 CFLAGS   = -pipe -Wall -W -O0
-INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I projectSpecific -I../../libUDB -I../../libDCM -I../../MatrixPilot
-LFLAGS   = 
+INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot
+LFLAGS   =
 LIBS     = -lm
 RM_FILE  = rm -f
 
@@ -67,10 +67,7 @@ MPCAT_OBJECTS  = ../HILSIM_XPlane/UDBSocketUnix.o SILcat.o
 
 first: all
 
-#%.o: %.c $(MP_HEADERS)
-#	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
-
-%.o: %.c 
+%.o: %.c $(MP_HEADERS)
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
 all: $(MPSIL_TARGET) $(MPCAT_TARGET)

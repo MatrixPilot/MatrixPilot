@@ -86,11 +86,11 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	This fixes waypoint following using Xplane10.
 
 29 September:
-	added macro SOFTWARE_FLOW_CONTROL in MAVLink.c to disable software flow control
-  This allows using the ring buffer with 2-way binary telemetry, but OpenLog will
-	drop bytes at high throughput rates. For high speed logging, set SOFTWARE_FLOW_CONTROL
-  nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog/tree/master/OpenLog_v3_Light
-  and DON'T uplink binary data.
+        added macro SOFTWARE_FLOW_CONTROL in MAVLink.c to disable software flow control
+    This allows using the ring buffer with 2-way binary telemetry, but OpenLog will
+    drop bytes at high throughput rates. For high speed logging, set SOFTWARE_FLOW_CONTROL
+    nonzero, use this version of OpenLog: github.com/kd0aij/OpenLog/tree/master/OpenLog_v3_Light
+    and DON'T uplink binary data.
 
 26 October: HILSIM and SILSIM working with Xplane9
 
@@ -109,3 +109,14 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
     quantity to represent COG as range [0,35999]. This caused an overflow which
     was inconsequential with 16 bit hardware, but manifested on 32 bit
     architectures. Fix was simply to declare the variable as uint16_t.
+
+30 October:
+        Noticed that state stabilizedS was being entered before GPS 3D fix.
+    Found bugs in handling of gps_data_age introduced when parameterizing on
+    HEARTBEAT_HZ. Bench tested with LEA6 and UBLOX parser.
+        Note that loss of GPS while in state waypointS does not trigger fallback
+    to stabilizedS, not sure if this is the best choice...
+        Also noted that disconnect/reconnect of LEA6 while nav_capable seems to
+    break the GPS parser. It appears that commit_gps_data is never called after
+    reconnection.
+

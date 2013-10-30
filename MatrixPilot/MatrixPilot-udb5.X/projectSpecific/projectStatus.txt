@@ -16,3 +16,11 @@
 	Tested at 16, 32 and 40MIPS: 8%, 4% and 3% cpu load, respectively.
 
 17 August: need to flight test UDB5 at 40MIPS/200Hz
+
+29 October:
+        Getting the 4 waggles before ublox GPS is sending 3D fixes... Ready to
+    fly with lat/lon still at 0,0; see branchStatus for notes on bugfix
+        Also noted that libUDB/eeprom_udb4.c was still referenced by this project
+    even though it is obsolete and replaced by 24LC256.c; deleted reference and
+    verified that PID parameters are properly saved to eeprom and restored using
+    QGroundControl v2.0.0

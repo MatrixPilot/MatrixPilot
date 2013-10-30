@@ -44,6 +44,7 @@
 
 // define this to add debug text messages to mavlink stream
 #undef USE_MAVLINK_DBGIO
+#define USE_MAVLINK_DBGIO
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type

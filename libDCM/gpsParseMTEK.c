@@ -173,7 +173,7 @@ void msg_CS1(uint8_t gpschar)
 	}
 	else
 	{
-		gps_data_age = GPS_DATA_MAX_AGE+1;  // if the checksum is wrong then the data from this packet is invalid.
+		gps_data_age = HEARTBEAT_HZ * (GPS_DATA_MAX_AGE + 1);  // if the checksum is wrong then the data from this packet is invalid.
 		                                    // setting this ensures the nav routine does not try to use this data.
 	}
 	msg_parse = &msg_start;
