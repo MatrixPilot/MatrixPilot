@@ -1698,8 +1698,10 @@ void mavlink_output_40hz(void)
 	{
 #if (BOARD_TYPE == AUAV3_BOARD)
 		voltage_milis.BB = (uint16_t)(2 * 5550 * 3.3 * ((double)udb_vcc.value + 32768) / 65536);
+#elif (BOARD_TYPE == UDB5_BOARD)
+		voltage_milis.BB = (uint16_t)(2000 * 3.3 * ((double)udb_vcc.value + 32768) / 65536);
 #else
-		// TODO: assign this for udb4/5
+		// TODO: assign this for udb4
 		voltage_milis.BB = 0;
 #endif
 		mavlink_msg_sys_status_send(MAVLINK_COMM_0,
@@ -1707,7 +1709,7 @@ void mavlink_output_40hz(void)
 			0,					// Sensors enabled
 			0,					// Sensor health
 			CPU_LOAD,
-			voltage_milis.BB,					// Battery voltage in mV
+			voltage_milis.BB,			// Battery voltage in mV
 			0,					// Current
 			0,					// Percentage battery remaining 100 percent is 1000
 			r_mavlink_status.packet_rx_drop_count,
@@ -1750,8 +1752,6 @@ void mavlink_output_40hz(void)
 				(uint8_t)255); // 255 denotes not in use
 #endif
 	}
-	// mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw,
-	//	uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
 	// RAW SENSORS - ACCELOREMETERS and GYROS
 	// It is expected that these values are graphed to allow users to check basic sensor operation,
 	// and to graph noise on the signals. As this code if for testing and graphing basic hardware, it uses
