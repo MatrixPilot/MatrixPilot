@@ -230,7 +230,6 @@
         <itemPath>../../libUDB/serialIO.c</itemPath>
         <itemPath>../../libUDB/I2C1.c</itemPath>
         <itemPath>../../libUDB/I2C2.c</itemPath>
-        <itemPath>../../libUDB/read.c</itemPath>
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
       </logicalFolder>

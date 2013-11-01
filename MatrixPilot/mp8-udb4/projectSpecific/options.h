@@ -359,7 +359,7 @@
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       55
+#define MAVLINK_SYSID                       1
 
 
 ////////////////////////////////////////////////////////////////////////////////

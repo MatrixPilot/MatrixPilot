@@ -360,7 +360,7 @@
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       55
+#define MAVLINK_SYSID                       1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -781,10 +781,10 @@
 
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG                         1
+#define USE_TELELOG                         0
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      1
+#define USE_CONFIGFILE                      0
 
 // Set this to 1 to enable the USB stack on AUAV3
 #define USE_USB                             0
