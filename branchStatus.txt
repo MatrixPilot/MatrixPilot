@@ -118,5 +118,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
     to stabilizedS, not sure if this is the best choice...
         Also noted that disconnect/reconnect of LEA6 while nav_capable seems to
     break the GPS parser. It appears that commit_gps_data is never called after
-    reconnection.
+    reconnection. Not an issue: cycling power on the LEA6 causes it to revert to
+    NMEA mode, hence there are no longer ubx binary messages to parse.
 

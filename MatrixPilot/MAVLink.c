@@ -1734,11 +1734,12 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
 		mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0, msec,
-				(uint16_t)((udb_pwIn[0]) >> 1),
-				(uint16_t)((udb_pwIn[1]) >> 1),
-				(uint16_t)((udb_pwIn[2]) >> 1),
-				(uint16_t)((udb_pwIn[3]) >> 1),
-				(uint16_t)((udb_pwIn[4]) >> 1),
+				(uint16_t)((udb_pwIn[8]) >> 1), // FIXME: don't know where this is going in QGC 2.0.0
+                                // but the following assignments generate the correct display in Config:RC Calibration menu
+				(uint16_t)((udb_pwIn[AILERON_INPUT_CHANNEL]) >> 1),
+				(uint16_t)((udb_pwIn[ELEVATOR_INPUT_CHANNEL]) >> 1),
+				(uint16_t)((udb_pwIn[THROTTLE_INPUT_CHANNEL]) >> 1),
+				(uint16_t)((udb_pwIn[RUDDER_INPUT_CHANNEL]) >> 1),
 				(uint16_t)((udb_pwIn[5]) >> 1),
 				(uint16_t)((udb_pwIn[6]) >> 1),
 				(uint16_t)((udb_pwIn[7]) >> 1),

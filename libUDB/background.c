@@ -150,14 +150,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 
 	_T1IF = 0;              // clear the interrupt
 
-#if (HILSIM == 1)
-#ifdef USE_MAVLINK_DBGIO
-	int len = snprintf((char*)dbg_buff, 50, "T1 ISR heartbeat: %i\n", udb_heartbeat_counter);
-	mavlink_serial_send(0, dbg_buff, len);
-#endif
-#endif
-
-		// Start the sequential servo pulses at frequency SERVO_HZ
+	// Start the sequential servo pulses at frequency SERVO_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
 	{
 		start_pwm_outputs();
