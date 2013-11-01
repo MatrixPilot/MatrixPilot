@@ -2,6 +2,7 @@ Source file changes which must be flight tested
 (behaves differently in HILSIM):
 
 libDCM:
+
 deadReckoning.c
 estAltitude.c
 estWind.c
@@ -12,9 +13,11 @@ Source file changes which require ground and/or flight testing
 (code not exercised at all by HILSIM):
 
 libDCM:
+
 gpsParse*.c
 
 libUDB:
+
 24LC256.c
 analog2digital*.c
 barometer.c
@@ -30,10 +33,12 @@ servoOut.c
 spiUtils.c
 
 MatrixPilot:
+
 cameraCntrl.c ?does Xplane accept camera pan/tilt commands?
 mp_osd.c ???
 
-
+SILSIM may be used to test changes only to files in the MatrixPilot folder,
+with the exception of those listed above.
 
 
 
