@@ -188,7 +188,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 	}
 #endif
 
-#if (HILSIM != 1)
 	__eds__ int16_t *CurBuffer = (DmaBuffer == 0) ? BufferA : BufferB;
 	udb_vcc.input  = CurBuffer[A_VCC_BUFF-1];
 	udb_5v.input   = CurBuffer[A_5V_BUFF-1];
@@ -206,8 +205,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 #if (NUM_ANALOG_INPUTS >= 4)
 	udb_analogInputs[3].input = CurBuffer[analogInput4BUFF-1];
 #endif
-
-#endif // HILSIM
 
 	DmaBuffer ^= 1;             // Switch buffers
 	_DMA0IF = 0;                // Clear the DMA Interrupt Flag
