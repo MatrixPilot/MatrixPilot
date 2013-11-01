@@ -37,21 +37,45 @@
 #pragma message "__XC16__"
 #endif
 #if defined(__dsPIC33F__)
-#pragma message "__dsPIC33F__"
+#pragma message "cpu class dsPIC33F"
+#if (MIPS > 40)
+#error "MIPS must be <= 40 for dsPIC33F"
+#endif
 #endif
 #if defined(__dsPIC33E__)
-#pragma message "__dsPIC33E__"
+#pragma message "cpu class dsPIC33E"
+#if (MIPS > 70)
+#error "MIPS must be <= 70 for dsPIC33E"
 #endif
-
-#if (BOARD_TYPE == UDB4_BOARD)
-#pragma message "BOARD_TYPE: UDB4_BOARD"
-#elif (BOARD_TYPE == UDB5_BOARD)
-#pragma message "BOARD_TYPE: UDB5_BOARD"
-#elif (BOARD_TYPE == AUAV3_BOARD)
-#pragma message "BOARD_TYPE: AUAV3_BOARD"
 #endif
 
 #pragma message (SELECTED_VALUE(MIPS))
+
+#if (BOARD_TYPE == UDB4_BOARD)
+#pragma message "BOARD_TYPE: UDB4_BOARD"
+#if defined(__dsPIC33FJ256GP710A__)
+#pragma message "cpu: dsPIC33FJ256GP710A"
+#else
+#error "wrong cpu specified in project settings"
+#endif
+
+#elif (BOARD_TYPE == UDB5_BOARD)
+#pragma message "BOARD_TYPE: UDB5_BOARD"
+#if defined(__dsPIC33FJ256GP710A__)
+#pragma message "cpu: dsPIC33FJ256GP710A"
+#else
+#error "wrong cpu specified in project settings"
+#endif
+
+#elif (BOARD_TYPE == AUAV3_BOARD)
+#pragma message "BOARD_TYPE: AUAV3_BOARD"
+#if defined(__dsPIC33EP512MU810__)
+#pragma message "cpu: dsPIC33EP512MU810"
+#else
+#error "wrong cpu specified in project settings"
+#endif
+
+#endif
 
 #if (GPS_TYPE == GPS_STD)
 #pragma message "GPS_TYPE: GPS_STD"
