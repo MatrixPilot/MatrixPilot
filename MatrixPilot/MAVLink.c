@@ -1727,15 +1727,15 @@ void mavlink_output_40hz(void)
 
 	// RC CHANNELS
 	// Channel values shifted left by 1, to divide by two, so values reflect PWM pulses in microseconds.
-	// mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint16_t chan1_raw, uint16_t chan2_raw,
-	//	uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw,
-	//	uint16_t chan8_raw, uint8_t rssi)
+	// mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint32_t time_boot_ms, uint8_t port,
+        // uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw,
+        // uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
 	spread_transmission_load = 24;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
 		mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0, msec,
-				(uint16_t)((udb_pwIn[8]) >> 1), // FIXME: don't know where this is going in QGC 2.0.0
-                                // but the following assignments generate the correct display in Config:RC Calibration menu
+				(uint8_t) 0, // port number for more than 8 servos
+                                // the following assignments generate the correct display in Config:RC Calibration menu
 				(uint16_t)((udb_pwIn[AILERON_INPUT_CHANNEL]) >> 1),
 				(uint16_t)((udb_pwIn[ELEVATOR_INPUT_CHANNEL]) >> 1),
 				(uint16_t)((udb_pwIn[THROTTLE_INPUT_CHANNEL]) >> 1),
@@ -1743,7 +1743,7 @@ void mavlink_output_40hz(void)
 				(uint16_t)((udb_pwIn[5]) >> 1),
 				(uint16_t)((udb_pwIn[6]) >> 1),
 				(uint16_t)((udb_pwIn[7]) >> 1),
-				(uint8_t) 0, // port number for more than 8 servos
+				(uint16_t)((udb_pwIn[8]) >> 1),
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 				(uint8_t)rc_signal_strength);
 #else
