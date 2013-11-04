@@ -33,7 +33,7 @@ struct ADchannel udb_vcc;
 struct ADchannel udb_5v;
 struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
 
-// Number of locations for ADC buffer = 6 (AN0,15,16,17,18) x 1 = 6 words
+// Number of locations for ADC buffer = 6 (AN0,1,15,16,17,18) x 1 = 6 words
 // Align the buffer. This is needed for peripheral indirect mode
 #define NUM_AD_CHAN 6
 int16_t BufferA[NUM_AD_CHAN] __attribute__((space(dma), aligned(32)));

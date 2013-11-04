@@ -93,6 +93,12 @@
 #error "invalid GPS_TYPE"
 #endif
 
+#ifdef SERIAL_BAUDRATE_DEFAULT
+#pragma message "SERIAL_BAUDRATE defaulted to 115200"
+#else
+#pragma message (SELECTED_VALUE(SERIAL_BAUDRATE))
+#endif
+
 #pragma message (SELECTED_VALUE(MAVLINK_BAUD))
 
 

@@ -158,9 +158,9 @@ uint8_t mavlink_counter_40hz = 0;
 uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 
-int16_t sb_index = 0;
-int16_t end_index = 0;
-char serial_interrupt_stopped = 1;
+extern int16_t sb_index;
+extern int16_t end_index;
+extern char serial_interrupt_stopped;
 #ifndef USE_RING_BUFFER
 uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
 #endif
@@ -240,26 +240,26 @@ void init_mavlink(void)
 
 
 #ifndef USE_RING_BUFFER
-int16_t udb_serial_callback_get_byte_to_send(void)
-{
-	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
-	{
-		uint8_t txchar = serial_buffer[ sb_index++ ];
-		return txchar;
-	}
-	else
-	{
-		serial_interrupt_stopped = 1;
-	}
-	return -1;
-}
+//int16_t udb_serial_callback_get_byte_to_send(void)
+//{
+//	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
+//	{
+//		uint8_t txchar = serial_buffer[ sb_index++ ];
+//		return txchar;
+//	}
+//	else
+//	{
+//		serial_interrupt_stopped = 1;
+//	}
+//	return -1;
+//}
 #else
 #include "ring_buffer.h"
 
-// to be used with OpenLog for software flow control
-// Warning: imcompatible with mavlink binary uplink
-extern boolean pauseSerial;
-#define SOFTWARE_FLOW_CONTROL 0
+//// to be used with OpenLog for software flow control
+//// Warning: imcompatible with mavlink binary uplink
+//extern boolean pauseSerial;
+//#define SOFTWARE_FLOW_CONTROL 0
 
 // compiler built_in mechanism to set and restore IPL
 static int current_cpu_ipl;
@@ -274,26 +274,26 @@ static inline void restoreIPL()
 	RESTORE_CPU_IPL(current_cpu_ipl);
 }
 
-// Return one character at a time, as requested.
-// Requests will stop after we return false.
-// called by _U2TXInterrupt at IPL5
-
-boolean udb_serial_callback_get_binary_to_send(char *c)
-{
-	boolean status = false;
-
-#if (SOFTWARE_FLOW_CONTROL != 0)
-	if (!pauseSerial)
-#endif
-	{
-		status = ring_get(c);
-	}
-
-	if (!status)
-		serial_interrupt_stopped = 1;
-
-	return status;
-}
+//// Return one character at a time, as requested.
+//// Requests will stop after we return false.
+//// called by _U2TXInterrupt at IPL5
+//
+//boolean udb_serial_callback_get_binary_to_send(char *c)
+//{
+//	boolean status = false;
+//
+//#if (SOFTWARE_FLOW_CONTROL != 0)
+//	if (!pauseSerial)
+//#endif
+//	{
+//		status = ring_get(c);
+//	}
+//
+//	if (!status)
+//		serial_interrupt_stopped = 1;
+//
+//	return status;
+//}
 #endif
 
 int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)

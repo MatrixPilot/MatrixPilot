@@ -22,6 +22,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "ring_buffer.h"
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES
@@ -34,7 +35,11 @@
 // to be used with OpenLog for software flow control
 // Warning: imcompatible with mavlink binary uplink
 boolean pauseSerial = false;
+#define SOFTWARE_FLOW_CONTROL 0
 
+int16_t sb_index = 0;
+int16_t end_index = 0;
+char serial_interrupt_stopped = 1;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -204,6 +209,20 @@ void udb_serial_start_sending_data(void)
 }
 
 #ifndef USE_RING_BUFFER
+int16_t udb_serial_callback_get_byte_to_send(void)
+{
+	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
+	{
+		uint8_t txchar = serial_buffer[ sb_index++ ];
+		return txchar;
+	}
+	else
+	{
+		serial_interrupt_stopped = 1;
+	}
+	return -1;
+}
+
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 {
 	_U2TXIF = 0; // clear the interrupt
@@ -218,6 +237,27 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 	interrupt_restore_corcon;
 }
 #else
+
+// Return one character at a time, as requested.
+// Requests will stop after we return false.
+// called by _U2TXInterrupt at IPL5
+
+boolean udb_serial_callback_get_binary_to_send(char *c)
+{
+	boolean status = false;
+
+#if (SOFTWARE_FLOW_CONTROL != 0)
+	if (!pauseSerial)
+#endif
+	{
+		status = ring_get(c);
+	}
+
+	if (!status)
+		serial_interrupt_stopped = 1;
+
+	return status;
+}
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 {

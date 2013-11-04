@@ -27,6 +27,15 @@
 #include <stdio.h>
 
 #include "options.h"
+
+// here we specify default values for optional settings in options.h
+#ifndef SERIAL_BAUDRATE
+#define SERIAL_BAUDRATE 115200
+#define SERIAL_BAUDRATE_DEFAULT
+#else
+#undef SERIAL_BAUDRATE_DEFAULT
+#endif
+
 #if (SILSIM == 1)
 #include "SIL-udb.h"
 #else

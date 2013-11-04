@@ -47,6 +47,7 @@
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../config.h</itemPath>
+        <itemPath>../cbox.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -264,6 +265,7 @@
         <itemPath>../console.c</itemPath>
         <itemPath>../ring_buffer.h</itemPath>
         <itemPath>../ring_buffer.c</itemPath>
+        <itemPath>../cbox.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -272,9 +274,13 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
     <itemPath>../../branchStatus.txt</itemPath>
+    <itemPath>../../testingRequirements.txt</itemPath>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../..</Elem>
+    <Elem>../../libDCM</Elem>
+    <Elem>../../libUDB</Elem>
+    <Elem>..</Elem>
+    <Elem>../../MAVLink</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

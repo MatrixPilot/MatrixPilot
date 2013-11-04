@@ -38,6 +38,7 @@
 
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
+#include "heartbeat.h"
 #endif
 
 // Include the NV memory services if required
@@ -45,6 +46,12 @@
 #include "NV_memory.h"
 #include "data_storage.h"
 #include "data_services.h"
+#endif
+
+int cbox_on = 0;
+#ifdef ENABLE_GAIN_CBOX
+#include "cbox.h"
+#include "libDCM_defines.h"
 #endif
 
 // Include flexifunction mixers if required
@@ -61,7 +68,7 @@ union longww battery_mAh_used;
 #endif
 
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
-union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
+union longww battery_voltage; // battery_voltage._.W1 is in tenths of Volts
 #endif
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
@@ -73,7 +80,7 @@ uint8_t rc_signal_strength;
 
 // Functions only included with nv memory.
 #if (USE_NV_MEMORY == 1)
-UDB_SKIP_FLAGS udb_skip_flags = {0,0,0};
+UDB_SKIP_FLAGS udb_skip_flags = {0, 0, 0};
 
 void udb_skip_radio_trim(boolean b)
 {
@@ -113,7 +120,7 @@ void udb_init(void)
 #if (USE_I2C1_DRIVER == 1)
 	I2C1_Init();
 #endif
-//FIXME: add AUAV3 support
+	//FIXME: add AUAV3 support
 #if (USE_NV_MEMORY == 1)
 	nv_memory_init();
 	data_storage_init();
@@ -139,7 +146,7 @@ void udb_init(void)
 	MPU6000_init16();
 #endif
 
-	SRbits.IPL = 0;	// turn on all interrupt priorities
+	SRbits.IPL = 0; // turn on all interrupt priorities
 }
 
 void udb_run(void)
@@ -159,6 +166,23 @@ void udb_run(void)
 		console();
 #endif
 
+#ifdef ENABLE_GAIN_CBOX
+		static int cbox_delay = 4 * HEARTBEAT_HZ;
+		static int cbcnt = 0;
+		if (cbox_delay > 0)
+		{
+			cbox_delay--;
+		}
+		else
+		{
+			if (cbcnt++ > HEARTBEAT_HZ / 20)
+			{
+				cbcnt = 0;
+				check_cbox();
+			}
+		}
+#endif
+
 #if (USE_MCU_IDLE == 1)
 		// it's possible for an interrupt to occur between turning the orange LED off
 		// and completion of the Idle instruction, but the off time will be little more than
@@ -175,6 +199,7 @@ void udb_run(void)
 }
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
+
 void udb_a2d_record_offsets(void)
 {
 #if (USE_NV_MEMORY == 1)
@@ -185,7 +210,7 @@ void udb_a2d_record_offsets(void)
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value;
 	udb_xrate.offset = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
+	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN((int16_t) (2 * GRAVITY))); // opposite direction
 	udb_yrate.offset = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value;
 	udb_zrate.offset = udb_zrate.value;
@@ -194,10 +219,11 @@ void udb_a2d_record_offsets(void)
 #endif
 }
 #else  // horizontal initialization
+
 void udb_a2d_record_offsets(void)
 {
 #if (USE_NV_MEMORY == 1)
-	if(udb_skip_flags.skip_imu_cal == 1)
+	if (udb_skip_flags.skip_imu_cal == 1)
 		return;
 #endif
 
@@ -206,7 +232,7 @@ void udb_a2d_record_offsets(void)
 	udb_xrate.offset = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value;
 	udb_yrate.offset = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
+	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN((int16_t) (2 * GRAVITY))); // same direction
 	udb_zrate.offset = udb_zrate.value;
 #ifdef VREF
 	udb_vref.offset = udb_vref.value;
@@ -224,11 +250,12 @@ void udb_servo_record_trims(void)
 }
 
 // saturation logic to maintain pulse width within bounds
+
 int16_t udb_servo_pulsesat(int32_t pw)
 {
 	if (pw > SERVOMAX) pw = SERVOMAX;
 	if (pw < SERVOMIN) pw = SERVOMIN;
-	return (int16_t)pw;
+	return (int16_t) pw;
 }
 
 void calculate_analog_sensor_values(void)
@@ -236,8 +263,8 @@ void calculate_analog_sensor_values(void)
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to current in tenths of Amps
-	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_CURRENT) + (((int32_t)(CURRENT_SENSOR_OFFSET)) << 16);
-	
+	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL - 1].value + (int32_t) 32768) * (MAX_CURRENT) + (((int32_t) (CURRENT_SENSOR_OFFSET)) << 16);
+
 	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
 	// 90000/144000 == 900/1440
 	battery_mAh_used.WW += (battery_current.WW / 1440);
@@ -246,17 +273,17 @@ void calculate_analog_sensor_values(void)
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to voltage in tenths of Volts
-	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE) + (((int32_t)(VOLTAGE_SENSOR_OFFSET)) << 16);
+	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL - 1].value + (int32_t) 32768) * (MAX_VOLTAGE) + (((int32_t) (VOLTAGE_SENSOR_OFFSET)) << 16);
 #endif
 
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	union longww rssi_accum;
-	rssi_accum.WW = (((udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value + 32768) - (MIN_RSSI)) * (10000 / (RSSI_RANGE)));
+	rssi_accum.WW = (((udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL - 1].value + 32768) - (MIN_RSSI)) * (10000 / (RSSI_RANGE)));
 	if (rssi_accum._.W1 < 0)
 		rc_signal_strength = 0;
 	else if (rssi_accum._.W1 > 100)
 		rc_signal_strength = 100;
 	else
-		rc_signal_strength = (uint8_t)rssi_accum._.W1;
+		rc_signal_strength = (uint8_t) rssi_accum._.W1;
 #endif
 }
