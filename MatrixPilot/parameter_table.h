@@ -85,6 +85,7 @@ typedef struct tag_mavlink_parameter_block
 	const uint16_t block_size;
 	const uint16_t data_storage_flags;
 	PT_callbackFunc ploadCallback;
+        const char      block_name[15];                // Name used for filename and gcs display
 } mavlink_parameter_block;
 
 extern const mavlink_parameter_block mavlink_parameter_blocks[];
