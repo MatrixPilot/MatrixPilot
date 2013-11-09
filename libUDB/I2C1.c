@@ -24,6 +24,7 @@
 #include "I2C.h"
 #include "NV_memory.h"
 #include "events.h"
+#include "timer.h"
 
 #if (USE_I2C1_DRIVER == 1)
 
@@ -52,10 +53,10 @@ static void I2C1_doneWrite(void);
 static void I2C1_writeCommandData(void);
 static void serviceI2C1(void);              // service the I2C
 
-static int16_t I2C1ERROR = 0;
-static boolean I2C1_Busy = true;            // Port busy flag. Set true until initialized
+static int16_t  I2C1ERROR = 0;
+static boolean  I2C1_Busy = true;            // Port busy flag. Set true until initialized
 static uint16_t I2C1_Index = 0;             // index into the write buffer
-static uint8_t I2C1_AddressByte = 0;
+static uint8_t  I2C1_AddressByte = 0;
 static uint16_t I2C1_tx_data_size = 0;      // tx data size
 static uint16_t I2C1_rx_data_size = 0;      // rx data size
 static uint16_t I2C1_command_data_size = 0; // command data size
@@ -65,6 +66,7 @@ static uint16_t I2C1_service_handle = INVALID_HANDLE;
 static void (*I2C1_state)(void) = &I2C1_idle;
 static I2C_callbackFunc pI2C_callback = NULL;
 
+static uint16_t I2C1_timer_handle = TIMER_INVALID_HANDLE;
 
 void I2C1_Init(void)
 {
@@ -76,9 +78,16 @@ void I2C1_Init(void)
 	_MI2C1IF = 0;                       // clear the I2C1 master interrupt
 	_MI2C1IE = 1;                       // enable the interrupt
 
-	I2C1_service_handle = register_event(&serviceI2C1);
+        // register I2C1 service event at medium priority
+	I2C1_service_handle = register_event_p(&serviceI2C1, EVENT_PRIORITY_MEDIUM);
 
 	I2C1_Busy = false;
+
+        I2C1_timer_handle = timer_register();
+        if(I2C1_timer_handle == TIMER_INVALID_HANDLE) return;
+
+        // Start a repeating soft-timer every 39ms
+        timer_start(I2C1_timer_handle, 39, true, I2C1_service_handle);
 }
 
 // Trigger the I2C1 service routine to run at low priority

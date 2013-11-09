@@ -21,7 +21,7 @@
 
 #define INT_PRI_T1      6   // background.c : high priority HEARTBEAT_HZ heartbeat of libUDB
 //#define INT_PRI_T2      ?   // radioIn.c : does not use the timer interrupt
-//#define INT_PRI_T3      ?   // unused
+#define INT_PRI_T3      6   // system clock tick
 #define INT_PRI_T4      7   // servoOut.c : highest priority interrupt for pwm
 #define INT_PRI_T5      6   // background.c : high priority, but ISR is very short - used to measure CPU usage.
 #define INT_PRI_T6      3   // background.c : trigger from the high priority heartbeat ISR to start all the HEARTBEAT_HZ processing at a lower priority - NOTE: timer 6 is not actually being used
@@ -48,6 +48,7 @@
 
 #define INT_PRI_USB1    4   // USB available only on AUAV3
 
+#define INT_PRI_EVENTH  3   // events.c : trigger M uses the C1 interrupt
 #define INT_PRI_EVENTM  2   // events.c : trigger M uses the C1 interrupt
 #define INT_PRI_EVENTL  1   // events.c : trigger L uses the C2 interrupt
 

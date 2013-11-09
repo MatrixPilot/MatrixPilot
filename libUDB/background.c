@@ -251,6 +251,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 
 	udb_servo_callback_prepare_outputs();
 
+/*
 #if (USE_I2C1_DRIVER == 1)
 	I2C1_trigger_service();
 #endif
@@ -264,6 +265,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 	flexiFunctionServiceTrigger();
 #endif
-
+*/
+        
 	interrupt_restore_corcon;
 }

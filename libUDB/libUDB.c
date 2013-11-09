@@ -24,6 +24,8 @@
 #include "interrupt.h"
 #include "analogs.h"
 #include "events.h"
+#include "timer.h"
+#include "sysTick.h"
 
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
@@ -75,6 +77,10 @@ void udb_init(void)
 
 	udb_init_ADC();
 	init_events();
+
+        timer_init();
+        sys_tick_init();
+
 #if (USE_I2C1_DRIVER == 1)
 	I2C1_Init();
 #endif
