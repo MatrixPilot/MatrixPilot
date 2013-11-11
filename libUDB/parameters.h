@@ -85,14 +85,25 @@ typedef enum param_type_e {
 		.val.p = &_default;			\
 	}
 
-/** define a parameter that points to a structure */
+/** define a parameter that that is the end of the list */
 #define PARAM_DEFINE_END()                              \
 	static const					\
-	__attribute__((used, section("__paramend")))	\
+	__attribute__((used, section("__pend")))	\
 	struct param_info_s __param__the_end = {    	\
 		NULL,					\
 		PARAM_TYPE_INT32,                       \
 		.val.i = 0                              \
+	}
+
+
+/** define a parameter that is the start of the list */
+#define PARAM_DEFINE_START()                            \
+	static const					\
+	__attribute__((used, section("__pstart")))	\
+	struct param_info_s __param__the_start = {    	\
+		NULL,					\
+		PARAM_TYPE_INT32,                       \
+		.val.i = 1                              \
 	}
 
 /**
