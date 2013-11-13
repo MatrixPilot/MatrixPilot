@@ -21,6 +21,7 @@
 
 #include "defines.h"
 
+
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
@@ -31,6 +32,14 @@ uint16_t rollkp;
 uint16_t rollkd;
 uint16_t hoverrollkp;
 uint16_t hoverrollkd;
+
+PARAM_SECTION(PID, 0, NULL);
+PARAM_DEFINE_Q14(PID_YAWKDAIL,  &yawkdail,  0, 0.5, false);
+PARAM_DEFINE_Q14(PID_ROLLKP,    &rollkp,    0, 0.5, false);
+PARAM_DEFINE_Q14(PID_ROLLKD,    &rollkd,    0, 0.5, false);
+
+PARAM_DEFINE_Q14(PID_HROLLKP,    &hoverrollkp, 0, 0.5, false);
+PARAM_DEFINE_Q14(PID_HROLLKD,    &hoverrollkd, 0, 0.5, false);
 
 void normalRollCntrl(void);
 void hoverRollCntrl(void);

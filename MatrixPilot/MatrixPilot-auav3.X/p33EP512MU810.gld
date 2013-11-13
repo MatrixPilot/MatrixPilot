@@ -111,6 +111,14 @@ SECTIONS
 		
   } >program
 
+  __param ALIGN(2):
+  {
+		__section_start = ABSOLUTE(.);
+		KEEP(*(__sstart*) ) KEEP(*(__section*) ) KEEP(*(__send*))
+        __section_end = ABSOLUTE(.);
+
+  } >program
+
 
   /*
   ** User-Defined Section in Program Memory
