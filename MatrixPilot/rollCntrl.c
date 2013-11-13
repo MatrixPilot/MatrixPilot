@@ -51,6 +51,9 @@ void init_rollCntrl(void)
 	rollkd      = (uint16_t)(ROLLKD*SCALEGYRO*RMAX);
 	hoverrollkp = (uint16_t)(HOVER_ROLLKP*SCALEGYRO*RMAX);
 	hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX);
+
+        uint16_t handle = get_param_handle("PID_ROLLKD");
+        handle = handle + handle;
 }
 
 void rollCntrl(void)
