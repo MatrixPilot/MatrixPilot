@@ -8,6 +8,8 @@
 #ifndef PARAMETER_MACROS_H
 #define	PARAMETER_MACROS_H
 
+// NOTE: Function prototypes at bottom
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -15,6 +17,10 @@ extern "C" {
 #include "../MatrixPilot/parameter_table.h"
 
 #define PARAM_COUNT 0
+
+#define INVALID_PARAMETER_HANDLE 0x7FFF
+
+
 
 ///**
 // * Parameter types.
@@ -182,11 +188,25 @@ struct param_section_s {
 #define PARAM_SECTION(_name, _flags, _callback)         \
 	static const					\
 	__attribute__((used, section("__section")))	\
-	struct param_section_s __section__the_start = { \
+	struct param_section_s __section__##name = {    \
 		#_name,					\
 		_flags,					\
 		_callback,				\
 	}
+
+
+uint16_t get_param_handle(char* name);
+const struct param_info_s* get_param(uint16_t handle);
+uint16_t get_param_count(void);
+
+param_union_t get_param_val(uint16_t handle);
+uint16_t get_param_udb_type(uint16_t handle);
+uint16_t get_param_mavlink_type(uint16_t handle);
+
+uint16_t get_section_handle(char* name);
+const struct param_section_s* get_section(uint16_t handle);
+uint16_t get_section_count(void);
+
 
 
 
