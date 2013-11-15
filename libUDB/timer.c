@@ -43,7 +43,7 @@ uint16_t timer_register(void)
     return TIMER_INVALID_HANDLE;
 };
 
-// inline code polling timers
+// polling timers
 inline void timer_tick(void)
 {
     uint16_t index;

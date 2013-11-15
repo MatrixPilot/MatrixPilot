@@ -20,7 +20,30 @@ extern "C" {
 
 #define INVALID_PARAMETER_HANDLE 0x7FFF
 
+// callback type for data services user
+typedef void (*param_callbackFunc)(boolean);
 
+typedef enum
+    {
+    UDB_PARAM_INT,
+    UDB_PARAM_Q14,
+    UDB_PARAM_PWTRIM,
+    UDB_PARAM_GYROSCALE_Q14,
+    UDB_PARAM_INT_CIRCULAR,
+    UDB_PARAM_CM_AIRSPEED_TO_DM,
+    UDB_PARAM_M_AIRSPEED_TO_DM,
+    UDB_PARAM_M_AIRSPEED_TO_CM,
+    UDB_PARAM_FRAME_ANGLERATE,
+    UDB_PARAM_DCM_ANGLE,
+    } udb_parameter_types_e;
+
+
+typedef union
+{
+	float param_float;
+	int32_t param_int32;
+	uint32_t param_uint32;
+} parameter_union_t;
 
 ///**
 // * Parameter types.
@@ -70,7 +93,7 @@ extern "C" {
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
 		(uint8_t*) _pvar,					\
-		UDB_TYPE_INT,                           \
+		UDB_PARAM_INT,                           \
 		.min.param_int32 = _min,                \
 		.max.param_int32 = _max,           	\
                 _readOnly                               \
@@ -83,7 +106,7 @@ extern "C" {
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
 		(uint8_t*) _pvar,					\
-		UDB_TYPE_Q14,                     	\
+		UDB_PARAM_Q14,                     	\
 		.min.param_float = _min,                \
 		.max.param_float = _max,           	\
                 _readOnly                               \
@@ -96,7 +119,7 @@ extern "C" {
 	__attribute__((used, section("__param")))	\
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
-		PARAM_TYPE_FLOAT,			\
+		PARAM_PARAM_FLOAT,			\
 		.val.f = _default			\
 	}
 
@@ -106,7 +129,7 @@ extern "C" {
 	__attribute__((used, section("__param")))	\
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
-		PARAM_TYPE_STRUCT + sizeof(_default),	\
+		PARAM_PARAM_STRUCT + sizeof(_default),	\
 		.val.p = &_default;			\
 	}
 
@@ -141,9 +164,9 @@ extern "C" {
 struct param_info_s {
 	const char          *name;          // name of parameter
 	uint8_t*            pvar;           // Reference to variable
-	udb_internal_type_e type;           // Internal type of variable
-	param_union_t       min;            // parameter minimum
-	param_union_t       max;            // parameter maximum
+	uint16_t            type;           // Internal UDB type of variable
+	parameter_union_t   min;            // parameter minimum
+	parameter_union_t   max;            // parameter maximum
         boolean             readOnly;       // Is read only
 };
 
@@ -158,7 +181,7 @@ struct param_info_s {
 struct param_section_s {
 	const char              *name;
         uint16_t                flags;
-        PT_callbackFunc         ploadCallback;
+        param_callbackFunc      ploadCallback;
 };
 
 
@@ -195,17 +218,17 @@ struct param_section_s {
 	}
 
 
-uint16_t get_param_handle(char* name);
-const struct param_info_s* get_param(uint16_t handle);
-uint16_t get_param_count(void);
+extern uint16_t get_param_handle(char* name);
+extern const struct param_info_s* get_param(uint16_t handle);
+extern  uint16_t get_param_count(void);
 
-param_union_t get_param_val(uint16_t handle);
-uint16_t get_param_udb_type(uint16_t handle);
-uint16_t get_param_mavlink_type(uint16_t handle);
+extern parameter_union_t get_param_val(uint16_t handle);
+extern uint16_t get_param_udb_type(uint16_t handle);
+extern uint16_t get_param_mavlink_type(uint16_t handle);
 
-uint16_t get_section_handle(char* name);
-const struct param_section_s* get_section(uint16_t handle);
-uint16_t get_section_count(void);
+extern uint16_t get_section_handle(char* name);
+extern const struct param_section_s* get_section(uint16_t handle);
+extern uint16_t get_section_count(void);
 
 
 

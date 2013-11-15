@@ -33,8 +33,8 @@ typedef enum tagTIMER_STATUS
     // unregister a timer
     uint16_t timer_unregister(uint16_t handle);
 
-    // fast inline to poll timers
-    void timer_tick(void);
+    // poll software timers
+    inline void timer_tick(void);
 
     void timer_start(uint16_t timer_handle, uint16_t time, boolean repeat, uint16_t event_handle);
     void timer_stop(uint16_t timer_handle);
