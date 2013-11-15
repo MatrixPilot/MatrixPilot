@@ -217,17 +217,26 @@ struct param_section_s {
 		_callback,				\
 	}
 
-
+// Find the handle/index for a parameter with the given name
 extern uint16_t get_param_handle(char* name);
+
+// Get a pointer to the parameter with the provided handle
 extern const struct param_info_s* get_param(uint16_t handle);
+
+// Get a total count of declared parameters
 extern  uint16_t get_param_count(void);
 
 extern parameter_union_t get_param_val(uint16_t handle);
 extern uint16_t get_param_udb_type(uint16_t handle);
 extern uint16_t get_param_mavlink_type(uint16_t handle);
 
+// Get a handle for the section with given name
 extern uint16_t get_section_handle(char* name);
+
+// Return a pointer to the section with given handle
 extern const struct param_section_s* get_section(uint16_t handle);
+
+// Return a count of the number of delcared sections
 extern uint16_t get_section_count(void);
 
 

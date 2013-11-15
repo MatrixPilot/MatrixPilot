@@ -62,4 +62,8 @@ uint16_t get_param_udb_type(uint16_t handle);
 uint16_t get_param_mavlink_type(uint16_t handle);
 
 uint16_t get_section_handle(char* name);
-const struct param_section_s* get_section(uint16_t handle);
+
+const struct param_section_s* get_section(uint16_t handle)
+{
+    return &param_section_base[handle];
+}

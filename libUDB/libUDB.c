@@ -26,6 +26,7 @@
 #include "events.h"
 #include "timer.h"
 #include "sysTick.h"
+#include "parameter_storage.h"
 
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
@@ -114,6 +115,7 @@ void udb_init(void)
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 	MPU6000_init16();
 #endif
+        init_parameter_storage();
 
 	SRbits.IPL = 0; // turn on all interrupt priorities
 }

@@ -769,7 +769,7 @@
 #define USE_CONFIGFILE                      0
 
 // Set this to 1 to enable the USB stack on AUAV3
-#define USE_USB                             0
+#define USE_USB                             1
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
-#define USE_MSD                             0
+#define USE_MSD                             1

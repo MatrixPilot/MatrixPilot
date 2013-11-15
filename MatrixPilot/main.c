@@ -52,6 +52,8 @@ int main(void)
 #if (USE_TELELOG == 1)
 	log_init();
 #endif
+	log_init();
+
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
