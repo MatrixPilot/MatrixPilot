@@ -13,6 +13,17 @@
 extern "C" {
 #endif
 
+
+typedef enum
+    {
+    STORAGE_FLAG_ALL = 1,
+    STORAGE_FLAG_LOAD_AT_STARTUP = 2,
+    STORAGE_FLAG_LOAD_AT_REBOOT = 4,
+    STORAGE_FLAG_SAVE_AFTER_CAL = 8,
+    STORAGE_FLAG_STORE_CALIB = 16,
+    } storage_flags_e;
+
+
     // Initialize storage
     void init_parameter_storage(void);
 

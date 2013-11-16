@@ -80,6 +80,7 @@
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../parameter_storage.h</itemPath>
+        <itemPath>../parameter_scaling.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -344,6 +345,7 @@
         <itemPath>../redef.c</itemPath>
         <itemPath>../flight_state.c</itemPath>
         <itemPath>../parameter_storage.c</itemPath>
+        <itemPath>../parameter_scaling.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>

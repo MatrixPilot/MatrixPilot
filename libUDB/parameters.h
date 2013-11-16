@@ -14,7 +14,8 @@
 extern "C" {
 #endif
 
-#include "../MatrixPilot/parameter_table.h"
+//#include "../MatrixPilot/parameter_table.h"
+#include "../MAVLink/include/mavlink_types.h"
 
 #define PARAM_COUNT 0
 
@@ -23,13 +24,25 @@ extern "C" {
 // callback type for data services user
 typedef void (*param_callbackFunc)(boolean);
 
+
+typedef union
+{
+    float param_float;
+    int32_t param_int32;
+    uint32_t param_uint32;
+    uint8_t param_uint8;
+    uint8_t bytes[4];
+} parameter_union_t;
+
+
+
 typedef enum
     {
     UDB_PARAM_INT,
     UDB_PARAM_Q14,
     UDB_PARAM_PWTRIM,
     UDB_PARAM_GYROSCALE_Q14,
-    UDB_PARAM_INT_CIRCULAR,
+//    UDB_PARAM_INT_CIRCULAR,   // Deprecated until further notice
     UDB_PARAM_CM_AIRSPEED_TO_DM,
     UDB_PARAM_M_AIRSPEED_TO_DM,
     UDB_PARAM_M_AIRSPEED_TO_CM,
@@ -38,12 +51,6 @@ typedef enum
     } udb_parameter_types_e;
 
 
-typedef union
-{
-	float param_float;
-	int32_t param_int32;
-	uint32_t param_uint32;
-} parameter_union_t;
 
 ///**
 // * Parameter types.
@@ -187,20 +194,20 @@ struct param_section_s {
 
 
 /** define a parameter that is the start of the list */
-#define PARAM_SECTION_START()                            \
+#define PARAM_SECTION_START()                           \
 	static const					\
 	__attribute__((used, section("__sstart")))	\
-	struct param_section_s __section__the_start = {    	\
+	struct param_section_s __section__the_start = { \
 		NULL,					\
 		NULL,					\
 		NULL,					\
 	}
 
 /** define a parameter that that is the end of the list */
-#define PARAM_SECTION_END()                              \
+#define PARAM_SECTION_END()                             \
 	static const					\
 	__attribute__((used, section("__send")))	\
-	struct param_section_s __section__the_end = {    	\
+	struct param_section_s __section__the_end = {   \
 		NULL,					\
 		NULL,					\
 		NULL,					\

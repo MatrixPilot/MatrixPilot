@@ -5,11 +5,14 @@
  * Array of static parameter info.
  */
 
-unsigned int zip_bag;
-fractional bluff;
+unsigned int zip_bag = 999;
+fractional bluff = 12345;
 
 PARAM_DEFINE_START();
 PARAM_DEFINE_END();
+
+PARAM_SECTION(MISC, 0, NULL);
+
 PARAM_DEFINE_INT(MISC_ZIP_BAG, &zip_bag, 0, RMAX, false);
 PARAM_DEFINE_Q14(MISC_BLUFF, &bluff, -1.0, 1.0, false);
 
@@ -19,30 +22,32 @@ PARAM_SECTION_END();
 extern char __param_start, __param_end;
 static const struct param_info_s	*param_info_base = &(((struct param_info_s *) &__param__the_start)[1]);
 static const struct param_info_s	*param_info_limit = (struct param_info_s *) &__param__the_end;
-#define	param_info_count		((unsigned)(param_info_limit - param_info_base))
-#define param_count (((uint32_t) param_info_count/sizeof(struct param_info_s)) - 1)
+#define	param_info_count		((unsigned)(&param_info_limit - &param_info_base))
 
 
 static const struct param_section_s	*param_section_base = &(((struct param_section_s *) &__section__the_start)[1]);
 static const struct param_section_s	*param_section_limit = (struct param_section_s *) &__section__the_end;
-#define	param_section_count		((unsigned)(param_section_limit - param_section_base))
-#define section_count (((uint32_t) param_section_count/sizeof(struct param_section_s)) - 1)
+#define	param_section_count		((unsigned)(&param_section_limit - &param_section_base))
 
 
-inline uint16_t get_param_count(void) {return (uint16_t) param_count;};
-inline uint16_t get_section_count(void) {return (uint16_t) section_count;};
+uint16_t get_param_count(void)
+{
+    return (&__param__the_end - &__param__the_start) - 1;
+};
 
+uint16_t get_section_count(void)
+{
+//    return (uint16_t) param_section_count;
+    return (&__section__the_end - &__section__the_start) - 1;
+}
 
 uint16_t get_param_handle(char* name)
 {
-    int index = param_count;
-    index = (((uint32_t) param_info_count/sizeof(struct param_info_s)) - 1);
-    index = param_info_count;
-    index = param_info_base;
-    index = param_info_limit;
+    int index;
+
     struct param_info_s* pparam;
 
-    for(index = 0; index < param_count; index++)
+    for(index = 0; index < param_info_count; index++)
     {
         pparam = &param_info_base[index];
         if(strcmp(pparam->name, name) == 0)

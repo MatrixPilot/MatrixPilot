@@ -36,6 +36,8 @@
 #endif
 
 
+#include "parameter_storage.h"
+
 #if (SILSIM == 1)
 int mp_argc;
 char **mp_argv;
@@ -65,6 +67,9 @@ int main(void)
 	init_states();
 	init_behavior();
 	init_serial();
+
+        init_parameter_storage();
+
 
 	if (setjmp())
 	{
