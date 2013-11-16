@@ -71,7 +71,9 @@ void yawCntrl(void);
 void altitudeCntrl(void);
 void setTargetAltitude(int16_t targetAlt);
 
-void init_yawCntrl(void);void init_rollCntrl(void);void init_pitchCntrl(void);
+void init_yawCntrl(void);
+void init_rollCntrl(void);
+void init_pitchCntrl(void);
 void init_airspeedCntrl(void);
 void init_altitudeCntrl(void);
 void init_altitudeCntrlVariable(void);
@@ -121,7 +123,12 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 ////////////////////////////////////////////////////////////////////////////////
 // navigation.c
+void init_navigation(void);
+#ifdef USE_EXTENDED_NAV
+void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
+#else
 void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
+#endif // USE_EXTENDED_NAV
 void update_goal_alt(int16_t z);
 void compute_bearing_to_goal (void);
 void process_flightplan(void);
@@ -263,14 +270,14 @@ void camera_live_commit_relative_position(const struct relative3D target);
 // mp_osd.c
 void osd_run_step(void);
 
-#define OSD_NTSC            0
-#define OSD_PAL             1
+//#define OSD_NTSC            0
+//#define OSD_PAL             1
 
 // new OSD types
-#define OSD_NONE            0   // OSD disabled
-#define OSD_NATIVE          1   // native OSD
-#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
-#define OSD_MINIM           3   // Output data formatted for minim OSD
+//#define OSD_NONE            0   // OSD disabled
+//#define OSD_NATIVE          1   // native OSD
+//#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
+//#define OSD_MINIM           3   // Output data formatted for minim OSD
 
 
 #include "gain_variables.h"

@@ -41,8 +41,7 @@ const int16_t tan_pitch_in_stabilized_mode = CAM_TAN_PITCH_IN_STABILIZED_MODE;
 
 const int16_t pitch_offset_centred_pwm = (CAM_PITCH_OFFSET_CENTRED * 65536.0 / 360.0) * PITCH_SERVO_RATIO;
 const int16_t yaw_offset_centred_pwm   = (CAM_YAW_OFFSET_CENTRED   * 65536.0 / 360.0) * YAW_SERVO_RATIO  ;
-
-const int16_t pitch_servo_pwm_max = ((CAM_PITCH_SERVO_MAX - CAM_PITCH_OFFSET_CENTRED) * 65536.0 / 360.0) * PITCH_SERVO_RATIO;					;
+const int16_t pitch_servo_pwm_max      = ((CAM_PITCH_SERVO_MAX - CAM_PITCH_OFFSET_CENTRED) * 65536.0 / 360.0) * PITCH_SERVO_RATIO;
 const int16_t pitch_servo_pwm_min = ((CAM_PITCH_SERVO_MIN - CAM_PITCH_OFFSET_CENTRED) * 65536.0 / 360.0) * PITCH_SERVO_RATIO;
 const int16_t yaw_servo_pwm_max   = ((CAM_YAW_SERVO_MAX   - CAM_YAW_OFFSET_CENTRED  ) * 65536.0 / 360.0) * YAW_SERVO_RATIO;
 const int16_t yaw_servo_pwm_min   = ((CAM_YAW_SERVO_MIN   - CAM_YAW_OFFSET_CENTRED  ) * 65536.0 / 360.0) * YAW_SERVO_RATIO;
@@ -66,14 +65,14 @@ int32_t cam_pitchServoLimit(int32_t pwm_pulse)
 {
 	if (pwm_pulse > pitch_servo_pwm_max) pwm_pulse = pitch_servo_pwm_max;
 	if (pwm_pulse < pitch_servo_pwm_min) pwm_pulse = pitch_servo_pwm_min;
-	return(pwm_pulse);
+	return pwm_pulse;
 }
 
 int32_t cam_yawServoLimit(int32_t pwm_pulse)
 {
 	if (pwm_pulse > yaw_servo_pwm_max) pwm_pulse = yaw_servo_pwm_max;
 	if (pwm_pulse < yaw_servo_pwm_min) pwm_pulse = yaw_servo_pwm_min;
-	return (pwm_pulse);
+	return pwm_pulse;
 }
 
 void set_camera_view(struct relative3D current_view)
@@ -119,10 +118,8 @@ void cameraCntrl(void)
 #endif
 	{
 		// set camera to default position
-		// Pitch Servo
-		cam_pitch_servo_pwm_delta =  - pitch_offset_centred_pwm;		
-		// Yaw Servo	
-		cam_yaw_servo_pwm_delta = - yaw_offset_centred_pwm ;
+		cam_pitch_servo_pwm_delta = -pitch_offset_centred_pwm;  // Pitch Servo
+		cam_yaw_servo_pwm_delta   = -yaw_offset_centred_pwm;    // Yaw Servo
 	}
 	else
 	{
@@ -130,7 +127,7 @@ void cameraCntrl(void)
 #if (CAMERA_MODE_INPUT_CHANNEL ==	CHANNEL_UNUSED)
 		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
 #else
-		if ((udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] > CAMERA_MODE_THRESHOLD_LOW) && \
+		if ((udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] > CAMERA_MODE_THRESHOLD_LOW) &&
 		    (udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_HIGH))
 #endif
 		{
@@ -148,7 +145,7 @@ void cameraCntrl(void)
 			// "Aviation Convention - Ground" frame of reference
 			matrix_accum.x =   rmat[4];
 			matrix_accum.y =   rmat[1];
-			cam_yaw8 =  rect_to_polar(&matrix_accum); //
+			cam_yaw8 =  rect_to_polar(&matrix_accum);
 
 			// camera_view uses the "UAV Devboard - Earth" reference
 			// The next lines overide waypoint camera views for stablized mode.

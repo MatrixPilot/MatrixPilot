@@ -31,8 +31,8 @@
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
-//#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
-#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+//#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
 //#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
 
 

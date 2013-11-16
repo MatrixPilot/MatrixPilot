@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
 #include "../libDCM/libDCM_internal.h"
+#include "../libDCM/mathlibNAV.h"
 #include "../libUDB/osd.h"
 #include "osd_config.h"
 #include <stdlib.h>
@@ -558,8 +559,9 @@ void osd_run_step(void)
 				osd_spi_write(MAX7456_VOS, OSD_VERTICAL_OFFSET);
 				osd_spi_write(MAX7456_HOS, OSD_HORIZONTAL_OFFSET);
 
-			osd_update_values();
-			osd_phase = (osd_phase+1) % 4;
+				osd_update_values();
+				osd_phase = (osd_phase+1) % 4;
+			}
 		}
 	}
 }

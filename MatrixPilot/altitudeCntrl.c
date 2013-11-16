@@ -233,14 +233,17 @@ static void normalAltitudeCntrl(void)
 		}
 		else
 		{
-#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
+//#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
+if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) {
 			// In stabilized mode using pitch-only altitude hold, use desiredHeight as
 			// set from the state machine upon entering stabilized mode in ent_stabilizedS().
-#elif (ALTITUDEHOLD_STABILIZED == AH_FULL)
+//#elif (ALTITUDEHOLD_STABILIZED == AH_FULL)
+} else if (ALTITUDEHOLD_STABILIZED == AH_FULL) {
 			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
 			desiredHeight =((__builtin_mulss((int16_t)(HEIGHTTHROTTLEGAIN), throttleInOffset - ((int16_t)(DEADBAND)))) >> 11) 
 			                + (int16_t)(HEIGHT_TARGET_MIN);
-#endif
+}
+//#endif
 			if (desiredHeight < (int16_t)(HEIGHT_TARGET_MIN)) desiredHeight = (int16_t)(HEIGHT_TARGET_MIN);
 			if (desiredHeight > (int16_t)(HEIGHT_TARGET_MAX)) desiredHeight = (int16_t)(HEIGHT_TARGET_MAX);
 		}
@@ -281,12 +284,14 @@ static void normalAltitudeCntrl(void)
 				pitchAccum.WW = __builtin_mulss((int16_t)(PITCHHEIGHTGAIN) , - heightError._.W0 - (int16_t)(HEIGHT_MARGIN*8.0))>>3;
 				pitchAltitudeAdjust = (int16_t)(PITCHATMAX) + pitchAccum._.W0;
 			}
-#if (RACING_MODE == 1)
+//#if (RACING_MODE == 1)
+if (RACING_MODE == 1) {
 			if (flags._.GPS_steering)
 			{
 				throttleAccum.WW = (int32_t)(FIXED_WP_THROTTLE);
 			}
-#endif
+}
+//#endif
 		}
 		if (!flags._.altitude_hold_throttle)
 		{

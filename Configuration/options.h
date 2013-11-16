@@ -37,7 +37,7 @@
 #include "altitude_config.h"
 
 // parameters for HILSIM and SILSIM build methods
-//#include "simulate_config.h"
+#include "simulate_config.h"
 
 // all the control loop gains (PID loop tuning)
 #include "gains_config.h" // or tuning.h

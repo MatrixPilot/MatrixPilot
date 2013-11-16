@@ -29,5 +29,5 @@
 // Customize the OSD Layout in the osd_layout.h file.
 //
 //#define USE_OSD                             OSD_NATIVE
-#define USE_OSD                             OSD_NATIVE
+//#define USE_OSD                             OSD_NATIVE
 

@@ -25,6 +25,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
@@ -41,7 +42,7 @@
 
 //Sensor variables
 uint16_t mpu_data[8], mpuCnt = 0;
-bool mpuDAV = false;
+boolean mpuDAV = false;
 
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
@@ -267,6 +268,10 @@ void process_MPU_data(void)
 		dcm_run_imu_step();
 	}
 */
+#if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
+	//  trigger synchronous processing of sensor data
+	_T1IF = 1;              // trigger the heartbeat interrupt
+#endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 
 void MPU6000_read(void)

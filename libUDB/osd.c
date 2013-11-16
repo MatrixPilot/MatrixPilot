@@ -21,31 +21,34 @@
 
 #include "libUDB_internal.h"
 #include "oscillator.h"
+#include "defines.h"
 #include "osd_config.h"
-#include "delay.h"
 #include "osd.h"
 
+//#define SF 2
 
 #if (USE_OSD == OSD_NATIVE)
 
 void osd_reset(void)
 {
 	osd_spi_write(MAX7456_VM0, 0x42);    // VM0: enable display of PAL OSD image, force software reset
-//	delayMs(10);
-	__delay32(400000UL * OSD_SF);
+	delay_us(200);                      // The register reset process requires 100µs
+
+//	__delay32(400000UL * SF);
 //	osd_spi_write(MAX7456_VM0, 0x08);    // VM0: enable display of NTSC OSD image
-	osd_spi_write(MAX7456_VM0, 0x48);    // VM0: enable display of PAL OSD image
+//	osd_spi_write(MAX7456_VM0, 0x48);   // VM0: enable display of PAL OSD image
 
 //	osd_spi_write(MAX7456_VOS, 0x00);    // VOS set to +15 pixels (farthest up)
 //	osd_spi_write(MAX7456_VOS, 0x10);    // VOS set to +-0 pixels (no shift, default)
-	osd_spi_write(MAX7456_VOS, 0x1F);    // VOS set to -15 pixels (farthest down)
-//	osd_spi_write(MAX7456_VOS, 0x10);    // VOS set to -8 pixels
+//	osd_spi_write(MAX7456_VOS, 0x1F);   // VOS set to -15 pixels (farthest down)
+//	osd_spi_write(MAX7456_HOS, 0x00);   // HOS set to -32 pixels (farthest left)
+//	osd_spi_write(MAX7456_HOS, 0x20);   // HOS set to +-0 pixels (no offset, default)
+//	osd_spi_write(MAX7456_HOS, 0x3F);   // HOS set to +31 pixels (farthest right)
 
 //	osd_spi_write(MAX7456_DMM, 0x00);    // DMM set to 0
-	osd_spi_write(MAX7456_DMM, 0x04);    // DMM set to clear display memory
+//	osd_spi_write(MAX7456_DMM, 0x04);   // DMM set to clear display memory
 
-//	delayMs(10);
-	__delay32(20000UL * OSD_SF);
+//	__delay32(20000UL * SF);
 }
 
 void udb_init_osd(void)

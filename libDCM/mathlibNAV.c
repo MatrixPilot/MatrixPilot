@@ -20,7 +20,10 @@
 
 
 #include "dcmTypes.h"
-#include "mathlibNav.h"
+#include "mathlibNAV.h"
+#if (WIN == 1 || NIX == 1)
+#include "SIL-udb.h"
+#endif // (WIN == 1 || NIX == 1)
 
 //  math libraray
 
@@ -401,5 +404,65 @@ int32_t long_scale(int32_t arg1, int16_t arg2)
 	else
 	{
 		return -product;
+	}
+}
+
+int16_t find_first_bit_int16(int16_t argument)
+{
+	// finds first bit position in the absolute value of a 16 bit signed integer
+	// returns the position of the first significant bit
+	// MSB position is 0
+	// LSB position is 15
+	// returns 16 for input=0 and 0 for input=0x8000H
+	int16_t input;
+
+	if (argument == 0)
+	{
+		return 16;
+	}
+	if (argument < 0)
+	{
+		input = - argument;
+	}
+	else
+	{
+		input = argument;
+	}
+	return FindFirstBitFromLeft(input) - 1;
+}
+
+int16_t find_first_bit_int32(int32_t argument)
+{
+	// finds first bit position in the absolute value of a 32 bit signed integer
+	// returns the position of the first significan bit
+	// MSB position is 0
+	// LSB position is 31
+	// returns 32 for input=0 and 0 for input=0x80000000H
+	union longww input;
+	int16_t binw0;
+	int16_t binw1;
+
+	if (argument == 0)
+	{
+		return 32;
+	}
+	if (argument < 0)
+	{
+		input.WW = -argument;
+	}
+	else
+	{
+		input.WW = argument;
+	}
+
+	binw1 = FindFirstBitFromLeft(input._.W1);
+	binw0 = FindFirstBitFromLeft(input._.W0);
+	if (binw1 == 0)
+	{
+		return binw0 + 15;
+	}
+	else
+	{
+		return binw1 - 1;
 	}
 }

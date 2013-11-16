@@ -8,7 +8,7 @@ dir_src=
 dir_bin=
 dir_tmp=build/auav3
 dir_sin=
-dir_inc=.;C:\DATA-ROB\PROJECTS\RCIO\MatrixPilot_AUAV3\Configuration;C:\DATA-ROB\PROJECTS\RCIO\MatrixPilot_AUAV3\MatrixPilot;C:\DATA-ROB\PROJECTS\RCIO\MatrixPilot_AUAV3\libUDB
+dir_inc=.;..\..\Configuration;..\..\MatrixPilot;..\..\libUDB
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
 [CAT_FILTERS]

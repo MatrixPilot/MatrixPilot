@@ -82,11 +82,15 @@
         <itemPath>../config.h</itemPath>
         <itemPath>../preflight.h</itemPath>
         <itemPath>../redef.h</itemPath>
-        <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../osd_layout_remzibi.h</itemPath>
+        <itemPath>../MAVFlexiFunctions.h</itemPath>
+        <itemPath>../MAVLinkMP.h</itemPath>
+        <itemPath>../MAVMission.h</itemPath>
+        <itemPath>../MAVParams.h</itemPath>
+        <itemPath>../MAVUDB.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -228,6 +232,7 @@
         <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
         <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
         <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
+        <itemPath>../../Microchip/HardwareProfile.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -250,6 +255,7 @@
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
         <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
+        <itemPath>../../libDCM/fbcl.s</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.c</itemPath>
@@ -346,6 +352,10 @@
         <itemPath>../remzibi_osd.c</itemPath>
         <itemPath>../flight_state.c</itemPath>
         <itemPath>../network.c</itemPath>
+        <itemPath>../MAVFlexiFunctions.c</itemPath>
+        <itemPath>../MAVMission.c</itemPath>
+        <itemPath>../MAVParams.c</itemPath>
+        <itemPath>../MAVUDB.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
@@ -366,6 +376,7 @@
     <Elem>../../libDCM</Elem>
     <Elem>../../libFlashFS</Elem>
     <Elem>..</Elem>
+    <Elem>../../Microchip</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

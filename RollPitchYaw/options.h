@@ -23,27 +23,9 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
+// This file includes most of the user-configuration for this firmware,
+// one of the exceptions being waypoints, which live in the waypoints.h file.
 //
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type
-// See the MatrixPilot wiki for more details on different board types.
-#ifdef UDB4
-#define BOARD_TYPE                          UDB4_BOARD
-#endif
-#ifdef UDB5
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-#ifdef AUAV3
-#define BOARD_TYPE                          AUAV3_BOARD
-#endif
-
-#ifndef BOARD_TYPE
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,6 +111,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for status messages
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+#define SERIAL_BAUDRATE                     19200 // default
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Control gains.
 // All gains should be positive real numbers.
 
@@ -142,27 +130,6 @@
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
 // See the MatrixPilot wiki for more info on using HILSIM.
 #define HILSIM                              0
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Software In the Loop Simulation
-// Only set this to 1 when building for simulation directly on your computer instead of
-// running on a UDB.
-// See the MatrixPilot wiki for more info on using SILSIM.
-// Below are settings to configure the simulated UDB UARTs.
-// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
-// passing RC inputs through to the simulated UDB.
-#define SILSIM                              0
-#define SILSIM_GPS_RUN_AS_SERVER            0
-#define SILSIM_GPS_PORT                     14551       // default port to connect to XPlane HILSIM plugin
-#define SILSIM_GPS_HOST                     "127.0.0.1"
-#define SILSIM_TELEMETRY_RUN_AS_SERVER      0
-#define SILSIM_TELEMETRY_PORT               14550       // default port to connect to QGroundControl
-#define SILSIM_TELEMETRY_HOST               "127.0.0.1"
-#define SILSIM_SERIAL_RC_INPUT_DEVICE       ""          // i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
-#define SILSIM_SERIAL_RC_INPUT_BAUD         38400
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -25,8 +25,18 @@
 // Customize the OSD Layout in the osd_layout.h file.
 //
 
-//#define USE_OSD         1
-//#define USE_OSD         OSD_NATIVE   // USE_OSD enables the OSD system
+#define OSD_NTSC            0
+#define OSD_PAL             1
+
+// new OSD types
+#define OSD_NONE            0   // OSD disabled
+#define OSD_NATIVE          1   // native OSD
+#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
+#define OSD_MINIM           3   // Output data formatted for minim OSD
+
+/*
+//#define USE_OSD         0              // USE_OSD enables the OSD system
+#define USE_OSD         OSD_NATIVE   // USE_OSD enables the OSD system
 //#define USE_OSD         OSD_REMZIBI
 
 #define USE_OSD_SPI     1   // set this to 1 to use the SPI peripheral, 0 to bit-bash
@@ -34,6 +44,7 @@
 
 #define OSD_NTSC        0
 #define OSD_PAL         1
+ */
 
 #define MAX7456_VM0     0x00   // Video Mode 0
 #define MAX7456_VM1     0x01   // Video Mode 1
@@ -51,7 +62,7 @@
 
 void udb_init_osd(void);
 void osd_reset(void);
-void osd_run_step(void);
+//void osd_run_step(void);
 void osd_spi_init(void);
 
 void osd_spi_write(int8_t address, int8_t byte);

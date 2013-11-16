@@ -20,14 +20,15 @@
 
 
 #include "defines.h"
-#include "osd_config.h"
-#include "camera_config.h"
-#include "altitude_config.h"
-#include "telemetry_config.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/osd.h"
+#include "osd_config.h"
+#include "camera_config.h"
+#include "altitude_config.h"
+#include "telemetry_config.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
@@ -350,13 +351,13 @@ void serial_output(const char* format, ...)
 //	static int maxlen = 0;
 //	if (len > maxlen) {
 //		maxlen = len;
-//		printf("maxlen %u\r\n", maxlen);
+//		DPRINT("maxlen %u\r\n", maxlen);
 //	}
 
 	int16_t start_index = end_index;
 	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index);
 	if (remaining < len) {
-		printf("SERBUF discarding %u bytes\r\n", len - remaining);
+		DPRINT("SERBUF discarding %u bytes\r\n", len - remaining);
 	}
 	if (remaining > 1)
 	{
@@ -770,4 +771,13 @@ void serial_output_8hz(void)
 #endif // USE_OSD
 
 #endif
+
+#else
+
+#if (USE_OSD != OSD_MINIM) && (USE_OSD != OSD_REMZIBI)
+void serial_output_8hz(void)
+{
+}
+#endif // USE_OSD
+
 #endif // (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)

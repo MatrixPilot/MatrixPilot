@@ -27,12 +27,17 @@
 
 
 // GPS modules global variables
+#ifdef USE_EXTENDED_NAV
+struct relative3D_32 GPSlocation = { 0, 0, 0 };
+#else
 struct relative3D GPSlocation = { 0, 0, 0 };
+#endif // USE_EXTENDED_NAV
 struct relative3D GPSvelocity = { 0, 0, 0 };
 
 union longbbbb lat_origin, lon_origin, alt_origin;
 union longbbbb lat_gps, lon_gps, alt_sl_gps;        // latitude, longitude, altitude
-union intbb sog_gps, cog_gps, climb_gps;            // speed over ground, course over ground, climb
+union intbb sog_gps, climb_gps, week_no;            // speed over ground, climb
+union uintbb cog_gps;                               // course over ground, units: degrees * 100, range [0-35999]
 union intbb week_no;
 union intbb as_sim;
 union longbbbb tow;
@@ -166,7 +171,11 @@ void udb_background_callback_triggered(void)
 	int8_t cog_delta;
 	int16_t sog_delta;
 	int16_t climb_rate_delta;
+#ifdef USE_EXTENDED_NAV
+	int32_t location[3];
+#else
 	int16_t location[3];
+#endif // USE_EXTENDED_NAV
 	int16_t location_deltaZ;
 	struct relative2D location_deltaXY;
 	struct relative2D velocity_thru_air;
@@ -184,12 +193,15 @@ void udb_background_callback_triggered(void)
 
 		dcm_callback_gps_location_updated();
 
+#ifdef USE_EXTENDED_NAV
+		location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
+		location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
+		location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
+#else
 		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 		location[1] = accum_nav._.W0;
-
 		accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
 		location[0] = accum_nav._.W0;
-
 #ifdef USE_PRESSURE_ALT
 #warning "using pressure altitude instead of GPS altitude"
 		// division by 100 implies alt_origin is in centimeters; not documented elsewhere
@@ -197,8 +209,9 @@ void udb_background_callback_triggered(void)
 		accum_nav.WW = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
 #else
 		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
-#endif
+#endif // USE_PRESSURE_ALT
 		location[2] = accum_nav._.W0;
+#endif // USE_EXTENDED_NAV
 
 		// convert GPS course of 360 degrees to a binary model with 256
 		accum.WW = __builtin_muluu (COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
@@ -307,6 +320,8 @@ static uint8_t day_of_week;
 
 int16_t calculate_week_num(int32_t date)
 {
+//	DPRINT("date %li\r\n", date);
+
 	// Convert date from DDMMYY to week_num and day_of_week
 	uint8_t year = date % 100;
 	date /= 100;
@@ -343,6 +358,8 @@ int16_t calculate_week_num(int32_t date)
 
 int32_t calculate_time_of_week(int32_t time)
 {
+//	DPRINT("time %li\r\n", time);
+
 	// Convert time from HHMMSSmil to time_of_week in ms
 	int16_t ms = time % 1000;
 	time /= 1000;

@@ -11,7 +11,13 @@ OBJECTS_DIR = ./
 
 MPSIL_TARGET  = matrixpilot.exe
 
-MP_HEADERS = ../../MatrixPilot/options.h ../../MatrixPilot/waypoints.h ../../MatrixPilot/flightplan-logo.h
+MP_HEADERS = \
+../../libUDB/udbTypes.h \
+../../libUDB/libUDB_defines.h \
+../../libDCM/dcmTypes.h \
+../../MatrixPilot/options.h \
+../../MatrixPilot/waypoints.h \
+../../MatrixPilot/flightplan-logo.h
 
 MPSIL_OBJECTS = \
 SIL-udb.o \
@@ -20,6 +26,8 @@ SIL-serial.o \
 SIL-dsp.o \
 SIL-eeprom.o \
 SIL-events.o \
+SIL-24LC256.o \
+SIL-I2C1.o \
 ../HILSIM_XPlane/UDBSocketWin.o \
  \
 ../../libDCM/deadReckoning.o \
@@ -39,6 +47,7 @@ SIL-events.o \
 ../../MatrixPilot/altitudeCntrlVariable.o \
 ../../MatrixPilot/behavior.o \
 ../../MatrixPilot/cameraCntrl.o \
+../../MatrixPilot/config.o \
 ../../MatrixPilot/config_tests.o \
 ../../MatrixPilot/data_services.o \
 ../../MatrixPilot/data_storage.o \
@@ -47,6 +56,10 @@ SIL-events.o \
 ../../MatrixPilot/flightplan-waypoints.o \
 ../../MatrixPilot/main.o \
 ../../MatrixPilot/MAVLink.o \
+../../MatrixPilot/MAVParams.o \
+../../MatrixPilot/MAVMission.o \
+../../MatrixPilot/MAVFlexiFunctions.o \
+../../MatrixPilot/MAVUDB.o \
 ../../MatrixPilot/mode_switch.o \
 ../../MatrixPilot/mp_osd.o \
 ../../MatrixPilot/navigate.o \

@@ -112,11 +112,18 @@ static int fs_nextlog(char* filename)
 // called at startup to initialise the telemetry log system
 void log_init(void)
 {
+#ifdef USE_AT45D_FLASH
 	init_dataflash(MIPS);
+#else
+	MDD_InitIO(); // this is called by FSInit() below
+#endif
 
 	if (!FSInit())
 	{
+#ifdef USE_AT45D_FLASH
 		AT45D_FormatFS();
+#else
+#endif
 		if (!FSInit())
 		{
 			printf("File system initialisation failed\r\n");

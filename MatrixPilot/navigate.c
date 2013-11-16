@@ -46,6 +46,7 @@ struct relative2D togoal = { 0, 0 };
 int16_t tofinish_line = 0;
 int16_t progress_to_goal = 0;
 int8_t desired_dir = 0;
+int8_t extended_range = 0;
 
 int8_t desired_bearing_over_ground;
 int16_t desired_bearing_over_ground_vector[2];
@@ -55,8 +56,8 @@ extern union longww IMUintegralAccelerationy;
 
 void init_navigation(void)
 {
-	uint16_t yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
-	uint16_t yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
+	yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
+	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 }
 
 static void setup_origin(void)
@@ -94,11 +95,56 @@ void dcm_callback_gps_location_updated(void)
 //	take more than 1 second, the interrupt handler will simply skip some of the navigation passes.
 }
 
+#ifdef USE_EXTENDED_NAV
+void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
+#else
 void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
+#endif // USE_EXTENDED_NAV
+
 {
 	struct relative2D courseLeg;
-
 	int16_t courseDirection[2];
+
+#ifdef USE_EXTENDED_NAV
+	union longww from_to_x;
+	union longww from_to_y;
+	int16_t from_to_z;
+	int16_t first_one_bit_location_min;
+	int16_t first_one_bit_location_x;
+	int16_t first_one_bit_location_y;
+
+	from_to_x.WW = toPoint.x - fromPoint.x;
+	from_to_y.WW = toPoint.y - fromPoint.y;
+	from_to_z = toPoint.z - fromPoint.z;
+
+	first_one_bit_location_x = find_first_bit_int32(from_to_x.WW);
+	first_one_bit_location_y = find_first_bit_int32(from_to_y.WW);
+
+	if (first_one_bit_location_x < first_one_bit_location_y)
+	{
+		first_one_bit_location_min = first_one_bit_location_x;
+	}
+	else
+	{
+		first_one_bit_location_min = first_one_bit_location_y;
+	}
+
+	if (first_one_bit_location_min < 18)
+	{
+		from_to_x.WW = (from_to_x.WW) >> (18 - first_one_bit_location_min);
+		from_to_y.WW = (from_to_y.WW) >> (18 - first_one_bit_location_min);
+		from_to_z    = (from_to_z)    >> (18 - first_one_bit_location_min);
+
+		toPoint.x = fromPoint.x + from_to_x.WW;
+		toPoint.y = fromPoint.y + from_to_y.WW;
+		toPoint.z = fromPoint.z + from_to_z;
+
+		extended_range = 1;
+	}
+	else {
+		extended_range = 0;
+	}
+#endif // USE_EXTENDED_NAV
 	
 	goal.x = toPoint.x;
 	goal.y = toPoint.y;
@@ -118,6 +164,10 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 //	TODO: revise the following two lines.	
 	goal.phi = rect_to_polar (&courseLeg);
 	goal.legDist = courseLeg.x;
+
+//struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
+//extern struct waypointparameters goal;
+	DPRINT("set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
 
 //	New method for computing cosine and sine of course direction	
 	vector2_normalize(&courseDirection[0], &courseDirection[0]);

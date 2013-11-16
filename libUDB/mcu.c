@@ -24,7 +24,8 @@
 #include "interrupt.h"
 
 #if (CONSOLE_UART != 0)
-#include "console.h"
+//#include "console.h"
+#include "uart.h"
 #include <stdio.h>
 #endif // CONSOLE_UART
 
@@ -428,13 +429,13 @@ void mcu_init(void)
 
 	configureDigitalIO();
 	init_leds();
-
 #if (CONSOLE_UART != 0)
-	init_console();
-	printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
+//	init_console();
+	init_uart();
+	DPRINT("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if (_SWR == 1)
 	{
-		printf("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
+		DPRINT("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
 			trap_flags, 
 			(unsigned int)(trap_source >> 16), 
 			(unsigned int)(trap_source & 0xffff), 

@@ -1,6 +1,7 @@
 // pyparam generated file - DO NOT EDIT
 
 #include "defines.h" 
+#include "telemetry_config.h"
 
 #if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
 

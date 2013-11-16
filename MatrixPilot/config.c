@@ -74,7 +74,7 @@ void load_network(void)
 	printf("IP port: %u\r\n", port);
 	printf("DHCP: %u\r\n", dhcp);
 
-#if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
+#if (USE_NETWORK != 0)
 	nw_mod._.uart1           = ini_getbool(strNetwork, "uart1", NETWORK_USE_UART1, strConfigFile);
 	nw_mod._.uart2           = ini_getbool(strNetwork, "uart2", NETWORK_USE_UART2, strConfigFile);
 	nw_mod._.flybywire       = ini_getbool(strNetwork, "flybywire", NETWORK_USE_FLYBYWIRE, strConfigFile);
@@ -88,7 +88,7 @@ void load_network(void)
 	nw_mod._.xplane          = ini_getbool(strNetwork, "xplane", NETWORK_USE_XPLANE, strConfigFile);
 	nw_mod._.telemetry_extra = ini_getbool(strNetwork, "telemetry_extra", NETWORK_USE_TELEMETRY_EXTRA, strConfigFile);
 	nw_mod._.ground_station  = ini_getbool(strNetwork, "ground_station", NETWORK_USE_GROUND_STATION, strConfigFile);
-#endif
+#endif // USE_NETWORK
 }
 
 void load_settings(void)

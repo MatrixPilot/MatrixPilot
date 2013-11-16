@@ -44,6 +44,7 @@
 #define CLK_PHASES              2
 #define FCY                     (FOSC/CLK_PHASES)   // MCU is running at FCY MIPS
 
+// Define the clock macros expected by the Microchip Application Libraries
 #define GetSystemClock()        (FCY)
 #define GetInstructionClock()   (FCY)   // Normally GetSystemClock()/2 for PIC24/dsPIC
 #define GetPeripheralClock()    (FCY)

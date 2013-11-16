@@ -19,10 +19,13 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "defines.h"
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
 #include "../libUDB/uart.h"
+#include "../libUDB/osd.h"
+#include "osd_config.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -117,6 +120,13 @@ void cmd_barom(void)
 	       (uint16_t)get_barometer_altitude(),
 	       (uint16_t)get_barometer_agl_altitude()
 	      );
+}
+
+extern union fbts_int flags;
+
+void cmd_flags(void)
+{
+//	printf("flags %04X\r\n", (uint16_t)flags);
 }
 
 void cmd_magno(void)
@@ -276,9 +286,44 @@ void cmd_close(void)
 #endif
 }
 
+#if (USE_OSD == OSD_NATIVE)
+
+void cmd_q(void)
+{
+	osd_spi_write(MAX7456_VOS, 0x00);    // VOS set to +15 pixels (farthest up)
+}
+
+void cmd_a(void)
+{
+	osd_spi_write(MAX7456_VOS, 0x10);    // VOS set to +-0 pixels (no shift, default)
+}
+
+void cmd_z(void)
+{
+	osd_spi_write(MAX7456_VOS, 0x1F);    // VOS set to -15 pixels (farthest down)
+}
+
+void cmd_x(void)
+{
+	osd_spi_write(MAX7456_HOS, 0x00);    // HOS set to -32 pixels (farthest left)
+}
+
+void cmd_c(void)
+{
+	osd_spi_write(MAX7456_HOS, 0x20);    // HOS set to +-0 pixels (no offset, default)
+}
+
+void cmd_v(void)
+{
+	osd_spi_write(MAX7456_HOS, 0x3F);    // HOS set to +31 pixels (farthest right)
+}
+
+#endif // (USE_OSD == OSD_NATIVE)
+
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
 	{ 0, cmd_ver,    "ver" },
+	{ 0, cmd_flags,  "flags" },
 	{ 0, cmd_format, "format" },
 	{ 0, cmd_start,  "start" },
 	{ 0, cmd_stop,   "stop" },
@@ -296,6 +341,14 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_reset,  "reset" },
 	{ 0, cmd_trap,   "trap" },
 	{ 0, cmd_close,  "close" },
+#if (USE_OSD == OSD_NATIVE)
+	{ 0, cmd_q,      "q" },
+	{ 0, cmd_a,      "a" },
+	{ 0, cmd_z,      "z" },
+	{ 0, cmd_x,      "x" },
+	{ 0, cmd_c,      "c" },
+	{ 0, cmd_v,      "v" },
+#endif // (USE_OSD == OSD_NATIVE)
 };
 
 void cmd_help(void)
@@ -319,12 +372,6 @@ void command(char* cmdstr)
 	}
 }
 
-void init_console(void)
-{
-	__C30_UART = CONSOLE_UART;
-	Init();
-}
-
 void console(void)
 {
 	if (kbhit()) {
@@ -337,7 +384,6 @@ void console(void)
 				if (strlen(cmdstr) > 0) {
 					putch('\r');
 					command(cmdstr);
-//					cmdlen = 0;
 				}
 			} else {
 				putch(ch);
@@ -347,6 +393,18 @@ void console(void)
 			cmdlen = 0;
 		}
 	}
+}
+
+void init_console(void)
+{
+	__C30_UART = CONSOLE_UART;
+	Init();
+}
+
+#else
+
+void init_console(void)
+{
 }
 
 #endif // CONSOLE_UART

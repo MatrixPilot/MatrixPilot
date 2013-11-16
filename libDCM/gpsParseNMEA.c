@@ -26,14 +26,37 @@
 
 //#define DEBUG_NMEA
 #ifdef DEBUG_NMEA
-extern int8_t debug_RMC[80];
-extern int8_t debug_GGA[80];
-void send_debug_line(int8_t ch);
-#include <string.h>
-#endif
-
 static uint16_t RMCpos = 0;
 static uint16_t GGApos = 0;
+int8_t debug_RMC[80];
+int8_t debug_GGA[80];
+#include <string.h>
+void debug_rmc(uint8_t ch)
+{
+	if (RMCpos < (sizeof(debug_RMC)-1))
+	{
+		debug_RMC[RMCpos++] = ch;
+		debug_RMC[RMCpos] = '\0';
+	}
+}
+void debug_rmc_send(int8_t ch)
+{
+	debug_rmc(ch);
+	printf("%s\r\n", debug_RMC);
+}
+void debug_gga(uint8_t ch)
+{
+	if (GGApos < (sizeof(debug_GGA)-1))
+	{
+		debug_GGA[GGApos++] = ch;
+		debug_GGA[GGApos] = '\0';
+	}
+}
+#else
+#define debug_rmc(a)
+#define debug_rmc_send(a)
+#define debug_gga(a)
+#endif
 
 // Parse the GPS messages, using the NMEA interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -94,8 +117,8 @@ static int16_t digit;
 static int32_t degrees, minutes;
 
 //static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
-static union intbb sog_gps_, cog_gps_;
-//static union longbbbb date_gps_, time_gps_;
+static union intbb sog_gps_;
+static union uintbb cog_gps_;
 static uint8_t svs_;
 static uint8_t data_valid_, NS_, EW_;
 //static uint8_t hdop_;
@@ -201,18 +224,18 @@ static void gps_id3(uint8_t gpschar)
 	{
 		rmc_counter = 1;                    // Next rmc message after the comma
 		msg_parse = &gps_comma;             // A comma ',' is expected now
-		RMCpos = 6;
 #ifdef DEBUG_NMEA
 //	msg_parse = &msg_start;	
 		strcpy(debug_RMC, "$GPRMC");
+		RMCpos = 6;
 #endif
 	}
 	else if (id1 == 'G' && id2 == 'G' && gpschar == 'A') // "$GPGGA"
 	{
 		gga_counter = 1;                    // Next gga message after the comma
 		msg_parse = &gps_comma;             // A comma ',' is expected now	
-		GGApos = 6;
 #ifdef DEBUG_NMEA
+		GGApos = 6;
 //	msg_parse = &msg_start;
 		strcpy(debug_GGA, "$GPGGA");
 #endif
@@ -227,7 +250,7 @@ static void gps_comma(uint8_t gpschar)
 {
 #ifdef DEBUG_NMEA
 	if (gga_counter > 0) debug_GGA[GGApos++] = gpschar;
-	if (rmc_counter > 0) debug_RMC[RMCpos++] = gpschar;
+	if (rmc_counter > 0) debug_rmc(gpschar);
 #endif
 	if (gpschar != '*') XOR ^= gpschar;
 	if (gpschar == ',')
@@ -304,7 +327,7 @@ static void gps_comma(uint8_t gpschar)
 static void gps_rmc1(uint8_t gpschar)       // rmc1 -> Time HHMMSS.SSS
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')                     // rmc1 not present or reading finished
@@ -321,7 +344,7 @@ static void gps_rmc1(uint8_t gpschar)       // rmc1 -> Time HHMMSS.SSS
 static void gps_rmc2(uint8_t gpschar)       // GPS status
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')                     // GPS status information not available
@@ -343,7 +366,7 @@ static void gps_rmc2(uint8_t gpschar)       // GPS status
 static void gps_rmc3(uint8_t gpschar)       // latitude
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')                     // latitude not providev, error! start over again
@@ -378,7 +401,7 @@ static void gps_rmc3(uint8_t gpschar)       // latitude
 static void gps_rmc4(uint8_t gpschar)       // N or S int8_t
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')                     // NS information not available
@@ -402,7 +425,7 @@ static void gps_rmc4(uint8_t gpschar)       // N or S int8_t
 static void gps_rmc5(uint8_t gpschar)       // Longitude
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')                     // Longitude not provided, error! start over again
@@ -437,7 +460,7 @@ static void gps_rmc5(uint8_t gpschar)       // Longitude
 static void gps_rmc6(uint8_t gpschar)       // E or W int8_t
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')                     // EW not provided
@@ -458,7 +481,7 @@ static void gps_rmc6(uint8_t gpschar)       // E or W int8_t
 static void gps_rmc7(uint8_t gpschar)       // Speed over ground
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')
@@ -477,7 +500,7 @@ static void gps_rmc7(uint8_t gpschar)       // Speed over ground
 static void gps_rmc8(uint8_t gpschar)       // Course Over Ground
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')
@@ -495,7 +518,7 @@ static void gps_rmc8(uint8_t gpschar)       // Course Over Ground
 static void gps_rmc9(uint8_t gpschar)       // rmc9 -> Date DDMMYY
 {
 #ifdef DEBUG_NMEA
-	debug_RMC[RMCpos++] = gpschar;
+	debug_rmc(gpschar);
 #endif
 	XOR ^= gpschar;
 	if (gpschar == ',')                     // rmc9 not present or reading finished
@@ -573,11 +596,11 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 
 #ifdef DEBUG_NMEA
 	if (gga_counter > 0) debug_GGA[GGApos++] = gpschar;
-	if (rmc_counter > 0) debug_RMC[RMCpos++] = gpschar;
+	if (rmc_counter > 0) debug_rmc(gpschar);
 #endif
 	if (gpschar == 0x0D)                    // checksum reading finished
 	{
-//		send_debug_line('a');
+//		debug_rmc_send('a');
 		msg_parse = &msg_start;
 
 		if (XOR == checksum)
@@ -588,7 +611,7 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 			if (rmc_counter > 0 && gga_chksm_ok == 1)
 			{
 #ifdef DEBUG_NMEA
-				send_debug_line(gpschar);
+				debug_rmc_send(gpschar);
 #endif
 				udb_background_trigger();   // parsing is complete, schedule navigation
 			}

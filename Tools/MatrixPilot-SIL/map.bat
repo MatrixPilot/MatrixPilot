@@ -1,1 +1,1 @@
-set path=c:\dev-cpp\bin;%path%
+set path=c:\dev-cpp\MinGW32\bin;%path%

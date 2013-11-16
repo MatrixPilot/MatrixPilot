@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "../Configuration/features_config.h"
 #include "libUDB_internal.h"
 #include "I2C.h"
 #include "barometer.h"
@@ -291,6 +292,12 @@ void ReadBarPres_callback(boolean I2CtrxOK)
 	{
 		// the operation failed - we should probably do something about it...
 	}
+}
+
+#else
+
+void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
+{
 }
 
 #endif // BAROMETER_ALTITUDE

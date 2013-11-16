@@ -194,7 +194,7 @@
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS                   4   // perhaps move this the to ConfigUDBx.h files
+//#define NUM_ANALOG_INPUTS                   4   // perhaps move this the to ConfigUDBx.h files
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
@@ -221,6 +221,12 @@
 #define ANALOG_CURRENT_INPUT_CHANNEL        A_AMPS_BUFF   // I,  pin label CS Curr
 #define ANALOG_VOLTAGE_INPUT_CHANNEL        A_VOLT_BUFF   // V,  pin label Bat Volt
 #define ANALOG_RSSI_INPUT_CHANNEL           A_RSSI_BUFF   // RS, pin label RSSI
+
+#define MAX_CURRENT                         900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define CURRENT_SENSOR_OFFSET               10  // Add 1.0 Amp to whatever value we sense
+
+#define MAX_VOLTAGE                         543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define VOLTAGE_SENSOR_OFFSET               0   // Add 0.0 Volts to whatever value we sense
 
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE             0.5     // Voltage when RSSI should show 0%

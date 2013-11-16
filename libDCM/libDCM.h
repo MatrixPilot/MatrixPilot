@@ -58,6 +58,7 @@ void dcm_servo_callback_prepare_outputs(void);  // Callback
 
 // Convert an absolute location to relative
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute);
+struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute);
 
 // FIXME: This should be handled internally, along with DCM calibration
 // Count down from 1000 at 40Hz
@@ -80,6 +81,12 @@ void rotate(struct relative2D *xy, int8_t angle);
 void rotate_2D_vector_by_angle(int16_t vector[2], int8_t);
 void rotate_2D_vector_by_vector(int16_t vector1[2], int16_t vector2[2]);
 void rotate_2D_long_vector_by_vector(int32_t vector[2], int16_t rotate[2]);
+
+// first changed bit location functions
+int16_t FindFirstBitChangeFromLeft(int16_t);    // applies raw FBCL instruction and returns result
+int16_t FindFirstBitFromLeft(int16_t);          // applies raw FF1L instruction and returns result
+int16_t find_first_bit_int16(int16_t);          // finds first bit position in the absolute value of a 16 bit signed integer
+int16_t find_first_bit_int32(int32_t);          // finds first bit position in the absolute value of a 32 bit signed integer
 
 // integer and int32_t integer square roots
 uint16_t sqrt_int(uint16_t);
@@ -105,7 +112,11 @@ extern fractional omegaAccum[];
 extern fractional omegagyro[];
 extern fractional accelEarth[];
 
+#ifdef USE_EXTENDED_NAV
+extern struct relative3D_32 GPSlocation;
+#else
 extern struct relative3D GPSlocation;
+#endif // USE_EXTENDED_NAV
 extern struct relative3D GPSvelocity;
 extern struct relative2D velocity_thru_air; // derived horizontal velocity relative to air in cm/sec
 extern int16_t estimatedWind[3];            // wind velocity vectors in cm / sec

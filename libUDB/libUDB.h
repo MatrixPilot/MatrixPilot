@@ -28,6 +28,34 @@
 
 #include "../Configuration/options.h"
 
+#if (WIN == 1 || NIX == 1)
+#define SILSIM                              1
+#undef  HILSIM
+#define HILSIM                              1
+#undef  MODE_SWITCH_TWO_POSITION
+#define MODE_SWITCH_TWO_POSITION            0
+#undef  USE_TELELOG
+#define USE_TELELOG                         0
+#undef  USE_CONFIGFILE
+#define USE_CONFIGFILE                      0
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
+#undef  FAILSAFE_INPUT_MIN
+#define FAILSAFE_INPUT_MIN                  1500
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
+#else
+#define SILSIM                              0
+#if (BOARD_TYPE == AUAV4_BOARD)
+//#define fractional float
+//#define fractional int
+#include "../Tools/MatrixPilot-SIL/SIL-dsp.h"
+#else
+#include <dsp.h>
+#endif
+#endif // (WIN == 1 || NIX == 1)
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
 // The UDB4, UDB5, or AUAV3 definition now comes from the project, or if not
@@ -44,28 +72,22 @@
 #endif
 
 #ifndef BOARD_TYPE
-#pragma warning BOARD_TYPE defaulting to UDB4_BOARD
+#if (SILSIM == 0)
+#warning BOARD_TYPE defaulting to UDB4_BOARD
+#endif // SILSIM
 #define BOARD_TYPE                          UDB4_BOARD
-#endif
-
+#endif // BOARD_TYPE
 
 #ifdef USE_DEBUG_IO
+#ifdef USE_MAVLINK_IO
+void mav_printf(const char * format, ...);
+#define DPRINT mav_printf
+#else
 #define DPRINT printf
+#endif // USE_MAVLINK_IO
 #else
 #define DPRINT(args...)
-#endif
-
-#if (SILSIM == 1)
-#include "SIL-udb.h"
-#else
-#if (BOARD_TYPE == AUAV4_BOARD)
-//#define fractional float
-//#define fractional int
-#include "..\Tools\MatrixPilot-SIL\SIL-dsp.h"
-#else
-#include <dsp.h>
-#endif
-#endif
+#endif // USE_DEBUG_IO
 
 #include "fixDeps.h"
 #include "libUDB_defines.h"

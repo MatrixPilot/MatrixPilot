@@ -23,7 +23,9 @@
 #include "osd_config.h"
 #include "osd.h"
 
-#if (USE_OSD_SPI == 1)
+#if (USE_OSD == OSD_NATIVE && USE_OSD_SPI == 1)
+
+#warning "Using OSD_NATIVE in SPI hardware mode"
 
 #include "interrupt.h"
 #include "oscillator.h"
@@ -35,13 +37,12 @@
 
 uint8_t osd_spi_read(int8_t addr);
 
-#if (USE_OSD == OSD_NATIVE)
-
-
 //  UDB4 uses SPI1 port
 // AUAV3 uses SPI3 port
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+
+#warning "OSD configured for SPI port 1"
 
 #define OSD_CS          _LATF7 // _LATB2
 #define OSD_SCK         _LATF8 // _LATF6
@@ -64,6 +65,8 @@ uint8_t osd_spi_read(int8_t addr);
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
+#warning "OSD configured for SPI port 3"
+
 #define OSD_CS          _LATD2
 #define OSD_SCK         _LATD1
 #define OSD_MOSI        _LATD3
@@ -84,6 +87,8 @@ uint8_t osd_spi_read(int8_t addr);
 #define _SPIEN          SPI3STATbits.SPIEN
 
 #elif (BOARD_TYPE == AUAV4_BOARD)
+
+#warning "OSD configured for SPI port 2"
 
 #define OSD_CS          _LATD2
 #define OSD_SCK         _LATD1
@@ -114,10 +119,6 @@ static void initSPI_OSD(uint16_t priPre, uint16_t secPre)
 	uint16_t SPICON1Value = 0, SPICON2Value = 0;
 	uint16_t SPISTATValue = 0;
 
-	CloseSPI1();
-
-//	ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
-
 #if defined(__dsPIC33E__)
 	SPICON1Value =
 	    ENABLE_SDO_PIN & SPI_MODE16_OFF & ENABLE_SCK_PIN &
@@ -141,14 +142,17 @@ static void initSPI_OSD(uint16_t priPre, uint16_t secPre)
 	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR;
 #endif
 
-#if (BOARD_TYPE == UDB4_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+	CloseSPI1();
+//	ConfigIntSPI1(SPI_INT_DIS & SPI_INT_PRI_6);
 	OpenSPI1(SPICON1Value, SPICON2Value, SPISTATValue);
 	SPI1STATbits.SPIROV = 0;    // clear SPI receive overflow
 	_SPI1IF = 0;                // clear any pending interrupts
 //	_SPI1IP = INT_PRI_SPI1;     // set interrupt priority
 //	_SPI1IE = 1;                // turn on SPI interrupts
-#elif (BOARD_TYPE == UDB5_BOARD)
 #elif (BOARD_TYPE == AUAV3_BOARD)
+	CloseSPI3();
+//	ConfigIntSPI3(SPI_INT_DIS & SPI_INT_PRI_6);
 	OpenSPI3(SPICON1Value, SPICON2Value, SPISTATValue);
 	SPI3STATbits.SPIROV = 0;    // clear SPI receive overflow
 	_SPI3IF = 0;                // clear any pending interrupts
@@ -156,7 +160,6 @@ static void initSPI_OSD(uint16_t priPre, uint16_t secPre)
 //	_SPI3IE = 1;                // turn on SPI interrupts
 
 // SPIxSTAT 801C, SPIxCON1 0079, SPIxCON2 0000
-
 #endif
 }
 
@@ -330,6 +333,5 @@ void osd_print(int8_t *str)
 
 #endif // 0
 
-#endif // USE_OSD
+#endif // (USE_OSD == OSD_NATIVE && USE_OSD_SPI == 1)
 
-#endif // USE_OSD_SPI

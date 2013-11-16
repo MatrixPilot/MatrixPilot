@@ -93,7 +93,9 @@ void udb_init_GPS(void)
 
 void udb_gps_set_rate(int32_t rate)
 {
+#if (CONSOLE_UART != 1)
 	U1BRG = UDB_BAUD(rate);
+#endif
 }
 
 boolean udb_gps_check_rate(int32_t rate)

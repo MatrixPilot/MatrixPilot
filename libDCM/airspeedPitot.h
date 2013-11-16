@@ -21,7 +21,6 @@
 #ifndef _AIRSPEEDPITOT_H_
 #define	_AIRSPEEDPITOT_H_
 
-
 typedef struct
 {
     int16_t zeroOffset;

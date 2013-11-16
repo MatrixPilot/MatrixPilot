@@ -10,11 +10,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <Windows.h>
-#include <Time.h>
+//#include <Windows.h>
+//#include <Time.h>
 
 #include "UDBSocket.h"
 #include "options.h"
+#include "SIL-config.h"
 
 UDBSocket stdioSocket;
 UDBSocket transportSocket;
@@ -34,10 +35,12 @@ void printHelp(void)
 	printf("       (With no arguments, will connect to MatrixPilot-SIL's telemetry port.)\n");
 }
 
-void usleep(int useconds)
-{
-	Sleep((useconds + 999) / 1000);
-}
+//int __cdecl __MINGW_NOTHROW usleep(useconds_t useconds)
+////void usleep(int useconds)
+//{
+//	Sleep((useconds + 999) / 1000);
+//	return 0; // 0 on success, -1 on error. 
+//}
 
 int main(int argc, char** argv)
 {

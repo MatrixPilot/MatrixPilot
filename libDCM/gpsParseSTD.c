@@ -41,6 +41,17 @@ static void msg_MSGU(uint8_t inchar);
 static void msg_B0(uint8_t inchar);
 static void msg_B3(uint8_t inchar);
 
+const char bin_mode[] = "$PSRF100,0,19200,8,1,0*39\r\n"; // turn on binary
+const uint8_t mode[] = {
+	0x86,
+	0x00,0x00,0x4B,0x00,
+	0x08,
+	0x01,
+	0x00,
+	0x00 
+};
+const uint16_t mode_length = 9;
+
 //void (*msg_parse)(uint8_t inchar) = &msg_B3;
 static union intbb payloadlength;
 static int16_t store_index = 0;
@@ -55,23 +66,13 @@ static uint8_t svs_;
 
 //static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 //static union longbbbb tow_;
-static union intbb sog_gps_, cog_gps_, climb_gps_;
+static union intbb sog_gps_, climb_gps_;
+static union uintbb cog_gps_;
 static union intbb nav_valid_, nav_type_, week_no_;
 //static uint8_t hdop_;
 static union intbb checksum_; // included at the end of the GPS message
 static union intbb calculated_checksum; // calculated locally
 #define INVALID_CHECKSUM -1
-
-const char bin_mode[] = "$PSRF100,0,19200,8,1,0*39\r\n"; // turn on binary
-const uint8_t mode[] = {
-	0x86,
-	0x00,0x00,0x4B,0x00,
-	0x08,
-	0x01,
-	0x00,
-	0x00 
-};
-const uint16_t mode_length = 9;
 
 /*
 uint8_t * const msg2parse[] = {

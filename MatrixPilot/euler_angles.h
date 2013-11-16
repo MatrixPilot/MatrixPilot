@@ -27,11 +27,10 @@
 
 typedef struct
 {
-  int32_t pitch;
-  int32_t roll;
-  int16_t yaw; // angle in degrees, 0 = north, wraps at 360
-}
-euler_struct;
+	int32_t pitch;
+	int32_t roll;
+	int16_t yaw;    // angle in degrees, 0 = north, wraps at 360
+} euler_struct;
 
 
 /**

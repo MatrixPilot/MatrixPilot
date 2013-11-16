@@ -11,6 +11,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libUDB.h"
+#include "../../libUDB/magnetometer.h"
+#include "../../libUDB/heartbeat.h"
+#include "SIL-config.h"
+
 #ifdef WIN
 
 #define SIL_WINDOWS_INCS
@@ -23,8 +28,9 @@ struct timezone
 	int tz_dsttime;     // type of dst correction to apply
 };
 
-//int gettimeofday(struct timeval *tp, struct timezone *tzp);
-
+#if 1
+int gettimeofday(struct timeval *tp, struct timezone *tzp);
+#else
 #ifndef _TIMEVAL_DEFINED // also in winsock[2].h
 #define _TIMEVAL_DEFINED
 struct timeval {
@@ -54,6 +60,8 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 	p->tv_sec= (long)((now.ns100-(116444736000000000LL))/10000000LL);
 	return 0;
 }
+
+#endif // 1/0
 
 #else
 
@@ -100,9 +108,9 @@ uint8_t rc_signal_strength;                     // rc_signal_strength is 0-100 a
 int16_t magMessage;
 int16_t vref_adj;
 
-volatile int16_t trap_flags;
-volatile int32_t trap_source;
-volatile int16_t osc_fail_count;
+volatile uint16_t trap_flags;
+volatile uint32_t trap_source;
+volatile uint16_t osc_fail_count;
 uint16_t mp_rcon = 3;                           // default RCON state at normal powerup
 
 extern int mp_argc;
@@ -119,6 +127,20 @@ void sleep_milliseconds(uint16_t ms);
 
 #define UDB_HW_RESET_ARG "-r=EXTR"
 
+// Functions only included with nv memory.
+#if (USE_NV_MEMORY == 1)
+UDB_SKIP_FLAGS udb_skip_flags = {0, 0, 0};
+
+void udb_skip_radio_trim(boolean b)
+{
+	udb_skip_flags.skip_radio_trim = 1;
+}
+
+void udb_skip_imu_calibration(boolean b)
+{
+	udb_skip_flags.skip_imu_cal = 1;
+}
+#endif
 
 void udb_init(void)
 {
@@ -147,22 +169,27 @@ void udb_init(void)
 	}
 }
 
-#define UDB_STEP_TIME 25
 #define UDB_WRAP_TIME 1000
+#define UDB_STEP_TIME 25
+//#define UDB_STEP_TIME (UDB_WRAP_TIME/HEARTBEAT_HZ)
+
+int initialised = 0;
 
 void udb_run(void)
 {
 	uint16_t currentTime;
 	uint16_t nextHeartbeatTime;
 
-	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
-		udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
-		udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
+	if (!initialised) {
+		initialised = 1;
+		if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
+			udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
+			udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
+		}
+		nextHeartbeatTime = get_current_milliseconds();
 	}
 
-	nextHeartbeatTime = get_current_milliseconds();
-
-	while (1) {
+//	while (1) {
 		if (!handleUDBSockets()) {
 			sleep_milliseconds(1);
 		}
@@ -180,15 +207,18 @@ void udb_run(void)
 
 			sil_ui_update();
 
-			if (udb_heartbeat_counter % 80 == 0) writeEEPROMFileIfNeeded(); // Run at 0.5Hz
+			if (udb_heartbeat_counter % 80 == 0) {
+//			if (udb_heartbeat_counter % (2 * HEARTRATE_HZ) == 0) {
+				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
+			}
 			
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
 		}
 		process_queued_events();
+//	}
 	}
-}
 
 void udb_background_trigger(void)
 {
@@ -365,6 +395,14 @@ boolean handleUDBSockets(void)
 }
 
 #if  (MAG_YAW_DRIFT == 1)
+
+static magnetometer_callback_funcptr magnetometer_callback = NULL;
+
+void rxMagnetometer(magnetometer_callback_funcptr callback)
+{
+	magnetometer_callback = callback;
+}
+
 void I2C_doneReadMagData(void)
 {
 	magFieldRaw[0] = (magreg[0]<<8)+magreg[1];
@@ -381,7 +419,15 @@ void I2C_doneReadMagData(void)
 			(abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM) &&
 			(abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM))
 		{
-			udb_magnetometer_callback();
+//			udb_magnetometer_callback();
+			if (magnetometer_callback != NULL)
+			{
+				magnetometer_callback();
+		}
+		else
+		{
+				printf("ERROR: magnetometer_callback function pointer not set\r\n");
+			}
 		}
 		else
 		{
@@ -390,10 +436,37 @@ void I2C_doneReadMagData(void)
 	}
 }
 
-void HILSIM_MagData(void)
+void HILSIM_MagData(magnetometer_callback_funcptr callback)
 {
+//	magnetometer_callback = callback;
 	magMessage = 7;                 // indicate valid magnetometer data
 	I2C_doneReadMagData();          // run the magnetometer computations
 }
 
-#endif
+#endif // MAG_YAW_DRIFT
+
+#include "barometer.h"
+
+void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
+{
+}
+
+int setjmp(void)
+{
+	return 0;
+}
+
+int16_t FindFirstBitFromLeft(int16_t val)
+{
+	int16_t i;
+
+	if (val == 0) return 0;
+
+	for (i = 1; i <= 16; i++)
+	{
+		if (val & 0x8000) break;
+		val <<= 1;
+	}
+	return i;
+}
+

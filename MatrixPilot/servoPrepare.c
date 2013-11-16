@@ -20,10 +20,10 @@
 
 
 #include "defines.h"
-#include "mode_switch.h"
-#include "airspeedCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/osd.h"
+#include "mode_switch.h"
+#include "airspeedCntrl.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -111,7 +111,7 @@ void dcm_servo_callback_prepare_outputs(void)
 //		if (udb_heartbeat_counter % 5 == 0)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
-			flight_state_8hz();
+// RobD			flight_state_8hz();
 			serial_output_8hz();
 		}
 	}

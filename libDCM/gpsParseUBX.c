@@ -21,7 +21,9 @@
 
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
-
+#include "../libUDB/magnetometer.h"
+#include "rmat.h"
+//#include "../Configuration/simulate_config.h"
 
 //#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
 
@@ -810,9 +812,9 @@ static void gps_commit_data_(void)
 #if (HILSIM == 1)
 	as_sim.BB       = as_sim_._.W0;                 // provided by HILSIM, simulated airspeed
 #endif
-	cog_gps.BB      = (int16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
+	cog_gps.BB      = (uint16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 
-printf("cog_gps.BB = %u\r\n", cog_gps.BB);
+//printf("cog_gps.BB = %u\r\n", cog_gps.BB);
 
 	climb_gps.BB    = - climb_gps_._.W0;            // SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop            = (uint8_t)(hdop_.BB / 20);     // SIRF scales HDOP by 5, UBX by 10^-2
@@ -830,8 +832,8 @@ printf("cog_gps.BB = %u\r\n", cog_gps.BB);
 	svs             = svs_;
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
-	extern void HILSIM_MagData();
-	HILSIM_MagData(); // run the magnetometer computations
+//	extern void HILSIM_MagData();
+	HILSIM_MagData(udb_magnetometer_callback); // run the magnetometer computations
 #endif // HILSIM
 }
 

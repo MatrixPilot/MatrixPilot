@@ -9,27 +9,25 @@ bool CommsEnabled;
 float fTextColour[3];
 char szString[100];
 
-XPLMHotKeyID	gHotKey = NULL;
+XPLMHotKeyID gHotKey = NULL;
 
-void	MyHotKeyCallback(void *               inRefcon);    
-int 	MyOrbitPlaneFunc(
-                                   XPLMCameraPosition_t * outCameraPosition,  
-                                   int                  inIsLosingControl,    
-                                   void *               inRefcon);  
+void MyHotKeyCallback(void* inRefcon);
+int MyOrbitPlaneFunc(XPLMCameraPosition_t* outCameraPosition,
+                     int                   inIsLosingControl,
+                     voi *                 inRefcon);
 
-int	MyDrawCallback(
-                                   XPLMDrawingPhase     inPhase,    
-                                   int                  inIsBefore,    
-                                   void *               inRefcon);
+int	MyDrawCallback(XPLMDrawingPhase     inPhase,
+                   int                  inIsBefore,
+                   void *               inRefcon);
 
 // Here are the variables for implementing the file based control of the setup
 Channels ControlSurfaces;							// The list of control surfaces
-string	CommPortString = "";				// Pnace to put the port string to open
-long	CommPortSpeed = 38400;
-uint16_t	PortNum = 14551;
-string  OverString = "sim/operation/override/override_flightcontrol";
+string   CommPortString = "";				// Pnace to put the port string to open
+long     CommPortSpeed = 38400;
+uint16_t PortNum = 14551;
+string   OverString = "sim/operation/override/override_flightcontrol";
 													// Defaults to standard joystick control
-float	ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
+float    ThrottleSettings[8] = {0,0,0,0,0,0,0,0};	// The throttle settings with default values
 
 float	GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon);
 void	SerialPortAccessCallback(XPLMWindowID inWindowID, void *inRefcon);
@@ -358,46 +356,44 @@ PLUGIN_API void		XPluginReceiveMessage(
 	(void)inParam;
 }
 
-
 float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon)
 {
 	(void)elapsedSim;
 	(void)counter;
 	(void)refcon;
-	
+
 	pendingElapsedTime += elapsedMe;
-	
+
 	ReceiveFromComPort();
-	
+
 	if (pendingElapsedTime < 0.025) { // Don't run faster than 40Hz
 		return -1;
 	}
-	
-   	union intbb Temp2;
+
+	union intbb Temp2;
 	float phi, theta, psi;
 	float alpha, beta;
 	float P_flight, Q_flight, R_flight;
 	float ax, ay, az;
-	float gravity_acceleration_x, gravity_acceleration_y, gravity_acceleration_z ;
+	float gravity_acceleration_x, gravity_acceleration_y, gravity_acceleration_z;
 
-	
 	// Angular rates in X-Plane are specified relative to the flight path, not to the aircraft,
 	// for reasons unknown. So that means we need to rotate by alpha and beta to get angular rates
 	// in the aircraft body frame, which is what the UDB measures.
-	
- // Retrieve rates and slip angles, and convert to radians
-    P_flight = XPLMGetDataf(drP) / 180 * PI ;
-    Q_flight = XPLMGetDataf(drQ) / 180 * PI ;
-    R_flight = XPLMGetDataf(drR) / 180 * PI ;
-    alpha = XPLMGetDataf(drAlpha) / 180 * PI;
-    beta = XPLMGetDataf(drBeta) / 180 * PI;
+
+	// Retrieve rates and slip angles, and convert to radians
+	P_flight = XPLMGetDataf(drP) / 180 * PI;
+	Q_flight = XPLMGetDataf(drQ) / 180 * PI;
+	R_flight = XPLMGetDataf(drR) / 180 * PI;
+	alpha = XPLMGetDataf(drAlpha) / 180 * PI;
+	beta = XPLMGetDataf(drBeta) / 180 * PI;
 
 	FLIGHTtoBCBF(P_flight, Q_flight, R_flight, alpha, beta);
-    
+
 	P_plane = P_flight;
 	Q_plane = - Q_flight;  // convert from NED to UDB
 	R_plane = R_flight;
-	
+
 	// Angular rate
 	// multiply by 5632 (constant from UDB code)
 	// Divide by SCALEGYRO(3.0 for red board)
@@ -414,12 +410,12 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	// Phi is roll, roll to right is positive
 	// Theta is pitch, pitch up is positive
 	// Psi is yaw, relative to north. North is 0/360.
-	
+
 	// Convert these angles to radians first.
 
 	phi = (float)((XPLMGetDataf(drPhi) / 180) * PI );
-    theta = (float)((XPLMGetDataf(drTheta) / 180) * PI);
-    psi = (float)((XPLMGetDataf(drPsi) / 180) * PI );
+	theta = (float)((XPLMGetDataf(drTheta) / 180) * PI);
+	psi = (float)((XPLMGetDataf(drPsi) / 180) * PI );
 	
 	//	set up a vertical reference for the plotting computations
 	//	vertical in earth frame:
@@ -432,9 +428,9 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void * refcon
 	//	and convert to meter/sec/sec
 	//	x, y, and z are "UDB" coordinates, x is left wing, y is forward, and z is down.
 
-	gravity_acceleration_x = (float)((XPLMGetDataf(drg_side))*9.8) ;
-	gravity_acceleration_y = (float)((XPLMGetDataf(drg_axil))*9.8) ;
-	gravity_acceleration_z = (float)((XPLMGetDataf(drg_nrml))*9.8) ;
+	gravity_acceleration_x = (float)((XPLMGetDataf(drg_side))*9.8);
+	gravity_acceleration_y = (float)((XPLMGetDataf(drg_axil))*9.8);
+	gravity_acceleration_z = (float)((XPLMGetDataf(drg_nrml))*9.8);
 
 
 	// Convert from OGL frame to Aircraft body fixed frame
@@ -816,12 +812,12 @@ int	msgServos(unsigned char rxChar)
 }
 
 
-int	msgCheckSum(unsigned char rxChar)
+int msgCheckSum(unsigned char rxChar)
 {
 	msg_parse = &msgDefault;
 
 	ck_in_b = rxChar;
-	if((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
+	if ((ck_in_a == ck_calc_a) && (ck_in_b == ck_calc_b))
 	{
 		memcpy(SERVO_IN,SERVO_IN_,sizeof(SERVO_IN_));
 		return 1; // success!
@@ -834,17 +830,14 @@ int	msgCheckSum(unsigned char rxChar)
 // and setting either a surface or engine(s) to the value
 void ServosToControls()
 {
-	int		iIndex = 0;
-	int		iSize = ControlSurfaces.size();
-	
-	int		iServoChannel;
-	intbb	ServoValue;
-
-	float	ControlSetting;
-
+	int   iIndex = 0;
+	int   iSize = ControlSurfaces.size();
+	int   iServoChannel;
+	intbb ServoValue;
+	float ControlSetting;
 	ChannelSetup* pScanSetup;
 
-	for(iIndex = 0; iIndex < iSize; iIndex++)
+	for (iIndex = 0; iIndex < iSize; iIndex++)
 	{
 		pScanSetup = &ControlSurfaces[iIndex];
 
@@ -854,17 +847,17 @@ void ServosToControls()
 
 		ControlSetting = pScanSetup->GetControlDeflection(ServoValue.BB);
 		
-		if(pScanSetup->mControlType == CONTROL_TYPE_SURFACE)
+		if (pScanSetup->mControlType == CONTROL_TYPE_SURFACE)
 		{
 			XPLMSetDataf(pScanSetup->mControlSurfaceRef, ControlSetting);
 		}
-		else if(pScanSetup->mControlType == CONTROL_TYPE_ENGINE)
+		else if (pScanSetup->mControlType == CONTROL_TYPE_ENGINE)
 		{
 			unsigned int Mask = pScanSetup->mEngineMask;
 
 			for (int Engine = 0; Engine < 8; Engine++)
 			{
-				if( (Mask & 0x01) != 0 )
+				if ((Mask & 0x01) != 0)
 				{
 					ThrottleSettings[Engine] = ControlSetting;
 				}
@@ -878,17 +871,16 @@ void ServosToControls()
 // Set all control channels in the list to the default servo position
 // Note, if there is more than one control surface per channel, it will reset it
 // to the last surface defined in the list
-void	SetupDefaultServoZeros(void)
+void SetupDefaultServoZeros(void)
 {
-	int		iIndex = 0;
-	int		iSize = ControlSurfaces.size();
-	
-	int		iServoChannel;
-	intbb	ServoValue;
+	int   iIndex = 0;
+	int   iSize = ControlSurfaces.size();
+	int   iServoChannel;
+	intbb ServoValue;
 
 	ChannelSetup* pScanSetup;
 
-	for(iIndex = 0; iIndex < iSize; iIndex++)
+	for (iIndex = 0; iIndex < iSize; iIndex++)
 	{
 		pScanSetup = &ControlSurfaces[iIndex];
 
@@ -900,16 +892,16 @@ void	SetupDefaultServoZeros(void)
 	};
 }
 
-void	MyHotKeyCallback(void *               inRefcon)
+void MyHotKeyCallback(void* inRefcon)
 {
 	(void)inRefcon;
-	
+
 	/* This is the hotkey callback.  First we simulate a joystick press and
 	 * release to put us in 'free view 1'.  This guarantees that no panels
 	 * are showing and we are an external view. */
 	XPLMCommandButtonPress(xplm_joy_v_fr1);
 	XPLMCommandButtonRelease(xplm_joy_v_fr1);
-	
+
 	/* Now we control the camera until the view changes. */
 	XPLMControlCamera(xplm_ControlCameraUntilViewChanges, MyOrbitPlaneFunc, NULL);
 }
@@ -921,36 +913,36 @@ void	MyHotKeyCallback(void *               inRefcon)
  * called each time X-Plane needs to draw a frame.
  * 
  */
-int 	MyOrbitPlaneFunc(
-                                   XPLMCameraPosition_t * outCameraPosition,   
-                                   int                  inIsLosingControl,    
-                                   void *               inRefcon)
+int MyOrbitPlaneFunc(
+                     XPLMCameraPosition_t* outCameraPosition,
+                     int                   inIsLosingControl,
+                     void*                 inRefcon)
 {
 	(void)inRefcon;
-	
+
 	if (outCameraPosition && !inIsLosingControl)
 	{
-			int	w, h, x, y;
-			float dx, dz, dy, heading, pitch;
-		
+		int w, h, x, y;
+		float dx, dz, dy, heading, pitch;
+
 		/* First get the screen size and mouse location.  We will use this to decide
 		 * what part of the orbit we are in.  The mouse will move us up-down and around. */
 		XPLMGetScreenSize(&w, &h);
 		XPLMGetMouseLocation(&x, &y);
 		heading = (float)(2 * PI * (((float) x / (float) w)-0.5));
 		pitch = (float)(PI * (((float) y / (float) h) - 0.5));
-		
+
 		double local_x	= XPLMGetDataf(drLocal_x);
 		double local_y	= XPLMGetDataf(drLocal_y);
 		double local_z	= XPLMGetDataf(drLocal_z);
 		float phi		= XPLMGetDataf(drPhi);
 		float theta		= XPLMGetDataf(drTheta);
 		float psi		= XPLMGetDataf(drPsi);
-		
+
 		// Convert this vector back into angles.
-		float CamPitchOGL = (atan2( CamY , sqrt( (CamX * CamX) + (CamZ * CamZ) ))) / PI * 180;
-		float CamYawOGL = (atan2( CamX , CamZ * (float)-1.0 )) / PI * 180;
-		
+		float CamPitchOGL = (atan2(CamY , sqrt( (CamX * CamX) + (CamZ * CamZ) ))) / PI * 180;
+		float CamYawOGL = (atan2(CamX , CamZ * (float)-1.0 )) / PI * 180;
+
 		//sprintf(szString,"CamPitch: %f,\tCamYaw: %f,\tCamX: %f,\tCamY: %f,\tCamZ: %f,\0", (CamPitch), (CamYaw), CamX, CamY, CamZ);
 
 		// Camera Position On Aircraft
@@ -966,18 +958,18 @@ int 	MyOrbitPlaneFunc(
 		outCameraPosition->z = (float)(local_z + dz);
 		outCameraPosition->pitch = CamPitchOGL;
 		outCameraPosition->heading = CamYawOGL;
-		outCameraPosition->roll = 0;		
+		outCameraPosition->roll = 0;
 
 	}
-	
+
 	/* Return 1 to indicate we want to keep controlling the camera. */
 	return 1;
-}        
+}
 
-int	MyDrawCallback(
-                                   XPLMDrawingPhase     inPhase,    
-                                   int                  inIsBefore,    
-                                   void *               inRefcon)
+int MyDrawCallback(
+                   XPLMDrawingPhase     inPhase,
+                   int                  inIsBefore,
+                   void *               inRefcon)
 {
 	(void)inPhase;
 	(void)inIsBefore;
@@ -992,13 +984,13 @@ int	MyDrawCallback(
 	float planeY = XPLMGetDataf(drLocal_y);
 	float planeZ = XPLMGetDataf(drLocal_z);
 
-	float phi	= XPLMGetDataf(drPhi) / 180 * PI;
-	float theta	= XPLMGetDataf(drTheta) / 180 * PI;
-	float psi	= XPLMGetDataf(drPsi) / 180 * PI;
+	float phi   = XPLMGetDataf(drPhi) / 180 * PI;
+	float theta = XPLMGetDataf(drTheta) / 180 * PI;
+	float psi   = XPLMGetDataf(drPsi) / 180 * PI;
 
 	float alpha = XPLMGetDataf(drAlpha) / 180 * PI;
-    float beta	= XPLMGetDataf(drBeta) / 180 * PI;
-	
+	float beta  = XPLMGetDataf(drBeta) / 180 * PI;
+
 	/* Reset the graphics state.  This turns off fog, texturing, lighting,
 	 * alpha blending or testing and depth reading and writing, which
 	 * guarantees that our axes will be seen no matter what. */
@@ -1006,33 +998,33 @@ int	MyDrawCallback(
 
 	/* Do the actual drawing.  use GL_LINES to draw sets of discrete lines.
 	 * Each one will go 100 meters in any direction from the plane. */
-	
+
 	float pointX1 = 0;
 	float pointY1 = 0;
 	float pointZ1 = 0;
 	float pointX2 = 10 * ax_plane;
 	float pointY2 = 0;
 	float pointZ2 = 0;
-	
+
 	BCBFtoOGL(pointX1, pointY1, pointZ1, phi, theta, psi);
 	BCBFtoOGL(pointX2, pointY2, pointZ2, phi, theta, psi);
-	
+
 	glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_LINES);
 	glVertex3f(pointX1 + planeX, pointY1 + planeY, pointZ1 + planeZ);
 	glVertex3f(pointX2 + planeX, pointY2 + planeY, pointZ2 + planeZ);
 	glEnd();
-		
+
 	pointX1 = 0;
 	pointY1 = 0;
 	pointZ1 = 0;
 	pointX2 = 0;
 	pointY2 = 10 * ay_plane;
 	pointZ2 = 0;
-	
+
 	BCBFtoOGL(pointX1, pointY1, pointZ1, phi, theta, psi);
 	BCBFtoOGL(pointX2, pointY2, pointZ2, phi, theta, psi);
-	
+
 	glColor3f(0.0, 1.0, 0.0);
 	glBegin(GL_LINES);
 	glVertex3f(pointX1 + planeX, pointY1 + planeY, pointZ1 + planeZ);
@@ -1045,10 +1037,10 @@ int	MyDrawCallback(
 	pointX2 = 0;
 	pointY2 = 0;
 	pointZ2 = 10 * az_plane;
-	
+
 	BCBFtoOGL(pointX1, pointY1, pointZ1, phi, theta, psi);
 	BCBFtoOGL(pointX2, pointY2, pointZ2, phi, theta, psi);
-	
+
 	glColor3f(0.0, 0.0, 1.0);
 	glBegin(GL_LINES);
 	glVertex3f(pointX1 + planeX, pointY1 + planeY, pointZ1 + planeZ);
@@ -1056,7 +1048,7 @@ int	MyDrawCallback(
 	glEnd();
 
 	// Calculate a direction vector for the camera in the aircraft reference frame.
-		
+
 	CamX = cos(CamPitch) * cos(CamYaw);
 	CamY = cos(CamPitch) * sin(CamYaw);
 	CamZ = sin(CamPitch);
@@ -1065,11 +1057,11 @@ int	MyDrawCallback(
 	BCBFtoOGL(CamX, CamY, CamZ, phi, theta, psi);
 
 	float scalar = 1;
-	if( CamY != 0 ) scalar = (float)((planeY - 624) / CamY * -1.0);
+	if (CamY != 0) scalar = (float)((planeY - 624) / CamY * -1.0);
 	
 	// If the camera view intersects the ground, add that point to the
 	// camera ground path.
-	if(CamY < 0)
+	if (CamY < 0)
 	{
 		CamPath[CamPathIterator][0] = (CamX * scalar) + planeX;
 		CamPath[CamPathIterator][1] = (CamY * scalar) + planeY;
@@ -1095,30 +1087,32 @@ int	MyDrawCallback(
 	glEnd();
 
 	// Display the camera ground track
-	/*int i = 0;
+/*
+	int i = 0;
 	int j = CamPathIterator;
 	glColor3f(0.0, 1.0, 0.0);
 	glBegin(GL_LINE_STRIP);
-	for(i = 0; i < CamPathCount; i++)
+	for (i = 0; i < CamPathCount; i++)
 	{
 		glVertex3f(CamPath[j][0],CamPath[j][1],CamPath[j][2]);
 		j--;
-		if(j < 0) j = (CamPathLength - 1);
+		if (j < 0) j = (CamPathLength - 1);
 	}
-	glEnd();*/
-	if(CamPathCount < CamPathLength) CamPathCount++;
-	if(CamY < 0) CamPathIterator++;
-	if(CamPathIterator >= CamPathLength) CamPathIterator = 0;
+	glEnd();
+*/
+	if (CamPathCount < CamPathLength) CamPathCount++;
+	if (CamY < 0) CamPathIterator++;
+	if (CamPathIterator >= CamPathLength) CamPathIterator = 0;
 
 	// Display a vector in the flight frame
 	pointX1 = 100;
 	pointY1 = 0;
 	pointZ1 = 0;
-	
+
 	FLIGHTtoBCBF(pointX1, pointY1, pointZ1, alpha, beta);
 	pointY1 = -pointY1 ; // convert from NED to UDB frame
 	BCBFtoOGL(pointX1, pointY1, pointZ1, phi, theta, psi);
-		
+
 	glColor3f(1.0, 0.0, 1.0);
 	glBegin(GL_LINES);
 	glVertex3f(pointX1 + planeX, pointY1 + planeY, pointZ1 + planeZ);
@@ -1126,20 +1120,20 @@ int	MyDrawCallback(
 	glEnd();
 
 	// Test our rotation from OGL to BCBF frame
-	/*pointX1 = 0;
+/*
+	pointX1 = 0;
 	pointY1 = 0;
 	pointZ1 = 20;
-		
+
 	OGLtoBCBF(pointX1, pointY1, pointZ1, phi, theta, psi);
 	BCBFtoOGL(pointX1, pointY1, pointZ1, phi, theta, psi);
-		
+
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_LINES);
 	glVertex3f(pointX1 + planeX, pointY1 + planeY, pointZ1 + planeZ);
 	glVertex3f(planeX, planeY, planeZ);
-	glEnd();*/
-
-
+	glEnd();
+ */
 
 	return 1;
 }

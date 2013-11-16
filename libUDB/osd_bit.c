@@ -23,9 +23,9 @@
 #include "osd_config.h"
 #include "osd.h"
 
-#if (USE_OSD_SPI == 0)
+#if (USE_OSD == OSD_NATIVE && USE_OSD_SPI == 0)
 
-#if (USE_OSD == OSD_NATIVE)
+#warning "OSD_NATIVE in bit-bash mode enabled"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
@@ -136,6 +136,5 @@ uint8_t osd_spi_read(int8_t addr)
 }
 */
 
-#endif // USE_OSD
+#endif // (USE_OSD == OSD_NATIVE && USE_OSD_SPI == 0)
 
-#endif // USE_OSD_SPI

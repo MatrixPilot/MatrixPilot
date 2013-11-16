@@ -21,7 +21,9 @@
 
 #include "libDCM_internal.h"
 #include "mathlibNAV.h"
+#include "rmat.h"
 #include "../libUDB/magnetometerOptions.h"
+#include "../libUDB/heartbeat.h"
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane
@@ -39,13 +41,29 @@
 
 #define RMAX15 24576 //0b0110000000000000   // 1.5 in 2.14 format
 
-#define GGAIN SCALEGYRO*6*(RMAX*0.025)      // integration multiplier for gyros at 40 Hz
+#define GGAIN SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ)) // integration multiplier for gyros
+//#define GGAIN SCALEGYRO*6*(RMAX*0.025)      // integration multiplier for gyros at 40 Hz
 //#define GGAIN SCALEGYRO*1.2*(RMAX*0.025)  // integration multiplier for gyros at 200 Hz
 fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
 
 uint16_t spin_rate = 0;
 fractional spin_axis[] = { 0, 0, RMAX };
 
+#if (BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == UDB5_BOARD)
+// modified gains for MPU6000
+#define KPROLLPITCH (ACCEL_RANGE * 1280/3)
+#define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)
+
+#elif (BOARD_TYPE == UDB4_BOARD)
+// Paul's gains for 6G accelerometers
+#define KPROLLPITCH (256*5)
+#define KIROLLPITCH (10240/HEARTBEAT_HZ) // 256
+
+#else
+#error Unsupported BOARD_TYPE
+#endif // BOARD_TYPE
+
+/*
 #if (BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 // Paul's gains corrected for GGAIN
 #define KPROLLPITCH 256*5
@@ -55,9 +73,11 @@ fractional spin_axis[] = { 0, 0, RMAX };
 #define KPROLLPITCH 256*10
 #define KIROLLPITCH 256*2
 #endif
+ */
 
 #define KPYAW 256*4
-#define KIYAW 32
+//#define KIYAW 32
+#define KIYAW (1280/HEARTBEAT_HZ)
 
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
@@ -197,7 +217,7 @@ void read_accel(void)
 {
 #if (HILSIM == 1)
 	gplane[0] = g_a_x_sim.BB;
-	gplane[1] = g_a_y_sim.BB; 
+	gplane[1] = g_a_y_sim.BB;
 	gplane[2] = g_a_z_sim.BB;
 #else
 	gplane[0] = XACCEL_VALUE;
@@ -205,6 +225,9 @@ void read_accel(void)
 	gplane[2] = ZACCEL_VALUE;
 #endif
 
+	// transform gplane from body frame to earth frame
+	// x component in earth frame is earth x unit vector (rmat[0,1,2]) dotted with gplane
+	//FIXME: But why are the y and z components negated?
 	accelEarth[0] =   VectorDotProduct(3, &rmat[0], gplane) << 1;
 	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane) << 1;
 	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane) << 1);
@@ -336,6 +359,14 @@ static void normalize(void)
 static void roll_pitch_drift(void)
 {
 	VectorCross(errorRP, gplane, &rmat[6]);
+//#ifdef CATAPULT_LAUNCH_ENABLE
+#define MAXIMUM_PITCH_ERROR ((fractional)(GRAVITY*0.25))
+	// the following is done to limit the pitch error during a catapult launch
+	// it has no effect during normal conditions, because acceleration
+	// compensated gplane is approximately aligned with rmat[6] vector
+	if (errorRP[0] >  MAXIMUM_PITCH_ERROR) errorRP[0] =  MAXIMUM_PITCH_ERROR;
+	if (errorRP[0] < -MAXIMUM_PITCH_ERROR) errorRP[0] = -MAXIMUM_PITCH_ERROR;
+//#endif // CATAPULT_LAUNCH_ENABLE
 }
 
 static void yaw_drift(void)
@@ -506,7 +537,12 @@ static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_v
 }
 
 #define MAG_LATENCY 0.085 // seconds
-#define MAG_LATENCY_COUNT ((int16_t)(MAG_LATENCY / 0.025))
+#define MAG_LATENCY_COUNT ((int16_t)(HEARTBEAT_HZ * MAG_LATENCY))
+
+// Since mag_drift is called every heartbeat the first assignment to rmatDelayCompensated
+// will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
+// Since rxMagnetometer is called  at multiples of .25 seconds, this initial
+// delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
 
 static int16_t mag_latency_counter = 10 - MAG_LATENCY_COUNT;
 
@@ -532,7 +568,8 @@ static void mag_drift(void)
 	if (mag_latency_counter == 0)
 	{
 		VectorCopy(9, rmatDelayCompensated, rmat);
-		mag_latency_counter = 10; // not really needed, but its good insurance
+		mag_latency_counter = (HEARTBEAT_HZ / 4);   // not really needed, but its good insurance
+		// mag_latency_counter is assigned in the next block
 	}
 	
 	if (dcm_flags._.mag_drift_req)
@@ -558,7 +595,7 @@ static void mag_drift(void)
 			VectorCopy (9, rmatDelayCompensated, rmat);
 		}
 
-		mag_latency_counter = 10 - MAG_LATENCY_COUNT; // setup for the next reading
+		mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT; // setup for the next reading
 
 		// Compute the mag field in the earth frame
 
@@ -771,6 +808,7 @@ void output_IMUvelocity(void)
  */
 
 extern void dead_reckon(void);
+extern uint16_t air_speed_3DIMU;
 
 void dcm_run_imu_step(void)
 {
@@ -782,6 +820,8 @@ void dcm_run_imu_step(void)
 	normalize();                // local
 	roll_pitch_drift();         // local
 #if (MAG_YAW_DRIFT == 1)
+//	// TODO: validate: disabling mag_drift when airspeed greater than 5 m/sec
+//	if ((magMessage == 7) && (air_speed_3DIMU < 500))
 	if (magMessage == 7)
 	{
 		mag_drift();            // local

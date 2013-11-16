@@ -147,6 +147,18 @@ void set_udb_pwIn(int pwm, int index)
 #if (NORADIO != 1)
 	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
 
+	if (FAILSAFE_INPUT_CHANNEL == index)
+	{
+		if ((pwm > FAILSAFE_INPUT_MIN) && (pwm < FAILSAFE_INPUT_MAX))
+		{
+			failSafePulses++;
+		}
+		else
+		{
+			noisePulses++;
+		}
+	}
+
 #if (FLY_BY_DATALINK_ENABLED == 1)
 	// It's kind of a bad idea to override the radio mode input
 	if (MODE_SWITCH_INPUT_CHANNEL == index)
@@ -168,21 +180,13 @@ void set_udb_pwIn(int pwm, int index)
 #else
 	if (FAILSAFE_INPUT_CHANNEL == index)
 	{
-		if ((pwm > FAILSAFE_INPUT_MIN) && (pwm < FAILSAFE_INPUT_MAX))
-		{
-			failSafePulses++;
-		}
-		else
-		{
-			noisePulses++;
-		}
-		//printf("FS: %u %u %u\r\n", pwm, failSafePulses, noisePulses);
+		//DPRINT("FS: %u %u %u\r\n", pwm, failSafePulses, noisePulses);
 		#ifdef DEBUG_FAILSAFE_MIN_MAX
 		{
 			static uint8_t foo = 0;
 			if (!(++foo % 32)) 
 			{
-				printf("FS: %u\r\n", pwm);
+				DPRINT("FS: %u\r\n", pwm);
 			}
 		}
 		#endif // DEBUG_FAILSAFE_MIN_MAX
@@ -230,6 +234,13 @@ IC_HANDLER(8, REGTOK1, IC_PIN8);
 #define PPM_PULSE_VALUE 1
 #endif
 
+//#if (BOARD_TYPE == AUAV3_BOARD)
+//#define ICBNE(x) IC##x##CON1bits.ICBNE
+//#else
+//#define ICBNE(x) IC##x##CONbits.ICBNE
+//#endif
+
+//#define REGTOK1 N1
 #define ICBNE(x, y) IC##x##CO##y##bits.ICBNE
 
 #define _IC_TIME(x, y) \
@@ -247,7 +258,7 @@ IC_TIME(PPM_IC, REGTOK1);
 #define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
 #define IC_INTERRUPT(x) _IC_INTERRUPT(x)
 
-// PPM Input on Channel 1
+// PPM Input on Channel PPM_IC
 void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 {
 	indicate_loading_inter;
@@ -310,4 +321,4 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 }
 
 #endif // USE_PPM_INPUT
-#endif // NOARADIO !=1
+#endif // NORADIO !=1

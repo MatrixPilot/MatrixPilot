@@ -10,19 +10,19 @@
 #include "SIL-dsp.h"
 
 
-int16_t MatrixIndex(int16_t col, int16_t row, int16_t numCols)
+static int16_t MatrixIndex(int16_t col, int16_t row, int16_t numCols)
 {
 	return col + row*numCols;
 }
 
 
-fractional fl2fr(float fl)
+static fractional fl2fr(float fl)
 {
 	return (int16_t)(fl*32768.0);
 }
 
 
-float fr2fl(fractional fr)
+static float fr2fl(fractional fr)
 {
 	return (fr/32768.0);
 }

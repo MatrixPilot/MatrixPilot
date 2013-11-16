@@ -172,7 +172,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable TCP/IP network support
-#define USE_NETWORK                         1
+#define USE_NETWORK                         0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +206,7 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-#define CONSOLE_UART                        0
+#define CONSOLE_UART                        1
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
@@ -215,11 +215,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // AUAV3 only features
 
-// Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG                         0
+// Set this to 1 to enable logging telemetry to dataflash on AUAV3 or SD-SPI on UDB4/5
+#define USE_TELELOG                         1
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      0
+#define USE_CONFIGFILE                      1
 
 // Set this to 1 to enable the USB stack on AUAV3
 #define USE_USB                             0

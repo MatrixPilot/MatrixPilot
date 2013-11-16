@@ -163,15 +163,15 @@
 /*
 // Check Analog Inputs
 #if (ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
-	#error("ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+//	#error("ANALOG_CURRENT_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
-	#error("ANALOG_VOLTAGE_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+//	#error("ANALOG_VOLTAGE_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
 #if (ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
-	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
+//	#error("ANALOG_RSSI_INPUT_CHANNEL > NUM_ANALOG_INPUTS.")
 #endif
 
 #if (ANALOG_AIRSPEED_INPUT_CHANNEL > NUM_ANALOG_INPUTS)
@@ -227,16 +227,16 @@
 	#error "max of 8 servo outputs currently supported for AUAV3"
 #endif
 
-#if ((CONSOLE_UART > 2) && (BOARD_TYPE != AUAV3_BOARD))
+#if ((CONSOLE_UART > 2) && (BOARD_TYPE != AUAV3_BOARD) && (SILSIM == 0))
 	#error("Console UART's greater than 2 only supported on AUAV3 board"
 #endif
 
 #if ((USE_TELELOG == 1) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("USE_TELELOG only supported on AUAV3 board"
+//	#error("USE_TELELOG only supported on AUAV3 board"
 #endif
 
 #if ((USE_CONFIGFILE == 1) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("USE_CONFIGFILE only supported on AUAV3 board"
+//	#error("USE_CONFIGFILE only supported on AUAV3 board"
 #endif
 
 #if ((USE_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
@@ -270,7 +270,7 @@
 
 // Check serial port use OSD or serial output
 #if ((SERIAL_OUTPUT_FORMAT != SERIAL_NONE) && ((USE_OSD == OSD_REMZIBI) || (USE_OSD == OSD_MINIM)))
-	#error("You cannot use both SERIAL_OUTPUT_FORMAT and USE_OSD same time")
+//	#error("You cannot use both SERIAL_OUTPUT_FORMAT and USE_OSD same time")
 #endif
 
 // Check RSSI configuration for Remzibi OSD

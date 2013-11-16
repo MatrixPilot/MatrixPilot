@@ -104,7 +104,8 @@ void do_I2C_stuff(void)
 
 	if (toggle) {
 		if (counter++ > 0) {
-#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#if (MAG_YAW_DRIFT == 1)
 //			printf("rxMag %u\r\n", udb_heartbeat_counter);
 			rxMagnetometer(udb_magnetometer_callback);
 #endif
@@ -127,7 +128,8 @@ void udb_servo_callback_prepare_outputs(void)
 #if (BAROMETER_ALTITUDE == 1)
 	do_I2C_stuff();
 #else
-#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz
 //	if (udb_heartbeat_counter % 10 == 0)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
@@ -193,6 +195,18 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 	rel.x = long_scale((absolute.x - lon_origin.WW)/90, cos_lat);
 	return rel;
 }
+
+#ifdef USE_EXTENDED_NAV
+struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute)
+{
+	struct relative3D_32 rel;
+
+	rel.z = absolute.z;
+	rel.y = (absolute.y - lat_origin.WW) / 90; // in meters
+	rel.x = long_scale((absolute.x - lon_origin.WW) / 90, cos_lat);
+	return rel;
+}
+#endif // USE_EXTENDED_NAV
 
 #if (HILSIM == 1)
 

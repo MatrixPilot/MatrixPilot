@@ -6,7 +6,7 @@
 
 #include "mavlink_types.h"
 
-//extern void mp_mavlink_transmit(uint8_t) ; 
+//extern void mp_mavlink_transmit(uint8_t);
 
 /* Struct that stores the communication settings of this system.
    you can also define / alter these settings elsewhere, as long
@@ -18,7 +18,7 @@
  
    Lines also in your main.c, e.g. by reading these parameter from EEPROM.
  */
-mavlink_system_t mavlink_system ;
+extern mavlink_system_t mavlink_system;
 //mavlink_system.sysid = 100; // System ID, 1-255
 //mavlink_system.compid = 50; // Component/Subsystem ID, 1-255
  

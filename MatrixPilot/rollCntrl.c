@@ -75,7 +75,6 @@ void normalRollCntrl(void)
 		rmat6 = -rmat[6];
 		omegaAccum2 = -omegaAccum[2];
 	}
-
 #ifdef TestGains
 	flags._.GPS_steering = 0; // turn off navigation
 #endif
@@ -83,11 +82,9 @@ void normalRollCntrl(void)
 	{
 		rollAccum._.W1 = determine_navigation_deflection('a');
 	}
-
 #ifdef TestGains
 	flags._.pitch_feedback = 1;
 #endif
-
 	if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback)
 	{
 		gyroRollFeedback.WW = __builtin_mulus(rollkd , omegaAccum[1]);
@@ -97,7 +94,6 @@ void normalRollCntrl(void)
 	{
 		gyroRollFeedback.WW = 0;
 	}
-
 	if (YAW_STABILIZATION_AILERON && flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW = __builtin_mulus(yawkdail, omegaAccum2);
@@ -106,11 +102,9 @@ void normalRollCntrl(void)
 	{
 		gyroYawFeedback.WW = 0;
 	}
-
 	roll_control = (int32_t)rollAccum._.W1 - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
 	// Servo reversing is handled in servoMix.c
 }
-
 
 void hoverRollCntrl(void)
 {
@@ -127,7 +121,6 @@ void hoverRollCntrl(void)
 		{
 			rollNavDeflection = 0;
 		}
-		
 		gyroRollFeedback.WW = __builtin_mulus(hoverrollkd , omegaAccum[1]);
 	}
 	else
@@ -135,6 +128,5 @@ void hoverRollCntrl(void)
 		rollNavDeflection = 0;
 		gyroRollFeedback.WW = 0;
 	}
-
 	roll_control = rollNavDeflection -(int32_t)gyroRollFeedback._.W1;
 }

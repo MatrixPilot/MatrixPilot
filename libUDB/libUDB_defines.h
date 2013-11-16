@@ -36,7 +36,8 @@
 //union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #include "udbTypes.h"
 
-#if SILSIM
+//#if SILSIM
+#if (SILSIM == 1)
 #define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
 #else
 #define NUM_POINTERS_IN(x)      (sizeof(x)>>1)
@@ -54,55 +55,29 @@
 #define AUAV3_BOARD             9   // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 #define AUAV4_BOARD             10  // AUAV4 with PIC32MX
 
-#if (SILSIM != 1)
-
-// Device header file
-//#if defined(__PIC32MX__)
-//#include <p32xxxx.h>
-//#include <plib.h>
-//#else
-//#if defined(__XC16__)
-//#include <xc.h>
-//#elif defined(__C30__)
-//#if defined(__dsPIC33E__)
-//#include <p33Exxxx.h>
-//#elif defined(__dsPIC33F__)
-//#include <p33Fxxxx.h>
-//#endif // __dsPIC33E__
-//#endif // !__XC16__ : __C30__
-//#endif // __PIC32MX__
+#if (SILSIM == 0)
 
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == UDB4_BOARD)
 #include "ConfigUDB4.h"
-
 #elif (BOARD_TYPE == UDB5_BOARD)
 #include "ConfigUDB5.h"
-
 #elif (BOARD_TYPE == AUAV3_BOARD)
 #include "ConfigAUAV3.h"
-
 #elif (BOARD_TYPE == AUAV4_BOARD)
 #include <p32xxxx.h>
 #include "ConfigAUAV4.h"
-
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "../CANInterface/ConfigCANInterface.h"
 #else
 #error "unsupported value for BOARD_TYPE"
 #endif // BOARD_TYPE
 
-#endif // (SILSIM != 1)
-
-#if (SILSIM == 1)
-#undef HILSIM
-#define HILSIM 1
-#endif
+#endif // SILSIM
 
 #if (HILSIM == 1)
 #include "ConfigHILSIM.h"
 #endif
-
 
 #if (USE_PPM_INPUT == 1 && BOARD_TYPE != AUAV3_BOARD)
 #undef MAX_INPUTS
@@ -158,9 +133,9 @@
 
 
 // Types
-#ifndef SIL_WINDOWS_INCS
+//#ifndef SIL_WINDOWS_INCS
 typedef uint8_t boolean;
-#endif
+//#endif
 #define true                    1
 #define false                   0
 
@@ -212,12 +187,6 @@ struct udb_flag_bits {
 #define SERVORANGE              ((int16_t)(SERVOSAT*1000))
 #define SERVOMAX                (SERVOCENTER + SERVORANGE)
 #define SERVOMIN                (SERVOCENTER - SERVORANGE)
-
-#define MAX_CURRENT             900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
-#define CURRENT_SENSOR_OFFSET   10  // Add 1.0 Amp to whatever value we sense
-
-#define MAX_VOLTAGE             543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
-#define VOLTAGE_SENSOR_OFFSET   0   // Add 0.0 Volts to whatever value we sense
 
 extern int16_t magMessage;
 extern int16_t vref_adj;
