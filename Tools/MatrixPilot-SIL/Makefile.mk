@@ -1,5 +1,5 @@
 CC = gcc
-INCPATH = -Iinclude -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot
+INCPATH = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot
 RM_FILE = rm -f
 ifeq ($(OS),Windows_NT)
 	TARGET_EXTENSION = .exe
@@ -78,3 +78,4 @@ $(MPCAT_TARGET): $(MPCAT_OBJECTS)
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
 	-$(RM_FILE) *~ core *.core *.d ../../libDCM/*.d ../../MatrixPilot/*.d
+

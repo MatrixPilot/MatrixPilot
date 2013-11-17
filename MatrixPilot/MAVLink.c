@@ -153,8 +153,8 @@ void init_mavlink(void)
 void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
-#define SERIAL_BAUDRATE 19200 // default
-#warning SERIAL_BAUDRATE set to default value of 19200 bps
+#define SERIAL_BAUDRATE 57600 // default
+#warning SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();

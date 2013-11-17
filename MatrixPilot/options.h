@@ -340,7 +340,6 @@
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
-// SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
 #define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
@@ -348,7 +347,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
-//#define SERIAL_BAUDRATE                     19200 // default
+//#define SERIAL_BAUDRATE                     19200
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -634,7 +633,7 @@
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
 #define HILSIM                              0
-#define HILSIM_USB                          0           // AUAV3 only
+#define HILSIM_USB                          0           // AUAV3 only (under development)
 #define HILSIM_BAUD                         38400
 
 
