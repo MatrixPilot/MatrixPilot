@@ -23,13 +23,6 @@
 #include "mode_switch.h"
 #include <stdio.h>
 
-#undef DPRINT
-#ifdef USE_DEBUG_IO
-#define DPRINT printf
-#else
-#define DPRINT(args...)
-#endif
-
 union fbts_int flags;
 int16_t waggle = 0;
 uint8_t counter = 0;
@@ -348,7 +341,7 @@ static void calibrateS(void)
 		udb_led_toggle(LED_RED);
 		calib_timer--;
 
-DPRINT("calib_timer %u  \r", calib_timer);
+//		DPRINT("calib_timer %u  \r", calib_timer);
 
 		if (calib_timer <= 0)
 			ent_acquiringS();

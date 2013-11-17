@@ -13,7 +13,7 @@
 //#include <Windows.h>
 //#include <Time.h>
 
-#include "UDBSocket.h"
+#include "../HILSIM_XPlane/UDBSocket.h"
 #include "options.h"
 #include "SIL-config.h"
 
@@ -49,7 +49,6 @@ int main(int argc, char** argv)
 	char *udpHost = SILSIM_TELEMETRY_HOST;
 	char *serialPort = NULL;
 	uint32_t serialBaud = 0;
-
 	uint8_t argPos = 0;
 
 	int i;
@@ -95,7 +94,6 @@ int main(int argc, char** argv)
 	}
 
 	stdioSocket = UDBSocket_init(UDBSocketStandardInOut, 0, NULL, NULL, 0);
-	
 	transportSocket = UDBSocket_init(socketType, udpPort, udpHost, serialPort, serialBaud);
 	if (!transportSocket) {
 		printf("ERROR: UDBSocket_init failed: %s\n", UDBSocketLastErrorMessage());

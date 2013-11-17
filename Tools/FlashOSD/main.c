@@ -39,7 +39,7 @@ void osd_update_glyph(void)
 	for (i = 0; i < 54; i++)
 	{
 		osd_spi_write(0xA, i);          // CMAL: set the 4-px chunk of the glyph to overwrite
-		osd_spi_write(0xB, font_data[charPosition*64 + i]); // CMDI: update the data representing the 4-px chunk of the glyph
+		osd_spi_write(0xB, font_data[charPosition * 64 + i]); // CMDI: update the data representing the 4-px chunk of the glyph
 	}
 
 	osd_spi_write(0x8, 0xA0);           // CMM: write glyph to NVRAM
@@ -90,12 +90,12 @@ void udb_background_callback_periodic(void)
 			int row;
 			for (row = 0; row < 11; row++)
 			{
-				osd_spi_write_location(OSD_LOC(row+1, 3));
+				osd_spi_write_location(OSD_LOC(row + 1, 3));
 				osd_spi_write(0x04, 1); // DMM: Enable auto-increment mode
 				int col;
-				for (col = 0; col<24; col++)
+				for (col = 0; col < 24; col++)
 				{
-					osd_spi_write_byte(row*24 + col);
+					osd_spi_write_byte(row * 24 + col);
 				}
 				osd_spi_write_byte(0xFF);
 				didDisplay = 1;
@@ -123,20 +123,24 @@ int main(void)
 
 // Unused callbacks
 void udb_background_callback_triggered(void) {}
-void udb_gps_callback_received_byte( uint8_t rxchar ) {}
-int16_t udb_gps_callback_get_byte_to_send( void ) { return 0; }
-void udb_serial_callback_received_byte( uint8_t rxchar ) {}
-int16_t udb_serial_callback_get_byte_to_send( void ) { return 0; }
-void udb_magnetometer_callback_data_available( void ) {}
+void udb_gps_callback_received_byte(uint8_t rxchar) {}
+int16_t udb_gps_callback_get_byte_to_send(void) { return 0; }
+void udb_serial_callback_received_byte(uint8_t rxchar) {}
+int16_t udb_serial_callback_get_byte_to_send(void) { return 0; }
+void udb_magnetometer_callback_data_available(void) {}
 void udb_callback_read_sensors(void) {}
-void udb_callback_radio_did_turn_off( void ) {}
+void udb_callback_radio_did_turn_off(void) {}
 
 
-void init_analogs(void) {}void init_events(void) {}void udb_init_capture(void) {}void MPU6000_init16(void) {}
+void init_analogs(void) {}
+void init_events(void) {}
+void udb_init_capture(void) {}
+void MPU6000_init16(void) {}
 
 int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
-int16_t vref_adj;
+int16_t vref_adj;
+
 void init_gps(void) {}
 void udb_init_ADC(void) {}
 void calculate_analog_sensor_values(void) {}
@@ -148,8 +152,10 @@ struct ADchannel udb_xrate;
 struct ADchannel udb_yrate;
 struct ADchannel udb_zrate;
 
-void start_pwm_outputs(void) {}void udb_init_pwm(void) {}
+void start_pwm_outputs(void) {}
+void udb_init_pwm(void) {}
 
 void udb_init_GPS(void) {}
-void udb_init_USART(void) {}void udb_eeprom_init(void) {}
+void udb_init_USART(void) {}
+void udb_eeprom_init(void) {}
 

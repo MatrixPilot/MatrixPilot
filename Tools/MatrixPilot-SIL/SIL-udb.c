@@ -75,7 +75,7 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 #include "magnetometerOptions.h"
 #include "events.h"
 #include "SIL-udb.h"
-#include "UDBSocket.h"
+//#include "UDBSocket.h"
 #include "SIL-ui.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
@@ -127,6 +127,20 @@ void sleep_milliseconds(uint16_t ms);
 
 #define UDB_HW_RESET_ARG "-r=EXTR"
 
+// Functions only included with nv memory.
+#if (USE_NV_MEMORY == 1)
+UDB_SKIP_FLAGS udb_skip_flags = {0, 0, 0};
+
+void udb_skip_radio_trim(boolean b)
+{
+	udb_skip_flags.skip_radio_trim = 1;
+}
+
+void udb_skip_imu_calibration(boolean b)
+{
+	udb_skip_flags.skip_imu_cal = 1;
+}
+#endif
 
 void udb_init(void)
 {
@@ -155,8 +169,9 @@ void udb_init(void)
 	}
 }
 
-#define UDB_STEP_TIME 25
 #define UDB_WRAP_TIME 1000
+#define UDB_STEP_TIME 25
+//#define UDB_STEP_TIME (UDB_WRAP_TIME/HEARTBEAT_HZ)
 
 int initialised = 0;
 
@@ -192,7 +207,10 @@ void udb_run(void)
 
 			sil_ui_update();
 
-			if (udb_heartbeat_counter % 80 == 0) writeEEPROMFileIfNeeded(); // Run at 0.5Hz
+			if (udb_heartbeat_counter % 80 == 0) {
+//			if (udb_heartbeat_counter % (2 * HEARTRATE_HZ) == 0) {
+				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
+			}
 			
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;

@@ -25,26 +25,21 @@
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
 
-//	routines to drive the PWM pins for the servos,
-//	assumes the use of the 16MHz crystal.
-
 int16_t pitch_control, roll_control, yaw_control, throttle_control;
 uint16_t wind_gain;
 
-
 void manualPassthrough(void);
-
 
 void init_servoPrepare(void) // initialize the PWM
 {
 	int16_t i;
 
 #if (USE_NV_MEMORY == 1)
-	if(udb_skip_flags.skip_radio_trim == 1)
+	if (udb_skip_flags.skip_radio_trim == 1)
 		return;
 #endif
 
-	for (i=0; i <= NUM_INPUTS; i++)
+	for (i = 0; i <= NUM_INPUTS; i++)
 	{
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
@@ -53,7 +48,7 @@ void init_servoPrepare(void) // initialize the PWM
 #endif
 	}
 
-	for (i=0; i <= NUM_OUTPUTS; i++)
+	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);

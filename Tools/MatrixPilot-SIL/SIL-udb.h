@@ -10,7 +10,7 @@
 #define MatrixPilot_SIL_dsp_compat_h
 
 #include "SIL-dsp.h"
-#include "UDBSocket.h"
+#include "../HILSIM_XPlane/UDBSocket.h"
 
 
 // Fake ASM calls
@@ -38,21 +38,20 @@ static inline int16_t  __builtin_divsd(const int32_t num,  const int16_t den)  {
 //int __builtin_divsd(const long num, const int den);
 #endif
 
-
 // LEDs
 extern uint8_t leds[4];
-#define LED_RED				leds[0]
-#define LED_GREEN			leds[1]
-#define LED_ORANGE			leds[2]
-#define LED_BLUE			leds[3]
+#define LED_RED         leds[0]
+#define LED_GREEN       leds[1]
+#define LED_ORANGE      leds[2]
+#define LED_BLUE        leds[3]
 
 // There are no hardware toggle switches on the UDB4, so use values of 0
-#define HW_SWITCH_1			0
-#define HW_SWITCH_2			0
-#define HW_SWITCH_3			0
+#define HW_SWITCH_1     0
+#define HW_SWITCH_2     0
+#define HW_SWITCH_3     0
 
-#define MAX_INPUTS			8
-#define MAX_OUTPUTS			8
+#define MAX_INPUTS      8
+#define MAX_OUTPUTS     8
 
 
 extern UDBSocket gpsSocket;
@@ -60,15 +59,15 @@ extern UDBSocket telemetrySocket;
 extern UDBSocket serialSocket;
 extern uint8_t sil_radio_on;
 
-extern volatile uint16_t trap_flags ;
-extern volatile uint32_t trap_source ;
-extern volatile uint16_t osc_fail_count ;
+extern volatile uint16_t trap_flags;
+extern volatile uint32_t trap_source;
+extern volatile uint16_t osc_fail_count;
 
 void udb_magnetometer_callback(void);
-uint16_t get_reset_flags(void) ;
+uint16_t get_reset_flags(void);
 void sil_reset(void);
 
-uint16_t get_current_milliseconds();
+uint16_t get_current_milliseconds(void);
 void sleep_milliseconds(uint16_t ms);
 
 
