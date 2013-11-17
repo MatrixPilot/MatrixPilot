@@ -16,7 +16,7 @@ MP_OBJECTS = \
 ../../MatrixPilot/MAVParams.o \
 ../../MatrixPilot/MAVMission.o \
 ../../MatrixPilot/MAVFlexiFunctions.o \
-../../MatrixPilot/MAVUDB.o \
+../../MatrixPilot/MAVUDBExtra.o \
 ../../MatrixPilot/mode_switch.o \
 ../../MatrixPilot/mp_osd.o \
 ../../MatrixPilot/navigate.o \

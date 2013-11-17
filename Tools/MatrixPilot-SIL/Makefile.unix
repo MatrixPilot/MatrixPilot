@@ -47,6 +47,10 @@ SIL-events.o \
 ../../MatrixPilot/flightplan-waypoints.o \
 ../../MatrixPilot/main.o \
 ../../MatrixPilot/MAVLink.o \
+../../MatrixPilot/MAVParams.o \
+../../MatrixPilot/MAVMission.o \
+../../MatrixPilot/MAVFlexiFunctions.o \
+../../MatrixPilot/MAVUDBExtra.o \
 ../../MatrixPilot/mode_switch.o \
 ../../MatrixPilot/mp_osd.o \
 ../../MatrixPilot/navigate.o \

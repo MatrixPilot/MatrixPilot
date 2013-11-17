@@ -62,6 +62,11 @@
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../config.h</itemPath>
+        <itemPath>../MAVFlexiFunctions.h</itemPath>
+        <itemPath>../MAVMission.h</itemPath>
+        <itemPath>../MAVParams.h</itemPath>
+        <itemPath>../MAVLink.h</itemPath>
+        <itemPath>../MAVUDBExtra.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -290,6 +295,10 @@
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
         <itemPath>../config.c</itemPath>
+        <itemPath>../MAVFlexiFunctions.c</itemPath>
+        <itemPath>../MAVMission.c</itemPath>
+        <itemPath>../MAVParams.c</itemPath>
+        <itemPath>../MAVUDBExtra.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

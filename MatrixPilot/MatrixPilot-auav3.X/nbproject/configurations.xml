@@ -76,6 +76,11 @@
         <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
+        <itemPath>../MAVFlexiFunctions.h</itemPath>
+        <itemPath>../MAVMission.h</itemPath>
+        <itemPath>../MAVParams.h</itemPath>
+        <itemPath>../MAVLink.h</itemPath>
+        <itemPath>../MAVUDBExtra.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -335,6 +340,10 @@
         <itemPath>../console.c</itemPath>
         <itemPath>../redef.c</itemPath>
         <itemPath>../flight_state.c</itemPath>
+        <itemPath>../MAVFlexiFunctions.c</itemPath>
+        <itemPath>../MAVMission.c</itemPath>
+        <itemPath>../MAVParams.c</itemPath>
+        <itemPath>../MAVUDBExtra.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>

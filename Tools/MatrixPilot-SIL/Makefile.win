@@ -11,7 +11,10 @@ OBJECTS_DIR = ./
 
 MPSIL_TARGET  = matrixpilot.exe
 
-MP_HEADERS = ../../MatrixPilot/options.h ../../MatrixPilot/waypoints.h ../../MatrixPilot/flightplan-logo.h
+MP_HEADERS = \
+../../MatrixPilot/options.h \
+../../MatrixPilot/waypoints.h \
+../../MatrixPilot/flightplan-logo.h
 
 MPSIL_OBJECTS = \
 SIL-udb.o \
@@ -48,6 +51,10 @@ SIL-events.o \
 ../../MatrixPilot/flightplan-waypoints.o \
 ../../MatrixPilot/main.o \
 ../../MatrixPilot/MAVLink.o \
+../../MatrixPilot/MAVParams.o \
+../../MatrixPilot/MAVMission.o \
+../../MatrixPilot/MAVFlexiFunctions.o \
+../../MatrixPilot/MAVUDBExtra.o \
 ../../MatrixPilot/mode_switch.o \
 ../../MatrixPilot/mp_osd.o \
 ../../MatrixPilot/navigate.o \
@@ -74,6 +81,10 @@ first: all
 
 all: $(MPSIL_TARGET) $(MPCAT_TARGET)
 
+sil: $(MPSIL_TARGET)
+
+cat: $(MPCAT_TARGET)
+
 $(MPSIL_TARGET): $(MPSIL_OBJECTS)
 	$(CC) -o $(MPSIL_TARGET) $(LFLAGS) $(MPSIL_OBJECTS) $(LIBS)
 
@@ -83,5 +94,3 @@ $(MPCAT_TARGET): $(MPCAT_OBJECTS)
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
 	-$(RM_FILE) *~ core *.core
-
-

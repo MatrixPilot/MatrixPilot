@@ -94,10 +94,10 @@ const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
 #define _SELECTED_VALUE(l, v) #l#v
 #define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro, macro)
-#pragma warning (SELECTED_VALUE(ADCLK_DIV_N_MINUS_1))
-#pragma warning (SELECTED_VALUE(ADC_CLK))
-#pragma warning (SELECTED_VALUE(ADC_RATE))
-#pragma warning (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))
+#warning (SELECTED_VALUE(ADCLK_DIV_N_MINUS_1))
+#warning (SELECTED_VALUE(ADC_CLK))
+#warning (SELECTED_VALUE(ADC_RATE))
+#warning (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))
 #endif // 0/1
 
 int16_t vref_adj;
