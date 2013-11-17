@@ -35,6 +35,18 @@ uint8_t *gps_out_buffer = 0;
 int16_t gps_out_buffer_length = 0;
 int16_t gps_out_index = 0;
  */
+extern union longbbbb tow;
+extern union intbb sog_gps, climb_gps, week_no;
+extern union uintbb cog_gps;
+extern union intbb as_sim;
+//extern union longbbbb as_sim_;
+extern uint8_t hdop;
+extern union longbbbb xpg, ypg, zpg;
+extern union intbb xvg, yvg, zvg;
+//extern uint8_t mode1, mode2;
+extern uint8_t svs;
+extern int16_t cos_lat;
+
 
 // the following variables are shared internally between the various GPS parsing modules only
 //

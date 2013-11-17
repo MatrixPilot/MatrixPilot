@@ -37,7 +37,7 @@
 
 //Sensor variables
 uint16_t mpu_data[8], mpuCnt = 0;
-bool mpuDAV = false;
+boolean mpuDAV = false;
 
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
 struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
@@ -120,7 +120,7 @@ void MPU6000_init16(void)
 
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
-//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 16384
+//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scale 2g, g = 16384
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
 //	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
 #endif

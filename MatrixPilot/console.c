@@ -320,12 +320,6 @@ void command(char* cmdstr)
 	}
 }
 
-void init_console(void)
-{
-	__C30_UART = CONSOLE_UART;
-	Init();
-}
-
 void console(void)
 {
 	if (kbhit()) {

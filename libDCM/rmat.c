@@ -215,7 +215,7 @@ void read_accel(void)
 {
 #if (HILSIM == 1)
 	gplane[0] = g_a_x_sim.BB;
-	gplane[1] = g_a_y_sim.BB; 
+	gplane[1] = g_a_y_sim.BB;
 	gplane[2] = g_a_z_sim.BB;
 #else
 	gplane[0] = XACCEL_VALUE;
@@ -230,8 +230,11 @@ void read_accel(void)
 	}
 #endif
 
-	accelEarth[0] =   VectorDotProduct(3, &rmat[0], gplane) << 1;
-	accelEarth[1] = - VectorDotProduct(3, &rmat[3], gplane) << 1;
+	// transform gplane from body frame to earth frame
+	// x component in earth frame is earth x unit vector (rmat[0,1,2]) dotted with gplane
+	//FIXME: But why are the y and z components negated?
+	accelEarth[0] =  VectorDotProduct(3, &rmat[0], gplane) << 1;
+	accelEarth[1] = -VectorDotProduct(3, &rmat[3], gplane) << 1;
 	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane) << 1);
 
 //	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5;
@@ -541,6 +544,10 @@ static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_v
 #define MAG_LATENCY 0.085 // seconds
 #define MAG_LATENCY_COUNT ((int16_t)(HEARTBEAT_HZ * MAG_LATENCY))
 
+// Since mag_drift is called every heartbeat the first assignment to rmatDelayCompensated
+// will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
+// Since rxMagnetometer is called  at multiples of .25 seconds, this initial
+// delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
 static int16_t mag_latency_counter = 10 - MAG_LATENCY_COUNT;
 
 static void mag_drift(void)

@@ -29,15 +29,19 @@
 // 
 //
 
-#include "../libUDB/libUDB.h"
+//#include "../libUDB/libUDB.h"
+#include "../libUDB/libUDB_internal.h"
 
 #if (USE_NV_MEMORY == 1)
-
 
 #include "data_services.h"
 #include "../libUDB/events.h"
 #include "parameter_table.h"
 #include <string.h>
+
+#if (SILSIM == 1)
+int _SWR = 0;
+#endif
 
 // Data buffer used for services
 uint8_t data_services_buffer[DATA_SERVICE_BUFFER_SIZE];

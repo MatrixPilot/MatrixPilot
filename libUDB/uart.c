@@ -144,6 +144,12 @@ _GetChar(CONSOLE_UART);
 _PutChar(CONSOLE_UART);
 _ClrError(CONSOLE_UART);
 
+void init_uart(void)
+{
+	__C30_UART = CONSOLE_UART;
+	Init();
+}
+
 /*******************************************************************************
 Function: GetBaudError()
 
@@ -392,6 +398,12 @@ char Hex2Char(char hex)
 		return (h + 55);
 	else
 		return (h + 48);
+}
+
+#else
+
+void init_uart(void)
+{
 }
 
 #endif // CONSOLE_UART

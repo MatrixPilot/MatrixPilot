@@ -22,11 +22,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
-
-#if (CONSOLE_UART != 0)
-#include "console.h"
 #include <stdio.h>
-#endif // CONSOLE_UART
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
@@ -393,17 +389,16 @@ void mcu_init(void)
 
 	configureDigitalIO();
 	init_leds();
-
 #if (CONSOLE_UART != 0)
-	init_console();
-	printf("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
+	init_uart();
+	DPRINT("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if (_SWR == 1)
 	{
-		printf("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
-			trap_flags, 
-			(unsigned int)(trap_source >> 16), 
-			(unsigned int)(trap_source & 0xffff), 
-			osc_fail_count);
+		DPRINT("S/W Reset: trap_flags %04x, trap_source %04x%04x, osc_fail_count %u\r\n", 
+		    trap_flags, 
+		    (unsigned int)(trap_source >> 16), 
+		    (unsigned int)(trap_source & 0xffff), 
+		    osc_fail_count);
 	}
 #endif // CONSOLE_UART
 }

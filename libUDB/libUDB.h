@@ -73,7 +73,12 @@
 #endif // BOARD_TYPE
 
 #ifdef USE_DEBUG_IO
+#ifdef USE_MAVLINK_IO
+void mav_printf(const char * format, ...);
+#define DPRINT mav_printf
+#else
 #define DPRINT printf
+#endif // USE_MAVLINK_IO
 #else
 #define DPRINT(args...)
 #endif // USE_DEBUG_IO
@@ -119,7 +124,7 @@ void udb_init(void);
 // Your code should respond to the Callbacks below.
 void udb_run(void);
 
-int setjmp(void);
+//int setjmp(void);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks

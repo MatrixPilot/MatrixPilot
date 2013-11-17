@@ -176,13 +176,13 @@ void set_udb_pwIn(int pwm, int index)
 #else
 	if (FAILSAFE_INPUT_CHANNEL == index)
 	{
-		//printf("FS: %u %u %u\r\n", pwm, failSafePulses, noisePulses);
+		//DPRINT("FS: %u %u %u\r\n", pwm, failSafePulses, noisePulses);
 		#ifdef DEBUG_FAILSAFE_MIN_MAX
 		{
 			static uint8_t foo = 0;
 			if (!(++foo % 32)) 
 			{
-				printf("FS: %u\r\n", pwm);
+				DPRINT("FS: %u\r\n", pwm);
 			}
 		}
 		#endif // DEBUG_FAILSAFE_MIN_MAX

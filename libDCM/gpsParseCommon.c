@@ -313,7 +313,7 @@ static uint8_t day_of_week;
 
 int16_t calculate_week_num(int32_t date)
 {
-//	printf("date %li\r\n", date);
+//	DPRINT("date %li\r\n", date);
 
 	// Convert date from DDMMYY to week_num and day_of_week
 	uint8_t year = date % 100;
@@ -351,7 +351,7 @@ int16_t calculate_week_num(int32_t date)
 
 int32_t calculate_time_of_week(int32_t time)
 {
-//	printf("time %li\r\n", time);
+//	DPRINT("time %li\r\n", time);
 
 	// Convert time from HHMMSSmil to time_of_week in ms
 	int16_t ms = time % 1000;

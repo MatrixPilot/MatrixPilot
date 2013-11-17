@@ -40,20 +40,20 @@ extern fractional dirovergndHRmat[];
 extern fractional dirovergndHGPS[];
 extern fractional locationErrorEarth[3];
 
-#if (MAG_YAW_DRIFT == 1)
-extern fractional magFieldEarth[3];
-#endif
+//#if (MAG_YAW_DRIFT == 1)
+//extern fractional magFieldEarth[3];
+//#endif
 
-extern union longbbbb tow;
-extern union intbb sog_gps, climb_gps, week_no;
-extern union uintbb cog_gps;
-extern union intbb as_sim;
-//extern union longbbbb as_sim_;
-extern uint8_t hdop;
-extern union longbbbb xpg, ypg, zpg;
-extern union intbb xvg, yvg, zvg;
-//extern uint8_t mode1, mode2;
-extern uint8_t svs;
+//extern union longbbbb tow;
+//extern union intbb sog_gps, climb_gps, week_no;
+//extern union uintbb cog_gps;
+//extern union intbb as_sim;
+////extern union longbbbb as_sim_;
+//extern uint8_t hdop;
+//extern union longbbbb xpg, ypg, zpg;
+//extern union intbb xvg, yvg, zvg;
+////extern uint8_t mode1, mode2;
+//extern uint8_t svs;
 
 extern int16_t forward_acceleration;
 extern uint16_t air_speed_3DGPS;

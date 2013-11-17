@@ -35,8 +35,6 @@
 #define _EVENTM_TRIGGERIE _C1IE
 #define _EVENTM_INTERUPT  _C1Interrupt
 
-#define MAX_EVENTS 16
-
 EVENT events[MAX_EVENTS];
 boolean event_init_done = false;
 

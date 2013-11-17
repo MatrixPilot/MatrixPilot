@@ -348,13 +348,13 @@ void serial_output(char* format, ...)
 //	static int maxlen = 0;
 //	if (len > maxlen) {
 //		maxlen = len;
-//		printf("maxlen %u\r\n", maxlen);
+//		DPRINT("maxlen %u\r\n", maxlen);
 //	}
 
 	int16_t start_index = end_index;
 	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index);
 	if (remaining < len) {
-		printf("SERBUF discarding %u bytes\r\n", len - remaining);
+		DPRINT("SERBUF discarding %u bytes\r\n", len - remaining);
 	}
 	if (remaining > 1)
 	{
