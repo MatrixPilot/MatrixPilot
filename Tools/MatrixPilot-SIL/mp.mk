@@ -1,0 +1,31 @@
+MP_OBJECTS = \
+../../MatrixPilot/airspeedCntrl.o \
+../../MatrixPilot/altitudeCntrl.o \
+../../MatrixPilot/altitudeCntrlVariable.o \
+../../MatrixPilot/behavior.o \
+../../MatrixPilot/cameraCntrl.o \
+../../MatrixPilot/config.o \
+../../MatrixPilot/config_tests.o \
+../../MatrixPilot/data_services.o \
+../../MatrixPilot/data_storage.o \
+../../MatrixPilot/euler_angles.o \
+../../MatrixPilot/flightplan-logo.o \
+../../MatrixPilot/flightplan-waypoints.o \
+../../MatrixPilot/main.o \
+../../MatrixPilot/MAVLink.o \
+../../MatrixPilot/MAVParams.o \
+../../MatrixPilot/MAVMission.o \
+../../MatrixPilot/MAVFlexiFunctions.o \
+../../MatrixPilot/MAVUDB.o \
+../../MatrixPilot/mode_switch.o \
+../../MatrixPilot/mp_osd.o \
+../../MatrixPilot/navigate.o \
+../../MatrixPilot/nv_memory_table.o \
+../../MatrixPilot/parameter_table.o \
+../../MatrixPilot/pitchCntrl.o \
+../../MatrixPilot/rollCntrl.o \
+../../MatrixPilot/servoMix.o \
+../../MatrixPilot/servoPrepare.o \
+../../MatrixPilot/states.o \
+../../MatrixPilot/telemetry.o \
+../../MatrixPilot/yawCntrl.o
