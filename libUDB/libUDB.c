@@ -73,13 +73,13 @@ void udb_init(void)
 {
 	udb_flags.B = 0;
 
+	init_events();
+        timer_init();
+        sys_tick_init();
+
 	init_analogs();
 
 	udb_init_ADC();
-	init_events();
-
-        timer_init();
-        sys_tick_init();
 
 #if (USE_I2C1_DRIVER == 1)
 	I2C1_Init();

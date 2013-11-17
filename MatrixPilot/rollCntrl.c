@@ -41,6 +41,8 @@ PARAM_DEFINE_Q14(PID_ROLLKD,    &rollkd,    0, 0.5, false);
 PARAM_DEFINE_Q14(PID_HROLLKP,    &hoverrollkp, 0, 0.5, false);
 PARAM_DEFINE_Q14(PID_HROLLKD,    &hoverrollkd, 0, 0.5, false);
 
+
+
 void normalRollCntrl(void);
 void hoverRollCntrl(void);
 

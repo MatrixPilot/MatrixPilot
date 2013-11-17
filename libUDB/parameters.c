@@ -5,13 +5,16 @@
  * Array of static parameter info.
  */
 
-unsigned int zip_bag = 999;
+int16_t zip_bag = 999;
 fractional bluff = 12345;
+//int16_t misc_storage_flags = 665;
 
 PARAM_DEFINE_START();
 PARAM_DEFINE_END();
 
 PARAM_SECTION(MISC, 0, NULL);
+
+//PARAM_DEFINE_INT(PARAM_SF_NAME, &misc_storage_flags, 0, 32767, false);
 
 PARAM_DEFINE_INT(MISC_ZIP_BAG, &zip_bag, 0, RMAX, false);
 PARAM_DEFINE_Q14(MISC_BLUFF, &bluff, -1.0, 1.0, false);

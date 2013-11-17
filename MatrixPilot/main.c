@@ -51,10 +51,10 @@ int main(void)
 {
 	mcu_init();
 #endif
-#if (USE_TELELOG == 1)
-	log_init();
+
+#if (BOARD_TYPE == AUAV3_BOARD)
+	log_init();             // Start flash services
 #endif
-	log_init();
 
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()

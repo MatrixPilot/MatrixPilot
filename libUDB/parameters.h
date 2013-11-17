@@ -99,8 +99,8 @@ typedef enum
 	__attribute__((used, section("__param")))	\
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
-		(uint8_t*) _pvar,					\
-		UDB_PARAM_INT,                           \
+		(uint8_t*) _pvar,                       \
+		UDB_PARAM_INT,                          \
 		.min.param_int32 = _min,                \
 		.max.param_int32 = _max,           	\
                 _readOnly                               \
@@ -213,16 +213,47 @@ struct param_section_s {
 		NULL,					\
 	}
 
+//#define STR_EXPAND(tok) blah##tok_STORAGE_FLAGS
+//#define STR_EXP(tok) STR_EXPAND(tok)
+
+#define PARAM_SF_NAME_STR(_sectname) #_sectname "_S_FLAGS"
+#define PARAM_EN_NAME_STR(_sectname) #_sectname "_PARAM_EN"
+
+#define PARAM_SF_NAME(_sectname) _sectname##_S_FLAGS
+#define PARAM_EN_NAME(_sectname) _sectname##_PARAM_EN
+
+
 
 /** define a parameter that is the start of the list */
-#define PARAM_SECTION(_name, _flags, _callback)         \
-	static const					\
-	__attribute__((used, section("__section")))	\
-	struct param_section_s __section__##name = {    \
-		#_name,					\
-		_flags,					\
-		_callback,				\
-	}
+#define PARAM_SECTION(_name, _flags, _callback)             \
+	static const                                        \
+	__attribute__((used, section("__section")))         \
+	struct param_section_s __section__##name = {        \
+		#_name,                                     \
+		_flags,                                     \
+		_callback,                                  \
+	};                                                  \
+        int16_t storageFlags_##_name = _flags;              \
+        int16_t parametersEnabled_##_name = 1;              \
+                                                            \
+	static const                                        \
+	__attribute__((used, section("__param")))           \
+	struct param_info_s __param__##_name_S_FLAGS = {    \
+		#_name "_S_FLAGS",                        \
+		(uint8_t*) &storageFlags_##_name,           \
+		UDB_PARAM_INT,                              \
+		.min.param_int32 = 0,                       \
+		.max.param_int32 = 32767,                   \
+                false                                       \
+        }
+
+
+
+
+//PARAM_DEFINE_INT( #_name#_PARAM_EN, &parametersEnabled_##_name, 0, 1, false)
+//        #undef SECT_FLAGS_NAME                              \
+//       #define SECT_FLAGS_NAME PARAM_SECTION_SF_NAME(_name)    \
+
 
 // Find the handle/index for a parameter with the given name
 extern uint16_t get_param_handle(char* name);
