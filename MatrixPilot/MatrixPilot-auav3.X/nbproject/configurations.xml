@@ -68,10 +68,6 @@
         <itemPath>../waypoints.h</itemPath>
         <itemPath>../gain_variables.h</itemPath>
         <itemPath>../osd_layout.h</itemPath>
-        <itemPath>../data_services.h</itemPath>
-        <itemPath>../data_storage.h</itemPath>
-        <itemPath>../parameter_datatypes.h</itemPath>
-        <itemPath>../parameter_table.h</itemPath>
         <itemPath>../mode_switch.h</itemPath>
         <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
@@ -338,12 +334,9 @@
         <itemPath>../flightplan-logo.c</itemPath>
         <itemPath>../mp_osd.c</itemPath>
         <itemPath>../altitudeCntrl.c</itemPath>
-        <itemPath>../MAVLink.c</itemPath>
         <itemPath>../mode_switch.c</itemPath>
         <itemPath>../data_services.c</itemPath>
         <itemPath>../data_storage.c</itemPath>
-        <itemPath>../nv_memory_table.c</itemPath>
-        <itemPath>../parameter_table.c</itemPath>
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
@@ -358,6 +351,7 @@
         <itemPath>../flight_state.c</itemPath>
         <itemPath>../parameter_storage.c</itemPath>
         <itemPath>../parameter_scaling.c</itemPath>
+        <itemPath>../MAVLink_param.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>

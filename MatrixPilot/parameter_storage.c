@@ -44,12 +44,13 @@ void init_parameter_storage(void)
 
 static void parstore_initS(void)
 {
-    parstoreS = &parstore_start_savingS;
+    parstoreS = &parstore_waitingS;
     timer_start(parstore_timer_handle, 1000, false, parstore_event_handle);
 }
 
 static void parstore_waitingS(void)
 {
+    timer_start(parstore_timer_handle, 1000, false, parstore_event_handle);
 }
 
 static void parstore_start_loadingS(void)

@@ -38,6 +38,11 @@ uint16_t get_param_count(void)
     return (&__param__the_end - &__param__the_start) - 1;
 };
 
+uint16_t get_active_param_count(boolean telemetry)
+{
+    return (&__param__the_end - &__param__the_start) - 1;
+};
+
 uint16_t get_section_count(void)
 {
 //    return (uint16_t) param_section_count;
@@ -62,6 +67,7 @@ uint16_t get_param_handle(char* name)
 
 const struct param_info_s* get_param(uint16_t handle)
 {
+    if(handle > (&__param__the_end - &__param__the_start) ) return NULL;
     return &param_info_base[handle];
 }
 

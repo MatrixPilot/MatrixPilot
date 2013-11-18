@@ -38,7 +38,7 @@ typedef union
 
 typedef enum
     {
-    UDB_PARAM_INT,
+    UDB_PARAM_INT16,
     UDB_PARAM_Q14,
     UDB_PARAM_PWTRIM,
     UDB_PARAM_GYROSCALE_Q14,
@@ -51,6 +51,15 @@ typedef enum
     } udb_parameter_types_e;
 
 
+    typedef enum
+    {
+        PARAM_ENABLE_NONE = 0,
+        PARAM_ENABLE_GLOBAL = 1,
+        PARAM_ENABLE_MAVLINK = 2,
+        PARAM_ENABLE_STORAGE = 4,
+    } param_enable_flags_e;
+
+#define PARAM_ENABLE_ALL (PARAM_ENABLE_GLOBAL | PARAM_ENABLE_MAVLINK | PARAM_ENABLE_STORAGE)
 
 ///**
 // * Parameter types.
@@ -100,7 +109,7 @@ typedef enum
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
 		(uint8_t*) _pvar,                       \
-		UDB_PARAM_INT,                          \
+		UDB_PARAM_INT16,                        \
 		.min.param_int32 = _min,                \
 		.max.param_int32 = _max,           	\
                 _readOnly                               \
@@ -112,7 +121,7 @@ typedef enum
 	__attribute__((used, section("__param")))	\
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
-		(uint8_t*) _pvar,					\
+		(uint8_t*) _pvar,			\
 		UDB_PARAM_Q14,                     	\
 		.min.param_float = _min,                \
 		.max.param_float = _max,           	\
@@ -216,12 +225,8 @@ struct param_section_s {
 //#define STR_EXPAND(tok) blah##tok_STORAGE_FLAGS
 //#define STR_EXP(tok) STR_EXPAND(tok)
 
-#define PARAM_SF_NAME_STR(_sectname) #_sectname "_S_FLAGS"
-#define PARAM_EN_NAME_STR(_sectname) #_sectname "_PARAM_EN"
-
-#define PARAM_SF_NAME(_sectname) _sectname##_S_FLAGS
-#define PARAM_EN_NAME(_sectname) _sectname##_PARAM_EN
-
+//#define PARAM_SF_NAME_STR(_sectname) #_sectname "_S_FLAGS"
+//#define PARAM_EN_NAME_STR(_sectname) #_sectname "_PARAM_EN"
 
 
 /** define a parameter that is the start of the list */
@@ -233,15 +238,27 @@ struct param_section_s {
 		_flags,                                     \
 		_callback,                                  \
 	};                                                  \
+                                                            \
         int16_t storageFlags_##_name = _flags;              \
-        int16_t parametersEnabled_##_name = 1;              \
+        int16_t enableFlags_##_name = PARAM_ENABLE_ALL;     \
                                                             \
 	static const                                        \
 	__attribute__((used, section("__param")))           \
 	struct param_info_s __param__##_name_S_FLAGS = {    \
-		#_name "_S_FLAGS",                        \
-		(uint8_t*) &storageFlags_##_name,           \
-		UDB_PARAM_INT,                              \
+		#_name "_S_FLAGS",                          \
+		(int16_t*) &storageFlags_##_name,           \
+		UDB_PARAM_INT16,                              \
+		.min.param_int32 = 0,                       \
+		.max.param_int32 = 32767,                   \
+                false                                       \
+        };                                                  \
+                                                            \
+	static const                                        \
+	__attribute__((used, section("__param")))           \
+	struct param_info_s __param__##_name_EN_FLAGS = {   \
+		#_name "_EN_FLAGS",                         \
+		(int16_t*) &enableFlags_##_name,            \
+		UDB_PARAM_INT16,                              \
 		.min.param_int32 = 0,                       \
 		.max.param_int32 = 32767,                   \
                 false                                       \
@@ -263,6 +280,8 @@ extern const struct param_info_s* get_param(uint16_t handle);
 
 // Get a total count of declared parameters
 extern  uint16_t get_param_count(void);
+
+extern uint16_t get_active_param_count(boolean telemetry);
 
 extern parameter_union_t get_param_val(uint16_t handle);
 extern uint16_t get_param_udb_type(uint16_t handle);
