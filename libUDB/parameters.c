@@ -1,5 +1,6 @@
 #include "../libUDB/libUDB.h"
-//#include "../MatrixPilot/parameter_table.h"
+#include "parameters.h"
+#include "../MatrixPilot/parameter_table.h"
 
 /**
  * Array of static parameter info.
@@ -52,13 +53,15 @@ uint16_t get_section_count(void)
 uint16_t get_param_handle(char* name)
 {
     int index;
+    char buff[32];
 
     struct param_info_s* pparam;
 
-    for(index = 0; index < param_info_count; index++)
+    for(index = 0; index < ((&__param__the_end - &__param__the_start) - 1 ); index++)
     {
         pparam = &param_info_base[index];
-        if(strcmp(pparam->name, name) == 0)
+        strcpy(buff, pparam->name);
+        if(strcmp(buff, name) == 0)
             return index;
     }
 
