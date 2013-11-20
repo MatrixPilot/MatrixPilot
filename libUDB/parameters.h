@@ -285,7 +285,6 @@ extern uint16_t get_active_param_count(boolean telemetry);
 
 extern parameter_union_t get_param_val(uint16_t handle);
 extern uint16_t get_param_udb_type(uint16_t handle);
-extern uint16_t get_param_mavlink_type(uint16_t handle);
 
 // Get a handle for the section with given name
 extern uint16_t get_section_handle(char* name);
@@ -296,7 +295,7 @@ extern const struct param_section_s* get_section(uint16_t handle);
 // Return a count of the number of delcared sections
 extern uint16_t get_section_count(void);
 
-
+extern uint16_t get_section_params_count(uint16_t handle);
 
 
 #ifdef	__cplusplus

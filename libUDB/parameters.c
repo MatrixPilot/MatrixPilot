@@ -76,11 +76,34 @@ const struct param_info_s* get_param(uint16_t handle)
 
 parameter_union_t get_param_val(uint16_t handle);
 uint16_t get_param_udb_type(uint16_t handle);
-uint16_t get_param_mavlink_type(uint16_t handle);
+
+
 
 uint16_t get_section_handle(char* name);
 
 const struct param_section_s* get_section(uint16_t handle)
 {
     return &param_section_base[handle];
+}
+
+// Get the count of parameters contained in a given section
+extern uint16_t get_section_params_count(uint16_t handle)
+{
+    uint16_t    count = 0;
+    struct      param_section_s* psect;
+    struct      param_info_s* pparam;
+    char        buff[17];
+    uint16_t    index;
+
+    psect = &param_info_base[handle];
+
+    for(index = 0; index < ((&__param__the_end - &__param__the_start) - 1 ); index++)
+    {
+        sprintf(buff, "%s_",  psect->name);
+
+       if(strncmp(pparam->name, buff, strlen(buff)) == 0)
+           count++;
+    }
+
+    return count;
 }

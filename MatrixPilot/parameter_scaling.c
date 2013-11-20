@@ -378,3 +378,8 @@ void param_scale_write_frame_anglerate(mavlink_param_union_t setting, const stru
 	*((int16_t*) pparam->pvar) = dec_angle._.W1;
 }
 
+
+uint16_t get_param_mavlink_type(const struct param_info_s* pparam)
+{
+    return parameter_scalers[pparam->type].mavlink_type;
+}

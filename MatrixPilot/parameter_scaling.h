@@ -22,6 +22,8 @@ extern mavlink_param_union_t param_scale_read( const struct param_info_s* pparam
 // Check data range and return false if out of range, true if in range
 extern boolean param_scale_write(mavlink_param_union_t setting, const struct param_info_s* pparam) ;
 
+// Get the mavlink type for the parameter
+extern uint16_t get_param_mavlink_type(const struct param_info_s* pparam);
 
 
 #ifdef	__cplusplus
