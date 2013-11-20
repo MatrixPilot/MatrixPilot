@@ -610,8 +610,8 @@
 						barometer_altitude_agl = get_barometer_altitude_agl();
 						barometer_altitude_asl = get_barometer_altitude_asl();
 						serial_output("t%i,p%i,ga%i,ag%i,as%i:",
-						(int)barometer_temperature, (double)barometer_pressure, (double)barometer_altitude_gnd,
-						(double)barometer_altitude_agl, (double)barometer_altitude_asl );
+						(int)barometer_temperature, (int)barometer_pressure, (int)barometer_altitude_gnd,
+						(int)barometer_altitude_agl, (int)barometer_altitude_asl );
 					#endif
 				/* ***  sonar and barometer feed MODS END ***  */
 			#if (RECORD_FREE_STACK_SPACE == 1)

@@ -98,7 +98,7 @@ void udb_callback_read_sensors(void)
 
 void runI2CSensors(void) // currently called at 40Hz
 {
-	int i_ctr = I2CS_CNTR;
+	int i_ctr = I2CS_CNTR;  // For ease of debugging, counter I2CS_CNTR is defined in options.h
 	// This is a simple counter to run calls at 4hz
 	if ( udb_heartbeat_counter % i_ctr == 0 )  // def 20 for 2hz, 10 for 4hz, 5 for 8hz, 4 for 10hz and 2 for 20hz
 	{

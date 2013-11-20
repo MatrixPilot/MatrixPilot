@@ -163,12 +163,12 @@
 
 // USE_PA_PRESSURE if 0, barometric alt will be base on ASL ground altitude defined below
 // if set to 1, will use hPA and if set to 2, will use METAR's mercury pressure measurement
-#define USE_PA_PRESSURE						1   
+#define USE_PA_PRESSURE						2   
 
 // PA_PRESSURE below is for Ontario, Canada as of 11-16-2012, 1029.6826 hPA from
 // http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query=Mississauga%2C+Canada
-#define PA_PRESSURE							100530  	// hPA [set USE_PA_PRESSURE to 1]
-#define MC_PRESSURE							2965   		// mercury (METAR) [set USE_PA_PRESSURE to 2]
+#define PA_PRESSURE							101120  	// PA [set USE_PA_PRESSURE to 1]
+#define MC_PRESSURE							2986   		// in mercury (METAR [inch Hg]) [set USE_PA_PRESSURE to 2]
 
 // Barometer oversampling [OSS] can be set from 0 thru 3
 //				  [ms]  Ave/cur/uA   [hPA]      [m]
@@ -177,7 +177,7 @@
 //  1	 2		  7.5		5		  0.05		0.4  [standard]
 //  2	 4		 13.5		7		  0.04		0.3  [high resolution]
 //  3	 8		 25.5	   12		  0.03		0.25 [ultra high resolution]
-#define OSS 								0  // tested good, 2-3 best but have tradeoffs, 0 is very iffy
+#define OSS 								3  // tested good, 2-3 best but have tradeoffs, 0 is very iffy
 
 // I2CS_CNTR defines frequency in hz that I2C sensors will run at
 //  20 for 2hz, 10 [def] for 4hz, 5 for 8hz, 4 for 10hz, 2 for 20hz and 1 for 40hz
@@ -194,7 +194,7 @@
 // Otherwise, set to 0 to use GPS and IMU estimated ALTITUDE. 
 // When enabled, sonar altitude will be used to recalibrate altitude in navigation and 
 // deadreckoning within 4 to 22m altitude range, depending on the sensor class used.
-#define SONAR_ALTITUDE 						1
+#define SONAR_ALTITUDE 						2
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -487,9 +487,15 @@
 #define USE_OSD								1
 
 // NUM_ANALOG_INPUTS: Set to 0, 1, or 2
+//  Set higher than 0 only if USE_PPM_INPUT is enabled above.
+// UDB3
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
-//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
+// UDB4
+//   1 enables A15
+//   2 enables A16
+//   3 enables A17
+//   4 enables A18
 #define NUM_ANALOG_INPUTS					2
 
 // Channel numbers for each analog input
@@ -514,9 +520,15 @@
 // to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
-#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_2
-#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_1
-#define ANALOG_RSSI_INPUT_CHANNEL			CHANNEL_UNUSED
+#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_2   // UDB4 pin A15
+#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_1   // UDB4 pin A16
+
+// USE_WIFI Enables a wifi module.  This requires a MRF24WG0MA and MRF24WG0MB www.microchip.com, 
+//  module to be installed. See documentations at TBD wiki for use, installation and wiring 
+//  instructions. This option can only be applied to UDB4 due to its memory requirements.   
+//  When enabled, this uses UDB4 analog pins 17 and 18.  Hence the NUM_ANALOG_INPUTS defined 
+//  above shouldn't exceed 2. 
+#define USE_WIFI							0      // 1 to enable			
 
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%

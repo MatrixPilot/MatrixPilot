@@ -61,11 +61,11 @@ void altimeter_calibrate(void)
 	{
 	float runtime_altitude;
 	#if (USE_PA_PRESSURE == 1)	  						//  option to use current sea level PA pressure
-		const float p0 = (PA_PRESSURE);    				//    as defined in options.h  
+		const float p0 = PA_PRESSURE;    				//    as defined in options.h  
 		runtime_altitude = (float)44330 * (1 - pow(((float) pressure/p0), (1/5.255)));
 		ground_altitude = (float)44330 * (1 - pow(((float) barometer_pressure_gnd/p0), (1/5.255)));
-	#elif (USE_PA_PRESSURE == 2)    					// option to use current sea level use METAR's mercury pressure
-		const float p0 = (MC_PRESSURE/0.0295333727112); // convert mercury to sea level PA pressure
+	#elif (USE_PA_PRESSURE == 2)    					// option to use current sea level use METAR's mercury [inch Hg] pressure
+		const float p0 = (MC_PRESSURE/0.0295333727112); // convert mercury to PA sea level pressure
 		runtime_altitude = (float)44330 * (1 - pow(((float) pressure/p0), (1/5.255)));  // compute actual runtime ASL altitude in meters
 		ground_altitude = (float)44330 * (1 - pow(((float) barometer_pressure_gnd/p0), (1/5.255)));
 	#else  				// else, use user defined GROUND ALT to compute for SL hPA and use product to compute ASL altitude
