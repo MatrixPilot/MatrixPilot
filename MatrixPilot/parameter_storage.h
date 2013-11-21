@@ -33,6 +33,8 @@ typedef enum
     // load parameters from storage
     void load_parameters(uint16_t flags);
 
+    void set_parameter_defaults(void);
+
 
 #ifdef	__cplusplus
 }

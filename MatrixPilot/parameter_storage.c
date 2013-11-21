@@ -283,3 +283,21 @@ void load_parameters(uint16_t flags)
         parstore_status = PARSTORE_REQUEST_LOAD;
     }
 }
+
+// Set all parameters to default value
+void set_parameter_defaults()
+{
+    struct param_info_s*       pparam;
+    mavlink_param_union_t       param;
+
+    const uint16_t maxparms = get_param_count();
+    uint16_t param_index;
+
+    for(param_index = 0; param_index < maxparms; param_index++)
+    {
+        pparam = get_param(param_index);
+        param.type = get_param_mavlink_type(pparam);
+        param.param_float = pparam->default_val.param_float;
+        param_scale_write(param, pparam);
+    }
+}
