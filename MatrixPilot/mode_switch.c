@@ -79,6 +79,7 @@ int16_t flight_mode_switch_waypoints(void)
 // Stabilized is Stabilized unless you try quite hard to reach Autonomous.
 void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 {
+// TODO: potential bug below when the mode switch input channel is exactly equal to MODE_SWITCH_THRESHOLD_LOW - RobD
 #if (MODE_SWITCH_TWO_POSITION == 1)
 	switch (flight_mode_switch_state)
 	{

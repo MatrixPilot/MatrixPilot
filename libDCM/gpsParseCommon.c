@@ -60,6 +60,19 @@ union longbbbb tow_;
 //union intbb nav_valid_, nav_type_, week_no_;
 union intbb hdop_;
 
+int8_t actual_dir;
+uint16_t ground_velocity_magnitudeXY = 0;
+int16_t forward_acceleration = 0;
+uint16_t air_speed_magnitudeXY = 0;
+uint16_t air_speed_3DGPS = 0;
+int8_t calculated_heading;
+
+static int8_t cog_previous = 64;
+static int16_t sog_previous = 0;
+static int16_t climb_rate_previous = 0;
+static int16_t location_previous[] = { 0, 0, 0 };
+static uint16_t velocity_previous = 0;
+
 extern void (*msg_parse)(uint8_t gpschar);
 
 union longbbbb date_gps_, time_gps_;
@@ -140,19 +153,6 @@ void udb_gps_callback_received_byte(uint8_t rxchar)
 	//bin_out(rxchar);      // binary out to the debugging USART
 	(*msg_parse)(rxchar);   // parse the input byte
 }
-
-int8_t actual_dir;
-uint16_t ground_velocity_magnitudeXY = 0;
-int16_t forward_acceleration = 0;
-uint16_t air_speed_magnitudeXY = 0;
-uint16_t air_speed_3DGPS = 0;
-int8_t calculated_heading;
-
-static int8_t cog_previous = 64;
-static int16_t sog_previous = 0;
-static int16_t climb_rate_previous = 0;
-static int16_t location_previous[] = { 0, 0, 0 };
-static uint16_t velocity_previous = 0;
 
 // Received a full set of GPS messages
 void udb_background_callback_triggered(void)

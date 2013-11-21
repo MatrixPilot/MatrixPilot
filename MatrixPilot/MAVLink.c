@@ -55,16 +55,6 @@
 #include "../libDCM/mathlibNAV.h"
 #include "../MatrixPilot/euler_angles.h"
 #include "../libUDB/events.h"
-#if (USE_FLEXIFUNCTION_MIXING == 1)
-#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
-#include "../libflexifunctions/flexifunctionservices.h"
-#else
-#error(" Flexifunctions must be defined in MAVlink to use them")
-#endif // MAVLINK_MSG_ID_FLEXIFUNCTION_SET
-#endif // (USE_FLEXIFUNCTION_MIXING == 1)
-#if (USE_NV_MEMORY == 1)
-#include "data_services.h"
-#endif // (USE_NV_MEMORY == 1)
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
@@ -94,9 +84,6 @@ mavlink_status_t r_mavlink_status;
 		mavlink_tests_pass++; \
 	}
 
-#endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
-
-#if (MAVLINK_TEST_ENCODE_DECODE == 1)
 #include "../MAVLink/include/matrixpilot/testsuite.h"
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
@@ -355,12 +342,12 @@ static void command_ack(uint16_t command, uint16_t result)
 // ArdupilotMega, and are used by his kind permission and also in accordance with the GPS V3 licensing
 // of that code.
 
-static void handleMessage(void)
 // This is the main routine for taking action against a parsed message from the GCS
+static void handleMessage(void)
 {
-//	send_text((uint8_t*) "Handling message ID 0x");
-//	send_uint8(handle_msg->msgid);
-//	send_text((uint8_t*) "\r\n");
+	//send_text((uint8_t*) "Handling message ID 0x");
+	//send_uint8(handle_msg->msgid);
+	//send_text((uint8_t*) "\r\n");
 	mavlink_message_t* handle_msg;
 	if (mavlink_message_index == 0)
 	{
@@ -414,9 +401,9 @@ static void handleMessage(void)
 			mavlink_command_long_t packet;
 			mavlink_msg_command_long_decode(handle_msg, &packet);
 			//if (mavlink_check_target(packet.target, packet.target_component) == false) break;
-//			send_text((uint8_t*) "Command ID 0x");
-//			send_uint8(packet.command);
-//			send_text((uint8_t*) "\r\n");
+			//send_text((uint8_t*) "Command ID 0x");
+			//send_uint8(packet.command);
+			//send_text((uint8_t*) "\r\n");
 			switch (packet.command)
 			{
 			case MAV_CMD_PREFLIGHT_CALIBRATION:
@@ -459,7 +446,6 @@ static void handleMessage(void)
 				else
 					command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
 				break;
-
 			case MAV_CMD_PREFLIGHT_STORAGE_ADVANCED:
 				switch ((uint16_t)packet.param1)
 				{
@@ -502,25 +488,21 @@ static void handleMessage(void)
 					//DPRINT("Action: Launch !\r\n");
 					//set_mode(TAKEOFF);
 					break;
-
 				case MAV_ACTION_RETURN:
 					//send_text((uint8_t*) "Action: Return !\r\n");
 					//DPRINT("Action: Return !\r\n");
 					//set_mode(RTL);
 					break;
-
 				case MAV_ACTION_EMCY_LAND:
 					//send_text((uint8_t*) "Action: Emergency Land !\r\n");
 					//DPRINT("Action: Emergency Land !\r\n");
 					//set_mode(LAND);
 					break;
-
 				case MAV_ACTION_HALT:
 					//send_text((uint8_t*) "Action: Halt !\r\n");
 					//DPRINT("Action: Halt !\r\n");
 					//loiter_at_location();
 					break;
-
 				case MAV_ACTION_MOTORS_START:
 				case MAV_ACTION_CONFIRM_KILL:
 				case MAV_ACTION_EMCY_KILL:
@@ -528,34 +510,27 @@ static void handleMessage(void)
 				case MAV_ACTION_SHUTDOWN:
 					//set_mode(MANUAL);
 					break;
-
 				case MAV_ACTION_CONTINUE:
 					//process_next_command();
 					break;
-
 				case MAV_ACTION_SET_MANUAL:
 					//set_mode(MANUAL);
 					break;
-
 				case MAV_ACTION_SET_AUTO:
 					//set_mode(AUTO);
 					break;
-
 				case MAV_ACTION_STORAGE_READ:
 					//send_text((uint8_t*)"Action: Storage Read\r\n");
 					//DPRINT("Action: Storage Read\r\n");
 					break;
-
 				case MAV_ACTION_STORAGE_WRITE:
 					//send_text((uint8_t*)"Action: Storage Write\r\n");
 					//DPRINT("Action: Storage Write\r\n");
 					break;
-
 				case MAV_ACTION_CALIBRATE_RC:
 					//send_text((uint8_t*)"Action: Calibrate RC\r\n");
 					//DPRINT("Action: Calibrate RC\r\n");
 					break;
-
 				case MAV_ACTION_CALIBRATE_GYRO:
 				case MAV_ACTION_CALIBRATE_MAG:
 				case MAV_ACTION_CALIBRATE_ACC:
@@ -563,41 +538,33 @@ static void handleMessage(void)
 				case MAV_ACTION_REBOOT:
 					//startup_IMU_ground();
 					break;
-
 				case MAV_ACTION_REC_START: break;
 				case MAV_ACTION_REC_PAUSE: break;
 				case MAV_ACTION_REC_STOP: break;
-
 				case MAV_ACTION_TAKEOFF:
 					//send_text((uint8_t*)"Action: Take Off !\r\n");
 					//DPRINT("Action: Take Off !\r\n");
 					//set_mode(TAKEOFF);
 					break;
-
 				case MAV_ACTION_NAVIGATE:
 					// send_text((uint8_t*)"Action: Navigate !\r\n");
 					// DPRINT("Action: Navigate !\r\n");
 					//set_mode(AUTO);
 					break;
-
 				case MAV_ACTION_LAND:
 					//set_mode(LAND);
 					break;
-
 				case MAV_ACTION_LOITER:
 					//set_mode(LOITER);
 					break;
-
 				default: break;
 			}
 			break;
 */
 		}
-
 		case MAVLINK_MSG_ID_SET_MODE:
 			DPRINT("MAVLINK_MSG_ID_SET_MODE %u\r\n", handle_msg->msgid);
 			break;
-
 		default:
 			DPRINT("handle_msg->msgid %u\r\n", handle_msg->msgid);
 			break;
@@ -628,6 +595,7 @@ inline void preflight_storage_complete_callback(boolean success)
 // MAIN MAVLINK CODE FOR SENDING COMMANDS TO THE GROUND CONTROL STATION
 //
 
+#if (MAVLINK_TEST_ENCODE_DECODE != 1)
 const uint8_t mavlink_freq_table[] = {0, 40, 20, 13, 10, 8, 7, 6, 5, 4, 4};
 
 static boolean is_this_the_moment_to_send(uint8_t counter, uint8_t max_counter)
@@ -680,6 +648,7 @@ static boolean mavlink_frequency_send(uint8_t frequency, uint8_t counter)
 		return false; // should never reach this line
 	}
 }
+#endif // (MAVLINK_TEST_ENCODE_DECODE != 1)
 
 void mavlink_output_40hz(void)
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)

@@ -104,8 +104,8 @@ void cameraCntrl(void)
 	int16_t cam_yaw16   = 0;    // yaw   accumalator in 16 bit byte circular.
 	int8_t  cam_yaw8    = 0;    // An 8 bit version of cam_yaw to use with sine(), cosine()
 
-	struct relative2D matrix_accum = { 0, 0 };      // Temporary variable to keep intermediate results of functions.
-	fractional cam_vector_ground[] = { 0, 0 ,0 };   // Vector to camera target from within ground coordinate reference.
+	struct relative2D matrix_accum = { 0, 0 };      // Temporary variable to keep intermediate results of functions
+	fractional cam_vector_ground[] = { 0, 0 ,0 };   // Vector to camera target from within ground coordinate reference
 	fractional cam_vector_plane[]  = { 0, 0, 0 };   // Vector to camera target from within plane's coordinate reference
 	fractional rmat_transpose[]    = { RMAX, 0, 0, 0, RMAX, 0, 0, 0, RMAX };
 

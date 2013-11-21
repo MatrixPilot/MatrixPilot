@@ -223,7 +223,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 		// and also that the noise rate has not been exceeded
 		if ((failSafePulses == 0) || (noisePulses > MAX_NOISE_RATE))
 		{
-			if (udb_flags._.radio_on == 1) {
+			if (udb_flags._.radio_on == 1)
+			{
 				udb_flags._.radio_on = 0;
 				udb_callback_radio_did_turn_off();
 			}

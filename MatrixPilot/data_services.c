@@ -374,7 +374,6 @@ void data_services_read_callback(boolean success)
 			data_services_user_callback = NULL;
 			data_service_state = DATA_SERVICE_STATE_WAITING;
 		}
-	return;
 }
 
 // Serialise a list of data items/variables to the buffer

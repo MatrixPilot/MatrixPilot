@@ -340,15 +340,13 @@ static void calibrateS(void)
 	{
 		udb_led_toggle(LED_RED);
 		calib_timer--;
-
-//		DPRINT("calib_timer %u  \r", calib_timer);
-
+		DPRINT("calib_timer %u  \r", calib_timer);
 		if (calib_timer <= 0)
 			ent_acquiringS();
 	}
 	else
 	{
-DPRINT("radio is not on %u\r\n", calib_timer);
+		DPRINT("radio is not on %u\r\n", calib_timer);
 		ent_calibrateS();
 	}
 }

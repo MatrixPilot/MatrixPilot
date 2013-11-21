@@ -47,7 +47,6 @@ extern union intbb xvg, yvg, zvg;
 extern uint8_t svs;
 extern int16_t cos_lat;
 
-
 // the following variables are shared internally between the various GPS parsing modules only
 //
 //extern union intbb payloadlength;

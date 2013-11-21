@@ -250,17 +250,17 @@ static void normalAltitudeCntrl(void)
 			}
 			else
 			{
-				desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal)>>12) ;
+				desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal)>>12);
 			}
 		}
 		else
 		{
 #if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
 			// In stabilized mode using pitch-only altitude hold, use desiredHeight as
-			// set from the state machine upon entering stabilized mode in ent_stabilizedS().
+			// set from the state machine upon entering stabilized mode in ent_stabilizedS()
 #elif ((ALTITUDEHOLD_STABILIZED == AH_FULL) || (ALTITUDEHOLD_STABILIZED == AH_THROTTLE_ONLY))
 			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
-			desiredHeight =((__builtin_mulss(height_throttle_gain, throttleInOffset - ((int16_t)(DEADBAND)))) >> 11) 
+			desiredHeight = ((__builtin_mulss(height_throttle_gain, throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
 			                + height_target_min;
 #endif
 			if (desiredHeight < (int16_t)(height_target_min)) desiredHeight = (int16_t)(height_target_min);
@@ -274,7 +274,6 @@ static void normalAltitudeCntrl(void)
 		}
 		else
 		{
-
 			heightError._.W1 = - desiredHeight;
 			heightError.WW = (heightError.WW + IMUlocationz.WW + speed_height) >> 13;
 			if (heightError._.W0 < -height_marginx8)

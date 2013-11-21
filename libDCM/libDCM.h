@@ -70,37 +70,6 @@ boolean gps_nav_valid(void);
 // Should navigation be based on a "virtual GPS" instead of the real GPS
 boolean use_virtual_gps(void);
 
-/*
-// Rotation utility functions
-int16_t cosine(int8_t angle);
-int16_t sine(int8_t angle);
-int8_t arcsine(int16_t y);
-int8_t rect_to_polar(struct relative2D *xy);
-int16_t rect_to_polar16(struct relative2D *xy);
-void rotate(struct relative2D *xy, int8_t angle);
-void rotate_2D_vector_by_angle(int16_t vector[2], int8_t);
-void rotate_2D_vector_by_vector(int16_t vector1[2], int16_t vector2[2]);
-void rotate_2D_long_vector_by_vector(int32_t vector[2], int16_t rotate[2]);
-
-// first changed bit location functions
-int16_t FindFirstBitChangeFromLeft(int16_t);    // applies raw FBCL instruction and returns result
-int16_t FindFirstBitFromLeft(int16_t);          // applies raw FF1L instruction and returns result
-int16_t find_first_bit_int16(int16_t);          // finds first bit position in the absolute value of a 16 bit signed integer
-int16_t find_first_bit_int32(int32_t);          // finds first bit position in the absolute value of a 32 bit signed integer
-
-// integer and int32_t integer square roots
-uint16_t sqrt_int(uint16_t);
-uint16_t sqrt_long(uint32_t);
-
-// magnitudes of 2 and 3 component vectors
-uint16_t vector2_mag(int16_t, int16_t);
-uint16_t vector3_mag(int16_t, int16_t, int16_t);
-
-// normalize vectors to RMAX format
-uint16_t vector2_normalize(int16_t result[], int16_t input[]);
-uint16_t vector3_normalize(int16_t result[], int16_t input[]);
-int32_t long_scale(int32_t arg1, int16_t arg2);
- */
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars

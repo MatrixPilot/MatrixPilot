@@ -26,21 +26,9 @@
 #include "MAVLink.h"
 #include "MAVParams.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
-//#include "../libDCM/gpsParseCommon.h"
-//#include "../libDCM/mathlibNAV.h"
-#include <string.h>
-#include <stdarg.h>
+//#include <string.h>
+//#include <stdarg.h>
 #include <math.h>
-
-/*
-#if (USE_FLEXIFUNCTION_MIXING == 1)
-#ifdef MAVLINK_MSG_ID_FLEXIFUNCTION_SET
-#include "../libflexifunctions/flexifunctionservices.h"
-#else
-#error(" Flexifunctions must be defined in MAVlink to use them")
-#endif
-#endif
- */
 
 extern mavlink_flags_t mavlink_flags;
 
@@ -363,7 +351,7 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 	mavlink_msg_param_set_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system,packet.target_component) == true)
 	{
-		send_text((uint8_t*)"failed target system check on parameter set \r\n");
+//		send_text((uint8_t*)"failed target system check on parameter set \r\n");
 //		break;
 	}
 	else

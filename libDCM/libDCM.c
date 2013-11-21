@@ -97,6 +97,13 @@ void udb_callback_read_sensors(void)
 }
 
 #if (BAROMETER_ALTITUDE == 1)
+
+// We want to be reading both the magnetometer and the barometer at 4Hz
+// The magnetometer driver returns a new result via the callback on each call
+// The barometer driver needs to be called several times to get a single 
+//  result set via the callback. Also on first invocation the barometer driver
+//  reads calibration data, and hence requires one extra call
+
 void do_I2C_stuff(void)
 {
 	static int toggle = 0;

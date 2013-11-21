@@ -25,11 +25,10 @@
 
 //  Compute actual and desired courses.
 //  Actual course is simply the scaled GPS course over ground information.
-//  Desired course is a "return home" course, which is simply the negative of the
-//  angle of the vector from the origin to the location of the plane.
+//  Desired course is a "return home" course, which is simply the negative of
+//  the angle of the vector from the origin to the location of the plane.
 
-//  The origin is recorded as the location of the plane during power up of the control.
-
+//  The origin is recorded as the location of the plane during power up.
 
 void dcm_enable_yaw_drift_correction(boolean enabled)
 {
@@ -44,7 +43,8 @@ void estYawDrift(void)
 	// Don't update Yaw Drift while hovering, since that doesn't work right yet
 	if (gps_nav_valid() && !dcm_flags._.skip_yaw_drift)
 	{
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || (air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN))
+		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) ||
+		    (air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN))
 		{
 			dirovergndHGPS[0] = -cosine(actual_dir);
 			dirovergndHGPS[1] = sine(actual_dir);

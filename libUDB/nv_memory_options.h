@@ -18,9 +18,6 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-// Internal MPU6000 axis definition
-// X axis pointing to right, Y axis pointing forward and Z axis pointing up
-
 
 #ifndef NV_MEMORY_OPTIONS_H
 #define NV_MEMORY_OPTIONS_H
