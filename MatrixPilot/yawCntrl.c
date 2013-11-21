@@ -37,12 +37,12 @@ uint16_t hoveryawkp;
 uint16_t hoveryawkd;
 
 
-PARAM_DEFINE_Q14(PID_YAWKDRUD,   &yawkdrud, 0, 0.5, false);
-PARAM_DEFINE_Q14(PID_ROLLKPR,    &rollkprud, 0, 0.5, false);
-PARAM_DEFINE_Q14(PID_ROLLKDR,    &rollkdrud, 0, 0.5, false);
+PARAM_DEFINE_GYROSCALE_Q14(PID_YAWKDRUD,&yawkdrud,  YAWKD_RUDDER,   0, 0.5, false);
+PARAM_DEFINE_Q14(PID_ROLLKPR,           &rollkprud, ROLLKP_RUDDER,  0, 0.5, false);
+PARAM_DEFINE_GYROSCALE_Q14(PID_ROLLKDR, &rollkdrud, ROLLKD_RUDDER,  0, 0.5, false);
 
-PARAM_DEFINE_Q14(PID_HYAWKP,    &hoveryawkp, 0, 0.5, false);
-PARAM_DEFINE_Q14(PID_HYAWKD,    &hoveryawkd, 0, 0.5, false);
+PARAM_DEFINE_Q14(PID_HYAWKP,            &hoveryawkp,HOVER_YAWKP,    0, 0.5, false);
+PARAM_DEFINE_GYROSCALE_Q14(PID_HYAWKD,  &hoveryawkd,HOVER_YAWKD,    0, 0.5, false);
 
 void normalYawCntrl(void);
 void hoverYawCntrl(void);

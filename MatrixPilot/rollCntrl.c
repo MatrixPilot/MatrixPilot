@@ -34,12 +34,12 @@ uint16_t hoverrollkp;
 uint16_t hoverrollkd;
 
 PARAM_SECTION(PID, 0, NULL);
-PARAM_DEFINE_Q14(PID_YAWKDAIL,  &yawkdail,  0, 0.5, false);
-PARAM_DEFINE_Q14(PID_ROLLKP,    &rollkp,    0, 0.5, false);
-PARAM_DEFINE_Q14(PID_ROLLKD,    &rollkd,    0, 0.5, false);
+PARAM_DEFINE_GYROSCALE_Q14(PID_YAWKDAIL,    &yawkdail,  YAWKD_AILERON,  0, 0.5, false);
+PARAM_DEFINE_Q14(PID_ROLLKP,                &rollkp,    ROLLKP,         0, 0.5, false);
+PARAM_DEFINE_GYROSCALE_Q14(PID_ROLLKD,      &rollkd,    ROLLKD,         0, 0.5, false);
 
-PARAM_DEFINE_Q14(PID_HROLLKP,    &hoverrollkp, 0, 0.5, false);
-PARAM_DEFINE_Q14(PID_HROLLKD,    &hoverrollkd, 0, 0.5, false);
+PARAM_DEFINE_Q14(PID_HROLLKP,               &hoverrollkp, HOVER_ROLLKP, 0, 0.5, false);
+PARAM_DEFINE_GYROSCALE_Q14(PID_HROLLKD,     &hoverrollkd, HOVER_ROLLKD, 0, 0.5, false);
 
 
 
@@ -53,9 +53,6 @@ void init_rollCntrl(void)
 	rollkd      = (uint16_t)(ROLLKD*SCALEGYRO*RMAX);
 	hoverrollkp = (uint16_t)(HOVER_ROLLKP*SCALEGYRO*RMAX);
 	hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX);
-
-        uint16_t handle = get_param_handle("PID_ROLLKD");
-        handle = handle + handle;
 }
 
 void rollCntrl(void)

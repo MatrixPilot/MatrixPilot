@@ -103,26 +103,42 @@ typedef enum
  */
 
 /** define an int32 parameter */
-#define PARAM_DEFINE_INT(_name, _pvar, _min, _max, _readOnly)		\
+#define PARAM_DEFINE_INT(_name, _pvar, _default, _min, _max, _readOnly)		\
 	static const					\
 	__attribute__((used, section("__param")))	\
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
 		(uint8_t*) _pvar,                       \
 		UDB_PARAM_INT16,                        \
+                .default_val.param_int32 = _default,    \
 		.min.param_int32 = _min,                \
 		.max.param_int32 = _max,           	\
                 _readOnly                               \
 	}
 
 /** define an int32 parameter */
-#define PARAM_DEFINE_Q14(_name, _pvar, _min, _max, _readOnly)		\
+#define PARAM_DEFINE_Q14(_name, _pvar, _default, _min, _max, _readOnly)		\
 	static const					\
 	__attribute__((used, section("__param")))	\
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
 		(uint8_t*) _pvar,			\
 		UDB_PARAM_Q14,                     	\
+                .default_val.param_float = _default,    \
+		.min.param_float = _min,                \
+		.max.param_float = _max,           	\
+                _readOnly                               \
+	}
+
+/** define a gyroscale parameter */
+#define PARAM_DEFINE_GYROSCALE_Q14(_name, _pvar, _default, _min, _max, _readOnly)		\
+	static const					\
+	__attribute__((used, section("__param")))	\
+	struct param_info_s __param__##_name = {	\
+		#_name,					\
+		(uint8_t*) _pvar,			\
+		UDB_PARAM_GYROSCALE_Q14,                \
+                .default_val.param_float = _default,    \
 		.min.param_float = _min,                \
 		.max.param_float = _max,           	\
                 _readOnly                               \
@@ -130,13 +146,15 @@ typedef enum
 
     
 /** define a float parameter */
-#define PARAM_DEFINE_FLOAT(_name, _default)		\
+#define PARAM_DEFINE_FLOAT(_name, _pvar, _default, _min, _max, _readOnly)       \
 	static const					\
 	__attribute__((used, section("__param")))	\
 	struct param_info_s __param__##_name = {	\
 		#_name,					\
-		PARAM_PARAM_FLOAT,			\
-		.val.f = _default			\
+                .default_val.param_float = _default,    \
+		.min.param_float = _min,                \
+		.max.param_float = _max,           	\
+                _readOnly                               \
 	}
 
 /** define a parameter that points to a structure */
@@ -181,6 +199,7 @@ struct param_info_s {
 	const char          *name;          // name of parameter
 	uint8_t*            pvar;           // Reference to variable
 	uint16_t            type;           // Internal UDB type of variable
+	parameter_union_t   default_val;    // parameter default
 	parameter_union_t   min;            // parameter minimum
 	parameter_union_t   max;            // parameter maximum
         boolean             readOnly;       // Is read only
@@ -196,7 +215,6 @@ struct param_info_s {
  */
 struct param_section_s {
 	const char              *name;
-        uint16_t                flags;
         param_callbackFunc      ploadCallback;
 };
 
@@ -209,7 +227,6 @@ struct param_section_s {
 	struct param_section_s __section__the_start = { \
 		NULL,					\
 		NULL,					\
-		NULL,					\
 	}
 
 /** define a parameter that that is the end of the list */
@@ -217,7 +234,6 @@ struct param_section_s {
 	static const					\
 	__attribute__((used, section("__send")))	\
 	struct param_section_s __section__the_end = {   \
-		NULL,					\
 		NULL,					\
 		NULL,					\
 	}
@@ -235,7 +251,6 @@ struct param_section_s {
 	__attribute__((used, section("__section")))         \
 	struct param_section_s __section__##name = {        \
 		#_name,                                     \
-		_flags,                                     \
 		_callback,                                  \
 	};                                                  \
                                                             \
@@ -247,7 +262,8 @@ struct param_section_s {
 	struct param_info_s __param__##_name_S_FLAGS = {    \
 		#_name "_S_FLAGS",                          \
 		(int16_t*) &storageFlags_##_name,           \
-		UDB_PARAM_INT16,                              \
+		UDB_PARAM_INT16,                            \
+                .default_val.param_int32 = _flags,          \
 		.min.param_int32 = 0,                       \
 		.max.param_int32 = 32767,                   \
                 false                                       \
@@ -258,7 +274,8 @@ struct param_section_s {
 	struct param_info_s __param__##_name_EN_FLAGS = {   \
 		#_name "_EN_FLAGS",                         \
 		(int16_t*) &enableFlags_##_name,            \
-		UDB_PARAM_INT16,                              \
+		UDB_PARAM_INT16,                            \
+                .default_val.param_int32 = 1,               \
 		.min.param_int32 = 0,                       \
 		.max.param_int32 = 32767,                   \
                 false                                       \

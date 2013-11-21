@@ -18,8 +18,8 @@ PARAM_SECTION(MISC, 0, NULL);
 
 //PARAM_DEFINE_INT(PARAM_SF_NAME, &misc_storage_flags, 0, 32767, false);
 
-PARAM_DEFINE_INT(MISC_ZIP_BAG, &zip_bag, 0, RMAX, false);
-PARAM_DEFINE_Q14(MISC_BLUFF, &bluff, -1.0, 1.0, false);
+PARAM_DEFINE_INT(MISC_ZIP_BAG, &zip_bag, 998, 0, RMAX, false);
+PARAM_DEFINE_Q14(MISC_BLUFF, &bluff, 0.1111, -1.0, 1.0, false);
 
 PARAM_SECTION_START();
 PARAM_SECTION_END();
@@ -108,4 +108,3 @@ extern uint16_t get_section_params_count(uint16_t handle)
 
     return count;
 }
-

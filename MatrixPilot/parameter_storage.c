@@ -108,6 +108,9 @@ static void parstore_loadingS(void)
     sprintf(paramstr, "%s.PAR",  psect->name);
     ini_openread(paramstr, &file);
 
+    // TODO add parameter storage checking of parameter sequence
+    // TODO add parameter storage version checking
+
     // For each file in the line find the parameter and laod it.
     while(ini_read(paramstr, sizeof(paramstr), &file) != 0)
     {
