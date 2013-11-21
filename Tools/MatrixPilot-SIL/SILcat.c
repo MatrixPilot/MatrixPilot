@@ -1,5 +1,5 @@
 //
-//  SIL-udb.h
+//  SIL-udb.c
 //  MatrixPilot-SIL
 //
 //  Created by Ben Levitt on 2/1/13.

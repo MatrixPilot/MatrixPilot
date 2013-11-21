@@ -41,8 +41,8 @@ struct timeval {
 #define timerisset(tvp)  ((tvp)->tv_sec || (tvp)->tv_usec)
 #define timercmp(tvp, uvp, cmp) \
 	(((tvp)->tv_sec != (uvp)->tv_sec) ? \
-	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
-	((tvp)->tv_usec cmp (uvp)->tv_usec))
+	 ((tvp)->tv_sec cmp (uvp)->tv_sec) : \
+	 ((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)  (tvp)->tv_sec = (tvp)->tv_usec = 0
 #endif // _TIMEVAL_DEFINED
 
@@ -150,7 +150,7 @@ void udb_init(void)
 	}
 	
 	int16_t i;
-	for (i=0; i<4; i++) {
+	for (i = 0; i < 4; i++) {
 		leds[i] = LED_OFF;
 	}
 	
@@ -241,9 +241,10 @@ void udb_servo_record_trims(void)
 {
 	int16_t i;
 
-	for (i = 1; i <= NUM_INPUTS; i++)
+	for (i = 1; i <= NUM_INPUTS; i++) {
 		udb_pwTrim[i] = udb_pwIn[i];
-	return;
+		DPRINT("udb_pwTrim[%i] = %u\r\n", i, udb_pwTrim[i]);
+	}
 }
 
 void udb_set_action_state(boolean newValue)
@@ -352,45 +353,39 @@ boolean handleUDBSockets(void)
 		if (bytesRead < 0) {
 			UDBSocket_close(gpsSocket);
 			gpsSocket = NULL;
-		}
-		else {
-			for (i=0; i<bytesRead; i++) {
+		} else {
+			for (i = 0; i < bytesRead; i++) {
 				udb_gps_callback_received_byte(buffer[i]);
 			}
-			if (bytesRead>0) didRead = true;
+			if (bytesRead > 0) didRead = true;
 		}
 	}
-
 	// Handle Telemetry Socket
 	if (telemetrySocket) {
 		bytesRead = UDBSocket_read(telemetrySocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
 			UDBSocket_close(telemetrySocket);
 			telemetrySocket = NULL;
-		}
-		else {
-			for (i=0; i<bytesRead; i++) {
+		} else {
+			for (i = 0; i < bytesRead; i++) {
 				udb_serial_callback_received_byte(buffer[i]);
 			}
 			if (bytesRead>0) didRead = true;
 		}
 	}
-
 	// Handle optional Serial RC input Socket
 	if (serialSocket) {
 		bytesRead = UDBSocket_read(serialSocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
 			UDBSocket_close(serialSocket);
 			serialSocket = NULL;
-		}
-		else {
+		} else {
 			if (bytesRead>0) {
 				sil_handle_seial_rc_input(buffer, bytesRead);
 				didRead = true;
 			}
 		}
 	}
-
 	return didRead;
 }
 
@@ -452,15 +447,15 @@ int setjmp(void)
 
 int16_t FindFirstBitFromLeft(int16_t val)
 {
-	int16_t i;
+	int16_t i = 0;
 
-	if (val == 0) return 0;
-
-	for (i = 1; i <= 16; i++)
+	if (val != 0) 
 	{
-		if (val & 0x8000) break;
-		val <<= 1;
+		for (i = 1; i <= 16; i++)
+		{
+			if (val & 0x8000) break;
+			val <<= 1;
+		}
 	}
 	return i;
 }
-
