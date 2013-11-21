@@ -1,6 +1,7 @@
 #include "../libUDB/libUDB.h"
 #include "parameters.h"
 #include "../MatrixPilot/parameter_table.h"
+#include <string.h>
 
 /**
  * Array of static parameter info.
@@ -107,3 +108,4 @@ extern uint16_t get_section_params_count(uint16_t handle)
 
     return count;
 }
+

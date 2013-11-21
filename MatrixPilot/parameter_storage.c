@@ -7,7 +7,11 @@
 #include "../libUDB/timer.h"
 
 
+#if (WIN == 1)
+#include "../libFlashFS/minGlue.h"
+#else
 #include "../libFlashFS/minGlue-mdd.h"
+#endif
 #include <string.h>
 
 uint16_t parstore_event_handle = INVALID_HANDLE;

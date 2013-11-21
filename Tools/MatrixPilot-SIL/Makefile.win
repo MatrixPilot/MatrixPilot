@@ -1,7 +1,7 @@
 CC       = gcc
 #CC      = /usr/local/i386-mingw32-4.3.0/bin/i386-mingw32-gcc   # used when cross-compiling from a unix system
 CFLAGS   = -pipe -Wall -W -O0 -DWIN=1
-INCPATH  = -Iinclude -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot
+INCPATH  = -I. -I../HILSIM_XPlane -I../../libUDB -I../../libDCM -I../../MatrixPilot -I../../Microchip/Include
 LFLAGS   = 
 LIBS     = -lws2_32
 RM_FILE  = rm -f
@@ -21,6 +21,9 @@ SIL-dsp.o \
 SIL-eeprom.o \
 SIL-events.o \
 ../HILSIM_XPlane/UDBSocketWin.o \
+ \
+../../libUDB/parameters.o \
+../../libUDB/timer.o \
  \
 ../../libDCM/deadReckoning.o \
 ../../libDCM/estAltitude.o \
@@ -52,6 +55,8 @@ SIL-events.o \
 ../../MatrixPilot/mp_osd.o \
 ../../MatrixPilot/navigate.o \
 ../../MatrixPilot/nv_memory_table.o \
+../../MatrixPilot/parameter_scaling.o \
+../../MatrixPilot/parameter_storage.o \
 ../../MatrixPilot/parameter_table.o \
 ../../MatrixPilot/pitchCntrl.o \
 ../../MatrixPilot/rollCntrl.o \

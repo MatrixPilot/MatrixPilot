@@ -266,11 +266,11 @@ struct param_section_s {
 
 
 
-
+/*
 //PARAM_DEFINE_INT( #_name#_PARAM_EN, &parametersEnabled_##_name, 0, 1, false)
 //        #undef SECT_FLAGS_NAME                              \
 //       #define SECT_FLAGS_NAME PARAM_SECTION_SF_NAME(_name)    \
-
+ */
 
 // Find the handle/index for a parameter with the given name
 extern uint16_t get_param_handle(char* name);
