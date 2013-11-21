@@ -25,6 +25,8 @@
 
 int16_t estimatedWind[3] = { 0, 0, 0 };
 
+#if (WIND_ESTIMATION == 1)
+
 static int16_t groundVelocityHistory[3] = { 0, 0, 0 };
 static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
@@ -32,8 +34,6 @@ static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
 void estimateWind(void)
 {
-#if (WIND_ESTIMATION == 1)
-
 	if (dcm_flags._.skip_yaw_drift) return;
 	
 	int16_t index;
@@ -123,5 +123,12 @@ void estimateWind(void)
 			fuselageDirectionHistory[index] = fuselageDirection[index];
 		}
 	}
-#endif // WIND_ESTIMATION
 }
+
+#else
+
+void estimateWind(void)
+{
+}
+
+#endif // WIND_ESTIMATION

@@ -21,9 +21,9 @@
 #define MAVLINK_AVOID_GCC_STACK_BUG defined(__GNUC__)
 #endif
 
-#ifndef MAVLINK_ASSERT
-#define MAVLINK_ASSERT(x)
-#endif
+//#ifndef MAVLINK_ASSERT
+//#define MAVLINK_ASSERT(x)
+//#endif
 
 #ifndef MAVLINK_START_UART_SEND
 #ifdef USE_RING_BUFFER
