@@ -23,17 +23,24 @@ typedef enum
     STORAGE_FLAG_STORE_CALIB = 16,
     } storage_flags_e;
 
+typedef void (*storageCallback)(boolean);  // Callback type
+
 
     // Initialize storage
     void init_parameter_storage(void);
 
     // save parameters to storage
-    void save_parameters(uint16_t flags);
+    // Runs at low priority with callback
+    void save_parameters(uint16_t flags, void (*callback) (boolean) );
 
     // load parameters from storage
-    void load_parameters(uint16_t flags);
+    // Runs at low priority with callback
+    void load_parameters(uint16_t flags, void (*callback) (boolean) );
 
+    // Set all parameters to default value
+    // Runs immediately
     void set_parameter_defaults(void);
+
 
 
 #ifdef	__cplusplus

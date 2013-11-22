@@ -25,8 +25,11 @@ static void parstore_start_loadingS(void);
 static void parstore_loadingS(void);
 static void parstore_start_savingS(void);
 static void parstore_savingS(void);
+static void parstore_defaultS(void);
 
 void (*parstoreS)(void) = &parstore_initS;  // &parstore_waitingS; //
+
+void (*store_callback)(boolean)  = NULL;
 
 enum
 {
@@ -90,6 +93,8 @@ static void parstore_start_loadingS(void)
 }
 
 
+// load parameters from storage
+// Runs at low priority with callback
 static void parstore_loadingS(void)
 {
     struct param_section_s*     psect;
@@ -108,6 +113,7 @@ static void parstore_loadingS(void)
     sprintf(paramstr, "%s.PAR",  psect->name);
     ini_openread(paramstr, &file);
 
+    // TODO add load flag control
     // TODO add parameter storage checking of parameter sequence
     // TODO add parameter storage version checking
 
@@ -122,8 +128,6 @@ static void parstore_loadingS(void)
             param_index = get_param_handle(pch);
             if(param_index != INVALID_PARAMETER_HANDLE)
             {
-                int16_t tempint;
-                uint16_t tempuint;
                 float tempfloat;
                 pparam = get_param(param_index);
 
@@ -135,13 +139,12 @@ static void parstore_loadingS(void)
                     switch(param.type)
                     {
                         case MAVLINK_TYPE_UINT32_T:
-                            sscanf(pch, "%d", &param.param_uint32);
+                            sscanf(pch, "%ld", &param.param_uint32);
                             if(param_scale_write(param, pparam) == true)
                                 paramcount++;
                             break;
                         case MAVLINK_TYPE_INT32_T:
-                            sscanf(pch, "%d", &tempint);
-                            param.param_int32 = (int32_t) tempint;
+                            sscanf(pch, "%ld", &param.param_int32);
                             if(param_scale_write(param, pparam) == true)
                                 paramcount++;
                             break;
@@ -178,7 +181,13 @@ static void parstore_loadingS(void)
     {
         parstore_status = PARSTORE_REQUEST_NONE;
         parstore_loadsave_flags = 0;
+        if(store_callback != NULL)
+        {
+            store_callback(true);
+            store_callback = NULL;
+        }
         parstoreS = &parstore_waitingS;
+        timer_start(parstore_timer_handle, 100, false, parstore_event_handle);
     }
 }
 
@@ -192,6 +201,8 @@ static void parstore_start_savingS(void)
 }
 
 
+// save parameters to storage
+// Runs at low priority with callback
 static void parstore_savingS(void)
 {
     struct param_section_s*    psect;
@@ -207,6 +218,8 @@ static void parstore_savingS(void)
 //    strcpy(filename, psect->name);
     sprintf(paramstr, "%s.PAR",  psect->name);
     ini_openwrite(paramstr, &file);
+
+    // TODO add save flag control
 
     // Iterate through the parameter list looking for params belonging to the
     // group.  When one is found, save it to the file.
@@ -228,10 +241,10 @@ static void parstore_savingS(void)
             switch(param.type)
             {
                 case MAVLINK_TYPE_UINT32_T:
-                    sprintf(paramstr, "%u", param.param_uint32);
+                    sprintf(paramstr, "%ld", param.param_uint32);
                     break;
                 case MAVLINK_TYPE_INT32_T:
-                    sprintf(paramstr, "%d", param.param_int32);
+                    sprintf(paramstr, "%ld", param.param_int32);
                     break;
                 case MAVLINK_TYPE_FLOAT:
                     sprintf(paramstr, "%f", param.param_float);
@@ -260,26 +273,34 @@ static void parstore_savingS(void)
     {
         parstore_status = PARSTORE_REQUEST_NONE;
         parstore_loadsave_flags = 0;
+        if(store_callback != NULL)
+        {
+            store_callback(true);
+            store_callback = NULL;
+        }
         parstoreS = &parstore_waitingS;
+        timer_start(parstore_timer_handle, 100, false, parstore_event_handle);
     }
 }
 
 // save parameters to storage
-void save_parameters(uint16_t flags)
+void save_parameters(uint16_t flags, void (*callback) (boolean) )
 {
     if(parstore_status == PARSTORE_REQUEST_NONE)
     {
         parstore_loadsave_flags = flags;
+        store_callback = callback;
         parstore_status = PARSTORE_REQUEST_SAVE;
     }
 }
 
 // load parameters from storage
-void load_parameters(uint16_t flags)
+void load_parameters(uint16_t flags, void (*callback) (boolean) )
 {
     if(parstore_status == PARSTORE_REQUEST_NONE)
     {
         parstore_loadsave_flags = flags;
+        store_callback = callback;
         parstore_status = PARSTORE_REQUEST_LOAD;
     }
 }
@@ -301,3 +322,6 @@ void set_parameter_defaults()
         param_scale_write(param, pparam);
     }
 }
+
+
+

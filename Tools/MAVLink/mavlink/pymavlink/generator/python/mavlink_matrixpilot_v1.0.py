@@ -121,10 +121,14 @@ MAV_PFS_CMD_READ_SPECIFIC = 3 # Read specific parameters from storage
 MAV_PFS_CMD_WRITE_SPECIFIC = 4 # Write specific parameters to storage
 MAV_PFS_CMD_CLEAR_SPECIFIC = 5 # Clear specific parameters in storage
 MAV_PFS_CMD_DO_NOTHING = 6 # do nothing
-MAV_PREFLIGHT_STORAGE_ACTION_ENUM_END = 7 # 
+MAV_PFS_CMD_DEFAULT_ALL = 7 # Set all parameters to default
+MAV_PFS_CMD_DEFAULT_SPECIFIC = 8 # Set all parameters in defined storage area to default
+MAV_PREFLIGHT_STORAGE_ACTION_ENUM_END = 9 # 
 
 # MAV_CMD
 MAV_CMD_PREFLIGHT_STORAGE_ADVANCED = 0 # Request storage of different parameter values and logs. This command
+                        # will be only accepted if in pre-flight mode.
+MAV_CMD_PREFLIGHT_STORAGE_ADVANCED2 = 1 # Request storage of different parameter values and logs. This command
                         # will be only accepted if in pre-flight mode.
 MAV_CMD_NAV_WAYPOINT = 16 # Navigate to MISSION.
 MAV_CMD_NAV_LOITER_UNLIM = 17 # Loiter around this MISSION an unlimited amount of time

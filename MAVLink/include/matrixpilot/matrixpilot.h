@@ -42,7 +42,9 @@ enum MAV_PREFLIGHT_STORAGE_ACTION
 	MAV_PFS_CMD_WRITE_SPECIFIC=4, /* Write specific parameters to storage | */
 	MAV_PFS_CMD_CLEAR_SPECIFIC=5, /* Clear specific parameters in storage | */
 	MAV_PFS_CMD_DO_NOTHING=6, /* do nothing | */
-	MAV_PREFLIGHT_STORAGE_ACTION_ENUM_END=7, /*  | */
+	MAV_PFS_CMD_DEFAULT_ALL=7, /* Set all parameters to default | */
+	MAV_PFS_CMD_DEFAULT_SPECIFIC=8, /* Set all parameters in defined storage area to default | */
+	MAV_PREFLIGHT_STORAGE_ACTION_ENUM_END=9, /*  | */
 };
 #endif
 
@@ -51,7 +53,8 @@ enum MAV_PREFLIGHT_STORAGE_ACTION
 #define HAVE_ENUM_MAV_CMD
 enum MAV_CMD
 {
-	MAV_CMD_PREFLIGHT_STORAGE_ADVANCED=0, /* Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode. |Storage action: Action defined by MAV_PREFLIGHT_STORAGE_ACTION_ADVANCED| Storage area as defined by parameter database| Storage flags as defined by parameter database| Empty| Empty| Empty| Empty|  */
+	MAV_CMD_PREFLIGHT_STORAGE_ADVANCED=0, /* Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode. |Storage action: Action defined by MAV_PREFLIGHT_STORAGE_ACTION| Storage area as defined by parameter database| Storage flags as defined by parameter database| Empty| Empty| Empty| Empty|  */
+	MAV_CMD_PREFLIGHT_STORAGE_ADVANCED2=1, /* Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode. |Storage action: Action defined by MAV_PREFLIGHT_STORAGE_ACTION_ADVANCED| Empty| Storage flags as defined by parameter database| Storage area name - chars[0:3]| Storage area name - chars[4:7]| Storage area name - chars[8:11]| Empty|  */
 	MAV_CMD_NAV_WAYPOINT=16, /* Navigate to MISSION. |Hold time in decimal seconds. (ignored by fixed wing, time to stay at MISSION for rotary wing)| Acceptance radius in meters (if the sphere with this radius is hit, the MISSION counts as reached)| 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.| Desired yaw angle at MISSION (rotary wing)| Latitude| Longitude| Altitude|  */
 	MAV_CMD_NAV_LOITER_UNLIM=17, /* Loiter around this MISSION an unlimited amount of time |Empty| Empty| Radius around MISSION, in meters. If positive loiter clockwise, else counter-clockwise| Desired yaw angle.| Latitude| Longitude| Altitude|  */
 	MAV_CMD_NAV_LOITER_TURNS=18, /* Loiter around this MISSION for X turns |Turns| Empty| Radius around MISSION, in meters. If positive loiter clockwise, else counter-clockwise| Desired yaw angle.| Latitude| Longitude| Altitude|  */

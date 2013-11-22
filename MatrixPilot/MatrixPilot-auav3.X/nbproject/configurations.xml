@@ -335,8 +335,6 @@
         <itemPath>../mp_osd.c</itemPath>
         <itemPath>../altitudeCntrl.c</itemPath>
         <itemPath>../mode_switch.c</itemPath>
-        <itemPath>../data_services.c</itemPath>
-        <itemPath>../data_storage.c</itemPath>
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>

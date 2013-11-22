@@ -1,6 +1,7 @@
 #ifndef MAVLINK_TYPES_H_
 #define MAVLINK_TYPES_H_
 
+#include <inttypes.h>
 
 #ifndef MAVLINK_MAX_PAYLOAD_LEN
 // it is possible to override this, but be careful!
@@ -86,9 +87,9 @@ typedef struct __mavlink_field_info {
         const char *name;                 // name of this field
         const char *print_format;         // printing format hint, or NULL
         mavlink_message_type_t type;      // type of this field
-        uint16_t array_length;        // if non-zero, field is an array
-        uint16_t wire_offset;         // offset of each field in the payload
-        uint16_t structure_offset;    // offset in a C structure
+        unsigned int array_length;        // if non-zero, field is an array
+        unsigned int wire_offset;         // offset of each field in the payload
+        unsigned int structure_offset;    // offset in a C structure
 } mavlink_field_info_t;
 
 // note that in this structure the order of fields is the order

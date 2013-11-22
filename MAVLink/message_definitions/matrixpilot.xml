@@ -36,18 +36,34 @@
                <entry value="6" name="MAV_PFS_CMD_DO_NOTHING">
                     <description>do nothing</description>
                </entry>
+               <entry value="7" name="MAV_PFS_CMD_DEFAULT_ALL">
+                    <description>Set all parameters to default</description>
+               </entry>
+               <entry value="8" name="MAV_PFS_CMD_DEFAULT_SPECIFIC">
+                    <description>Set all parameters in defined storage area to default</description>
+               </entry>
           </enum>
 
           <enum name="MAV_CMD" >
             <entry value="0" name="MAV_CMD_PREFLIGHT_STORAGE_ADVANCED">
-	<description>Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode.</description>
-	<param index="1">Storage action: Action defined by MAV_PREFLIGHT_STORAGE_ACTION_ADVANCED</param>
-	<param index="2">Storage area as defined by parameter database</param>
-	<param index="3">Storage flags as defined by parameter database</param>
-	<param index="4">Empty</param>
-	<param index="5">Empty</param>
-	<param index="6">Empty</param>
-	<param index="7">Empty</param>
+				<description>Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode.</description>
+				<param index="1">Storage action: Action defined by MAV_PREFLIGHT_STORAGE_ACTION</param>
+				<param index="2">Storage area as defined by parameter database</param>
+				<param index="3">Storage flags as defined by parameter database</param>
+				<param index="4">Empty</param>
+				<param index="5">Empty</param>
+				<param index="6">Empty</param>
+				<param index="7">Empty</param>
+             </entry>
+            <entry value="1" name="MAV_CMD_PREFLIGHT_STORAGE_ADVANCED2">
+				<description>Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode.</description>
+				<param index="1">Storage action: Action defined by MAV_PREFLIGHT_STORAGE_ACTION_ADVANCED</param>
+				<param index="2">Empty</param>
+				<param index="3">Storage flags as defined by parameter database</param>
+				<param index="4">Storage area name - chars[0:3]</param>
+				<param index="5">Storage area name - chars[4:7]</param>
+				<param index="6">Storage area name - chars[8:11]</param>
+				<param index="7">Empty</param>
              </entry>
           </enum>
           
