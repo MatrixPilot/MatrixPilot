@@ -32,8 +32,8 @@
 union dcm_fbts_word dcm_flags;
 
 // Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT  400    // 10 seconds at 40 Hz
-#define GPS_COUNT    1000   // 25 seconds at 40 Hz
+#define CALIB_COUNT  (int)(10 * HEARTBEAT_HZ)    // 10 seconds
+#define GPS_COUNT    (int)(25 * HEARTBEAT_HZ)    // 25 seconds
 
 #if (HILSIM == 1)
 #if (USE_VARIABLE_HILSIM_CHANNELS != 1)
@@ -199,8 +199,8 @@ struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 	struct relative3D rel;
 
 	rel.z = absolute.z;
-	rel.y = (absolute.y - lat_origin.WW)/90; // in meters
-	rel.x = long_scale((absolute.x - lon_origin.WW)/90, cos_lat);
+	rel.y = (absolute.y - lat_origin.WW) / 90; // in meters
+	rel.x = long_scale((absolute.x - lon_origin.WW) / 90, cos_lat);
 	return rel;
 }
 

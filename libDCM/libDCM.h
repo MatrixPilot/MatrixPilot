@@ -33,7 +33,7 @@
 // Requires libUDB.
 // 
 // This library is designed to use libUDB, but to remain independent of the 
-// sepcifics of the MatrixPilot application.
+// specifics of the MatrixPilot application.
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -82,7 +82,6 @@ struct dcm_flag_bits {
 
 #define LONGDEG_2_BYTECIR   305 // = (256/360)*((256)**4)/(10**7)
 #define COURSEDEG_2_BYTECIR 466 // = (256/360)*((256)**2)/(10**2)
-#define LONGDEG_2_BYTECIR   305 // = (256/360)*((256)**4)/(10**7)
 
 #define RADPERSEC ((int64_t)5632.0/SCALEGYRO)
 // one radian per second, in AtoD/2 units

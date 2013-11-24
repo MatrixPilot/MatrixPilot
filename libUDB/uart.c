@@ -35,6 +35,8 @@
 
 #if (CONSOLE_UART != 0)
 
+extern int __C30_UART;
+
 //******************************************************************************
 // Constants
 //******************************************************************************
@@ -209,7 +211,7 @@ Input: Binary data.
 Output: None.
 
 *******************************************************************************/
-void  PutDec(unsigned char dec)
+void PutDec(unsigned char dec)
 {
 	unsigned char res;
 	unsigned char printed_already = 0;

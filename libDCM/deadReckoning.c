@@ -25,12 +25,13 @@
 #include "../libUDB/heartbeat.h"
 
 
-// seconds
+// heartbeats
 #define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4)
 
 // seconds
 #define DR_TIMESTEP (1.0/HEARTBEAT_HZ)
 
+// 1.0 in 0.16 format
 #define MAX16 (4.0*RMAX)
 
 // seconds
@@ -47,18 +48,21 @@
 // The factor of 16 is so that the gain is more precise.
 // There is a subsequent right shift by 4 to cancel the multiply by 16.
 
-// 1/seconds^2
+// dimensionless
 #define DR_FILTER_GAIN (int16_t)(DR_TIMESTEP*MAX16/DR_TAU)
+
+// 1/seconds
 #define ONE_OVER_TAU (uint16_t)(MAX16/DR_TAU)
 
 int16_t dead_reckon_clock = DR_PERIOD;
 
-// velocity, as estimated by the IMU
+// velocity, as estimated by the IMU: high word is cm/sec
 union longww IMUvelocityx = { 0 };
 union longww IMUvelocityy = { 0 };
 union longww IMUvelocityz = { 0 };
 
 // location, as estimated by the IMU
+// high word is meters, low word is fractional meters
 union longww IMUlocationx = { 0 };
 union longww IMUlocationy = { 0 };
 union longww IMUlocationz = { 0 };
@@ -71,7 +75,7 @@ union longww IMUintegralAccelerationz = { 0 };
 uint16_t air_speed_3DIMU = 0;
 int16_t total_energy = 0;
 
-// GPSlocation - IMUlocation
+// GPSlocation - IMUlocation: meters
 fractional locationErrorEarth[] = { 0, 0, 0 };
 // GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0, 0, 0 };

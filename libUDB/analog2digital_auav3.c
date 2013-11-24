@@ -197,7 +197,6 @@ ALMOST_ENOUGH_SAMPLES = 88
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 {
-	DIG2 = 1;
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
@@ -259,7 +258,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 		}
 	}
 	interrupt_restore_corcon;
-	DIG2 = 0;
 }
 
 #endif // BOARD_TYPE

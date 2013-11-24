@@ -60,18 +60,6 @@ fractional spin_axis[] = { 0, 0, RMAX };
 #error Unsupported BOARD_TYPE
 #endif // BOARD_TYPE
 
-/*
-#if (BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-// Paul's gains corrected for GGAIN
-#define KPROLLPITCH 256*5
-#define KIROLLPITCH 256
-#else
-// Paul's gains:
-#define KPROLLPITCH 256*10
-#define KIROLLPITCH 256*2
-#endif
- */
-
 #define KPYAW 256*4
 //#define KIYAW 32
 #define KIYAW (1280/HEARTBEAT_HZ)
