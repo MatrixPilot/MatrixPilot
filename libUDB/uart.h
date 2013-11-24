@@ -33,10 +33,11 @@
 	#error Must select a valid BRGHX value
 #endif
 
+void init_uart(void);
+
 char GetBaudError(void);
 char GetChar(void);
 void PutChar(char ch);
-void Init(void);
 char IsPressed(void);
 void PrintString(char* str);
 void PutDec(unsigned char dec);
