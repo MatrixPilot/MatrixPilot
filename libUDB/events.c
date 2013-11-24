@@ -58,7 +58,7 @@ uint16_t register_event_p(void(*event_callback)(void), eventPriority priority)
 			return eventIndex;
 		}
 	}
-	return INVALID_HANDLE;
+	return INVALID_EVENT_HANDLE;
 }
 
 void trigger_event(uint16_t hEvent)

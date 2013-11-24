@@ -26,7 +26,7 @@
 
 #include "libUDB_internal.h"
 
-#define INVALID_HANDLE 0xFFFF
+#define INVALID_EVENT_HANDLE 0xFFFF
 
 void init_events(void);
 void trigger_event(uint16_t hEvent);
