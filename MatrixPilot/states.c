@@ -29,7 +29,7 @@ uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
 #if (SILSIM == 1)
-#define CALIB_PAUSE (2 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
+#define CALIB_PAUSE   (2  * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
 #define STANDBY_PAUSE (24 * FSM_CLK)    // pause for 24 seconds of runs through the state machine
 #else
 #define CALIB_PAUSE (10.5 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine

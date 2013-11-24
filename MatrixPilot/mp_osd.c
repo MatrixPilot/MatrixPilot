@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
 #include "../libDCM/libDCM_internal.h"
+#include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/osd.h"
 #include "osd_config.h"

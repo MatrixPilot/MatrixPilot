@@ -24,7 +24,7 @@
 
 //  If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 
-#define ANGLE_90DEG (RMAX/(2*57.3))
+#define ANGLE_90DEG (RMAX/(2*57.3)) // FIXME: never used
 #define RTLKICK ((int32_t)(RTL_PITCH_DOWN*(RMAX/57.3)))
 #define INVNPITCH ((int32_t)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
 #define HOVERPOFFSET ((int32_t)(HOVER_PITCH_OFFSET*(RMAX/57.3)))

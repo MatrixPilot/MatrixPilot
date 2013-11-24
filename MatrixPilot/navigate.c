@@ -459,6 +459,6 @@ int16_t determine_navigation_deflection(char navType)
 		deflectionAccum.WW = -deflectionAccum.WW;
 	}
 	// multiply by wind gain adjustment, and multiply by 2
-	deflectionAccum.WW = (__builtin_mulsu (deflectionAccum._.W1, wind_gain) << 1); 
+	deflectionAccum.WW = (__builtin_mulsu(deflectionAccum._.W1, wind_gain) << 1);
 	return deflectionAccum._.W1;
 }

@@ -612,7 +612,7 @@ void serial_output_8hz(void)
 				    air_speed_3DIMU,
 				    estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
-				    magFieldEarth[0],magFieldEarth[1],magFieldEarth[2],
+				    magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
 #else
 				    (int16_t)0, (int16_t)0, (int16_t)0,
 #endif // MAG_YAW_DRIFT
