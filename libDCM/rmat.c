@@ -536,7 +536,7 @@ static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_v
 // will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
 // Since rxMagnetometer is called  at multiples of .25 seconds, this initial
 // delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
-static int16_t mag_latency_counter = 10 - MAG_LATENCY_COUNT;
+static int16_t mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
 
 static void mag_drift(void)
 {

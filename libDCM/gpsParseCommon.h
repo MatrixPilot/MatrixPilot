@@ -19,32 +19,18 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-/*
-union longbbbb lat_gps, lon_gps, alt_sl_gps, tow;  // latitude, longitude, altitude
-union intbb sog_gps, cog_gps, climb_gps, week_no;   // speed over ground, course over ground, climb
-union intbb as_sim;
-uint8_t hdop;                                       // horizontal dilution of precision
-union longbbbb lat_origin, lon_origin, alt_origin;
-//union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
-//union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
-//uint8_t mode1, mode2;                             // gps mode1, mode2
-uint8_t svs;                                        // number of satellites
-int16_t cos_lat = 0;
-int16_t gps_data_age;
-uint8_t *gps_out_buffer = 0;
-int16_t gps_out_buffer_length = 0;
-int16_t gps_out_index = 0;
- */
 extern union longbbbb tow;
-extern union intbb sog_gps, climb_gps, week_no;
-extern union uintbb cog_gps;
+extern union intbb week_no;
+extern union intbb sog_gps;                         // speed over ground
+extern union uintbb cog_gps;                        // course over ground, units: degrees * 100, range [0-35999]
+extern union intbb climb_gps;                       // climb
 extern union intbb as_sim;
 //extern union longbbbb as_sim_;
-extern uint8_t hdop;
-extern union longbbbb xpg, ypg, zpg;
-extern union intbb xvg, yvg, zvg;
-//extern uint8_t mode1, mode2;
-extern uint8_t svs;
+extern uint8_t hdop;                                // horizontal dilution of precision
+extern union longbbbb xpg, ypg, zpg;                // gps x, y, z position
+extern union intbb xvg, yvg, zvg;                   // gps x, y, z velocity
+//extern uint8_t mode1, mode2;                      // gps mode1, mode2
+extern uint8_t svs;                                 // number of satellites
 extern int16_t cos_lat;
 
 // the following variables are shared internally between the various GPS parsing modules only
@@ -63,7 +49,6 @@ extern union intbb hdop_;
 extern union longbbbb tow_;
 extern union longbbbb date_gps_;
 extern union longbbbb time_gps_;
-//
 
 //extern void (*msg_parse)(uint8_t inchar);
 //extern void (*gps_startup_sequence)(int16_t gpscount);
