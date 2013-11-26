@@ -4,10 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <logicalFolder name="fatFS" displayName="fatFS" projectFiles="true">
-        <logicalFolder name="Unused" displayName="Unused" projectFiles="true">
-        </logicalFolder>
-      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
@@ -26,8 +22,6 @@
         <itemPath>../../libFlashFS/minGlue.h</itemPath>
         <itemPath>../../libFlashFS/minIni.h</itemPath>
         <itemPath>../../libFlashFS/usb_config.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="libSys" projectFiles="true">
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
@@ -234,10 +228,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="fatFS" displayName="fatFS" projectFiles="true">
-        <logicalFolder name="Unused" displayName="Unused" projectFiles="true">
-        </logicalFolder>
-      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
         <itemPath>../../libDCM/estYawDrift.c</itemPath>
@@ -264,8 +254,6 @@
         <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
         <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
         <itemPath>../../libFlashFS/usb_msd.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="libSys" projectFiles="true">
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>

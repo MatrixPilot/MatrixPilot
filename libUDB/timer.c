@@ -22,7 +22,7 @@ void timer_init(void)
     uint16_t index;
     for(index = 0; index < TIMER_MAX_TIMERS; index ++)
     {
-        timers[index].event_handle = INVALID_HANDLE;
+        timers[index].event_handle = INVALID_EVENT_HANDLE;
         timers[index].timeout = 0;
         timers[index].status = TIMER_STATUS_UNASSIGNED;
     }
@@ -70,7 +70,7 @@ inline void timer_tick(void)
                         if(ptimer->repeat_time == 0)
                         {
                             ptimer->status = TIMER_STATUS_STOPPED;
-                            ptimer->event_handle = INVALID_HANDLE;
+                            ptimer->event_handle = INVALID_EVENT_HANDLE;
                         }
                         else
                         {
@@ -105,5 +105,5 @@ void timer_stop(uint16_t timer_handle)
 {
     TIMER_DATA* ptimer = &timers[timer_handle];
     ptimer->status = TIMER_STATUS_STOPPED;
-    ptimer->event_handle = INVALID_HANDLE;
+    ptimer->event_handle = INVALID_EVENT_HANDLE;
 }

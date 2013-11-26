@@ -130,7 +130,7 @@ union intbb dcm_declination_angle = {.BB = 0};
 #define	SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
 #define	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Conveert 16 bit byte circular to radians
 
-uint16_t mavlink_process_message_handle = INVALID_HANDLE;
+uint16_t mavlink_process_message_handle = INVALID_EVENT_HANDLE;
 uint8_t handling_of_message_completed = true;
 
 //static void send_text(uint8_t text[]);

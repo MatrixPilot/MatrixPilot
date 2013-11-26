@@ -82,6 +82,8 @@
 #include "libUDB_defines.h"
 #include "nv_memory_options.h"
 #include "parameters.h"
+#include "events.h"
+#include "timer.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.

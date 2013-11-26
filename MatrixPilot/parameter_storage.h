@@ -31,11 +31,22 @@ typedef void (*storageCallback)(boolean);  // Callback type
 
     // save parameters to storage
     // Runs at low priority with callback
-    void save_parameters(uint16_t flags, void (*callback) (boolean) );
+    // return true if request can be serviced
+    boolean save_parameters(uint16_t flags, void (*callback) (boolean) );
 
     // load parameters from storage
     // Runs at low priority with callback
-    void load_parameters(uint16_t flags, void (*callback) (boolean) );
+    // return true if request can be serviced
+    boolean load_parameters(uint16_t flags, void (*callback) (boolean) );
+
+    // load parameter block name from storage
+    // Runs at low priority with callback
+    boolean load_parameter_block(char* name, void (*callback) (boolean) );
+
+    // load parameter block name from storage
+    // Runs at low priority with callback
+    // return true if request can be serviced
+    boolean save_parameter_block(char* name, void (*callback) (boolean) );
 
     // Set all parameters to default value
     // Runs immediately

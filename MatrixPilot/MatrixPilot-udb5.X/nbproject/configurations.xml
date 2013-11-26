@@ -14,6 +14,14 @@
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
         <itemPath>../../libDCM/mathlibNAV.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>../../libFlashFS/minGlue-mdd.h</itemPath>
+        <itemPath>../../libFlashFS/minIni.h</itemPath>
+        <itemPath>../../libFlashFS/usb_cdc.h</itemPath>
+        <itemPath>../../libFlashFS/usb_config.h</itemPath>
+        <itemPath>../../libFlashFS/EEPROMconfig.h</itemPath>
+        <itemPath>../../libFlashFS/MDD_24LC256.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
@@ -39,6 +47,9 @@
         <itemPath>../../libUDB/analogs.h</itemPath>
         <itemPath>../../libUDB/mpu_spi.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../libUDB/sysTick.h</itemPath>
+        <itemPath>../../libUDB/timer.h</itemPath>
+        <itemPath>../../libUDB/parameters.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -49,10 +60,6 @@
         <itemPath>../waypoints.h</itemPath>
         <itemPath>../gain_variables.h</itemPath>
         <itemPath>../osd_layout.h</itemPath>
-        <itemPath>../data_services.h</itemPath>
-        <itemPath>../data_storage.h</itemPath>
-        <itemPath>../parameter_datatypes.h</itemPath>
-        <itemPath>../parameter_table.h</itemPath>
         <itemPath>../mode_switch.h</itemPath>
         <itemPath>../airspeed_options.h</itemPath>
         <itemPath>../airspeedCntrl.h</itemPath>
@@ -62,6 +69,8 @@
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../config.h</itemPath>
+        <itemPath>../parameter_scaling.h</itemPath>
+        <itemPath>../parameter_storage.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -189,6 +198,12 @@
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f2" displayName="Microchip" projectFiles="true">
+        <itemPath>../../Microchip/Include/Compiler.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD File System/SD-SPI.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -211,6 +226,11 @@
         <itemPath>../../libDCM/estAltitude.c</itemPath>
         <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
         <itemPath>../../libDCM/fbcl.s</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>../../libFlashFS/minIni.c</itemPath>
+        <itemPath>../../libFlashFS/EEPROM_FS.c</itemPath>
+        <itemPath>../../libFlashFS/MDD_24LC256.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>
@@ -240,6 +260,9 @@
         <itemPath>../../libUDB/osd_bit.c</itemPath>
         <itemPath>../../libUDB/osd_spi.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../libUDB/sysTick.c</itemPath>
+        <itemPath>../../libUDB/timer.c</itemPath>
+        <itemPath>../../libUDB/parameters.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -280,16 +303,17 @@
         <itemPath>../altitudeCntrl.c</itemPath>
         <itemPath>../MAVLink.c</itemPath>
         <itemPath>../mode_switch.c</itemPath>
-        <itemPath>../data_services.c</itemPath>
-        <itemPath>../data_storage.c</itemPath>
-        <itemPath>../nv_memory_table.c</itemPath>
-        <itemPath>../parameter_table.c</itemPath>
         <itemPath>../airspeedCntrl.c</itemPath>
         <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../fly_by_datalink.c</itemPath>
         <itemPath>../console.c</itemPath>
         <itemPath>../config.c</itemPath>
+        <itemPath>../parameter_scaling.c</itemPath>
+        <itemPath>../parameter_storage.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="Microchip" projectFiles="true">
+        <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -306,6 +330,9 @@
     <Elem>../../MAVLink</Elem>
     <Elem>../../Tools/flight_analyzer</Elem>
     <Elem>../../Tools/MAVLink</Elem>
+    <Elem>../../libFlashFS</Elem>
+    <Elem>../../Microchip/Include</Elem>
+    <Elem>../../Microchip/MDD File System</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -315,9 +342,9 @@
         <targetDevice>dsPIC33FJ256GP710A</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>PICkit3PlatformTool</platformTool>
+        <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -377,12 +404,13 @@
         <property key="preprocessor-macros" value="UDB5"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>
         <property key="extra-include-directories-for-assembler"
-                  value="..;..\..\libVectorMatrix"/>
+                  value="..;..\..\libVectorMatrix;..\Microchip"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
@@ -443,11 +471,136 @@
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
+      <ICD3PlatformTool>
+        <property key="ADC 1" value="true"/>
+        <property key="ADC 2" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="DCI" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C1" value="true"/>
+        <property key="I2C2" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="SPI 1" value="true"/>
+        <property key="SPI 2" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART 1" value="true"/>
+        <property key="UART 2" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="false"/>
+        <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.eeprom" value="true"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="true"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
+        <property key="memories.programmemory.start" value="0x0"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveprogramrange.end" value="0x2abff"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
+      </ICD3PlatformTool>
       <PICkit3PlatformTool>
-        <property key="tracecontrol.disablemacros" value="true"/>
-        <property key="tracecontrol.medium" value="0"/>
-        <property key="tracecontrol.select" value="0"/>
+        <property key="ADC 1" value="true"/>
+        <property key="ADC 2" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="DCI" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C1" value="true"/>
+        <property key="I2C2" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="SPI 1" value="true"/>
+        <property key="SPI 2" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART 1" value="true"/>
+        <property key="UART 2" value="true"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="true"/>
+        <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.eeprom" value="true"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="true"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
+        <property key="memories.programmemory.start" value="0x0"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmertogo.imagename" value=""/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.pgmspeed" value="2"/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveprogramrange.end" value="0x2abff"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
       </PICkit3PlatformTool>
     </conf>
   </confs>

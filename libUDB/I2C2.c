@@ -63,7 +63,7 @@ static void isr_writeCommandData(void);
 
 static int I2C2ERROR = 0;
 static boolean I2C2_Busy = true;    // Port busy flag.  Set true until initialized
-static uint16_t I2C2_service_handle = INVALID_HANDLE;
+static uint16_t I2C2_service_handle = INVALID_EVENT_HANDLE;
 
 struct I2C_xfer {
 	uint8_t  addr;

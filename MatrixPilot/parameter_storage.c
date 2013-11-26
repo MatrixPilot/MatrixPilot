@@ -3,10 +3,6 @@
 #include "parameter_storage.h"
 #include "parameter_scaling.h"
 
-#include "../libUDB/events.h"
-#include "../libUDB/timer.h"
-
-
 #if (WIN == 1)
 #include "../libFlashFS/minGlue.h"
 #else
@@ -14,7 +10,7 @@
 #endif
 #include <string.h>
 
-uint16_t parstore_event_handle = INVALID_HANDLE;
+uint16_t parstore_event_handle = INVALID_EVENT_HANDLE;
 uint16_t parstore_timer_handle = TIMER_INVALID_HANDLE;
 
 uint16_t parstore_section_index;
@@ -27,6 +23,11 @@ static void parstore_start_savingS(void);
 static void parstore_savingS(void);
 static void parstore_defaultS(void);
 
+static void parstore_loading_specificS(void);
+static void parstore_saving_specificS(void);
+static void parstore_start_loading_specificS(void);
+static void parstore_start_saving_specificS(void);
+
 void (*parstoreS)(void) = &parstore_initS;  // &parstore_waitingS; //
 
 void (*store_callback)(boolean)  = NULL;
@@ -35,7 +36,9 @@ enum
 {
     PARSTORE_REQUEST_NONE,
     PARSTORE_REQUEST_SAVE,
-    PARSTORE_REQUEST_LOAD
+    PARSTORE_REQUEST_LOAD,
+    PARSTORE_REQUEST_SAVE_SPECIFIC,
+    PARSTORE_REQUEST_LOAD_SPECIFIC,
 } PARSTORE_REQUESTS;
 
 uint16_t parstore_loadsave_flags = 0;
@@ -284,25 +287,31 @@ static void parstore_savingS(void)
 }
 
 // save parameters to storage
-void save_parameters(uint16_t flags, void (*callback) (boolean) )
+boolean save_parameters(uint16_t flags, void (*callback) (boolean) )
 {
     if(parstore_status == PARSTORE_REQUEST_NONE)
     {
         parstore_loadsave_flags = flags;
         store_callback = callback;
         parstore_status = PARSTORE_REQUEST_SAVE;
+        return true;
     }
+    else
+        return false;
 }
 
 // load parameters from storage
-void load_parameters(uint16_t flags, void (*callback) (boolean) )
+boolean load_parameters(uint16_t flags, void (*callback) (boolean) )
 {
     if(parstore_status == PARSTORE_REQUEST_NONE)
     {
         parstore_loadsave_flags = flags;
         store_callback = callback;
         parstore_status = PARSTORE_REQUEST_LOAD;
+        return true;
     }
+    else
+        return false;
 }
 
 // Set all parameters to default value
