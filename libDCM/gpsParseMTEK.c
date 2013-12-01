@@ -171,7 +171,7 @@ static void msg_CS1(uint8_t gpschar)
 	if ((checksum._.B1 == CK_A) && (checksum._.B0 == CK_B))
 	{
 		// correct checksum for DATA message
-		udb_background_trigger();           // parsing is complete, schedule navigation
+		gps_parse_common();                 // parsing is complete, schedule navigation
 	}
 	else
 	{

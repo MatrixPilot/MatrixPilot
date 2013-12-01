@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 
 #define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 

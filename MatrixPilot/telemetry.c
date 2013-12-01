@@ -20,17 +20,20 @@
 
 
 #include "defines.h"
+#include "flightplan-waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/osd.h"
+#include "../libUDB/magnetometerOptions.h"
 #include "osd_config.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
 #include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include <string.h>
 
@@ -433,7 +436,7 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_ARDUSTATION)
 
-extern int16_t desiredHeight, waypointIndex;
+extern int16_t desiredHeight;
 
 void serial_output_8hz(void)
 {
@@ -507,8 +510,6 @@ void serial_output_8hz(void)
 }
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-
-extern int16_t waypointIndex;
 
 void serial_output_8hz(void)
 {
@@ -685,8 +686,8 @@ void serial_output_8hz(void)
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER)
 
 extern int16_t udb_magFieldBody[3];
-extern int16_t magFieldEarth[3];
-extern int16_t udb_magOffset[3];
+//extern int16_t magFieldEarth[3];
+//extern int16_t udb_magOffset[3];
 extern int16_t magGain[3];
 extern int16_t rawMagCalib[3];
 extern int16_t magMessage;

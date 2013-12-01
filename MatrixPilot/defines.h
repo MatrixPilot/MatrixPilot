@@ -120,41 +120,37 @@ int32_t cam_pitchServoLimit(int32_t pwm_pulse);
 int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // navigation.c
-void init_navigation(void);
-#ifdef USE_EXTENDED_NAV
-void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
-#else
-void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
-#endif // USE_EXTENDED_NAV
-void update_goal_alt(int16_t z);
-void compute_bearing_to_goal (void);
-void process_flightplan(void);
-int16_t determine_navigation_deflection(char navType);
+//void init_navigation(void);
+//#ifdef USE_EXTENDED_NAV
+//void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
+//#else
+//void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
+//#endif // USE_EXTENDED_NAV
+//void update_goal_alt(int16_t z);
+//void compute_bearing_to_goal (void);
+//void process_flightplan(void);
+//int16_t determine_navigation_deflection(char navType);
 
-struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
-extern struct waypointparameters goal;
-
-extern struct relative2D togoal;
-extern int16_t tofinish_line;
-extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
-extern int8_t desired_dir;
-
+//struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
+//extern struct waypointparameters goal;
+//extern struct relative2D togoal;
+//extern int16_t tofinish_line;
+//extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+//extern int8_t desired_dir;
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
-void init_flightplan(int16_t flightplanNum);
-boolean use_fixed_origin(void);
-struct absolute3D get_fixed_origin(void);
-int32_t get_fixed_altitude(void);
-void run_flightplan(void);
+//void init_flightplan(int16_t flightplanNum);
+//boolean use_fixed_origin(void);
+//struct absolute3D get_fixed_origin(void);
+//void run_flightplan(void);
 
-void flightplan_live_begin(void);
-void flightplan_live_received_byte(uint8_t inbyte);
-void flightplan_live_commit(void);
+//void flightplan_live_begin(void);
+//void flightplan_live_received_byte(uint8_t inbyte);
+//void flightplan_live_commit(void);
 
 // Failsafe Type
 #define FAILSAFE_RTL                1

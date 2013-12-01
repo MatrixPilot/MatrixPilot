@@ -20,6 +20,8 @@
 
 
 #include "defines.h"
+#include "navigate.h"
+#include "../libDCM/deadReckoning.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
@@ -103,15 +105,12 @@ static int32_t excess_energy_height(void) // computes (1/2gravity)*(actual_speed
 	accum.WW = __builtin_mulsu(speed_component, 37877);
 	equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
 
-	//	compute the projection of the ground speed in the forward direction
-
+	// compute the projection of the ground speed in the forward direction
 	forward_ground_speed.WW = ((__builtin_mulss(-IMUvelocityx._.W1, rmat[1])
-	                          + __builtin_mulss(IMUvelocityy._.W1, rmat[4])) << 2);
+	                          + __builtin_mulss( IMUvelocityy._.W1, rmat[4])) << 2);
 
-	//	if we are going forward, add the energy, otherwise, subract it
-
+	// if we are going forward, add the energy, otherwise, subract it
 	accum.WW = __builtin_mulsu(forward_ground_speed._.W1, 37877);
-
 	if (forward_ground_speed._.W1 > 0)
 	{
 		equivalent_energy_ground_speed += __builtin_mulss(accum._.W1, accum._.W1);
@@ -121,9 +120,8 @@ static int32_t excess_energy_height(void) // computes (1/2gravity)*(actual_speed
 		equivalent_energy_ground_speed -= __builtin_mulss(accum._.W1, accum._.W1);
 	}
 
-//	return the smaller of the energies of ground and air speed
-//	to keep both of them from getting too small
-
+	// return the smaller of the energies of ground and air speed
+	// to keep both of them from getting too small
 	if (equivalent_energy_ground_speed < equivalent_energy_air_speed)
 	{
 		return equivalent_energy_ground_speed;
@@ -260,7 +258,7 @@ if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) {
 		}
 		else
 		{
-			heightError._.W1 = - desiredHeight;
+			heightError._.W1 = -desiredHeight;
 			heightError.WW = (heightError.WW + IMUlocationz.WW + speed_height) >> 13;
 			if (heightError._.W0 < (-(int16_t)(HEIGHT_MARGIN*8.0)))
 			{

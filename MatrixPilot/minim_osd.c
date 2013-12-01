@@ -20,8 +20,10 @@
 
 
 #include "defines.h"
+#include "flightplan-waypoints.h"
 #include "../libDCM/libDCM_internal.h"
 #include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/osd.h"
 #include "osd_config.h"
@@ -33,8 +35,6 @@
 
 #include <string.h>
 #include "osd_layout_remzibi.h"
-
-extern int16_t waypointIndex;
 
 static int16_t telemetry_counter = 0;
 

@@ -319,7 +319,7 @@ static void msg_B0(uint8_t gpschar)
 		int16_t masked = calculated_checksum.BB & 0x7FFF;
 		if (calculated_checksum.BB != INVALID_CHECKSUM && checksum_.BB == masked)
 		{
-			udb_background_trigger(); // parsing is complete and valid, schedule navigation
+			gps_parse_common(); // parsing is complete and valid, schedule navigation
 		}
 		msg_parse = &msg_B3;
 	}

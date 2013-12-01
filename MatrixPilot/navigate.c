@@ -20,18 +20,21 @@
 
 
 #include "defines.h"
+#include "navigate.h"
+#include "flightplan-waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/libUDB.h"
 #include <stdlib.h>
 
-//	Compute actual and desired courses.
-//	Actual course is simply the scaled GPS course over ground information.
-//	Desired course is a "return home" course, which is simply the negative of the
-//	angle of the vector from the origin to the location of the plane.
+// Compute actual and desired courses.
+// Actual course is simply the scaled GPS course over ground information.
+// Desired course is a "return home" course, which is simply the negative of the
+// angle of the vector from the origin to the location of the plane.
 
-//	The origin is recorded as the location of the plane during power up of the control.
+// The origin is recorded as the location of the plane during power up of the control.
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
@@ -78,8 +81,9 @@ void dcm_callback_gps_location_updated(void)
 {
 	if (flags._.save_origin)
 	{
-		//	capture origin information during power up. much of this is not actually used for anything,
-		//	but is saved in case you decide to extend this code.
+		// capture origin information during power up. much of this is not
+		// actually used for anything, but is saved in case you decide to
+		// extend this code.
 		flags._.save_origin = 0;
 		setup_origin();
 #if (BAROMETER_ALTITUDE == 1)
@@ -87,12 +91,13 @@ void dcm_callback_gps_location_updated(void)
 #endif
 	}
 
-//	Ideally, navigate should take less than one second. For MatrixPilot, navigation takes only
-//	a few milliseconds.
+// Ideally, navigate should take less than one second.
+// For MatrixPilot, navigation takes only a few milliseconds.
 
-//	If you rewrite navigation to perform some rather ambitious calculations, perhaps using floating
-//	point, matrix inversions, Kalman filters, etc., you will not cause a stack overflow if you
-//	take more than 1 second, the interrupt handler will simply skip some of the navigation passes.
+// If you rewrite navigation to perform some rather ambitious calculations,
+// perhaps using floating point, matrix inversions, Kalman filters, etc,
+// you will not cause a stack overflow if you take more than 1 second,
+// the interrupt handler will simply skip some of the navigation passes.
 }
 
 #ifdef USE_EXTENDED_NAV
@@ -100,7 +105,6 @@ void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
 #else
 void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 #endif // USE_EXTENDED_NAV
-
 {
 	struct relative2D courseLeg;
 	int16_t courseDirection[2];
@@ -115,7 +119,7 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 
 	from_to_x.WW = toPoint.x - fromPoint.x;
 	from_to_y.WW = toPoint.y - fromPoint.y;
-	from_to_z = toPoint.z - fromPoint.z;
+	from_to_z    = toPoint.z - fromPoint.z;
 
 	first_one_bit_location_x = find_first_bit_int32(from_to_x.WW);
 	first_one_bit_location_y = find_first_bit_int32(from_to_y.WW);
@@ -141,7 +145,8 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 
 		extended_range = 1;
 	}
-	else {
+	else
+	{
 		extended_range = 0;
 	}
 #endif // USE_EXTENDED_NAV
@@ -167,7 +172,7 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 
 //struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
 //extern struct waypointparameters goal;
-	DPRINT("set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
+//	DPRINT("set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
 
 //  New method for computing cosine and sine of course direction
 	vector2_normalize(&courseDirection[0], &courseDirection[0]);
@@ -207,16 +212,13 @@ void compute_bearing_to_goal(void)
 	// to get the distance to the "finish" line:
 	temporary.WW = (__builtin_mulss(togoal.x, goal.cosphi)
 	              + __builtin_mulss(togoal.y, goal.sinphi))<<2;
-
 	tofinish_line = temporary._.W1;
 
 	// Determine if aircraft is making forward progress.
 	// If not, do not apply cross track correction.
 	// This is done to prevent "waggles" during a 180 degree turn.
-
 	temporary.WW = (__builtin_mulss(IMUintegralAccelerationx._.W1, goal.cosphi)
 	              + __builtin_mulss(IMUintegralAccelerationy._.W1, goal.sinphi));
-
 	if ((desired_behavior._.cross_track) && (temporary._.W1 > 0))
 	{
 		// Using Cross Tracking
@@ -245,7 +247,6 @@ void compute_bearing_to_goal(void)
 		// The following rotation transforms the cross track error vector into the
 		// frame of the desired course track
 		rotate_2D_long_vector_by_vector(&crossVector[0].WW, cross_rotate);
-
 		crosstrack = crossVector[1]._.W1;
 
 		// Compute the adjusted desired bearing over ground.
@@ -325,18 +326,18 @@ uint16_t wind_gain_adjustment(void)
 	uint16_t G_over_2A;
 	uint16_t G_over_2A_sqr;
 	uint32_t temporary_long;
+
 	horizontal_air_speed = vector2_mag(IMUvelocityx._.W1 - estimatedWind[0],
 	                                   IMUvelocityy._.W1 - estimatedWind[1]);
 	horizontal_ground_speed_over_2 = vector2_mag(IMUvelocityx._.W1,
 	                                             IMUvelocityy._.W1) >> 1;
-
 	if (horizontal_ground_speed_over_2 >= horizontal_air_speed)
 	{
 		return 0xFFFF;
 	}
 	else if (horizontal_air_speed > 0)
 	{
-		temporary_long = ((uint32_t) horizontal_ground_speed_over_2) << 16;
+		temporary_long = ((uint32_t)horizontal_ground_speed_over_2) << 16;
 		G_over_2A = __builtin_divud(temporary_long, horizontal_air_speed);
 		temporary_long = __builtin_muluu(G_over_2A, G_over_2A);
 		G_over_2A_sqr = temporary_long >> 16;
@@ -373,8 +374,8 @@ int16_t determine_navigation_deflection(char navType)
 	uint16_t yawkp;
 	union longww forward_ground_speed;
 
-	forward_ground_speed.WW =((__builtin_mulss(-IMUintegralAccelerationx._.W1, rmat[1])
-	                         + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4])) << 2);
+	forward_ground_speed.WW = ((__builtin_mulss(-IMUintegralAccelerationx._.W1, rmat[1])
+	                          + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4])) << 2);
 	// If plane is flying, and is making forward progress over the ground,
 	// use course over ground to navigate, otherwise, use attitude.
 	// Forward ground speed must be greater than 1/8 of the airspeed, plus a fixed margin
@@ -447,11 +448,11 @@ int16_t determine_navigation_deflection(char navType)
 	{
 		if (crossprod._.W1 > 0)
 		{
-			deflectionAccum._.W1 = (yawkp/2);
+			deflectionAccum._.W1 = (yawkp / 2);
 		}
 		else
 		{
-			deflectionAccum._.W1 = -(yawkp/2); // yawkp is unsigned, must divide and then negate
+			deflectionAccum._.W1 = -(yawkp / 2);    // yawkp is unsigned, must divide and then negate
 		}
 	}
 	if (navType == 'h')

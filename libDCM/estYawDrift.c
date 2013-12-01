@@ -22,21 +22,17 @@
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 #include "mathlibNAV.h"
+#include "rmat.h"
 
 //  Compute actual and desired courses.
 //  Actual course is simply the scaled GPS course over ground information.
 //  Desired course is a "return home" course, which is simply the negative of
 //  the angle of the vector from the origin to the location of the plane.
 
-//  The origin is recorded as the location of the plane during power up.
-
 void dcm_enable_yaw_drift_correction(boolean enabled)
 {
 	dcm_flags._.skip_yaw_drift = !enabled;
 }
-
-extern int8_t actual_dir;
-extern int8_t calculated_heading;
 
 void estYawDrift(void)
 {

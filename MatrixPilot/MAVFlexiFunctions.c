@@ -29,9 +29,6 @@
 #include "../libFlexiFunctions/flexiFunctionServices.h"
 #endif
 
-extern mavlink_flags_t mavlink_flags;
-
-
 boolean MAVFlexiFunctionsHandleMessage(mavlink_message_t* handle_msg)
 {
 	switch (handle_msg->msgid)

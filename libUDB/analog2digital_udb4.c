@@ -44,8 +44,8 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 // Number of locations for ADC buffer = 10 (AN1,4,6,9,10,11,15,16,17,18) x 1 = 10 words
 // Align the buffer to 10 words or 20 bytes. This is needed for peripheral indirect mode
 #define NUM_AD_CHAN 10
-int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
-int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
+int16_t BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
+int16_t BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 
 
 #if 0   // these are the original/legacy values, switch this off to test Mark's new timing constants

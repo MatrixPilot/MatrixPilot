@@ -24,6 +24,7 @@
 #include "interrupt.h"
 #include "analogs.h"
 #include "events.h"
+#include "osd.h"
 
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
@@ -57,15 +58,7 @@ void udb_skip_imu_calibration(boolean b)
 {
 	udb_skip_flags.skip_imu_cal = 1;
 }
-
-#endif
-
-
-//#if(USE_NV_MEMORY == 1)
-//if(udb_skip_flags.skip_radio_trim == 1)
-//if(udb_skip_flags.skip_imu_cal == 1)
-//#endif
-//
+#endif // (USE_NV_MEMORY == 1)
 
 void udb_init(void)
 {
@@ -98,7 +91,7 @@ void udb_init(void)
 	udb_init_USART();
 #endif
 	udb_init_pwm();
-	udb_init_osd();
+	osd_init();
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)

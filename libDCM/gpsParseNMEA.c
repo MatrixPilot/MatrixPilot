@@ -622,7 +622,7 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 #ifdef DEBUG_NMEA
 				debug_rmc_send(gpschar);
 #endif
-				udb_background_trigger();   // parsing is complete, schedule navigation
+				gps_parse_common();         // parsing is complete, schedule navigation
 			}
 		}
 		else

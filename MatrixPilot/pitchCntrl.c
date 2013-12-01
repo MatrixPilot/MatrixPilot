@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 #include "airspeedCntrl.h"
 
 //  If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.

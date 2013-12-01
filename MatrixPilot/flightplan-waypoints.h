@@ -19,16 +19,23 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM.h"
+#ifndef FLIGHTPLAN_WAYPOINTS_H
+#define FLIGHTPLAN_WAYPOINTS_H
 
-void dcm_init_rmat(void);
 
-void estYawDrift(void);
-void estimateWind(void);
+extern uint16_t number_of_waypoints;
+extern int16_t waypointIndex;
+extern int8_t extended_range;  // TODO: move this to navigate.h
 
-void gps_commit_data(void);
 
-void gpsoutline(const char* message);
-void gpsoutbin(int16_t length, const uint8_t* msg);
+void init_flightplan(int16_t flightplanNum);
+vect3D_32 getWaypoint3D(uint16_t wp);
+boolean use_fixed_origin(void);
+struct absolute3D get_fixed_origin(void);
+void run_flightplan(void);
+void flightplan_live_begin(void);
+void flightplan_live_received_byte(uint8_t inbyte);
+void flightplan_live_commit(void);
 
-void dcm_run_imu_step(void);    // This needs to be run every 25ms
+
+#endif // FLIGHTPLAN_WAYPOINTS_H

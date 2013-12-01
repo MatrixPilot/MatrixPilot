@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "flightplan-waypoints.h"
 #include "../libDCM/libDCM_internal.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/mathlibNAV.h"
@@ -53,8 +54,6 @@ enum PLANE_FLIGHT_MODE
 	PLANE_IN_FLIGHT,
 	PLANE_LANDED
 };
-
-extern int16_t waypointIndex;
 
 #if (GPS_TYPE == GPS_MTEK)
 	extern union longbbbb date_gps_, time_gps_;

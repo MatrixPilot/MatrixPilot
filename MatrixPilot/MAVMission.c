@@ -25,12 +25,8 @@
 
 #include "MAVLink.h"
 #include "MAVMission.h"
-
-extern mavlink_flags_t mavlink_flags;
-
-extern int8_t calculated_heading;
-extern uint16_t number_of_waypoints;
-extern int16_t waypointIndex;
+#include "flightplan-waypoints.h"
+#include "../libDCM/gpsParseCommon.h"
 
 uint16_t waypoint_request_i;
 uint16_t mav_waypoint_reached;
@@ -42,7 +38,6 @@ uint16_t mavlink_waypoint_timeout = 0;
 uint8_t  number_of_waypoint_retries = 2;
 uint8_t  mavlink_waypoint_frame = MAV_FRAME_GLOBAL;
 boolean  mavlink_waypoint_current = true;
-
 
 #define MAX_WAYPOINTS 4
 
@@ -741,11 +736,17 @@ void MAVMissionOutput_40hz(void)
 
 			//BUILDING
 
-			//extern struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints;
 			//struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
-			struct waypoint3D getWaypoint3D(uint16_t wp);
-			struct waypoint3D wp;
+
+//			struct waypoint3D getWaypoint3D(uint16_t wp);
+//			struct waypoint3D wp;
+//			wp = getWaypoint3D(mavlink_waypoint_requested_sequence_number);
+
+			vect3D_32 getWaypoint3D(uint16_t wp);
+			vect3D_32 wp;
 			wp = getWaypoint3D(mavlink_waypoint_requested_sequence_number);
+
+
 
 			//float lat_float, lon_float, alt_float = 0.0;
 			//uint32_t accum_long = IMUlocationy._.W1 + (lat_origin.WW / 90); //  meters North from Equator

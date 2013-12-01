@@ -26,11 +26,10 @@
 #include "MAVLink.h"
 #include "MAVParams.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
+#include "../libDCM/rmat.h"
 //#include <string.h>
 //#include <stdarg.h>
 #include <math.h>
-
-extern mavlink_flags_t mavlink_flags;
 
 #if (DECLINATIONANGLE_VARIABLE != 1)
 union intbb dcm_declination_angle = {.BB = 0};

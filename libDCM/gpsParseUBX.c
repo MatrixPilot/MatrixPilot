@@ -275,12 +275,11 @@ static uint8_t nmea_passthrough_char = 0;
 //static int16_t frame_errors = 0;
 
 #if (HILSIM == 1)
-	union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
-	union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
-	union intbb p_sim_,     q_sim_,     r_sim_;
-	union intbb p_sim,      q_sim,      r_sim;
-
-	void commit_bodyrate_data(void);
+static union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
+static union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
+static union intbb p_sim_,     q_sim_,     r_sim_;
+static union intbb p_sim,      q_sim,      r_sim;
+void commit_bodyrate_data(void);
 #endif
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
@@ -782,7 +781,7 @@ static void msg_CS1(uint8_t gpschar)
 		if (msg_id == 0x12)
 		{
 			// correct checksum for VELNED message
-			udb_background_trigger();  // parsing is complete, schedule navigation
+			gps_parse_common(); // parsing is complete, schedule navigation
 		}
 #if (HILSIM == 1)
 		else if (msg_id == 0xAB)
@@ -843,6 +842,20 @@ void commit_bodyrate_data(void)
 	p_sim = p_sim_;
 	q_sim = q_sim_;
 	r_sim = r_sim_;
+}
+
+void HILSIM_set_gplane(void)
+{
+	gplane[0] = g_a_x_sim.BB;
+	gplane[1] = g_a_y_sim.BB;
+	gplane[2] = g_a_z_sim.BB;
+}
+
+void HILSIM_set_omegagyro(void)
+{
+	omegagyro[0] = q_sim.BB;
+	omegagyro[1] = p_sim.BB;
+	omegagyro[2] = r_sim.BB;
 }
 #endif // HILSIM
 

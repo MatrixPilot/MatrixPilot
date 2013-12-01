@@ -21,7 +21,9 @@
 
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
+#include "deadReckoning.h"
 #include "mathlibNAV.h"
+#include "rmat.h"
 #include "../libUDB/heartbeat.h"
 
 
@@ -80,8 +82,6 @@ fractional locationErrorEarth[] = { 0, 0, 0 };
 // GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0, 0, 0 };
 
-extern int16_t errorYawground[];
-
 void dead_reckon(void)
 {
 	if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
@@ -120,7 +120,7 @@ void dead_reckon(void)
 		}
 		else  // GPS has gotten disconnected
 		{
-			errorYawground[0] = errorYawground[1] = errorYawground[2] = 0; // turn off yaw drift
+			yaw_drift_reset();
 			dcm_flags._.gps_history_valid = 0; // restart GPS history variables
 			IMUvelocityx.WW = IMUintegralAccelerationx.WW;
 			IMUvelocityy.WW = IMUintegralAccelerationy.WW;

@@ -19,16 +19,20 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM.h"
+#ifndef DEADRECKONING_H
+#define DEADRECKONING_H
 
-void dcm_init_rmat(void);
 
-void estYawDrift(void);
-void estimateWind(void);
+extern uint16_t air_speed_3DIMU;
+extern int16_t total_energy;
+extern fractional locationErrorEarth[3];
 
-void gps_commit_data(void);
+extern union longww IMUlocationx, IMUlocationy, IMUlocationz;
+extern union longww IMUvelocityx, IMUvelocityy, IMUvelocityz;
+#define IMUheight IMUlocationz._.W1
 
-void gpsoutline(const char* message);
-void gpsoutbin(int16_t length, const uint8_t* msg);
 
-void dcm_run_imu_step(void);    // This needs to be run every 25ms
+void dead_reckon(void);
+
+
+#endif // DEADRECKONING_H

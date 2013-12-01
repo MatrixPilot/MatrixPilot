@@ -25,14 +25,14 @@
 
 #include "MAVLink.h"
 #include "MAVUDBExtra.h"
+#include "navigate.h"
+#include "flightplan-waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/deadReckoning.h"
 #include "../libDCM/rmat.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
 #endif
-
-extern mavlink_flags_t mavlink_flags;
-extern int16_t waypointIndex;
 
 union intbb voltage_milis = {0};
 int16_t mavlink_sue_telemetry_counter = 8; // Countdown counter, for use with SERIAL_UDB_EXTRA compatibility

@@ -92,8 +92,8 @@ const uint32_t adc_clk = ADC_CLK;
 #define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
 const uint32_t adc_rate = ADC_RATE;
 
-//#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
-#define ALMOST_ENOUGH_SAMPLES 20
+#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+//#define ALMOST_ENOUGH_SAMPLES 20
 const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
 //#define _SELECTED_VALUE(l,v) #l#v
@@ -199,7 +199,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-
 
 #if (RECORD_FREE_STACK_SPACE == 1)
 	uint16_t stack = SP_current();

@@ -32,8 +32,8 @@
 union dcm_fbts_word dcm_flags;
 
 // Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT  (int)(10 * HEARTBEAT_HZ)    // 10 seconds
-#define GPS_COUNT    (int)(25 * HEARTBEAT_HZ)    // 25 seconds
+#define CALIB_COUNT  400    // 10 seconds at 40 Hz
+#define GPS_COUNT    1000   // 25 seconds at 40 Hz
 
 #if (HILSIM == 1)
 #if (USE_VARIABLE_HILSIM_CHANNELS != 1)
@@ -90,12 +90,6 @@ void dcm_run_init_step(void)
 	}
 }
 
-void udb_callback_read_sensors(void)
-{
-	read_gyros(); // record the average values for both DCM and for offset measurements
-	read_accel();
-}
-
 #if (BAROMETER_ALTITUDE == 1)
 
 // We want to be reading both the magnetometer and the barometer at 4Hz
@@ -130,10 +124,13 @@ void do_I2C_stuff(void)
 #endif // BAROMETER_ALTITUDE
 
 // Called at HEARTBEAT_HZ
-void udb_servo_callback_prepare_outputs(void)
+void udb_heartbeat_callback(void)
 {
 #if (BAROMETER_ALTITUDE == 1)
-	do_I2C_stuff();
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+	{
+		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
+	}
 #else
 //#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 #if (MAG_YAW_DRIFT == 1)
@@ -215,6 +212,18 @@ struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute)
 	return rel;
 }
 #endif // USE_EXTENDED_NAV
+
+vect3D_32 dcm_rel2abs(vect3D_32 rel)
+{
+	vect3D_32 abs;
+
+	abs.z = rel.z;
+	abs.y = (rel.y * 90) + lat_origin.WW;
+	abs.x = (rel.x * 90) + lon_origin.WW;
+//	abs.x = long_scale((rel.x * 90), cos_lat) + lon_origin.WW;
+
+	return abs;
+}
 
 #if (HILSIM == 1)
 

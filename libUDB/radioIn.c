@@ -36,6 +36,8 @@
 #define PPM_IC 1
 #define IC_PIN IC_PIN1
 
+#define MAX_NOISE_RATE 5    // up to 5 PWM "glitches" per second are allowed
+
 #if (MIPS == 64)
 #define TMR_FACTOR 4
 #elif (MIPS == 32)
@@ -61,8 +63,8 @@
 int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
 int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 
-int16_t failSafePulses = 0;
-int16_t noisePulses = 0;
+static int16_t failSafePulses = 0;
+static int16_t noisePulses = 0;
 
 
 void udb_servo_record_trims(void)
@@ -138,7 +140,34 @@ void udb_init_capture(void)
 #endif // NORADIO
 }
 
-void set_udb_pwIn(int pwm, int index)
+void radioIn_failsafe_check(void)
+{
+	// check to see if at least one valid pulse has been received,
+	// and also that the noise rate has not been exceeded
+	if ((failSafePulses == 0) || (noisePulses > MAX_NOISE_RATE))
+	{
+		if (udb_flags._.radio_on == 1)
+		{
+			udb_flags._.radio_on = 0;
+			udb_callback_radio_did_turn_off();
+		}
+		LED_GREEN = LED_OFF;
+		noisePulses = 0; // reset count of noise pulses
+	}
+	else
+	{
+		udb_flags._.radio_on = 1;
+		LED_GREEN = LED_ON;
+	}
+	failSafePulses = 0;
+}
+
+void radioIn_failsafe_reset(void)
+{
+	noisePulses = 0;
+}
+
+static void set_udb_pwIn(int pwm, int index)
 {
 #if (NORADIO != 1)
 	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front

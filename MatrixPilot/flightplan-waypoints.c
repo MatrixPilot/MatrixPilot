@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+#include "navigate.h"
+#include "flightplan-waypoints.h"
+#include "../libDCM/deadReckoning.h"
 #include <stdlib.h>
 
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
@@ -37,18 +40,14 @@ struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D vie
 #define NUMBER_POINTS ((sizeof waypoints) / sizeof (struct waypointDef))
 #define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))
 
-struct waypointDef *currentWaypointSet = (struct waypointDef*)waypoints;
-int16_t numPointsInCurrentSet = NUMBER_POINTS;
 uint16_t number_of_waypoints = NUMBER_POINTS;
-
 int16_t waypointIndex = 0;
 
-extern int8_t extended_range;
-struct relWaypointDef current_waypoint;
-
-
-struct waypointDef wp_inject;
-uint8_t wp_inject_pos = 0;
+static struct waypointDef* currentWaypointSet = (struct waypointDef*)waypoints;
+static int16_t numPointsInCurrentSet = NUMBER_POINTS;
+static struct relWaypointDef current_waypoint;
+static struct waypointDef wp_inject;
+static uint8_t wp_inject_pos = 0;
 #define WP_INJECT_READY 255
 const uint8_t wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15, 14, 13, 12, 19, 18, 17, 16, 21, 20 };
 
@@ -56,7 +55,7 @@ const uint8_t wp_inject_byte_order[] = {3, 2, 1, 0, 7, 6, 5, 4, 9, 8, 11, 10, 15
 // waypoint location through unchanged.
 // For an absolute waypoint, wp_to_relative() converts the waypoint's
 // location from absolute to relative.
-struct relWaypointDef wp_to_relative(struct waypointDef wp)
+static struct relWaypointDef wp_to_relative(struct waypointDef wp)
 {
 	struct relWaypointDef rel;
 
@@ -83,6 +82,29 @@ struct relWaypointDef wp_to_relative(struct waypointDef wp)
 	return rel;
 }
 
+//struct relWaypointDef wp_to_absolute(struct waypointDef wp)
+
+//struct waypoint3D wp_to_absolute(struct waypointDef wp)
+static vect3D_32 wp_to_absolute_coords(struct waypointDef wp)
+{
+	vect3D_32 v;
+
+	if (wp.flags & F_ABSOLUTE)
+	{
+		v.x = wp.loc.x;
+		v.y = wp.loc.y;
+		v.z = wp.loc.z;
+	}
+	else
+	{
+		v.x = wp.loc.x;
+		v.y = wp.loc.y;
+		v.z = wp.loc.z;
+		v = dcm_rel2abs(v);
+	}
+	return v;
+}
+
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
@@ -106,9 +128,17 @@ void init_flightplan(int16_t flightplanNum)
 	// udb_background_trigger();    // trigger navigation immediately
 }
 
-struct waypoint3D getWaypoint3D(uint16_t wp)
+//struct waypoint3D getWaypoint3D(uint16_t wp)
+vect3D_32 getWaypoint3D(uint16_t wp)
 {
-	return currentWaypointSet[wp].loc;
+//struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
+//	struct waypoint3D = currentWaypointSet[wp].loc;
+
+	vect3D_32 v;
+	v = wp_to_absolute_coords(currentWaypointSet[wp]);
+	return v;
+
+//	return currentWaypointSet[wp].loc;
 }
 
 boolean use_fixed_origin(void)
@@ -212,7 +242,7 @@ void run_flightplan(void)
 	
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN))
+		if (abs(IMUheight - goal.height) < ((int16_t)HEIGHT_MARGIN))
 		{
 			next_waypoint();
 		}

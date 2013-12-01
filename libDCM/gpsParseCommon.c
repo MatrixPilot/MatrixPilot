@@ -23,6 +23,8 @@
 #include "gpsParseCommon.h"
 #include "estAltitude.h"
 #include "mathlibNAV.h"
+#include "rmat.h"
+#include "../libUDB/interrupt.h"
 #include <string.h>
 
 
@@ -66,7 +68,7 @@ uint16_t ground_velocity_magnitudeXY = 0;
 int16_t forward_acceleration = 0;
 uint16_t air_speed_magnitudeXY = 0;
 uint16_t air_speed_3DGPS = 0;
-int8_t calculated_heading;
+int8_t calculated_heading;           // takes into account wind velocity
 
 static int8_t cog_previous = 64;
 static int16_t sog_previous = 0;
@@ -155,10 +157,24 @@ void udb_gps_callback_received_byte(uint8_t rxchar)
 	(*msg_parse)(rxchar);   // parse the input byte
 }
 
+boolean gps_nav_capable_check_set(void)
+{
+	if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++;
+	dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE);
+//	return (gps_data_age < GPS_DATA_MAX_AGE);
+	return dcm_flags._.nav_capable;
+}
+
+void udb_background_callback_triggered(void);
+
 // Received a full set of GPS messages
+void gps_parse_common(void)
+{
+	udb_background_trigger(&udb_background_callback_triggered);
+}
+
 void udb_background_callback_triggered(void)
 {
-	union longbbbb accum_nav;
 	union longbbbb accum;
 	union longww accum_velocity;
 	int8_t cog_circular;
@@ -169,6 +185,7 @@ void udb_background_callback_triggered(void)
 	int32_t location[3];
 #else
 	int16_t location[3];
+	union longbbbb accum_nav;
 #endif // USE_EXTENDED_NAV
 	int16_t location_deltaZ;
 	struct relative2D location_deltaXY;

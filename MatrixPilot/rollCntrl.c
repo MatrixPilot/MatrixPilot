@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"

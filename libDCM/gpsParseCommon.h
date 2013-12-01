@@ -21,16 +21,16 @@
 
 extern union longbbbb tow;
 extern union intbb week_no;
-extern union intbb sog_gps;                         // speed over ground
-extern union uintbb cog_gps;                        // course over ground, units: degrees * 100, range [0-35999]
-extern union intbb climb_gps;                       // climb
+extern union intbb sog_gps;                 // speed over ground
+extern union uintbb cog_gps;                // course over ground, units: degrees * 100, range [0-35999]
+extern union intbb climb_gps;               // climb
 extern union intbb as_sim;
 //extern union longbbbb as_sim_;
-extern uint8_t hdop;                                // horizontal dilution of precision
-extern union longbbbb xpg, ypg, zpg;                // gps x, y, z position
-extern union intbb xvg, yvg, zvg;                   // gps x, y, z velocity
-//extern uint8_t mode1, mode2;                      // gps mode1, mode2
-extern uint8_t svs;                                 // number of satellites
+extern uint8_t hdop;                        // horizontal dilution of precision
+extern union longbbbb xpg, ypg, zpg;        // gps x, y, z position
+extern union intbb xvg, yvg, zvg;           // gps x, y, z velocity
+//extern uint8_t mode1, mode2;              // gps mode1, mode2
+extern uint8_t svs;                         // number of satellites
 extern int16_t cos_lat;
 
 // the following variables are shared internally between the various GPS parsing modules only
@@ -50,12 +50,26 @@ extern union longbbbb tow_;
 extern union longbbbb date_gps_;
 extern union longbbbb time_gps_;
 
+extern uint16_t ground_velocity_magnitudeXY;
+extern uint16_t air_speed_magnitudeXY;
+extern int8_t calculated_heading;           // takes into account wind velocity
+extern int16_t gps_data_age;
+extern int8_t actual_dir;
+
+extern int16_t forward_acceleration;
+extern uint16_t air_speed_3DGPS;
+
+
 //extern void (*msg_parse)(uint8_t inchar);
 //extern void (*gps_startup_sequence)(int16_t gpscount);
 //extern boolean (*gps_nav_valid)(void);
 //extern void (*gps_commit_data)(void);
 
 void gps_init(void);
+void gps_parse_common(void);
+boolean gps_nav_capable_check_set(void);
+void HILSIM_set_gplane(void);
+void HILSIM_set_omegagyro(void);
 
 int32_t get_gps_date(void);
 int32_t get_gps_time(void);

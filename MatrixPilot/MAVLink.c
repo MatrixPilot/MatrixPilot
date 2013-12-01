@@ -52,6 +52,7 @@
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h" // Needed for access to internal DCM value
 #include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../MatrixPilot/euler_angles.h"
 #include "../libUDB/events.h"
@@ -78,7 +79,7 @@ mavlink_status_t r_mavlink_status;
 	if (!(exp)) \
 	{ \
 		printf("MAVLink Test Fail: " \
-		"at %s, line %d.\r\n", __FILE__, __LINE__); \
+		       "at %s, line %d.\r\n", __FILE__, __LINE__); \
 		mavlink_tests_fail++; \
 	} else { \
 		mavlink_tests_pass++; \
@@ -198,15 +199,16 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint1
 	return (1);
 }
 
-void mav_printf(const char * format, ...)
+void mav_printf(const char* format, ...)
 {
 	char buf[200];
-
 	va_list arglist;
+
 	va_start(arglist, format);
-	int16_t len = vsnprintf(buf, sizeof(buf), format, arglist);
-	printf("%s", buf);
-//	mavlink_serial_send(0, (uint8_t)buf, len);
+	vsnprintf(buf, sizeof(buf), format, arglist);
+	// mavlink_msg_statustext_send(MAVLINK_COMM_1, severity, text);
+	// severity: Severity of status, 0 = info message, 255 = critical fault (uint8_t)
+	mavlink_msg_statustext_send(MAVLINK_COMM_0, 0, buf);
 	va_end(arglist);
 }
 
@@ -217,6 +219,7 @@ void serial_output(char* format, ...)
 	int16_t remaining = 0;
 	int16_t wrote = 0;
 	va_list arglist;
+
 	va_start(arglist, format);
 	remaining = MAVLINK_TEST_MESSAGE_SIZE;
 	wrote = vsnprintf((char*)(&mavlink_test_message_buffer[0]), (size_t)remaining, format, arglist);

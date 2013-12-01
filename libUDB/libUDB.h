@@ -130,20 +130,27 @@ void udb_run(void);
 // Run Background Tasks
 
 // Implement this callback to perform periodic background tasks (high priority).
-// It is called once every 0.5 seconds, and must return quickly. (No printf!)
-void udb_background_callback_periodic(void);    // Callback
+// It is called at 40 Hertz and must return quickly. (No printf!)
+void udb_heartbeat_40hz_callback(void);
 
-// Call this function to trigger the udb_background_callback_triggered() function
+// Implement this callback to prepare the pwOut values.
+// It is called at HEARTBEAT_HZ at a low priority.
+void udb_heartbeat_callback(void);
+
+typedef void (*background_callback)(void);
+
+// Call these to trigger the background_callback() function
 // from a low priority ISR.
-void udb_background_trigger(void);
+void udb_background_trigger(background_callback callback);
+void udb_background_trigger_pulse(background_callback callback);
 
 // Implement this callback to respond to udb_background_trigger() in
 // the background (low priority)
-void udb_background_callback_triggered(void);   // Callback
+//void udb_background_callback_triggered(void);   // Callback
 
-// This function returns the current CPU load as an integer percentage value
-// from 0-100.
+// Return the current CPU load as an integer percentage value from 0-100.
 uint8_t udb_cpu_load(void);
+inline void cpu_load_calc(void);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,8 +169,7 @@ extern int16_t udb_pwIn[];                  // pulse widths of radio inputs
 extern int16_t udb_pwTrim[];                // initial pulse widths for trimming
 
 // These are the servo channel values that will be sent out to the servos.
-// Set these values in your implementation of the udb_servo_callback_prepare_outputs()
-// callback.
+// Set these values in your implementation of the udb_heartbeat_callback()
 // Each channel should be set to a value between 2000 and 4000.
 extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
 
@@ -173,14 +179,22 @@ extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
 
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int16_t  udb_servo_pulsesat(int32_t pw);
+int16_t udb_servo_pulsesat(int32_t pw);
 
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
 void udb_servo_record_trims(void);
 
+// Called immediately whenever the radio_on flag is set to 0
+void udb_callback_radio_did_turn_off(void);     // Callback
+
+// Call this function to set the digital output to 0 or 1.
+// This can be used to do things like triggering cameras, turning on
+// lights, etc.
+void udb_set_action_state(boolean newValue);
+
 // Functions only included with nv memory.
-#if(USE_NV_MEMORY == 1)
+#if (USE_NV_MEMORY == 1)
 // Call this funtion to skip doing radio trim calibration
 void udb_skip_radio_trim(boolean);
 void udb_skip_imu_calibration(boolean);
@@ -193,25 +207,12 @@ typedef struct tagUDB_SKIP_FLAGS
 } UDB_SKIP_FLAGS;
 
 extern UDB_SKIP_FLAGS udb_skip_flags;
-#endif
-
-// Implement this callback to prepare the pwOut values.
-// It is called at HEARTBEAT_HZ at a low priority.
-void udb_servo_callback_prepare_outputs(void);  // Callback
-
-// Called immediately whenever the radio_on flag is set to 0
-void udb_callback_radio_did_turn_off(void);     // Callback
-
-// Call this function to set the digital output to 0 or 1.
-// This can be used to do things like triggering cameras, turning on
-// lights, etc.
-void udb_set_action_state(boolean newValue);
-
+#endif // (USE_NV_MEMORY == 1)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Raw Accelerometer and Gyroscope(rate) Values
 extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
-extern struct ADchannel udb_xrate, udb_yrate, udb_zrate;   // x, y, and z gyro channels
+extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
 extern struct ADchannel udb_vref;                          // reference voltage
 extern struct ADchannel udb_analogInputs[];
 
@@ -285,14 +286,14 @@ void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
 
 // Write 1 byte to eeprom at address, or read 1 byte from address in eeprom into data
 void eeprom_ByteWrite(uint16_t address, uint8_t data);
-void eeprom_ByteRead(uint16_t address, uint8_t *data);
+void eeprom_ByteRead(uint16_t address, uint8_t* data);
 
 // Write numbytes of data to eeprom, starting at address. The write area can not span a
 // page boundry.  Pages start on addresses of multiples of 64.
 // Read numbytes of data from address in eeprom into data.  Note that there is no 1-page
 // limit for sequential reads as there is for page writes.
-void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes);
-void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes);
+void eeprom_PageWrite(uint16_t address, uint8_t* data, uint8_t numbytes);
+void eeprom_SequentialRead(uint16_t address, uint8_t* data, uint16_t numbytes);
 
 
 #endif // LIB_UDB_H

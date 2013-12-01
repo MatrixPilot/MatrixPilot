@@ -28,7 +28,7 @@
 #define SCALEGYRO           3.0016  // 500 degree/second range
 #define SCALEACCEL          1.29    // 4 g range
 
-#define NUM_ANALOG_INPUTS   7
+//#define NUM_ANALOG_INPUTS   7
 
 // A/D channels:
 #define A_VOLT_BUFF         5       // V, pin label Bat Volt

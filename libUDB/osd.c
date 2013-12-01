@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "oscillator.h"
-#include "defines.h"
+//#include "defines.h"
 #include "osd_config.h"
 #include "osd.h"
 
@@ -51,7 +51,7 @@ void osd_reset(void)
 //	__delay32(20000UL * SF);
 }
 
-void udb_init_osd(void)
+void osd_init(void)
 {
 	osd_spi_init();
 	osd_reset();
@@ -63,7 +63,7 @@ void osd_spi_write_location(int16_t loc)
 	osd_spi_write(0x06, (uint8_t)(loc & 0xFF)); // DMAL
 }
 
-void osd_spi_write_string(const uint8_t *str)
+void osd_spi_write_string(const uint8_t* str)
 {
 	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
 	
@@ -75,7 +75,7 @@ void osd_spi_write_string(const uint8_t *str)
 	}
 }
 
-void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
+void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t* str)
 {
 	while (1)
 	{
@@ -241,6 +241,6 @@ void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places,
 
 #else
 
-void udb_init_osd(void) {}
+void osd_init(void) {}
 
 #endif // USE_OSD

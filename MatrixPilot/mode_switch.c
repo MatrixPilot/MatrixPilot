@@ -74,7 +74,7 @@ int16_t flight_mode_switch_waypoints(void)
 // to create three flight modes. When switch is "Down" the plane always reverts to Manual. When "Up" the plane moves to Stabilized".
 // If the user is in stabilized ("Up"), and then the user toggles the switch to Down, Up, Down, Up, then the plane moves to autonomous.
 // Each toggle must be achieved with a limited time period (MAX_PAUSE_TOGGLE) and not faster than 1/40th of a second.
-// When in Autonomous, a move to "Down" puts the switch state  back to Manual. And a futher move to "UP, will put the
+// When in Autonomous, a move to "Down" puts the switch state back to Manual. And a futher move to "UP, will put the
 // switch state back in stabilized. The important design concept is that Manual is always Manual immediately.
 // Stabilized is Stabilized unless you try quite hard to reach Autonomous.
 void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz

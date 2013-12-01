@@ -18,17 +18,37 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef NAVIGATE_H
+#define NAVIGATE_H
 
-#include "libDCM.h"
 
-void dcm_init_rmat(void);
+struct waypointparameters {
+	int16_t x;
+	int16_t y;
+	int16_t cosphi;
+	int16_t sinphi;
+	int8_t  phi;
+	int16_t height;
+	int16_t fromHeight;
+	int16_t legDist;
+};
 
-void estYawDrift(void);
-void estimateWind(void);
+extern struct waypointparameters goal;
+extern struct relative2D togoal;
+extern int16_t tofinish_line;
+extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+extern int8_t desired_dir;
 
-void gps_commit_data(void);
+void init_navigation(void);
+#ifdef USE_EXTENDED_NAV
+void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
+#else
+void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
+#endif // USE_EXTENDED_NAV
+void update_goal_alt(int16_t z);
+void compute_bearing_to_goal (void);
+void process_flightplan(void);
+int16_t determine_navigation_deflection(char navType);
 
-void gpsoutline(const char* message);
-void gpsoutbin(int16_t length, const uint8_t* msg);
 
-void dcm_run_imu_step(void);    // This needs to be run every 25ms
+#endif // NAVIGATE_H

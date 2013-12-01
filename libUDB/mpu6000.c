@@ -206,7 +206,8 @@ void process_MPU_data(void)
  */
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
-	_T1IF = 1;              // trigger the heartbeat interrupt
+//	_T1IF = 1;              // trigger the heartbeat interrupt
+	heartbeat();
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 
@@ -241,9 +242,11 @@ void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 #endif
 
 // Used for debugging:
-void MPU6000_print(void) {
-	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n", mpuCnt,
-	       mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+void MPU6000_print(void)
+{
+	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
+	    mpuCnt,      mpu_data[0], mpu_data[1], mpu_data[2], 
+	    mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
 #endif // (BOARD_TYPE != UDB4_BOARD)
