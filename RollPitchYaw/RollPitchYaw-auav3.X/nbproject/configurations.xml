@@ -76,6 +76,7 @@
         <itemPath>../../libUDB/analogs.c</itemPath>
         <itemPath>../../libUDB/traps.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../libUDB/heartbeat.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>

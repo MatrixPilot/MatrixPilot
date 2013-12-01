@@ -70,6 +70,7 @@
         <itemPath>../../libUDB/serialIO.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
         <itemPath>../../libUDB/analogs.c</itemPath>
+        <itemPath>../../libUDB/heartbeat.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>

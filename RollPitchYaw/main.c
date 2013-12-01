@@ -58,7 +58,7 @@ void init_events(void)
 }
 
 // Called every 1/40 second at high priority
-void udb_background_callback_periodic(void)
+void udb_heartbeat_40hz_callback(void)
 {
 	static int count = 0;
 	if (!dcm_flags._.calib_finished)
@@ -83,7 +83,7 @@ void dcm_callback_gps_location_updated(void)
 	udb_led_toggle(LED_GREEN);
 }
 
-// Called at 40 Hz, before sending servo pulses
+// Called at HEARTBEAT_HZ, before sending servo pulses
 void dcm_servo_callback_prepare_outputs(void)
 {
 	if (!dcm_flags._.calib_finished)
@@ -148,6 +148,6 @@ void udb_callback_radio_did_turn_off(void)
 {
 }
 
-void udb_init_osd(void)
+void osd_init(void)
 {
 }
