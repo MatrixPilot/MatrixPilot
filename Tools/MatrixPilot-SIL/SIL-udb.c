@@ -1,11 +1,12 @@
 //
-//  SIL-udb.h
+//  SIL-udb.c
 //  MatrixPilot-SIL
 //
 //  Created by Ben Levitt on 2/1/13.
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -145,33 +146,50 @@ void udb_skip_imu_calibration(boolean b)
 void udb_init(void)
 {
 	// If we were reest:
-	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0) {
+	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
+	{
 		mp_rcon = 128; // enable just the external/MCLR reset bit
 	}
-	
+
 	int16_t i;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++)
+	{
 		leds[i] = LED_OFF;
 	}
-	
+
 	udb_heartbeat_counter = 0;
-	
 	udb_flags.B = 0;
 	sil_radio_on = 1;
-	
+
 	sil_ui_init(mp_rcon);
-	
-	gpsSocket = UDBSocket_init((SILSIM_GPS_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_GPS_PORT, SILSIM_GPS_HOST, NULL, 0);
-	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_TELEMETRY_PORT, SILSIM_TELEMETRY_HOST, NULL, 0);
-	
-	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) > 0) {
-		serialSocket = UDBSocket_init(UDBSocketSerial, 0, NULL, SILSIM_SERIAL_RC_INPUT_DEVICE, SILSIM_SERIAL_RC_INPUT_BAUD);
+
+	gpsSocket = UDBSocket_init((SILSIM_GPS_RUN_AS_SERVER) ?
+	                            UDBSocketUDPServer :
+	                            UDBSocketUDPClient,
+	                            SILSIM_GPS_PORT,
+	                            SILSIM_GPS_HOST,
+	                            NULL,
+	                            0);
+	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_RUN_AS_SERVER) ?
+	                                  UDBSocketUDPServer :
+	                                  UDBSocketUDPClient,
+	                                  SILSIM_TELEMETRY_PORT,
+	                                  SILSIM_TELEMETRY_HOST,
+	                                  NULL,
+	                                  0);
+	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) > 0)
+	{
+		serialSocket = UDBSocket_init(UDBSocketSerial,
+		                              0,
+		                              NULL,
+		                              SILSIM_SERIAL_RC_INPUT_DEVICE,
+		                              SILSIM_SERIAL_RC_INPUT_BAUD);
 	}
 }
 
 #define UDB_WRAP_TIME 1000
-#define UDB_STEP_TIME 25
-//#define UDB_STEP_TIME (UDB_WRAP_TIME/HEARTBEAT_HZ)
+//#define UDB_STEP_TIME 25
+#define UDB_STEP_TIME (UDB_WRAP_TIME/HEARTBEAT_HZ)
 
 int initialised = 0;
 
@@ -180,9 +198,11 @@ void udb_run(void)
 	uint16_t currentTime;
 	uint16_t nextHeartbeatTime;
 
-	if (!initialised) {
+	if (!initialised)
+	{
 		initialised = 1;
-		if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
+		if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0)
+		{
 			udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
 			udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
 		}
@@ -190,25 +210,33 @@ void udb_run(void)
 	}
 
 //	while (1) {
-		if (!handleUDBSockets()) {
+		if (!handleUDBSockets())
+		{
 			sleep_milliseconds(1);
 		}
 
 		currentTime = get_current_milliseconds();
 
-		if (currentTime >= nextHeartbeatTime && !(nextHeartbeatTime <= UDB_STEP_TIME && currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME)) {
+		if (currentTime >= nextHeartbeatTime &&
+		    !(nextHeartbeatTime <= UDB_STEP_TIME && 
+		    currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME))
+		{
 			udb_callback_read_sensors();
 
-			udb_flags._.radio_on = (sil_radio_on && udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
+			udb_flags._.radio_on = (sil_radio_on && 
+			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && 
+			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
+
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 
-			udb_background_callback_periodic(); // Run at 40Hz
-			udb_servo_callback_prepare_outputs();
+			udb_heartbeat_40hz_callback(); // Run at 40Hz
+			udb_heartbeat_callback(); // Run at HEARTBEAT_HZ
 
 			sil_ui_update();
 
-			if (udb_heartbeat_counter % 80 == 0) {
-//			if (udb_heartbeat_counter % (2 * HEARTRATE_HZ) == 0) {
+//			if (udb_heartbeat_counter % 80 == 0)
+			if (udb_heartbeat_counter % (2 * HEARTRATE_HZ) == 0)
+			{
 				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
 			}
 			
@@ -220,9 +248,9 @@ void udb_run(void)
 //	}
 }
 
-void udb_background_trigger(void)
+void udb_background_trigger(background_callback callback)
 {
-	udb_background_callback_triggered();
+	if (callback) callback();
 }
 
 uint8_t udb_cpu_load(void)
@@ -241,7 +269,8 @@ void udb_servo_record_trims(void)
 {
 	int16_t i;
 
-	for (i = 1; i <= NUM_INPUTS; i++) {
+	for (i = 1; i <= NUM_INPUTS; i++)
+	{
 		udb_pwTrim[i] = udb_pwIn[i];
 		DPRINT("udb_pwTrim[%i] = %u\r\n", i, udb_pwTrim[i]);
 	}
@@ -315,24 +344,31 @@ void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 	uint8_t headerBytes = 0;
 	uint8_t numServos = 0;
 
-	if (bytesRead >= 2 && buffer[0]==0xFF && buffer[1]==0xEE) {
+	if (bytesRead >= 2 && buffer[0] == 0xFF && buffer[1] == 0xEE)
+	{
 		headerBytes = 2;
 		numServos = 8;
 	}
-	else if (bytesRead >= 3 && buffer[0]==0xFE && buffer[1]==0xEF) {
+	else if (bytesRead >= 3 && buffer[0] == 0xFE && buffer[1] == 0xEF)
+	{
 		headerBytes = 3;
 		numServos = buffer[2];
 	}
 
-	if (numServos && bytesRead >= headerBytes + numServos*2 + 2) {
-		for (i=headerBytes; i < headerBytes + numServos*2; i++)
+	if (numServos && bytesRead >= headerBytes + numServos*2 + 2)
+	{
+		for (i = headerBytes; i < headerBytes + numServos*2; i++)
 		{
 			CK_A += buffer[i];
 			CK_B += CK_A;
 		}
-		if (CK_A == buffer[headerBytes + numServos*2] && CK_B == buffer[headerBytes + numServos*2 + 1]) {
-			for (i=1; i <= numServos; i++) {
-				udb_pwIn[i] = (uint16_t)(buffer[headerBytes + (i-1)*2])*256 + buffer[headerBytes + (i-1)*2 + 1];
+		if (CK_A == buffer[headerBytes + numServos*2] &&
+		    CK_B == buffer[headerBytes + numServos*2 + 1])
+		{
+			for (i = 1; i <= numServos; i++)
+			{
+				udb_pwIn[i] = (uint16_t)(buffer[headerBytes + (i-1)*2])*256 +
+				                         buffer[headerBytes + (i-1)*2 + 1];
 			}
 		}
 	}
@@ -400,9 +436,9 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)
 
 void I2C_doneReadMagData(void)
 {
-	magFieldRaw[0] = (magreg[0]<<8)+magreg[1];
-	magFieldRaw[1] = (magreg[2]<<8)+magreg[3];
-	magFieldRaw[2] = (magreg[4]<<8)+magreg[5];
+	magFieldRaw[0] = (magreg[0]<<8) + magreg[1];
+	magFieldRaw[1] = (magreg[2]<<8) + magreg[3];
+	magFieldRaw[2] = (magreg[4]<<8) + magreg[5];
 
 	if (magMessage == 7)
 	{
@@ -433,6 +469,7 @@ void I2C_doneReadMagData(void)
 
 void HILSIM_MagData(magnetometer_callback_funcptr callback)
 {
+	(void)callback;
 //	magnetometer_callback = callback;
 	magMessage = 7;                 // indicate valid magnetometer data
 	I2C_doneReadMagData();          // run the magnetometer computations
@@ -459,3 +496,5 @@ int16_t FindFirstBitFromLeft(int16_t val)
 	}
 	return i;
 }
+
+#endif // (WIN == 1 || NIX == 1)

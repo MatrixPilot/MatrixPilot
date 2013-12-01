@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -145,3 +147,5 @@ uint8_t readSockets(void)
 
 	return didRead;
 }
+
+#endif // (WIN == 1 || NIX == 1)

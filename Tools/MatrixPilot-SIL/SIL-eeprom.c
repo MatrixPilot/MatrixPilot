@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include <stdio.h>
 #include "libUDB.h"
 #include "string.h"
@@ -79,3 +81,5 @@ void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 	memcpy(data, EEPROMbuffer+address, numbytes);
 	EEPROMdirty = 1;
 }
+
+#endif // (WIN == 1 || NIX == 1)

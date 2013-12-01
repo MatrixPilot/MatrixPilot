@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include <stdio.h>
 #include "libUDB.h"
 #include "events.h"
@@ -48,3 +50,4 @@ void process_queued_events(void)
 	eventFlags = 0;
 }
 
+#endif // (WIN == 1 || NIX == 1)

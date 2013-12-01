@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#include "UDBSocket.h"
+#if (NIX == 1)
 
-#if (WIN != 1)
+#include "UDBSocket.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -456,4 +456,4 @@ char* UDBSocketLastErrorMessage(void)
 	return UDBSocketLastError;
 }
 
-#endif // (WIN != 1)
+#endif // (NIX == 1)

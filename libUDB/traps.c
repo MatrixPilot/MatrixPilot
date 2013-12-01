@@ -73,6 +73,10 @@ void restart(uint16_t flags, uint32_t addrs)
 	}
 	else
 	{
+		// TODO: if we want to do more than simply modify the stack and retfie
+		//       then we need to clear the IPL3 bit first
+		//SRbits.IPL3 = 0;
+
 		// for less 'serious' exceptions just take the longjmp solution
 		asm("mov   _JmpStckPtr,w15");
 		asm("push  _JmpAddrLow");

@@ -6,9 +6,10 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include <stdio.h>
 #include "SIL-dsp.h"
-
 
 static int16_t MatrixIndex(int16_t col, int16_t row, int16_t numCols)
 {
@@ -218,3 +219,4 @@ fractional* VectorScale (
 	return dstV;
 }
 
+#endif // (WIN == 1 || NIX == 1)

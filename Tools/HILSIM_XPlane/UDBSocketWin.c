@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#include "UDBSocket.h"
-
 #if (WIN == 1)
+
+#include "UDBSocket.h"
 
 #ifdef WIN32
 #define snprintf _snprintf

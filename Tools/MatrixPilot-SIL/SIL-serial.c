@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include <stdio.h>
 #include "SIL-udb.h"
 #include "libUDB.h"
@@ -91,3 +93,5 @@ void udb_serial_start_sending_data(void)
 		telemetrySocket = NULL;
 	}
 }
+
+#endif // (WIN == 1 || NIX == 1)

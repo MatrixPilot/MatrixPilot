@@ -6,8 +6,11 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include "SIL-udb.h"
 #include "defines.h"
+#include "flightplan-waypoints.h"
 #include <stdio.h>
 
 #define BUFLEN 512
@@ -246,3 +249,4 @@ void sil_handle_key_input(char c)
 	}
 }
 
+#endif // (WIN == 1 || NIX == 1)
