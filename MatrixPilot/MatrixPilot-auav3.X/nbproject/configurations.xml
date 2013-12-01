@@ -13,6 +13,7 @@
         <itemPath>../../libDCM/rmat.h</itemPath>
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
         <itemPath>../../libDCM/mathlibNAV.h</itemPath>
+        <itemPath>../../libDCM/deadReckoning.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.h</itemPath>
@@ -81,6 +82,8 @@
         <itemPath>../MAVParams.h</itemPath>
         <itemPath>../MAVLink.h</itemPath>
         <itemPath>../MAVUDBExtra.h</itemPath>
+        <itemPath>../flightplan-waypoints.h</itemPath>
+        <itemPath>../navigate.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -285,6 +288,7 @@
         <itemPath>../../libUDB/osd_bit.c</itemPath>
         <itemPath>../../libUDB/osd_spi.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../libUDB/heartbeat.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
