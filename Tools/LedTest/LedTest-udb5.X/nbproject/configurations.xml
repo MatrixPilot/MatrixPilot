@@ -16,12 +16,12 @@
         <itemPath>../../../libUDB/boardRotation_defines.h</itemPath>
         <itemPath>../../../libUDB/ConfigUDB5.h</itemPath>
         <itemPath>../../../libUDB/mpu6000.h</itemPath>
-        <itemPath>../../../libUDB/spiUtils.h</itemPath>
         <itemPath>../../../libUDB/oscillator.h</itemPath>
         <itemPath>../../../libUDB/heartbeat.h</itemPath>
         <itemPath>../../../libUDB/interrupt.h</itemPath>
         <itemPath>../../../libUDB/magnetometer.h</itemPath>
         <itemPath>../../../libUDB/analogs.h</itemPath>
+        <itemPath>../../../libUDB/mpu_spi.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -41,7 +41,6 @@
         <itemPath>../../../libUDB/servoOut.c</itemPath>
         <itemPath>../../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../../libUDB/mpu6000.c</itemPath>
-        <itemPath>../../../libUDB/spiUtils.c</itemPath>
         <itemPath>../../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../../libUDB/mcu.c</itemPath>
         <itemPath>../../../libUDB/traps_asm.s</itemPath>
@@ -50,6 +49,8 @@
         <itemPath>../../../libUDB/serialIO.c</itemPath>
         <itemPath>../../../libUDB/analogs.c</itemPath>
         <itemPath>../../../libUDB/traps.c</itemPath>
+        <itemPath>../../../libUDB/heartbeat.c</itemPath>
+        <itemPath>../../../libUDB/mpu_spi.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

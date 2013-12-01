@@ -50,25 +50,6 @@
 // edge up, then sit it flat to test the Z accel.
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type
-#ifdef UDB4
-#define BOARD_TYPE                          UDB4_BOARD
-#endif
-#ifdef UDB5
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-#ifdef AUAV3
-#define BOARD_TYPE                          AUAV3_BOARD
-#endif
-
-#ifndef BOARD_TYPE
-#define BOARD_TYPE                          UDB5_BOARD
-#warning No board type specified in project, defaulting to UDB5
-#endif
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // The following 4 orientations have the board parallel with the ground.

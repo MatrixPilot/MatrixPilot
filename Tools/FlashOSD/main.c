@@ -49,8 +49,8 @@ void osd_update_glyph(void)
 	udb_led_toggle(LED_GREEN);          // Flash the green LED after each char is updated
 }
 
-// Called every 25ms
-void udb_servo_callback_prepare_outputs(void)
+// Called at HEARTBEAT_HZ
+void udb_heartbeat_callback(void)
 {
 	if (countdown)
 	{
@@ -63,19 +63,21 @@ void udb_servo_callback_prepare_outputs(void)
 		return;
 	}
 
-	if (!skip)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
-		if (charPosition < 256)
+		if (!skip)
 		{
-			osd_update_glyph();
+			if (charPosition < 256)
+			{
+				osd_update_glyph();
+			}
 		}
+		skip = !skip;
 	}
-
-	skip = !skip;
 }
 
 // Called every 1/40 second at low priority
-void udb_background_callback_periodic(void)
+void udb_heartbeat_40hz_callback(void)
 {
 	if (udb_heartbeat_counter % 20 == 0)
 	{
@@ -158,4 +160,3 @@ void udb_init_pwm(void) {}
 void udb_init_GPS(void) {}
 void udb_init_USART(void) {}
 void udb_eeprom_init(void) {}
-
