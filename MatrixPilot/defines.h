@@ -79,6 +79,9 @@ void init_altitudeCntrl(void);
 void init_altitudeCntrlVariable(void);
 
 
+void calculate_sonar_height_above_ground(void);
+
+
 // wind gain adjustment
 uint16_t wind_gain_adjustment(void);
 extern uint16_t wind_gain;

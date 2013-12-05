@@ -404,6 +404,22 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// MAXBOTIX SONAR LANDING FLARE
+// Designed for use with the following device:-
+// http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
+// Can be used on INPUT 8 of the UDB4/5 if that is not used for a channel input.
+// Will return distance to ground in meters and compensate for roll subject to 
+// receiving a returned sonar signal.
+// This option is designed to be used with Logo Flight Planning.
+// Logo allows the user to Interrupt a Landing and flare, or Go Around,
+// based on sonar distance to ground.
+
+// Set USE_SONAR_INPUT to the input capture channel which the sensor
+// is connected to. Currently on channel 8 is supported.
+#define USE_SONAR_INPUT                     0
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Trigger Action
 // Use the trigger to do things like drop an item at a certain waypoint, or take a photo every
 // N seconds during certain waypoint legs.
