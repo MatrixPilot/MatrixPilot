@@ -165,7 +165,7 @@ boolean gps_nav_capable_check_set(void)
 	return dcm_flags._.nav_capable;
 }
 
-void udb_background_callback_triggered(void);
+static void udb_background_callback_triggered(void);
 
 // Received a full set of GPS messages
 void gps_parse_common(void)
@@ -173,7 +173,7 @@ void gps_parse_common(void)
 	udb_background_trigger(&udb_background_callback_triggered);
 }
 
-void udb_background_callback_triggered(void)
+static void udb_background_callback_triggered(void)
 {
 	union longbbbb accum;
 	union longww accum_velocity;

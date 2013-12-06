@@ -235,7 +235,7 @@ void udb_run(void)
 			sil_ui_update();
 
 //			if (udb_heartbeat_counter % 80 == 0)
-			if (udb_heartbeat_counter % (2 * HEARTRATE_HZ) == 0)
+			if (udb_heartbeat_counter % (2 * HEARTBEAT_HZ) == 0)
 			{
 				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
 			}
