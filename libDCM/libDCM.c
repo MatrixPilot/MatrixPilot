@@ -67,24 +67,25 @@ void dcm_init(void)
 {
 	dcm_flags.W = 0;
 	dcm_flags._.first_mag_reading = 1;
-
 	dcm_init_rmat();
 }
 
-void dcm_run_init_step(void)
+void dcm_run_init_step(uint16_t count)
 {
-	if (udb_heartbeat_counter == CALIB_COUNT)
+	if (count == CALIB_COUNT)
 	{
 		// Finish calibration
+		DPRINT("calib_finished\r\n");
 		dcm_flags._.calib_finished = 1;
 		dcm_calibrate();
 	}
 
-	if (udb_heartbeat_counter <= GPS_COUNT)
+	if (count <= GPS_COUNT)
 	{
-		gps_startup_sequence(GPS_COUNT - udb_heartbeat_counter); // Counts down from GPS_COUNT to 0
-		if (udb_heartbeat_counter == GPS_COUNT)
+		gps_startup_sequence(GPS_COUNT - count); // Counts down from GPS_COUNT to 0
+		if (count == GPS_COUNT)
 		{
+			DPRINT("init_finished\r\n");
 			dcm_flags._.init_finished = 1;
 		}
 	}
@@ -149,11 +150,14 @@ void udb_heartbeat_callback(void)
 		dcm_run_imu_step();
 	}
 
-	dcm_servo_callback_prepare_outputs();
+	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();
 
 	if (!dcm_flags._.init_finished)
 	{
-		dcm_run_init_step();
+		if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+		{
+			dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+		}
 	}
 
 #if (HILSIM == 1)
@@ -236,14 +240,14 @@ void send_HILSIM_outputs(void)
 	union intbb TempBB;
 
 #if (USE_VARIABLE_HILSIM_CHANNELS != 1)
-	for (i=1; i<=NUM_OUTPUTS; i++)
+	for (i = 1; i <= NUM_OUTPUTS; i++)
 	{
 		TempBB.BB = udb_pwOut[i];
 		SIMservoOutputs[2*i] = TempBB._.B1;
 		SIMservoOutputs[(2*i)+1] = TempBB._.B0;
 	}
 
-	for (i=2; i<HILSIM_NUM_SERVOS*2+2; i++)
+	for (i = 2; i < HILSIM_NUM_SERVOS*2+2; i++)
 	{
 		CK_A += SIMservoOutputs[i];
 		CK_B += CK_A;
@@ -254,7 +258,7 @@ void send_HILSIM_outputs(void)
 	// Send HILSIM outputs
 	gpsoutbin(HILSIM_NUM_SERVOS*2+4, SIMservoOutputs);
 #else
-	for (i=1; i<=NUM_OUTPUTS; i++)
+	for (i = 1; i <= NUM_OUTPUTS; i++)
 	{
 		TempBB.BB = udb_pwOut[i];
 		SIMservoOutputs[(2*i)+1] = TempBB._.B1;
@@ -264,7 +268,7 @@ void send_HILSIM_outputs(void)
 	SIMservoOutputs[2] = NUM_OUTPUTS;
 
 	// Calcualte checksum
-	for (i=3; i<(NUM_OUTPUTS*2)+3; i++)
+	for (i = 3; i < (NUM_OUTPUTS*2)+3; i++)
 	{
 		CK_A += SIMservoOutputs[i];
 		CK_B += CK_A;

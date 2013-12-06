@@ -496,7 +496,7 @@ void osd_run_step(void)
 	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] >= 3000 || !udb_flags._.radio_on);
 	
 	int16_t countdown = 0;
-	if (!dcm_flags._.init_finished && udb_heartbeat_counter < 100)
+	if (!dcm_flags._.init_finished && udb_heartbeat_counter < 100)  // TODO: this will need updating for increased HEARTBEAT_HZ
 	{
 		countdown = 100 - udb_heartbeat_counter;
 	}

@@ -160,15 +160,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 {
 	interrupt_save_set_corcon;
 	TMR5 = 0;               // reset the timer
-	_cpu_timer ++;          // increment the load counter
+	_cpu_timer++;           // increment the load counter
 	_T5IF = 0;              // clear the interrupt
 	interrupt_restore_corcon;
 }
 
 static background_callback callback_fptr_1 = NULL;
 
-//	Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
-//	This is a good place to eventually compute pulse widths for servos.
+// Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
+// This is a good place to eventually compute pulse widths for servos.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 {
 	indicate_loading_inter;
@@ -182,7 +182,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 // Trigger the low priority background processing interrupt.
 void udb_background_trigger_pulse(background_callback callback)
 {
-//	pulse_callback_fptr = callback;
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 	callback_fptr_1 = callback;
 	_T6IF = 1;

@@ -225,7 +225,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			_T4IE = 0;              // disable timer 4 interrupt
 			break;
 #else
-	case 9:
+		case 9:
 			SERVO_OUT_PIN_9 = 0;
 			_T4IE = 0;              // disable timer 4 interrupt
 			break;

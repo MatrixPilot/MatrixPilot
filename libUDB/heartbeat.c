@@ -34,7 +34,21 @@ int one_hertz_flag = 0;
 uint16_t udb_heartbeat_counter = 0;
 #define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
+static void pulse(void);    // forward declaration
+
 //#define HEARTBEAT_FREQ(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
+//#define HEARTBEAT_CHK(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
+
+inline boolean heartbeat_chk(uint16_t freq)
+{
+	return (udb_heartbeat_counter % (HEARTBEAT_HZ/freq) == 0);
+//	return HEARTBEAT_CHK(freq);
+}
+
+inline uint16_t heartbeat_cnt(void)
+{
+	return udb_heartbeat_counter;
+}
 
 inline void heartbeat(void)
 {
@@ -64,9 +78,9 @@ inline void heartbeat(void)
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 }
 
-//	Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
-//	This is a good place to eventually compute pulse widths for servos.
-inline void pulse(void)
+// Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
+// This is a good place to eventually compute pulse widths for servos.
+static void pulse(void)
 {
 	LED_BLUE = LED_OFF;     // indicates logfile activity
 

@@ -54,7 +54,8 @@ void dcm_enable_yaw_drift_correction(boolean enabled);
 
 // Implement this callback to prepare the pwOut values.
 // It is called at 40Hz (once every 25ms).
-void dcm_servo_callback_prepare_outputs(void);  // Callback
+//void dcm_servo_callback_prepare_outputs(void);  // Callback
+void dcm_heartbeat_callback(void);
 
 // Convert an absolute location to relative
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute);

@@ -139,14 +139,9 @@ void udb_heartbeat_callback(void);
 
 typedef void (*background_callback)(void);
 
-// Call these to trigger the background_callback() function
-// from a low priority ISR.
+// Trigger the background_callback() functions from a low priority ISR.
 void udb_background_trigger(background_callback callback);
 void udb_background_trigger_pulse(background_callback callback);
-
-// Implement this callback to respond to udb_background_trigger() in
-// the background (low priority)
-//void udb_background_callback_triggered(void);   // Callback
 
 // Return the current CPU load as an integer percentage value from 0-100.
 uint8_t udb_cpu_load(void);

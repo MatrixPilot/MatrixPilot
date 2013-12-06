@@ -37,7 +37,8 @@ extern uint16_t udb_heartbeat_counter;
 
 
 inline void heartbeat(void);
-inline void pulse(void);
+inline uint16_t heartbeat_cnt(void);
+inline boolean heartbeat_chk(uint16_t hertz);
 
 
 #endif // HEARTBEAT_H

@@ -65,7 +65,8 @@ void init_servoPrepare(void) // initialize the PWM
 }
 
 // Called at HEARTBEAT_HZ
-void dcm_servo_callback_prepare_outputs(void)
+//void dcm_servo_callback_prepare_outputs(void)
+void dcm_heartbeat_callback(void)
 {
 	if (dcm_flags._.calib_finished)
 	{

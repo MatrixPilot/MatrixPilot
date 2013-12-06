@@ -184,6 +184,8 @@ void cameraServoMix(void)
 	int32_t temp;
 	int16_t pwManual[NUM_INPUTS+1];
 
+	// TODO: why is this code from above repeated here? - RobD
+
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
 	for (temp = 0; temp <= NUM_INPUTS; temp++)
 	{
