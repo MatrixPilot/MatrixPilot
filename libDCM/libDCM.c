@@ -98,9 +98,8 @@ void udb_callback_read_sensors(void)
 
 void runI2CSensors(void) // currently called at 40Hz
 {
-	int i_ctr = I2CS_CNTR;  // For ease of debugging, counter I2CS_CNTR is defined in options.h
 	// This is a simple counter to run calls at 4hz
-	if ( udb_heartbeat_counter % i_ctr == 0 )  // def 20 for 2hz, 10 for 4hz, 5 for 8hz, 4 for 10hz and 2 for 20hz
+	if ( udb_heartbeat_counter % 10 == 0 )  // def 10 for 4hz, 4 for 10hz and 2 for 20hz
 	{
 		#if (MAG_YAW_DRIFT == 1)
 			rxMagnetometer() ;
@@ -112,10 +111,29 @@ void runI2CSensors(void) // currently called at 40Hz
 
 }
 
+void runBarFunctions(void) // defined in options.h USED ONLY FOR DEBUGGING & OPTIMIZING RUNTIME
+{
+//  0- default; 1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
+#if (USE_BAROMETER == 1)    
+	#if (BAR_RUN_FROM == 4) //   DEBUG runtime location
+		if ( udb_heartbeat_counter % 10 == 0 )  // This is a simple counter to slow down to 40/10 hz or 4hz 
+		{
+			altimeter_calibrate() ;  	// runs BAROMETER FUNCTION in estAltitude.c
+			/*  DEBUG options deactivated but kept for posterity
+			#if (EST_ALT == 1)
+				estAltitude() ;			// DEBUG NECESSITY FOR THIS FUNCTION in estAltitude.c
+			#endif
+			*/
+		}
+	#endif
+#endif
+}
+
 // Called at 40Hz
 void udb_servo_callback_prepare_outputs(void)
 {
 	runI2CSensors();
+	runBarFunctions();					
 	if (dcm_flags._.calib_finished) {
 		dcm_run_imu_step() ;
 	}
@@ -168,19 +186,15 @@ void dcm_set_origin_location(long o_long, long o_lat, long o_alt)
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute)
 {
 	struct relative3D rel ;
-	//union longww accum_nav ; //  BP's mod r1817
+	union longww accum_nav ;
 	
 	rel.z = absolute.z ;
 	
 	rel.y = (absolute.y - lat_origin.WW)/90 ; // in meters
-
-	//  BP's mod r1817 removing 20m range restriction, using 32 bit integers replacing 16 bit
-	rel.x = long_scale((absolute.x - long_origin.WW)/90 , cos_lat ) ;
-
-	//  BP's mod r1817
-	//accum_nav.WW = ((absolute.x - long_origin.WW)/90) ; // in meters
-	//accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
-	//rel.x = accum_nav._.W1 ;
+	
+	accum_nav.WW = ((absolute.x - long_origin.WW)/90) ; // in meters
+	accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
+	rel.x = accum_nav._.W1 ;
 	
 	return rel ;
 }

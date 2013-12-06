@@ -217,7 +217,11 @@
 // DIST_TO_GOAL			- in m
 // ALT					- in m
 // ALT_SONAR			- in cm
-// ALT_BAROMETER		- in cm  
+// ALT_GRD_BAROMETER	- in cm  		(DEV-WIP)
+// ALT_AGL_BAROMETER	- in cm  		(DEV-WIP)  
+// ALT_ASL_BAROMETER	- in cm  		(DEV-WIP) 
+// PRESSURE_BAROMETER	- in PA  		(DEV-WIP)
+// TEMPERATURE_BAROMETER- in celcius  	(DEV-WIP)
 // CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_HOME		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
@@ -279,10 +283,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Flight Plan
-//
-
-////////////////////////////////////////////////////////////////////////////////
-// Main Flight Plan
 
 // //////  FUNCTIONS  //////
 #define PP_SWITCH				1
@@ -299,7 +299,7 @@
 #define CM_CC_AUTOTAKEOFF		12
 #define CM_CC_RECTANGLE			13
 #define CM_CW_RECTANGLE			14
-//#define CM_SET_SPEED			15
+#define CM_SET_SPEED			15
 #define CM_RTSR_90				16
 #define CM_LTSR_90				17
 #define CM_CKMAX_FLIGHTDIST		18
@@ -308,8 +308,9 @@
 #define CM_DIST_RETTOHOME		21
 
 // //////  PARAMETERS  //////
-#define PM_SHORT_RTGLLEG		110  // m
-#define PM_LONG_RTGLLEG			125  // m
+#define PM_SHORT_RTGLLEG		110  // m  opt. 120
+#define PM_MLONG_RTGLLEG		130  // m  opt. 150
+#define PM_XLONG_RTGLLEG		155  // m  opt. 180
 #define PM_TKOFF_SNRALT			320  // cm, takeoff sonar low alt. threshold
 #define PM_TKOFF_GPSALT			3	 // m, takeoff GPS low alt. threshold
 #define PM_SRNDTURN_FD			10 	 // m
@@ -326,19 +327,36 @@
 #define PM_LANDG_FSTSEG_GPSALT  3  	 // m, FIRST SEGMENT landing sonar alt. threshold
 #define PM_LANDG_SECSEG_GPSALT  2    // m, SECOND SEGMENT landing sonar alt. threshold
 #define PM_LANDG_TRDSEG_GPSALT 	1    // m, THIRD SEGMENT landing sonar alt. threshold
+#define PM_LANDG_FRTSEG_GPSALT 	0    // ing, approach to sonar managed soft touch-down
+#define PM_LANDG_APRCH_GPSALT	4    // m, start of landing field LT/min. alt. threshold
+#define PM_LANDG_APRCH_SNRALT	380  // cm, start of landing field sonar LT/min. alt. threshold
+#define PM_LANDG_FSTSEG_SNRALT  280  // cm, FIRST SEGMENT landing sonar alt. threshold
+#define PM_LANDG_SECSEG_SNRALT  180  // cm, SECOND SEGMENT landing sonar alt. threshold
+#define PM_LANDG_TRDSEG_SNRALT  80   // cm, THIRD SEGMENT landing sonar alt. threshold
+#define PM_LANDG_FRTSEG_SNRALT  5    // cm, FOURTH SEGMENT landing sonar alt. threshold
+#define PM_LANDG_FSTSEG_GPSALT  3  	 // m, FIRST SEGMENT landing sonar alt. threshold
+#define PM_LANDG_SECSEG_GPSALT  2    // m, SECOND SEGMENT landing sonar alt. threshold
+#define PM_LANDG_TRDSEG_GPSALT 	1    // m, THIRD SEGMENT landing sonar alt. threshold
 #define PM_LANDG_FRTSEG_GPSALT 	0    // m, FOURTH SEGMENT landing sonar alt. threshold
+// FOURTH SEGMENT landing sonar alt. threshold
 #define PM_LANDG_APCHSEG_FD  	2  	 // m, END OF LANDING APPROACH FLARE-FD distance
 #define PM_LANDG_FSTSEG_FD  	3  	 // m, FIRST SEGMENT landing FLARE-FD distance
 #define PM_LANDG_SECSEG_FD  	3    // m, SECOND SEGMENT landing FLARE-FD distance
 #define PM_LANDG_TRDSEG_FD		2    // m, THIRD SEGMENT landing FLARE-FD distance
 //  SPEED CONTROL: 9mps:32.4kph, 10mps:36kph, 11:39.6kph, 12:43.2kph, 13:46.8kph
-#define PM_SPEED_LOWTRH			10    // m/sec, speed LT/min. alt. threshold
-#define PM_SPEED_HIGHTRH		11   // m/sec, speed LT/min. alt. threshold
+#define PM_SPEED_LOWTRH			10   // m/sec, speed LT/min. alt. threshold
+#define PM_SPEED_HIGHTRH		12   // m/sec, speed LT/min. alt. threshold
 #define PM_TXTOGGLE_LOWTRH		2800 // TX 3pos-switch control LT/low threshold
 #define PM_TXTOGGLE_MIDTRH		3400 // TX 3pos-switch control LT/mid-GT/high threshold
 #define PM_TXKNOB_FSTQTL		2800 // TX knob/slider control LT/1st quartile threshold
 #define PM_TXKNOB_SECQTL		3100 // TX knob/slider control LT/2nd quartile threshold
 #define PM_TXKNOB_TRDQTL		3450 // TX knob/slider control LT/3rd-GT/4th quartile threshold
+#define PM_TXKNOB_FSTSPD		2530 // TX knob/slider control LT/1st knob spread threshold
+#define PM_TXKNOB_SECSPD		3460 // TX knob/slider control LT/2nd knob spread threshold
+#define PM_TXKNOB_TRDSPD		3050 // TX knob/slider control LT/3rd knob spread threshold
+#define PM_TXKNOB_FRTSPD		3230 // TX knob/slider control LT/4th knob spread threshold
+#define PM_TXKNOB_FIFSPD		3460 // TX knob/slider control LT/5rd knob spread threshold
+//#define PM_TXKNOB_SIXSPD		3700 // TX knob/slider control LT/6th knob spread threshold
 #define PM_DISTTO_HOME			160  // m min distance threshold to trigger auto RTH and land 
 #define PM_CKMAX_FLIGHTDIST	    1000 // m max distance perimeter threshold to auto trigger RTH and land 
 #define PM_LANDRTGL_REPEATS		2  	 // number of semi-rounded rectangles before landing 
@@ -349,33 +367,251 @@ const struct logoInstructionDef instructions[] = {
 	//  MAIN ROUTINE TO RUN PATTERN BASED ON DX8 or MPX GEAR 3p POSITION SWITCH AND CHANNEL ASSIGNMENT
 	//		IMPORTANT: SET SPEED RANGE FROM 9 TO 10 OPTIMIZED FOR GLIDERS OR LIGHT WING LOADING
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-
-	DO(CM_RET_LP)  					//  RETURN TO POWER-ON POINT OR HOME POSITION
-
+	IF_LT(LOGO_A_CHANNEL, PM_TXTOGGLE_LOWTRH) //  UP (FROM TX BOTTOM) TOGGLE-SWITCH POSITION - TUNED FOR DX8
+		DO (PP_SWITCH)   					//  SWITCH TO Rectangular Semi-round Pattern
+    ELSE
+        IF_LT(LOGO_A_CHANNEL, PM_TXTOGGLE_MIDTRH) //  MIDDLE TOGGLE-SWITCH POSITION
+			DO (TM_SWITCH) 					//  DO THERMAL 
+		ELSE                          		//  DOWN TOGGLE-SWITCH POSITION
+			DO(CM_RET_LP)  					//  RETURN TO POWER-ON POINT OR HOME POSITION
+		END									//      AND CIRCLE INDEFINITELY
+	END
 	//////////////////////////////////////////////////////////////////////////////////////////////////
     //  ****************  MAIN PATTERN AND WAYPOINT MANAGEMENT CONTROLS  ****************  
 	//  SWITCH TO CW OR CC RECTANGULAR PATTERN WITH RADIUS CONTROL BY KNOB (DX8) OR SLIDER (MPX)
- 
-	//  ****************  COMMON PROGRAMS  ****************  
-	TO (CM_RET_LP)
-		IF_GE(ALT_SONAR, 0)
-			IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)  	// if less than 300cm do autotakeoff
-				DO_ARG(CM_CC_AUTOTAKEOFF,PM_LONG_RTGLLEG)
+	// 	 Knob Aux 3 with DX8 TX or F Slider in MPX TX
+   	TO (PP_SWITCH) 
+		IF_GT(LOGO_B_CHANNEL,PM_TXKNOB_FSTSPD) 
+			IF_GE(ALT_SONAR, 0)					// Use sonar's accurate low altitude measurement, when enabled
+				IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)  // if less than 300cm do autotakeoff
+					DO_ARG(CM_CC_AUTOTAKEOFF,PM_SHORT_RTGLLEG) 
+				END
+			ELSE  							// Otherwise use GPS iffy measurement at times, +- 5 to 10m
+				IF_LT(ALT, PM_TKOFF_GPSALT)	// if less than defined parameter do autotakeoff
+					DO_ARG(CM_CC_AUTOTAKEOFF,PM_SHORT_RTGLLEG)
+				END
 			END
-		ELSE  		
-			IF_LT(ALT,PM_TKOFF_GPSALT) 			// if less than 3m do autotakeoff
-				DO_ARG(CM_CC_AUTOTAKEOFF,PM_LONG_RTGLLEG)
+      		REPEAT_FOREVER 	
+				DO_ARG(CM_CC_RECTANGLE,PM_SHORT_RTGLLEG)
 			END
-		END
-		REPEAT(PM_LANDRTGL_REPEATS)				// do landing rect. 2x
-			DO_ARG(CM_CC_RECTANGLE,PM_LONG_RTGLLEG)
-		END
-		DO_ARG(CM_AUTOLAND,PM_LANDG_SPAN)		// do auto land
-	END
+		ELSE
+			IF_LT(LOGO_B_CHANNEL,PM_TXKNOB_SECSPD)  	//  SECOND SPREAD
+				IF_GE(ALT_SONAR, 0)
+					IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)  	// if less than PARAM Do autotakeoff
+						DO_ARG(CM_CC_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+					END
+				ELSE  		
+					IF_LT(ALT,PM_TKOFF_GPSALT) 			// if less than PARAM do autotakeoff
+						DO_ARG(CM_CC_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+					END
+				END
+      			REPEAT_FOREVER  
+					DO_ARG(CM_CC_RECTANGLE,PM_MLONG_RTGLLEG)
+				END
+			ELSE
+				IF_LT (LOGO_B_CHANNEL,PM_TXKNOB_TRDSPD)  //  THIRD SPREAD
+					IF_GE(ALT_SONAR, 0)
+						IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+							DO_ARG(CM_CC_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+						END
+					ELSE
+						IF_LT(ALT,PM_TKOFF_GPSALT)
+							DO_ARG(CM_CC_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+						END
+					END
+	      			REPEAT_FOREVER 		
+						DO_ARG(CM_CC_RECTANGLE,PM_XLONG_RTGLLEG)
+					END
+				ELSE
+					IF_LT (LOGO_B_CHANNEL,PM_TXKNOB_FRTSPD) //  FOURTH SPREAD
+						IF_GE(ALT_SONAR, 0)
+							IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+								DO_ARG(CM_CW_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+							END
+						ELSE
+							IF_LT(ALT,PM_TKOFF_GPSALT)
+								DO_ARG(CM_CW_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+							END
+						END
+		      			REPEAT_FOREVER 		
+							DO_ARG(CM_CW_RECTANGLE,PM_XLONG_RTGLLEG)
+						END
+					ELSE  
 
+						IF_LT (LOGO_B_CHANNEL,PM_TXKNOB_FIFSPD) //  FIFTH SPREAD
+							IF_GE(ALT_SONAR, 0)
+								IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+								END
+							ELSE
+								IF_LT(ALT,PM_TKOFF_GPSALT)
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+								END
+							END
+			      			REPEAT_FOREVER 		
+								DO_ARG(CM_CW_RECTANGLE,PM_MLONG_RTGLLEG)
+							END
+						ELSE  									//   MORE THAN 3460 UP TO 3700
+							IF_GE(ALT_SONAR, 0)
+								IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_SHORT_RTGLLEG)  
+								END
+							ELSE
+								IF_LT(ALT,PM_TKOFF_GPSALT)  
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_SHORT_RTGLLEG)  
+								END
+							END
+			      			REPEAT_FOREVER  
+								DO_ARG(CM_CW_RECTANGLE,PM_SHORT_RTGLLEG)
+							END
+						END
+					END
+				END
+			END
+		END
+		DO(CM_CKMAX_FLIGHTDIST) 			// 1KM RADIUS FLIGHT PERMIMETER 
+	END
+	//  ****************  COMMON PROGRAMS  ****************  
+	TO (CM_RET_LP)       								// Return to home, semi-round rectangle and land function
+		DO(CM_DIST_RETTOHOME)							// if distance from home is more than PARAM then ret. to home
+		USE_CURRENT_ANGLE
+		IF_GT(LOGO_B_CHANNEL,PM_TXKNOB_FSTSPD) 
+			IF_GE(ALT_SONAR, 0)					// Use sonar's accurate low altitude measurement, when enabled
+				IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)  // if less than 300cm do autotakeoff
+					DO_ARG(CM_CC_AUTOTAKEOFF,PM_SHORT_RTGLLEG) 
+				END
+			ELSE  							// Otherwise use GPS iffy measurement at times, +- 5 to 10m
+				IF_LT(ALT, PM_TKOFF_GPSALT)	// if less than defined parameter do autotakeoff
+					DO_ARG(CM_CC_AUTOTAKEOFF,PM_SHORT_RTGLLEG)
+				END
+			END
+      		REPEAT_FOREVER 	
+				DO_ARG(CM_CC_RECTANGLE,PM_SHORT_RTGLLEG)
+			END
+		ELSE
+			IF_LT(LOGO_B_CHANNEL,PM_TXKNOB_SECSPD)  	//  SECOND SPREAD
+				IF_GE(ALT_SONAR, 0)
+					IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)  	// if less than PARAM Do autotakeoff
+						DO_ARG(CM_CC_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+					END
+				ELSE  		
+					IF_LT(ALT,PM_TKOFF_GPSALT) 			// if less than PARAM do autotakeoff
+						DO_ARG(CM_CC_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+					END
+				END
+				REPEAT(PM_LANDRTGL_REPEATS)				// do landing rect. 2x
+					DO_ARG(CM_CC_RECTANGLE,PM_MLONG_RTGLLEG)
+				END
+				DO_ARG(CM_AUTOLAND,PM_LANDG_SPAN)		// do auto land
+			ELSE
+				IF_LT (LOGO_B_CHANNEL,PM_TXKNOB_TRDSPD)  //  THIRD SPREAD
+					IF_GE(ALT_SONAR, 0)
+						IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+							DO_ARG(CM_CC_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+						END
+					ELSE
+						IF_LT(ALT,PM_TKOFF_GPSALT)
+							DO_ARG(CM_CC_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+						END
+					END
+					REPEAT(PM_LANDRTGL_REPEATS)				// do landing rect. 2x
+						DO_ARG(CM_CC_RECTANGLE,PM_XLONG_RTGLLEG)
+					END
+					DO_ARG(CM_AUTOLAND,PM_LANDG_SPAN)		// do auto land
+				ELSE
+					IF_LT (LOGO_B_CHANNEL,PM_TXKNOB_FRTSPD) //  FOURTH SPREAD
+						IF_GE(ALT_SONAR, 0)
+							IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+								DO_ARG(CM_CW_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+							END
+						ELSE
+							IF_LT(ALT,PM_TKOFF_GPSALT)
+								DO_ARG(CM_CW_AUTOTAKEOFF,PM_XLONG_RTGLLEG)
+							END
+						END
+						REPEAT(PM_LANDRTGL_REPEATS)				// do landing rect. 2x
+							DO_ARG(CM_CW_RECTANGLE,PM_XLONG_RTGLLEG)
+						END
+						DO_ARG(CM_AUTOLAND,PM_LANDG_SPAN)		// do auto land
+					ELSE  
+
+						IF_LT (LOGO_B_CHANNEL,PM_TXKNOB_FIFSPD) //  FIFTH SPREAD
+							IF_GE(ALT_SONAR, 0)
+								IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+								END
+							ELSE
+								IF_LT(ALT,PM_TKOFF_GPSALT)
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_MLONG_RTGLLEG)
+								END
+							END
+							REPEAT(PM_LANDRTGL_REPEATS)				// do landing rect. 2x
+								DO_ARG(CM_CW_RECTANGLE,PM_MLONG_RTGLLEG)
+							END
+							DO_ARG(CM_AUTOLAND,PM_LANDG_SPAN)		// do auto land
+						ELSE  									//  SIXTH SPREAD MORE THAN 3460 UP TO 3700
+							IF_GE(ALT_SONAR, 0)
+								IF_LT(ALT_SONAR,PM_TKOFF_SNRALT)
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_SHORT_RTGLLEG)  
+								END
+							ELSE
+								IF_LT(ALT,PM_TKOFF_GPSALT)  
+									DO_ARG(CM_CW_AUTOTAKEOFF,PM_SHORT_RTGLLEG)  
+								END
+							END
+			      			REPEAT_FOREVER  
+								DO_ARG(CM_CW_RECTANGLE,PM_SHORT_RTGLLEG)
+							END
+						END
+					END
+				END
+			END
+		END
+		DO(CM_CKMAX_FLIGHTDIST) 			// 1KM RADIUS FLIGHT PERMIMETER 
+	END
+	TO (CM_CW_AUTOTAKEOFF) 					// Clockwise autonomous takeoff
+		DO(CM_SET_SPEED)
+		PEN_UP
+			USE_CURRENT_ANGLE  
+			USE_CURRENT_POS
+			PARAM_DIV(4)
+			BK_PARAM 	   					// use parm to move back from target position as routine's takeoff span 
+			PARAM_SUB(7)
+			SET_ALT_PARAM					// at 110 param, ALT 20.5 m
+			PARAM_ADD(7)
+			PARAM_MUL(4)
+			FD_PARAM						// FD 110
+		PEN_DOWN
+		DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+		PARAM_DIV(4)
+		PARAM_SUB(2)
+		SET_ALT_PARAM						// at 110 param, ALT 25.5 m
+		PARAM_ADD(2)
+		PARAM_MUL(4)
+		PARAM_DIV(3)
+		PARAM_ADD(5)
+		FD_PARAM							// at 110 param, FD 41.66 m
+		DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+		PARAM_ADD(5)
+		SET_ALT_PARAM						// at 110 param, ALT 46.66
+		PARAM_SUB(10)
+		PARAM_MUL(3)
+		FD_PARAM							// FD 110
+		DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+		PARAM_DIV(2)
+		PARAM_SUB(4)
+		SET_ALT_PARAM						// at 110 param, ALT 51
+		PARAM_ADD(4)
+		PARAM_MUL(2)
+		PARAM_DIV(3)
+		PARAM_ADD(5)
+		FD_PARAM							// at 110 param, FD 41.66 m
+		DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+		PARAM_SUB(5)
+		PARAM_MUL(3)
+	END
 	TO (CM_CC_AUTOTAKEOFF) 					// Counter-clockwise autonomous takeoff
-		SET_SPEED(PM_SPEED_HIGHTRH)
-		//DO(CM_SET_SPEED)
+		DO(CM_SET_SPEED)
 		PEN_UP
 			USE_CURRENT_ANGLE  		
 			USE_CURRENT_POS
@@ -415,12 +651,26 @@ const struct logoInstructionDef instructions[] = {
 		PARAM_SUB(5)
 		PARAM_MUL(3)
 	END
-
+	//  CLOCKWISE RECTANGLE:
+	TO (CM_CW_RECTANGLE)
+		SET_INTERRUPT(CM_SET_ALT) 			// SET ALT PER THROTTLE POSITION
+		DO(CM_SET_SPEED)
+		REPEAT(2)
+			FD_PARAM
+			DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+			PARAM_DIV(3)
+			PARAM_ADD(5)
+			FD_PARAM
+			DO_ARG(CM_RTSR_90,PM_SRNDTURN_FD)
+			PARAM_SUB(5)
+			PARAM_MUL(3)
+		END
+		CLEAR_INTERRUPT	
+	END
 	//  COUNTER CLOCKWISE RECTANGLE: 
 	TO (CM_CC_RECTANGLE)
 		SET_INTERRUPT(CM_SET_ALT) 
-		SET_SPEED(PM_SPEED_LOWTRH)
-		//DO(CM_SET_SPEED)			
+		DO(CM_SET_SPEED)			
 		REPEAT(2)
 			FD_PARAM
 			DO_ARG(CM_LTSR_90,PM_SRNDTURN_FD)
@@ -445,7 +695,6 @@ const struct logoInstructionDef instructions[] = {
 	        RT(10)    
 	     END     
 	END 
-/*
 	TO(CM_SET_SPEED)        				
 		IF_LT(LOGO_C_CHANNEL,PM_TXTOGGLE_MIDTRH)  
 			SET_SPEED(PM_SPEED_LOWTRH)				// Light payload and wingloading cruising green speed
@@ -453,7 +702,6 @@ const struct logoInstructionDef instructions[] = {
 			SET_SPEED(PM_SPEED_HIGHTRH)				// Added payload and wingloading speed
 		END
 	END
-*/
 	TO(CM_SET_ALT)        							//  Altitude control  
 		LOAD_TO_PARAM(THROTTLE_INPUT_CHANNEL)
 		PARAM_SUB(2250)								//  Baseline throttle input: c. 1/4 throttle, 90m mid optimized for DX8
@@ -472,8 +720,7 @@ const struct logoInstructionDef instructions[] = {
 	TO (CM_DIST_RETTOHOME)       					// Return to home, based on distance from home
 		IF_GT(DIST_TO_HOME,PM_DISTTO_HOME)
 			SET_INTERRUPT(CM_SET_ALT) 
-			SET_SPEED(PM_SPEED_LOWTRH)
-			//DO(CM_SET_SPEED)
+			DO(CM_SET_SPEED)
 			HOME  									// Fly home
 			CLEAR_INTERRUPT	
 		END
@@ -569,8 +816,108 @@ const struct logoInstructionDef instructions[] = {
 		FD_PARAM
 	END
 
+	//  ****************  THERMAL PROGRAM  ****************  
+   	TO (TM_SWITCH) 
+		DO(CM_SET_SPEED)							// Select thermal hunt speed		
+		FD(80)			
+		REPEAT_FOREVER
+			DO(TM_EIGHT)
+			DO(CM_CKMAX_FLIGHTDIST) 				// FLIGHT PERMIMETER PARAM
+		END	
+	END 
+	TO (TM_EIGHT) 
+		CLEAR_INTERRUPT
+		DO_ARG(TM_TURN_RIGHT,44)
+		RT(10)
+		REPEAT(20)
+			IF_GE(WIND_SPEED_Z,100)
+				SET_INTERRUPT(TM_LOITER)
+			END
+			FD(15)
+		END
+		CLEAR_INTERRUPT
+		LT(10)
+		DO_ARG(TM_TURN_LEFT,44)
+		LT(10)
+		REPEAT(20)
+			IF_GE(WIND_SPEED_Z,100)
+				SET_INTERRUPT(TM_LOITER)
+			END
+			FD(15)
+		END
+		CLEAR_INTERRUPT
+		RT(10)
+	END
+	TO (TM_TURN_RIGHT)			
+		FLAG_ON(F_CROSS_TRACK)		
+		PARAM_DIV(10)		
+		FD_PARAM		
+		PARAM_MUL(2)		
+			REPEAT(8)		
+				RT(20)		
+				FD_PARAM		
+			END		
+		RT(20)		
+		PARAM_DIV(2)		
+		FD_PARAM		
+		FLAG_OFF(F_CROSS_TRACK)		
+	END	
+	TO (TM_TURN_LEFT)			
+		FLAG_ON(F_CROSS_TRACK)		
+		PARAM_DIV(10)		
+		FD_PARAM		
+		PARAM_MUL(2)		
+			REPEAT(8)		
+				LT(20)		
+				FD_PARAM		
+			END		
+		LT(20)		
+		PARAM_DIV(2)		
+		FD_PARAM		
+		FLAG_OFF(F_CROSS_TRACK)		
+	END
+	TO (TM_LOITER)
+		IF_LT(LOGO_B_CHANNEL,PM_TXKNOB_FSTQTL)  
+			DO_ARG(TM_LOITER_LEFT,3)
+		ELSE
+			IF_LT(LOGO_B_CHANNEL,PM_TXKNOB_SECQTL)
+			DO_ARG(TM_LOITER_LEFT,6)
+			ELSE
+				IF_LT(LOGO_B_CHANNEL,PM_TXKNOB_TRDQTL)
+				DO_ARG(TM_LOITER_RIGHT,6)
+				ELSE     					//_GT PARAM last quartile
+					DO_ARG(TM_LOITER_RIGHT,3)
+				END
+			END
+		END
+	END
+	TO (TM_LOITER_RIGHT)
+		FLAG_ON(F_CROSS_TRACK)
+		FLAG_ON(F_LAND)
+			REPEAT(36)
+				RT(10)
+				FD_PARAM
+			END
+		FLAG_OFF(F_CROSS_TRACK)
+		FLAG_OFF(F_LAND)
+		IF_LT(WIND_SPEED_Z,100)
+			CLEAR_INTERRUPT
+		END
+	END
+	TO (TM_LOITER_LEFT)
+		FLAG_ON(F_CROSS_TRACK)
+		FLAG_ON(F_LAND)
+			REPEAT(36)
+				LT(10)
+				FD_PARAM
+			END
+		FLAG_OFF(F_CROSS_TRACK)
+		FLAG_OFF(F_LAND)
+		IF_LT(WIND_SPEED_Z,100)
+			CLEAR_INTERRUPT
+		END
+	END 
 } ;
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
@@ -582,15 +929,17 @@ const struct logoInstructionDef rtlInstructions[] = {
 	// Use cross-tracking for navigation
 	FLAG_ON(F_CROSS_TRACK)
 
-	// Fly home
+	// Fly home with power before 
 	HOME
 	
-	// Turn off engine for RTL
-	// Move this line down below the HOME to return home with power before circling unpowered.
+	// Turn off engine for RTL then circle unpowered.
+
 	FLAG_ON(F_LAND)
 
 	// Once we arrive home, aim the turtle in the
 	// direction that the plane is already moving.
+	// Todo:  capture take off point and angle and
+    //     use here instead with landing sequence
 	USE_CURRENT_ANGLE
 	
 	REPEAT_FOREVER
@@ -602,4 +951,3 @@ const struct logoInstructionDef rtlInstructions[] = {
 	END
 	
 };
-

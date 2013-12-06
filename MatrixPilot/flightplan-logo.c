@@ -52,7 +52,7 @@ enum {
 	DIST_TO_GOAL,
 	ALT,
 	ALT_SONAR,	
-	ALT_GND_BAROMETER,  //	barometer_grd_altitude = get_barometer_grd_altitude();
+	ALT_GRD_BAROMETER,  //	barometer_grd_altitude = get_barometer_grd_altitude();
 	ALT_ASL_BAROMETER,	
 	ALT_AGL_BAROMETER,	
 	TEMPERATURE_BAROMETER,	
@@ -647,47 +647,47 @@ int logo_value_for_identifier(char ident)
 		/************************************************
 		BAROMETER SYSTEMS VALUE SUPPORT
 		*************************************************/
-		case ALT_GND_BAROMETER: // centimeters, above sea level altitude 
+		case ALT_GRD_BAROMETER: // centimeters, above sea level altitude 
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				return barometer_altitude_gnd = get_barometer_altitude_gnd(); // in meters
+				return barometer_grd_altitude = get_barometer_grd_altitude(); // in centimeters
 			}
 			#else   //absence of sonar sensor device
 			{
-				int barometer_altitude_gnd = -99;  //  return dummy value in the absence of sonar sensor device
-				return barometer_altitude_gnd;
+				int barometer_grd_altitude = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_grd_altitude;
 			}
 			#endif
 		case ALT_ASL_BAROMETER: // centimeters, above sea level altitude 
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				return barometer_altitude_asl = get_barometer_altitude_asl(); // in meters
+				return barometer_asl_altitude = get_barometer_asl_altitude(); // in centimeters
 			}
 			#else   //absence of sonar sensor device
 			{
-				int barometer_altitude_asl = -99;  //  return dummy value in the absence of sonar sensor device
-				return barometer_altitude_asl;
+				int barometer_asl_altitude = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_asl_altitude;
 			}
 			#endif
 		case ALT_AGL_BAROMETER: // centimeters, above ground level altitude
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				return barometer_altitude_agl = get_barometer_altitude_agl(); // in meters
+				return barometer_agl_altitude = get_barometer_agl_altitude(); // in centimeters
 			}
 			#else   //absence of sonar sensor device
 			{
-				int barometer_altitude_agl = -99;  //  return dummy value in the absence of sonar sensor device
-				return barometer_altitude_agl;
+				int barometer_agl_altitude = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_agl_altitude;
 			}
 			#endif
 		case TEMPERATURE_BAROMETER: // in celcius
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				return barometer_temperature = get_barometer_temperature(); // in celcius
+				return barometer_temperature = get_barometer_temperature(); // in centimeters
 			}
 			#else   //absence of sonar sensor device
 			{
@@ -699,7 +699,7 @@ int logo_value_for_identifier(char ident)
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				return barometer_pressure = get_barometer_pressure(); // in PA
+				return barometer_pressure = get_barometer_pressure(); // in centimeters
 			}
 			#else   //absence of sonar sensor device
 			{

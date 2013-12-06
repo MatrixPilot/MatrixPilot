@@ -29,13 +29,12 @@
 
 #define BMP085_COMMAND 0xEE  // I2C address of BMP085
 
-// Oversampling has been moved over into options.h
-// BMP085 oversampling can be set from 0 thru 3  - 
+// BMP085 oversampling can be set from 0 thru 3  - moved over in options.h
 //#define OSS 3	//  low power low resolution least stable data
 //#define OSS 2
 //#define OSS 1
 //#define OSS 0  //  low power low resolution least stable data
-//#define OSS 1
+// #define OSS 1
 
 typedef union 
 {
@@ -62,7 +61,7 @@ static unsigned char bmp085read_barCalib[] = { 0xAA } ;	// Address of the first 
 static unsigned char bmp085read_barTemp[]  = { 0x2E } ;
 static unsigned char bmp085read_barPres[]  = { 0x34 + (OSS<<6) } ;
 static unsigned char bmp085read_barData[]  = { 0xF6 } ;
-static unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
+//static unsigned char bmp085read_index[]    = { 0xAA } ;	// Address of the first calibration register to read
 static unsigned char bmp085write_index[]   = { 0xF4 } ;	// Address of the command register to write
 
 static unsigned char barData[3];
@@ -110,6 +109,7 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 		case  2:					// put magnetomter into the power up defaults on a reset
 			break ;
 		case  3:  					// clear out any data that is still there
+			//I2C_Read(BMP085_ADDRESS, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback, I2C_MODE_WRITE_ADDR_READ);
 			I2C_Read(BMP085_COMMAND, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback);
 			break ;
 		case  4:  					// enable the calibration process
@@ -188,6 +188,7 @@ static long bmp085CalcPressure(unsigned long up)
 	x2 = (bc.ac2 * b6)>>11; 
 	x3 = x1 + x2; 
 	b3 = (((bc.ac1 * 4 + x3) << OSS) + 2) / 4;
+	//b3 = (((bc.ac1 * 4 + x3) << OSS) + 2) >> 2;
 	
 	// Calculate B4 
 	x1 = (bc.ac3 * b6)>>13; 
@@ -206,6 +207,7 @@ static long bmp085CalcPressure(unsigned long up)
 	x1 = (x1 * 3038)>>16; 
 	x2 = (-7357 * p)>>16; 
 	p += (x1 + x2 + 3791)>>4;
+	
 	return p;
 }
 
@@ -224,6 +226,7 @@ void ReadBarTemp_callback( boolean I2CtrxOK )
 	}
 	else
 	{
+		temperature = -99;
 		// the operation failed - we should probably do something about it...
 	}
 }
@@ -234,9 +237,7 @@ void ReadBarPres_callback( boolean I2CtrxOK )
 
 	if( I2CtrxOK == true )
 	{
-	 //  **** WIP ****	pressure = ((long) barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]) >> (8-OSS); //  **** WIP ****
-		//pressure = ((long) barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]);  //  **** WIP ****
-		pressure = ((long) barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]) >> (8-OSS);
+	  	pressure = ((long) barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]) >> (8-OSS);
 		pressure = bmp085CalcPressure(pressure);
 		if (barometer_callback != NULL) {
 			barometer_callback(pressure, ((b5 + 8) >> 4), 0);		// Callback
@@ -244,6 +245,7 @@ void ReadBarPres_callback( boolean I2CtrxOK )
 	}
 	else
 	{
+		pressure = -99;
 		// the operation failed - we should probably do something about it...
 	}
 }

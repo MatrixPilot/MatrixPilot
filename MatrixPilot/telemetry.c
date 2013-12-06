@@ -606,12 +606,12 @@
 					#if (USE_BAROMETER == 1) 
 						barometer_temperature = get_barometer_temperature();
 						barometer_pressure = get_barometer_pressure(); 
-						barometer_altitude_gnd = get_barometer_altitude_gnd();
-						barometer_altitude_agl = get_barometer_altitude_agl();
-						barometer_altitude_asl = get_barometer_altitude_asl();
+						barometer_grd_altitude = get_barometer_grd_altitude();
+						barometer_agl_altitude = get_barometer_agl_altitude();
+						barometer_asl_altitude = get_barometer_asl_altitude();
 						serial_output("t%i,p%i,ga%i,ag%i,as%i:",
-						(int)barometer_temperature, (int)barometer_pressure, (int)barometer_altitude_gnd,
-						(int)barometer_altitude_agl, (int)barometer_altitude_asl );
+						(int)barometer_temperature, (int)barometer_pressure, (double)barometer_grd_altitude,
+						(double)barometer_agl_altitude, (double)barometer_asl_altitude );
 					#endif
 				/* ***  sonar and barometer feed MODS END ***  */
 			#if (RECORD_FREE_STACK_SPACE == 1)
@@ -759,12 +759,12 @@
 			{
 				barometer_temperature = get_barometer_temperature();
 				barometer_pressure = get_barometer_pressure(); 
-				barometer_altitude_gnd = get_barometer_altitude_gnd();
-				barometer_altitude_agl = get_barometer_altitude_agl();
-				barometer_altitude_asl = get_barometer_altitude_asl();
+				barometer_grd_altitude = get_barometer_grd_altitude();
+				barometer_agl_altitude = get_barometer_agl_altitude();
+				barometer_asl_altitude = get_barometer_asl_altitude();
 				serial_output("t%i,p%i,ga%i,ag%i,as%i:\r\n",
-				(int)barometer_temperature, (double)barometer_pressure, (double)barometer_altitude_gnd,
-				(double)barometer_altitude_agl, (double)barometer_altitude_asl );
+				(int)barometer_temperature, (int)barometer_pressure, (double)barometer_grd_altitude,
+				(double)barometer_agl_altitude, (double)barometer_asl_altitude );
 
 				return ;
 			}

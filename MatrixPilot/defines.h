@@ -120,14 +120,15 @@ long cam_yawServoLimit( long pwm_pulse) ;
 
 #if ( USE_BAROMETER == 1 )
 
+	extern inline long get_barometer_asl_altitude(void) ;
 	extern inline long get_barometer_pressure(void) ;
 	extern inline int get_barometer_temperature(void) ;
-	extern inline long get_barometer_altitude_agl(void) ;
-	extern inline long get_barometer_altitude_asl(void) ;
-	extern inline long get_barometer_altitude_gnd(void) ;
+	extern inline long get_barometer_grd_altitude(void) ;
+	extern inline long get_barometer_agl_altitude(void) ;
 
-	extern long barometer_altitude_asl ;	
-	extern long barometer_altitude_agl ; 
+	extern long barometer_asl_altitude ;	
+	extern long barometer_agl_altitude ; 
+	extern long barometer_grd_altitude ; 
 	extern long barometer_pressure;
 	extern int barometer_temperature;
 

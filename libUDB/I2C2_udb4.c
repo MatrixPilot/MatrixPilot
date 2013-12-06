@@ -62,13 +62,8 @@ int I2C2MAXQ	= 0 ;
 boolean I2C2_Busy = true;
 
 void (* I2C2_state ) ( void ) = &I2C2_idle ;
-
-// **** WIP **** [upgraded to lates trunk codes]  **** WIP **** 
-// Calculate the BRGvalue automatically  
-// #define I2C2FSCL 400000						// Bus speed measured in Hz
-// #define I2C2BRGVAL ((FREQOSC/(CLK_PHASES *I2C2FSCL))-(FREQOSC/(CLK_PHASES * 10000000)))-1
-
-#define I2C2BRGVAL 60 					//  **** WIP **** orig. def 60, 200 Khz  mod code [ per latest trunk revision]  **** WIP **** 
+#define I2C2FSCL 400000						// Bus speed measured in Hz
+#define I2C2BRGVAL ((FREQOSC/(CLK_PHASES *I2C2FSCL))-(FREQOSC/(CLK_PHASES * 10000000)))-1
 
 #define I2C2_NORMAL ( (I2C2STAT & 0b0000010011000000) == 0 )	// There is the queue, it's ok if the module is reading
 
@@ -156,6 +151,9 @@ void serviceI2C2(void)  // service the I2C
 	if ( _I2C2EN == 0 ) // I2C is off
 	{
 		I2C2_state = &I2C2_idle ; 	// disable response to any interrupts
+ 	// pull SDA and SCL high - preserved for posterity
+//		I2C2_SDA = 1 ;
+//	 	I2C2_SCL = 1 ;
 		I2C2_init() ; 			// turn the I2C back on
 		// Put something here to reset state machine.  Make sure attached servies exit nicely.
 		return ;
@@ -294,6 +292,11 @@ boolean I2C2_Read(unsigned char command, unsigned char* pcommandData, unsigned c
 		}
 	}
 
+/*	while(1)		// STOP HERE ON FAILURE.
+	{
+		LED_GREEN = LED_ON;	
+	}			
+*/
 	I2C2_reset();
 	return false;
 	

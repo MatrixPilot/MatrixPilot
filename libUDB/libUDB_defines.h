@@ -25,15 +25,10 @@
 	struct bb { unsigned char B0 ; unsigned char B1 ; } ;
 	struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
 	struct ww { int W0 ; int W1 ; } ;
-//  added BP's mod r1817 removing 20m range restriction, using 32 bit integers replacing 16 bit
-	struct wwww { int W0 ; int W1 ; int W2 ; int W3 ; } ;
-	struct LL { long L0 ; long L1 ; } ;
-
+	
 	union intbb { int BB ; struct bb _ ; } ;
 	union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
 	union longww { long  WW ; struct ww _ ; } ;
-//  added BP's mod r1817 removing 20m range restriction, using 32 bit integers replacing 16 bit
-	union longlongLL { long long LL ; struct LL _ ; struct wwww __ ; } ;
 	
 	// Build for the specific board type
 	#define RED_BOARD		1	// red board with vertical LISY gyros, no longer in production
@@ -182,7 +177,6 @@
 				unsigned int a2d_read						: 1 ;
 				unsigned int radio_on						: 1 ;
 				unsigned int sonar_updated					: 1 ; // added to support sonnar device on UDB4
-				unsigned int sonar_print_telemetry			: 1 ; // added to support sonnar device on UDB4
 				} ;
 	
 	// Baud Rate Generator -- See section 19.3.1 of datasheet.

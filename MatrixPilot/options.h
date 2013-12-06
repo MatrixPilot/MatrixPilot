@@ -1,41 +1,36 @@
-// This file is part of MatrixPilot.
-//
-//    http://code.google.com/p/gentlenav/
-//
-// Copyright 2009-2012 MatrixPilot Team
-// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
-//
-// MatrixPilot is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// MatrixPilot is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
- 
-////////////////////////////////////////////////////////////////////////////////
-// options.h
-// Bill Premerlani's UAV Dev Board 
-// 
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
-// 
-// Note that there is a small but growing library of preset options.h files for
-// specific planes located in the MatrixPilot/example-options-files directory.
-// You can use one of those files by replacing this file with that one.
+/*  Ref. ID T011fw fine tuned for Breeze V-tail glider airframe 
+ *  
+ *  Modifications (dberroya):
+ *  
+ *  Added i2c2 queued algorithm to support Magnetometer and Barometer (WIP) sensors to use i2c2 pins
+ *  Added Sonar AGL altitude enhanced LOGO, navigation and deadreckoning modules using Pete and Robert's codes as baseline
+ *  Reorganized options.h to enhance logical groupings and to include paremeter (from other header files) for ease of use 
+ *     single point of access, simplification of finetuning 
+ *
+ *  DEVWIP : 1) Get Barometer algorithm to work and fuse with altitude management
+ *           2) Dev. database (mavlink compliant) parameter definitions for settings
+ *           3) Enable Wifi communication
+ *           4) phase-in interactive GCS functionalities
+ *
+ *  RELEASE NOTES:
+ *  
+ *  Baseline Trunk Commit: 1782
+ *  Last modified date  Nov 19, 2013
+ *  Status: 
+ *   -  Deployed and tested with fixwing and gliders, with consistently stable flights using RC managed dynamic
+ *      Logo flight plans
+ *   -  Doesn't GCS functionalities
+ *   -  Tested BOM: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer (WIP), standard GPS, Breeze 2000 V-tail
+ *
+ *  Contact: Daniel (dberroya@gmail.com) for any inquiry
+ *
+ *  ACKNOWLEDGEMENTS AND SPECIAL THANKS :
+ *  Creator:        Bill Premerlani's UAV Dev Board 
+ *  Lead Developer: 
+ *
+*/
 
-///////////////////////////////////////////////////////////////////////////////
-// /////////      Customized for EZAPS24 Custom FPV airplane        ///////////
-//
-// 	   with modifications to support Magnetometer, Sonar and Barometer sensors
-//  For Precision landing, enhanced LOGO, navigation and deadreckoning functionalities
-//  BOM: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer, Mediatek GPS
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -83,10 +78,11 @@
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
 #define GPS_TYPE							GPS_STD
 
-// Set to 1 to use GPS data providing for goal coordinates for LOGO navigation [navigate.c],
+// Set to 1 to use GPS data providing for goal coordinates to navigate flight plans defined in LOGO
 // otherwise, set to 0 to use IMU data.  
 //  Note: navigation accuracy may be better if set to 1 only if an EM-406A GPS (GPS_STD) is used 
-#define GPS_GOAL							0
+#define GPS_GOAL							0 
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enable/Disable core features of this firmware
@@ -144,57 +140,13 @@
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.
-#define USE_CAMERA_STABILIZATION			0
+//#define USE_CAMERA_STABILIZATION			0
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						1
-
-////////////////////////////////////////////////////////////////////////////////
-// Works with  only UDB4. This feature can only be turned on with the USE_BAROMETER set to 1, below.
-// Design for recalibrating altitude for enhaced accuracy in navigation, particularly trajectory.  
-// Otherwise, set to 0 to use GPS and IMU estimated ALTITUDE. 
-// If set to 1, barometer altitude will be used to recalibrate altitude in navigation and 
-// deadreckoning, starting 0 to 20m above altitude range, depending on the whether a SONAR sensor 
-// is attached and if so, what sonar sensor class used is used.
-#define BAROMETER_ALTITUDE 					1    
-
-// USE_PA_PRESSURE if 0, barometric alt will be base on ASL ground altitude defined below
-// if set to 1, will use hPA and if set to 2, will use METAR's mercury pressure measurement
-#define USE_PA_PRESSURE						2   
-
-// PA_PRESSURE below is for Ontario, Canada as of 11-16-2012, 1029.6826 hPA from
-// http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query=Mississauga%2C+Canada
-#define PA_PRESSURE							101120  	// PA [set USE_PA_PRESSURE to 1]
-#define MC_PRESSURE							2986   		// in mercury (METAR [inch Hg]) [set USE_PA_PRESSURE to 2]
-
-// Barometer oversampling [OSS] can be set from 0 thru 3
-//				  [ms]  Ave/cur/uA   [hPA]      [m]
-// Set  Samples  Time  /1 sample   RMS noise  RMS noise
-//  0	 1		  4.5		3		  0.06		0.5  [ultra low power]
-//  1	 2		  7.5		5		  0.05		0.4  [standard]
-//  2	 4		 13.5		7		  0.04		0.3  [high resolution]
-//  3	 8		 25.5	   12		  0.03		0.25 [ultra high resolution]
-#define OSS 								3  // tested good, 2-3 best but have tradeoffs, 0 is very iffy
-
-// I2CS_CNTR defines frequency in hz that I2C sensors will run at
-//  20 for 2hz, 10 [def] for 4hz, 5 for 8hz, 4 for 10hz, 2 for 20hz and 1 for 40hz
-#define I2CS_CNTR 							10  
-
-// Home position fix above-sea-level(ASL) ground altitude in meters, USED BY sonar and barometer
-// altitude computation when USE_PA_PRESSURE is set to 0 and a barometer sensor is enabled
-//   PN: Home front yard 13200, 16950  ground altitude of OMFC, SF
-#define ASL_GROUND_ALT						132	// in meters
-
-////////////////////////////////////////////////////////////////////////////////
-// Works with  only UDB4. This feature can only be combined with USE_SONAR set to 1, below.
-// Design for supporting autonomous and soft precision landing flight plan in LOGO.  
-// Otherwise, set to 0 to use GPS and IMU estimated ALTITUDE. 
-// When enabled, sonar altitude will be used to recalibrate altitude in navigation and 
-// deadreckoning within 4 to 22m altitude range, depending on the sensor class used.
-#define SONAR_ALTITUDE 						2
+// #define MAG_YAW_DRIFT 						1
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -240,32 +192,12 @@
 // NUM_INPUTS: Set to 1-5 (or 1-8 when using PPM input)
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS							8     
+#define NUM_INPUTS							8
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-/*    WL - MIN 18 IN CHANNELS OPTION
-#define THROTTLE_INPUT_CHANNEL				CHANNEL_3
-#define AILERON_A_INPUT_CHANNEL				CHANNEL_1
-#define AILERON_B_INPUT_CHANNEL				CHANNEL_4
-#define ELEVATOR_A_INPUT_CHANNEL			CHANNEL_2
-#define ELEVATOR_B_INPUT_CHANNEL			CHANNEL_5
-#define RUDDER_INPUT_CHANNEL				CHANNEL_6
-#define FLAPERON_A_INPUT_CHANNEL			CHANNEL_7
-#define FLAPERON_B_INPUT_CHANNEL			CHANNEL_8
-#define AUX_A_INPUT_CHANNEL					CHANNEL_9
-#define AUX_B_INPUT_CHANNEL					CHANNEL_10
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_11
-#define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_12
-#define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_13
-#define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_14
-#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_15
-#define LOGO_A_CHANNEL						CHANNEL_16		  	 // PPM/C16 to RxC7  AUX2,3p toggle, 1st LOGO plan change 	  
-#define LOGO_B_CHANNEL						CHANNEL_17		  	 // PPM/C17 to RxC8  AUX3,3p toggle, 2nd LOGO plan change 
-#define LOGO_C_CHANNEL						CHANNEL_18		  	 // PPM/C18 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
-*/
 //                                                              physical PPM IN channels to AR8000 Rx / DX8 Tx
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_1            // PPM/C1 to RxC1  Throttle
 #define AILERON_INPUT_CHANNEL				CHANNEL_2 		     // PPM/C2 to RxC2  Ail
@@ -303,26 +235,6 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 // 
-/*   WL - MIN 18 IN CHANNELS OPTION
-#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
-#define AILERON_A_OUTPUT_CHANNEL			CHANNEL_1
-#define AILERON_B_OUTPUT_CHANNEL			CHANNEL_4
-#define ELEVATOR_A_OUTPUT_CHANNEL			CHANNEL_2
-#define ELEVATOR_B_OUTPUT_CHANNEL			CHANNEL_5
-#define RUDDER_OUTPUT_CHANNEL				CHANNEL_6
-#define FLAPERON_A_OUTPUT_CHANNEL			CHANNEL_7
-#define FLAPERON_B_OUTPUT_CHANNEL			CHANNEL_8
-#define AUX_A_OUTPUT_CHANNEL				CHANNEL_9
-#define AUX_B_OUTPUT_CHANNEL				CHANNEL_10
-#define AUX_C_OUTPUT_CHANNEL				CHANNEL_11
-#define AUX_D_OUTPUT_CHANNEL				CHANNEL_12
-#define AUX_E_OUTPUT_CHANNEL				CHANNEL_13
-#define AUX_F_OUTPUT_CHANNEL				CHANNEL_14
-#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_15
-#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_16
-#define CAMERA_MODE_OUTPUT_CHANNEL			CHANNEL_17
-#define OSD_MODE_SWITCH_OUTPUT_CHANNEL		CHANNEL_18
-*/
 //                                                                physical pin to servo/controls connections
 //  UDB4/UDB3/PPM_ALT_OUTPUT_PINS=1 OPTIONS 
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3            // Out3 to ESC/BL Motor  
@@ -418,7 +330,140 @@
 #define FAILSAFE_HOLD						0
 
 
+// MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
+// Each aircraft in the sky will need a unique I.D. in the range from 0-255
+#define MAVLINK_SYSID	155
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////   OPTIONAL SENSORS AND DEVICES   /////////////////////////////////   
+// 
+//    Section to manage: Magnetormeter, Barometer, Sonar, OSD, Current-Voltage-RSSI and CAM gimbal 
+//                                       setup and finetuning
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////    	1. MAGNETOMETER (DIGITAL COMPASS) SUPPORT ON/OFF     //////////
+///
+// Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
+// Otherwise, if set to 0 the GPS will be used.
+// If you select this option, you also need to set magnetometer options in
+// the magnetometerOptions.h file, including declination and magnetometer type.
+#define MAG_YAW_DRIFT 						1
+
+// Define which magnetometer you are using by uncommenting one
+// of the #define lines below.
+// HMC5843 is the 3DRobotics HMC5843 (now out of production).
+// HMC5883L is the 3DRobotics HMC5883L
+// HMC5883L_SF is the SparkFun HMC5883L
+#define HMC5883L_SF
+
+// Define magneticDeclination to be the magnectic declination, in degrees, measured
+// clockwise from the north, east is plus, west is minus.
+//  Mississauga, ON is Lat 45.58 N and Long 79.65 W, Mag. Decl. therefore is 10deg21' W or -10.35 degrees
+//  Bennet Field Springvale, ON is Lat 42deg58' N and Long 80deg9' W, Mag. Decl. therefore is 9deg48' W or -9.48 degrees
+#define MAGNETICDECLINATION -10.35  // 0
+
+// Set to 0 for fixed declination angle or 1 for variable declination angle
+#define DECLINATIONANGLE_VARIABLE 0
+
+
+///////////  	2. BAROMETER PRESURE (ALTEMETER) AND TEMPERATURE SUPPORT    //////////
+//
+// Works with  only UDB4. The barometer sensor must be plugged in at the UDB4's I2C2 pins.
+//
+// This feature is optionally combined with BAROMETER ALTITUDE set to 1, above.
+// When enabled, barometer altitude will be available as systems value in LOGO functions and in 
+// telemetry.  With BAROMETER ALTITUDE set to 1, above and BAR_ALT~ LOGO function used, barometer 
+// altitude will be used in deadreckoning for altitude correction, on ground or 20m above altitude 
+// range, complementing the sonar's altitude range if enabled below and above.
+// Recommended sensors:  BMP085 with .25 m accuracy and altitude range anywhere between -1640 to about 
+// 29,000 ft  (manufacturer's data). 
+// uncomment to enable for testing and debugging barometer program only
+// #define TEST_WITH_DATASHEET_VALUES  	
+// NOTE: Pending testing/verification, doesn't really do enything except include barometer in logged telemetry data.	
+	
+#define USE_BAROMETER						1  
+
+// Works with  only UDB4. This feature can only be turned on with the USE_BAROMETER set to 1, below.
+// Design for recalibrating altitude for enhaced accuracy in navigation, particularly trajectory.  
+// Otherwise, set to 0 to use GPS and IMU estimated ALTITUDE. 
+// If set to 1, barometer altitude will be used to recalibrate altitude in navigation and 
+// deadreckoning, starting 0 to 20m above altitude range, depending on the whether a SONAR sensor 
+// is attached and if so, what sonar sensor class used is used.
+#define BAROMETER_ALTITUDE 					1    // UNTESTED
+
+// FOR DEBUGGING TRIGGER LOCATION of barometer functions altimeter_calibrate() and estAltitude() 
+//  0- default original (distributed); 1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
+//  DEBUG options deactivated but kept for posterity
+//#define BAR_RUN_FROM	 					0   //  DEBUG: choose location from where to run functions    
+//#define EST_ALT 							1   //  DEBUG: turn on (1) or off (0) run of estAltitude()  
+
+// USE_PA_PRESSURE if 0, barometric alt will be base on ASL ground altitude defined below
+// if set to 1, will use hPA and if set to 2, will use mercury based on METAR/station computation
+#define USE_PA_PRESSURE						2    
+
+// PA_PRESSURE below is for Ontario, Canada as of 11-16-2012, 1029.6826 hPA from
+// http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query=Mississauga%2C+Canada
+#define PA_PRESSURE							101800   	// in hPA [set USE_PA_PRESSURE to 1]
+#define MC_PRESSURE							3006   		// in. mercury (METAR) [set USE_PA_PRESSURE to 2]
+
+//  To use realtime ground pressure set to 1, or otherwise will use static-altimeter-calibrated 
+//  ground pressure for ASL and AGL computations. 
+//  IMPORTANT: Use realtime only for ground/terrain based vehicles to constantly update
+//     ground reference. Also, this is only applicable with PA_PRESSURE set to 1 or 2.
+#define USE_REALTIME_GRDPRES 				0 
+
+// Barometer oversampling [OSS] can be set from 0 thru 3
+//				  [ms]  Ave/cur/uA   [hPA]      [m]
+// Set  Samples  Time  /1 sample   RMS noise  RMS noise
+//  0	 1		  4.5		3		  0.06		0.5  [ultra low power]
+//  1	 1		  4.5		3		  0.06		0.5  [standard]
+//  2	 1		  4.5		3		  0.06		0.5  [high resolution]
+//  3	 1		  4.5		3		  0.06		0.5  [ultra high resolution]
+#define OSS 						2
+
+// Home position fix above-sea-level(ASL) ground altitude in centimeter, USED BY sonar and barometer
+// altitude computation when USE_PA_PRESSURE is set to 0 and a barometer sensor is enabled
+//   PN: Home front yard 13200, 16950  ground altitude of OMFC, SF
+#define ASL_GROUND_ALT						16950	// in centimeters
+
+//////////////    	3. SONAR AGL ALTITUDE SENSOR SUPPORT    	///////////////
+//
+// Works with UDB4 only with the sensor attached to the UDB4 input c8 
+// Supports MAXBOTIX MB1230 and 2200 for MB1260 XL
+// http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
+// This option is only usable with LOGO enhancements.
+// Provides for a soft landing LOGO function using sonar AGL (above ground level) altitude.
+// Note: Set to 1 to enable a sonar sensor device and for debugging option 
+//     SERIAL_OUTPUT_FORMAT may be defined as SERIAL_SONAR for debugging purposes
+//     If this is turned off, when used in LOGO, ALT_SNR will have a 0 default value
+//     Turned on, the baud rate for the SERIAL_OUTPUT_FORMAT will default to 57600.
+//     Adjust any serial telemetry logging and transmitting device to same baud rate.
+#define USE_SONAR							1
+
 ////////////////////////////////////////////////////////////////////////////////
+// Works with  only UDB4. This feature can only be combined with USE_SONAR set to 1, below.
+// Design for supporting autonomous and soft precision landing flight plan in LOGO.  
+// Otherwise, set to 0 to use GPS and IMU estimated ALTITUDE. 
+// When enabled, sonar altitude will be used to recalibrate altitude in navigation and 
+// deadreckoning within 4 to 22m altitude range, depending on the sensor class used.
+#define SONAR_ALTITUDE 						1
+
+
+// This specifies the tested effective and vendor max range of the type of sonar being used: . 
+// 	400 cm (4 m) effective and 750 cm max (vendor rated) for an MB1230 XL-MaxSonar-EZ3 
+// 	500 cm (5 m) effective and 1000 cm max (10 m vendor rated) for an  MB1261 XL-MaxSonar-EZL1
+#define EFFECTV_SONAR_ALTRANGE				400 // conservative to ensure effectiveness
+#define MAXIMUM_SONAR_ALTRANGE      		1000
+
+//////////////   	4. TELEMETRY ON SCREEN DISPLAY (OSD) SUPPORT     ///////////
+//
+// On Screen Display
+// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
+#define USE_OSD	    						1
+
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
 // SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
 // This determines the format of the output sent out the spare serial port.
@@ -436,66 +481,12 @@
 
 #define SERIAL_OUTPUT_FORMAT 			SERIAL_UDB_EXTRA
 
-// MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
-// Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID	155
-
-////////////////////////////////////////////////////////////////////////////////
-// Works with  only UDB4. The barometer sensor must be plugged in at the UDB4's I2C pins.
+//////////////   	5. ANALOG INPUT CURRENT-VOLTAGE-RSSI SENSORS   	////////////
 //
-// This feature is optionally combined with BAROMETER ALTITUDE set to 1, above.
-// When enabled, barometer altitude will be available as systems value in LOGO functions and in 
-// telemetry.  With BAROMETER ALTITUDE set to 1, above and BAR_ALT~ LOGO function used, barometer 
-// altitude will be used in deadreckoning for altitude correction, on ground or 20m above altitude 
-// range, complementing the sonar's altitude range if enabled below and above.
-// Recommended sensors:  BMP085 with .25 m accuracy and altitude range anywhere between -1640 to about 
-// 29,000 ft  (manufacturer's data). 
-// uncomment to enable for testing and debugging barometer program only
-// #define TEST_WITH_DATASHEET_VALUES  	
-// NOTE: Pending testing/verification, doesn't really do enything except include barometer in logged telemetry data.	
-	
-#define USE_BAROMETER						1  
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Works with UDB4 only
-// MAXBOTIX SONAR LANDING FLARE
-// Designed for use with MAXBOTIX MB1230 and 2200 for MB1260 XL
-// http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
-// Can be used on INPUT 8 of the UDB4 if that is not used for a channel input.
-// Will return distance to ground in meters and compensate for roll subject to 
-// receiving a returned sonar signal.
-// This option is designed to be used with Logo Flight Planning.
-// Logo allows the user to Interrupt a Landing and flare, or Go Around, based on sonar distance to ground.
-// Note: Set to 1 to enable a sonar sensor device and for debugging option 
-//     SERIAL_OUTPUT_FORMAT may be defined as SERIAL_SONAR abouve 
-//     If this is turned off, when used in LOGO, ALT_SNR will have a 0 default value
-//     Turned on the baud rate for the SERIAL_OUTPUT_FORMAT will default to 57600. In this case, adjust
-//     any serial telemetry logging and transmitting device to same baud rate.
-
-#define USE_SONAR							1
-
-// This specifies the tested effective and vendor max range of the type of sonar being used: . 
-// 	400 cm (4 m) effective and 750 cm max (vendor rated) for an MB1230 XL-MaxSonar-EZ3 
-// 	500 cm (5 m) effective and 1000 cm max (10 m vendor rated) for an  MB1261 XL-MaxSonar-EZL1
-#define EFFECTV_SONAR_ALTRANGE				500
-#define MAXIMUM_SONAR_ALTRANGE      		1000
-
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD								1
-
 // NUM_ANALOG_INPUTS: Set to 0, 1, or 2
-//  Set higher than 0 only if USE_PPM_INPUT is enabled above.
-// UDB3
 //   1 enables Radio In 1 as an analog Input
 //   2 also enables Radio In 2 as another analog Input
-// UDB4
-//   1 enables A15
-//   2 enables A16
-//   3 enables A17
-//   4 enables A18
+//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 #define NUM_ANALOG_INPUTS					2
 
 // Channel numbers for each analog input
@@ -520,22 +511,20 @@
 // to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
-#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_2   // UDB4 pin A15
-#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_1   // UDB4 pin A16
-
-// USE_WIFI Enables a wifi module.  This requires a MRF24WG0MA and MRF24WG0MB www.microchip.com, 
-//  module to be installed. See documentations at TBD wiki for use, installation and wiring 
-//  instructions. This option can only be applied to UDB4 due to its memory requirements.   
-//  When enabled, this uses UDB4 analog pins 17 and 18.  Hence the NUM_ANALOG_INPUTS defined 
-//  above shouldn't exceed 2. 
-#define USE_WIFI							0      // 1 to enable			
+#define ANALOG_CURRENT_INPUT_CHANNEL		CHANNEL_2
+#define ANALOG_VOLTAGE_INPUT_CHANNEL		CHANNEL_1
+#define ANALOG_RSSI_INPUT_CHANNEL			CHANNEL_UNUSED
 
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE				0.5		// Voltage when RSSI should show 0%
 #define RSSI_MAX_SIGNAL_VOLTAGE				3.3		// Voltage when RSSI should show 100%
 
 
-////////////////////////////////////////////////////////////////////////////////
+///////   6. CAMERA GIMBAL STABILIZATION, TARGETTING AND TRIGERING SETUP   /////   
+//
+// Set this value to 1, for camera to be stabilized using camera options further below.
+#define USE_CAMERA_STABILIZATION			0
+
 // Trigger Action
 // Use the trigger to do things like drop an item at a certain waypoint, or take a photo every
 // N seconds during certain waypoint legs.
@@ -568,6 +557,79 @@
 #define TRIGGER_PULSE_DURATION				250
 #define TRIGGER_REPEAT_PERIOD				4000
 
+// Camera Stabilization and Targeting
+// 
+// There are three camera modes within MatrixPilot
+/// Canera Mode 1: No stabilisation for camera pitch or yaw
+//  Camera Mode 2: Stabilisation of camera pitch but not yaw.
+//  Camera Mode 3: Camera targetting. The camera is aimed at a GPS location.
+
+// Control of camera modes
+// If CAMERA_MODE_INPUT_CHANNEL is assigned to a channel in the channels section of
+// options.h then a three position switch can be used to select between the three camera
+// stabilization modes. The following min and max values should work for most transmitters.
+
+#define CAMERA_MODE_THRESHOLD_LOW			2600
+#define CAMERA_MODE_THRESHOLD_HIGH			3400
+
+// If you do not have a spare channel for CAMERA_MODE_INPUT_CHANNEL then,
+// If CAMERA_MODE_INPUT_CHANNEL is defined as CHANNEL_UNUSED :-
+//  In UDB Manual Mode the camera is fixed straight ahead. (Camera mode 1)
+//  In UDB Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
+//     relative to the plane's frame of reference. (Camera mode 2).
+//  In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
+// In all three flight modes, if you set CAMERA_INPUT_CHANNEL then the transmitter camera controls
+// will be mixed into the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
+// during flight and point the camera at a specific target of interest.
+
+// Setup and configuration of camera targetting at installation of camera servos:-
+// To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
+// when in stabilized mode. This should be expressed in 2:14 format. 
+// Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
+// Paste the following line into a google search box (without the //)
+// tan((( 15 /180 )* 3.1416 ))* 16384
+// The result, as an integer, will be 4390. Change the angle, 15, for whatever angle you would like.
+// Note that CAM_TAN_PITCH_IN_STABILIZED_MODE should not exceed 32767 (integer overflows to negative).
+
+#define CAM_TAN_PITCH_IN_STABILIZED_MODE   1433	// 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
+#define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
+
+// All number should be integers
+#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
+#define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
+#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
+#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
+											    // Example: 30 would mean that a centered pitch servo points the camera
+												// 30 degrees down from horizontal when looking to the front of the plane.
+
+#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
+#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
+#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
+#define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
+
+// Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
+// That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
+// Once the camera rotates correctly through 180 degrees, then you can adjust CAM_PITCH_OFFSET_CENTRED to center the camera.
+// In Camera test mode, pitch angle changes permanently to 90 degrees down in stabilized mode, and  0 (level) in Manual Mode.
+
+#define CAM_TESTING_OVERIDE				      0 // Set to 1 for camera to move to test angles in stabilized mode.
+#define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
+#define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
+
+// Set this to 1 to ignore camera target data from the flightplan, and instead use camera target data coming in on the serial port.
+// This data can be generated by another UDB running MatrixPilot, using SERIAL_CAM_TRACK.
+// NOTE: When using camera tracking, both UDBs must be set to use the same fixed origin location.
+#define CAM_USE_EXTERNAL_TARGET_DATA		0
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////  FLIGHT BEHAVIOR PARAMETERS AND FINETUNING   //////////////////////////// 
+// 
+//    Section to manage: Magnetormeter, Barometer, Sonar, OSD, Current-Voltage-RSSI and CAM gimbal 
+//                                       setup and finetuning
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.
@@ -668,72 +730,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Camera Stabilization and Targeting
-// 
-// There are three camera modes within MatrixPilot
-/// Canera Mode 1: No stabilisation for camera pitch or yaw
-//  Camera Mode 2: Stabilisation of camera pitch but not yaw.
-//  Camera Mode 3: Camera targetting. The camera is aimed at a GPS location.
-
-// Control of camera modes
-// If CAMERA_MODE_INPUT_CHANNEL is assigned to a channel in the channels section of
-// options.h then a three position switch can be used to select between the three camera
-// stabilization modes. The following min and max values should work for most transmitters.
-
-#define CAMERA_MODE_THRESHOLD_LOW			2600
-#define CAMERA_MODE_THRESHOLD_HIGH			3400
-
-// If you do not have a spare channel for CAMERA_MODE_INPUT_CHANNEL then,
-// If CAMERA_MODE_INPUT_CHANNEL is defined as CHANNEL_UNUSED :-
-//  In UDB Manual Mode the camera is fixed straight ahead. (Camera mode 1)
-//  In UDB Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
-//     relative to the plane's frame of reference. (Camera mode 2).
-//  In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
-// In all three flight modes, if you set CAMERA_INPUT_CHANNEL then the transmitter camera controls
-// will be mixed into the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
-// during flight and point the camera at a specific target of interest.
-
-// Setup and configuration of camera targetting at installation of camera servos:-
-// To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
-// when in stabilized mode. This should be expressed in 2:14 format. 
-// Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
-// Paste the following line into a google search box (without the //)
-// tan((( 15 /180 )* 3.1416 ))* 16384
-// The result, as an integer, will be 4390. Change the angle, 15, for whatever angle you would like.
-// Note that CAM_TAN_PITCH_IN_STABILIZED_MODE should not exceed 32767 (integer overflows to negative).
-
-#define CAM_TAN_PITCH_IN_STABILIZED_MODE   1433	// 1443 is 5 degrees of pitch. Example: 15 degrees is 4389
-#define CAM_YAW_IN_STABILIZED_MODE			  0 // in degrees relative to the plane's yaw axis.    Example: 0
-
-// All number should be integers
-#define CAM_PITCH_SERVO_THROW			     95	// Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
-#define CAM_PITCH_SERVO_MAX					 85	// Max pitch up that plane can tilt and keep camera level, in degrees.  
-#define CAM_PITCH_SERVO_MIN				    -22 // Max pitch down that plane can tilt and keep camera level, in degrees. 
-#define CAM_PITCH_OFFSET_CENTRED		     38 // Offset in degrees of servo that results in a level camera.           
-											    // Example: 30 would mean that a centered pitch servo points the camera
-												// 30 degrees down from horizontal when looking to the front of the plane.
-
-#define CAM_YAW_SERVO_THROW				    350	// Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
-#define CAM_YAW_SERVO_MAX				    130 // Max positive yaw of camera relative to front of plane in Degrees. 		     
-#define CAM_YAW_SERVO_MIN				   -130 // Min reverse  yaw of camera relative to front of plane in Degrees.   
-#define CAM_YAW_OFFSET_CENTRED				 11	// Yaw offset in degrees that results in camera pointing forward. 
-
-// Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
-// That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
-// Once the camera rotates correctly through 180 degrees, then you can adjust CAM_PITCH_OFFSET_CENTRED to center the camera.
-// In Camera test mode, pitch angle changes permanently to 90 degrees down in stabilized mode, and  0 (level) in Manual Mode.
-
-#define CAM_TESTING_OVERIDE				      0 // Set to 1 for camera to move to test angles in stabilized mode.
-#define CAM_TESTING_YAW_ANGLE			 	 90 // e.g. 90 degrees. Will try to swing 90 degrees left, then 90 degrees right
-#define CAM_TESTING_PITCH_ANGLE				 90 // In degrees.
-
-// Set this to 1 to ignore camera target data from the flightplan, and instead use camera target data coming in on the serial port.
-// This data can be generated by another UDB running MatrixPilot, using SERIAL_CAM_TRACK.
-// NOTE: When using camera tracking, both UDBs must be set to use the same fixed origin location.
-#define CAM_USE_EXTERNAL_TARGET_DATA		0
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Configure altitude hold
 // These settings are only used when Altitude Hold is enabled above.
 
@@ -743,7 +739,7 @@
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
-// smoother, and is suggested for very fast planes. 
+// smoother, and is suggested for very fast planes.
 #define HEIGHT_MARGIN						6  // 10
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.

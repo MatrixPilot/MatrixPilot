@@ -6,6 +6,6 @@ typedef void (*barometer_callback_funcptr)(long pressure, int temperature, char 
 
 void rxBarometer(barometer_callback_funcptr) ;  // service the barometer
 //void rxBarometer(void) ;  // service the barometer
-void computeAltitudeAGL(void);
+void estAltitude(void);
 
 #endif // BAROMETER_H

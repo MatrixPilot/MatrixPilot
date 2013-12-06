@@ -69,7 +69,7 @@
 		int sonar_rawaltitude ;      				// PWM converted sonar raw altitude in centimeters
 		int sonar_altitude ; 		 				// cosine rmat8, tilt compensated sonar raw altitude
 		fractional cos_pitch_roll ;  				// tilt of the plane in UDB fractional units * 2.
-		void computeSonarAltitude();				// sonar altitude compute function
+		void computeSonarAltitude(void);			// sonar altitude compute function
 
 		// The ff. sonar defines were move to option.h
 		// #define EFFECTV_SONAR_ALTRANGE  	400 	// 400 for MAXBOTIX MB1230 and 2200 for MB1260 XL.
@@ -400,7 +400,7 @@
 	
 	/* ***************** SONAR ALTITUDE SUPPORT FUNCTION *********************  */
 	#if ( USE_SONAR == 1 )
-			void computeSonarAltitude()
+		void computeSonarAltitude()
 		{
 			if ( udb_flags._.sonar_updated == 1 ) 
 			{	

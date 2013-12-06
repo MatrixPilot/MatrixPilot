@@ -84,5 +84,4 @@
 #define OSD_LOC_BATT_CURRENT			OSD_LOC(13, 0)			// 4 characters wide OSD_LOC(13,0)
 #define OSD_LOC_BATT_USED				OSD_LOC(14, 0)			// 5 characters wide OSD_LOC(14,0)
 #define OSD_LOC_BATT_VOLTAGE			OSD_LOC(15, 0)			// 4 characters wide OSD_LOC(15,0)
-
 #define OSD_LOC_RSSI					OSD_LOC(12, 0)			// 4 characters wide def OSD_LOC(12,0)

@@ -139,13 +139,9 @@ void udb_background_callback_triggered(void)
 		location[1] = accum_nav._.W0 ;
 		
 		//	multiply the longitude delta by the cosine of the latitude
-		// accum_nav.WW = ((long_gps.WW - long_origin.WW)/90) ; // in meters
-		// accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
-		// location[0] = accum_nav._.W1 ;
-
-		//  BP's mod r1817 removing 20m range restriction, using 32 bit integers replacing 16 bit
-		accum_nav.WW = long_scale((long_gps.WW - long_origin.WW)/90 , cos_lat ) ;
-		location[0] = accum_nav._.W0 ;	
+		accum_nav.WW = ((long_gps.WW - long_origin.WW)/90) ; // in meters
+		accum_nav.WW = ((__builtin_mulss ( cos_lat , accum_nav._.W0 )<<2)) ;
+		location[0] = accum_nav._.W1 ;
 		
 		accum_nav.WW = ( alt_sl_gps.WW - alt_origin.WW)/100 ; // height in meters
 		location[2] = accum_nav._.W0 ;
@@ -224,11 +220,23 @@ void udb_background_callback_triggered(void)
 		velocity_previous = air_speed_3DGPS ;
 
 		estimateWind() ;
-/*
+
+/*  DEBUG options deactivated but kept for posterity
+		//  0- default original; 1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
 		#if (USE_BAROMETER == 1)    
-			estAltitudeAGL() ;			// run at estAltitude.c
+			#if (BAR_RUN_FROM == 2) //   DEBUG runtime location  (0 is original location
+				altimeter_calibrate() ;  	// runs BAROMETER FUNCTION in estAltitude.c
+				#if (EST_ALT == 1)
+					estAGLAltitude() ;			// DEBUG NECESSITY FOR THIS FUNCTION in estAltitude.c
+				#endif
+			#elif (BAR_RUN_FROM == 0) //   DEBUG runtime location
+				#if (EST_ALT == 1)
+					estAGLAltitude() ;			// DEBUG NECESSITY FOR THIS FUNCTION in estAltitude.c
+				#endif
+			#endif
 		#endif
 */
+
 		estYawDrift() ;	
 		dcm_flags._.yaw_req = 1 ;  // request yaw drift correction 
 		dcm_flags._.reckon_req = 1 ; // request dead reckoning correction
