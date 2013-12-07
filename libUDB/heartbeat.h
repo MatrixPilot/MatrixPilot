@@ -24,7 +24,7 @@
 
 
 // number of heartbeats per second
-#define HEARTBEAT_HZ 200
+#define HEARTBEAT_HZ 40
 
 // number of servo updates per second
 #define SERVO_HZ 40
@@ -39,7 +39,6 @@ extern uint16_t udb_heartbeat_counter;
 inline void heartbeat(void);
 inline uint16_t heartbeat_cnt(void);
 inline boolean heartbeat_chk(uint16_t hertz);
-inline void pulse(void);
 
 
 #endif // HEARTBEAT_H
