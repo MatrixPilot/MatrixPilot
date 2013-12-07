@@ -33,90 +33,74 @@
 // Requires libUDB.
 // 
 // This library is designed to use libUDB, but to remain independent of the 
-// sepcifics of the MatrixPilot application.
+// specifics of the MatrixPilot application.
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
-void dcm_init( void ) ;
-void dcm_calibrate(void) ;
-void dcm_set_origin_location(long o_long, long o_lat, long o_alt) ;
+void dcm_init(void);
+void dcm_calibrate(void);
+void dcm_set_origin_location(int32_t o_long, int32_t o_lat, int32_t o_alt);
 
-extern union intbb dcm_declination_angle ;	// Declination +-32767 = +-360deg
+//extern union intbb dcm_declination_angle;       // Declination +-32767 = +-360deg
 
 // Called once each time the GPS reports a new location.
 // After dead reckoning is complete, this callback may go away.
-void dcm_callback_gps_location_updated(void) ;				// Callback
+void dcm_callback_gps_location_updated(void);   // Callback
 
 // Allows disabling yaw drift estimation.
 // Starts off enabled.  Call this to disable and to then re-enable.
-void dcm_enable_yaw_drift_correction(boolean enabled) ;
+void dcm_enable_yaw_drift_correction(boolean enabled);
 
 // Implement this callback to prepare the pwOut values.
 // It is called at 40Hz (once every 25ms).
-void dcm_servo_callback_prepare_outputs(void) ;				// Callback
+//void dcm_servo_callback_prepare_outputs(void);  // Callback
+void dcm_heartbeat_callback(void);
 
 // Convert an absolute location to relative
-struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute) ;
+struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute);
+struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute);
+
+vect3D_32 dcm_rel2abs(vect3D_32 rel);
 
 // FIXME: This should be handled internally, along with DCM calibration
 // Count down from 1000 at 40Hz
-void gps_startup_sequence( int gpscount ) ;
+void gps_startup_sequence(int16_t gpscount);
 
 // Is our gps data good enough for navigation?
-boolean gps_nav_valid(void) ;
+boolean gps_nav_valid(void);
 
-
-// Rotation utility functions
-int cosine ( signed char angle ) ;
-int sine ( signed char angle ) ;
-signed char arcsine ( int y ) ;
-signed char rect_to_polar ( struct relative2D *xy ) ;
-int rect_to_polar16 ( struct relative2D *xy ) ;
-void rotate( struct relative2D *xy , signed char angle ) ;
-
-// integer and long integer square roots
-unsigned int sqrt_int ( unsigned int ) ;
-unsigned int sqrt_long ( unsigned long int ) ;
-
-// magnitudes of 2 and 3 component vectors
-unsigned int vector2_mag( int , int ) ;
-unsigned int vector3_mag( int , int , int ) ;
-
-// normalize vectors to RMAX format
-unsigned int vector2_normalize( int result[] , int input[] ) ;
-unsigned int vector3_normalize( int result[] , int input[] ) ;
+// Should navigation be based on a "virtual GPS" instead of the real GPS
+boolean use_virtual_gps(void);
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vars
-extern union dcm_fbts_word { struct dcm_flag_bits _ ; int W ; } dcm_flags ;
+extern union dcm_fbts_word { struct dcm_flag_bits _; int16_t W; } dcm_flags;
 
 // Outside of libDCM, these should all be treated as read-only
-extern fractional rmat[] ;
-extern fractional omegaAccum[] ;
-extern fractional omegagyro[] ;
-extern fractional accelEarth[] ;
+extern fractional rmat[];
+extern fractional omegaAccum[];
+extern fractional omegagyro[];
+extern fractional accelEarth[];
 
-extern struct relative3D GPSlocation ;
-extern struct relative3D GPSvelocity ;
-extern struct relative2D velocity_thru_air ; // derived horizontal velocity relative to air in cm/sec
-extern int    estimatedWind[3] ;			// wind velocity vectors in cm / sec
+#ifdef USE_EXTENDED_NAV
+extern struct relative3D_32 GPSlocation;
+#else
+extern struct relative3D GPSlocation;
+#endif // USE_EXTENDED_NAV
+extern struct relative3D GPSvelocity;
+extern struct relative2D velocity_thru_air; // derived horizontal velocity relative to air in cm/sec
+extern int16_t estimatedWind[3];            // wind velocity vectors in cm / sec
 
-extern unsigned int air_speed_3DIMU ;
-extern int total_energy ;
+//extern uint16_t air_speed_3DIMU;
+//extern int16_t total_energy;
 
-extern union longww IMUlocationx , IMUlocationy , IMUlocationz ;
-extern union longww IMUvelocityx , IMUvelocityy , IMUvelocityz ;
-#define IMUheight IMUlocationz._.W1
+//extern union longww IMUlocationx, IMUlocationy, IMUlocationz;
+//extern union longww IMUvelocityx, IMUvelocityy, IMUvelocityz;
+//#define IMUheight IMUlocationz._.W1
 
-extern signed char calculated_heading ; // takes into account wind velocity
-extern int gps_data_age ;
+extern union longbbbb lat_gps,    lon_gps,    alt_sl_gps;
+extern union longbbbb lat_origin, lon_origin, alt_origin;
 
-extern unsigned int ground_velocity_magnitudeXY ;
-extern unsigned int air_speed_magnitudeXY;
-
-extern union longbbbb lat_gps , long_gps , alt_sl_gps ;
-extern union longbbbb lat_origin , long_origin , alt_origin ;
-
-#endif
+#endif // LIB_DCM_H

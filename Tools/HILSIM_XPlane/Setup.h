@@ -55,6 +55,7 @@ It will give you details of what has been loaded from the setup file.
 #define EngineString	"Engine"
 #define ControlString	"Control"
 #define CommString		"Comm"
+#define PortString		"Port"
 #define OverideString	"Overide"
 
 typedef enum
@@ -70,7 +71,6 @@ typedef enum
 	DATAPOS_CONTROL_LAST_INDEX,
 } ControlDataPos;
 
-
 typedef enum
 {	
 	DATAPOS_ENGINE_DATATYPE = 0,
@@ -84,7 +84,6 @@ typedef enum
 	DATAPOS_ENGINE_LAST_INDEX,
 } EngineDataPos;
 
-
 typedef enum
 {	
 	DATAPOS_OVERIDE_DATATYPE = 0,
@@ -92,14 +91,12 @@ typedef enum
 	DATAPOS_OVERIDE_LAST_INDEX,
 } OverideDataPos;
 
-
 typedef enum
 {	
 	DATAPOS_COMM_DATATYPE = 0,
 	DATAPOS_COMM_IDENTITY,
 	DATAPOS_COMM_LAST_INDEX
 } CommDataPos;
-
 
 typedef enum
 {
@@ -131,18 +128,16 @@ public:
 	unsigned int mEngineMask;
 };
 
-
 class Channels : public vector<ChannelSetup>
 {
 };
 
-
 class SetupFile
 {
 public:
-	void LoadSetupFile(Channels& ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr);
+	void LoadSetupFile(Channels& ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr);
 
-	void ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, string& OverideStr);
+	void ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr);
 
 	void ParseControlLine(string& ParseString, Channels &ChannelInfo);
 	void ParseControlString(string& ValueString, int Index, ChannelSetup* pSetup);
@@ -151,10 +146,10 @@ public:
 	void ParseEngineString(string& ValueString, int Index, ChannelSetup* pSetup);
 
 	void ParseCommLine(string& ParseString, string& CommStr, long& CommSpeed);
+	void ParsePortLine(string& ParseString, uint16_t& PortNum);
 
 	void ParseOverideLine(string& ParseString, string& OverideStr);
 };
-
 
 class LogFile
 {
@@ -165,6 +160,5 @@ public:
 	
 	ofstream mLogFile;
 };
-
 
 static LogFile LoggingFile;

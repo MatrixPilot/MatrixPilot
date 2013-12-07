@@ -21,43 +21,48 @@
 
 // used for the UDB4
 
-#define	xrateBUFF			2
-#define	yrateBUFF			1
-#define	zrateBUFF			3
-
-#define	xaccelBUFF			5
-#define	yaccelBUFF			6
-#define	zaccelBUFF			4
-
-#define analogInput1BUFF	7
-#define analogInput2BUFF	8
-#define analogInput3BUFF	9
-#define analogInput4BUFF	10
-
-#define XRATE_SIGN -
-#define YRATE_SIGN -
-#define ZRATE_SIGN -
-
-#define XACCEL_SIGN -
-#define YACCEL_SIGN -
-#define ZACCEL_SIGN +
-
 //#define VREF
 
-#define SCALEGYRO 4.95
-#define SCALEACCEL 2.64
+#define SCALEGYRO           4.95
+#define SCALEACCEL          2.64
+
+#define xrateBUFF           2
+#define yrateBUFF           1
+#define zrateBUFF           3
+#define xaccelBUFF          5
+#define yaccelBUFF          6
+#define zaccelBUFF          4
+#define analogInput1BUFF    7
+#define analogInput2BUFF    8
+#define analogInput3BUFF    9
+#define analogInput4BUFF    10
+
+#define A_VOLT_BUFF         7       // V, pin label Bat Volt
+#define A_AMPS_BUFF         8       // I, pin label CS Curr
+#define A_RSSI_BUFF         9       // RS, pin label RSSI
+
+#define XRATE_SIGN          -
+#define YRATE_SIGN          -
+#define ZRATE_SIGN          -
+#define XACCEL_SIGN         -
+#define YACCEL_SIGN         -
+#define ZACCEL_SIGN         +
 
 // Max inputs and outputs
-#define MAX_INPUTS	8
-#define MAX_OUTPUTS	8
+#define MAX_INPUTS          8
+#define MAX_OUTPUTS         8
 
 // LED pins
-#define LED_BLUE			LATEbits.LATE4
-#define LED_ORANGE			LATEbits.LATE3
-#define LED_GREEN			LATEbits.LATE2
-#define LED_RED				LATEbits.LATE1
+#define LED_BLUE            _LATE4
+#define LED_ORANGE          _LATE3
+#define LED_GREEN           _LATE2
+#define LED_RED             _LATE1
 
-// There are no hardware toggle switches on the UDB4, so use values of 0
-#define HW_SWITCH_1			0
-#define HW_SWITCH_2			0
-#define HW_SWITCH_3			0
+#define IC_PIN1             _RD8
+#define IC_PIN2             _RD9
+#define IC_PIN3             _RD10
+#define IC_PIN4             _RD11
+#define IC_PIN5             _RD12
+#define IC_PIN6             _RD13
+#define IC_PIN7             _RD14
+#define IC_PIN8             _RD15

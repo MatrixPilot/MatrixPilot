@@ -48,7 +48,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack(uint8_t system_id, 
 	_mav_put_int32_t(buf, 8, sue_alt_origin);
 	_mav_put_int16_t(buf, 12, sue_week_no);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 14);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 14);
 #else
 	mavlink_serial_udb_extra_f13_t packet;
 	packet.sue_lat_origin = sue_lat_origin;
@@ -56,7 +56,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack(uint8_t system_id, 
 	packet.sue_alt_origin = sue_alt_origin;
 	packet.sue_week_no = sue_week_no;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 14);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 14);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13;
@@ -86,7 +86,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack_chan(uint8_t system
 	_mav_put_int32_t(buf, 8, sue_alt_origin);
 	_mav_put_int16_t(buf, 12, sue_week_no);
 
-        memcpy(_MAV_PAYLOAD(msg), buf, 14);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 14);
 #else
 	mavlink_serial_udb_extra_f13_t packet;
 	packet.sue_lat_origin = sue_lat_origin;
@@ -94,7 +94,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack_chan(uint8_t system
 	packet.sue_alt_origin = sue_alt_origin;
 	packet.sue_week_no = sue_week_no;
 
-        memcpy(_MAV_PAYLOAD(msg), &packet, 14);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 14);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13;

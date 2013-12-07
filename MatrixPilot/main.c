@@ -20,20 +20,68 @@
 
 
 #include "defines.h"
+#include "../libDCM/gpsParseCommon.h"
+#include "config.h"
 
-//	main program for testing the IMU.
+#if (USE_TELELOG == 1)
+#include "telemetry_log.h"
+#endif
 
-int main (void)
+#if (USE_USB == 1)
+#include "preflight.h"
+#endif
+
+#if (CONSOLE_UART != 0)
+#include "console.h"
+#endif
+
+
+#if (SILSIM == 1)
+int mp_argc;
+char **mp_argv;
+int main(int argc, char** argv)
 {
-	udb_init() ;
-	dcm_init() ;
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
-	
-	udb_run() ;
-	// This never returns.
-	
-	return 0 ;
+	// keep these values available for later
+	mp_argc = argc;
+	mp_argv = argv;
+#else
+int main(void)
+{
+	mcu_init();
+#endif
+#if (USE_TELELOG == 1)
+	log_init();
+#endif
+#if (USE_USB == 1)
+	preflight();    // perhaps this would be better called usb_init()
+#endif
+	gps_init();     // this sets function pointers so i'm calling it early for now
+	udb_init();
+	dcm_init();
+	init_config();  // this will need to be moved up in order to support runtime hardware options
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	init_serial();
+
+	if (setjmp())
+	{
+		// a processor exception occurred and we're resuming execution here 
+		DPRINT("longjmp'd\r\n");
+	}
+
+	while (1)
+	{
+#if (USE_TELELOG == 1)
+		telemetry_log();
+#endif
+#if (USE_USB == 1)
+		USBPollingService();
+#endif
+#if (CONSOLE_UART != 0 && SILSIM == 0)
+		console();
+#endif
+		udb_run();
+	}
+	return 0;
 }

@@ -4,7 +4,7 @@ import os
 
 
 try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..\MAVlink\pymavlink'))
+    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
     os.environ['MAVLINK10'] = '1'
     import mavlinkv10 as mavlink
     import mavutil
@@ -35,7 +35,7 @@ class raw_mavlink_telemetry_file:
     def next(self):
         """return the next good SERIAL UDB EXTRA (SUE) Binary MAVLink record"""
         while True :
-            self.msg = self.m.recv_match(blocking=False, end_fragment = True)
+            self.msg = self.m.recv_match(blocking=False)
             if not self.msg:
                     # Reached end of file
                     print "Total MAVLink Packets processed:", self.total_mavlink_packets_received
@@ -207,6 +207,13 @@ class base_telemetry :
         self.flight_plan_type = 0
         self.rollkd_rudder = 0
         self.rollkp_rudder = 0
+        self.IMUvelocityx = 0
+        self.IMUvelocityy = 0
+        self.IMUvelocityz = 0
+        self.flags = 0
+        self.sonar_direct = 0 # Direct distance in cm to sonar target
+        self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
+       
 
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
@@ -1063,7 +1070,7 @@ class ascii_telemetry(base_telemetry):
                 try:
                     self.ley = int(match.group(1))
                 except:
-                    print "Corrtup :ley value in line", line_no
+                    print "Corrupt :ley value in line", line_no
                     pass
             else :
                 pass # Not a serious error
@@ -1103,6 +1110,46 @@ class ascii_telemetry(base_telemetry):
             else :
                 pass
 
+            match = re.match(".*:tx([-0-9]*?):",line) # IMUvelocity x. 
+            if match :
+                try:
+                    self.IMUvelocityx = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationx value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:ty([-0-9]*?):",line) # IMUvelocity y. 
+            if match :
+                try:
+                    self.IMUvelocityy = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationy value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:tz([-0-9]*?):",line) # IMUvelocity z. 
+            if match :
+                try:
+                    self.IMUvelocityz = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationz value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:fgs([-0-9]*?):",line) # flags from defines.h 
+            if match :
+                try:
+                    self.flags = int(match.group(1))
+                except:
+                    print "Corrupt flag values in line", line_no
+                    return "Error"
+            else :
+                pass
+
             match = re.match(".*:G([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
             if match :
                 try:
@@ -1112,9 +1159,19 @@ class ascii_telemetry(base_telemetry):
                 except:
                     print "Corrupt F2: waypoint value in line", line_no
                     pass
+
+            match = re.match(".*:H([-0-9]*?),([-0-9]*?):",line) # Sonar information, if available
+            if match :
+                try:
+                    self.sonar_direct = int(match.group(1))
+                    self.alt_sonar    = int(match.group(2))
+                except:
+                    print "Corrupt F2: sonar value in line", line_no
+                    pass
             
              # line was parsed without major errors
             return "F2"
+            
 
         #################################################################
         # Try Another format of telemetry
@@ -1823,8 +1880,9 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             print "Error: Unknown Mavlink file type (not raw or timestamp)."
             return
     record_no = 0
+    last_F2_A_message = None
     while True:
-        msg = m.recv_match(blocking=False, end_fragment = True)
+        msg = m.recv_match(blocking=False)
         record_no = record_no + 1
 ##        # Provide indication of progress
 ##        if record_no % 300 == 1:
@@ -1845,6 +1903,8 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_B':
             #try:
+                if last_F2_A_message is None  :
+                    continue
                 if ( last_F2_A_message.sue_time <= msg.sue_time ):
                     print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
                      ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \

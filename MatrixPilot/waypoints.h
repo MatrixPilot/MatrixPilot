@@ -23,7 +23,9 @@
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		25
+#define WAYPOINT_RADIUS         25
+
+#define CAM_VIEW_LAUNCH         { 0, 0, 0 }
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -45,14 +47,9 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		1
-// #define FIXED_ORIGIN_LOCATION	{ -797866871, 435341708, 182.0 }	// North Field field center launch point 168m above sea lev 
-// #define FIXED_ORIGIN_LOCATION	{-797279923, 434894384, 168.4 }		// OMFC South Field field NW offset DC launch point 168m above sea lev
-#define FIXED_ORIGIN_LOCATION	{-797278708, 434893087, 170.0}			// OMFC South Field field dead center launch point 168m above sea lev
-// #define FIXED_ORIGIN_LOCATION	{-801586991, 429692064, 226.2 }		// Bennet Field, Springvale East field 
-// #define FIXED_ORIGIN_LOCATION	{-801605927, 429691278, 226.2 }		// Bennet Field, Springvale West field 
-// #define FIXED_ORIGIN_LOCATION	{-801595895, 429693672,  226.2}		// Bennet Field, Springvale Center field 
-// #define FIXED_ORIGIN_LOCATION	{-801595895, 429693672,  226.2}		// Bennet Field, Springvale Center field 
+#define USE_FIXED_ORIGIN        0
+#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 30.0 }    // A point in Baylands Park in Sunnyvale, CA
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint definitions
@@ -60,18 +57,18 @@
 // Define the main course as:
 // 
 // const struct waypointDef waypoints[] = {
-//						waypoint1 ,
-//						waypoint2 ,
-//						etc.
-//						} ;
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
 // and the Failsafe RTL course as:
 // 
 // const struct waypointDef rtlWaypoints[] = {
-//						waypoint1 ,
-//						waypoint2 ,
-//						etc.
-//						} ;
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
 // A waypoint is defined as { { X , Y , Z } , F , CAM_VIEW }
 // where X, Y, and Z are the three coordinates of the waypoint,
@@ -94,20 +91,20 @@
 // Z is altitude in meters relative to the initialization location of the board.
 // As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_ABSOLUTE } represents a point
 // 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
-// ( Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees. )
+// (Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees.)
 // 
 // Currently F can be set to: F_NORMAL, or any combination of:
-// F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
+// F_ABSOLUTE       - Waypoints are Relative by default, unless F_ABSOLUTE is specified.
 // 
-// F_TAKEOFF		- More quickly gain altitude at takeoff.
-// F_INVERTED		- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
-// F_HOVER			- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
-//					  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
-// F_LOITER			- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
-// F_TRIGGER		- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
-// F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
-// F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer waypoint legs.
-// F_LAND			- Navigate towards this waypoint with the throttle off.
+// F_TAKEOFF        - More quickly gain altitude at takeoff.
+// F_INVERTED       - Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
+// F_HOVER          - Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
+//                    NOTE: while hovering, no navigation is performed, and throttle is under manual control.
+// F_LOITER         - After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
+// F_TRIGGER        - Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
+// F_ALTITUDE_GOAL  - Climb or descend to the given altitude, then continue to the next waypoint.
+// F_CROSS_TRACK    - Navigate using cross-tracking.  Best used for longer waypoint legs.
+// F_LAND           - Navigate towards this waypoint with the throttle off.
 // 
 // 
 // NOTE: Please be very careful when including inverted or hovering legs in a waypoints list.  Even if your plane does not fly well
@@ -122,7 +119,7 @@
 // 
 // Camera Viewpoints are exactly like waypoint definitions. They define a point at which
 // the camera will look in 3 dimensions. If you are using a waypoint relative to the initialisation of your 
-// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0 )".
+// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0)".
 // Camera waypoints can be absolute LAT and LONG, and camera target height is height above initalisation.
 // This is the same as a fixed or absolute waypoint.
 // Finally, do not mix relative waypoints and absolute camera viewpoint in the same line. A line should
@@ -140,31 +137,9 @@
 // 
 // By default the only waypoint is defined to be 75 meters above the starting point.
 
-
-/* const struct waypointDef waypoints[] = {
-{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,   // return to, and loiter 75 meters above the startup position
-} ; 
-*/
-//   OMFC Southfield LOS FLYING CLOCKWISE  15 way points  // for glider
 const struct waypointDef waypoints[] = {
-                                        { { -274, -94, 105 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -427, 41, 110 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { -148, 255, 115 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { 12, 93, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { -292, -109, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { -395, 32, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { -152, 241, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        { { 10, 101, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 7
-                                        { { -273, -79, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 8
-                                        { { -406, 44, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 9
-                                        { { -141, 247, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 10
-                                        { { 20, 87, 120 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 11
-                                        { { -267, -112, 115 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 12
-                                        { { -406, 32, 115 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 13
-                                        { { -150, 234, 105 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 14
-                                        { { 11, 91, 105 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 15
-                                        }
-;
+		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,9 +155,7 @@ const struct waypointDef waypoints[] = {
 
 const struct waypointDef rtlWaypoints[] = {
 		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
-} ;
-
-
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -214,7 +187,7 @@ const struct waypointDef waypoints[] = {
 		{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
 		{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
-} ;
+};
 */
 
 
@@ -249,169 +222,5 @@ const struct waypointDef waypoints[] = {
 		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
-} ;
-*/
-/* Options for OMFC LOS flight: 
-//  CLOCKWISE PATTERN TEMPLATES
-// 1)	Relative  coordinates,  clockwise rectangular repetitive rounds, with   4 wps.
-const struct waypointDef waypoints[] = {
-                                        { { -96, -35, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -149, 33, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { 38, 132, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { 91, 71, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        }
-;
-
-// 2)	Relative  coordinates,  clockwise rectangular flight 3 rounds, with   13 wps, landing on last.
-const struct waypointDef waypoints[] = {
-                                        { { -88, -18, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -134, 37, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { 31, 133, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { 73, 85, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { -100, -15, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { -139, 39, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { 33, 140, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        { { 79, 86, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 7
-                                        { { -105, -21, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 8
-                                        { { -145, 39, 42 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 9
-                                        { { 34, 145, 37 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 10
-                                        { { 88, 85, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 11
-                                        { { 68, 68, 12 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 12
-                                        { { 39, 39, 5 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 13
-                                        { { 15, 17, 1 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 14
-                                        { { -9, -4, 0 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 15                                        
-                                         }
-;
-       
-// 3) Relative  coordinates,  clockwise  flight, with rectangular  6 waypoints, inverted between 2 and 3.
-const struct waypointDef waypoints[] = {
-                                        { { -87, -18, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -121, 34, 65 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { -73, 80, 65 } , F_NORMAL  +  F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -6, 109, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { 55, 117, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { 92, 77, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        }
- ;
-// 4) Relative  coordinates,  CLOCKWISE  flight, with rectangular  6 waypoints, inverted between 2 and 3
-//     hover between 6 and 7; and inverted between 8 and launch point.
-//     IMPORTANT: Plane must be 3D capable to hover.
-const struct waypointDef waypoints[] = {
-                                        { { -87, -18, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -119, 32, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { -62, 73, 45 } , F_NORMAL  +  F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -1, 99, 40 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { 55, 117, 40 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { 92, 77, 40 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { 53, 38, 35 } , F_NORMAL + F_HOVER , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        { { 39, 27, 35 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 7
-                                        { { 25, 16, 40 } , F_NORMAL  +  F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 8
-                                        }
-;
-// 5) Relative  coordinates,  clockwise  flight, with half star pattern  7 waypoints, inverted between 2 and 3.
-const struct waypointDef waypoints[] = {
-                                        { { -98, -27, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -80, 35, 65 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { -104, 92, 75 } , F_NORMAL + F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -36, 91, 75 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { -1, 142, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { 39, 102, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { 101, 86, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        }
-;
-
-//  COUNTER-CLOCKWISE PATTERN TEMPLATES
-
-// 6)	Relative  coordinates,  counter-clockwise rectangular repetitive rounds, with   4 wps.
-const struct waypointDef waypoints[] = {
-                                        { { 74, 97, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { 27, 148, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { -141, 34, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -99, -20, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        }
- ;
-// 7)	Relative  coordinates,  COUNTER-CLOCKWISE rectangular flight 3 rounds, with   13 wps, landing on last.
-const struct waypointDef waypoints[] = {
-                                        { { 79, 89, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { 34, 133, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { -150, 30, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -108, -13, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { 88, 94, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { 38, 136, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { -157, 30, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        { { -110, -18, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 7
-                                        { { 95, 94, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 8
-                                        { { 42, 141, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 9
-                                        { { -174, 17, 40 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 10
-                                        { { -122, -42, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 11
-                                        { { -82, -28, 12 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 12
-                                        { { -51, -15, 5 } , F_NORMAL  + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 13
-                                        { { -16, -2, 1 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 14
-                                        { { 15, 10, 0 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 15
-                                        }
-;
-
-// 8)	Relative  coordinates,  COUNTER-CLOCKWISE  flight, with rectangular  6 waypoints, inverted between 2 and 3.
-const struct waypointDef waypoints[] = {
-                                        { { 88, 67, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { 54, 105, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { 2, 91, 60 } , F_NORMAL  +  F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -73, 57, 65 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { -114, 14, 65 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { -83, -29, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        }
-;
-// 9)	Relative  coordinates,  COUNTER-CLOCKWISE  flight, with rectangular 8 waypoints, inverted between 2 and 3.
-//     HOVER between 6 and 7; and inverted between 8 and launch point.
-//     IMPORTANT: Plane must be 3D capable to hover.
-const struct waypointDef waypoints[] = {
-                                        { { 88, 67, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { 54, 105, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { 2, 91, 45 } , F_NORMAL  +  F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -71, 54, 40 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { -114, 14, 40 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { -83, -29, 40 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { -58, -22, 35 } , F_NORMAL + F_HOVER , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        { { -39, -15, 35 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 7
-                                        { { -12, -5, 40 } , F_NORMAL  +  F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 8
-                                        }
-;
-// 10)	Relative  coordinates,  COUNTER-CLOCKWISE  flight, with HALF STAR pattern  7 waypoints, inverted between 3 and 4.
-const struct waypointDef waypoints[] = {
-                                        { { 94, 87, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { 44, 101, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { 6, 134, 60 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -32, 97, 65 } , F_NORMAL   +  F_INVERTED , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { -88, 91, 70 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { -67, 37, 65 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { -86, -18, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        }
-;
-//  SOUTHFIELD rtlWaypoints PATTERN TEMPLATES
-//  1.	Relative  coordinates  CLOCKWISE
-const struct waypointDef rtlWaypoints[] = {
-                                        { { -61, 30, 45 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -28, 105, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { 45, 131, 37 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { 84, 98, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { 68, 68, 12 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { 39, 39, 5 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { 15, 17, 1 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        { { 0, 0, 0 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 7
-                                        }
-;
-
-//  2.	Relative  coordinates  COUNTER-CLOCKWISE
-const struct waypointDef rtlWaypoints[] = {
-                                        { { -36, 50, 55 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 0
-                                        { { -110, 36, 50 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-                                        { { -162, -8, 37 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-                                        { { -124, -45, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-                                        { { -91, -41, 12 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-                                        { { -60, -30, 5 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 5
-                                        { { -26, -14, 1 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 6
-                                        { { 0, 0, 0 } , F_NORMAL + F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 7
-                                        }
-;
-
+};
 */
