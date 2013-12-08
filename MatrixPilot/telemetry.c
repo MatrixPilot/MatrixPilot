@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 #include "flightplan-waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -35,6 +36,7 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/rmat.h"
 #include <string.h>
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
