@@ -79,7 +79,7 @@ void init_altitudeCntrl(void);
 void init_altitudeCntrlVariable(void);
 
 
-void calculate_sonar_height_above_ground(void);
+void calcSonarAGLAltitude(void); //void calculate_sonar_height_above_ground(void);
 
 
 // wind gain adjustment
@@ -98,7 +98,6 @@ extern int16_t desiredSpeed; // Stored in 10ths of meters per second
 #define AH_NONE             0
 #define AH_PITCH_ONLY       1
 #define AH_FULL             3
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,9 +121,38 @@ extern int16_t cam_yaw_servo_pwm_delta;
 int32_t cam_pitchServoLimit(int32_t pwm_pulse);
 int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
+/* ************  SONAR SUPPORT External Variables ************ */
+#if ( USE_SONAR == 1 )
+	extern int sonar_rawaltitude ;			// direct distance from sonar to a target in cm fr. altitudeCntrl.c
+	extern fractional cos_pitch_roll;
+	extern int sonar_aglaltitude ;			// rmat tilt compensated sonar altitude in cm  fr. altitudeCntrl.c
+	extern boolean altitude_sonar_on;		// on off for using landing sonar altitude data fr. flightplan-logo.c
+#endif
+
+/* ************  BAROMETER SUPPORT External Variables ************ */
+
+#if ( USE_BAROMETER == 1 )
+
+	extern inline long get_barometer_asl_altitude(void) ;
+	extern inline long get_barometer_pressure(void) ;
+	extern inline int get_barometer_temperature(void) ;
+	extern inline long get_barometer_grd_altitude(void) ;
+	extern inline long get_barometer_agl_altitude(void) ;
+
+	extern long barometer_asl_altitude ;	
+	extern long barometer_agl_altitude ; 
+	extern long barometer_grd_altitude ; 
+	extern long barometer_pressure;
+	extern int barometer_temperature;
+
+	extern long barometer_altitude_gnd;
+	extern long barometer_pressure_gnd ; 
+	extern int barometer_temperature_gnd;
+	extern boolean altitude_bar_on;			// on off for using landing sonar altitude data fr. flightplan-logo.c
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
-// navigation.c
+// navigation.c  >>>>>>  this has been move to navigat.h   12/8/2013 dberroya
 //void init_navigation(void);
 //#ifdef USE_EXTENDED_NAV
 //void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
@@ -138,10 +166,12 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 //struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
 //extern struct waypointparameters goal;
-//extern struct relative2D togoal;
-//extern int16_t tofinish_line;
-//extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
-//extern int8_t desired_dir;
+
+// 12/8/2013 Daniel:  uncommented ff. to solve build error
+extern struct relative2D togoal;
+extern int16_t tofinish_line;
+extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+extern int8_t desired_dir;
 
 
 ////////////////////////////////////////////////////////////////////////////////

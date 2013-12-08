@@ -44,9 +44,9 @@ inline long get_barometer_pressure(void)     { return barometer_pressure; }
 inline long get_barometer_altitude(void)     { return barometer_altitude; }
 inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
-void altimeter_calibrate(void)
+void altimeter_calibrate(void)						// function call in navigate.c
 {
-	int ground_altitude = alt_origin.WW / 100;    // meters
+	int ground_altitude = alt_origin.WW / 100;    	// meters
 	barometer_temperature_gnd = barometer_temperature;
 	barometer_pressure_gnd = barometer_pressure;
 
@@ -58,36 +58,34 @@ void altimeter_calibrate(void)
 }
 
 #if (BAROMETER_ALTITUDE == 1)
-void udb_barometer_callback(long pressure, int temperature, char status)
-{
-	barometer_temperature = temperature;
-	barometer_pressure = pressure;
-}
-#endif
-
-void estAltitude(void)
-{
-#if (BAROMETER_ALTITUDE == 1)
-	float pressure_ambient = barometer_pressure;    // Pascals?
-//	float pressure_sea_level = barometer_pressure_gnd;
-	float barometer_alt;
-
-	if (barometer_pressure_gnd != 0)
+	void udb_barometer_callback(long pressure, int temperature, char status)
 	{
-//		barometer_alt = 44330.0f * ((1-pow((pressure_ambient/pressure_sea_level),(1/5.255f)))); // Meters
-		barometer_alt = 44330.0f * ((1-pow((pressure_ambient/sea_level_pressure),(1/5.255f)))); // Meters
-		barometer_altitude = (long)(barometer_alt * 1000); // millimeters
-//		barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
-#ifdef USE_DEBUG_IO
-		// estimate sea level pressure assuming we're still on the ground
-		int ground_altitude = alt_origin.WW / 100; // meters
-		sea_level_pressure = ((float) barometer_pressure / powf((1 - (ground_altitude / 44330.0)), 5.255));
-		// print pressure altitude, pressure and current SLP estimate
-		printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
-#endif
+		barometer_temperature = temperature;
+		barometer_pressure = pressure;
 	}
+	#endif
+	
+	void estAltitude(void)
+	{
+	#if (BAROMETER_ALTITUDE == 1)
+		float pressure_ambient = barometer_pressure;    // Pascals?
+		float barometer_alt;
+	
+		if (barometer_pressure_gnd != 0)
+		{
+			barometer_alt = 44330.0f * ((1-pow((pressure_ambient/sea_level_pressure),(1/5.255f)))); // Meters
+			barometer_altitude = (long)(barometer_alt * 1000); // millimeters
+	  		//barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
+	#ifdef USE_DEBUG_IO
+			// estimate sea level pressure assuming we're still on the ground
+			int ground_altitude = alt_origin.WW / 100; // meters
+			sea_level_pressure = ((float) barometer_pressure / powf((1 - (ground_altitude / 44330.0)), 5.255));
+			// print pressure altitude, pressure and current SLP estimate
+			printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
+	#endif
+		}
 #endif // BAROMETER_ALTITUDE
-}
+	}
 
 /*  rough-in draft of new algorithm adaption pending verification and revision of barometer data & functions
 #if (BAROMETER_ALTITUDE == 1)
@@ -114,6 +112,58 @@ void estAltitude(void)
 	}
 #endif
  */
+/*  EXPERIMENTAL ROUGH-IN 
+
+#if (USE_BAROMETER == 1)
+	void udb_barometer_callback(long pressure, int temperature, char status)	
+	{
+	float asl_altitude;
+	float ground_altitude;
+	#if (USE_PA_PRESSURE == 1)	  // 102189	     				// defined in options.h option to use SL hPA current pressure  
+		const float p0 = (PA_PRESSURE);    						//  Current pressure at sea level (SL hPA) defined in options.h  
+ 		#if ( USE_REALTIME_GRDPRES == 1)     					//  Option enabled in options.h  
+			ground_altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
+		#else
+			 // ga24592
+			ground_altitude = (float)44330 * (1 - pow(((float) barometer_pressure_gnd/p0), 0.190295));
+		#endif
+		//  as-3082:
+		asl_altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
+	#elif (USE_PA_PRESSURE == 2)    // use mercury value
+		const float p0 = (MC_PRESSURE/0.0295333727112);    	// Current pressure at sea level (SL METAR in. mercury) defined in options.h  
+ 		#if ( USE_REALTIME_GRDPRES == 1)  // TODO: store in an array landing field ground reference during auto take off using RT GA
+			ground_altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
+		#else
+			 // ga24592
+			ground_altitude = (float)44330 * (1 - pow(((float) barometer_pressure_gnd/p0), 0.190295));
+		#endif
+		//  as-3082:
+		asl_altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
+	#else  							// else, use user defined GROUND ALT to compute for SL hPA and use product to compute ASL altitude
+		float seal_pressure;
+		ground_altitude = (ASL_GROUND_ALT);			//   use home GROUND ALTITUDE, USER DEFINED in options.h 
+		seal_pressure = ((float)pressure / pow((1 - (ground_altitude/44330.0)), 5.255));
+	 	asl_altitude = (float)44330 * (1 - pow(((float) pressure/seal_pressure), 0.190295));  // this is just the reverse of using PA pressure
+	#endif
+	barometer_pressure = (pressure/100);
+	barometer_temperature = (temperature/10);
+	barometer_asl_altitude = (asl_altitude) ;
+	#if ( USE_REALTIME_GRDPRES == 1)
+		barometer_grd_altitude = ground_altitude ;
+		barometer_agl_altitude = (asl_altitude - ground_altitude) ;
+	#else
+		barometer_grd_altitude = barometer_pressure_gnd ; // ERROR
+		barometer_agl_altitude = (asl_altitude - barometer_grd_altitude) ;
+	#endif
+	}
+#endif
+*/
+
+
+
+
+
+
 
 // MAVLINK_MESSAGE_INFO_SCALED_PRESSURE
 /*

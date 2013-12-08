@@ -249,8 +249,8 @@ IC_HANDLER(4, REGTOK1, IC_PIN4);
 IC_HANDLER(5, REGTOK1, IC_PIN5);
 IC_HANDLER(6, REGTOK1, IC_PIN6);
 IC_HANDLER(7, REGTOK1, IC_PIN7);
-#if (USE_SONAR_INPUT != 8)
-IC_HANDLER(8, REGTOK1, IC_PIN8);
+#if (USE_SONAR_INPUT != 8)   				//  12/07/2013 added fix solving minor build/compile issue; auth. Robert 
+	IC_HANDLER(8, REGTOK1, IC_PIN8);
 #endif // USE_SONAR_INPUT
 
 #else // (USE_PPM_INPUT != 0)

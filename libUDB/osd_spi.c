@@ -25,7 +25,7 @@
 
 #if (USE_OSD == OSD_NATIVE && USE_OSD_SPI == 1)
 
-#warning "Using OSD_NATIVE in SPI hardware mode"
+// #warning "Using OSD_NATIVE in SPI hardware mode"  // 12/8//2013 Daniel  COMMENTED OUT to take out built warning  >>> REMOVE AFTER TESTING
 
 #include "interrupt.h"
 #include "oscillator.h"
@@ -42,7 +42,7 @@ uint8_t osd_spi_read(int8_t addr);
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
-#warning "OSD configured for SPI port 1"
+//  #warning "OSD configured for SPI port 1"   // 12/8//2013 Daniel COMMENTED OUT to take out built warning  >>> REMOVE AFTER TESTING
 
 #define OSD_CS          _LATF7 // _LATB2
 #define OSD_SCK         _LATF8 // _LATF6

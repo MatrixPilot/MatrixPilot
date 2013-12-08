@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
@@ -54,6 +55,12 @@ enum {
 	DIST_TO_HOME = 16,
 	DIST_TO_GOAL,
 	ALT,
+	ALT_SONAR,	
+	ALT_GRD_BAROMETER,  //	barometer_grd_altitude = get_barometer_grd_altitude();
+	ALT_ASL_BAROMETER,	
+	ALT_AGL_BAROMETER,	
+	TEMPERATURE_BAROMETER,	
+	PRESSURE_BAROMETER,
 	CURRENT_ANGLE,
 	ANGLE_TO_HOME,
 	ANGLE_TO_GOAL,
@@ -99,6 +106,14 @@ enum {
 #define _SET_ABS_X_LOW(x)       {5,   0,   0,   9,   x}, // then Y, as 4 consecutive instructions.
 #define _SET_ABS_Y_LOW(y, fl)   {5,   fl,  0,   10,  y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
 
+/* SONAR SUPPORT   12/8/2013 dberroya */ 
+#define _MV_ZS(z, fl, pr)		{5,	fl,	pr,	11,	z},  //  move to SNR based altitude
+#define _SET_ZS(z, fl, pr)		{5,	fl,	pr,	12,	z},  //  set to SNR based altitude
+
+/* BAROMETER SUPPORT   12/8/2013 dberroya */ 
+#define _MV_ZB(z, fl, pr)		{5,	fl,	pr,	13,	z},  //  move to BAR based altitude
+#define _SET_ZB(z, fl, pr)		{5,	fl,	pr,	14,	z},  //  set to BAR based altitude
+
 #define _FLAG_ON(f)             {6,   0,   0,   0,   f},
 #define _FLAG_OFF(f)            {6,   0,   0,   1,   f},
 #define _FLAG_TOGGLE(f)         {6,   0,   0,   2,   f},
@@ -142,6 +157,7 @@ enum {
 #define LT_PARAM                _RT(-1, 1)
 #define SET_ANGLE_PARAM         _SET_ANGLE(0, 1)
 #define USE_CURRENT_ANGLE       _USE_CURRENT_ANGLE
+//#define USE_TAKEOFF_ANGLE	_USE_TAKEOFF_ANGLE
 #define USE_ANGLE_TO_GOAL       _USE_ANGLE_TO_GOAL
 
 #define EAST(x)                 _MV_X(x, 1, 0)
@@ -151,6 +167,7 @@ enum {
 #define WEST_PARAM              _MV_X(-1, 1, 1)
 #define SET_X_POS_PARAM         _SET_X(1, 1, 1)
 #define USE_CURRENT_POS         _USE_CURRENT_POS(1)
+//#define USE_TAKEOFF_POS		_USE_TAKEOFF_POS(1)
 
 #define NORTH(y)                _MV_Y(y, 1, 0)
 #define SOUTH(y)                _MV_Y(-y, 1, 0)
@@ -158,6 +175,24 @@ enum {
 #define NORTH_PARAM             _MV_Y(1, 1, 1)
 #define SOUTH_PARAM             _MV_Y(-1, 1, 1)
 #define SET_Y_POS_PARAM         _SET_Y(1, 1, 1)
+
+//SONAR ALTITUDE
+#define ALT_UP_SNR(z)		_MV_ZS(z, 0, 0)
+#define ALT_DOWN_SNR(z)		_MV_ZS(-z, 0, 0)
+#define SET_ALT_SNR(z)		_SET_ZS(z, 0, 0)
+#define ALT_UP_PARAM_SNR	_MV_ZS(1, 0, 1)
+#define ALT_DOWN_PARAM_SNR	_MV_ZS(-1, 0, 1)
+#define SET_ALT_PARAM_SNR	_SET_ZS(1, 0, 1)
+boolean altitude_sonar_on = false ;  	
+
+//BAROMETER ALTITUDE
+#define ALT_UP_BAR(z)		_MV_ZB(z, 0, 0)
+#define ALT_DOWN_BAR(z)		_MV_ZB(-z, 0, 0)
+#define SET_ALT_BAR(z)		_SET_ZB(z, 0, 0)
+#define ALT_UP_PARAM_BAR	_MV_ZB(1, 0, 1)
+#define ALT_DOWN_PARAM_BAR	_MV_ZB(-1, 0, 1)
+#define SET_ALT_PARAM_BAR	_SET_ZB(1, 0, 1)
+boolean altitude_bar_on = false ;  	
 
 #define ALT_UP(z)               _MV_Z(z, 0, 0)
 #define ALT_DOWN(z)             _MV_Z(-z, 0, 0)
@@ -552,7 +587,84 @@ int16_t logo_value_for_identifier(uint8_t ident)
 
 		case ALT: // in m
 			return IMUlocationz._.W1;
+		/************************************************
+		SONAR SUPPORT  12/8/2013 dberroya
+		*************************************************/
+		case ALT_SONAR: // in centimeters
+			#if ( USE_SONAR == 1 )
+			{
+				return sonar_aglaltitude ; // in centimeters
+			}
+			#else   //absence of sonar sensor device
+			{
+				int sonar_aglaltitude = -99;  //  return dummy value to trap absence of sonar sensor device in LOGO
+				return sonar_aglaltitude ;
+			}
+			#endif
 
+		/************************************************
+		BAROMETER SYSTEMS VALUE SUPPORT  12/8/2013 dberroya
+		*************************************************/
+		case ALT_GRD_BAROMETER: // centimeters, above sea level altitude 
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_grd_altitude = get_barometer_grd_altitude(); // in centimeters
+			}
+			#else   //absence of barometer sensor device
+			{
+				int barometer_grd_altitude = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_grd_altitude;
+			}
+			#endif
+		case ALT_ASL_BAROMETER: // centimeters, above sea level altitude 
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_asl_altitude = get_barometer_asl_altitude(); // in centimeters
+			}
+			#else   //absence of barometer sensor device
+			{
+				int barometer_asl_altitude = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_asl_altitude;
+			}
+			#endif
+		case ALT_AGL_BAROMETER: // centimeters, above ground level altitude
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_agl_altitude = get_barometer_agl_altitude(); // in centimeters
+			}
+			#else   //absence of barometer sensor device
+			{
+				int barometer_agl_altitude = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_agl_altitude;
+			}
+			#endif
+		case TEMPERATURE_BAROMETER: // in celcius
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_temperature = get_barometer_temperature(); // in centimeters
+			}
+			#else   //absence of barometer sensor device
+			{
+				int barometer_temperature = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_temperature;
+			}
+			#endif
+		case PRESSURE_BAROMETER: // in hPA
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return barometer_pressure = get_barometer_pressure(); // in centimeters
+			}
+			#else   //absence of barometer sensor device
+			{
+				int barometer_pressure = -99;  //  return dummy value in the absence of sonar sensor device
+				return barometer_pressure;
+			}
+			#endif
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
 			return get_current_angle();
 
@@ -814,6 +926,42 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 					turtleLocations[currentTurtle].y._.W0 = 0;
 					turtleLocations[currentTurtle].y._.W1 = rel.y;
 					break;
+				}
+				/************************************************
+				SONAR SUPPORT  11 n 12 sub routines _MV_ZS _SET_ZS  12/8/2013 dberroya
+				*************************************************/
+				case 11: // Move ZS 
+				{ 
+					altitude_sonar_on = true ;  // use sonar alt in deadreckoning
+					int sonar_m_alt = instr.arg ;
+					turtleLocations[currentTurtle].z += (sonar_m_alt/100) ; //convert sonar alt, cm to meter
+
+					break ;
+				}
+				case 12: // Set ZS location  
+				{ 
+					altitude_sonar_on = true ;  // use sonar alt in deadreckoning
+					int sonar_m_alt = instr.arg;  
+					turtleLocations[currentTurtle].z = (sonar_m_alt/100) ; //convert sonar alt, cm to meter
+					break ;
+				}
+				/************************************************
+				BAROMETER SUPPORT  11 n 12 sub routines _MV_ZB _SET_ZB  12/8/2013 dberroya
+				*************************************************/
+				case 13: // Move ZB 
+				{ 
+					altitude_bar_on = true ;  // use barometer alt in deadreckoning
+					int barometer_m_alt = instr.arg ;
+					turtleLocations[currentTurtle].z += (barometer_m_alt/100) ; //convert sonar alt, cm to meter
+
+					break ;
+				}
+				case 14: // Set ZB location  
+				{ 
+					altitude_bar_on = true ;  // use barometer alt in deadreckoning
+					int barometer_m_alt = instr.arg;  
+					turtleLocations[currentTurtle].z = (barometer_m_alt/100) ; //convert sonar alt, cm to meter
+					break ;
 				}
 			}
 			break;

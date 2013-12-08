@@ -42,7 +42,15 @@
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
 #endif
-
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER) || (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA) && (MAG_YAW_DRIFT ==	1)
+	extern int16_t udb_magFieldBody[3];
+	extern int16_t magFieldEarth[3];       //  Daniel 12/8/2013 uncommented to fix build error
+	//extern int16_t udb_magOffset[3];
+	extern int16_t magGain[3];
+	extern int16_t rawMagCalib[3];
+	extern int16_t magMessage;
+	#include "navigate.h"
+#endif
 #include <stdarg.h>
 
 
@@ -77,13 +85,16 @@ void init_serial(void)
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 	dcm_flags._.nmea_passthrough = 1;
 #endif
-
-#ifndef SERIAL_BAUDRATE
-#define SERIAL_BAUDRATE 19200 // default
-#warning SERIAL_BAUDRATE set to default value of 19200 bps
+//#ifndef SERIAL_BAUDRATE
+//#define SERIAL_BAUDRATE 19200 // default
+//#warning SERIAL_BAUDRATE set to default value of 19200 bps
+//#endif
+#if (( USE_SONAR == 1) || ( USE_BAROMETER == 1))
+	udb_serial_set_rate(57600) ;   //  Rem. to adjust serial telemetry log to this baud rate to support extra data from Sonar
+#else
+	udb_serial_set_rate(19200) ;   // def. setting or uncomment any to change default to a higher baud
 #endif
-
-	udb_serial_set_rate(SERIAL_BAUDRATE);
+//udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -686,7 +697,7 @@ void serial_output_8hz(void)
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER)
 
 extern int16_t udb_magFieldBody[3];
-//extern int16_t magFieldEarth[3];
+extern int16_t magFieldEarth[3];       //  Daniel 12/8/2013 uncommented to fix build error
 //extern int16_t udb_magOffset[3];
 extern int16_t magGain[3];
 extern int16_t rawMagCalib[3];

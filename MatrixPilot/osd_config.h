@@ -18,14 +18,15 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+ //MOVED TO option.h >>> REMOVE AFTER TESTING
 
-// USE_OSD enables the OSD system
-#define USE_OSD         OSD_NONE
-//#define USE_OSD         OSD_NATIVE
+// USE_OSD enables the OSD system  moved back to option.h, REMOVE AFTER TESTING
+// #define USE_OSD         OSD_NONE
+// #define USE_OSD         OSD_NATIVE
 //#define USE_OSD         OSD_REMZIBI
 
-#define USE_OSD_SPI     1   // set this to 1 to use the SPI peripheral, 0 to bit-bash
+//#define USE_OSD_SPI     0   // set this to 1 to use the SPI peripheral, 0 to bit-bash //MOVED TO option.h >>> REMOVE AFTER TESTING
 #define OSD_SF          5   // scale factor for SPI delays - TODO: get rid of
 
-#define OSD_NTSC        0
-#define OSD_PAL         1
+//#define OSD_NTSC        0
+//#define OSD_PAL         1

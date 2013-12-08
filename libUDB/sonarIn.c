@@ -20,7 +20,7 @@
 
 
 #include "libUDB_internal.h"
-#include "interrupt.h"
+#include "interrupt.h"  //  added to fix minor build/compile issue; auth. Robert 12/07/2013
 
 #if (USE_SONAR_INPUT != 0)
 

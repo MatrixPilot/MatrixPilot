@@ -72,7 +72,17 @@ static void setup_origin(void)
 	}
 	else
 	{
-		dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW);
+		//dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW);  // replaced by sonar if on
+		#if ( SONAR_ALTITUDE == 1 )  	//  fuse point of origin altitude with sonar agl altitude during startup
+			{
+			int16_t alt_snr_rel_orgn = ((ASL_GROUND_ALT+sonar_aglaltitude)/100) ; //WIP, add spike detection and limitation algorithm
+			dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_snr_rel_orgn) ;
+			}
+		#else
+			{
+			dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW) ;
+			}
+		#endif
 	}
 	flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
 }
