@@ -23,13 +23,13 @@
 
 #include "airspeed_options.h"
 
-extern int 		airspeed;
-extern int 		groundspeed;
+extern int16_t 		airspeed;
+extern int16_t 		groundspeed;
 
-extern int 		minimum_airspeed;
-extern int 		maximum_airspeed;
-extern int 		target_airspeed;
-extern int 		airspeedError;
+extern int16_t 		minimum_airspeed;
+extern int16_t 		maximum_airspeed;
+extern int16_t 		target_airspeed;
+extern int16_t 		airspeedError;
 
 // Calculate the airspeed.
 void calc_airspeed(void);

@@ -23,17 +23,17 @@
 
 //	main program for testing the IMU.
 
-int main (void)
+int16_t main (void)
 {
-	udb_init() ;
-	dcm_init() ;
-	init_servoPrepare() ;
-	init_states() ;
-	init_behavior() ;
-	init_serial() ;
+	udb_init();
+	dcm_init();
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	init_serial();
 	
-	udb_run() ;
+	udb_run();
 	// This never returns.
 	
-	return 0 ;
+	return 0;
 }

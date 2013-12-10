@@ -69,12 +69,13 @@
 #define configUSE_PREEMPTION			1
 #define configUSE_IDLE_HOOK				0
 #define configUSE_TICK_HOOK				1
-#define configTICK_RATE_HZ				( ( portTickType ) 1000 )
+#define configTICK_RATE_HZ				((portTickType) 1000)
 
 
-#define configCPU_CLOCK_HZ				( ( unsigned portLONG ) 32000000UL )  
-//#define configPERIPHERAL_CLOCK_HZ		( ( unsigned portLONG ) 40000000UL )
-//#define configPERIPHERAL_CLOCK_HZ		( ( unsigned portLONG ) 80000000UL )
+#define configCPU_CLOCK_HZ				((unsigned portLONG) 16000000UL)  
+//#define configCPU_CLOCK_HZ			((unsigned portLONG) 32000000UL)  
+//#define configPERIPHERAL_CLOCK_HZ		((unsigned portLONG) 40000000UL)
+//#define configPERIPHERAL_CLOCK_HZ		((unsigned portLONG) 80000000UL)
 
 //        #define GetSystemClock()            (80000000ul)
 //        #define GetPeripheralClock()        (GetSystemClock()/2) 
@@ -84,13 +85,13 @@
 //#define configPERIPHERAL_CLOCK_HZ		(GetPeripheralClock())
 
 
-#define configMAX_PRIORITIES			( ( unsigned portBASE_TYPE ) 5 )
-#define configMINIMAL_STACK_SIZE		( 190 )
-#define configISR_STACK_SIZE			( 400 )
-// #define configTOTAL_HEAP_SIZE			( ( size_t ) 28000 )
-//#define configTOTAL_HEAP_SIZE			( ( size_t ) 4000 )
-#define configTOTAL_HEAP_SIZE			( ( size_t ) 2000 )
-#define configMAX_TASK_NAME_LEN			( 8 )
+#define configMAX_PRIORITIES			((unsigned portBASE_TYPE) 5)
+#define configMINIMAL_STACK_SIZE		(190)
+#define configISR_STACK_SIZE			(400)
+// #define configTOTAL_HEAP_SIZE			((size_t) 28000)
+//#define configTOTAL_HEAP_SIZE			((size_t) 4000)
+#define configTOTAL_HEAP_SIZE			((size_t) 2000)
+#define configMAX_TASK_NAME_LEN			(8)
 #define configUSE_TRACE_FACILITY		0
 #define configUSE_16_BIT_TICKS			0
 #define configIDLE_SHOULD_YIELD			1
@@ -100,7 +101,7 @@
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 			0
-#define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
+#define configMAX_CO_ROUTINE_PRIORITIES (2)
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */

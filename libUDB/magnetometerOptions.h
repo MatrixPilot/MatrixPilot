@@ -43,8 +43,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Uncomment one of the defines below to specify orientation of the mag.
 // The following 4 supported orientations have the mag level with the ground.
-// MAG_FORWARDS:  Component-side up,   edge connector front
-// MAG_BACKWARDS: Component-side up,   edge connector back
+// MAG_FORWARDS:  Component-side up,  edge connector front
+// MAG_BACKWARDS: Component-side up,  edge connector back
 // MAG_INVERTED:  Component-side down, edge connector front
 // MAG_FLIPPED:   Component-side down, edge connector back
 // MAG_DIRECT:    Magnetometer mounted in an orientation that permits a direct connection to a UDB4
@@ -190,6 +190,6 @@
 #define MAGNETICMAXIMUM 1500
 
 // The following line computes an internal parameter, do not change it.
-#define DECLINATIONANGLE ((int)(MAGNETICDECLINATION *(32767.0 / 180.0)))
+#define DECLINATIONANGLE ((int16_t)(MAGNETICDECLINATION *(32767.0 / 180.0)))
 
 

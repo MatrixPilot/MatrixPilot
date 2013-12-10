@@ -37,7 +37,7 @@
 #endif
 
 
-void udb_init_osd( void )
+void udb_init_osd(void)
 {
 #ifdef USE_SPI_HW
 	// setup the SPI peripheral
@@ -65,10 +65,10 @@ void udb_init_osd( void )
 }
 
 
-void spi_write_raw_byte(unsigned char byte)
+void spi_write_raw_byte(uint8_t byte)
 {
 #ifdef USE_SPI_HW
-	short temp;	
+	int16_t temp;	
 
 	temp = SPI1BUF;									// dummy read of the SPI1BUF register to clear the SPIRBF flag
 	SPI1BUF = byte;									// write the data out to the SPI peripheral
@@ -76,16 +76,16 @@ void spi_write_raw_byte(unsigned char byte)
 	while (!SPI1STATbits.SPIRBF) {}					// wait for the data to be sent out
 	Nop(); Nop(); Nop(); Nop(); Nop(); Nop();		// Kill some time with SCK high to make a more solid pulse
 #else
-	unsigned char SPICount;							// Counter used to clock out the data
+	uint8_t SPICount;							// Counter used to clock out the data
 	
 	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
 	{
-		unsigned char outBit = ((byte & 0x80) != 0);// Check for a 1 and set the MOSI line appropriately
+		uint8_t outBit = ((byte & 0x80) != 0);// Check for a 1 and set the MOSI line appropriately
 		if (outBit) OSD_MOSI = 1;					// Write this bit using the bit-set / bit-clear instrictions
 		else 		OSD_MOSI = 0;
 		
-		OSD_SCK = 1 ;								// Toggle the clock line up
-#if ( BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == CRYSTAL_CLOCK )
+		OSD_SCK = 1;								// Toggle the clock line up
+#if (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == CRYSTAL_CLOCK)
 		Nop(); Nop(); Nop();						// Kill some time with SCK high to make a more solid pulse
 #else
 		Nop(); Nop(); Nop(); Nop(); Nop(); Nop();	// Kill some time with SCK high to make a more solid pulse
@@ -95,278 +95,278 @@ void spi_write_raw_byte(unsigned char byte)
 	}
 #endif // USE_SPI_HW
 	
-	return ;
+	return;
 }
 
 
 void osd_spi_write_byte(char byte)
 {
-	OSD_CS = 1 ;				// Make sure we start with active-low CS high
-	OSD_SCK = 0 ;				// and CK low
+	OSD_CS = 1;				// Make sure we start with active-low CS high
+	OSD_SCK = 0;				// and CK low
 	
-	OSD_CS = 0 ;				// Set active-low CS low to start the SPI cycle 
-	spi_write_raw_byte(byte) ;	// Send the data
+	OSD_CS = 0;				// Set active-low CS low to start the SPI cycle 
+	spi_write_raw_byte(byte);	// Send the data
 	
-	OSD_CS = 1 ;				// Set active-low CS high to end the SPI cycle 
+	OSD_CS = 1;				// Set active-low CS high to end the SPI cycle 
 	
 	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
-	OSD_MOSI = 0 ;
+	OSD_MOSI = 0;
 	
-	return ;
+	return;
 }
 
 
 void osd_spi_write(char addr, char byte)
 {
-	OSD_CS = 1 ;				// Make sure we start with active-low CS high
-	OSD_SCK = 0 ;				// and CK low
+	OSD_CS = 1;				// Make sure we start with active-low CS high
+	OSD_SCK = 0;				// and CK low
 	
-	OSD_CS = 0 ;				// Set active-low CS low to start the SPI cycle 
-	spi_write_raw_byte(addr) ;	// Send the Address
-	spi_write_raw_byte(byte) ;	// Send the data
+	OSD_CS = 0;				// Set active-low CS low to start the SPI cycle 
+	spi_write_raw_byte(addr);	// Send the Address
+	spi_write_raw_byte(byte);	// Send the data
 	
-	OSD_CS = 1 ;				// Set active-low CS high to end the SPI cycle 
+	OSD_CS = 1;				// Set active-low CS high to end the SPI cycle 
 	
 	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
-	OSD_MOSI = 0 ;
+	OSD_MOSI = 0;
 	
-	return ;
+	return;
 }
 
 
 /*
-unsigned char spi_read_raw_byte( void )
+uint8_t spi_read_raw_byte(void)
 {
-	unsigned char SPICount ;						// Counter used to clock out the data
-	unsigned char SPIData = 0 ;						// Counter used to clock out the data
+	uint8_t SPICount;						// Counter used to clock out the data
+	uint8_t SPIData = 0;						// Counter used to clock out the data
 	
 	for (SPICount = 0; SPICount < 8; SPICount++)	// Prepare to clock out the Address byte
 	{
-		SPIData <<= 1 ;								// Rotate the data
+		SPIData <<= 1;								// Rotate the data
 		
-		OSD_SCK = 1 ;								// Raise the clock to clock the data out of the MAX7456
-		if (OSD_MISO) SPIData |= 1 ;				// Read the data bit
-		OSD_SCK = 0 ;								// Drop the clock ready for the next bit
+		OSD_SCK = 1;								// Raise the clock to clock the data out of the MAX7456
+		if (OSD_MISO) SPIData |= 1;				// Read the data bit
+		OSD_SCK = 0;								// Drop the clock ready for the next bit
 	}
 	
-	return SPIData ;
+	return SPIData;
 }
 
 
-unsigned char osd_spi_read(char addr)
+uint8_t osd_spi_read(char addr)
 {
-	unsigned char SPIData = 0 ;
+	uint8_t SPIData = 0;
 	
-	OSD_CS = 1 ;				// Make sure we start with active-low CS high
-	OSD_SCK = 0 ;				// and CK low
+	OSD_CS = 1;				// Make sure we start with active-low CS high
+	OSD_SCK = 0;				// and CK low
 	
-	OSD_CS = 0 ;				// Set active-low CS low to start the SPI cycle 
-	spi_write_raw_byte(addr) ;	// Send the Address
-	OSD_MOSI = 0 ;
-	SPIData = spi_read_raw_byte() ;	// Send the data
+	OSD_CS = 0;				// Set active-low CS low to start the SPI cycle 
+	spi_write_raw_byte(addr);	// Send the Address
+	OSD_MOSI = 0;
+	SPIData = spi_read_raw_byte();	// Send the data
 	
-	OSD_CS = 1 ;				// Set active-low CS high to end the SPI cycle 
+	OSD_CS = 1;				// Set active-low CS high to end the SPI cycle 
 	
 	Nop(); Nop(); Nop(); Nop();	// Kill some time with CS high to make a more solid pulse
 	
-	return SPIData ;
+	return SPIData;
 }
 */
 
 
-void osd_spi_write_location(int loc)
+void osd_spi_write_location(int16_t loc)
 {
-	osd_spi_write(0x05, (unsigned char)(loc>>8)) ;	// DMAH
-	osd_spi_write(0x06, (unsigned char)(loc & 0xFF)) ;	// DMAL
+	osd_spi_write(0x05, (uint8_t)(loc>>8));	// DMAH
+	osd_spi_write(0x06, (uint8_t)(loc & 0xFF));	// DMAL
 	
-	return ;
+	return;
 }
 
 
-void osd_spi_write_string(const unsigned char *str)
+void osd_spi_write_string(const uint8_t *str)
 {
-	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
+	osd_spi_write(0x04,1);		// DMM: Enable auto-increment mode
 	
 	while (1)
 	{
-		osd_spi_write_byte(*str) ;	// Disables auto-increment mode when sending 0xFF at the end of a string
-		if (*str == 0xFF) break ;
-		str++ ;
+		osd_spi_write_byte(*str);	// Disables auto-increment mode when sending 0xFF at the end of a string
+		if (*str == 0xFF) break;
+		str++;
 	}
 	
-	return ;
+	return;
 }
 
 
-void osd_spi_write_vertical_string_at_location(int loc, const unsigned char *str)
+void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t *str)
 {
 	while (1)
 	{
-		if (*str == 0xFF) break ;
-		if (loc >= 480) break ;			// 30*16
-		osd_spi_write_location(loc) ;
-		osd_spi_write(0x07, *str) ;
-		str++ ;
-		loc += 30 ;
+		if (*str == 0xFF) break;
+		if (loc >= 480) break;			// 30*16
+		osd_spi_write_location(loc);
+		osd_spi_write(0x07, *str);
+		str++;
+		loc += 30;
 	}
 	
-	return ;
+	return;
 }
 
 
-void osd_spi_erase_chars(unsigned char n)
+void osd_spi_erase_chars(uint8_t n)
 {
-	osd_spi_write(0x04,1) ;		// DMM: Enable auto-increment mode
+	osd_spi_write(0x04,1);		// DMM: Enable auto-increment mode
 	
 	while (n)
 	{
-		osd_spi_write_byte(0) ;	// Write a blank space
-		n-- ;
+		osd_spi_write_byte(0);	// Write a blank space
+		n--;
 	}
-	osd_spi_write_byte(0xFF) ;	// Disable auto-increment mode 
+	osd_spi_write_byte(0xFF);	// Disable auto-increment mode 
 	
-	return ;
+	return;
 }
 
 
-void osd_spi_write_number(long val, char num_digits, char decimal_places, char num_flags, char header, char footer)
+void osd_spi_write_number(int32_t val, char num_digits, char decimal_places, char num_flags, char header, char footer)
 {
-	boolean startWriting = 0 ;
-	long d;
+	boolean startWriting = 0;
+	int32_t d;
 	
-	osd_spi_write(0x04,1) ;			// DMM: Enable auto-increment mode
+	osd_spi_write(0x04,1);			// DMM: Enable auto-increment mode
 	
 	if (header)
-		osd_spi_write_byte(header) ;
+		osd_spi_write_byte(header);
 	
 	if (num_flags & NUM_FLAG_SIGNED)
 	{
 		if (val < 0)
 		{
-			osd_spi_write_byte(0x49) ;	// '-'
-			val = -val ;
+			osd_spi_write_byte(0x49);	// '-'
+			val = -val;
 		}
 		else
-			osd_spi_write_byte(0x00) ;	// ' '
+			osd_spi_write_byte(0x00);	// ' '
 	}
 	
 	switch (num_digits)
 	{
 		case 0:
 		case 10:
-			d = (val / 1000000000) ;
-			if (d) startWriting = 1 ;
+			d = (val / 1000000000);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(0x80 + d) ;
+				osd_spi_write_byte(0x80 + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x8A) ;
+				osd_spi_write_byte(0x8A);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*1000000000 ;
+				osd_spi_write_byte(0x00);
+			val -= d*1000000000;
 			
 		case 9:
-			d = (val / 100000000) ;
-			if (d) startWriting = 1 ;
+			d = (val / 100000000);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 9) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 9) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*100000000 ;
+				osd_spi_write_byte(0x00);
+			val -= d*100000000;
 		
 		case 8:
-			d = (val / 10000000) ;
-			if (d) startWriting = 1 ;
+			d = (val / 10000000);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 8) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 8) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*10000000 ;
+				osd_spi_write_byte(0x00);
+			val -= d*10000000;
 		
 		case 7:
-			d = (val / 1000000) ;
-			if (d) startWriting = 1 ;
+			d = (val / 1000000);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 7) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 7) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*1000000 ;
+				osd_spi_write_byte(0x00);
+			val -= d*1000000;
 		
 		case 6:
-			d = (val / 100000) ;
-			if (d) startWriting = 1 ;
+			d = (val / 100000);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 6) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 6) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*100000 ;
+				osd_spi_write_byte(0x00);
+			val -= d*100000;
 		
 		case 5:
-			d = (val / 10000) ;
-			if (d) startWriting = 1 ;
+			d = (val / 10000);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 5) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 5) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*10000 ;
+				osd_spi_write_byte(0x00);
+			val -= d*10000;
 		
 		case 4:
-			d = (val / 1000) ;
-			if (d) startWriting = 1 ;
+			d = (val / 1000);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 4) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 4) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*1000 ;
+				osd_spi_write_byte(0x00);
+			val -= d*1000;
 		
 		case 3:
-			d = (val / 100) ;
-			if (d) startWriting = 1 ;
+			d = (val / 100);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 3) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 3) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*100 ;
+				osd_spi_write_byte(0x00);
+			val -= d*100;
 		
 		case 2:
-			d = (val / 10) ;
-			if (d) startWriting = 1 ;
+			d = (val / 10);
+			if (d) startWriting = 1;
 			if (startWriting)
-				osd_spi_write_byte(((decimal_places == 2) ? 0xE0 : 0x80) + d) ;
+				osd_spi_write_byte(((decimal_places == 2) ? 0xE0 : 0x80) + d);
 			else if (num_digits && (num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x80) ;
+				osd_spi_write_byte(0x80);
 			else if (num_digits && !(num_flags & NUM_FLAG_ZERO_PADDED))
-				osd_spi_write_byte(0x00) ;
-			val -= d*10 ;
+				osd_spi_write_byte(0x00);
+			val -= d*10;
 		
 		case 1:
-			osd_spi_write_byte(((decimal_places == 1) ? 0xE0 : 0x80) + val) ;
+			osd_spi_write_byte(((decimal_places == 1) ? 0xE0 : 0x80) + val);
 	}
 	
 	if (footer)
-		osd_spi_write_byte(footer) ;
+		osd_spi_write_byte(footer);
 	
 	if (num_digits == 0)
-		osd_spi_write_byte(0x00) ;
+		osd_spi_write_byte(0x00);
 	
-	osd_spi_write_byte(0xFF) ;		// Disables auto-increment mode
+	osd_spi_write_byte(0xFF);		// Disables auto-increment mode
 	
-	return ;
+	return;
 }
 
 

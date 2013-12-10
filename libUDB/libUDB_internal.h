@@ -21,36 +21,36 @@
 
 #include "libUDB.h"
 
-extern int failSafePulses ;
+extern int16_t failSafePulses;
 
-void udb_init_leds(void) ;
-void udb_init_ADC(void) ;
-void udb_init_clock(void) ;
-void udb_init_capture(void) ;
-void udb_init_I2C(void) ;
-void udb_init_GPS(void) ;
-void udb_init_USART(void) ;
-void udb_init_pwm(void) ;
-void udb_init_osd( void ) ;
-void udb_eeprom_init( void ) ;
+void udb_init_leds(void);
+void udb_init_ADC(void);
+void udb_init_clock(void);
+void udb_init_capture(void);
+void udb_init_I2C(void);
+void udb_init_GPS(void);
+void udb_init_USART(void);
+void udb_init_pwm(void);
+void udb_init_osd(void);
+void udb_eeprom_init(void);
 
-void start_pwm_outputs( void ) ;
+void start_pwm_outputs(void);
 
-void calculate_analog_sensor_values( void ) ;
+void calculate_analog_sensor_values(void);
 
-extern int defaultCorcon ;
-extern unsigned int cpu_timer ;
-extern unsigned int _cpu_timer ;
+extern int16_t defaultCorcon;
+extern uint16_t cpu_timer;
+extern uint16_t _cpu_timer;
 
 //#define indicate_loading_main		//LATEbits.LATE4 = 0
 //#define indicate_loading_inter	//LATEbits.LATE4 = 1
 
 #define indicate_loading_inter	{							\
-									T5CONbits.TON = 1 ;		\
+									T5CONbits.TON = 1;		\
 								}
 
 #define indicate_loading_main	{							\
-									T5CONbits.TON = 0 ;		\
+									T5CONbits.TON = 0;		\
 								}
 
 

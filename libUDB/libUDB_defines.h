@@ -24,13 +24,13 @@
 
 
 // Types
-struct bb { unsigned char B0 ; unsigned char B1 ; } ;
-struct bbbb { unsigned char B0 ; unsigned char B1 ; unsigned char B2 ; unsigned char B3 ; } ;
-struct ww { int W0 ; int W1 ; } ;
+struct bb { uint8_t B0; uint8_t B1; };
+struct bbbb { uint8_t B0; uint8_t B1; uint8_t B2; uint8_t B3; };
+struct ww { int16_t W0; int16_t W1; };
 
-union intbb { int BB ; struct bb _ ; } ;
-union longbbbb { long WW ; struct ww _ ; struct bbbb __ ; } ;
-union longww { long  WW ; struct ww _ ; } ;
+union intbb { int16_t BB; struct bb _; };
+union longbbbb { int32_t WW; struct ww _; struct bbbb __; };
+union longww { int32_t  WW; struct ww _; };
 
 
 // Build for the specific board type
@@ -57,11 +57,11 @@ union longww { long  WW ; struct ww _ ; } ;
 #include "p30f4011.h"
 #include "ConfigGreen.h"
 
-#elif (BOARD_TYPE == UDB3_BOARD )
+#elif (BOARD_TYPE == UDB3_BOARD)
 #include "p30f4011.h"
 #include "ConfigIXZ500.h"
 
-#elif (BOARD_TYPE == AUAV1_BOARD )
+#elif (BOARD_TYPE == AUAV1_BOARD)
 #include "p30f4011.h"
 #include "ConfigARSOVUAV1.h"
 
@@ -107,13 +107,13 @@ union longww { long  WW ; struct ww _ ; } ;
 
 #include "boardRotation_defines.h"
 
-#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD || BOARD_TYPE == AUAV1_BOARD )
+#if (BOARD_TYPE == GREEN_BOARD || BOARD_TYPE == RED_BOARD || BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == RUSTYS_BOARD || BOARD_TYPE == AUAV1_BOARD)
 
 #define BOARD_IS_CLASSIC_UDB		1
 #define CLK_PHASES	4
 
 #ifdef CLOCK_CONFIG
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#if (CLOCK_CONFIG == CRYSTAL_CLOCK)
 #error "CLOCK_CONFIG is now preset to FRC8X_CLOCK, and is no longer configurable in options.h. \
 If you know what you're doing and still want to edit it, you can do so in libUDB_defines.h. \
 Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
@@ -130,9 +130,9 @@ Otherwise, please remove the CLOCK_CONFIG line from your options.h file."
 #define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
-#if ( CLOCK_CONFIG == CRYSTAL_CLOCK )
+#if (CLOCK_CONFIG == CRYSTAL_CLOCK)
 #define FREQOSC		16000000
-#elif ( CLOCK_CONFIG == FRC8X_CLOCK )
+#elif (CLOCK_CONFIG == FRC8X_CLOCK)
 #define FREQOSC		58982400
 #endif
 
@@ -175,18 +175,18 @@ typedef char boolean;
 #define false	0
 
 struct ADchannel {
-	int input; // raw input
-	int value; // average of the sum of inputs between report outs
-	int offset;  // baseline at power up 
-	long sum ; // used as an integrator
+	int16_t input; // raw input
+	int16_t value; // average of the sum of inputs between report outs
+	int16_t offset;  // baseline at power up 
+	int32_t sum; // used as an integrator
 };  // variables for processing an AD channel
 
 
 struct udb_flag_bits {
-			unsigned int unused					  	    : 6 ;
-			unsigned int a2d_read						: 1 ;
-			unsigned int radio_on						: 1 ;
-			} ;
+	uint16_t unused     : 6;
+	uint16_t a2d_read   : 1;
+	uint16_t radio_on   : 1;
+};
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES
@@ -194,10 +194,10 @@ struct udb_flag_bits {
 // UXBRG = ((32000000/2)/(16*9600))-1
 // UXBRG = 103
 
-#if ( BOARD_IS_CLASSIC_UDB == 1 )
-#define UDB_BAUD(x) ((int)((FREQOSC / CLK_PHASES) / ((long)16 * x) - 1))
+#if (BOARD_IS_CLASSIC_UDB == 1)
+#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)16 * x) - 1))
 #else
-#define UDB_BAUD(x) ((int)((FREQOSC / CLK_PHASES) / ((long)4 * x) - 1))
+#define UDB_BAUD(x) ((int16_t)((FREQOSC / CLK_PHASES) / ((int32_t)4 * x) - 1))
 #endif
 
 // LED states
@@ -227,10 +227,10 @@ struct udb_flag_bits {
 
 // Constants
 #define RMAX   0b0100000000000000	//	1.0 in 2.14 fractional format
-#define GRAVITY ((long)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
+#define GRAVITY ((int32_t)(5280.0/SCALEACCEL))  // gravity in AtoD/2 units
 
 #define SERVOCENTER 3000
-#define SERVORANGE ((int)(SERVOSAT*1000))
+#define SERVORANGE ((int16_t)(SERVOSAT*1000))
 #define SERVOMAX SERVOCENTER + SERVORANGE
 #define SERVOMIN SERVOCENTER - SERVORANGE
 
@@ -239,8 +239,8 @@ struct udb_flag_bits {
 
 #define MAX_VOLTAGE				543	// 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET	0	// Add 0.0 Volts to whatever value we sense
-	
-extern int magMessage ;
-extern int vref_adj ;
 
-#endif
+extern int16_t magMessage;
+extern int16_t vref_adj;
+
+#endif // UDB_DEFINES_H

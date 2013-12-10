@@ -28,31 +28,31 @@
 // Used for serial debug output
 #include "stdio.h"
 
-char debug_buffer[128] ;
-int db_index = 0 ;
-void send_debug_line( void ) ;
+char debug_buffer[128];
+int16_t db_index = 0;
+void send_debug_line(void);
 
 // trap handler variables
 // not used at the moment, but the trap handler is needed for clock "false alarms"
 
-volatile int trap_flags __attribute__ ((persistent));
-volatile long trap_source __attribute__ ((persistent));
-volatile int osc_fail_count __attribute__ ((persistent));
+volatile int16_t trap_flags __attribute__ ((persistent));
+volatile int32_t trap_source __attribute__ ((persistent));
+volatile int16_t osc_fail_count __attribute__ ((persistent));
 
-int main (void)
+int16_t main (void)
 {
 	// Set up the libraries
-	udb_init() ;
-	dcm_init() ;
+	udb_init();
+	dcm_init();
 	
-	udb_serial_set_rate(19200) ;
+	udb_serial_set_rate(19200);
 	
-	LED_GREEN = LED_OFF ;
+	LED_GREEN = LED_OFF;
 	
 	// Start it up!
-	udb_run() ;  // This never returns.
+	udb_run();  // This never returns.
 	
-	return 0 ;
+	return 0;
 }
 
 
@@ -62,15 +62,15 @@ void udb_background_callback_periodic(void)
 	if (!dcm_flags._.calib_finished)
 	{
 		// If still calibrating, blink RED
-		udb_led_toggle(LED_RED) ;
+		udb_led_toggle(LED_RED);
 	}
 	else
 	{
 		// No longer calibrating: solid RED and send debug output
-		LED_RED = LED_ON ;
+		LED_RED = LED_ON;
 	}
 	
-	return ;
+	return;
 }
 
 
@@ -78,8 +78,8 @@ void udb_background_callback_periodic(void)
 void dcm_callback_gps_location_updated(void)
 {
 	// Blink GREEN led to show that the GPS is communicating
-	udb_led_toggle(LED_GREEN) ;
-	return ;
+	udb_led_toggle(LED_GREEN);
+	return;
 }
 
 
@@ -88,22 +88,22 @@ void dcm_servo_callback_prepare_outputs(void)
 {
 	if (!dcm_flags._.calib_finished)
 	{
-		udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000 ;
-		udb_pwOut[PITCH_OUTPUT_CHANNEL] = 3000 ;
-		udb_pwOut[YAW_OUTPUT_CHANNEL] = 3000 ;
+		udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000;
+		udb_pwOut[PITCH_OUTPUT_CHANNEL] = 3000;
+		udb_pwOut[YAW_OUTPUT_CHANNEL] = 3000;
 	}
 	else
 	{
-		union longww accum ;
+		union longww accum;
 		
-		accum.WW = __builtin_mulss( rmat[6] , 4000 ) ;
-		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
+		accum.WW = __builtin_mulss(rmat[6], 4000);
+		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 		
-		accum.WW = __builtin_mulss( rmat[7] , 4000 ) ;
-		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
+		accum.WW = __builtin_mulss(rmat[7], 4000);
+		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 		
-		accum.WW = __builtin_mulss( rmat[4] , 4000 ) ;
-		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1) ;
+		accum.WW = __builtin_mulss(rmat[4], 4000);
+		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 	}
 	
 	// Serial output at 2Hz  (40Hz / 20)
@@ -111,39 +111,39 @@ void dcm_servo_callback_prepare_outputs(void)
 	{
 		if (dcm_flags._.calib_finished)
 		{
-			send_debug_line() ;
+			send_debug_line();
 		}
 	}
 	
-	return ;
+	return;
 }
 
 
 // Prepare a line of serial output and start it sending
-void send_debug_line( void )
+void send_debug_line(void)
 {
-	db_index = 0 ;
-	sprintf( debug_buffer , "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n" , 
-		lat_gps.WW , long_gps.WW , alt_sl_gps.WW , 
-		rmat[0] , rmat[1] , rmat[2] , 
-		rmat[3] , rmat[4] , rmat[5] , 
-		rmat[6] , rmat[7] , rmat[8]  ) ; 
+	db_index = 0;
+	sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
+		lat_gps.WW, long_gps.WW, alt_sl_gps.WW, 
+		rmat[0], rmat[1], rmat[2], 
+		rmat[3], rmat[4], rmat[5], 
+		rmat[6], rmat[7], rmat[8] ); 
 	
-	udb_serial_start_sending_data() ;
+	udb_serial_start_sending_data();
 	
-	return ;
+	return;
 }
 
 
 // Return one character at a time, as requested.
 // Requests will stop after we send back a -1 end-of-data marker.
-int udb_serial_callback_get_byte_to_send(void)
+int16_t udb_serial_callback_get_byte_to_send(void)
 {
-	unsigned char c = debug_buffer[ db_index++ ] ;
+	uint8_t c = debug_buffer[ db_index++ ];
 	
-	if (c == 0) return -1 ;
+	if (c == 0) return -1;
 	
-	return c ;
+	return c;
 }
 
 
@@ -151,8 +151,8 @@ int udb_serial_callback_get_byte_to_send(void)
 void udb_serial_callback_received_byte(char rxchar)
 {
 	// Do nothing
-	return ;
+	return;
 }
 
 
-void udb_callback_radio_did_turn_off( void ) {}
+void udb_callback_radio_did_turn_off(void) {}

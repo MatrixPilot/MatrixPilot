@@ -208,7 +208,7 @@
 //		TO (FOO)
 //			etc.
 //		END
-//	} ;
+//	};
 // 
 // and the Failsafe RTL course as:
 // 
@@ -223,7 +223,7 @@
 //		TO (BAR)
 //			etc.
 //		END
-//	} ;
+//	};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +251,7 @@ const struct logoInstructionDef instructions[] = {
 			RT(90)
 		END
 	END
-} ;
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ const struct logoInstructionDef instructions[] = {
 	
 DO_ARG(SPIRAL_IN, 10)
 RT(100)
-DO_ARG(SPIRAL_OUT,  70)
+DO_ARG(SPIRAL_OUT, 70)
 
 END
 
