@@ -23,28 +23,25 @@
 //#include "../libUDB/sonarIn.h"
 extern int16_t get_sonar_value(void);   // Get the raw pwm units from the sonar device driver
 
-#if (USE_SONAR_INPUT != 0)
+#if (USE_SONAR == 1)
 
 	int16_t sonar_rawaglaltitude;       // PWM converted sonar raw altitude in centimeters
 	int16_t sonar_aglaltitude; 			// calculated distance to ground in Earth's Z Plane allowing for tilt
 	fractional cos_pitch_roll;      	// tilt of the plane in UDB fractional units * 2.
-	
-	
-	// USEABLE_SONAR_DISTANCE may well vary with type of ground cover (e.g. long grass may be less).
-	// Pete Hollands ran the code with #define SERIAL_OUTPUT SERIAL_UDB_SONAR while flying low
-	// over his landing area, which was a freshly cut straw field. Post flight, he anlaysed the CSV telemetry into a spreadsheet graph,
-	// and determined that all measurements below 4 meters were true, as long as there were at least 3 consecutive measurements,
-	// that were less than 4 meters (400 centimeters).
-	//#define EFFECTV_SONAR_ALTRANGE               400 // Reliable Sonar measurement distance (centimeters) for your specific landing area.
-	//#define MAXIMUM_SONAR_ALTRANGE                750 // Distance in centimeters that denotes "out of range" for your Sonar device.
-	//#define SONAR_MINIMUM_VALREADS                 2 // Def 3, Number of validation readings threshold of a true reading.
-	#define SONAR_VALREADS_DUMMYNO		        9999 // Distance denotes that no sonar reading was returned from sonar device
-	#define SONAR_PWM_CM_EQCONSTNT				4451 // 64536.0 / 14.5 (True for Maxbotix devices using PWM of 58 microseconds / centimeter).
+
+	// >>>   Defined in option.h   <<<
+	//#define EFFECTV_SONAR_ALTRANGE            400 // Reliable Sonar measurement distance (centimeters) for your specific landing area.
+	//#define MAXIMUM_SONAR_ALTRANGE            750 // Distance in centimeters that denotes "out of range" for your Sonar device.
+	//#define SONAR_MINIMUM_VALREADS              2 // Def 3, Number of validation readings threshold of a true reading, 
+                                                    //    higher increases error filtering, but slows down the aglaltitude read
+
+	#define SONAR_VALREADS_DUMMYNO		       9999 // Distance denotes that no sonar reading was returned from sonar device
+	#define SONAR_PWM_CM_EQCONSTNT		  	   4451 // 64536.0 / 14.5 (True for Maxbotix devices using PWM of 58 microseconds / centimeter).
 	
 	static uint8_t valreadIndex = 0;   // Tracks the number of consequtive good samples up until SONAR_SAMPLE_THRESHOLD is reached.
 	static uint8_t noreadIndex = 0;   // Tracks number of UDB frames since last sonar reading was sent by sonar device
 	
-	void calcSonarAGLAltitude(void)   // Called in altitudeCntrl.c
+	void calcSonarAGLAltitude(void)   // runtime call at altitudeCntrl.c
 	{
 		if (udb_flags._.sonar_updated == 1) 
 		{	
@@ -100,4 +97,4 @@ extern int16_t get_sonar_value(void);   // Get the raw pwm units from the sonar 
 	{
 	}
 
-#endif // USE_SONAR_INPUT
+#endif // USE_SONAR

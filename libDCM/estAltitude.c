@@ -26,93 +26,98 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#define USE_DEBUG_IO
+/* DEVELOPER'S TECH. NOTES:
 
-// The origin is recorded as the altitude of the plane during power up.
+   per gpsParseCommon.c funtions:
+		alt_sl_gps.WW  	ambient realtime altitude GPS reading  in meters
+		alt_origin.WW    	power on calibrated altitude in cm
+*/
 
-long barometer_pressure_gnd = 0;
-int barometer_temperature_gnd = 0;
+// These origin barometer_~ is calibrated below during power on or at point of origin.
+int32_t barometer_cal_gndpressure;			// calibrated ground pressure
+int16_t barometer_cal_gndtemperature;		// calibrated ground temperature 
+float barometer_cal_slpressure;    			// calibrated sea level pressure	
 
-long barometer_altitude;        // above sea level altitude - ASL (millimeters)
-long barometer_agl_altitude;    // above ground level altitude - AGL
-long barometer_pressure;
-int barometer_temperature;
-float sea_level_pressure;
+// Ambient runtime barometer values:
 
-inline int get_barometer_temperature(void)   { return barometer_temperature; }
-inline long get_barometer_pressure(void)     { return barometer_pressure; }
-inline long get_barometer_altitude(void)     { return barometer_altitude; }
-inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
+int32_t barometer_pressure;    							// RT barometer preassure in hPA
+int32_t barometer_gndpressure;    						// launch point barometer preassure in hPA
+int32_t barometer_rawaltitude;    						// RT inflight, from above sea level (ASL) altitude in meters
+int32_t barometer_aslaltitude;        					// RT inflight, from above sea level (ASL) altitude in centimeters
+int32_t barometer_aglaltitude;    						// RT from above ground level (AGL) altitude in centimeters
+int32_t barometer_gndaltitude;    						// RT terrain ground altitude estimate in centimeters >>> theoretical <<<<
+int16_t barometer_temperature;    						// RT barometer temperature in degrees celcius
+int16_t barometer_gndtemperature; 						// launch point barometer temperature in degrees celcius
 
-void altimeter_calibrate(void)						// function call in navigate.c
+inline int32_t get_barometer_pressure(void)  { return barometer_pressure; }  // RT inflight barometer preassure in hPA
+inline int32_t get_barometer_gnd_pressure(void) { return barometer_gndpressure; }  // launch point barometer ground level preassure in hPA
+inline int32_t get_barometer_raw_altitude(void) { return barometer_rawaltitude; }  // RT inflight, from above sea level (ASL) altitude in m
+inline int32_t get_barometer_asl_altitude(void) { return barometer_aslaltitude; }  // RT inflight, from above sea level (ASL) altitude 
+inline int32_t get_barometer_agl_altitude(void) { return barometer_aglaltitude; }  // RT above ground level (AGL) altitude in centimeters
+inline int32_t get_barometer_gnd_altitude(void) { return barometer_gndaltitude; }  // RT inlfight terrain ground level altitude estimate in centimeters
+inline int16_t get_barometer_temperature(void) { return barometer_temperature; }   // RT barometer inflight temperature realtime in degrees celcius
+inline int32_t get_barometer_gnd_temperature(void) { return barometer_gndtemperature; }  // launch point barometer temperature 
+
+//  altimeter_calibrate() function calibrates and stores baromerter_~~ values
+//    calibration triggered from navigate.c, when USE_BAROMETER == 1
+void altimeter_calibrate(void)						    
 {
-	int ground_altitude = alt_origin.WW / 100;    	// meters
-	barometer_temperature_gnd = barometer_temperature;
-	barometer_pressure_gnd = barometer_pressure;
-
-	sea_level_pressure = ((float)barometer_pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
-
-#ifdef USE_DEBUG_IO
-	printf("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
-#endif
+	const int32_t gps_orig_gndaltitude = (alt_origin.WW / 100);    	// GPS estimated ground altitude reading in meters at power-on or point of origin in meters
+	barometer_cal_gndtemperature = barometer_temperature;
+	barometer_cal_gndpressure = barometer_pressure;
+	barometer_cal_slpressure = ((float)barometer_pressure / powf((1 - (gps_orig_gndaltitude/44330.0)), 5.255));  // calibrate sea_level_pressure
 }
 
-#if (BAROMETER_ALTITUDE == 1)
-	void udb_barometer_callback(long pressure, int temperature, char status)
-	{
-		barometer_temperature = temperature;
-		barometer_pressure = pressure;
-	}
-	#endif
+//  runtime barometer feeds
+void udb_barometer_callback(int32_t pressure, int16_t temperature, char status)
+{
+	barometer_temperature = temperature;
+	barometer_pressure = pressure;
+}
 	
-	void estAltitude(void)
-	{
-	#if (BAROMETER_ALTITUDE == 1)
-		float pressure_ambient = barometer_pressure;    // Pascals?
-		float barometer_alt;
+void estAltitude(void)
+{
 	
-		if (barometer_pressure_gnd != 0)
-		{
-			barometer_alt = 44330.0f * ((1-pow((pressure_ambient/sea_level_pressure),(1/5.255f)))); // Meters
-			barometer_altitude = (long)(barometer_alt * 1000); // millimeters
-	  		//barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
-	#ifdef USE_DEBUG_IO
-			// estimate sea level pressure assuming we're still on the ground
-			int ground_altitude = alt_origin.WW / 100; // meters
-			sea_level_pressure = ((float) barometer_pressure / powf((1 - (ground_altitude / 44330.0)), 5.255));
-			// print pressure altitude, pressure and current SLP estimate
-			printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
-	#endif
-		}
-#endif // BAROMETER_ALTITUDE
-	}
+	if (barometer_pressure != 0)
+	{
+		#if (USE_PA_PRESSURE == 1)	  			     				// defined in options.h option to use SL hPA current pressure  
+        	const float p0 = (PA_PRESSURE);    						// Current pressure at sea level (SL hPA) defined in options.h  
+		#elif (USE_PA_PRESSURE == 2)    							// use mercury value
+			const float p0 = (MC_PRESSURE/0.0295333727112); 		// Current pressure at sea level (SL METAR inch mercury) defined in options.h  
+        #endif
 
-/*  rough-in draft of new algorithm adaption pending verification and revision of barometer data & functions
-#if (BAROMETER_ALTITUDE == 1)
-	void udb_barometer_callback(long pressure, int temperature, char status)
-	{
-	#if (USE_PA_PRESSURE == 1)          // **** OPTION TO USE PRESSURE OR HOME POSITION ALTITUDE  in options.h   ****
-		const float p0 = PA_PRESSURE;   // **** Current pressure at sea level (Pa) defined in options.h   ****
-		altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
-		#if (SONAR_ALTITUDE == 1) 
-			barometer_ground_altitude = ((float)44330 * (1 - pow(((float) barometer_pressure/p0), 0.190295))-(sonar_altitude/100));
-		#else 
-			barometer_ground_altitude = (float)44330 * (1 - pow(((float) barometer_pressure/p0), 0.190295));
-//		return;
-		#endif
-	#else
-		const float ground_altitude = (ASL_GROUND_ALT/100); // **** defined HOME ASL GROUND ALTITUDE in options.h  ****
-//		float altitude;
-//		float sea_level_pressure;
-		barometer_pressure = pressure / 100;
-		barometer_temperature = temperature / 10;
-		sea_level_pressure = ((float)pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
-		altitude = (float)44330 * (1 - pow(((float) pressure/sea_level_pressure), 0.190295));  // this is just the reverse of the sea_level_pressure algorithm for testing
-	#endif
+		const int32_t barometer_ambientpressure = barometer_pressure;
+
+        // ASL raw altitude in Meters
+		barometer_rawaltitude = 44330.0f * ((1-pow((barometer_ambientpressure/barometer_cal_slpressure),(1/5.255f)))); 
+
+        // ASL raw altitude in centimeters; millimeters, use (~~)x1000
+		barometer_aslaltitude = (int32_t)(barometer_rawaltitude*100); 
+
+        //  AGL altitude in centimeters; millimeters, use (~~)x1000
+  		barometer_aglaltitude = (int32_t)(44330.0f*((1-pow((((float)barometer_ambientpressure)/((float)barometer_cal_gndpressure)),(1/5.255f)))))*100; 
+
+        //  inflight >>> THEORETICAL <<< ground-terrain ASL altitude in centimeters; millimeters, use (~~)x1000
+		barometer_gndaltitude = ((float)44330 * (1 - pow(((float) barometer_ambientpressure/p0), 0.190295)))*100;
+
+		//  launch point  ground temperature
+		barometer_gndtemperature = barometer_cal_gndtemperature;
+
+		//  launch point  ground hPA pressure 
+		barometer_gndpressure = barometer_cal_gndpressure;
 	}
-#endif
- */
-/*  EXPERIMENTAL ROUGH-IN 
+	else
+	{
+		// something to filter an error read or glitch
+		barometer_rawaltitude = -99;
+		barometer_aslaltitude = -99;
+		barometer_aglaltitude = -99;
+		barometer_gndaltitude = -99;
+	}
+}
+
+
+/*  EXPERIMENTAL ROUGH-IN DBERROYA 12/19/2013
 
 #if (USE_BAROMETER == 1)
 	void udb_barometer_callback(long pressure, int temperature, char status)	
@@ -183,93 +188,4 @@ typedef struct __mavlink_scaled_pressure_t
 #define MAVLINK_MSG_ID_29_LEN 14
  */
 
-/*
-Peter Hollands peter.hollands@gmail.com
 
-8 May (13 days ago)
-
-to uavdevboard
-Hi Robert,
-
-I think that over time all the scenarios will be catered for. So it's just a question of which one to do first.
-
-1) Suitable for UDB3 and UDB4: Pilot wants an accurate landing back at the same place as the take off. 
-Pilot does not want to take a computer or GCS to the airfiled. i.e. a simple easy flight.  
-Solution defaults to option 1 on your list, and uses the barometer primarily for relative altitude. 
-Some provision is made to sense check the barometer against the GPS. (another discussion).  
-If the pilot has set the ORIGIN in waypoints.h then the barometer will calibrate to the Origin Height at startup.
-
-2.)  Suitable only for UDB4: Pilot is using a GCS and wants proper and sophisticated control of altltitude, 
-again primarily for landing purposes. For this scenario, the location of the Origin (including Altitude) 
-is settable via MAVLink. This is  easy and quick to program because of  of Matt's work. (and the fact that 
-no additonal programming is required in MAVLink GCS's for setting paramaters).  
-Also, with Matt's USE_NV_MEMORY option, the altitude can be stored in the EEPROM. This is important for 
-the reboot scenario, should it ever happen. The developer will add the origin parameters to the
-parameters.xml file. (beautiful art and recommended reading for early adopters in the uav devboard group).
-
-Best wishes, Pete
- */
-
-/*
-crashmatt uavflightdirector@gmail.com
-
-8 May (12 days ago)
-
-to uavdevboard
-Robert,
-
-mavlink has a specific calibration command for setting barometric offsets.  We need to link this to a function of your choosing.
-
-These storage settings are easy to do.  For each variable you wish to set / store you need the following:
-
-    MatrixPilot variable name
-    The storage area to put it in.  Does it belong with some other variables or does should it be in a collection of its own?
-    The variable type e.g. int, Q14
-    The variable units for mavlink eg. degrees, m/s, meters
-    The variable units in mavlink eg. int circular, cm/s, cenitmeters.
-    The mavlink parameter name, preferably starting with the storage area keyword.  limited to 15 characters max.
-    If the variable should load on startup, reboot, both or neither.
-    If the variable is read only
-
-The parameters are defined in ParameterDatabase.xml
-http://code.google.com/p/gentlenav/source/browse/trunk/Tools/pyparam/ParameterDatabase.xml#37
-
-
-Regards Matt
- */
-/*
-crashmatt uavflightdirector@gmail.com
-
-9 May (12 days ago)
-
-to uavdevboard
-Hi all,
-
-Your enthusiasm has got me interested in running the barometer to compare against GPS and IMU performance.  
-The first thing to do before attaching the barometer to the IMU is to sanity check the results.  
-For that we need to datalog barometer value.  Any values from any mavlink messages can be plotted in QGC, 
-either real time or from datalogs recorded by mavlink or QGC.
-
-There is a mavlink message available for reporting the sensor pressures for airspeed, barometer and temperature.
-mavlink message raw pressure
-We can ask this message to be sent at an xHz rate for datalogging.
-
-I can't see a message that would carry the raw altitude data from the barometer.  These are the related message that I find:
-raw gps data - altitude information but for gps
-global position - altitude information for the IMU
-
-There is a general debug message that you could put some data in:
-debug message - Floating point value plus identifier.
-
-If none of these work for you, we can define a new message for the data you want.  That would go somewhere in here:
-matrixpilot mavlink message definitions
-
-the pre-flight calibration of barometer is done through this defined command:
-Preflight storage mavlink command
-
-The message is processed and act on here:
-mavlink.c preflight storage command processing
-This needs modifying to add the barometer calibration.  This is reasonably easy.
-
-Regards Matt
- */

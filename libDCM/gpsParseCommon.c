@@ -30,9 +30,9 @@
 
 // GPS modules global variables
 #ifdef USE_EXTENDED_NAV
-struct relative3D_32 GPSlocation = { 0, 0, 0 };
+	struct relative3D_32 GPSlocation = { 0, 0, 0 };
 #else
-struct relative3D GPSlocation = { 0, 0, 0 };
+	struct relative3D GPSlocation = { 0, 0, 0 };
 #endif // USE_EXTENDED_NAV
 struct relative3D GPSvelocity = { 0, 0, 0 };
 
@@ -204,25 +204,24 @@ static void udb_background_callback_triggered(void)
 
 		dcm_callback_gps_location_updated();
 
-#ifdef USE_EXTENDED_NAV
-		location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
-		location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
-		location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
-#else
-		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
-		location[1] = accum_nav._.W0;
-		accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
-		location[0] = accum_nav._.W0;
-#ifdef USE_PRESSURE_ALT
-#warning "using pressure altitude instead of GPS altitude"
-		// division by 100 implies alt_origin is in centimeters; not documented elsewhere
-		// longword result = (longword/10 - longword)/100 : range
-		accum_nav.WW = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
-#else
-		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
-#endif // USE_PRESSURE_ALT
-		location[2] = accum_nav._.W0;
-#endif // USE_EXTENDED_NAV
+		#ifdef USE_EXTENDED_NAV
+			location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
+			location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
+			location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
+		#else
+			accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
+			location[1] = accum_nav._.W0;
+			accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
+			location[0] = accum_nav._.W0;
+			#ifdef USE_PRESSURE_ALT  	// use altitude estimate computed in estAltitude.c
+				#warning "using pressure altitude instead of GPS altitude"
+				// division by 100 implies alt_origin is in centimeters
+				accum_nav.WW = ((get_barometer_asl_altitude()/100) - alt_origin.WW)/100; // AGL  height in meters
+			#else
+				accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; 				// AGL  height in meters
+			#endif // USE_PRESSURE_ALT
+			location[2] = accum_nav._.W0;
+		#endif // USE_EXTENDED_NAV
 
 		// convert GPS course of 360 degrees to a binary model with 256
 		accum.WW = __builtin_muluu (COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;

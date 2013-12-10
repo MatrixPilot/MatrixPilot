@@ -22,7 +22,7 @@
 #include "libUDB_internal.h"
 #include "interrupt.h"  //  added to fix minor build/compile issue; auth. Robert 12/07/2013
 
-#if (USE_SONAR_INPUT != 0)
+#if (USE_SONAR == 1)
 
 int16_t udb_pwm_sonar;          // pulse width of sonar signal
 static int16_t udb_pwm_sonar_rise;
@@ -89,4 +89,4 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	interrupt_restore_corcon;
 }
 
-#endif // USE_SONAR_INPUT
+#endif // USE_SONAR

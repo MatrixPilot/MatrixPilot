@@ -123,9 +123,9 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 /* ************  SONAR SUPPORT External Variables ************ */
 #if ( USE_SONAR == 1 )
-	extern int sonar_rawaltitude ;			// direct distance from sonar to a target in cm fr. altitudeCntrl.c
+	extern int16_t sonar_rawaglaltitude ;			// direct distance from sonar to a target in cm fr. altitudeCntrl.c
 	extern fractional cos_pitch_roll;
-	extern int sonar_aglaltitude ;			// rmat tilt compensated sonar altitude in cm  fr. altitudeCntrl.c
+	extern int16_t sonar_aglaltitude ;			// rmat tilt compensated sonar altitude in cm  fr. altitudeCntrl.c
 	extern boolean altitude_sonar_on;		// on off for using landing sonar altitude data fr. flightplan-logo.c
 #endif
 
@@ -133,22 +133,24 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 #if ( USE_BAROMETER == 1 )
 
-	extern inline long get_barometer_asl_altitude(void) ;
-	extern inline long get_barometer_pressure(void) ;
-	extern inline int get_barometer_temperature(void) ;
-	extern inline long get_barometer_grd_altitude(void) ;
-	extern inline long get_barometer_agl_altitude(void) ;
+	extern inline int32_t get_barometer_pressure(void); 			// RT inflight barometer preassure in hPA
+	extern inline int32_t get_barometer_gnd_pressure(void);  		// launch point barometer ground level preassure in hPA
+	extern inline int32_t get_barometer_raw_altitude(void); 		// RT inflight, from above sea level (ASL) altitude in m
+	extern inline int32_t get_barometer_asl_altitude(void);  		// RT inflight, from above sea level (ASL) altitude 
+	extern inline int32_t get_barometer_agl_altitude(void); 		// RT above ground level (AGL) altitude in centimeters
+	extern inline int32_t get_barometer_gnd_altitude(void); 		// RT inlfight terrain ground level altitude estimate in centimeters
+	extern inline int16_t get_barometer_temperature(void);  		// RT barometer inflight temperature realtime in degrees celcius
+	extern inline int32_t get_barometer_gnd_temperature(void); 		// launch point barometer temperature 
 
-	extern long barometer_asl_altitude ;	
-	extern long barometer_agl_altitude ; 
-	extern long barometer_grd_altitude ; 
-	extern long barometer_pressure;
-	extern int barometer_temperature;
-
-	extern long barometer_altitude_gnd;
-	extern long barometer_pressure_gnd ; 
-	extern int barometer_temperature_gnd;
-	extern boolean altitude_bar_on;			// on off for using landing sonar altitude data fr. flightplan-logo.c
+	extern int32_t barometer_pressure;    							// RT barometer preassure in hPA
+	extern int32_t barometer_gndpressure;    						// launch point barometer preassure in hPA
+	extern int32_t barometer_rawaltitude;    						// RT inflight, from above sea level (ASL) altitude in meters
+	extern int32_t barometer_aslaltitude;        					// RT inflight, from above sea level (ASL) altitude in centimeters
+	extern int32_t barometer_aglaltitude;    						// RT from above ground level (AGL) altitude in centimeters
+	extern int32_t barometer_gndaltitude;    						// RT terrain ground altitude estimate in centimeters >>> theoretical <<<<
+	extern int16_t barometer_temperature;    						// RT barometer temperature in degrees celcius
+	extern int16_t barometer_gndtemperature; 						// launch point barometer temperature in degrees celcius
+	extern boolean altitude_bar_on;									// on off for using landing sonar altitude data fr. flightplan-logo.c
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

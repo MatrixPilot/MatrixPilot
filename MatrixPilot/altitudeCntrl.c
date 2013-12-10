@@ -148,7 +148,7 @@ int16_t desiredSpeed = (DESIRED_SPEED*10);
 
 void altitudeCntrl(void)
 {
-	#if (USE_SONAR_INPUT != 0)
+	#if (USE_SONAR == 1)
 		calcSonarAGLAltitude();//calculate_sonar_height_above_ground();
 	#endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)

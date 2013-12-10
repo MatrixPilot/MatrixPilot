@@ -1,30 +1,40 @@
-#define THISFIRMWARE "MxPilotPlane APS3104.bz2k.t103"  // WIP add to telemetry log 
+#define THISFIRMWARE "MxPilotPlane APS3104.fwstd.t103"  // WIP add to telemetry log 
 
 /*  TEST RELEASE# t103, UDB4-UDB5 Breeze V-tail glider airframe
  *  
  *  MODIFICATIONS :
  *  
- *  1) Reorganized options.h to support logical groupings of paremeters, recon from other header files,  for ease of use 
- *      and single point of access to all basic setup parms 
- *  2) Added Sonar AGL altitude enhanced LOGO params and functions (UNTESTED)
- *  3) Added Sonar AGL altitude enhanced LOGO params and functions (UNTESTED)
- *  4) Fused Sonar AGL and Barometer altitude to recalibrate altitude estimates in deadReckoning (deadReckoning.c locationErrorEarth[2]~)
- *  5) Fused point of origin altitude with sonar agl altitude during startup
- *  6) Added serial baud rate auto increase to 57600 in telemetry.c when sonar and/or barometer is in use
+ *  1) options.h: reorganized/reconstituted to enforce logical groupings of parameters, some moved from other header files,   
+ *     for ease of use, reduce complexity and provide single point of access to all basic and essential setup params 
+ *  2) sonarCtrl.c, sonarIn.c, radioIn.c, flightplan-logo.h(runtime altitudeCntrl.c  (runtime altitudeCntrl.c) ~ : 
+ *     Added Sonar AGL altitude  enhanced LOGO params and functions (UNTESTED, see notes below)
+ *  3) flightplan-logo.h, flightplan-logo.c, magnetometer.h, magnetometer.c (runtime navigate.c) ~: 
+ *     added Barometer  enhanced LOGO params and functions (UNTESTED see notes below)
+ *  4) deadReckoning.c locationErrorEarth[2]~): fused Sonar AGL and Barometer altitude to recalibrate altitude estimates in deadReckoning 
+ *  5) navigate.c:  fused point of origin altitude with sonar agl altitude during startup
+ *  6) telemetry.c: added serial baud rate auto configured to 57600 in  when sonar and/or barometer is in use
  *  7) OSD related built bug fix: defines.h uncomment 4 osd variables required by mp_osd.c
  *  8) magnetometerOptions.h, osd_spi.c (commented warnings) mods to fix warning messages during compile
+ *  9) options.h, sonarCtrl and sonarIn.c: change USE_SONAR_INPUT to USE_SONAR and SONAR_CHANNEL for consistency and add config flexibility
+ *  10) telemetry.c, added sonar and barometer data
+ *  11) WIP sonarCntrl, options.h.c and telemetry.c added option param (at options.h) either to use vanilla (Pete's) or own/modified sonar algo
  *
- *  >>>>>>  WIP - Add 2 LOGO flight mode options (option.h LOGO_TYPE), ie., static and dynamic (RC generated/controlled)
- *  >>>>>>  WIP - Add & test spike filter algo in fusing sonar and barometer altitude estimtes
- *
- *  >>>>>> : 1) Enable-Test Wifi communication, check WiFly (SparkFun) viability as substitute to XBee
- *           2) Research viability of incrementaly phasing in interactive GCS (mavlink protocol) capabilitiess
+ *  Down the road:
+ *  Challenging
+ *  >>>>>>  WIP - Add 2 LOGO flight mode options (option.h LOGO_TYPE), ie., static and dynamic (RC TX generated/controlled)
+ *  >>>>>>  WIP - Add & test tunable-threshold transition dampening (similar to APM) algo in fusing sonar and barometer altitude estimates
+ *  >>>>>>  WIP - Add & test spike filter(similar to APM) algo in fusing sonar and barometer altitude estimates
+ *  Ambitious (dream world - shooting for the stars ;):
+ *  >>>>>> : 1) Enable-Test Wifi communication, check WiFly (SparkFun) viability as substitute to XBee and 3DRadio
+ *           2) Research viability of incrementally phasing in interactive GCS (mavlink protocol) capabilities
+ *           3) Incorporate long planned Kalman filter (possibly akin to Paul's EKF where applicable/possible) 
  *
  *  TEST RELEASE NOTES:
  *  
- *  Baseline Trunk Commit: 3104
+ *  Baseline Trunk Commit: 3104, Sonar baseline Pete's, Barometer baseline Rob's
  *  Last modified date  Dec 8, 2013
- *  Status: FLIGHT UNTESTED, RECOMMENDED FOR GROUND TESTING ONLY, AND TELEMETRY LOG CHECK ON SONAR AND BAROMETER DATA FEED...
+ *
+ *  Status: FLIGHT UNTESTED, RECOMMENDED FOR GROUND TESTING ONLY - CHECK TELEMETRY LOG FOR SONAR AND BAROMETER DATA FEED...
  *   -  Suited for fixwing and gliders, past tests: consistently stable flights~auto landings using 8C RCTX managed dynamic
  *      Logo flight plans
  *   -  No support GCS functionality
@@ -32,7 +42,7 @@
  *
  *  ACKNOWLEDGEMENTS AND SPECIAL THANKS :
  *   Copyright 2009-2012 MatrixPilot Team
- *   Creator:        Bill Premerlani's UAV Dev Board 
+ *   Creator:        Bill Premerlani's UAV Dev Board
  *   See the AUTHORS.TXT file for a list of authors of MatrixPilot.
  *
 */
@@ -66,7 +76,7 @@
 
 ///////////////////////////////////  I.  BASIC CONFIGURATION   ////////////////////////////////////
 // 
-//    Section to manage: Airframe, Board Deployment, Mandatory Devices, Input and Output Connections,  
+//   Section to manage: Airframe, Board Deployment, Mandatory Devices, Input and Output Connections,  
 //                                       Options and Finetuning
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,14 +117,16 @@
 
 // MANDATORY GPS
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
-#define GPS_TYPE                            GPS_STD
+#define GPS_TYPE                            GPS_STD  
+
+// GPS Baud rate, uncomment to specify a rate other than default, leave commented to use default
 //#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
 
 // RADIO/FULL AUTONOMOUS ON/OFF
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
-// receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
-// recommended that you actually use this option, since you'd have no manual control to fall
-// back on if things go wrong.  It may not even be legal in your area.
+// receiver. (Totally autonomous.)  Recommended ONLY for simulation and debugging.  
+// Note that  there's no manual control to fall back on if things go wrong, when turned on.  
+// Also may not be legal in your area. Check and conform with your local laws, rules and regulations.
 #define NORADIO                             0
 
 /////////////////////////    I.2 INPUT AND OUTPUT CHANNEL CONFIGURATION  //////////////////////////
@@ -153,12 +165,16 @@
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-//                                                              physical PPM IN channels to AR8000 Rx / DX8 Tx
+// This setup works only with a 8C PPM encoder and an 8 channel, minimum, TX-RX (DX8)
+//                                                              physical >> PPM IN << channels to AR8000 Rx / DX8 TX
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_1            // PPM/C1 to RxC1  Throttle
 #define AILERON_INPUT_CHANNEL				CHANNEL_2 		     // PPM/C2 to RxC2  Ail
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_3            //	PPM/C3 to RxC3  Elev
 #define RUDDER_INPUT_CHANNEL				CHANNEL_4            // PPM/C4 to RxC4  Rudder
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5            // PPM/C5 to RxC6  AUX1, flight mode
+#define LOGO_A_CHANNEL						CHANNEL_6		  	 // PPM/C6 to RxC7  AUX2,3p toggle, 1st LOGO plan change 	  
+#define LOGO_B_CHANNEL						CHANNEL_7		  	 // PPM/C7 to RxC8  AUX3,3p toggle, 2nd LOGO plan change 
+#define LOGO_C_CHANNEL						CHANNEL_8		  	 // PPM/C8 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
 
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED       
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED       
@@ -169,10 +185,9 @@
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
 
-#define SONAR_CHANNEL						CHANNEL_UNUSED       // WIP - TO SUPPORT CONFIGURABLE SONAR PWM CHANNEL ASSIGNEMT
-#define LOGO_A_CHANNEL						CHANNEL_6		  	 // PPM/C6 to RxC7  AUX2,3p toggle, 1st LOGO plan change 	  
-#define LOGO_B_CHANNEL						CHANNEL_7		  	 // PPM/C7 to RxC8  AUX3,3p toggle, 2nd LOGO plan change 
-#define LOGO_C_CHANNEL						CHANNEL_8		  	 // PPM/C8 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
+// >>>> WIP - defaults to C8 when CHANNEL_UNUSED and USE_SONAR is on (1)
+#define SONAR_CHANNEL						CHANNEL_UNUSED       // Sonar may be connected to any of CHANNEL 6 to 8/ default
+
 
 // NUM_OUTPUTS:
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
@@ -191,7 +206,6 @@
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
-//
 //                                                                physical pin to servo/controls connections
 //  UDB4/UDB3/PPM_ALT_OUTPUT_PINS=1 OPTIONS 
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3            // Out3 to ESC/BL Motor  
@@ -305,7 +319,7 @@
 // uncomment to enable for testing and debugging barometer program only
 // #define TEST_WITH_DATASHEET_VALUES  	
 // NOTE: Pending testing/verification, doesn't really do enything except include barometer in logged telemetry data.	
-//#define USE_BAROMETER						1  
+#define USE_BAROMETER						1  
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
@@ -316,29 +330,19 @@
 // is attached and if so, what sonar sensor class used is used.
 #define BAROMETER_ALTITUDE                  0  // UNTESTED
 
-// Set your takeoff point ASL ground altitude in meters.
-#define LAUNCH_ALTITUDE                     300
-
-// FOR DEBUGGING TRIGGER LOCATION of barometer functions altimeter_calibrate() and estAltitude() 
-//  0- default original (distributed); 1- states.c (orig); 2- gpsParseCommon.c; 3. altitudeCntrl.c and 4- libDCM.c
-//  DEBUG options deactivated but kept for posterity
-//#define BAR_RUN_FROM	 					0   //  DEBUG: choose location from where to run functions    
-//#define EST_ALT 							1   //  DEBUG: turn on (1) or off (0) run of estAltitude()  
+// Home position fix above-sea-level(ASL) ground altitude in centimeter, USED BY sonar and barometer
+//   altitude computation when USE_PA_PRESSURE is set to 0 and a barometer sensor is enabled
+//   eg. PN: Home front yard 13200, OMFC, SF 16950
+#define ASL_GROUND_ALT						13200	// in centimeters
 
 // USE_PA_PRESSURE if 0, barometric alt will be base on ASL ground altitude defined below
-// if set to 1, will use hPA and if set to 2, will use mercury based on METAR/station computation
-//#define USE_PA_PRESSURE						2    
+// if set to 1, will use hPA and if set to 2, will use mercury inch based on METAR/station computation
+#define USE_PA_PRESSURE						2    
 
 // PA_PRESSURE below is for Ontario, Canada as of 11-16-2012, 1029.6826 hPA from
 // http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query=Mississauga%2C+Canada
-#define PA_PRESSURE							101800   		// in hPA [set USE_PA_PRESSURE to 1]
-//#define MC_PRESSURE							3006   		// in. mercury (METAR) [set USE_PA_PRESSURE to 2]
-
-//  To use realtime ground pressure set to 1, or otherwise will use static-altimeter-calibrated 
-//  ground pressure for ASL and AGL computations. 
-//  IMPORTANT: Use realtime only for ground/terrain based vehicles to constantly update
-//     ground reference. Also, this is only applicable with PA_PRESSURE set to 1 or 2.
-//#define USE_REALTIME_GRDPRES 				0 
+#define PA_PRESSURE							101300   // in (1013 pa) hPA 							[set USE_PA_PRESSURE to 1]
+#define MC_PRESSURE							3016   	 // 30.16 in. mercury METAR) altimeter/pressure [set USE_PA_PRESSURE to 2]
 
 // Barometer oversampling [OSS] can be set from 0 thru 3
 //				  [ms]  Ave/cur/uA   [hPA]      [m]
@@ -347,12 +351,11 @@
 //  1	 1		  4.5		3		  0.06		0.5  [standard]
 //  2	 1		  4.5		3		  0.06		0.5  [high resolution]
 //  3	 1		  4.5		3		  0.06		0.5  [ultra high resolution]
-//#define OSS 						2
+#define OSS 								2
 
-// Home position fix above-sea-level(ASL) ground altitude in centimeter, USED BY sonar and barometer
-//   altitude computation when USE_PA_PRESSURE is set to 0 and a barometer sensor is enabled
-//   eg. PN: Home front yard 13200, OMFC, SF 16950
-#define ASL_GROUND_ALT						13200	// in centimeters
+// Uncomment the ff. #define USE_PRESSURE_ALT to use barometer pressure altitude instead of GPS altitude
+//    algorithm in the gpsParseCommon.c program
+//#define USE_PRESSURE_ALT
 
 
 /////////////////////////     II.3. SONAR AGL ALTITUDE SENSOR SUPPORT      ////////////////////////
@@ -372,7 +375,7 @@
 //  >>>>>>>>>>>    WIP NOTES:  TEMP TESTING PARAMS FOR SONAR TAKE OUT ONCE TESTED
 // Set USE_SONAR_INPUT to the input capture channel which the sensor
 // is connected to. Currently on channel 8 is supported.
-#define USE_SONAR_INPUT                     8  // WIP NOTES:  CHANNEL CONNECTION TRANSFERED TO APPROPRIATE PARAM LOGICAL GROUPING
+#define USE_SONAR_VER                    8  // WIP NOTES:  CHANNEL CONNECTION TRANSFERED TO APPROPRIATE PARAM LOGICAL GROUPING
 
 // Works with UDB4, UDB5 and AUAV3. This feature can only be combined with USE_SONAR set to 1, below.
 // Design for supporting autonomous and soft precision landing flight plan in LOGO.  
@@ -386,15 +389,20 @@
 // 	500 cm (5 m) effective and 1000 cm max (10 m vendor rated) for an  MB1261 XL-MaxSonar-EZL1
 #define EFFECTV_SONAR_ALTRANGE                400 // Reliable Sonar measurement distance (centimeters) for your specific landing area.
 #define MAXIMUM_SONAR_ALTRANGE                750 // Distance in centimeters that denotes "out of range" for your Sonar device.
-#define SONAR_MINIMUM_VALREADS                  2 // Def 3, Number of validation readings threshold of a true reading.
+#define SONAR_MINIMUM_VALREADS                  2 // Def 3, number of validation readings threshold of a true reading, higher valued 
+                                                  //    increases integrity/error filtering, but slows down the aglaltitude feed and 
+                                                  //    observed to cause intermentent blank feed in the telemetry log
 
 
-//////////////////////   II.4. TELEMETRY ON SCREEN DISPLAY (OSD) SETUP     //////////////////////
+//////////////////////   II.4. TELEMETRY, ON SCREEN DISPLAY (OSD) SETUP     ////////////////////
 //
 // On Screen Display
 // USE_OSD enables the OSD system.  OSD Layout can be customized in the osd_layout.h file.
 // Option for USE_OSD:  OSD_NONE. OSD_NATIVE, OSD_REMZIBI
 #define USE_OSD                             OSD_NATIVE
+
+// OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
+#define OSD_VIDEO_FORMAT                OSD_PAL
 
 // set this to 1 to use the SPI peripheral, 0 to bit-bash 
 // while osd_spi.c identifies SPI1 port (CK1 DO1 DI1) used for native osd applies to UDB5

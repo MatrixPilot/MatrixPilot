@@ -142,9 +142,9 @@ void dead_reckon(void)
 			#if (( SONAR_ALTITUDE == 1 ) && ( altitude_sonar_on == true ))  //  apply boolean from LOGO 
 				#if ( USE_PA_PRESSURE == 1 )
 					//add back sonar alt
-					locationErrorEarth[2] = (GPSlocation.z - ((barometer_grd_altitude+(sonar_altitude/100))));  
+					locationErrorEarth[2] = GPSlocation.z - ((get_barometer_gnd_altitude()+(sonar_altitude/100)));  
 				#else
-					locationErrorEarth[2] = (GPSlocation.z - ((ASL_GROUND_ALT +(sonar_altitude/100)))) ; 
+					locationErrorEarth[2] = GPSlocation.z - ((ASL_GROUND_ALT +(sonar_altitude/100))) ; 
 				#endif
 			#else
 				locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;

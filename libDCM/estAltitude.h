@@ -22,15 +22,17 @@
 #ifndef ESTALTITUDE_H
 #define ESTALTITUDE_H
 
-
-void udb_barometer_callback(long pressure, int temperature, char status);
+void udb_barometer_callback(int32_t pressure, int16_t temperature, char status);
 void altimeter_calibrate(void);
 void estAltitude(void);
 
-inline long get_barometer_altitude(void);
-inline long get_barometer_pressure(void);
-inline int get_barometer_temperature(void);
-inline long get_barometer_agl_altitude(void);
-
+inline int32_t get_barometer_pressure(void);
+inline int32_t get_barometer_gnd_pressure(void);
+inline int32_t get_barometer_raw_altitude(void);
+inline int32_t get_barometer_asl_altitude(void);
+inline int32_t get_barometer_agl_altitude(void);
+inline int32_t get_barometer_gnd_altitude(void);
+inline int16_t get_barometer_temperature(void);
+inline int32_t get_barometer_gnd_temperature(void);
 
 #endif // ESTALTITUDE_H

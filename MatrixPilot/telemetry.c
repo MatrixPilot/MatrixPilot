@@ -85,16 +85,20 @@ void init_serial(void)
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 	dcm_flags._.nmea_passthrough = 1;
 #endif
-//#ifndef SERIAL_BAUDRATE
-//#define SERIAL_BAUDRATE 19200 // default
-//#warning SERIAL_BAUDRATE set to default value of 19200 bps
-//#endif
+
+//  Rem. to adjust serial telemetry log to this baud rate to support extra data from Sonar
 #if (( USE_SONAR == 1) || ( USE_BAROMETER == 1))
-	udb_serial_set_rate(57600) ;   //  Rem. to adjust serial telemetry log to this baud rate to support extra data from Sonar
+    #ifndef SERIAL_BAUDRATE
+    	#define SERIAL_BAUDRATE 57600
+	#endif
+	//udb_serial_set_rate(57600) ;   
 #else
-	udb_serial_set_rate(19200) ;   // def. setting or uncomment any to change default to a higher baud
+    #ifndef SERIAL_BAUDRATE
+    	#define SERIAL_BAUDRATE 19200
+	#endif
+	//udb_serial_set_rate(19200) ; 
 #endif
-//udb_serial_set_rate(SERIAL_BAUDRATE);
+udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -650,11 +654,21 @@ void serial_output_8hz(void)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
 				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
-				    flags.WW, osc_fail_count,
-				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
-//				serial_output("tmp%i:prs%li:alt%li:agl%li:",
-//				    get_barometer_temperature(), get_barometer_pressure(), 
-//				    get_barometer_alt(), get_barometer_agl());
+				    flags.WW, osc_fail_count,IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
+				/* ***  SERIAL_UDB_EXTRA mod to include sonar and barometer feed  *** */
+					#if  (USE_SONAR == 1)
+						serial_output("H%i,%i:", sonar_rawaglaltitude, sonar_aglaltitude );
+					#endif
+					#if (USE_BAROMETER == 1) 
+						serial_output("t%i,p%i,ra%i,as%i,ag%i,ga%i:",
+						(int16_t)(get_barometer_temperature()), 
+						(int32_t)(get_barometer_pressure()), 
+						(int32_t)(get_barometer_raw_altitude()),
+						(int32_t)(get_barometer_asl_altitude()),
+						(int32_t)(get_barometer_agl_altitude()),
+						(int32_t)(get_barometer_gnd_altitude()));
+					#endif
+				/* ***  sonar and barometer feed MODS END ***  */
 #if (RECORD_FREE_STACK_SPACE == 1)
 				extern uint16_t maxstack;
 				serial_output("stk%d:", (int16_t)(4096-maxstack));

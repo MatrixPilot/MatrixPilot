@@ -21,8 +21,9 @@
 
 // Enable or disable the whole OSD system by setting the value of USE_OSD in osd.h
 
+//MOVED TO option.h >>> REMOVE AFTER TESTING
 // OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
-#define OSD_VIDEO_FORMAT                OSD_PAL
+// #define OSD_VIDEO_FORMAT                OSD_PAL
 
 // The callsign is written using characters from the OSD Font file.  (See Tools/FlashOSD/.)
 // This has to end with 0xFF.
