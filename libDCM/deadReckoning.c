@@ -20,34 +20,56 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsParseCommon.h"
+#include "deadReckoning.h"
+#include "mathlibNAV.h"
+#include "rmat.h"
+#include "../libUDB/heartbeat.h"
 
-#define DR_PERIOD (int16_t)((40/GPS_RATE)+4)
 
-#define DR_TIMESTEP 0.025
+// heartbeats
+#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4)
+
+// seconds
+#define DR_TIMESTEP (1.0/HEARTBEAT_HZ)
+
+// 1.0 in 0.16 format
 #define MAX16 (4.0*RMAX)
+
+// seconds
 #define DR_TAU 2.5
 
+// seconds * (cm/sec^2 / count) ??? is G always represented as cm/sec^2 ?
+// GRAVITYM is 980 cm/sec^2, GRAVITY is 2000 counts
+// dx/dt^2 * ACCEL2DELTAV = cm/sec
 #define ACCEL2DELTAV ((DR_TIMESTEP*GRAVITYM*MAX16)/GRAVITY)
-#define VELOCITY2LOCATION (DR_TIMESTEP*.01*MAX16*16.0)
-//	The factor of 16 is so that the gain is more precise.
-//	There is a subsequent right shift by 4 to cancel the multiply by 16.
 
-#define DR_FILTER_GAIN (int16_t) (DR_TIMESTEP*MAX16/DR_TAU)
-#define ONE_OVER_TAU (uint16_t) (MAX16/DR_TAU)
+// seconds; the .01 must convert from cm/sec^2 to m/sec^2
+// cm/sec * VELOCITY2LOCATION = meters
+#define VELOCITY2LOCATION (DR_TIMESTEP*.01*MAX16*16.0)
+// The factor of 16 is so that the gain is more precise.
+// There is a subsequent right shift by 4 to cancel the multiply by 16.
+
+// dimensionless
+#define DR_FILTER_GAIN (int16_t)(DR_TIMESTEP*MAX16/DR_TAU)
+
+// 1/seconds
+#define ONE_OVER_TAU (uint16_t)(MAX16/DR_TAU)
 
 int16_t dead_reckon_clock = DR_PERIOD;
 
-//      velocity, as estimated by the IMU
-union longww IMUvelocityx =  { 0 };
-union longww IMUvelocityy =  { 0 };
-union longww IMUvelocityz =  { 0 };
+// velocity, as estimated by the IMU: high word is cm/sec
+union longww IMUvelocityx = { 0 };
+union longww IMUvelocityy = { 0 };
+union longww IMUvelocityz = { 0 };
 
-//      location, as estimated by the IMU
-union longww IMUlocationx =  { 0 };
-union longww IMUlocationy =  { 0 };
-union longww IMUlocationz =  { 0 };
+// location, as estimated by the IMU
+// high word is meters, low word is fractional meters
+union longww IMUlocationx = { 0 };
+union longww IMUlocationy = { 0 };
+union longww IMUlocationz = { 0 };
 
-//	integral of acceleration
+// integral of acceleration
 union longww IMUintegralAccelerationx = { 0 };
 union longww IMUintegralAccelerationy = { 0 };
 union longww IMUintegralAccelerationz = { 0 };
@@ -55,64 +77,62 @@ union longww IMUintegralAccelerationz = { 0 };
 uint16_t air_speed_3DIMU = 0;
 int16_t total_energy = 0;
 
-//	GPSlocation - IMUlocation
+// GPSlocation - IMUlocation: meters
 fractional locationErrorEarth[] = { 0, 0, 0 };
-//	GPSvelocity - IMUvelocity
+// GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0, 0, 0 };
-
-extern int16_t errorYawground[];
 
 void dead_reckon(void)
 {
 	if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
 	{
-		//	integrate the accelerometers to update IMU velocity
+		// integrate the accelerometers to update IMU velocity
 		IMUintegralAccelerationx.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[0]);
 		IMUintegralAccelerationy.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[1]);
 		IMUintegralAccelerationz.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[2]);
 
-		//	integrate IMU velocity to update the IMU location	
+		// integrate IMU velocity to update the IMU location	
 		IMUlocationx.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUintegralAccelerationx._.W1)>>4);
 		IMUlocationy.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUintegralAccelerationy._.W1)>>4);
 		IMUlocationz.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUintegralAccelerationz._.W1)>>4);
 
 		if (dead_reckon_clock > 0)
-		//	apply drift adjustments only while valid GPS data is in force.
-		//  This is done with a countdown clock that gets reset each time new data comes in.
+		// apply drift adjustments only while valid GPS data is in force.
+		// This is done with a countdown clock that gets reset each time new data comes in.
 		{
 			dead_reckon_clock --;
 
 			IMUintegralAccelerationx.WW += __builtin_mulss(DR_FILTER_GAIN, velocityErrorEarth[0]);
 			IMUintegralAccelerationy.WW += __builtin_mulss(DR_FILTER_GAIN, velocityErrorEarth[1]);
 			IMUintegralAccelerationz.WW += __builtin_mulss(DR_FILTER_GAIN, velocityErrorEarth[2]);
-	
+
 			IMUlocationx.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[0]);
 			IMUlocationy.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[1]);
 			IMUlocationz.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[2]);
 
 			IMUvelocityx.WW = IMUintegralAccelerationx.WW +
-								__builtin_mulus(ONE_OVER_TAU, 100*locationErrorEarth[0]);
+			                  __builtin_mulus(ONE_OVER_TAU, 100*locationErrorEarth[0]);
 			IMUvelocityy.WW = IMUintegralAccelerationy.WW +
-								__builtin_mulus(ONE_OVER_TAU, 100*locationErrorEarth[1]);
+			                  __builtin_mulus(ONE_OVER_TAU, 100*locationErrorEarth[1]);
 			IMUvelocityz.WW = IMUintegralAccelerationz.WW +
-								__builtin_mulus(ONE_OVER_TAU, 100*locationErrorEarth[2]);
+			                  __builtin_mulus(ONE_OVER_TAU, 100*locationErrorEarth[2]);
 
 		}
 		else  // GPS has gotten disconnected
 		{
-			errorYawground[0] = errorYawground[1] = errorYawground[2] = 0; // turn off yaw drift
+			yaw_drift_reset();
 			dcm_flags._.gps_history_valid = 0; // restart GPS history variables
 			IMUvelocityx.WW = IMUintegralAccelerationx.WW;
 			IMUvelocityy.WW = IMUintegralAccelerationy.WW;
 			IMUvelocityz.WW = IMUintegralAccelerationz.WW;
 		}
-	
+
 		if (gps_nav_valid() && (dcm_flags._.reckon_req == 1))
 		{
-			//	compute error indications and restart the dead reckoning clock to apply them
+			// compute error indications and restart the dead reckoning clock to apply them
 			dcm_flags._.reckon_req = 0;
 			dead_reckon_clock = DR_PERIOD;
-	
+
 			locationErrorEarth[0] = GPSlocation.x - IMUlocationx._.W1;
 			locationErrorEarth[1] = GPSlocation.y - IMUlocationy._.W1;
 			locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1;
@@ -131,7 +151,7 @@ void dead_reckon(void)
 		IMUvelocityx.WW = 0;
 		IMUvelocityy.WW = 0;
 		IMUvelocityz.WW = 0;
-	
+
 		IMUlocationx.WW = 0;
 		IMUlocationy.WW = 0;
 		IMUlocationz.WW = 0;
@@ -143,25 +163,24 @@ void dead_reckon(void)
 	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1];
 	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2];
 
-	air_speed_3DIMU = 
-					vector3_mag (	air_speed_x, air_speed_y, air_speed_z);
+#if (HILSIM == 1)
+	air_speed_3DIMU = as_sim.BB;    // use Xplane as a pitot
+#else
+	air_speed_3DIMU = vector3_mag(air_speed_x, air_speed_y, air_speed_z);
+#endif
 
 	union longww accum;
 	union longww energy;
 
-	accum.WW = __builtin_mulsu (air_speed_x, 37877);
-	energy.WW = __builtin_mulss (accum._.W1, accum._.W1);
+	accum.WW   = __builtin_mulsu(air_speed_x, 37877);
+	energy.WW  = __builtin_mulss(accum._.W1, accum._.W1);
 
-	accum.WW = __builtin_mulsu (air_speed_y, 37877);
-	energy.WW += __builtin_mulss (accum._.W1, accum._.W1);
+	accum.WW   = __builtin_mulsu(air_speed_y, 37877);
+	energy.WW += __builtin_mulss(accum._.W1, accum._.W1);
 
-	accum.WW = __builtin_mulsu (air_speed_z, 37877);
-	energy.WW += __builtin_mulss (accum._.W1, accum._.W1);
+	accum.WW   = __builtin_mulsu(air_speed_z, 37877);
+	energy.WW += __builtin_mulss(accum._.W1, accum._.W1);
 
 	energy.WW += IMUlocationz.WW;
 	total_energy = energy._.W1;
-	
-	return;
 }
-
-

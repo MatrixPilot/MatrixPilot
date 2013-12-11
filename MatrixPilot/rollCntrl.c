@@ -20,32 +20,33 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int16_t yawkdail 		= YAWKD_AILERON*SCALEGYRO*RMAX;
-	int16_t rollkp 			= ROLLKP*RMAX;
-	int16_t rollkd 			= ROLLKD*SCALEGYRO*RMAX;
-#else 
-	const int16_t yawkdail 	= YAWKD_AILERON*SCALEGYRO*RMAX;
+#if (USE_CONFIGFILE == 1)
+#include "config.h"
+#include "redef.h"
+#endif // USE_CONFIGFILE
 
-	const int16_t rollkp 	= ROLLKP*RMAX;
-	const int16_t rollkd 	= ROLLKD*SCALEGYRO*RMAX;
-#endif	
-
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1)
-	int16_t hoverrollkp 	= HOVER_ROLLKP*SCALEGYRO*RMAX;
-	int16_t hoverrollkd 	= HOVER_ROLLKD*SCALEGYRO*RMAX;
-#else
-	const int16_t hoverrollkp = HOVER_ROLLKP*SCALEGYRO*RMAX;
-	const int16_t hoverrollkd = HOVER_ROLLKD*SCALEGYRO*RMAX;
-#endif
+uint16_t yawkdail;
+uint16_t rollkp;
+uint16_t rollkd;
+uint16_t hoverrollkp;
+uint16_t hoverrollkd;
 
 void normalRollCntrl(void);
 void hoverRollCntrl(void);
 
+void init_rollCntrl(void)
+{
+	yawkdail    = (uint16_t)(YAWKD_AILERON*SCALEGYRO*RMAX);
+	rollkp      = (uint16_t)(ROLLKP*RMAX);
+	rollkd      = (uint16_t)(ROLLKD*SCALEGYRO*RMAX);
+	hoverrollkp = (uint16_t)(HOVER_ROLLKP*SCALEGYRO*RMAX);
+	hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX);
+}
+
 void rollCntrl(void)
 {
-
 	if (canStabilizeHover() && current_orientation == F_HOVER)
 	{
 		hoverRollCntrl();
@@ -54,20 +55,16 @@ void rollCntrl(void)
 	{
 		normalRollCntrl();
 	}
-	
-	return;
 }
-
 
 void normalRollCntrl(void)
 {
 	union longww rollAccum = { 0 };
 	union longww gyroRollFeedback;
 	union longww gyroYawFeedback;
-	
 	fractional rmat6;
 	fractional omegaAccum2;
-	
+
 	if (!canStabilizeInverted() || !desired_behavior._.inverted)
 	{
 		rmat6 = rmat[6];
@@ -78,7 +75,6 @@ void normalRollCntrl(void)
 		rmat6 = -rmat[6];
 		omegaAccum2 = -omegaAccum[2];
 	}
-	
 #ifdef TestGains
 	flags._.GPS_steering = 0; // turn off navigation
 #endif
@@ -86,42 +82,35 @@ void normalRollCntrl(void)
 	{
 		rollAccum._.W1 = determine_navigation_deflection('a');
 	}
-	
 #ifdef TestGains
 	flags._.pitch_feedback = 1;
 #endif
-	
 	if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback)
 	{
-		gyroRollFeedback.WW = __builtin_mulss(rollkd, omegaAccum[1]);
-		rollAccum.WW += __builtin_mulss(rmat6, rollkp);
+		gyroRollFeedback.WW = __builtin_mulus(rollkd , omegaAccum[1]);
+		rollAccum.WW += __builtin_mulsu(rmat6 , rollkp);
 	}
 	else
 	{
 		gyroRollFeedback.WW = 0;
 	}
-	
 	if (YAW_STABILIZATION_AILERON && flags._.pitch_feedback)
 	{
-		gyroYawFeedback.WW = __builtin_mulss(yawkdail, omegaAccum2);
+		gyroYawFeedback.WW = __builtin_mulus(yawkdail, omegaAccum2);
 	}
 	else
 	{
 		gyroYawFeedback.WW = 0;
 	}
-	
 	roll_control = (int32_t)rollAccum._.W1 - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
 	// Servo reversing is handled in servoMix.c
-	
-	return;
 }
-
 
 void hoverRollCntrl(void)
 {
 	int16_t rollNavDeflection;
 	union longww gyroRollFeedback;
-	
+
 	if (flags._.pitch_feedback)
 	{
 		if (AILERON_NAVIGATION && flags._.GPS_steering)
@@ -132,16 +121,12 @@ void hoverRollCntrl(void)
 		{
 			rollNavDeflection = 0;
 		}
-		
-		gyroRollFeedback.WW = __builtin_mulss(hoverrollkd, omegaAccum[1]);
+		gyroRollFeedback.WW = __builtin_mulus(hoverrollkd , omegaAccum[1]);
 	}
 	else
 	{
 		rollNavDeflection = 0;
 		gyroRollFeedback.WW = 0;
 	}
-	
 	roll_control = rollNavDeflection -(int32_t)gyroRollFeedback._.W1;
-	
-	return;
 }

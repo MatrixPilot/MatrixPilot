@@ -1,3 +1,7 @@
-The pymavlink code has been downloaded using GIT from:-
-git://git.samba.org/tridge/UAV/pymavlink.git
-on 20th January 2012
+The mavlink code directory has been downloaded using GIT from:-
+https://github.com/mavlink/mavlink
+
+The MAVproxy code was downloded from
+https://github.com/tridge/MAVProxy
+
+on 20th December 2012

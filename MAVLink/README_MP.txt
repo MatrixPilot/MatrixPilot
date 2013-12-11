@@ -1,10 +1,14 @@
 
 ADDITIONAL INFORMATION REGARDING MAVLINK FOR MATRIXPILOT
 
-September 2011
+October 2012
+
+The following note about generating MAVLink header files in C and parsing code in
+Python is for developers of MatrixPilot. As these files are already generated,
+users of MAVLink in MatrixPilot do not need to know how to generate MAVlink as described below.
 
 The Include directories for MAVLink are now generated using Andrew Tridgell's
-pymavlink libary and a utility call gen_matrixpilot.py . We no longer are using QGroundControl. 
+pymavlink libary and a utility call gen_matrixpilot.py . We no longer are using QGroundControl to generate header files.
 You will find the relevant scripts in
 the tools directory. e.g. Tools/MAVLink/pymavlink/generator/gen_matrixpilot.py .
 
@@ -19,8 +23,8 @@ Running gen_matrixpilot.py will generate the C headers and copy them over to mai
 MAVLink include directories. It will also generate a python module for both creating and parsing the 
 same messages. That will be in Tools/MAVLink/pymavlink/generator/python/mavlink_matrixpilot_v0.9.py . 
 
-Currently we are using the MAVLink wire protocol0.9 (Mavlink version 2 in XML). 
-There is a 1.0 wire protocol in development.
+We are using the MAVLink wire protocol 1.0. 
+Mavlink wire protocol 0.9 is not supported.
 
 gen_matrixpilot.py currently has to be run from within a DOS window in Windows.
 
@@ -72,8 +76,8 @@ The Mavlink directory can also be created using the followign recipe:
   to the MPLAB project list for MatrixPilot (relative file addressing). 
   (we are currently only using the "common" message types.
 
+Pete Hollands
 
-Pete Hollands 1st April 2011
 
   
 

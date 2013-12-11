@@ -13,11 +13,6 @@
 
 #  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010, 2011, 2012
 #
-#  The following 3 lines require keyword insertion to be turned on
-#  in the code.google.com subversion repository. 
-#  $Rev:: 270           $:  Revision of last commit
-#  $Author:: peter.holl#$:  Author of last commit
-#  $Date:: 2010-01-31 2#$:  Date of last commit
 
 from xml.dom import minidom
 from math  import *
@@ -26,26 +21,20 @@ from tkMessageBox import *
 from zipfile import ZipFile,ZIP_DEFLATED
 from time import sleep
 from time import time
+from check_telemetry_type import check_type_of_telemetry_file
 import tkFileDialog
 import datetime
-import subprocess
+import subprocess 
 import pickle
 import re
 import sys
 import os
 import stat
 
-from matrixpilot_lib import telemetry
-
-try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..\MAVlink\pymavlink'))
-    os.environ['MAVLINK10'] = '1'
-    import mavlinkv10 as mavlink
-    import mavutil
-    print "Imported MAVLink python libraries"
-except:
-    print "Not able to find Python MAVlink libraries"
-
+from matrixpilot_lib import ascii_telemetry
+from matrixpilot_lib import raw_mavlink_telemetry_file
+from matrixpilot_lib import ascii_telemetry_file
+from matrixpilot_lib import write_mavlink_to_serial_udb_extra
 
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
@@ -226,7 +215,7 @@ def convert_meters_east_to_lon(meters,lat):
     return((90 * meters)/ (cos(((lat / 10000000.0) / 360)*2*pi)))
 
 def get_fixed_origin_coords(text):
-    """Parse s waypoints.h file to find absolute coordinatates of the origin"""
+    """  s waypoints.h file to find absolute coordinatates of the origin"""
     
     pattern = r"""
                                  ## 
@@ -922,7 +911,7 @@ def write_waypoint_document_preamble(filename):
   <Document>
     <open>1</open>
      <name>""",
-    waypoint_name = re.sub("\.h","", options.waypoint_filename)
+    waypoint_name = re.sub("\.h$","", options.waypoint_filename)
     if debug > 0 : print "Flight Log Name is ", waypoint_name
     split_path = os.path.split(waypoint_name)
     waypoint_name   = split_path[1]
@@ -936,8 +925,8 @@ def write_document_preamble(log_book,filename, telemetry_filename):
   <Document>
     <open>1</open>
     <name>Flight Log """,
-    flight_log_name = re.sub("\.[tT][xX][tT]","", telemetry_filename)
-    if debug > 0 : print "Flight Log Name is ", flight_logname
+    flight_log_name = re.sub("\.[tT][xX][tT]$","", telemetry_filename)
+    if debug > 0 : print "Flight Log Name is ", flight_log_name
     split_path = os.path.split(flight_log_name)
     flight_log_name   = split_path[1]
     print >> filename, flight_log_name,
@@ -1027,7 +1016,33 @@ def insert_time_span(filename,begin_time,end_time,log_book) :
     print >> filename, end_time, 
     print >> filename, """</end>
       </TimeSpan>"""
-    
+
+def write_placmark_preamble_complete_flight(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index):
+    print >> filename, """<Placemark>"""
+    begin_time = flight_clock.convert(log_book.entries[log_book_index].tm, log_book)
+    end_time = flight_clock.convert(find_gps_time_of_next_waypoint(log_book.entries,log_book_index),log_book)
+    insert_time_span(filename,begin_time,end_time,log_book)
+    print >> filename, """<name>""",
+    print >> filename, "Flight Track",
+    print >> filename, """</name>"""
+    print >> filename, "     <visibility>0</visibility>"
+    print >> filename, """        <description>Complete Flight Track""",
+    print >> filename, "</description>"
+    temp_line = "     <styleUrl>#" +  \
+        mycolors.list[3][0] + "</styleUrl>"
+    print >> filename, temp_line
+    print >> filename, """        <LineString>
+        <extrude>1</extrude>
+        <tessellate>1</tessellate>"""
+    if log_book.ardustation_pos == "Recorded" :
+        print >> filename, """
+      <altitudeMode>relativeToGround</altitudeMode>"""
+    else:
+        print >> filename, """
+      <altitudeMode>absolute</altitudeMode>"""
+    print >> filename, """
+            <coordinates>"""
+      
 
 def write_placemark_preamble_auto(open_waypoint,current_waypoint,filename,log_book,flight_clock,log_book_index):
     print >> filename, """<Placemark>"""
@@ -1396,24 +1411,53 @@ def write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primar
         log_book_index += 1
     write_placemark_postamble(filename)
     return
+
+def write_flight_path_complete_track(log_book,flight_origin, filename,flight_clock,primary_locator):
+    first_waypoint = True
+    open_waypoint = True      # We only open the first few waypoints in GE - to keep graphics clean
+    max_waypoints_to_open = 9
+    max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
+    log_book_index = 0
+    write_placmark_preamble_complete_flight(open_waypoint,3,filename,log_book,flight_clock,log_book_index)
+    for entry in log_book.entries :
+        line1 = "%f," % flight_origin.move_lon(entry.lon[primary_locator])
+        line2 = "%f," % flight_origin.move_lat(entry.lat[primary_locator])
+        line3 = "%f" %  flight_origin.move_alt(( entry.alt[primary_locator] - 2 ))
+        line = "          " + line1 + line2 + line3
+        print >> filename, line    
+        log_book_index += 1
+    write_placemark_postamble(filename)
+    return
+
     
 def write_flight_path(log_book,flight_origin, filename,flight_clock):
     primary_locator = log_book.primary_locator
     write_flight_path_preamble(log_book,filename)
     write_T3_waypoints(filename,flight_origin,log_book)
     if primary_locator == GPS :
+        
         print >> filename, """     <Folder><open>0</open>
         <name>GPS Paths</name>
         <description>Coloured Coded GPS Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
         write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primary_locator)
         write_flight_path_postamble(log_book, filename)
         print >> filename, """      </Folder>"""
+        
     elif primary_locator == IMU :
+        
         print >> filename, """     <Folder><open>0</open>
         <name>IMU Paths</name>
         <description>Coloured Coded IMU Paths to Waypoints<p> Manual Mode is Blue</p></description>"""
         write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primary_locator)
         write_flight_path_postamble(log_book, filename)
+        
+        print >> filename, """      </Folder>"""
+        print >> filename, """     <Folder><open>0</open>
+        <name>Flight Track</name>
+        <description>Complete Flight Track in one segment</description>"""
+        write_flight_path_complete_track(log_book,flight_origin, filename,flight_clock,primary_locator)
+        write_flight_path_postamble(log_book, filename)
+        
         print >> filename, """      </Folder>"""
         ### Also provide a GPS track for comparison
         print >> filename, """     <Folder><open>0</open>
@@ -1422,22 +1466,15 @@ def write_flight_path(log_book,flight_origin, filename,flight_clock):
         write_flight_path_inner(log_book,flight_origin, filename,flight_clock,GPS)
         write_flight_path_postamble(log_book, filename)
         print >> filename, """      </Folder>"""
+    
         
 
 class clock() :
     """ Generate a time sequence for use in KML and Google Earth"""
     def __init__(self) :
-        # It would be good to initilise the telemetry date and time from the
-        # telemetry log files and GPS reported time. But Currently we do not
-        # record the week number in the telemetry so this is not possible.
-        # So for now we use the time at which the telemety is converted. This
-        # will then provide us with an animated sequence over time in GE. The
-        # relative times will be correct, but absolute time will be wrong.
-        # Class Clock is conceptually designed accomodate SERIAL_ARUDSTATION telemetry
-        # format which does not actually have any time embedded in the data.
         self.time = datetime.datetime.now()
         self.difference = datetime.timedelta(seconds = 1)
-        self.gps_week_no = 200 # An arbitary week number until we the true week_no in telemetry
+        self.gps_week_no = 200 # An arbitary week number until we have the true week_no in telemetry
         self.last_gps_time = 0 # keep track of the last gps time that has been seen.
         self.identical_gps_time_count = 0 # Number of consequtive idential gps time entries.
         ## Note, race_time_start_object is a special "time object" allowing easy arithmetic with dates
@@ -1786,7 +1823,7 @@ class origin() :
         self.relocate_alt_diff = self.relocate_alt - ( self.altitude   / 100.0) 
         
     def average(self,initial_points,log_book) :
-        """ obsolete method of finding the origin. It is no close enough
+        """ obsolete method of finding the origin. It is not close enough
         to the algorithm used by the plane and so can cause in-consistancies"""
         index = 0
         sum_latitude = 0
@@ -1831,12 +1868,11 @@ class origin() :
         if initial_nav_valid_time == 0 :
             # Have not been able to find any entries with a valid GPS and radio on.
             message =  "There does not appear to be any valid GPS positions in this file. So it \n" + \
-            "is not possible to plot this file in Google Earth\n" + \
-            "Exiting Program"
+            "is not possible to plot this file in Google Earth\n"
             
             showerror(title = "No Valid GPS positions found in this telemetry file", message = message)
             print message
-            exit(0) # We exit the program. Note that we did leave a kml file around
+            return(False) # return Error
         time_to_acquire_origin = initial_nav_valid_time + msec_before_storing_origin
         if debug: print "time of acquiring origin will be ",time_to_acquire_origin
         for entry in log_book.entries :
@@ -1847,7 +1883,7 @@ class origin() :
                 self.altitude =  entry.altitude
                 if debug: print "Origin: Lat:",self.latitude,"Lon:",self.longitude,"Atl:",self.altitude
                 break
-        return
+        return(True) # Success
 
     def move_lat(self,lat):
         """relocate a KML floating point latitude to meetup location"""
@@ -1964,7 +2000,7 @@ def create_waypoint_kmz(options):
     return
         
 def create_telemetry_kmz(options,log_book):          
-    """Read a fligth log book, interpret the data and represent it in a
+    """Read a flight log book, interpret the data and represent it in a
     KML file that can be viewed in Google Earth"""
     
     telemetry_filename = options.telemetry_filename
@@ -1975,8 +2011,11 @@ def create_telemetry_kmz(options,log_book):
     f_pos = open(options.GE_filename_kml, 'w')
     flight_origin = origin()
     if log_book.F13 != "Recorded" :
-        flight_origin.calculate(log_book) # Telemetry never gave us the origin
-        print "Origin calculated - no specific origin sent by telemetry"
+        if ( flight_origin.calculate(log_book)== True ):# Try to estimate the origin from initial postiions
+            print "Origin calculated - no specific origin sent by telemetry"
+        else :
+            f_pos.close() # This currently leave a blank KML file in the file system.
+            return(False) # There were not enough GPS positions to calculate an origin.
     else :
         flight_origin.longitude = log_book.origin_east
         flight_origin.latitude = log_book.origin_north
@@ -1997,7 +2036,7 @@ def create_telemetry_kmz(options,log_book):
         find_waypoint_start_and_end_times(log_book)
         create_flown_waypoint_kml_using_waypoint_file(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
     else :
-        # Check whether waypoint iformation is embedded in every line (later versions of MatrixPilot)
+        # Check whether waypoint information is embedded in every line (later versions of MatrixPilot)
         if log_book.waypoints_in_telemetry == True and \
                log_book.F14 == "Recorded": # Check we received F14 telemetry before checking flight_plan_type
             if log_book.flight_plan_type == 2 : # Logo waypoint flight plan
@@ -2020,177 +2059,169 @@ def create_telemetry_kmz(options,log_book):
 
     write_document_postamble(f_pos)
     f_pos.close()
+    return(True)
+
 
 def create_log_book(options) :
     """Parse the telemetryfile and create a virtual flight log book object"""
-    if options.telemetry_type == "SERIAL_MAVLINK" :
-        # Note mavutil requires log file to end in lowercase .log
-        m = mavutil.mavlink_connection(options.telemetry_filename, notimestamps = True )
-        while True:
-            msg = m.recv_match(blocking=False)
-            if not msg:
-                print "Reached end of file"
-                showinfo(title=None, message="Don't yet know how to process SERIAL_MAVLINK .... Exiting Program")
-                exit(0) # temporary exit until more code written.
-            elif msg.get_type() == "BAD_DATA":
-                if mavutil.all_printable(msg.data):
-                    sys.stdout.write(msg.data)
-                    sys.stdout.flush()
-            else :
-                print msg
-        exit(0) # Temporary exit until more code written.
-    elif options.telemetry_type == "SERIAL_UDB_EXTRA" :
-        f = open(options.telemetry_filename, 'r')
-        roll = 0  # only used with ardustation roll
-        pitch = 0 # only used with ardustation pitch
-        line_no = 0
-        telemetry_restarts = 0 # Number of times we see telemetry re-start
-        skip_entry = 3 # hack required as first entry can have wrong status in telemetry
-                                # e.g. first status 100 even though GPS is good, second entry will
-                                # be 110 . Status can take a moment to reflect good GPS.
-        miss_out_interval = 0   # set to 3, 7, 15 for large datasets that slow down Google Earth
-        if miss_out_interval > 0 :
-            print "Note: miss_out_interval set to ", miss_out_interval, "telemetry entries"
-        miss_out_counter  = 0
-        max_tm_actual = 0
-        log_book = flight_log_book()
-        log_book.earth_mag_set = False 
-        log_book.wind_set = False
-        log_book.dead_reckoning = 0 # By default dead reckoning is off
-        log_book.primary_locator = GPS # Default is to use GPS for plotting plane position.
-        for line in f :
-            line_no += 1
-            if line_no == 1 :
-                continue      # The first line of MatrixPilot telemetry line is blank.
-            log = telemetry() # Make a new empty log entry
-            log_format  = log.parse(line,line_no, max_tm_actual)
-            if log_format == "HKGCS_BLANK_LINE" : # blank line in Happy Killmore's GCS
-                continue  # Go fetch another line
-            if log_format == "Error" :# we had an error
-                print "Error parsing telemetry line ",line_no 
-                continue  # Go get the next line
-            elif log_format == "F1" or log_format == "F2"  or \
-                   log_format == "ARDUSTATION!!!": # We have a normal telemetry line
-                if debug : print "lat",log.latitude,"lon",log.longitude,"alt",log.altitude, \
-                    "wp", log.waypointIndex, "rmat1", log.rmat1
-                if (log.latitude == 0 or log.longitude == 0 or log.altitude ==0 ):
-                    if debug: print "lat or long or alt is 0; ignoring line", line_no
-                    continue # Get next line of telemetry  - can happen at boot time on plane 
-                else :
-                    # We have a good log entry - put it in the logbook.
-                    miss_out_counter += 1
-                    if log_format == "ARDUSTATION!!!" :
-                            log_book.ardustation_pos = "Recorded"
-                            log.roll = roll   # add the last roll parsed from Ardustation +++
-                            log.pitch = pitch # add the last pitch parsed from Ardustation +++
-                    if skip_entry > 0 :
-                        skip_entry -= 1
-                        continue # get next line of telemetry
-                    if ((log.earth_mag_vec_E != 0 ) or (log.earth_mag_vec_N != 0 ) or (log.earth_mag_vec_Z != 0 )):
-                        log_book.earth_mag_set = True
-                    if ((log.est_wind_x != 0 ) or (log.est_wind_y != 0 )or (log.est_wind_z != 0 )):
-                        log_book.wind_set = True
-                    if max_tm_actual < log.tm_actual :
-                        max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
-                    if ((log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0)): # IMUlocation is active, use it
-                        log_book.primary_locator = IMU
-                    if ((log.inline_waypoint_x != 0) or (log.inline_waypoint_y != 0) or (log.inline_waypoint_z != 0)):
-                        log_book.waypoints_in_telemetry = True
-                    log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
-                    if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
-                        log_book.entries.append(log)
-                        miss_out_counter = 0
-            elif log_format == "F4" : # We have a type of options.h line
-                # format of roll_stabilization has changed over time
-                try:
-                    log_book.roll_stabilization        = log.roll_stabilization
-                except:
-                    pass
-                log_book.pitch_stabilization       = log.pitch_stabilization
-                log_book.yaw_stabilization_rudder  = log.yaw_stabilization_rudder
-                log_book.yaw_stabilization_aileron = log.yaw_stabilization_aileron
-                log_book.aileron_navigation        = log.aileron_navigation
-                log_book.rudder_navigation         = log.rudder_navigation
-                log_book.use_altitudehold          = log.use_altitudehold
-                log_book.racing_mode               = log.racing_mode
-                log_book.F4 = "Recorded"
-                telemetry_restarts += 1
-            elif log_format == "F5" : # We have a type of options.h line
-                log_book.yawkp_aileron = log.yawkp_aileron
-                log_book.yawkd_aileron = log.yawkd_aileron
-                log_book.rollkp = log.rollkp
-                log_book.rollkd = log.rollkd
-                log_book.aileron_boost = log.aileron_boost
-                log_book.F5 = "Recorded"
-            elif log_format == "F6" : # We have a type of options.h line
-                log_book.pitchgain = log.pitchgain
-                log_book.pitchkd = log.pitchkd
-                log_book.rudder_elev_mix = log.rudder_elev_mix
-                log_book.roll_elev_mix = log.roll_elev_mix
-                log_book.elevator_boost = log.elevator_boost
-                log_book.F6 = "Recorded"
-            elif log_format == "F7" : # We have a type of options.h line
-                log_book.yawkp_rudder = log.yawkp_rudder
-                log_book.yawkd_rudder = log.yawkd_rudder
-                log_book.rollkp_rudder = log.rollkp_rudder
-                log_book.rollkd_rudder = log.rollkd_rudder
-                log_book.rudder_boost = log.rudder_boost
-                log_book.rtl_pitch_down = log.rtl_pitch_down
-                log_book.F7 = "Recorded"
-            elif log_format == "F8" : # We have a type of options.h line
-                log_book.heightmax = log.heightmax
-                log_book.heightmin = log.heightmin
-                log_book.minimumthrottle = log.minimumthrottle
-                log_book.maximumthrottle = log.maximumthrottle
-                log_book.pitchatminthrottle = log.pitchatminthrottle
-                log_book.pitchatmaxthrottle = log.pitchatmaxthrottle
-                log_book.pitchatzerothrottle = log.pitchatzerothrottle
-                log_book.F8 = "Recorded"
-            elif (log_format == "F11") or (log_format == "F14") : # We have a type of options.h line
-                # All the F11 data variables need saving here ...
-                log_book.dead_reckoning = log.dead_reckoning
-                if log_format == "F14" :
-                    log_book.flight_plan_type = log.flight_plan_type
-                    log_book.F14 = "Recorded"
-                log_book.F11 = "Recorded"
-            elif log_format == "F13" : # We have origin information from telemetry
-                log_book.gps_week = log.gps_week
-                log_book.origin_north = log.origin_north
-                log_book.origin_east = log.origin_east
-                log_book.origin_altitude = log.origin_altitude
-                log_book.F13 = "Recorded"
-            elif log_format == "F15" : # We have vehicle identification from telemetry
-                log_book.id_vehicle_model_name = log.id_vehicle_model_name
-                log_book.id_vehicle_registration = log.id_vehicle_registration
-                log_book.F15 = "Recorded"
-            elif log_format == "F16" : # We have an association with a pilot from telemetry
-                log_book.id_lead_pilot = log.id_lead_pilot
-                log_book.id_diy_drones_url = log.id_diy_drones_url
-                log_book.F16 = "Recorded"
-            elif log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
-                roll = log.roll
-                pitch = log.pitch
-            else :
-                print "Parsed a line format - ,", log_format, \
-                      "but don't know what to do with it."
-            
-        initial_points = 10 # no. log entries to find origin at start
-        
-        f.close()
+    
+    # Set up Basic Initial Values for creating a log book.
+    roll = 0  # only used with ardustation roll
+    pitch = 0 # only used with ardustation pitch
+    record_no = 0
+    telemetry_restarts = 0 # Number of times we see telemetry re-start
+    skip_entry = 3 # hack required as first F2 entry can have wrong status in telemetry
+                            # e.g. first status 100 even though GPS is good, second entry will
+                            # be 110 . Status can take a moment to reflect good GPS.
+    miss_out_interval = 0   # set to 3, 7, 15 for large datasets that slow down Google Earth
+    if miss_out_interval > 0 :
+        print "Note: miss_out_interval set to ", miss_out_interval, "telemetry entries"
+    miss_out_counter  = 0
+    max_tm_actual = 0
+    log_book = flight_log_book()
+    log_book.earth_mag_set = False # No magnetometer arrows in GE unless mag telemetry arrives
+    log_book.wind_set = False      # No wind vector info in GE unless wind telemetry arrives
+    log_book.dead_reckoning = 0    # By default dead reckoning is assumed to be off until telemetry arrives
+    log_book.primary_locator = GPS # Default is to use GPS for plotting plane position unless IMU info arrives
 
-        if telemetry_restarts > 1 :
-            showinfo(title ="Multiple Telemetry Starts in this File\n" ,      
-                           message = "It appears that this telemetry has multiple\n" +
-                            "re-starts. Please proceed carefully. Re-starts can be\n"      +
-                            "an indicator of the UDB re-booting spontaneously in flight\n"  +
-                            "If you powered up your UDB, and then pressed the reset, then\n"   +
-                            "this will explain the multiple restarts.\n"             +
-                            "\n"                                                       +
-                            "It is best if flan.py does not have multiple telemetry\n"          +
-                            "starts in it's input file. This might confuse flan.py as\n"  +    
-                            "to which origin can be used for position and altitude.\n"   +
-                            "" )
-        return(log_book)
+    # Create either a SERIAL_MAVLINK or SUE class for getting next telemetry record
+    if options.telemetry_type == "SERIAL_MAVLINK_RAW" or  \
+       options.telemetry_type == "SERIAL_MAVLINK_TIMESTAMPS":
+        print "processing telemetry as binary file for MAVLink"
+        t = raw_mavlink_telemetry_file(options.telemetry_filename, options.telemetry_type)
+    else : # Expect a legacy Ascii telemetry file
+        t = ascii_telemetry_file(options.telemetry_filename)
+
+    # Process the telemetry file
+    for msg in t: # msg is either a line of ascii, or a mavlink message
+        record_no += 1
+        log  = t.parse(msg, record_no, max_tm_actual)
+        if log.log_format == "HKGCS_BLANK_LINE" : # blank line in Happy Killmore's GCS
+            continue  # Go fetch another line
+        if log.log_format == "Error" :# we had an error
+            print "Error parsing telemetry line ",record_no 
+            continue  # Go get the next line
+        elif log.log_format == "F1" or log.log_format == "F2"  or \
+               log.log_format == "ARDUSTATION!!!": # We have a normal telemetry line
+            if debug : print "lat",log.latitude,"lon",log.longitude,"alt",log.altitude, \
+                "wp", log.waypointIndex, "rmat1", log.rmat1
+            if (log.latitude == 0 and log.longitude == 0 and log.altitude == 0 ):
+                if debug: print "lat or long or alt is 0; ignoring line", record_no
+                continue # Get next line of telemetry  - No GPS yet, can happen at boot time on plane 
+            else :
+                # We have a good log entry - put it in the logbook.
+                miss_out_counter += 1
+                if log.log_format == "ARDUSTATION!!!" :
+                        log_book.ardustation_pos = "Recorded"
+                        log.roll = roll   # add the last roll parsed from Ardustation +++
+                        log.pitch = pitch # add the last pitch parsed from Ardustation +++
+                if skip_entry > 0 :
+                    skip_entry -= 1
+                    continue # get next line of telemetry
+                if ((log.earth_mag_vec_E != 0 ) or (log.earth_mag_vec_N != 0 ) or (log.earth_mag_vec_Z != 0 )):
+                    log_book.earth_mag_set = True
+                if ((log.est_wind_x != 0 ) or (log.est_wind_y != 0 )or (log.est_wind_z != 0 )):
+                    log_book.wind_set = True
+                if max_tm_actual < log.tm_actual :
+                    max_tm_actual = log.tm_actual  # record max_tm_actual for TOW week rollover case
+                if ((log.IMUlocationx_W1 !=0 ) or (log.IMUlocationy_W1 != 0)): # IMUlocation is active, use it
+                    log_book.primary_locator = IMU
+                if ((log.inline_waypoint_x != 0) or (log.inline_waypoint_y != 0) or (log.inline_waypoint_z != 0)):
+                    log_book.waypoints_in_telemetry = True
+                log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
+                if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
+                    log_book.entries.append(log)
+                    miss_out_counter = 0
+        elif log.log_format == "F4" : # We have a type of options.h line
+            # format of roll_stabilization has changed over time
+            try:
+                log_book.roll_stabilization        = log.roll_stabilization
+            except:
+                pass
+            log_book.pitch_stabilization       = log.pitch_stabilization
+            log_book.yaw_stabilization_rudder  = log.yaw_stabilization_rudder
+            log_book.yaw_stabilization_aileron = log.yaw_stabilization_aileron
+            log_book.aileron_navigation        = log.aileron_navigation
+            log_book.rudder_navigation         = log.rudder_navigation
+            log_book.use_altitudehold          = log.use_altitudehold
+            log_book.racing_mode               = log.racing_mode
+            log_book.F4 = "Recorded"
+            telemetry_restarts += 1
+        elif log.log_format == "F5" : # We have a type of options.h line
+            log_book.yawkp_aileron = log.yawkp_aileron
+            log_book.yawkd_aileron = log.yawkd_aileron
+            log_book.rollkp = log.rollkp
+            log_book.rollkd = log.rollkd
+            log_book.aileron_boost = log.aileron_boost
+            log_book.F5 = "Recorded"
+        elif log.log_format == "F6" : # We have a type of options.h line
+            log_book.pitchgain = log.pitchgain
+            log_book.pitchkd = log.pitchkd
+            log_book.rudder_elev_mix = log.rudder_elev_mix
+            log_book.roll_elev_mix = log.roll_elev_mix
+            log_book.elevator_boost = log.elevator_boost
+            log_book.F6 = "Recorded"
+        elif log.log_format == "F7" : # We have a type of options.h line
+            log_book.yawkp_rudder = log.yawkp_rudder
+            log_book.yawkd_rudder = log.yawkd_rudder
+            log_book.rollkp_rudder = log.rollkp_rudder
+            log_book.rollkd_rudder = log.rollkd_rudder
+            log_book.rudder_boost = log.rudder_boost
+            log_book.rtl_pitch_down = log.rtl_pitch_down
+            log_book.F7 = "Recorded"
+        elif log.log_format == "F8" : # We have a type of options.h line
+            log_book.heightmax = log.heightmax
+            log_book.heightmin = log.heightmin
+            log_book.minimumthrottle = log.minimumthrottle
+            log_book.maximumthrottle = log.maximumthrottle
+            log_book.pitchatminthrottle = log.pitchatminthrottle
+            log_book.pitchatmaxthrottle = log.pitchatmaxthrottle
+            log_book.pitchatzerothrottle = log.pitchatzerothrottle
+            log_book.F8 = "Recorded"
+        elif (log.log_format == "F11") or (log.log_format == "F14") : # We have a type of options.h line
+            # All the F11 data variables need saving here ...
+            log_book.dead_reckoning = log.dead_reckoning
+            if log.log_format == "F14" :
+                log_book.flight_plan_type = log.flight_plan_type
+                log_book.F14 = "Recorded"
+            log_book.F11 = "Recorded"
+        elif log.log_format == "F13" : # We have origin information from telemetry
+            log_book.gps_week = log.gps_week
+            log_book.origin_north = log.origin_north
+            log_book.origin_east = log.origin_east
+            log_book.origin_altitude = log.origin_altitude
+            log_book.F13 = "Recorded"
+        elif log.log_format == "F15" : # We have vehicle identification from telemetry
+            log_book.id_vehicle_model_name = log.id_vehicle_model_name
+            log_book.id_vehicle_registration = log.id_vehicle_registration
+            log_book.F15 = "Recorded"
+        elif log.log_format == "F16" : # We have an association with a pilot from telemetry
+            log_book.id_lead_pilot = log.id_lead_pilot
+            log_book.id_diy_drones_url = log.id_diy_drones_url
+            log_book.F16 = "Recorded"
+        elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
+            roll = log.roll
+            pitch = log.pitch
+        else :
+            print "Warning: Log Format received:", log.log_format
+        
+    initial_points = 10 # no. log entries to find origin at start if no F13 format line
+    
+    t.close()
+
+    if telemetry_restarts > 1 :
+        showinfo(title ="Multiple Telemetry Starts in this File\n" ,      
+                       message = "It appears that this telemetry has multiple\n" +
+                        "re-starts. Please proceed carefully. Re-starts can be\n"      +
+                        "an indicator of the UDB re-booting spontaneously in flight\n"  +
+                        "If you powered up your UDB, and then pressed the reset, then\n"   +
+                        "this will explain the multiple restarts.\n"             +
+                        "\n"                                                       +
+                        "It is best if flan.py does not have multiple telemetry\n"          +
+                        "starts in it's input file. This might confuse flan.py as\n"  +    
+                        "to which origin can be used for position and altitude.\n"   +
+                        "" )
+    return(log_book)
         
 def wrap_kml_into_kmz(options):
     flight_pos_kmz = options.GE_filename
@@ -2230,16 +2261,23 @@ def write_csv(options,log_book):
     ### write out a csv file enabling analysis in Excel or OpenOffice
    
     f_csv = open(options.CSV_filename, 'w')
-    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,Pitch,Roll, Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
+    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,",
+    print >> f_csv, "Rmat0,Rmat1,Rmat2,Rmat3,Rmat4,Rmat5,Rmat6,Rmat7,Rmat8,",
+    print >> f_csv, "Pitch,Roll,Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z"
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
+    print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
+    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
               entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
+              entry.rmat0, "," , entry.rmat1, "," , entry.rmat2 , "," ,\
+              entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
+              entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
               int(-entry.pitch), ",", int(-entry.roll), ",", int(entry.heading_degrees) , "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
@@ -2250,7 +2288,11 @@ def write_csv(options,log_book):
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
               entry.lex, "," , entry.ley , "," , entry.lez, ",", \
               entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , \
-              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z) 
+              int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z), "," , \
+              entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
+              entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
+              entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar
+
     f_csv.close()
     return
        
@@ -2321,7 +2363,7 @@ def process_telemetry():
     options.waypoint_selector = myframe.way_var.get()
     options.waypoint_filename = myframe.waypoint_filename
     options.GE_filename = myframe.GE_filename 
-    options.GE_filename_kml = re.sub("\.kmz",".kml",options.GE_filename)
+    options.GE_filename_kml = re.sub("\.kmz$",".kml",options.GE_filename)
     options.CSV_selector = myframe.CSV_var.get()
     options.CSV_filename = myframe.CSV_filename 
     options.altitude_correction = myframe.scl.get()
@@ -2359,15 +2401,19 @@ def process_telemetry():
        print "CSV Filename" , options.CSV_filename
        print "Altitude Correction" , options.altitude_correction
        print "GPS Delay Correction", options.gps_delay_correction
- 
+       
     saveObject( "flan_config",options) # save user selected options to a file
 
+
+    
+    #################################################################
     ##### Main Control of Flight Analyzer Processing Starts Here ####
+    kml_result = False # Initialise Flag to show whether kml was produced
     if (options.telemetry_selector == 1):
         print "Analyzing telemetry and creating flight log book"
         log_book = create_log_book(options)
         print "Writing to temporary telemetry kml file"
-        create_telemetry_kmz(options, log_book) 
+        kml_result = create_telemetry_kmz(options, log_book) 
     elif ((options.waypoint_selector ==1 ) and (options.telemetry_selector == 0)):
         print "Writing waypoint KML file"
         create_waypoint_kmz(options)
@@ -2377,7 +2423,18 @@ def process_telemetry():
         return
     print "Zipping up KML into a KMZ File"
     wrap_kml_into_kmz(options)
-    if (options.CSV_selector == 1):
+
+    if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW') \
+        or options.telemetry_filename.endswith('log') or options.telemetry_filename.endswith('LOG')):
+        serial_udb_extra_filename = re.sub("[rRlL][aAoO][wWgG]$","txt",options.telemetry_filename)
+        if os.path.exists(serial_udb_extra_filename):
+            print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
+        else:
+            print "Writing ascii version of SERIAL_UDB_EXTRA to", \
+                  os.path.basename(serial_udb_extra_filename)
+            write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
+                                              options.telemetry_type)
+    if (options.CSV_selector == 1) and(kml_result == True ):
         print "Writing CSV file"
         write_csv(options,log_book)
     message_text = "Flight Analyzer Processing Completed"
@@ -2401,7 +2458,9 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if re.match(".*\.[tT][xX][tT]$",self.telemetry_filename) :
             self.telemetry_type = "SERIAL_UDB_EXTRA"
         elif re.match(".*\.[lL][oO][gG]$",self.telemetry_filename):
-            self.telemetry_type = "SERIAL_MAVLINK"
+            self.telemetry_type = "SERIAL_MAVLINK_TIMESTAMPS"
+        elif re.match(".*\.[rR][aA][wW]$",self.telemetry_filename):
+            self.telemetry_type = "SERIAL_MAVLINK_RAW"
         else :
             print "Unkown type of telemetry selected - Error"
         
@@ -2534,12 +2593,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if self.telemetry_filename == "None" :
             return
         else :
-            self.GE_filename = re.sub("\.[tTlL][xXoO][tTgG]",".kmz",self.telemetry_filename)
+            self.GE_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]$",".kmz",self.telemetry_filename)
             self.GE_FileShown.destroy()
             cropped = self.crop_filename(self.GE_filename)
             self.GE_FileShown = Label(self,text = cropped, anchor = W)
             self.GE_FileShown.grid(row = 6, column = 3, sticky = W)
-            self.CSV_filename = re.sub("\.[tTlL][xXoO][tTgG]",".csv",self.telemetry_filename)
+            self.CSV_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]$",".csv",self.telemetry_filename)
             self.CSV_FileShown.destroy()
             cropped = self.crop_filename(self.CSV_filename)
             self.CSV_FileShown = Label(self,text = cropped, anchor = W)
@@ -2551,7 +2610,7 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         if self.waypoint_filename == "None" :
             return
         else :
-            self.GE_filename = re.sub("\.h",".kmz",self.waypoint_filename)
+            self.GE_filename = re.sub("\.h$",".kmz",self.waypoint_filename)
             self.GE_FileShown.destroy()
             cropped = self.crop_filename(self.GE_filename)
             self.GE_FileShown = Label(self,text = cropped, anchor = W)
@@ -2574,12 +2633,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         else: self.telemetry_filename = tkFileDialog.askopenfilename(parent=self,
                     title='Choose a telemetry file')
         if self.telemetry_filename != "":
-              match = re.match(".*\.[tTlL][xXoO][tTgG]$",self.telemetry_filename) # match a .txt file
+              match = re.match(".*\.[tTlLrR][xXoOaA][tTgGwW]$",self.telemetry_filename) # match a .txt file
               if match :
                   self.set_output_filenames_telemetry()
               else:
-                  showinfo('Telemetry files end in .txt for serial udb extra or .log for mavlink (or .TXT or .LOG)',  \
-                           'Telemetry files end in .txt for serial udb extra or .logfor mavlink (or .TXT or .LOG)')
+                  showinfo(title='Telemetry files end in .txt .log or .raw (upper of lower case)',  \
+                           message='Telemetry files end in .txt .log or .raw (upper or lower case)')
                   self.telemetry_filename = old_filename
         else:
             self.telemetry_filename = old_filename
@@ -2592,10 +2651,48 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
             self.telemetry_type = "SERIAL_UDB_EXTRA"
             print "Telemetry is expected to be SERIAL UDB EXTRA"
         elif re.match(".*\.[lL][oO][gG]$",self.telemetry_filename):
-            self.telemetry_type = "SERIAL_MAVLINK"
-            print "Telemetry is expected to be SERIAL_MAVLINK"
+            self.telemetry_type = "SERIAL_MAVLINK_TIMESTAMPS"
+            print "Telemetry is expected to be SERIAL_MAVLINK with Timestamps"
+        elif re.match(".*\.[rR][aA][wW]$",self.telemetry_filename):
+            self.telemetry_type = "SERIAL_MAVLINK_RAW"
+            print "Telemetry is expected to be raw SERIAL_MAVLINK"
         else :
-            print "Unkown type of telemetry selected - Error"
+            print "Unknown type of telemetry selected - Error"
+        file_type = check_type_of_telemetry_file(self.telemetry_filename)
+        if self.telemetry_filename.endswith(".TXT") or self.telemetry_filename.endswith(".txt") :
+            if file_type == "MAVLINK 1.0 RAW":
+                message = """Would you like flan.pyw to change the filename
+                             ending from .TXT to .RAW ?
+
+                             This file ends in .TXT but is actually a MAVLINK RAW
+                             telemetry file which needs to end in .RAW to be
+                             processed by this software."""
+                if askyesno("Change file ending ?", message):
+                    new_filename = re.sub("[Tt][xX][tT]$","RAW", self.telemetry_filename)
+                    file_rename_error = False
+                    try :
+                        os.rename(self.telemetry_filename, new_filename)
+                        file_rename_error = False
+                    except :
+                        showinfo("Error renaming file", "Error while trying to rename file")
+                        file_rename_error = True
+                    if not file_rename_error :
+                        self.telemetry_filename = new_filename
+                        self.telemetry_type = "SERIAL_MAVLINK_RAW"
+                        print "Telemetry is expected to be raw SERIAL_MAVLINK"
+                        self.TelFileShown.destroy()
+                        cropped = self.crop_filename(self.telemetry_filename)
+                        self.TelFileShown = Label(self, text = cropped, anchor=W)
+                        self.TelFileShown.grid(row = 2, column = 3, sticky=W)
+                        self.set_start_state()
+                    
+            elif file_type == "ASCII" :
+                # Do and say nothing. All is OK.
+                pass
+            else :
+                message = "This file is of type " + file_type
+                showinfo(message,message)       
+        print "File type is ", file_type
         return       
 
     def choose_file_waypoint(self) :
@@ -2724,7 +2821,7 @@ class flan_text_frame(Frame):
 
 ########## Start of the Main Program ##########
 
-debug = 0 # set this to 1 of you want lot's of debug info to be printed.
+debug = 0 # set this to 1 of you want debug info to be printed.
 GPS = 0
 IMU = 1
             

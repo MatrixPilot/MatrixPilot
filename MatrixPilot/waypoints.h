@@ -23,10 +23,9 @@
 // Waypoint handling
 
 // Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS 		25
+#define WAYPOINT_RADIUS         25
 
-#define CAM_VIEW_LAUNCH					{ 0, 0, 0 }
-
+#define CAM_VIEW_LAUNCH         { 0, 0, 0 }
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -48,8 +47,8 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
+#define USE_FIXED_ORIGIN        0
+#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 30.0 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,20 +57,20 @@
 // Define the main course as:
 // 
 // const struct waypointDef waypoints[] = {
-//						waypoint1,
-//						waypoint2,
-//						etc.
-//						};
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
 // and the Failsafe RTL course as:
 // 
 // const struct waypointDef rtlWaypoints[] = {
-//						waypoint1,
-//						waypoint2,
-//						etc.
-//						};
+//                      waypoint1 ,
+//                      waypoint2 ,
+//                      etc.
+//                      };
 // 
-// A waypoint is defined as { { X, Y, Z }, F, CAM_VIEW }
+// A waypoint is defined as { { X , Y , Z } , F , CAM_VIEW }
 // where X, Y, and Z are the three coordinates of the waypoint,
 // F stores the flags/options for this waypoint,
 // and CAM_VIEW is a 3D location to aim the camera as {CAM_X, CAM_Y, CAM_Z}, or just
@@ -95,17 +94,17 @@
 // (Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees.)
 // 
 // Currently F can be set to: F_NORMAL, or any combination of:
-// F_ABSOLUTE		- Waypoints are Relative by default, unless F_ABSOLUTE is specified.
+// F_ABSOLUTE       - Waypoints are Relative by default, unless F_ABSOLUTE is specified.
 // 
-// F_TAKEOFF		- More quickly gain altitude at takeoff.
-// F_INVERTED		- Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
-// F_HOVER			- Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
-//					  NOTE: while hovering, no navigation is performed, and throttle is under manual control.
-// F_LOITER			- After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
-// F_TRIGGER		- Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
-// F_ALTITUDE_GOAL	- Climb or descend to the given altitude, then continue to the next waypoint.
-// F_CROSS_TRACK	- Navigate using cross-tracking.  Best used for longer waypoint legs.
-// F_LAND			- Navigate towards this waypoint with the throttle off.
+// F_TAKEOFF        - More quickly gain altitude at takeoff.
+// F_INVERTED       - Navigate to this waypoint with the plane upside down. (only if STABILIZE_INVERTED_FLIGHT is set to 1 in options.h)
+// F_HOVER          - Hover the plane until reaching this waypoint. (only if STABILIZE_HOVER is set to 1 in options.h)
+//                    NOTE: while hovering, no navigation is performed, and throttle is under manual control.
+// F_LOITER         - After reaching this waypoint, continue navigating towards this same waypoint.  Repeat until leaving waypoint mode.
+// F_TRIGGER        - Trigger an action to happen when this waypoint leg starts.  (See the Trigger Action section of the options.h file.) 
+// F_ALTITUDE_GOAL  - Climb or descend to the given altitude, then continue to the next waypoint.
+// F_CROSS_TRACK    - Navigate using cross-tracking.  Best used for longer waypoint legs.
+// F_LAND           - Navigate towards this waypoint with the throttle off.
 // 
 // 
 // NOTE: Please be very careful when including inverted or hovering legs in a waypoints list.  Even if your plane does not fly well
@@ -120,7 +119,7 @@
 // 
 // Camera Viewpoints are exactly like waypoint definitions. They define a point at which
 // the camera will look in 3 dimensions. If you are using a waypoint relative to the initialisation of your 
-// plane, then the camera viewpoint should also be relative e.g. "{ 32, -22, 0)".
+// plane, then the camera viewpoint should also be relative e.g. "{ 32 , -22, 0)".
 // Camera waypoints can be absolute LAT and LONG, and camera target height is height above initalisation.
 // This is the same as a fixed or absolute waypoint.
 // Finally, do not mix relative waypoints and absolute camera viewpoint in the same line. A line should
@@ -137,48 +136,88 @@
 // waypoints[]
 // 
 // By default the only waypoint is defined to be 75 meters above the starting point.
+
 /*
 const struct waypointDef waypoints[] = {
-		{ {   0,  0, 75 }, F_NORMAL, CAM_VIEW_LAUNCH }, // return to, and loiter 75 meters above the startup position
-};
- */
-/*
-const struct waypointDef waypoints[] = {
-		{ { 1000,   0 , 750 }, F_NORMAL,  CAM_VIEW_LAUNCH },
-		{ { 1000, 1000 , 750 }, F_NORMAL,  CAM_VIEW_LAUNCH },
-		{ {    0, 1000 , 750 }, F_INVERTED, CAM_VIEW_LAUNCH },
-		{ {    0,   0 , 750 }, F_NORMAL,  CAM_VIEW_LAUNCH },
-		{ {   50,  50 , 750 }, F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH },
+		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
 };
  */
 
+/*
+const struct waypointDef waypoints[] = {
+		{ { 1000,    0  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ { 1000, 1000  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {    0, 1000  , 750 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
+		{ {    0,    0  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {   50,   50  , 750 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
+};
+ */
 
  // CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
 #define CORNER 1000
 
 // CLEARANCE is an allowance for obstacles.
-#define CLEARANCE 250
+#define CLEARANCE 350
 
-#define CAM_VIEW_2  { CORNER, CORNER, 0 } // Define a Camera ViewPoint to look at 100,100, 0
+#define CAM_VIEW_2  { CORNER, CORNER, 0 } // Define a Camera ViewPoint to look at 100 ,100, 0
 
 // Here is the T3 course definition:
 
 const struct waypointDef waypoints[] = {
-		{ {    CORNER ,   CORNER , CLEARANCE + 100 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {    CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER , - CORNER , CLEARANCE +  25 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {    CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {    CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER ,   CORNER , CLEARANCE + 100 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_2 },
-		{ {    CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_2 },
-		{ {    CORNER , - CORNER , CLEARANCE +  25 }, F_NORMAL, CAM_VIEW_2 },
-		{ {  - CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_2 },
-		{ {  - CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_2 },
+		{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
 };
- 
+/*
+//const struct waypointDef waypoints[] = {
+//		{ {    CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//};
+//const struct waypointDef waypoints[] = {
+//		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {    CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//};
 
+//const struct waypointDef waypoints[] = {
+//		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {    2000,        CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//};
+
+//const struct waypointDef waypoints[] = {
+//		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {    CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+//};
+
+
+// Innsbruck inverted/reversed T3 course
+const struct waypointDef waypoints[] = {
+		{ {  113236490, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+		{ {  113579820, 472496320, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+		{ {  113579820, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+		{ {  113236490, 472496320, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+};
+ */
+
+// As an example, the absolute waypoint { { -1219950467, 374124664, 100 }, F_ABSOLUTE } represents a point
+// 100 meters above Baylands Park in Sunnyvale, CA, and will fly there normally (not inverted, etc.)
+// (Longitude = -121.9950467 degrees, Latitude = 37.4124664 degrees.)
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -193,10 +232,8 @@ const struct waypointDef waypoints[] = {
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
 const struct waypointDef rtlWaypoints[] = {
-		{ { 0, 0, 50 }, F_LOITER + F_LAND, CAM_VIEW_LAUNCH },
+		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
 };
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,11 +260,11 @@ const struct waypointDef rtlWaypoints[] = {
 
 /*
 const struct waypointDef waypoints[] = {
-		{ { 100,  0 , 75 }, F_NORMAL,  CAM_VIEW_LAUNCH },
-		{ { 100, 100 , 75 }, F_NORMAL,  CAM_VIEW_LAUNCH },
-		{ {   0, 100 , 75 }, F_INVERTED, CAM_VIEW_LAUNCH },
-		{ {   0,  0 , 75 }, F_NORMAL,  CAM_VIEW_LAUNCH },
-		{ {  50, 50 , 75 }, F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH },
+		{ { 100,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ { 100, 100  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
+		{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
 };
 */
 
@@ -246,22 +283,22 @@ const struct waypointDef waypoints[] = {
 // CLEARANCE is an allowance for obstacles.
 #define CLEARANCE 25
 
-#define CAM_VIEW_2  { CORNER, CORNER, 0 } // Define a Camera ViewPoint to look at 100,100, 0
+#define CAM_VIEW_2  { CORNER, CORNER, 0 } // Define a Camera ViewPoint to look at 100 ,100, 0
 
 // Here is the T3 course definition:
 
 const struct waypointDef waypoints[] = {
-		{ {    CORNER ,   CORNER , CLEARANCE + 100 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {    CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER , - CORNER , CLEARANCE +  25 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {    CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {    CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER ,   CORNER , CLEARANCE + 100 }, F_NORMAL, CAM_VIEW_LAUNCH },
-		{ {  - CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_2 },
-		{ {    CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_2 },
-		{ {    CORNER , - CORNER , CLEARANCE +  25 }, F_NORMAL, CAM_VIEW_2 },
-		{ {  - CORNER ,   CORNER , CLEARANCE +  50 }, F_NORMAL, CAM_VIEW_2 },
-		{ {  - CORNER , - CORNER , CLEARANCE +  75 }, F_NORMAL, CAM_VIEW_2 },
+		{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {    CORNER  ,  - CORNER  , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
+		{ {  - CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
 };
 */

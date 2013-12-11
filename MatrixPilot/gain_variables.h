@@ -1,19 +1,36 @@
+// This file is part of MatrixPilot.
+//
+//    http://code.google.com/p/gentlenav/
+//
+// Copyright 2009-2011 MatrixPilot Team
+// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
+//
+// MatrixPilot is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MatrixPilot is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
+
+
 #include "../libUDB/libUDB.h"
 
 #ifndef GAIN_VARIABLES_H
 #define GAIN_VARIABLES_H
 
 
-#define GAINS_VARIABLE			0
+#define GAINS_VARIABLE                      0
 
 // Variable altitude and airspeed
 // BEWARE: This uses an alternative library for altitude control
-// Your aircraft will not behave the same way as when using non variable gains. 
-#define ALTITUDE_GAINS_VARIABLE 0
-// To use this option, you will need to add the following files to your project
-// airspeedCntrl.c/.h
-// altitudeCntrlVariable.c
-// airspeed_options.h
+// Your aircraft will not behave the same way as when using non variable gains.
+#define ALTITUDE_GAINS_VARIABLE             0
 
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
@@ -22,19 +39,12 @@
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-   // MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables 
-	extern int16_t rollkp;
-	extern int16_t rollkd;
-	extern int16_t yawkpail;
-	extern int16_t yawkdail;
-#else
-	extern const int16_t rollkp;
-	extern const int16_t rollkd;
-	extern const int16_t yawkpail;
-	extern const int16_t yawkdail;
-#endif
-//#define AILERON_BOOST						1.0
+// MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables
+extern uint16_t rollkp;
+extern uint16_t rollkd;
+extern uint16_t yawkpail;
+extern uint16_t yawkdail;
+//#define AILERON_BOOST                     1.0
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
@@ -42,22 +52,15 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-	extern int16_t pitchgain;
-	extern int16_t pitchkd;
-	extern int16_t rudderElevMixGain;
-	extern int16_t rollElevMixGain;
-#else
-	extern const int16_t pitchgain;
-	extern const int16_t pitchkd;
-	extern const int16_t rudderElevMixGain;
-	extern const int16_t rollElevMixGain;
-#endif
-//#define ELEVATOR_BOOST						0.5
+extern uint16_t pitchgain;
+extern uint16_t pitchkd;
+extern uint16_t rudderElevMixGain;
+extern uint16_t rollElevMixGain;
+//#define ELEVATOR_BOOST                    0.5
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-//#define INVERTED_NEUTRAL_PITCH				8.0
+//#define INVERTED_NEUTRAL_PITCH            8.0
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
@@ -67,19 +70,12 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-	extern int16_t yawkprud;
-	extern int16_t yawkdrud;
-	extern int16_t rollkprud;
-	extern int16_t rollkdrud;
-#else
-	extern const int16_t yawkprud;
-	extern const int16_t yawkdrud;
-	extern const int16_t rollkprud;
-	extern const int16_t rollkdrud;
-#endif
-//extern int16_t MANUAL_AILERON_RUDDER_MIX			0.20
-//#define RUDDER_BOOST						1.0
+extern uint16_t yawkprud;
+extern uint16_t yawkdrud;
+extern uint16_t rollkprud;
+extern uint16_t rollkdrud;
+//extern uint16_t MANUAL_AILERON_RUDDER_MIX 0.20
+//#define RUDDER_BOOST                      1.0
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
@@ -95,26 +91,17 @@
 // HOVER_NAV_MAX_PITCH_RADIUS is the radius around a waypoint in meters, within which the HOVER_PITCH_TOWARDS_WP
 //                            value is proportionally scaled down.
 
-#if ((SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) || (GAINS_VARIABLE == 1))
-	extern int16_t hoverrollkp;
-	extern int16_t hoverrollkd;
-	extern int16_t hoverpitchgain;
-	extern int16_t hoverpitchkd;
-	extern int16_t hoveryawkp;
-	extern int16_t hoveryawkd;
-#else
-	extern const int16_t hoverrollkp;
-	extern const int16_t hoverrollkd;
-	extern const int16_t hoverpitchgain;
-	extern const int16_t hoverpitchkd;
-	extern const int16_t hoveryawkp;
-	extern const int16_t hoveryawkd;
-#endif
+extern uint16_t hoverrollkp;
+extern uint16_t hoverrollkd;
+extern uint16_t hoverpitchgain;
+extern uint16_t hoverpitchkd;
+extern uint16_t hoveryawkp;
+extern uint16_t hoveryawkd;
 
-//#define HOVER_PITCH_OFFSET					0.0		// + leans towards top, - leans towards bottom
-//#define HOVER_YAW_OFFSET					0.0
-//#define HOVER_PITCH_TOWARDS_WP			   30.0
-//#define HOVER_NAV_MAX_PITCH_RADIUS		   20
+//#define HOVER_PITCH_OFFSET                0.0 // + leans towards top, - leans towards bottom
+//#define HOVER_YAW_OFFSET                  0.0
+//#define HOVER_PITCH_TOWARDS_WP            30.0
+//#define HOVER_NAV_MAX_PITCH_RADIUS        20
 
 
 /*
@@ -135,7 +122,6 @@ const int16_t yaw_servo_min;
 // 2000 units being sent to udb_pwOut. (i.e. min 2000, centered 3000, max 4000)
 const int16_t pitch_servo_ratio;
 const int16_t yaw_servo_ratio;
+ */
 
-*/
-
-#endif 	//GAIN_VARIABLES_H
+#endif //GAIN_VARIABLES_H

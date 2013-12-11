@@ -41,13 +41,13 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f16_pack(uint8_t system_id, 
 
 	_mav_put_uint8_t_array(buf, 0, sue_ID_LEAD_PILOT, 40);
 	_mav_put_uint8_t_array(buf, 40, sue_ID_DIY_DRONES_URL, 70);
-        memcpy(_MAV_PAYLOAD(msg), buf, 110);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 110);
 #else
 	mavlink_serial_udb_extra_f16_t packet;
 
 	mav_array_memcpy(packet.sue_ID_LEAD_PILOT, sue_ID_LEAD_PILOT, sizeof(uint8_t)*40);
 	mav_array_memcpy(packet.sue_ID_DIY_DRONES_URL, sue_ID_DIY_DRONES_URL, sizeof(uint8_t)*70);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 110);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 110);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16;
@@ -73,13 +73,13 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f16_pack_chan(uint8_t system
 
 	_mav_put_uint8_t_array(buf, 0, sue_ID_LEAD_PILOT, 40);
 	_mav_put_uint8_t_array(buf, 40, sue_ID_DIY_DRONES_URL, 70);
-        memcpy(_MAV_PAYLOAD(msg), buf, 110);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, 110);
 #else
 	mavlink_serial_udb_extra_f16_t packet;
 
 	mav_array_memcpy(packet.sue_ID_LEAD_PILOT, sue_ID_LEAD_PILOT, sizeof(uint8_t)*40);
 	mav_array_memcpy(packet.sue_ID_DIY_DRONES_URL, sue_ID_DIY_DRONES_URL, sizeof(uint8_t)*70);
-        memcpy(_MAV_PAYLOAD(msg), &packet, 110);
+        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, 110);
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16;

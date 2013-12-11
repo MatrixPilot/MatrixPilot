@@ -1,0 +1,27 @@
+OSD Remzibi with MP tutorial
+
+1. OSD Preparation
+1.1. Download and flash correct firmware https://sites.google.com/site/remzibiosd/8-connect-osd-to-other-deviceyour-project/c-communication-protocol/No%20baudrate%20autodetect.zip?attredirects=0&d=1
+1.2. Setup layout and keep layout editor open for reference
+1.3. After EVERY update run baudrater and set correct speed 19200
+
+2. Wiring
+2.1. Connect one wire from AUAV1 Tx to Remzibi OSD Rx
+2.2. You can measure RSSI on AUAV1 or on OSD
+2.3. Connect all other batteries/sensors to OSD
+2.4. Calibrate OSD
+
+3. MP preparation
+3.1. In options.h set 
+		#define USE_OSD	OSD_REMZIBI
+3.2. If you like to measure RSSI by MP set in options.h
+		#define NUM_ANALOG_INPUTS					1
+		#define ANALOG_RSSI_INPUT_CHANNEL			1
+3.3. RSSI must be no higher that 3.3V for AUAV1
+
+4. OSD Layout
+   This is most confusing part, some of parameters are handled by OSD directly and setup via screen layout. SOme other parameters are handled directly by MP and are defined in osd_layout.h
+   Parameters described in comment as MP only are NOT used by Remzibi OSD, only parameters with Remzibi OSD are valid.
+   Every parameter with OSD_LOC_DISABLED will NOT be displayed
+   For every other param define on screen location like OSD_LOC(2, 14) 2nd column, 14th row that why OSD editor is needed as a reference to not overlap 
+   Every parameter in form OSD_LOC(2, 14) will be displayed in large fonts, to use small fonts use form OSD_LOC(USE_SMALL_FONT + 2, 14)

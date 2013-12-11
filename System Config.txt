@@ -1,0 +1,35 @@
+Hardware Notes:
+
+System is based on the PIC32MX340F512 development board from sparkfun.
+
+http://www.sparkfun.com/products/9050
+
+On My board I've added LED's L0-L1-L2-L3 that are used to indicate when the write process starts, and when each block of 8MB has been written.
+
+The SD card socket is soldered on to the prototyping area to use SPI-2
+	I used one of these card holders http://www.sparkfun.com/products/136
+	But these will probably be easier to use http://www.sparkfun.com/products/204
+
+
+
+Software Notes:
+
+The code does the following:
+	-initializes the disk
+	-mounts the filesystem
+	-Opens/creates if absent a file called 'fileset.dex'
+	-1 byte is read from fileset.dex
+		-if the file is empty a zero is written to it
+		-otherwise the value is incremented and written back
+	-fileset.dex is closed
+	-based on the value of the byte a data file is created
+	-The code then proceeds to write 24 MB of data to the new data file
+		-ever 8MB an LED is turned on to notify the user
+	-the data file is closed
+	-the file system is unmounted
+
+
+My code does NOT implement the card detect or write protect functionality.
+
+Basically I have to have the card in when I release from reset or bad things will happen ;)
+

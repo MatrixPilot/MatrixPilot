@@ -26,45 +26,9 @@ void dcm_init_rmat(void);
 void estYawDrift(void);
 void estimateWind(void);
 
-void commit_gps_data(void);
+void gps_commit_data(void);
 
-void gpsoutline(char message[]);
-void gpsoutbin(int16_t length, const uint8_t msg[]);
+void gpsoutline(const char* message);
+void gpsoutbin(int16_t length, const uint8_t* msg);
 
-void dcm_run_imu_step(void);	// This needs to be run every 25ms
-void rxMagnetometer(void);		// This should be called every 250ms
-
-void read_accel();
-void read_gyros();
-
-extern uint16_t velocity_previous;
-
-extern fractional dirovergndHRmat[];
-extern fractional dirovergndHGPS[];
-extern fractional omega[];
-
-extern fractional locationErrorEarth[3];
-
-#if (MAG_YAW_DRIFT == 1)
-extern fractional magFieldEarth[3];
-#endif
-
-extern union longbbbb tow;
-extern union intbb    sog_gps, cog_gps, climb_gps, week_no;
-extern uint8_t  hdop;
-extern union longbbbb xpg, ypg, zpg;
-extern union intbb    xvg, yvg, zvg;
-extern uint8_t  mode1, mode2, svs, hdop;
-
-extern int16_t forward_acceleration;
-extern uint16_t air_speed_3DGPS;
-
-extern uint8_t  	lat_cir;
-extern int16_t				cos_lat;
-
-#if (HILSIM == 1)
-extern union intbb		u_dot_sim_, v_dot_sim_, w_dot_sim_; 
-extern union intbb		u_dot_sim, v_dot_sim, w_dot_sim; 
-extern union intbb		p_sim_, q_sim_, r_sim_; 
-extern union intbb		p_sim, q_sim, r_sim; 
-#endif
+void dcm_run_imu_step(void);    // This needs to be run every 25ms

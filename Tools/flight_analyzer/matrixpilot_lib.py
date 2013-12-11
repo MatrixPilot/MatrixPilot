@@ -1,6 +1,144 @@
 import re
+import sys
+import os
 
-class telemetry :
+
+try:
+    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
+    os.environ['MAVLINK10'] = '1'
+    import mavlinkv10 as mavlink
+    import mavutil
+except:
+    print "Not able to find Python MAVlink libraries"
+
+def bstr(n): # n in range 0-7
+    '''Convert number to 3 digit binary string'''
+    return ''.join([str(n >> x & 1) for x in (2,1,0)])
+
+class raw_mavlink_telemetry_file:
+    """Model a mavlink file (one without local time stamps inserted)"""
+    def __init__(self, filename, type_of_mavlink):
+        if (type_of_mavlink == "SERIAL_MAVLINK_RAW"):
+            self.m = mavutil.mavlink_connection(filename, notimestamps = True)
+        elif (type_of_mavlink == "SERIAL_MAVLINK_TIMESTAMPS"):
+            self.m = mavutil.mavlink_connection(filename, notimestamps = False)    
+        else:
+            print "Error: Unknown Mavlink file type (not raw or timestamp)."
+        self.total_mavlink_packets_received = 0
+        self.dropped_mavlink_packets = 0
+        self.first_packet_flag = True
+        self.SUE_F2_A_needs_printing = False
+        
+    def __iter__(self):
+        return(self)
+        
+    def next(self):
+        """return the next good SERIAL UDB EXTRA (SUE) Binary MAVLink record"""
+        while True :
+            self.msg = self.m.recv_match(blocking=False)
+            if not self.msg:
+                    # Reached end of file
+                    print "Total MAVLink Packets processed:", self.total_mavlink_packets_received
+                    print "Packets dropped in transmission:",  self.dropped_mavlink_packets
+                    raise StopIteration
+            elif self.msg.get_type() == "BAD_DATA":
+                pass
+            else :  # We have a good mavlink packet
+                self.track_dropped_packets(self.msg.get_seq())
+                if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
+                        self.last_F2_A_msg = self.msg
+                        self.SUE_F2_A_needs_printing = True
+                        continue
+                elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
+                        try:
+                            if self.msg.sue_time >= self.last_F2_A_msg.sue_time : #A and B halves of message are a pair
+                                self.last_F2_A_msg.sue_time = self.msg.sue_time
+                                return self.msg 
+                            else:
+                                pass
+                        except:
+                            # If the above python fails, it could be because the first F2_B message
+                            # is received before an F2_A has ever been seen. e.g. with Xbee.
+                            pass
+                elif  self.msg.get_type() == 'SERIAL_UDB_EXTRA_F4'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F5'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F6'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F7'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F8'  or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F13' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
+                            return self.msg                
+                else :
+                        #print "Ignoring non SUE MAVLink message", self.msg.get_type()
+                        pass
+                    
+    def parse(self,msg, record_no, max_tm_actual):
+        log = mavlink_telemetry() # Make a new empty mavlink log entry
+        log.log_format  = log.parse(self,record_no, max_tm_actual)
+        return(log)
+    def close(self) :
+        pass
+    
+    def track_dropped_packets(self,seq) :
+        self.total_mavlink_packets_received += 1
+        # print seq
+        if (self.first_packet_flag == True) :
+            self.last_seq = seq
+            return
+        else :
+            # Mavlink seqence numbers are modulo 255
+            if seq > 255 :
+                print "Error: Mavlink packet sequence number greater than 255"
+                return
+            elif ( seq == 0 )and ( self.last_seq == 255) :
+                self.last_seq = seq
+                return
+            elif (seq == self.last_seq + 1 ) :
+                self.last_seq = seq
+                return
+            else : # We have dropped packets
+                if ( seq > self.last_seq ): # most likely case
+                    self.dropped_mavlink_packets += seq - self.last_seq
+                elif (self.last_seq > seq): # assumes no more than 255 packets drop in one go
+                    self.dropped_mavlink_packets += (255 - self.last_seq )+ seq
+                elif (self.last_seq == seq) :
+                    self.dropped_mavlink_packets += 255 # best guess
+            self.last_seq = seq
+            return
+        
+class ascii_telemetry_file:
+    """ Get next line of ascii telemetry file"""
+    def __init__(self, filename):
+        self.f = open(filename, 'r')
+        self.record_no = 0
+        pass
+    
+    def __iter__(self):
+        return(self)
+     
+    def next(self):
+        while True :
+            self.line = self.f.next()
+            if self.line == "" :
+                raise StopIteration
+            self.record_no += 1
+            if self.record_no == 1 :
+                continue      # The first line of MatrixPilot telemetry line is blank.
+            else :
+                return(self.line)
+            
+    def parse(self,msg, record_no, max_tm_actual):
+        log = ascii_telemetry() # Make a new empty sue (Serial Udb Extra) log entry
+        log.log_format  = log.parse(msg,record_no, max_tm_actual)
+        return(log)
+     
+    def close(self):
+        self.f.close()
+       
+
+class base_telemetry :
     def __init__(self) :
         """Pattern match against a line of telemetry. max_tm_actual is the maximum
         actual time of week seen so far. It is required for processing a week rollover."""
@@ -42,8 +180,8 @@ class telemetry :
         self.earth_mag_vec_N = 0
         self.earth_mag_vec_Z = 0
         self.max_tm_actual = 0
-        self.pwm_input = [0,0,0,0,0,0,0,0,0]
-        self.pwm_output = [0,0,0,0,0,0,0,0,0]
+        self.pwm_input =  [0,0,0,0,0,0,0,0,0,0,0]
+        self.pwm_output = [0,0,0,0,0,0,0,0,0,0,0]
         self.lex = 0
         self.ley = 0
         self.lez = 0
@@ -69,7 +207,201 @@ class telemetry :
         self.flight_plan_type = 0
         self.rollkd_rudder = 0
         self.rollkp_rudder = 0
+        self.IMUvelocityx = 0
+        self.IMUvelocityy = 0
+        self.IMUvelocityz = 0
+        self.flags = 0
+        self.sonar_direct = 0 # Direct distance in cm to sonar target
+        self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
+       
+
+class mavlink_telemetry(base_telemetry):
+    """Parse a single binary mavlink message record"""
+    def parse(self,telemetry_file,record_no, max_tm_actual) :
+        if (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B"):
+            if telemetry_file.SUE_F2_A_needs_printing == True:
+                
+                self.tm_actual = float (telemetry_file.last_F2_A_msg.sue_time)
+                if ((self.tm_actual < max_tm_actual) and ( max_tm_actual > 604780000 )):
+                        # 604800000 is no. of milliseconds in a week. This extra precaution required because
+                        # occausionally the log file can have an entry with  atime which precedes the previous entry.
+                        # The following seconds rollover fix only works for flights of less than 1 week
+                        # in length. So watch out when analyzing your global solar powered UAV flights.
+                        print "Executing code for GPS weekly seconds rollover"
+                        self.tm = self.tm_actual + max_tm_actual
+                elif (self.tm_actual < max_tm_actual) :
+                        self.tm = max_tm_actual
+                        # takes account of occassional time entry which precedes time of previous entry.
+                        # This can happen when EM406A first starts up near beginning of telemetry.
+                        # It is caused by a synchronisation issue between GPS time, and synthesized time
+                        # within MatrixPilot. It has been seen to occur once near startup time of the UDB.
+                else :
+                        self.tm = self.tm_actual
+                
+                self.status = bstr( telemetry_file.last_F2_A_msg.sue_status )
+                self.latitude = float(telemetry_file.last_F2_A_msg.sue_latitude)
+                self.longitude = float(telemetry_file.last_F2_A_msg.sue_longitude)
+                self.altitude = float(telemetry_file.last_F2_A_msg.sue_altitude)
+                self.waypointIndex = int(telemetry_file.last_F2_A_msg.sue_waypoint_index)
+                self.rmat0 = int(telemetry_file.last_F2_A_msg.sue_rmat0)
+                self.rmat1 = int(telemetry_file.last_F2_A_msg.sue_rmat1)
+                self.rmat2 = int(telemetry_file.last_F2_A_msg.sue_rmat2)
+                self.rmat3 = int(telemetry_file.last_F2_A_msg.sue_rmat3)
+                self.rmat4 = int(telemetry_file.last_F2_A_msg.sue_rmat4)
+                self.rmat5 = int(telemetry_file.last_F2_A_msg.sue_rmat5)
+                self.rmat6 = int(telemetry_file.last_F2_A_msg.sue_rmat6)
+                self.rmat7 = int(telemetry_file.last_F2_A_msg.sue_rmat7)
+                self.rmat8 = int(telemetry_file.last_F2_A_msg.sue_rmat8)
+                self.cog = int(telemetry_file.last_F2_A_msg.sue_cog)
+                self.sog = int(telemetry_file.last_F2_A_msg.sue_sog)
+                self.cpu = int(telemetry_file.last_F2_A_msg.sue_cpu_load)
+                self.sue_voltage_milis = int(telemetry_file.last_F2_A_msg.sue_voltage_milis)
+                self.est_airspeed = int(telemetry_file.last_F2_A_msg.sue_air_speed_3DIMU)
+                self.est_wind_x = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_0)
+                self.est_wind_y = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_1)
+                self.est_wind_z = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_2)
+                self.earth_mag_vec_E = - int(telemetry_file.last_F2_A_msg.sue_magFieldEarth0)
+                self.earth_mag_vec_N = int(telemetry_file.last_F2_A_msg.sue_magFieldEarth1)
+                self.earth_mag_vec_Z = int(telemetry_file.last_F2_A_msg.sue_magFieldEarth2)  
+                self.svs = int(telemetry_file.last_F2_A_msg.sue_svs)
+                self.hdop = int(telemetry_file.last_F2_A_msg.sue_hdop)
+
+                self.pwm_input[1] = int(telemetry_file.msg.sue_pwm_input_1)
+                self.pwm_input[2] = int(telemetry_file.msg.sue_pwm_input_2)
+                self.pwm_input[3] = int(telemetry_file.msg.sue_pwm_input_3)
+                self.pwm_input[4] = int(telemetry_file.msg.sue_pwm_input_4)
+                self.pwm_input[5] = int(telemetry_file.msg.sue_pwm_input_5)
+                self.pwm_input[6] = int(telemetry_file.msg.sue_pwm_input_6)
+                self.pwm_input[7] = int(telemetry_file.msg.sue_pwm_input_7)
+                self.pwm_input[8] = int(telemetry_file.msg.sue_pwm_input_8)
+                self.pwm_input[9] = int(telemetry_file.msg.sue_pwm_input_9)
+                self.pwm_input[10] = int(telemetry_file.msg.sue_pwm_input_10)
+                
+                self.pwm_output[1] = int(telemetry_file.msg.sue_pwm_output_1)
+                self.pwm_output[2] = int(telemetry_file.msg.sue_pwm_output_2)
+                self.pwm_output[3] = int(telemetry_file.msg.sue_pwm_output_3)
+                self.pwm_output[4] = int(telemetry_file.msg.sue_pwm_output_4)
+                self.pwm_output[5] = int(telemetry_file.msg.sue_pwm_output_5)
+                self.pwm_output[6] = int(telemetry_file.msg.sue_pwm_output_6)
+                self.pwm_output[7] = int(telemetry_file.msg.sue_pwm_output_7)
+                self.pwm_output[8] = int(telemetry_file.msg.sue_pwm_output_8)
+                self.pwm_output[9] = int(telemetry_file.msg.sue_pwm_output_9)
+                self.pwm_output[10] = int(telemetry_file.msg.sue_pwm_output_10)
+
+                self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
+                self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
+                self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
+                self.sue_flags = int(telemetry_file.msg.sue_flags)
+
+                self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
+                self.sue_imu_velocity_x = int(telemetry_file.msg.sue_imu_velocity_x)
+                self.sue_imu_velocity_y = int(telemetry_file.msg.sue_imu_velocity_y)
+                self.sue_imu_velocity_z = int(telemetry_file.msg.sue_imu_velocity_z)
+                self.inline_waypoint_x = int(telemetry_file.msg.sue_waypoint_goal_x)
+                self.inline_waypoint_y = int(telemetry_file.msg.sue_waypoint_goal_y)
+                self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
+                self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
+
+                telemetry_file.SUE_F2_A_needs_printing = False
+                return("F2")
+            else :
+                return("F2_B message received without corresponding F2_A")
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
+            self.roll_stabilization = int(telemetry_file.msg.sue_ROLL_STABILIZATION_AILERONS)
+            #Following line probably needs adding to GE KML
+            self.roll_stabilization_rudder = int(telemetry_file.msg.sue_ROLL_STABILIZATION_RUDDER)
+            self.pitch_stabilization = int(telemetry_file.msg.sue_PITCH_STABILIZATION)
+            self.yaw_stabilization_rudder = int(telemetry_file.msg.sue_YAW_STABILIZATION_RUDDER)
+            self.yaw_stabilization_aileron = int(telemetry_file.msg.sue_YAW_STABILIZATION_AILERON)
+            self.aileron_navigation = int(telemetry_file.msg.sue_AILERON_NAVIGATION)
+            self.rudder_navigation = int(telemetry_file.msg.sue_RUDDER_NAVIGATION)
+            self.use_altitudehold = int(telemetry_file.msg.sue_ALTITUDEHOLD_STABILIZED)
+            #Following line probably needs adding to GE KML
+            self.use_altitudehold_waypoint = int(telemetry_file.msg.sue_ALTITUDEHOLD_WAYPOINT)
+            self.racing_mode = int(telemetry_file.msg.sue_RACING_MODE)
+
+            return("F4")
         
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F5' :
+            self.yawkp_aileron = float(telemetry_file.msg.sue_YAWKP_AILERON)
+            self.yawkd_aileron = float(telemetry_file.msg.sue_YAWKD_AILERON)
+            self.rollkp = float(telemetry_file.msg.sue_ROLLKP)
+            self.rollkd = float(telemetry_file.msg.sue_ROLLKD)
+            self.aileron_boost = float(telemetry_file.msg.sue_AILERON_BOOST)
+
+            return("F5")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F6' :
+            self.pitchgain = float(telemetry_file.msg.sue_PITCHGAIN)
+            self.pitchkd = float(telemetry_file.msg.sue_PITCHKD)
+            self.rudder_elev_mix = float(telemetry_file.msg.sue_RUDDER_ELEV_MIX)
+            self.roll_elev_mix = float(telemetry_file.msg.sue_ROLL_ELEV_MIX)
+            self.elevator_boost = float(telemetry_file.msg.sue_ELEVATOR_BOOST)
+
+            return("F6")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F7' :
+            self.yawkp_rudder = float(telemetry_file.msg.sue_YAWKP_RUDDER)
+            self.yawkd_rudder = float(telemetry_file.msg.sue_YAWKD_RUDDER)
+            self.rollkp_rudder = float(telemetry_file.msg.sue_ROLLKP_RUDDER)
+            self.rollkd_rudder = float(telemetry_file.msg.sue_ROLLKD_RUDDER)
+            self.rudder_boost = float(telemetry_file.msg.sue_RUDDER_BOOST)
+            self.rtl_pitch_down = float(telemetry_file.msg.sue_RTL_PITCH_DOWN)
+
+            return("F7")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F8' :
+            self.heightmax = float(telemetry_file.msg.sue_HEIGHT_TARGET_MAX)
+            self.heightmin = float (telemetry_file.msg.sue_HEIGHT_TARGET_MIN)
+            self.minimumthrottle = float(telemetry_file.msg.sue_ALT_HOLD_THROTTLE_MIN)
+            self.maximumthrottle = float(telemetry_file.msg.sue_ALT_HOLD_THROTTLE_MAX)
+            self.pitchatminthrottle = float(telemetry_file.msg.sue_ALT_HOLD_PITCH_MIN)
+            self.pitchatmaxthrottle = float(telemetry_file.msg.sue_ALT_HOLD_PITCH_MAX)
+            self.pitchatzerothrottle = float(telemetry_file.msg.sue_ALT_HOLD_PITCH_HIGH)
+
+            return("F8")
+            
+        elif (telemetry_file.msg.get_type() == "SERIAL_UDB_EXTRA_F13"):
+            self.gps_week = int(telemetry_file.msg.sue_week_no)
+            self.origin_north = int(telemetry_file.msg.sue_lat_origin)
+            self.origin_east = int(telemetry_file.msg.sue_lon_origin)
+            self.origin_altitude = int(telemetry_file.msg.sue_alt_origin)
+            
+            return("F13")
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' :
+            self.wind_est = int(telemetry_file.msg.sue_WIND_ESTIMATION)
+            self.gps_type = int(telemetry_file.msg.sue_GPS_TYPE)
+            self.dead_reckoning = int(telemetry_file.msg.sue_DR)
+            self.board_type = int(telemetry_file.msg.sue_BOARD_TYPE)
+            self.airframe = int(telemetry_file.msg.sue_AIRFRAME)
+            self.rcon = int(telemetry_file.msg.sue_RCON)
+            self.trap_flags = int(telemetry_file.msg.sue_TRAP_FLAGS)
+            self.trap_source = int(telemetry_file.msg.sue_TRAP_SOURCE)
+            self.alarms = int(telemetry_file.msg.sue_osc_fail_count)
+            self.clock_type = int(telemetry_file.msg.sue_CLOCK_CONFIG)
+            self.flight_plan_type = int(telemetry_file.msg.sue_FLIGHT_PLAN_TYPE)
+
+            return("F14")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
+            self.id_vehicle_model_name = telemetry_file.msg.sue_ID_VEHICLE_MODEL_NAME
+            self.id_vehicle_registration = telemetry_file.msg.sue_ID_VEHICLE_REGISTRATION
+
+            return("F15")
+        
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
+            self.id_lead_pilot = telemetry_file.msg.sue_ID_LEAD_PILOT
+            self.id_diy_drones_url = telemetry_file.msg.sue_ID_DIY_DRONES_URL
+
+            return("F16")
+
+        else :
+            err_message = "Warn:" + telemetry_file.msg.get_type()
+            return(err_message)
+
+class ascii_telemetry(base_telemetry):
+    """Parse a variety of historical ascii telemetry formats"""
     def parse(self,line,line_no, max_tm_actual) :
         self.line_no = line_no
 
@@ -738,7 +1070,7 @@ class telemetry :
                 try:
                     self.ley = int(match.group(1))
                 except:
-                    print "Corrtup :ley value in line", line_no
+                    print "Corrupt :ley value in line", line_no
                     pass
             else :
                 pass # Not a serious error
@@ -778,6 +1110,46 @@ class telemetry :
             else :
                 pass
 
+            match = re.match(".*:tx([-0-9]*?):",line) # IMUvelocity x. 
+            if match :
+                try:
+                    self.IMUvelocityx = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationx value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:ty([-0-9]*?):",line) # IMUvelocity y. 
+            if match :
+                try:
+                    self.IMUvelocityy = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationy value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:tz([-0-9]*?):",line) # IMUvelocity z. 
+            if match :
+                try:
+                    self.IMUvelocityz = int(match.group(1))
+                except:
+                    print "Corrupt IMUlocationz value in line", line_no
+                    return "Error"
+            else :
+                pass
+
+            match = re.match(".*:fgs([-0-9]*?):",line) # flags from defines.h 
+            if match :
+                try:
+                    self.flags = int(match.group(1))
+                except:
+                    print "Corrupt flag values in line", line_no
+                    return "Error"
+            else :
+                pass
+
             match = re.match(".*:G([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
             if match :
                 try:
@@ -787,9 +1159,19 @@ class telemetry :
                 except:
                     print "Corrupt F2: waypoint value in line", line_no
                     pass
+
+            match = re.match(".*:H([-0-9]*?),([-0-9]*?):",line) # Sonar information, if available
+            if match :
+                try:
+                    self.sonar_direct = int(match.group(1))
+                    self.alt_sonar    = int(match.group(2))
+                except:
+                    print "Corrupt F2: sonar value in line", line_no
+                    pass
             
              # line was parsed without major errors
             return "F2"
+            
 
         #################################################################
         # Try Another format of telemetry
@@ -1479,3 +1861,126 @@ def matrix_transpose(a) :
     b[7] = a[5]
     b[8] = a[8]
     return b
+
+def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filename, telemetry_type):
+    """Filter out all the SERIAL_UDB_EXTRA messages from a MAVLink log file, and print them to
+    to a ascii log file."""
+    
+    try:
+        f = open(serial_udb_extra_filename, 'w')
+    except:
+        print "Subroutine write_mavlink_to_serial_udb_extra: Error while trying to open:", serial_udb_extra_filename
+        return
+
+    if (telemetry_type == "SERIAL_MAVLINK_RAW"):
+            m = mavutil.mavlink_connection(telemetry_filename, notimestamps = True)
+    elif (telemetry_type == "SERIAL_MAVLINK_TIMESTAMPS"):
+            m = mavutil.mavlink_connection(telemetry_filename, notimestamps = False)    
+    else:
+            print "Error: Unknown Mavlink file type (not raw or timestamp)."
+            return
+    record_no = 0
+    last_F2_A_message = None
+    while True:
+        msg = m.recv_match(blocking=False)
+        record_no = record_no + 1
+##        # Provide indication of progress
+##        if record_no % 300 == 1:
+##            print ".",
+##        if record_no % 6000 == 1:
+##            print ""
+        if not msg:
+            print ""
+            f.close()
+            return
+        if msg.get_type() == "BAD_DATA":
+            #if mavutil.all_printable(msg.data):
+            #    sys.stdout.write(msg.data)
+            #    sys.stdout.flush()
+            pass
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_A':
+            last_F2_A_message = msg
+            
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F2_B':
+            #try:
+                if last_F2_A_message is None  :
+                    continue
+                if ( last_F2_A_message.sue_time <= msg.sue_time ):
+                    print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
+                     ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \
+                      ( last_F2_A_message.sue_time, bstr( last_F2_A_message.sue_status ), \
+                        last_F2_A_message.sue_latitude, last_F2_A_message.sue_longitude, \
+                        last_F2_A_message.sue_altitude, last_F2_A_message.sue_waypoint_index,  \
+                        last_F2_A_message.sue_rmat0, last_F2_A_message.sue_rmat1, last_F2_A_message.sue_rmat2, \
+                        last_F2_A_message.sue_rmat3, last_F2_A_message.sue_rmat4, last_F2_A_message.sue_rmat5, \
+                        last_F2_A_message.sue_rmat6, last_F2_A_message.sue_rmat7, last_F2_A_message.sue_rmat8, \
+                        last_F2_A_message.sue_cog, last_F2_A_message.sue_sog, last_F2_A_message.sue_cpu_load,  \
+                        last_F2_A_message.sue_voltage_milis, last_F2_A_message.sue_air_speed_3DIMU,            \
+                        last_F2_A_message.sue_estimated_wind_0, last_F2_A_message.sue_estimated_wind_1,        \
+                        last_F2_A_message.sue_estimated_wind_2, \
+                        last_F2_A_message.sue_magFieldEarth0, last_F2_A_message.sue_magFieldEarth1,            \
+                        last_F2_A_message.sue_magFieldEarth2, \
+                        last_F2_A_message.sue_svs, last_F2_A_message.sue_hdop ),
+                    sys.stdout.softspace=False # This stops a space being inserted between print statements
+                    print >> f, "p1i%i:p2i%i:p3i%i:p4i%i:p5i%i:p6i%i:p7i%i:p8i%i:p9i%i:p10i%i:" \
+                                "p1o%i:p2o%i:p3o%i:p4o%i:p5o%i:p6o%i:p7o%i:p8o%i:p9o%i:p10o%i:" \
+                                "imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:stk%d:\r\n" % \
+                      ( msg.sue_pwm_input_1, msg.sue_pwm_input_2, msg.sue_pwm_input_3, msg.sue_pwm_input_4, msg.sue_pwm_input_5, \
+                        msg.sue_pwm_input_6, msg.sue_pwm_input_7, msg.sue_pwm_input_8, msg.sue_pwm_input_9, msg.sue_pwm_input_10,\
+                        msg.sue_pwm_output_1, msg.sue_pwm_output_2, msg.sue_pwm_output_3, \
+                        msg.sue_pwm_output_4, msg.sue_pwm_output_5, msg.sue_pwm_output_6, \
+                        msg.sue_pwm_output_7, msg.sue_pwm_output_8, msg.sue_pwm_output_9, \
+                        msg.sue_pwm_output_10, msg.sue_imu_location_x, msg.sue_imu_location_y, msg.sue_imu_location_z,  \
+                        msg.sue_flags, msg.sue_osc_fails,                                         \
+                        msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,   \
+                        msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,\
+                        msg.sue_memory_stack_free ),
+                    last_F2_A_message.sue_time = msg.sue_time
+            #except:
+                #pass
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F4' :
+            print >> f, "F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:" \
+                      "RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n" % \
+              ( msg.sue_ROLL_STABILIZATION_AILERONS, msg.sue_ROLL_STABILIZATION_RUDDER,   \
+                    msg.sue_PITCH_STABILIZATION, msg.sue_YAW_STABILIZATION_RUDDER,            \
+                    msg.sue_YAW_STABILIZATION_AILERON, msg.sue_AILERON_NAVIGATION,            \
+                    msg.sue_RUDDER_NAVIGATION, msg.sue_ALTITUDEHOLD_STABILIZED,               \
+                    msg.sue_ALTITUDEHOLD_WAYPOINT, msg.sue_RACING_MODE ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F5' :
+            print >> f, "F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n" % \
+                  ( msg.sue_YAWKP_AILERON, msg.sue_YAWKD_AILERON, msg.sue_ROLLKP, \
+                    msg.sue_ROLLKD, msg.sue_AILERON_BOOST ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F6' :
+            print >> f, "F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n" % \
+                  ( msg.sue_PITCHGAIN, msg.sue_PITCHKD, msg.sue_RUDDER_ELEV_MIX, \
+                    msg.sue_ROLL_ELEV_MIX, msg.sue_ELEVATOR_BOOST),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F7' :
+            print >> f, "F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:" \
+                  "RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n"  % \
+                   ( msg.sue_YAWKP_RUDDER, msg.sue_YAWKD_RUDDER, msg.sue_ROLLKP_RUDDER , \
+                     msg.sue_ROLLKD_RUDDER , msg.sue_RUDDER_BOOST, msg.sue_RTL_PITCH_DOWN),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F8' :
+            print >> f, "F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:" \
+                  "PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n" % \
+                  ( msg.sue_HEIGHT_TARGET_MAX, msg.sue_HEIGHT_TARGET_MIN, \
+                    msg.sue_ALT_HOLD_THROTTLE_MIN, msg.sue_ALT_HOLD_THROTTLE_MAX, \
+                    msg.sue_ALT_HOLD_PITCH_MIN, msg.sue_ALT_HOLD_PITCH_MAX, \
+                    msg.sue_ALT_HOLD_PITCH_HIGH),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F13' :
+            print >> f, "F13:week%i:origN%li:origE%li:origA%li:\r\n" % \
+                  (msg.sue_week_no, msg.sue_lat_origin, msg.sue_lon_origin, msg.sue_alt_origin),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F14' :
+            print >> f, "\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+                       "CLOCK=%i:FP=%d:\r\n" % \
+                  ( msg.sue_WIND_ESTIMATION, msg.sue_GPS_TYPE, msg.sue_DR, msg.sue_BOARD_TYPE, \
+                    msg.sue_AIRFRAME, msg.sue_RCON, msg.sue_TRAP_FLAGS, msg.sue_TRAP_SOURCE, \
+                    msg.sue_osc_fail_count, msg.sue_CLOCK_CONFIG, msg.sue_FLIGHT_PLAN_TYPE ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
+            print >> f, "F15:IDA=%s:IDB=%s:\r\n" % \
+                  ( msg.sue_ID_VEHICLE_MODEL_NAME, msg.sue_ID_VEHICLE_REGISTRATION ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
+            print >> f, "F16:IDC=%s:IDD=%s:\r\n" % \
+                  ( msg.sue_ID_LEAD_PILOT, msg.sue_ID_DIY_DRONES_URL ),
+        else :
+            pass
+ 

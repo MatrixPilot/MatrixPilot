@@ -18,55 +18,32 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#if (BOARD_TYPE == UDB4_BOARD)
 
 #ifndef I2C_H
 #define I2C_H
 
-//******************************************************************
-// I2C driver for UDB4/5 and AUAV3
-//
-// To write 
-//  Set I2C1_rx_data_size to zero
-//  Set I2C1_tx_data_size to data size plus address size
-//  Set I2C1_writeCommandByte
-//  Set pI2C1txBuffer to transmit data buffer
-//
-// To read 
-//  set I2C1_tx_data_size to the size of address in bytes
-//  Set I2C1_writeCommandByte
-//  Set I2C1_rx_data_size to number of bytes to read
-//  Set pI2C1txBuffer to transmit data buffer
-//  Set pI2C1rxBuffer to receive data buffer
-// Read will send the address as a write followed by the read
-//
-
 #include "libUDB_internal.h"
 
-// callback type for I2C user
 typedef void (*I2C_callbackFunc)(boolean);
 
-// Start a transaction and take ownership of I2C bus.
-// returns false if I2C is busy or not initialized
-// command = command specific to device
-// ptxData = pointer to transmit data buffer
-// prxData = pointer to recieve data buffer
-// txSize = size of transmited data in bytes
-// rxSize = size of received data in bytes
-// pCallback = pointer to callback function for finish or error.
-extern boolean I2C1_Write(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback);
+typedef enum
+{
+	I2C_MODE_READ_ONLY,
+	I2C_MODE_WRITE_ADDR_READ,
+	I2C_MODE_WRITE,
+} I2C_MODES; 
 
-extern boolean I2C1_Read(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback);
+boolean I2C1_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback);
+boolean I2C1_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode);
+boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback);
+boolean I2C1_Normal(void);
+void I2C1_Trigger(void);
 
-// Check for I2C ACK on command
-extern boolean I2C1_checkACK(uint16_t command, I2C_callbackFunc pCallback);
-
-// Trigger the I2C1 service routine to run at low priority
-extern void I2C1_trigger_service(void);
-
-// Trigger the I2C1 service routine to run at low priority
-extern void I2C1_init(void);
+boolean I2C2_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback);
+boolean I2C2_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode);
+boolean I2C2_CheckACK(uint8_t addr, I2C_callbackFunc callback);
+boolean I2C2_Normal(void);
+void I2C2_Trigger(void);
+void I2C2_Reset(void);
 
 #endif // I2C_H
-
-#endif	// UDB4 BOARD
