@@ -20,7 +20,7 @@
 
 
 #include "libUDB_internal.h"
-#include "interrupt.h"  //  added to fix minor build/compile issue; auth. Robert 12/07/2013
+#include "interrupt.h"
 
 #if (USE_SONAR == 1)
 
@@ -41,26 +41,30 @@ uint16_t get_sonar_count(void)
 void udb_init_sonar(void)
 {
 	// Setup Channel 8 for Sonar
-    // Sonar PWM Pulses are at 58 micro seconds per cm measured. Maximum for MB1230 is 765 cm. So Max Pulse is 44370 micro seconds.
+	// Sonar PWM Pulses are at 58 micro seconds per cm measured. Maximum for MB1230 is 765 cm. So Max Pulse is 44370 micro seconds.
 	// ( MB1260 Maximum is 1053cm. So Max Pulse is 61074)
-    // Clock of timer is running at 16,000,000 Hz. So Max Sonar Pulse is 16000000 * 0.044379 clock pulses which is 710064 pulses. 
-    // If prescales of the timer is set to 64, then maxumum sonar measurement within matrixPIlot for MB1220 is 710064 / 64 = 11095.
+	// Clock of timer is running at 16,000,000 Hz. So Max Sonar Pulse is 16000000 * 0.044379 clock pulses which is 710064 pulses. 
+	// If prescales of the timer is set to 64, then maxumum sonar measurement within matrixPIlot for MB1220 is 710064 / 64 = 11095.
 	// ( For MB1260 maxumum will be 14.5 * 1053 which is 15268.5 )
-    // If minimum reading is 0.2 meters, then minimum PWM is  (20 * 58) = 1160 micro seconds. So the
-    // minimum integer in MatrixPilot should then be (16000000 * 0.001160) / 64 = 290
+	// If minimum reading is 0.2 meters, then minimum PWM is  (20 * 58) = 1160 micro seconds. So the
+	// minimum integer in MatrixPilot should then be (16000000 * 0.001160) / 64 = 290
 	// Each unit of UDB PWM sonar pulse is 64 / 16000000 seconds which is 0.000004 seconds in length.
-    // Therefore each centimeter of measured distance will show 0.000058 / 0.000004 or 58 or 14.5 UDB PWM sonar units / centimeter.
+	// Therefore each centimeter of measured distance will show 0.000058 / 0.000004 or 58 or 14.5 UDB PWM sonar units / centimeter.
 
 	TMR3 = 0;               // initialize timer
 	T3CONbits.TCKPS = 2;    // prescaler = 64,  see page 175 at http://ww1.microchip.com/downloads/en/DeviceDoc/70593C.pdf
 	T3CONbits.TCS = 0;      // use the internal clock
 	T3CONbits.TON = 1;      // turn on timer 3
-
-    IC8CONbits.ICTMR = 0;   // use timer 3
+#if (BOARD_TYPE == AUAV3_BOARD)
+	IC8CON1bits.ICTSEL = 0;   // use timer 3
+	IC8CON1bits.ICM = 1;     // capture every edge
+#else
+	IC8CONbits.ICTMR = 0;   // use timer 3
 	IC8CONbits.ICM = 1;     // capture every edge
+#endif // BOARD_TYPE
 	_TRISD15 = 1;
 	_IC8IP = 6;
-	_IC8IF = 0; 
+	_IC8IF = 0;
 	_IC8IE = 1;             // enable sonar intterupt
 }
 
@@ -68,11 +72,15 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 {
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-	
+
 	uint16_t time;
 
 	_IC8IF = 0;             // clear the interrupt
+#if (BOARD_TYPE == AUAV3_BOARD)
+	while (IC8CON1bits.ICBNE)
+#else
 	while (IC8CONbits.ICBNE)
+#endif // BOARD_TYPE
 	{
 		time = IC8BUF;
 	}
@@ -83,9 +91,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 	}
 	else
 	{
-		udb_pwm_sonar = time - udb_pwm_sonar_rise;	
+		udb_pwm_sonar = time - udb_pwm_sonar_rise;
 		udb_flags._.sonar_updated = 1;
-	}	
+	}
 	interrupt_restore_corcon;
 }
 
