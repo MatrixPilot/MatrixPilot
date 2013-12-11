@@ -87,7 +87,9 @@ static void TaskGPS(void* pvParameters)
 //		xSemaphoreTake(xSemaphoreGPS, portMAX_DELAY);
 //		DPRINT("gps\r\n");
 		vTaskDelay(1000 / portTICK_RATE_MS);
+#if (BAROMETER_ALTITUDE == 1)
 		rxBarometer(NULL);
+#endif // BAROMETER_ALTITUDE
 	}
 }
 
