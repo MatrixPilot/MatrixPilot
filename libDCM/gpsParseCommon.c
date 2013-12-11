@@ -19,8 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../libUDB/background_int.h"
-
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 #include "estAltitude.h"

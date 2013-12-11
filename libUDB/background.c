@@ -19,8 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "background_int.h"
-
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
