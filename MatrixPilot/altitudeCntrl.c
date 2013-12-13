@@ -84,72 +84,72 @@ void init_altitudeCntrl(void)
 
 #if (SPEED_CONTROL == 1)  // speed control loop
 
-static int32_t excess_energy_height(void) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
-{
-	int16_t speedAccum = 6 * desiredSpeed;
-	int32_t equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum));
-	int32_t equivalent_energy_ground_speed = equivalent_energy_air_speed;
-	int16_t speed_component;
-	union longww accum;
-	union longww forward_ground_speed;
-
-	speed_component = IMUvelocityx._.W1 - estimatedWind[0];
-	accum.WW = __builtin_mulsu(speed_component, 37877);
-	equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
-
-	speed_component = IMUvelocityy._.W1 - estimatedWind[1];
-	accum.WW = __builtin_mulsu(speed_component, 37877);
-	equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
-
-	speed_component = IMUvelocityz._.W1 - estimatedWind[2];
-	accum.WW = __builtin_mulsu(speed_component, 37877);
-	equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
-
-	// compute the projection of the ground speed in the forward direction
-	forward_ground_speed.WW = ((__builtin_mulss(-IMUvelocityx._.W1, rmat[1])
-	                          + __builtin_mulss( IMUvelocityy._.W1, rmat[4])) << 2);
-
-	// if we are going forward, add the energy, otherwise, subract it
-	accum.WW = __builtin_mulsu(forward_ground_speed._.W1, 37877);
-	if (forward_ground_speed._.W1 > 0)
+	static int32_t excess_energy_height(void) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
 	{
-		equivalent_energy_ground_speed += __builtin_mulss(accum._.W1, accum._.W1);
+		int16_t speedAccum = 6 * desiredSpeed;
+		int32_t equivalent_energy_air_speed = -(__builtin_mulss(speedAccum, speedAccum));
+		int32_t equivalent_energy_ground_speed = equivalent_energy_air_speed;
+		int16_t speed_component;
+		union longww accum;
+		union longww forward_ground_speed;
+	
+		speed_component = IMUvelocityx._.W1 - estimatedWind[0];
+		accum.WW = __builtin_mulsu(speed_component, 37877);
+		equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
+	
+		speed_component = IMUvelocityy._.W1 - estimatedWind[1];
+		accum.WW = __builtin_mulsu(speed_component, 37877);
+		equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
+	
+		speed_component = IMUvelocityz._.W1 - estimatedWind[2];
+		accum.WW = __builtin_mulsu(speed_component, 37877);
+		equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
+	
+		// compute the projection of the ground speed in the forward direction
+		forward_ground_speed.WW = ((__builtin_mulss(-IMUvelocityx._.W1, rmat[1])
+		                          + __builtin_mulss( IMUvelocityy._.W1, rmat[4])) << 2);
+	
+		// if we are going forward, add the energy, otherwise, subract it
+		accum.WW = __builtin_mulsu(forward_ground_speed._.W1, 37877);
+		if (forward_ground_speed._.W1 > 0)
+		{
+			equivalent_energy_ground_speed += __builtin_mulss(accum._.W1, accum._.W1);
+		}
+		else
+		{
+			equivalent_energy_ground_speed -= __builtin_mulss(accum._.W1, accum._.W1);
+		}
+	
+		// return the smaller of the energies of ground and air speed
+		// to keep both of them from getting too small
+		if (equivalent_energy_ground_speed < equivalent_energy_air_speed)
+		{
+			return equivalent_energy_ground_speed;
+		}
+		else
+		{
+			return equivalent_energy_air_speed;
+		}
 	}
-	else
+	#else
+	
+	static int32_t excess_energy_height(void)
 	{
-		equivalent_energy_ground_speed -= __builtin_mulss(accum._.W1, accum._.W1);
+		return 0;
 	}
-
-	// return the smaller of the energies of ground and air speed
-	// to keep both of them from getting too small
-	if (equivalent_energy_ground_speed < equivalent_energy_air_speed)
-	{
-		return equivalent_energy_ground_speed;
-	}
-	else
-	{
-		return equivalent_energy_air_speed;
-	}
-}
-#else
-
-static int32_t excess_energy_height(void)
-{
-	return 0;
-}
-
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
-// Stored in 10ths of meters per second
-int16_t desiredSpeed = (DESIRED_SPEED*10);
-#endif // SERIAL_OUTPUT_FORMAT
+	
+	#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+		// Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
+		// Stored in 10ths of meters per second
+		int16_t desiredSpeed = (DESIRED_SPEED*10);
+	#endif // SERIAL_OUTPUT_FORMAT
 
 #endif //(SPEED_CONTROL == 1)  // speed control loop
 
 void altitudeCntrl(void)
 {
 	#if (USE_SONAR == 1)
-		calcSonarAGLAltitude();//calculate_sonar_height_above_ground();
+		calcSonarAGLAltitude();//calculate sonar AGL altitude (sonarCntrl.c);
 	#endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)
 	{
