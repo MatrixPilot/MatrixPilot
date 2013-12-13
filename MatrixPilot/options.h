@@ -92,7 +92,7 @@
 //    AIRFRAME_HELI             
 //    AIRFRAME_QUAD           
 //
-#define AIRFRAME_TYPE                       AIRFRAME_STANDARD
+#define AIRFRAME_TYPE                       AIRFRAME_VTAIL
 
 // BOARD ORIENTATION
 // Note:
@@ -117,7 +117,7 @@
 
 // MANDATORY GPS
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
-#define GPS_TYPE                            GPS_STD  
+#define GPS_TYPE                            GPS_STD   // 
 
 // GPS Baud rate, uncomment to specify a rate other than default, leave commented to use default
 //#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
@@ -166,6 +166,21 @@
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
 // This setup works only with a 8C PPM encoder and an 8 channel, minimum, TX-RX (DX8)
+/*  DEFAULT
+#define THROTTLE_INPUT_CHANNEL				CHANNEL_3
+#define AILERON_INPUT_CHANNEL				CHANNEL_1
+#define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
+#define RUDDER_INPUT_CHANNEL				CHANNEL_5
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_4
+#define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
+#define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
+#define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
+#define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
+#define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
+#define PASSTHROUGH_D_INPUT_CHANNEL			CHANNEL_UNUSED
+*/
 //                                                              physical >> PPM IN << channels to AR8000 Rx / DX8 TX
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_1            // PPM/C1 to RxC1  Throttle
 #define AILERON_INPUT_CHANNEL				CHANNEL_2 		     // PPM/C2 to RxC2  Ail
@@ -206,6 +221,20 @@
 // NOTE: If your board is powered from your ESC through the throttle cable, make sure to
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
+/*  DEFAULT
+#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3
+#define AILERON_OUTPUT_CHANNEL				CHANNEL_1
+#define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
+#define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
+#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
+#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
+#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
+#define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
+#define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_D_OUTPUT_CHANNEL		CHANNEL_UNUSED
+*/
 //                                                                physical pin to servo/controls connections
 //  UDB4/UDB3/PPM_ALT_OUTPUT_PINS=1 OPTIONS 
 #define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3            // Out3 to ESC/BL Motor  
@@ -227,9 +256,9 @@
 // Servo Reversing Configuration
 // For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-#define AILERON_CHANNEL_REVERSED            1
-#define ELEVATOR_CHANNEL_REVERSED           0
-#define RUDDER_CHANNEL_REVERSED             1
+#define AILERON_CHANNEL_REVERSED            0
+#define ELEVATOR_CHANNEL_REVERSED           1  // reversed for breeze vtail glider 0 def for standard
+#define RUDDER_CHANNEL_REVERSED             0  // 1 or reverse for standard
 #define AILERON_SECONDARY_CHANNEL_REVERSED  0
 #define THROTTLE_CHANNEL_REVERSED           0
 #define CAMERA_PITCH_CHANNEL_REVERSED       0
@@ -284,10 +313,10 @@
 // clockwise from the north, east is plus, west is minus.
 //  Mississauga, ON is Lat 45.58 N and Long 79.65 W, Mag. Decl. therefore is 10deg21' W or -10.35 degrees
 //  Bennet Field Springvale, ON is Lat 42deg58' N and Long 80deg9' W, Mag. Decl. therefore is 9deg48' W or -9.48 degrees
-#define MAGNETICDECLINATION -10.35  // 0
+#define MAGNETICDECLINATION 				-10.35  // 0
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
-#define DECLINATIONANGLE_VARIABLE 0
+#define DECLINATIONANGLE_VARIABLE 			0
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.
@@ -335,14 +364,14 @@
 //   eg. PN: Home front yard 13200, OMFC, SF 16950
 #define ASL_GROUND_ALT						13200	// in centimeters
 
-// USE_PA_PRESSURE if 0, barometric alt will be base on ASL ground altitude defined below
-// if set to 1, will use hPA and if set to 2, will use mercury inch based on METAR/station computation
+// USE_PA_PRESSURE 
+// if set to 1, will use hPA PA_PRESSURE and if set to 2, will use MC_PRESSURE mercury inch based on METAR/station computation
 #define USE_PA_PRESSURE						2    
 
 // PA_PRESSURE below is for Ontario, Canada as of 11-16-2012, 1029.6826 hPA from
 // http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query=Mississauga%2C+Canada
-#define PA_PRESSURE							101300   // in (1013 pa) hPA 							[set USE_PA_PRESSURE to 1]
-#define MC_PRESSURE							3016   	 // 30.16 in. mercury METAR) altimeter/pressure [set USE_PA_PRESSURE to 2]
+#define PA_PRESSURE							1013.00   // in (1013 pa) PA  [set USE_PA_PRESSURE to 1]
+#define MC_PRESSURE							30.16     // 30.16 in. mercury METAR) altimeter/pressure [set USE_PA_PRESSURE to 2]
 
 // Barometer oversampling [OSS] can be set from 0 thru 3
 //				  [ms]  Ave/cur/uA   [hPA]      [m]
@@ -351,7 +380,15 @@
 //  1	 1		  4.5		3		  0.06		0.5  [standard]
 //  2	 1		  4.5		3		  0.06		0.5  [high resolution]
 //  3	 1		  4.5		3		  0.06		0.5  [ultra high resolution]
-#define OSS 								2
+#define OSS 								1
+
+// FOR DEBUGGING TRIGGER LOCATION of barometer function altimeter_calibrate() 
+//     0  from navigate.c          1 from states.c
+#define RUN_ALTCAL_FRM   					1  
+
+// FOR DEBUGGING CALCULATED VALUES in estAltitude.c, requires USE_PA_PRESSURE set to either 0, 1 or 2,
+//    uncomment and will run simple, comment out, complex experimental algorithm and caculation of values
+// #define RUN_SIMPLE_BARCALC 
 
 // Uncomment the ff. #define USE_PRESSURE_ALT to use barometer pressure altitude instead of GPS altitude
 //    algorithm in the gpsParseCommon.c program
@@ -372,11 +409,6 @@
 //     Adjust any serial telemetry logging and transmitting device to same baud rate.
 #define USE_SONAR							1
 
-//  >>>>>>>>>>>    WIP NOTES:  TEMP TESTING PARAMS FOR SONAR TAKE OUT ONCE TESTED
-// Set USE_SONAR_INPUT to the input capture channel which the sensor
-// is connected to. Currently on channel 8 is supported.
-#define USE_SONAR_VER                    8  // WIP NOTES:  CHANNEL CONNECTION TRANSFERED TO APPROPRIATE PARAM LOGICAL GROUPING
-
 // Works with UDB4, UDB5 and AUAV3. This feature can only be combined with USE_SONAR set to 1, below.
 // Design for supporting autonomous and soft precision landing flight plan in LOGO.  
 // Otherwise, set to 0 to use GPS and IMU estimated ALTITUDE. 
@@ -387,12 +419,13 @@
 // This specifies the tested effective and vendor max range of the type of sonar being used: . 
 // 	400 cm (4 m) effective and 750 cm max (vendor rated) for an MB1230 XL-MaxSonar-EZ3 
 // 	500 cm (5 m) effective and 1000 cm max (10 m vendor rated) for an  MB1261 XL-MaxSonar-EZL1
-#define EFFECTV_SONAR_ALTRANGE                400 // Reliable Sonar measurement distance (centimeters) for your specific landing area.
-#define MAXIMUM_SONAR_ALTRANGE                750 // Distance in centimeters that denotes "out of range" for your Sonar device.
-#define SONAR_MINIMUM_VALREADS                  2 // Def 3, number of validation readings threshold of a true reading, higher valued 
+#define EFFECTV_SONAR_ALTRANGE                400 // Def 450 Reliable Sonar measurement distance (centimeters) for your specific landing area.
+#define MAXIMUM_SONAR_ALTRANGE                700 // Distance in centimeters that denotes "out of range" for your Sonar device.
+#define SONAR_MINIMUM_VALREADS                  1 // Def 3, number of validation readings threshold of a true reading, higher valued 
                                                   //    increases integrity/error filtering, but slows down the aglaltitude feed and 
                                                   //    observed to cause intermentent blank feed in the telemetry log
 
+//#define USE_SONARVAN  // FOR DEBUGGING: Uncomment to run vanilla, comment to use modified sonar calculate algorithm 
 
 //////////////////////   II.4. TELEMETRY, ON SCREEN DISPLAY (OSD) SETUP     ////////////////////
 //
@@ -406,7 +439,7 @@
 
 // set this to 1 to use the SPI peripheral, 0 to bit-bash 
 // while osd_spi.c identifies SPI1 port (CK1 DO1 DI1) used for native osd applies to UDB5
-#define USE_OSD_SPI     1  //1
+#define USE_OSD_SPI     				1  //1
 
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
 // SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
@@ -607,7 +640,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN                  16 //32
+#define CROSS_TRACK_MARGIN                  16 // def 32
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -625,7 +658,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED             AH_FULL  //AH_PITCH_ONLY
+#define ALTITUDEHOLD_STABILIZED             AH_FULL  // def AH_PITCH_ONLY
 #define ALTITUDEHOLD_WAYPOINT               AH_FULL
 
 // Speed Control
@@ -637,8 +670,8 @@
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
-#define INVERTED_FLIGHT_STABILIZED_MODE     0
-#define INVERTED_FLIGHT_WAYPOINT_MODE       0
+#define INVERTED_FLIGHT_STABILIZED_MODE     1
+#define INVERTED_FLIGHT_WAYPOINT_MODE       1
 
 // Hovering
 // Set these to 1 to enable stabilization of hovering in stabilized and/or waypoint modes.
@@ -655,70 +688,8 @@
 #define RACING_MODE_WP_THROTTLE             1.0
 
 
-//////////////////////////    III.2  FLIGHT PLAN AND FAILSAFE SETUP    ////////////////////////////
-// Flight Plan handling
-//
-// You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
-// Set this to either FP_WAYPOINTS or FP_LOGO
-// The Waypoint definitions and options are located in the waypoints.h file.
-// The Logo flight plan definitions and options are located in the flightplan-logo.h file.
-#define FLIGHT_PLAN_TYPE                    FP_LOGO
 
-// Set this to either LOGO_SIMPLE or LOGO_VARIABLE
-// With LG_SIMPLE activates a simple AUTO MODE invoked LOGO flight plan.
-// With LG_VARIABLE, AUTO MODE will invoke a LOGO fight plan with pattern and properties configuratble 
-//   from a radio TX, realtime and dynamically while in flight
-#define LOGO_TYPE                    		LOGO_VARIABLE
-
-// Return To Launch Pitch Down in degrees, a real number.
-// this is the real angle in degrees that the nose of the plane will pitch downward during a return to launch.
-// it is used to increase speed (and wind penetration) during a return to launch.
-// set it to zero if you do not want to use this feature.
-// This only takes effect when entering RTL mode, which only happens when the plane loses the transmitter signal.
-#define RTL_PITCH_DOWN                      0.0
-
-// The Failsafe Channel is the RX channel that is monitored for loss of signal
-// Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
-//
-// For a receiver that remembers a failsafe value for when it loses the transmitter signal,
-// like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
-// the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value
-// between the receiver's programmed failsafe value and the transmitter's normal lowest
-// value for that channel.  This way the firmware can detect the difference between a normal
-// signal, and a lost transmitter.
-//
-// FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
-// Normal signals should fall within about 2000 - 4000.
-#define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN                  1500
-#define FAILSAFE_INPUT_MAX                  4500
-
-// FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
-// signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
-//
-// When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
-// as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
-// is set to return to a point above the location where the UDB was powered up, and to loiter there.
-// See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
-//
-// When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
-// defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
-// when it lost signal, the plane will just continue following the main flight plan without
-// starting them over.  And if the transmitter is still in waypoint mode when the UDB sees it
-// again, the UDB will still continue following the main flight plan without restarting.  If
-// the UDB loses signal while not in waypoint mode, it will start the main flight plan from the
-// beginning.
-#define FAILSAFE_TYPE                       FAILSAFE_RTL
-
-// When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
-// regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
-// to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
-// and keeps switching into and out of Failsafe mode, which depending on your configuration,
-// could be confusing and/or dangerous.
-#define FAILSAFE_HOLD                       0
-
-
-////////////////////    III.3  CONTROL GAINS, LIMITS AND RATES FINETUNING    //////////////////////
+////////////////////    III.2  CONTROL GAINS, LIMITS AND RATES FINETUNING    //////////////////////
 //
 // All gains should be positive real numbers.
 // Proportional gains should be less than 4.0.
@@ -739,7 +710,7 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-/*
+/* Def.:
 #define ROLLKP                              0.20
 #define ROLLKD                              0.05
 #define YAWKP_AILERON                       0.10
@@ -747,9 +718,9 @@
 #define AILERON_BOOST                       1.00
 */
 #define ROLLKP								0.25  // 0.25
-#define ROLLKD								0.05  // 0.08
-#define YAWKP_AILERON						0.12  // 0.08
-#define YAWKD_AILERON						0.04
+#define ROLLKD								0.07  // 0.08
+#define YAWKP_AILERON						0.18  // 0.08
+#define YAWKD_AILERON						0.05
 #define AILERON_BOOST						1.00
 
 // Elevator/Pitch Control Gains
@@ -758,7 +729,7 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-/*
+/* Def.:
 #define PITCHGAIN                           0.10
 #define PITCHKD                             0.04
 #define RUDDER_ELEV_MIX                     0.20
@@ -767,13 +738,13 @@
 */
 #define PITCHGAIN							0.11  // 0.12
 #define PITCHKD								0.04  // 0.07
-#define RUDDER_ELEV_MIX						0.18  
-#define ROLL_ELEV_MIX						0.05
+#define RUDDER_ELEV_MIX						0.16  // reduced for vtail configuration
+#define ROLL_ELEV_MIX						0.06
 #define ELEVATOR_BOOST						0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-#define INVERTED_NEUTRAL_PITCH              9.0 // 8.0
+#define INVERTED_NEUTRAL_PITCH              8.2 // def. 9.0
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder navigation
@@ -823,43 +794,102 @@
 #define HOVER_NAV_MAX_PITCH_RADIUS         20
 
 
-///////////////////////    III.4  ALTITUDE HOLD AND THROTTLE SETUP    /////////////////////////////
-// Configure altitude hold
+///////////////////////    III.3  ALTITUDE HOLD AND THROTTLE SETUP    /////////////////////////////
+// 
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN                   25.0
-#define HEIGHT_TARGET_MAX                   100.0
+#define HEIGHT_TARGET_MIN                   4.0  //25.00
+#define HEIGHT_TARGET_MAX                   500.0  // def. 100m, 500m is 1640.42ft, 600m is 1968.5ft 
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN                       10
+#define HEIGHT_MARGIN                       6 // def. 10
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
 // when within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
-#define ALT_HOLD_THROTTLE_MIN               0.35
-#define ALT_HOLD_THROTTLE_MAX               1.0
+#define ALT_HOLD_THROTTLE_MIN               0.38  // def. 0.35
+#define ALT_HOLD_THROTTLE_MAX               0.75  // def. 1.0
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when
 // within HEIGHT_MARGIN of the target height.
 // Use ALT_HOLD_PITCH_HIGH when above HEIGHT_MARGIN of the target height.
 // Pitch values are in degrees.  Negative values pitch the plane down.
-#define ALT_HOLD_PITCH_MIN                 -15.0
+#define ALT_HOLD_PITCH_MIN                 -16.0  //def 15
 #define ALT_HOLD_PITCH_MAX                  15.0
-#define ALT_HOLD_PITCH_HIGH                -15.0
+#define ALT_HOLD_PITCH_HIGH                -16.0  //def 15
 
+//////////////////////////    III.4  FLIGHT PLAN AND FAILSAFE SETUP    ////////////////////////////
+// Flight Plan handling
+//
+// You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
+// Set this to either FP_WAYPOINTS or FP_LOGO
+// The Waypoint definitions and options are located in the waypoints.h file.
+// The Logo flight plan definitions and options are located in the flightplan-logo.h file.
+#define FLIGHT_PLAN_TYPE                    FP_LOGO
 
+// Set this to either LOGO_SIMPLE or LOGO_VARIABLE
+// With LOGO_SIMPLE AUTO MODE invokes fix LOGO flight plan.
+// With LOGO_VARIABLE, AUTO MODE invokes LOGO fight plan with pattern and properties 
+//   controlled from a radio TX,  while in flight
+//#define LOGO_TYPE                    		LOGO_VARIABLE  //WIP, to accommodate an option for beginners
+
+// Return To Launch Pitch Down in degrees, a real number.
+// this is the real angle in degrees that the nose of the plane will pitch downward during a return to launch.
+// it is used to increase speed (and wind penetration) during a return to launch.
+// set it to zero if you do not want to use this feature.
+// This only takes effect when entering RTL mode, which only happens when the plane loses the transmitter signal.
+#define RTL_PITCH_DOWN                      0.0
+
+// The Failsafe Channel is the RX channel that is monitored for loss of signal
+// Make sure this is set to a channel you actually have plugged into the UAV Dev Board!
+//
+// For a receiver that remembers a failsafe value for when it loses the transmitter signal,
+// like the Spektrum AR6100, you can program the receiver's failsafe value to a value below
+// the normal low value for that channel.  Then set the FAILSAFE_INPUT_MIN value to a value
+// between the receiver's programmed failsafe value and the transmitter's normal lowest
+// value for that channel.  This way the firmware can detect the difference between a normal
+// signal, and a lost transmitter.
+//
+// FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
+// Normal signals should fall within about 2000 - 4000.
+#define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
+#define FAILSAFE_INPUT_MIN                  1500
+#define FAILSAFE_INPUT_MAX                  4500
+
+// FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
+// signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
+//
+// When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
+// as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
+// is set to return to a point above the location where the UDB was powered up, and to loiter there.
+// See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
+//
+// When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
+// defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
+// when it lost signal, the plane will just continue following the main flight plan without
+// starting them over.  And if the transmitter is still in waypoint mode when the UDB sees it
+// again, the UDB will still continue following the main flight plan without restarting.  If
+// the UDB loses signal while not in waypoint mode, it will start the main flight plan from the
+// beginning.
+#define FAILSAFE_TYPE                       FAILSAFE_RTL
+
+// When FAILSAFE_HOLD is set to 1, then once Failsafe has engaged, and you have subsequently
+// regained your RC TX-RX connection, you will need to manually change the Mode Switch in order
+// to exit Failsafe mode.  This avoids the situation where your plane flies in and out of range,
+// and keeps switching into and out of Failsafe mode, which depending on your configuration,
+// could be confusing and/or dangerous.
+#define FAILSAFE_HOLD                       1
 
 ///////////////    IV. FLIGHT SIMULATION, COMMUNICATION, ADVANCE OPTIONS SETUP    ////////////////
 // 
 //    Section to manage:  WIP description
-//                      
-//								
+						
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -896,11 +926,16 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
+/*
 #define ID_VEHICLE_MODEL_NAME               "Not Defined"
 #define ID_VEHICLE_REGISTRATION             "Not Defined"
 #define ID_LEAD_PILOT                       "Not Defined"
 #define ID_DIY_DRONES_URL                   "http://www.diydrones.com"
-
+*/
+#define ID_VEHICLE_MODEL_NAME "Breeze2K-APS103"
+#define ID_VEHICLE_REGISTRATION "EZB-BAPS"
+#define ID_LEAD_PILOT "DB-EZFLIER"
+#define ID_DIY_DRONES_URL ""
 
 /////////////////////////    IV.2  DATA COM AND OTHER ADVANCE OPTIONS    //////////////////////////
 //
