@@ -1,25 +1,30 @@
-#define THISFIRMWARE "MxPilotPlane APS1282.fwstd.t023"  
+#define THISFIRMWARE "MxPPlane-APS1282-brz2k.t105"  
 
-/*  TEST RELEASE# T011fw, Breeze V-tail glider airframe
+/*  TEST RELEASE# T105fw, Breeze V-tail glider airframe
  *  
  *  Modifications (dberroya):
  *  
- *  Added i2c2 queued algorithm to support Magnetometer and Barometer (WIP) sensors to use i2c2 pins
+ *  Added i2c2 queued algorithm (to support Magnetometer and Barometer (WIP) sensors to use UDB4's i2c2 pins
  *  Added Sonar AGL altitude enhanced LOGO, navigation and deadreckoning modules using Pete and Robert's codes as baseline
  *  Reorganized options.h to enhance logical groupings and to include paremeter (from other header files) for ease of use 
  *     single point of access, simplification of finetuning 
+ *  Added new compiler library/header files to support int/uint~_t data types and incrementaly, iteratively with ground 
+ *     testing, propagate throughout, per DEVWIP 1).
  *
- *  DEVWIP : 1) Get Barometer algorithm to work and fuse with altitude management
+ *  DEVWIP : 1) Work in trunk's 3104 codes and components to support portability to UDB5 and AUAV3
+ *  		 2) Get Barometer algorithm to work with filters/sampling/health check and fuse with altitude management
  *
  *  RELEASE NOTES:
  *  
- *  Baseline Trunk Commit: 1782
- *  Last modified date  Nov 19, 2012
+ *  Baseline Trunk Commit: 1782 ~
+ *  Deployed :  Nov 19, 2012 ~ early half of 2013
+ *  Last modified date   ~ Dec 14, 2013
  *  Status: 
  *   -  Deployed and tested with fixwing and gliders, with consistently stable flights using RC managed dynamic
  *      Logo flight plans
- *   -  Doesn't GCS functionalities
- *   -  Tested BOM: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer (WIP), standard GPS, Breeze 2000 V-tail
+ *   -  Constraint and issues: doesn't support GCS bidirectional telemetry, configuration and flight plan functionalities
+ *   -  Tested BOM: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer (WIP), standard GPS, 
+ *         SF Openlog, SF 8C PPM encoder
  *
  *  Contact: Daniel (dberroya@gmail.com) for any inquiry
  *
@@ -726,8 +731,8 @@
 #define RUDDER_BOOST						1.00
 */
 #define YAWKP_RUDDER						0.11   //  0.08
-#define YAWKD_RUDDER						0.06   //  0.12
-#define ROLLKP_RUDDER						0.08   //  0.06
+#define YAWKD_RUDDER						0.06   //  0.12 reduced for sharper turns
+#define ROLLKP_RUDDER						0.08   //  0.06 help prevent alt loss during turns
 #define ROLLKD_RUDDER						0.05
 #define MANUAL_AILERON_RUDDER_MIX			0.02
 #define RUDDER_BOOST						1.00
