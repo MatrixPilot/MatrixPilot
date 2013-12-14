@@ -88,7 +88,7 @@ int udb_gps_callback_get_byte_to_send(void)
 
 
 // Got a character from the GPS
-void udb_gps_callback_received_byte(char rxchar)
+void udb_gps_callback_received_byte(uint8_t rxchar)
 {
 	//bin_out ( rxchar ) ; // binary out to the debugging USART	
 	(* msg_parse) ( rxchar ) ; // parse the input byte
