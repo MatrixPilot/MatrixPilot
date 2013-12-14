@@ -881,7 +881,7 @@
 #define ID_VEHICLE_MODEL_NAME "EZAPS24-B4r1782-qbs"
 #define ID_VEHICLE_REGISTRATION "EZA-B4r1782"
 #define ID_LEAD_PILOT "DB-EZFLIER"
-#define ID_DIY_DRONES_URL "http://www.ezflightrc.com"
+#define ID_DIY_DRONES_URL ""
 
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL
