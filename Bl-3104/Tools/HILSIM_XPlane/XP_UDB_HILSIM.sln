@@ -1,0 +1,26 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XP_UDB_HILSIM", "XP_UDB_HILSIM.vcproj", "{81C72BCE-FAF2-423A-B311-50BA1F7A010D}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81C72BCE-FAF2-423A-B311-50BA1F7A010D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{81C72BCE-FAF2-423A-B311-50BA1F7A010D}.Debug|Win32.Build.0 = Debug|Win32
+		{81C72BCE-FAF2-423A-B311-50BA1F7A010D}.Release|Win32.ActiveCfg = Release|Win32
+		{81C72BCE-FAF2-423A-B311-50BA1F7A010D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		AMDCaProjectFile = C:\UAV\UAVDevboard\X-Plane\XP-netdata\CodeAnalyst\XP-netdata.caw
+	EndGlobalSection
+EndGlobal
