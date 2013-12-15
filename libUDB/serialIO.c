@@ -23,6 +23,56 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
+#if 1
+
+#include "sio.h"
+
+//
+// USAGE:
+//
+// SIO_DEFINE(UART)
+// sio_init(rx_callback, RX_INT_PRI, tx_callback, TX_INT_PRI)
+//
+//
+/*
+SIO_DEFINE(1)
+
+void udb_init_GPS(void)
+{
+	sio1_init(udb_gps_callback_received_byte, INT_PRI_U1RX, udb_gps_callback_get_byte_to_send, INT_PRI_U1RX);
+}
+
+void udb_gps_set_rate(int32_t rate)
+{
+	sio1_set_baud(rate);
+}
+
+void udb_gps_start_sending_data(void)
+{
+	sio1_start_tx();
+}
+ */
+SIO_DEFINE(tele, 2)
+
+void udb_init_USART(void)
+{
+	tele_sio_init(udb_serial_callback_received_byte, INT_PRI_U2RX, udb_serial_callback_get_byte_to_send, INT_PRI_U2RX);
+}
+
+//boolean udb_gps_check_rate(int32_t rate);
+
+void udb_serial_set_rate(int32_t rate)
+{
+	tele_sio_set_baud(rate);
+}
+
+void udb_serial_start_sending_data(void)
+{
+	tele_sio_start_tx();
+}
+
+#else
+
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES
 // UXBRG = (Fcy/(16*BaudRate))-1
@@ -37,7 +87,7 @@
 
 void udb_init_GPS(void)
 {
-	// configure U2MODE
+	// configure U1MODE
 	U1MODEbits.UARTEN = 0;      // Bit15 TX, RX DISABLED, ENABLE at end of func
 	//                          // Bit14
 	U1MODEbits.USIDL = 0;       // Bit13 Continue in Idle
@@ -156,7 +206,7 @@ void udb_init_USART(void)
 	U2MODEbits.PDSEL = 0;       // Bits1,2 8bit, No Parity
 	U2MODEbits.STSEL = 0;       // Bit0 One Stop Bit
 
-	// Load all values in for U1STA SFR
+	// Load all values in for U2STA SFR
 	U2STAbits.UTXISEL1 = 0;     //Bit15 Int when Char is transferred (1/2 config!)
 	U2STAbits.UTXINV = 0;       //Bit14 N/A, IRDA config
 	U2STAbits.UTXISEL0 = 1;     //Bit13 Other half of Bit15
@@ -228,3 +278,5 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	U2STAbits.OERR = 0;
 	interrupt_restore_corcon;
 }
+
+#endif // 0/1

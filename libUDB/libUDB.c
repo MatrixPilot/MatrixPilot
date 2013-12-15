@@ -87,9 +87,9 @@ void udb_init(void)
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
-#if (CONSOLE_UART != 1)
-	udb_init_GPS();
-#endif
+//#if (CONSOLE_UART != 1)
+//	udb_init_GPS();
+//#endif
 #if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif

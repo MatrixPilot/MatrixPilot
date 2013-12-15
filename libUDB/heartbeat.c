@@ -32,7 +32,6 @@
 
 int one_hertz_flag = 0;
 uint16_t udb_heartbeat_counter = 0;
-uint16_t udb_heartbeat_40hz_counter = 0;
 #define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
 //static void pulse(void);    // forward declaration
@@ -67,18 +66,18 @@ inline void heartbeat(void) // called from ISR
 	}
 
 	// Call the periodic callback at 40 Hz
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-	{
-		udb_heartbeat_40hz_callback(); // this was called udb_background_callback_periodic()
-		udb_heartbeat_40hz_counter = (udb_heartbeat_40hz_counter+1) % HEARTBEAT_MAX;
-	}
+//	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+//	{
+//		udb_heartbeat_40hz_callback(); // this was called udb_background_callback_periodic()
+//	}
 
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 
-#if defined (USE_BACKGROUND_INT) || defined (USE_FREERTOS)
+//#if defined (USE_BACKGROUND_INT) || defined (USE_FREERTOS)
 #if defined (USE_FREERTOS)
 void TriggerIMU(void);
-	TriggerIMU();
+//	TriggerIMU();
+	udb_background_trigger_pulse(&TriggerIMU);
 #else
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 //	_T6IF = 1;
@@ -89,54 +88,46 @@ void TriggerIMU(void);
 // Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 // This is a good place to eventually compute pulse widths for servos.
 //static void pulse(void)
-inline void pulse(void)
-{
-#else
-	SET_CPU_IPL(INT_PRI_T6);// switch from priority 6 to priority 3
-#endif
-
-//	LED_BLUE = LED_OFF;     // indicates logfile activity
-
-#if (NORADIO != 1)
-	// 20Hz testing of radio link
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
-	{
-		radioIn_failsafe_check();
-	}
-	// Computation of noise rate
-	// Noise pulses are counted when they are detected, and reset once a second
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 1)
-	{
-		radioIn_failsafe_reset();
-	}
-#endif // NORADIO
-
-#ifdef VREF
-	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1);
-#else
-	vref_adj = 0;
-#endif // VREF
-
-	calculate_analog_sensor_values();
-	udb_callback_read_sensors();
-	udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
-
-	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
-
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-	{
-#if (USE_I2C1_DRIVER == 1)
-		I2C1_Trigger();
-#endif
-
-#if (USE_NV_MEMORY == 1)
-		nv_memory_service_trigger();
-		storage_service_trigger();
-		data_services_trigger();
-#endif
-
-#if (USE_FLEXIFUNCTION_MIXING == 1)
-		flexiFunctionServiceTrigger();
-#endif
-	}
-}
+//inline void pulse(void)
+//{
+//#else
+//	SET_CPU_IPL(INT_PRI_T6);// switch from priority 6 to priority 3
+//#endif
+////	LED_BLUE = LED_OFF;     // indicates logfile activity
+//#if (NORADIO != 1)
+//	// 20Hz testing of radio link
+//	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
+//	{
+//		radioIn_failsafe_check();
+//	}
+//	// Computation of noise rate
+//	// Noise pulses are counted when they are detected, and reset once a second
+//	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 1)
+//	{
+//		radioIn_failsafe_reset();
+//	}
+//#endif // NORADIO
+//#ifdef VREF
+//	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1);
+//#else
+//	vref_adj = 0;
+//#endif // VREF
+//	calculate_analog_sensor_values();
+//	udb_callback_read_sensors();
+//	udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
+//	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
+//	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+//	{
+//#if (USE_I2C1_DRIVER == 1)
+//		I2C1_Trigger();
+//#endif
+//#if (USE_NV_MEMORY == 1)
+//		nv_memory_service_trigger();
+//		storage_service_trigger();
+//		data_services_trigger();
+//#endif
+//#if (USE_FLEXIFUNCTION_MIXING == 1)
+//		flexiFunctionServiceTrigger();
+//#endif
+//	}
+//}

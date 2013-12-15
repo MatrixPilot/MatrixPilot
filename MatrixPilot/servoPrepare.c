@@ -62,12 +62,13 @@ void init_servoPrepare(void) // initialize the PWM
 #endif
 }
 
-inline static void flight_controller(void)
+//inline static void flight_controller(void)
+void flight_controller(void)
 {
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-	{
-		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
-	}
+//	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+//	{
+//		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
+//	}
 #if (DEADRECKONING == 1)
 	process_flightplan();
 #endif	
@@ -86,7 +87,8 @@ inline static void flight_controller(void)
 	updateTriggerAction();
 }
 
-inline static void manualPassthrough(void)
+//inline static void manualPassthrough(void)
+void manualPassthrough(void)
 {
 	roll_control = pitch_control = yaw_control = throttle_control = 0;
 	servoMix();
@@ -94,35 +96,33 @@ inline static void manualPassthrough(void)
 
 // Called at HEARTBEAT_HZ
 //void dcm_servo_callback_prepare_outputs(void)
-void dcm_heartbeat_callback(void)
-{
-	if (dcm_flags._.calib_finished)
-	{
-		flight_controller();
-	}
-	else
-	{
-		// otherwise, there is not anything to do
-		manualPassthrough();                // Allow manual control while starting up
-	}
-	
-	// TODO: move this block into the end of flight_controller or after it's called
-	if (dcm_flags._.calib_finished)         // start telemetry after calibration
-	{
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			mavlink_output_40hz();
-		}
-#else
-		// This is a simple check to send telemetry at 8hz
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
-		{
-// RobD			flight_state_8hz();
-			serial_output_8hz();
-		}
-#endif
-	}
-
-	osd_run_step();
-}
+//void dcm_heartbeat_callback(void)
+//{
+//	if (dcm_flags._.calib_finished)
+//	{
+//		flight_controller();
+//	}
+//	else
+//	{
+//		// otherwise, there is not anything to do
+//		manualPassthrough();                // Allow manual control while starting up
+//	}	
+//	// TODO: move this block into the end of flight_controller or after it's called
+//	if (dcm_flags._.calib_finished)         // start telemetry after calibration
+//	{
+//#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+//		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+//		{
+//			mavlink_output_40hz();
+//		}
+//#else
+//		// This is a simple check to send telemetry at 8hz
+//		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
+//		{
+//// RobD			flight_state_8hz();
+//			serial_output_8hz();
+//		}
+//#endif
+//	}
+//	osd_run_step();
+//}

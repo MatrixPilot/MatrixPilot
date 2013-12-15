@@ -36,6 +36,9 @@
 #include "console.h"
 #endif
 
+void TaskIMU_Init(void);
+void TaskGPS_Init(void);
+
 #ifdef USE_FREERTOS
 
 #include "FreeRTOS.h"
@@ -44,83 +47,32 @@
 
 #include "../libUDB/barometer.h"
 
-//xSemaphoreHandle xBinarySemaphore;
-xSemaphoreHandle xSemaphoreGPS;
-xSemaphoreHandle xSemaphoreIMU;
-
-//void ScheduleIMU(void)
-void TriggerIMU(void)
+static void TaskI2C(void* pvParameters)
 {
-	xSemaphoreGiveFromISR(xSemaphoreIMU, NULL);
-}
-
-void TriggerGPS(void)
-{
-	xSemaphoreGiveFromISR(xSemaphoreGPS, NULL);
-}
-
-static void TaskIMU(void* pvParameters)
-{
-	static int i = 0;
-
+	DPRINT("TaskI2C\r\n");
 	while (1)
 	{
-		xSemaphoreTake(xSemaphoreIMU, portMAX_DELAY);
-		udb_led_toggle(LED_BLUE);
-		pulse();
-
-		if (i++ > 200)
-		{
-			i = 0;
-//			DPRINT("imu\r\n");
-			udb_led_toggle(LED_ORANGE);
-		}
-//		vTaskDelay(1500 / portTICK_RATE_MS);
-	}
-//	vTaskDelete(NULL);
-}
-
-static void TaskGPS(void* pvParameters)
-{
-	while (1)
-	{
-//		xSemaphoreTake(xSemaphoreGPS, portMAX_DELAY);
-//		DPRINT("gps\r\n");
 		vTaskDelay(1000 / portTICK_RATE_MS);
 #if (BAROMETER_ALTITUDE == 1)
 		rxBarometer(NULL);
 #endif // BAROMETER_ALTITUDE
+		udb_led_toggle(LED_RED);
 	}
+}
+
+static void TaskInit(void* pvParameters)
+{
+	DPRINT("TaskInit\r\n");
+
+	TaskIMU_Init();
+	TaskGPS_Init();
+	xTaskCreate(TaskI2C, (signed portCHAR*)"I2C", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+1, NULL);
+	vTaskDelete(NULL);
 }
 
 void init_tasks(void)
 {
-//	xTaskCreate(TaskIMU, (signed portCHAR*)"IMU", configMINIMAL_STACK_SIZE, (void*)&(xParameters[0]), tskIDLE_PRIORITY, NULL);
-
-//	vSemaphoreCreateBinary(xBinarySemaphore);
-	vSemaphoreCreateBinary(xSemaphoreIMU);
-	vSemaphoreCreateBinary(xSemaphoreGPS);
-	xTaskCreate(TaskIMU, (signed portCHAR*)"IMU", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+3, NULL);
-	xTaskCreate(TaskGPS, (signed portCHAR*)"GPS", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+2, NULL);
-}
-
-void vApplicationIdleHook(void)
-{
-//	DPRINT(".");
-//	while (1)
-	{
-#if (USE_TELELOG == 1)
-		telemetry_log();
-#endif
-#if (USE_USB == 1)
-		USBPollingService();
-#endif
-#if (CONSOLE_UART != 0 && SILSIM == 0)
-		console();
-#endif
-		udb_run();
-	}
-//	return 0;
+	xTaskCreate(TaskInit, (signed portCHAR*)"INI", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+3, NULL);
 }
 
 #endif // USE_FREERTOS

@@ -77,32 +77,29 @@ int main(void)
 
 //#undef USE_FREERTOS
 #ifdef USE_FREERTOS
-	// initialise the RTOS
 	DPRINT("Initialising RTOS\r\n");
-	init_tasks();
-
-	// start the RTOS running, this function should never return
+	init_tasks();	// initialise the RTOS
 	DPRINT("Starting Scheduler\r\n");
-	vTaskStartScheduler();
+	vTaskStartScheduler();	// start the RTOS running, this function should never return
+#else
+	while (1)
+	{
+		vApplicationIdleHook();
+	}
+#endif // USE_FREERTOS
 	return 0;
 }
 
-void idle_task(void)
+void vApplicationIdleHook(void)
 {
-#else
-#endif
-
-	while (1)
-	{
 #if (USE_TELELOG == 1)
-		telemetry_log();
+	telemetry_log();
 #endif
 #if (USE_USB == 1)
-		USBPollingService();
+	USBPollingService();
 #endif
 #if (CONSOLE_UART != 0 && SILSIM == 0)
-		console();
+	console();
 #endif
-		udb_run();
-	}
+	udb_run();
 }

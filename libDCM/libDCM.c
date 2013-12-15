@@ -81,7 +81,10 @@ void dcm_run_init_step(uint16_t count)
 		dcm_flags._.calib_finished = 1;
 		dcm_calibrate();
 	}
+}
 
+void gps_run_init_step(uint16_t count)
+{
 	if (count <= GPS_COUNT)
 	{
 		gps_startup_sequence(GPS_COUNT - count); // Counts down from GPS_COUNT to 0
@@ -93,7 +96,7 @@ void dcm_run_init_step(uint16_t count)
 	}
 }
 
-#if (BAROMETER_ALTITUDE == 1)
+//#if (BAROMETER_ALTITUDE == 1)
 
 // We want to be reading both the magnetometer and the barometer at 4Hz
 // The magnetometer driver returns a new result via the callback on each call
@@ -124,48 +127,45 @@ void do_I2C_stuff(void)
 		}
 	}
 }
-#endif // BAROMETER_ALTITUDE
+//#endif // BAROMETER_ALTITUDE
 
 // Called at HEARTBEAT_HZ
-void udb_heartbeat_callback(void)
-{
-#if (BAROMETER_ALTITUDE == 1)
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
-	{
-		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
-	}
-#else
-//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-#if (MAG_YAW_DRIFT == 1)
-	// This is a simple counter to do stuff at 4hz
-//	if (udb_heartbeat_counter % 10 == 0)
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
-	{
-		rxMagnetometer(udb_magnetometer_callback);
-	}
-#endif
-#endif // BAROMETER_ALTITUDE
-
-//  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
-	if (dcm_flags._.calib_finished)
-	{
-		dcm_run_imu_step();
-	}
-
-	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();
-
-	if (!dcm_flags._.init_finished)
-	{
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
-		{
-			dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
-		}
-	}
-
-#if (HILSIM == 1)
-	send_HILSIM_outputs();
-#endif
-}
+//void udb_heartbeat_callback(void)
+//{
+//#if (BAROMETER_ALTITUDE == 1)
+//	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+//	{
+//		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
+//	}
+//#else
+////#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+//#if (MAG_YAW_DRIFT == 1)
+//	// This is a simple counter to do stuff at 4hz
+////	if (udb_heartbeat_counter % 10 == 0)
+//	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
+//	{
+//		rxMagnetometer(udb_magnetometer_callback);
+//	}
+//#endif
+//#endif // BAROMETER_ALTITUDE
+////  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
+//	if (dcm_flags._.calib_finished)
+//	{
+//		dcm_run_imu_step();
+//	}
+//	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();
+//	if (!dcm_flags._.init_finished)
+//	{
+//		if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+//		{
+//			dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+//			gps_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+//		}
+//	}
+//#if (HILSIM == 1)
+//	send_HILSIM_outputs();
+//#endif
+//}
 
 // dcm_calibrate is called twice during the startup sequence.
 // Firstly 10 seconds after startup, then immediately before the first waggle, which is 10 seconds after getting radio link.  

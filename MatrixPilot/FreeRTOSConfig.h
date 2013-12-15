@@ -74,7 +74,7 @@
 
 
 
-#define configASSERT(x) if (!(x)) printf("ASSERT: %s %d\r\n", __FILE__, __LINE__);
+#define configASSERT(x) { if (!(x)) { printf("ASSERT: %s %d\r\n", __FILE__, __LINE__); for (;;) {} } }
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -95,9 +95,9 @@
 #define configCPU_CLOCK_HZ				( ( unsigned long ) 32000000 )  /* Fosc / 2 */
 #define configMAX_PRIORITIES			( ( unsigned portBASE_TYPE ) 4 )
 //#define configMINIMAL_STACK_SIZE		( 105 )
-#define configMINIMAL_STACK_SIZE		( 300 )
-//#define configTOTAL_HEAP_SIZE			( ( size_t ) 2120 )
-#define configTOTAL_HEAP_SIZE			( ( size_t ) 2250 )
+#define configMINIMAL_STACK_SIZE		( 500 )
+//#define configTOTAL_HEAP_SIZE			( ( size_t ) 2500 )
+#define configTOTAL_HEAP_SIZE			( ( size_t ) 12000 )
 #define configMAX_TASK_NAME_LEN			( 4 )
 #define configUSE_TRACE_FACILITY		0
 #define configUSE_16_BIT_TICKS			1
@@ -112,13 +112,13 @@ to exclude the API function. */
 
 #define INCLUDE_vTaskPrioritySet		1
 #define INCLUDE_uxTaskPriorityGet		0
-#define INCLUDE_vTaskDelete				0
+#define INCLUDE_vTaskDelete				1
 #define INCLUDE_vTaskCleanUpResources	0
 #define INCLUDE_vTaskSuspend			1
 #define INCLUDE_vTaskDelayUntil			1
 #define INCLUDE_vTaskDelay				1
 
-
-#define configKERNEL_INTERRUPT_PRIORITY	0x01
+//#define configKERNEL_INTERRUPT_PRIORITY	0x01
+#define configKERNEL_INTERRUPT_PRIORITY	0x03
 
 #endif /* FREERTOS_CONFIG_H */

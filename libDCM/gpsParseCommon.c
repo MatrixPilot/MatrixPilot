@@ -150,8 +150,12 @@ int16_t udb_gps_callback_get_byte_to_send(void)
 	return -1;
 }
 
-// Got a character from the GPS
+#if defined (USE_FREERTOS)
+void udb_gps_msg_parse(uint8_t rxchar)
+#else
 void udb_gps_callback_received_byte(uint8_t rxchar)
+#endif
+// Got a character from the GPS
 {
 	//bin_out(rxchar);      // binary out to the debugging USART
 	(*msg_parse)(rxchar);   // parse the input byte
@@ -165,21 +169,17 @@ boolean gps_nav_capable_check_set(void)
 	return dcm_flags._.nav_capable;
 }
 
-static void udb_background_callback_triggered(void);
-
 // Received a full set of GPS messages
 void gps_parse_common(void)
+#if defined (USE_FREERTOS)
+#else
 {
-#ifdef USE_BACKGROUND_INT
+static void udb_background_callback_triggered(void);
 	udb_background_trigger(&udb_background_callback_triggered);
 }
-
 static void udb_background_callback_triggered(void)
-{
-#else
-	SET_CPU_IPL(INT_PRI_T7);
 #endif
-
+{
 	union longbbbb accum;
 	union longww accum_velocity;
 	int8_t cog_circular;

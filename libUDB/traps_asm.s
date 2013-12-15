@@ -70,6 +70,23 @@ _SP_current:
 	mov w15,w0
 	return
 
+.global _get_dsrpag
+.global _get_dswpag
+.global _get_tblpag
+
+.section .text
+_get_dsrpag:
+	mov DSRPAG,w0
+	return
+
+_get_dswpag:
+	mov DSWPAG,w0
+	return
+
+_get_tblpag:
+	mov TBLPAG,w0
+	return
+
 .global _getErrLoc
 .section .text
 

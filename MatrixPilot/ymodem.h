@@ -49,7 +49,7 @@
 /* Number of consecutive receive errors before giving up: */
 #define MAX_ERRORS    (5)
 
-extern unsigned long ymodem_receive(unsigned char *buf, unsigned long length);
-extern unsigned long ymodem_send(unsigned char *buf, unsigned long size, char* filename);
+extern unsigned long ymodem_receive(unsigned char* buf, unsigned long length);
+extern unsigned long ymodem_send(unsigned char* buf, unsigned long size, char* filename);
 
 #endif  /* !define(_YMODEM_H) */

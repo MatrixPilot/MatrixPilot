@@ -204,9 +204,9 @@ void process_MPU_data(void)
 //  to run the IMU at 200 Hz, turn the following back on
 
 /*
-	if (dcm_flags._.calib_finished) {
-		dcm_run_imu_step();
-	}
+//	if (dcm_flags._.calib_finished) {
+//		dcm_run_imu_step();
+//	}
  */
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
