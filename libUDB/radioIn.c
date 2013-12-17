@@ -33,8 +33,9 @@
 // very tight airframes, as it allows alternative input pins to be
 // assigned for connection to the receiver.
 // If not using PPM, then this must be left set to '1'
+#ifndef PPM_IC
 #define PPM_IC 1
-#define IC_PIN IC_PIN1
+#endif // PPM_IC
 
 #define MAX_NOISE_RATE 5    // up to 5 PWM "glitches" per second are allowed
 
@@ -135,6 +136,7 @@ void udb_init_capture(void)
 	if (NUM_INPUTS > 4) IC_INIT(5, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 5) IC_INIT(6, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
+
 	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
 #endif // USE_PPM_INPUT
 #endif // NORADIO
@@ -267,6 +269,26 @@ IC_HANDLER(8, REGTOK1, IC_PIN8);
 //#define ICBNE(x) IC##x##CONbits.ICBNE
 //#endif
 
+/*
+PPM_2
+
+    1   2  3  4   5  6  7   
+   ___     _     ___   ___    
+  |   |   | |   |   | |   |   
+  |   |   | |   |   | |   |   
+__|   |___| |___|   |_|   |____________________
+
+
+PPM_1
+
+    1     2    3      4     5    6      7
+   ___   ___   _     ___   ___   _     ___
+  |   | |   | | |   |   | |   | | |   |   |
+  |   | |   | | |   |   | |   | | |   |   |
+__|   |_|   |_| |___|   |_|   |_| |___|   |____
+
+ */
+
 //#define REGTOK1 N1
 #define ICBNE(x, y) IC##x##CO##y##bits.ICBNE
 
@@ -285,6 +307,9 @@ IC_TIME(PPM_IC, REGTOK1);
 #define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
 #define IC_INTERRUPT(x) _IC_INTERRUPT(x)
 
+#define _IC_PIN(x) IC_PIN##x
+#define __IC_PIN(x) _IC_PIN(x)
+
 // PPM Input on Channel PPM_IC
 void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 {
@@ -298,7 +323,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 	time = ic_time();
 
 #if (USE_PPM_INPUT == 1)
-	if (IC_PIN == PPM_PULSE_VALUE)
+	if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
 	{
 		uint16_t pulse = time - rise_ppm;
 		rise_ppm = time;
@@ -323,7 +348,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 	uint16_t pulse = time - rise_ppm;
 	rise_ppm = time;
 
-	if (IC_PIN == PPM_PULSE_VALUE)
+	if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
 	{
 		if (pulse > MIN_SYNC_PULSE_WIDTH)
 		{

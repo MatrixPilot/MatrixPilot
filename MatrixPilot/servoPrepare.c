@@ -76,7 +76,7 @@ void dcm_heartbeat_callback(void)
 		}
 #if (DEADRECKONING == 1)
 		process_flightplan();
-#endif	
+#endif
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 		airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
