@@ -40,15 +40,17 @@ uint16_t get_sonar_count(void)
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 #define REGTOK1 N1
+#define REGLBL1 bits.ICTSEL
 #else // UDB4 or 5
 #define REGTOK1 N
+#define REGLBL1 bits.ICTMR
 #endif
 
 //	_TRISD15 = 1; \  // TODO: check if we need to be setting the tris bit for our input capture
 
 #define _SONAR_INIT(x, y, z) \
 { \
-	IC##x##CO##y##bits.ICTSEL = 0; \
+	IC##x##CO##y##z = 0; \
 	IC##x##CO##y##bits.ICM = 1; \
 	_IC##x##IP = 6; \
 	_IC##x##IF = 0; \
@@ -74,7 +76,8 @@ void udb_init_sonar(void)
 	T3CONbits.TCS = 0;      // use the internal clock
 	T3CONbits.TON = 1;      // turn on timer 3
 
-	SONAR_INIT(USE_SONAR_INPUT, REGTOK1, 0);
+	SONAR_INIT(USE_SONAR_INPUT, REGTOK1, REGLBL1);
+
 }
 
 #define _SONAR_HANDLER(x, y) \
