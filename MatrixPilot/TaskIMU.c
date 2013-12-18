@@ -32,7 +32,7 @@ static xSemaphoreHandle xSemaphoreIMU = NULL;
 
 uint16_t heartbeat_counter = 0;
 
-static inline void pulse(void)
+inline void pulse(void)
 {
 //	heartbeat_counter = (heartbeat_counter+1) % HEARTBEAT_MAX;
 
@@ -155,6 +155,7 @@ static inline void pulse(void)
 
 static void TaskIMU(void* pvParameters)
 {
+	(void)pvParameters;
 	DPRINT("TaskIMU\r\n");
 	while (1)
 	{

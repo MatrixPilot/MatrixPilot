@@ -14,6 +14,7 @@
 
 #include "libUDB.h"
 #include "../../libUDB/magnetometer.h"
+#include "../../libUDB/barometer.h"
 #include "../../libUDB/heartbeat.h"
 #include "SIL-config.h"
 
@@ -229,8 +230,10 @@ void udb_run(void)
 
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 
-			udb_heartbeat_40hz_callback(); // Run at 40Hz
-			udb_heartbeat_callback(); // Run at HEARTBEAT_HZ
+//			udb_heartbeat_40hz_callback(); // Run at 40Hz
+//			udb_heartbeat_callback(); // Run at HEARTBEAT_HZ
+void TriggerIMU(void);
+	TriggerIMU();
 
 			sil_ui_update();
 
@@ -239,7 +242,7 @@ void udb_run(void)
 			{
 				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
 			}
-			
+
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
@@ -318,7 +321,7 @@ uint16_t get_current_milliseconds()
 	// *nix / mac implementation
 	struct timeval tv;
 	struct timezone tz;
-	
+
 	gettimeofday(&tv,&tz);
 	return tv.tv_usec / 1000;
 }
@@ -328,7 +331,6 @@ void sleep_milliseconds(uint16_t ms)
 #ifdef WIN
 	// windows implementation
 	Sleep(ms);
-
 #else
 	// *nix / mac implementation
 	usleep(1000*ms);
@@ -338,7 +340,7 @@ void sleep_milliseconds(uint16_t ms)
 void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 {
 	int i;
-	
+
 	uint8_t CK_A = 0;
 	uint8_t CK_B = 0;
 	uint8_t headerBytes = 0;
@@ -521,7 +523,7 @@ void I2C_doneReadMagData(void)
 void HILSIM_MagData(magnetometer_callback_funcptr callback)
 {
 	(void)callback;
-//	magnetometer_callback = callback;
+	magnetometer_callback = callback;
 	magMessage = 7;                 // indicate valid magnetometer data
 	I2C_doneReadMagData();          // run the magnetometer computations
 }
@@ -548,9 +550,15 @@ int16_t FindFirstBitFromLeft(int16_t val)
 	return i;
 }
 
-void vApplicationTickHook(void) {}
-void vApplicationIdleHook(void) {}
+int rxBarometer(barometer_callback_funcptr callback)
+{
+	(void)callback;
+	return 0;
+}
 
+void vApplicationTickHook(void) {}
+//void vApplicationIdleHook(void) {}
+/*
 void *pvPortMalloc( size_t xWantedSize )
 {
 	return malloc(xWantedSize);
@@ -559,5 +567,10 @@ void vPortFree( void *pv )
 {
 	free(pv);
 }
+ */
+
+void radioIn_failsafe_check(void) {}
+void radioIn_failsafe_reset(void) {}
+void calculate_analog_sensor_values(void) {}
 
 #endif // (WIN == 1 || NIX == 1)

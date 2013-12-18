@@ -78,9 +78,9 @@ int main(void)
 //#undef USE_FREERTOS
 #ifdef USE_FREERTOS
 	DPRINT("Initialising RTOS\r\n");
-	init_tasks();	// initialise the RTOS
+	init_tasks();   // initialise the RTOS
 	DPRINT("Starting Scheduler\r\n");
-	vTaskStartScheduler();	// start the RTOS running, this function should never return
+	vTaskStartScheduler();  // start the RTOS running, this function should never return
 #else
 	while (1)
 	{

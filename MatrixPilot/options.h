@@ -150,13 +150,13 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT                       1
+#define MAG_YAW_DRIFT                       0
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE                  1
+#define BAROMETER_ALTITUDE                  0
 
 // Set your takeoff/launch/initialisation altitude in meters.
 #define LAUNCH_ALTITUDE                     300
@@ -201,6 +201,14 @@
 #define PPM_NUMBER_OF_CHANNELS              8
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
+
+// Select which Input Capture pin the PPM device is connected to
+// changing this can be useful when using PPM and fitting a UDB into
+// very tight airframes, as it allows alternative input pins to be
+// assigned for connection to the receiver.
+// If not using PPM, then this must be left set to '1'
+#define PPM_IC                              1
+
 
 // NUM_INPUTS:
 // For classic boards: Set to 1-5 (or 1-8 when using PPM input)
@@ -348,7 +356,7 @@
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
@@ -728,7 +736,7 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
-#define RECORD_FREE_STACK_SPACE             1
+#define RECORD_FREE_STACK_SPACE             0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -748,7 +756,7 @@
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
-//#define USE_MAVLINK_IO
+#define USE_MAVLINK_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////

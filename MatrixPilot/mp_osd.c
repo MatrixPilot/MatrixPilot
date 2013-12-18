@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 #include "../libUDB/heartbeat.h"
 #include "../libDCM/libDCM_internal.h"
 #include "../libDCM/gpsParseCommon.h"

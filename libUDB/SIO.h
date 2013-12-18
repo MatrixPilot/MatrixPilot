@@ -31,6 +31,8 @@
 typedef void (*sio_rx_callback)(uint8_t);
 typedef int16_t (*sio_tx_callback)(void);
 
+#ifndef SILSIM
+
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES
 // UXBRG = (Fcy/(16*BaudRate))-1
@@ -144,3 +146,26 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U##x##RXInterrupt(void) { \
 	SIO_RX_INT(w, x)
 
 //SIO_DEFINE(gps, 1)
+
+#else // SILSIM
+
+
+#define SIO_INIT(w, x) \
+void w##_sio_init(sio_rx_callback rx_callback, int rx_pri, sio_tx_callback tx_callback, int tx_pri) { }
+
+#define SIO_SET_BAUD(w, x) \
+void w##_sio_set_baud(int32_t rate) { }
+
+#define SIO_CHK_BAUD(w, x) \
+boolean w##_sio_chk_baud(int32_t rate) { return 1; }
+
+#define SIO_START_TX(w, x) \
+void w##_sio_start_tx(void) { }
+
+#define SIO_DEFINE(w, x) \
+	SIO_INIT(w, x) \
+	SIO_SET_BAUD(w, x) \
+	SIO_CHK_BAUD(w, x) \
+	SIO_START_TX(w, x)
+
+#endif // SILSIM

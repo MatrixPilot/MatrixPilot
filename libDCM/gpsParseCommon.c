@@ -169,12 +169,13 @@ boolean gps_nav_capable_check_set(void)
 	return dcm_flags._.nav_capable;
 }
 
+static void udb_background_callback_triggered(void);
+
 // Received a full set of GPS messages
 void gps_parse_common(void)
 #if defined (USE_FREERTOS)
 #else
 {
-static void udb_background_callback_triggered(void);
 	udb_background_trigger(&udb_background_callback_triggered);
 }
 static void udb_background_callback_triggered(void)

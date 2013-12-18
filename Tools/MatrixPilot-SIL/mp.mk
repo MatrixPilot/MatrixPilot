@@ -1,4 +1,8 @@
 MP_OBJECTS = \
+../../MatrixPilot/mp_tasks.o \
+../../MatrixPilot/TaskIMU.o \
+../../MatrixPilot/TaskGPS.o \
+\
 ../../MatrixPilot/airspeedCntrl.o \
 ../../MatrixPilot/altitudeCntrl.o \
 ../../MatrixPilot/altitudeCntrlVariable.o \

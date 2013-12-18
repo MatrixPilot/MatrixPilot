@@ -73,7 +73,7 @@
 #endif
 
 
-
+#include <stdio.h>
 #define configASSERT(x) { if (!(x)) { printf("ASSERT: %s %d\r\n", __FILE__, __LINE__); for (;;) {} } }
 
 /*-----------------------------------------------------------

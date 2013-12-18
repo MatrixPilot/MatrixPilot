@@ -37,8 +37,6 @@
 #define PPM_IC 1
 #endif // PPM_IC
 
-//#define IC_PIN IC_PIN1
-
 #define MAX_NOISE_RATE 5    // up to 5 PWM "glitches" per second are allowed
 
 #if (MIPS == 64)
@@ -271,6 +269,26 @@ IC_HANDLER(8, REGTOK1, IC_PIN8);
 //#else
 //#define ICBNE(x) IC##x##CONbits.ICBNE
 //#endif
+
+/*
+PPM_2
+
+    1   2  3  4   5  6  7   
+   ___     _     ___   ___    
+  |   |   | |   |   | |   |   
+  |   |   | |   |   | |   |   
+__|   |___| |___|   |_|   |____________________
+
+
+PPM_1
+
+    1     2    3      4     5    6      7
+   ___   ___   _     ___   ___   _     ___
+  |   | |   | | |   |   | |   | | |   |   |
+  |   | |   | | |   |   | |   | | |   |   |
+__|   |_|   |_| |___|   |_|   |_| |___|   |____
+
+ */
 
 //#define REGTOK1 N1
 #define ICBNE(x, y) IC##x##CO##y##bits.ICBNE

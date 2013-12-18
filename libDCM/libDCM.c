@@ -96,7 +96,7 @@ void gps_run_init_step(uint16_t count)
 	}
 }
 
-//#if (BAROMETER_ALTITUDE == 1)
+#if (BAROMETER_ALTITUDE == 1)
 
 // We want to be reading both the magnetometer and the barometer at 4Hz
 // The magnetometer driver returns a new result via the callback on each call
@@ -127,7 +127,11 @@ void do_I2C_stuff(void)
 		}
 	}
 }
-//#endif // BAROMETER_ALTITUDE
+#else
+void do_I2C_stuff(void)
+{
+}
+#endif // BAROMETER_ALTITUDE
 
 // Called at HEARTBEAT_HZ
 //void udb_heartbeat_callback(void)

@@ -4,7 +4,7 @@ INCPATH = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot -I../../FreeRTOS
 RM_FILE = rm -f
 ifeq ($(OS),Windows_NT)
 	TARGET_EXTENSION = .exe
-	FLAGS = -DWIN=1
+	FLAGS = -DWIN=1 -DUSE_FREERTOS
 	LFLAGS = 
 	LIBS = -lws2_32 -lWinmm
 	SOCK_OBJECTS = ../HILSIM_XPlane/UDBSocketWin.o

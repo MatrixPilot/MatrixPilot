@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"

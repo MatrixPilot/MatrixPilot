@@ -49,6 +49,7 @@ SIO_DEFINE(gps, 1)
 //	gps_sio_init(udb_gps_callback_received_byte, INT_PRI_U1RX, udb_gps_callback_get_byte_to_send, INT_PRI_U1RX);
 //}
 
+#ifndef SILSIM
 void udb_gps_set_rate(int32_t rate)
 {
 	gps_sio_set_baud(rate);
@@ -58,6 +59,7 @@ void udb_gps_start_sending_data(void)
 {
 	gps_sio_start_tx();
 }
+#endif // SILSIM
 
 
 // Got a character from the GPS
@@ -76,6 +78,7 @@ void udb_gps_callback_received_byte(uint8_t rxchar)
 
 static void TaskGPS(void* pvParameters)
 {
+	(void)pvParameters;
 	DPRINT("TaskGPS\r\n");
 	gps_sio_init(udb_gps_callback_received_byte, INT_PRI_U1RX, udb_gps_callback_get_byte_to_send, INT_PRI_U1RX);
 	while (1)
@@ -99,15 +102,15 @@ void TaskGPS_Init(void)
 	hRxQ = xQueueCreate(uxQueueLength, (unsigned portBASE_TYPE)sizeof(signed char));
 	configASSERT(hRxQ);
 	if (hRxQ == 0)
-    {
+	{
 		DPRINT("Failed to create GPS Rx queue\r\n");
-    }
+	}
 	hTxQ = xQueueCreate(uxQueueLength, (unsigned portBASE_TYPE)sizeof(signed char));
 	configASSERT(hTxQ);
 	if (hTxQ == 0)
-    {
+	{
 		DPRINT("Failed to create GPS Tx queue\r\n");
-    }
+	}
 //	vSemaphoreCreateBinary(xSemaphoreGPS);
 	xTaskCreate(TaskGPS, (signed portCHAR*)"GPS", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+2, &xHandle);
 	configASSERT(xHandle);
