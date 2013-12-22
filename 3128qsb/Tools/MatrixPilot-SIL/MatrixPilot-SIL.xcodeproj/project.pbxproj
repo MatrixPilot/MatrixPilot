@@ -1,0 +1,566 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B54B363816C2D8410072BC92 /* deadReckoning.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362B16C2D8410072BC92 /* deadReckoning.c */; };
+		B54B363916C2D8410072BC92 /* estWind.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362C16C2D8410072BC92 /* estWind.c */; };
+		B54B363A16C2D8410072BC92 /* estYawDrift.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362D16C2D8410072BC92 /* estYawDrift.c */; };
+		B54B363B16C2D8410072BC92 /* gpsParseCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362E16C2D8410072BC92 /* gpsParseCommon.c */; };
+		B54B363C16C2D8410072BC92 /* gpsParseMTEK.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B362F16C2D8410072BC92 /* gpsParseMTEK.c */; };
+		B54B363D16C2D8410072BC92 /* gpsParseSTD.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363016C2D8410072BC92 /* gpsParseSTD.c */; };
+		B54B363E16C2D8410072BC92 /* gpsParseUBX.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363116C2D8410072BC92 /* gpsParseUBX.c */; };
+		B54B363F16C2D8410072BC92 /* libDCM.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363416C2D8410072BC92 /* libDCM.c */; };
+		B54B364016C2D8410072BC92 /* mathlibNAV.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363616C2D8410072BC92 /* mathlibNAV.c */; };
+		B54B364116C2D8410072BC92 /* rmat.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B363716C2D8410072BC92 /* rmat.c */; };
+		B54B366A16C2D86E0072BC92 /* airspeedCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364316C2D86E0072BC92 /* airspeedCntrl.c */; };
+		B54B366B16C2D86E0072BC92 /* altitudeCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364516C2D86E0072BC92 /* altitudeCntrl.c */; };
+		B54B366C16C2D86E0072BC92 /* altitudeCntrlVariable.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364616C2D86E0072BC92 /* altitudeCntrlVariable.c */; };
+		B54B366D16C2D86E0072BC92 /* behavior.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364716C2D86E0072BC92 /* behavior.c */; };
+		B54B366E16C2D86E0072BC92 /* cameraCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364816C2D86E0072BC92 /* cameraCntrl.c */; };
+		B54B366F16C2D86E0072BC92 /* config_tests.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364916C2D86E0072BC92 /* config_tests.c */; };
+		B54B367016C2D86E0072BC92 /* data_services.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364A16C2D86E0072BC92 /* data_services.c */; };
+		B54B367116C2D86E0072BC92 /* data_storage.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364C16C2D86E0072BC92 /* data_storage.c */; };
+		B54B367216C2D86E0072BC92 /* euler_angles.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B364F16C2D86E0072BC92 /* euler_angles.c */; };
+		B54B367316C2D86E0072BC92 /* flightplan-logo.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365116C2D86E0072BC92 /* flightplan-logo.c */; };
+		B54B367416C2D86E0072BC92 /* flightplan-waypoints.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365316C2D86E0072BC92 /* flightplan-waypoints.c */; };
+		B54B367516C2D86E0072BC92 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365516C2D86E0072BC92 /* main.c */; };
+		B54B367616C2D86E0072BC92 /* MAVLink.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365716C2D86E0072BC92 /* MAVLink.c */; };
+		B54B367716C2D86E0072BC92 /* mode_switch.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365816C2D86E0072BC92 /* mode_switch.c */; };
+		B54B367816C2D86E0072BC92 /* mp_osd.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365A16C2D86E0072BC92 /* mp_osd.c */; };
+		B54B367916C2D86E0072BC92 /* navigate.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365B16C2D86E0072BC92 /* navigate.c */; };
+		B54B367A16C2D86E0072BC92 /* nv_memory_table.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B365C16C2D86E0072BC92 /* nv_memory_table.c */; };
+		B54B367B16C2D86E0072BC92 /* parameter_table.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366016C2D86E0072BC92 /* parameter_table.c */; };
+		B54B367C16C2D86E0072BC92 /* pitchCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366216C2D86E0072BC92 /* pitchCntrl.c */; };
+		B54B367D16C2D86E0072BC92 /* rollCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366316C2D86E0072BC92 /* rollCntrl.c */; };
+		B54B367E16C2D86E0072BC92 /* servoMix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366416C2D86E0072BC92 /* servoMix.c */; };
+		B54B367F16C2D86E0072BC92 /* servoPrepare.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366516C2D86E0072BC92 /* servoPrepare.c */; };
+		B54B368016C2D86E0072BC92 /* states.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366616C2D86E0072BC92 /* states.c */; };
+		B54B368116C2D86E0072BC92 /* telemetry.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366716C2D86E0072BC92 /* telemetry.c */; };
+		B54B368216C2D86E0072BC92 /* yawCntrl.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B366916C2D86E0072BC92 /* yawCntrl.c */; };
+		B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
+		B552690216C4382200E36CD9 /* SILcat.c in Sources */ = {isa = PBXBuildFile; fileRef = B552690116C4382200E36CD9 /* SILcat.c */; };
+		B552690416C43A3400E36CD9 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */; };
+		B56B31C41742FFD30070AD97 /* estAltitude.c in Sources */ = {isa = PBXBuildFile; fileRef = B56B31C21742FFD30070AD97 /* estAltitude.c */; };
+		B5933C0616C82C32001ABBA6 /* SIL-ui-mp-term.c in Sources */ = {isa = PBXBuildFile; fileRef = B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */; };
+		B5933C0916C82CCF001ABBA6 /* SIL-serial.c in Sources */ = {isa = PBXBuildFile; fileRef = B5933C0816C82CCF001ABBA6 /* SIL-serial.c */; };
+		B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */; };
+		B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */; };
+		B5D2E01316C2CDAF004A0D12 /* SIL-events.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */; };
+		B5D2E01416C2CDAF004A0D12 /* SIL-udb.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B55268F616C4381300E36CD9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		B5CFEFFE16BC81B10075C575 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B505E926177C0F1C001F60D4 /* magnetometer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = magnetometer.h; path = ../../libUDB/magnetometer.h; sourceTree = "<group>"; };
+		B505E927177C0F3A001F60D4 /* magnetometerOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = magnetometerOptions.h; path = ../../libUDB/magnetometerOptions.h; sourceTree = "<group>"; };
+		B54B362B16C2D8410072BC92 /* deadReckoning.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = deadReckoning.c; path = ../../libDCM/deadReckoning.c; sourceTree = "<group>"; };
+		B54B362C16C2D8410072BC92 /* estWind.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estWind.c; path = ../../libDCM/estWind.c; sourceTree = "<group>"; };
+		B54B362D16C2D8410072BC92 /* estYawDrift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estYawDrift.c; path = ../../libDCM/estYawDrift.c; sourceTree = "<group>"; };
+		B54B362E16C2D8410072BC92 /* gpsParseCommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseCommon.c; path = ../../libDCM/gpsParseCommon.c; sourceTree = "<group>"; };
+		B54B362F16C2D8410072BC92 /* gpsParseMTEK.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseMTEK.c; path = ../../libDCM/gpsParseMTEK.c; sourceTree = "<group>"; };
+		B54B363016C2D8410072BC92 /* gpsParseSTD.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseSTD.c; path = ../../libDCM/gpsParseSTD.c; sourceTree = "<group>"; };
+		B54B363116C2D8410072BC92 /* gpsParseUBX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gpsParseUBX.c; path = ../../libDCM/gpsParseUBX.c; sourceTree = "<group>"; };
+		B54B363216C2D8410072BC92 /* libDCM_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM_defines.h; path = ../../libDCM/libDCM_defines.h; sourceTree = "<group>"; };
+		B54B363316C2D8410072BC92 /* libDCM_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM_internal.h; path = ../../libDCM/libDCM_internal.h; sourceTree = "<group>"; };
+		B54B363416C2D8410072BC92 /* libDCM.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libDCM.c; path = ../../libDCM/libDCM.c; sourceTree = "<group>"; };
+		B54B363516C2D8410072BC92 /* libDCM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libDCM.h; path = ../../libDCM/libDCM.h; sourceTree = "<group>"; };
+		B54B363616C2D8410072BC92 /* mathlibNAV.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mathlibNAV.c; path = ../../libDCM/mathlibNAV.c; sourceTree = "<group>"; };
+		B54B363716C2D8410072BC92 /* rmat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rmat.c; path = ../../libDCM/rmat.c; sourceTree = "<group>"; };
+		B54B364216C2D86E0072BC92 /* airspeed_options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = airspeed_options.h; path = ../../MatrixPilot/airspeed_options.h; sourceTree = "<group>"; };
+		B54B364316C2D86E0072BC92 /* airspeedCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = airspeedCntrl.c; path = ../../MatrixPilot/airspeedCntrl.c; sourceTree = "<group>"; };
+		B54B364416C2D86E0072BC92 /* airspeedCntrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = airspeedCntrl.h; path = ../../MatrixPilot/airspeedCntrl.h; sourceTree = "<group>"; };
+		B54B364516C2D86E0072BC92 /* altitudeCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitudeCntrl.c; path = ../../MatrixPilot/altitudeCntrl.c; sourceTree = "<group>"; };
+		B54B364616C2D86E0072BC92 /* altitudeCntrlVariable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitudeCntrlVariable.c; path = ../../MatrixPilot/altitudeCntrlVariable.c; sourceTree = "<group>"; };
+		B54B364716C2D86E0072BC92 /* behavior.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = behavior.c; path = ../../MatrixPilot/behavior.c; sourceTree = "<group>"; };
+		B54B364816C2D86E0072BC92 /* cameraCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cameraCntrl.c; path = ../../MatrixPilot/cameraCntrl.c; sourceTree = "<group>"; };
+		B54B364916C2D86E0072BC92 /* config_tests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = config_tests.c; path = ../../MatrixPilot/config_tests.c; sourceTree = "<group>"; };
+		B54B364A16C2D86E0072BC92 /* data_services.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = data_services.c; path = ../../MatrixPilot/data_services.c; sourceTree = "<group>"; };
+		B54B364B16C2D86E0072BC92 /* data_services.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = data_services.h; path = ../../MatrixPilot/data_services.h; sourceTree = "<group>"; };
+		B54B364C16C2D86E0072BC92 /* data_storage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = data_storage.c; path = ../../MatrixPilot/data_storage.c; sourceTree = "<group>"; };
+		B54B364D16C2D86E0072BC92 /* data_storage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = data_storage.h; path = ../../MatrixPilot/data_storage.h; sourceTree = "<group>"; };
+		B54B364E16C2D86E0072BC92 /* defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = defines.h; path = ../../MatrixPilot/defines.h; sourceTree = "<group>"; };
+		B54B364F16C2D86E0072BC92 /* euler_angles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = euler_angles.c; path = ../../MatrixPilot/euler_angles.c; sourceTree = "<group>"; };
+		B54B365016C2D86E0072BC92 /* euler_angles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = euler_angles.h; path = ../../MatrixPilot/euler_angles.h; sourceTree = "<group>"; };
+		B54B365116C2D86E0072BC92 /* flightplan-logo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "flightplan-logo.c"; path = "../../MatrixPilot/flightplan-logo.c"; sourceTree = "<group>"; };
+		B54B365216C2D86E0072BC92 /* flightplan-logo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "flightplan-logo.h"; path = "../../MatrixPilot/flightplan-logo.h"; sourceTree = "<group>"; };
+		B54B365316C2D86E0072BC92 /* flightplan-waypoints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "flightplan-waypoints.c"; path = "../../MatrixPilot/flightplan-waypoints.c"; sourceTree = "<group>"; };
+		B54B365416C2D86E0072BC92 /* gain_variables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gain_variables.h; path = ../../MatrixPilot/gain_variables.h; sourceTree = "<group>"; };
+		B54B365516C2D86E0072BC92 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../../MatrixPilot/main.c; sourceTree = "<group>"; };
+		B54B365616C2D86E0072BC92 /* mavlink_options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mavlink_options.h; path = ../../MatrixPilot/mavlink_options.h; sourceTree = "<group>"; };
+		B54B365716C2D86E0072BC92 /* MAVLink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MAVLink.c; path = ../../MatrixPilot/MAVLink.c; sourceTree = "<group>"; };
+		B54B365816C2D86E0072BC92 /* mode_switch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mode_switch.c; path = ../../MatrixPilot/mode_switch.c; sourceTree = "<group>"; };
+		B54B365916C2D86E0072BC92 /* mode_switch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mode_switch.h; path = ../../MatrixPilot/mode_switch.h; sourceTree = "<group>"; };
+		B54B365A16C2D86E0072BC92 /* mp_osd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mp_osd.c; path = ../../MatrixPilot/mp_osd.c; sourceTree = "<group>"; };
+		B54B365B16C2D86E0072BC92 /* navigate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = navigate.c; path = ../../MatrixPilot/navigate.c; sourceTree = "<group>"; };
+		B54B365C16C2D86E0072BC92 /* nv_memory_table.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nv_memory_table.c; path = ../../MatrixPilot/nv_memory_table.c; sourceTree = "<group>"; };
+		B54B365D16C2D86E0072BC92 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = options.h; path = ../../MatrixPilot/options.h; sourceTree = "<group>"; };
+		B54B365E16C2D86E0072BC92 /* osd_layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = osd_layout.h; path = ../../MatrixPilot/osd_layout.h; sourceTree = "<group>"; };
+		B54B365F16C2D86E0072BC92 /* parameter_datatypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parameter_datatypes.h; path = ../../MatrixPilot/parameter_datatypes.h; sourceTree = "<group>"; };
+		B54B366016C2D86E0072BC92 /* parameter_table.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parameter_table.c; path = ../../MatrixPilot/parameter_table.c; sourceTree = "<group>"; };
+		B54B366116C2D86E0072BC92 /* parameter_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parameter_table.h; path = ../../MatrixPilot/parameter_table.h; sourceTree = "<group>"; };
+		B54B366216C2D86E0072BC92 /* pitchCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pitchCntrl.c; path = ../../MatrixPilot/pitchCntrl.c; sourceTree = "<group>"; };
+		B54B366316C2D86E0072BC92 /* rollCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rollCntrl.c; path = ../../MatrixPilot/rollCntrl.c; sourceTree = "<group>"; };
+		B54B366416C2D86E0072BC92 /* servoMix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = servoMix.c; path = ../../MatrixPilot/servoMix.c; sourceTree = "<group>"; };
+		B54B366516C2D86E0072BC92 /* servoPrepare.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = servoPrepare.c; path = ../../MatrixPilot/servoPrepare.c; sourceTree = "<group>"; };
+		B54B366616C2D86E0072BC92 /* states.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = states.c; path = ../../MatrixPilot/states.c; sourceTree = "<group>"; };
+		B54B366716C2D86E0072BC92 /* telemetry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = telemetry.c; path = ../../MatrixPilot/telemetry.c; sourceTree = "<group>"; };
+		B54B366816C2D86E0072BC92 /* waypoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = waypoints.h; path = ../../MatrixPilot/waypoints.h; sourceTree = "<group>"; };
+		B54B366916C2D86E0072BC92 /* yawCntrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = yawCntrl.c; path = ../../MatrixPilot/yawCntrl.c; sourceTree = "<group>"; };
+		B54B368316C2D88E0072BC92 /* boardRotation_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = boardRotation_defines.h; path = ../../libUDB/boardRotation_defines.h; sourceTree = "<group>"; };
+		B54B368416C2D88E0072BC92 /* ConfigHILSIM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConfigHILSIM.h; path = ../../libUDB/ConfigHILSIM.h; sourceTree = "<group>"; };
+		B54B368516C2D88E0072BC92 /* events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = events.h; path = ../../libUDB/events.h; sourceTree = "<group>"; };
+		B54B368616C2D88E0072BC92 /* libUDB_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB_defines.h; path = ../../libUDB/libUDB_defines.h; sourceTree = "<group>"; };
+		B54B368716C2D88E0072BC92 /* libUDB_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB_internal.h; path = ../../libUDB/libUDB_internal.h; sourceTree = "<group>"; };
+		B54B368816C2D88E0072BC92 /* libUDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libUDB.h; path = ../../libUDB/libUDB.h; sourceTree = "<group>"; };
+		B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = UDBSocketUnix.c; path = ../HILSIM_XPlane/UDBSocketUnix.c; sourceTree = "<group>"; };
+		B55268F216C335D200E36CD9 /* UDBSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UDBSocket.h; path = ../HILSIM_XPlane/UDBSocket.h; sourceTree = "<group>"; };
+		B55268F816C4381300E36CD9 /* SILcat */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = SILcat; path = silcat; sourceTree = BUILT_PRODUCTS_DIR; };
+		B552690116C4382200E36CD9 /* SILcat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SILcat.c; sourceTree = SOURCE_ROOT; };
+		B56B31C21742FFD30070AD97 /* estAltitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = estAltitude.c; path = ../../libDCM/estAltitude.c; sourceTree = "<group>"; };
+		B56B31C31742FFD30070AD97 /* estAltitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = estAltitude.h; path = ../../libDCM/estAltitude.h; sourceTree = "<group>"; };
+		B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-ui-mp-term.c"; sourceTree = "<group>"; };
+		B5933C0716C82C3E001ABBA6 /* SIL-ui.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SIL-ui.h"; sourceTree = "<group>"; };
+		B5933C0816C82CCF001ABBA6 /* SIL-serial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-serial.c"; sourceTree = "<group>"; };
+		B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "MatrixPilot-SIL"; path = matrixpilot; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-dsp.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-dsp.h"; sourceTree = SOURCE_ROOT; };
+		B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-eeprom.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E00C16C2CDAF004A0D12 /* SIL-eeprom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-eeprom.h"; sourceTree = SOURCE_ROOT; };
+		B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-events.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E00E16C2CDAF004A0D12 /* SIL-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-events.h"; sourceTree = SOURCE_ROOT; };
+		B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "SIL-udb.c"; sourceTree = SOURCE_ROOT; };
+		B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SIL-udb.h"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B55268F516C4381300E36CD9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5CFEFFD16BC81B10075C575 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B55268F916C4381300E36CD9 /* SILcat */ = {
+			isa = PBXGroup;
+			children = (
+				B552690116C4382200E36CD9 /* SILcat.c */,
+			);
+			path = SILcat;
+			sourceTree = "<group>";
+		};
+		B5CFEFF716BC81B10075C575 = {
+			isa = PBXGroup;
+			children = (
+				B5CFF00216BC81B10075C575 /* MatrixPilot-SIL */,
+				B55268F916C4381300E36CD9 /* SILcat */,
+				B5CFF00116BC81B10075C575 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B5CFF00116BC81B10075C575 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */,
+				B55268F816C4381300E36CD9 /* SILcat */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B5CFF00216BC81B10075C575 /* MatrixPilot-SIL */ = {
+			isa = PBXGroup;
+			children = (
+				B5CFF02816BC82560075C575 /* MatrixPilot */,
+				B5CFF01016BC82360075C575 /* libDCM */,
+				B5CFF00F16BC82270075C575 /* libUDB */,
+				B5CFF07216BCFDFE0075C575 /* SIL */,
+			);
+			name = "MatrixPilot-SIL";
+			sourceTree = "<group>";
+		};
+		B5CFF00F16BC82270075C575 /* libUDB */ = {
+			isa = PBXGroup;
+			children = (
+				B54B368316C2D88E0072BC92 /* boardRotation_defines.h */,
+				B54B368416C2D88E0072BC92 /* ConfigHILSIM.h */,
+				B54B368516C2D88E0072BC92 /* events.h */,
+				B54B368616C2D88E0072BC92 /* libUDB_defines.h */,
+				B54B368716C2D88E0072BC92 /* libUDB_internal.h */,
+				B54B368816C2D88E0072BC92 /* libUDB.h */,
+				B505E926177C0F1C001F60D4 /* magnetometer.h */,
+				B505E927177C0F3A001F60D4 /* magnetometerOptions.h */,
+			);
+			name = libUDB;
+			sourceTree = "<group>";
+		};
+		B5CFF01016BC82360075C575 /* libDCM */ = {
+			isa = PBXGroup;
+			children = (
+				B54B362B16C2D8410072BC92 /* deadReckoning.c */,
+				B56B31C21742FFD30070AD97 /* estAltitude.c */,
+				B56B31C31742FFD30070AD97 /* estAltitude.h */,
+				B54B362C16C2D8410072BC92 /* estWind.c */,
+				B54B362D16C2D8410072BC92 /* estYawDrift.c */,
+				B54B362E16C2D8410072BC92 /* gpsParseCommon.c */,
+				B54B362F16C2D8410072BC92 /* gpsParseMTEK.c */,
+				B54B363016C2D8410072BC92 /* gpsParseSTD.c */,
+				B54B363116C2D8410072BC92 /* gpsParseUBX.c */,
+				B54B363216C2D8410072BC92 /* libDCM_defines.h */,
+				B54B363316C2D8410072BC92 /* libDCM_internal.h */,
+				B54B363416C2D8410072BC92 /* libDCM.c */,
+				B54B363516C2D8410072BC92 /* libDCM.h */,
+				B54B363616C2D8410072BC92 /* mathlibNAV.c */,
+				B54B363716C2D8410072BC92 /* rmat.c */,
+			);
+			name = libDCM;
+			sourceTree = "<group>";
+		};
+		B5CFF02816BC82560075C575 /* MatrixPilot */ = {
+			isa = PBXGroup;
+			children = (
+				B54B364216C2D86E0072BC92 /* airspeed_options.h */,
+				B54B364316C2D86E0072BC92 /* airspeedCntrl.c */,
+				B54B364416C2D86E0072BC92 /* airspeedCntrl.h */,
+				B54B364516C2D86E0072BC92 /* altitudeCntrl.c */,
+				B54B364616C2D86E0072BC92 /* altitudeCntrlVariable.c */,
+				B54B364716C2D86E0072BC92 /* behavior.c */,
+				B54B364816C2D86E0072BC92 /* cameraCntrl.c */,
+				B54B364916C2D86E0072BC92 /* config_tests.c */,
+				B54B364A16C2D86E0072BC92 /* data_services.c */,
+				B54B364B16C2D86E0072BC92 /* data_services.h */,
+				B54B364C16C2D86E0072BC92 /* data_storage.c */,
+				B54B364D16C2D86E0072BC92 /* data_storage.h */,
+				B54B364E16C2D86E0072BC92 /* defines.h */,
+				B54B364F16C2D86E0072BC92 /* euler_angles.c */,
+				B54B365016C2D86E0072BC92 /* euler_angles.h */,
+				B54B365116C2D86E0072BC92 /* flightplan-logo.c */,
+				B54B365216C2D86E0072BC92 /* flightplan-logo.h */,
+				B54B365316C2D86E0072BC92 /* flightplan-waypoints.c */,
+				B54B365416C2D86E0072BC92 /* gain_variables.h */,
+				B54B365516C2D86E0072BC92 /* main.c */,
+				B54B365616C2D86E0072BC92 /* mavlink_options.h */,
+				B54B365716C2D86E0072BC92 /* MAVLink.c */,
+				B54B365816C2D86E0072BC92 /* mode_switch.c */,
+				B54B365916C2D86E0072BC92 /* mode_switch.h */,
+				B54B365A16C2D86E0072BC92 /* mp_osd.c */,
+				B54B365B16C2D86E0072BC92 /* navigate.c */,
+				B54B365C16C2D86E0072BC92 /* nv_memory_table.c */,
+				B54B365D16C2D86E0072BC92 /* options.h */,
+				B54B365E16C2D86E0072BC92 /* osd_layout.h */,
+				B54B365F16C2D86E0072BC92 /* parameter_datatypes.h */,
+				B54B366016C2D86E0072BC92 /* parameter_table.c */,
+				B54B366116C2D86E0072BC92 /* parameter_table.h */,
+				B54B366216C2D86E0072BC92 /* pitchCntrl.c */,
+				B54B366316C2D86E0072BC92 /* rollCntrl.c */,
+				B54B366416C2D86E0072BC92 /* servoMix.c */,
+				B54B366516C2D86E0072BC92 /* servoPrepare.c */,
+				B54B366616C2D86E0072BC92 /* states.c */,
+				B54B366716C2D86E0072BC92 /* telemetry.c */,
+				B54B366816C2D86E0072BC92 /* waypoints.h */,
+				B54B366916C2D86E0072BC92 /* yawCntrl.c */,
+			);
+			name = MatrixPilot;
+			sourceTree = "<group>";
+		};
+		B5CFF07216BCFDFE0075C575 /* SIL */ = {
+			isa = PBXGroup;
+			children = (
+				B5D2E01016C2CDAF004A0D12 /* SIL-udb.h */,
+				B5D2E00F16C2CDAF004A0D12 /* SIL-udb.c */,
+				B5933C0716C82C3E001ABBA6 /* SIL-ui.h */,
+				B5933C0516C82C32001ABBA6 /* SIL-ui-mp-term.c */,
+				B5933C0816C82CCF001ABBA6 /* SIL-serial.c */,
+				B5D2E00A16C2CDAF004A0D12 /* SIL-dsp.h */,
+				B5D2E00916C2CDAF004A0D12 /* SIL-dsp.c */,
+				B5D2E00C16C2CDAF004A0D12 /* SIL-eeprom.h */,
+				B5D2E00B16C2CDAF004A0D12 /* SIL-eeprom.c */,
+				B5D2E00E16C2CDAF004A0D12 /* SIL-events.h */,
+				B5D2E00D16C2CDAF004A0D12 /* SIL-events.c */,
+				B55268F216C335D200E36CD9 /* UDBSocket.h */,
+				B54B368916C2D8A30072BC92 /* UDBSocketUnix.c */,
+			);
+			name = SIL;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B55268F716C4381300E36CD9 /* silcat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B552690016C4381300E36CD9 /* Build configuration list for PBXNativeTarget "silcat" */;
+			buildPhases = (
+				B55268F416C4381300E36CD9 /* Sources */,
+				B55268F516C4381300E36CD9 /* Frameworks */,
+				B55268F616C4381300E36CD9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = silcat;
+			productName = SILcat;
+			productReference = B55268F816C4381300E36CD9 /* SILcat */;
+			productType = "com.apple.product-type.tool";
+		};
+		B5CFEFFF16BC81B10075C575 /* matrixpilot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "matrixpilot" */;
+			buildPhases = (
+				B5CFEFFC16BC81B10075C575 /* Sources */,
+				B5CFEFFD16BC81B10075C575 /* Frameworks */,
+				B5CFEFFE16BC81B10075C575 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = matrixpilot;
+			productName = "MatrixPilot-SIL";
+			productReference = B5CFF00016BC81B10075C575 /* MatrixPilot-SIL */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B5CFEFF816BC81B10075C575 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = MatrixPilot;
+			};
+			buildConfigurationList = B5CFEFFB16BC81B10075C575 /* Build configuration list for PBXProject "MatrixPilot-SIL" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = B5CFEFF716BC81B10075C575;
+			productRefGroup = B5CFF00116BC81B10075C575 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B5CFEFFF16BC81B10075C575 /* matrixpilot */,
+				B55268F716C4381300E36CD9 /* silcat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B55268F416C4381300E36CD9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B552690216C4382200E36CD9 /* SILcat.c in Sources */,
+				B552690416C43A3400E36CD9 /* UDBSocketUnix.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5CFEFFC16BC81B10075C575 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5D2E01116C2CDAF004A0D12 /* SIL-dsp.c in Sources */,
+				B5D2E01216C2CDAF004A0D12 /* SIL-eeprom.c in Sources */,
+				B5D2E01316C2CDAF004A0D12 /* SIL-events.c in Sources */,
+				B5D2E01416C2CDAF004A0D12 /* SIL-udb.c in Sources */,
+				B54B363816C2D8410072BC92 /* deadReckoning.c in Sources */,
+				B54B363916C2D8410072BC92 /* estWind.c in Sources */,
+				B54B363A16C2D8410072BC92 /* estYawDrift.c in Sources */,
+				B54B363B16C2D8410072BC92 /* gpsParseCommon.c in Sources */,
+				B54B363C16C2D8410072BC92 /* gpsParseMTEK.c in Sources */,
+				B54B363D16C2D8410072BC92 /* gpsParseSTD.c in Sources */,
+				B54B363E16C2D8410072BC92 /* gpsParseUBX.c in Sources */,
+				B54B363F16C2D8410072BC92 /* libDCM.c in Sources */,
+				B54B364016C2D8410072BC92 /* mathlibNAV.c in Sources */,
+				B54B364116C2D8410072BC92 /* rmat.c in Sources */,
+				B54B366A16C2D86E0072BC92 /* airspeedCntrl.c in Sources */,
+				B54B366B16C2D86E0072BC92 /* altitudeCntrl.c in Sources */,
+				B54B366C16C2D86E0072BC92 /* altitudeCntrlVariable.c in Sources */,
+				B54B366D16C2D86E0072BC92 /* behavior.c in Sources */,
+				B54B366E16C2D86E0072BC92 /* cameraCntrl.c in Sources */,
+				B54B366F16C2D86E0072BC92 /* config_tests.c in Sources */,
+				B54B367016C2D86E0072BC92 /* data_services.c in Sources */,
+				B54B367116C2D86E0072BC92 /* data_storage.c in Sources */,
+				B54B367216C2D86E0072BC92 /* euler_angles.c in Sources */,
+				B54B367316C2D86E0072BC92 /* flightplan-logo.c in Sources */,
+				B54B367416C2D86E0072BC92 /* flightplan-waypoints.c in Sources */,
+				B54B367516C2D86E0072BC92 /* main.c in Sources */,
+				B54B367616C2D86E0072BC92 /* MAVLink.c in Sources */,
+				B54B367716C2D86E0072BC92 /* mode_switch.c in Sources */,
+				B54B367816C2D86E0072BC92 /* mp_osd.c in Sources */,
+				B54B367916C2D86E0072BC92 /* navigate.c in Sources */,
+				B54B367A16C2D86E0072BC92 /* nv_memory_table.c in Sources */,
+				B54B367B16C2D86E0072BC92 /* parameter_table.c in Sources */,
+				B54B367C16C2D86E0072BC92 /* pitchCntrl.c in Sources */,
+				B54B367D16C2D86E0072BC92 /* rollCntrl.c in Sources */,
+				B54B367E16C2D86E0072BC92 /* servoMix.c in Sources */,
+				B54B367F16C2D86E0072BC92 /* servoPrepare.c in Sources */,
+				B54B368016C2D86E0072BC92 /* states.c in Sources */,
+				B54B368116C2D86E0072BC92 /* telemetry.c in Sources */,
+				B54B368216C2D86E0072BC92 /* yawCntrl.c in Sources */,
+				B54B368B16C2D8A30072BC92 /* UDBSocketUnix.c in Sources */,
+				B5933C0616C82C32001ABBA6 /* SIL-ui-mp-term.c in Sources */,
+				B5933C0916C82CCF001ABBA6 /* SIL-serial.c in Sources */,
+				B56B31C41742FFD30070AD97 /* estAltitude.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B55268FE16C4381300E36CD9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B55268FF16C4381300E36CD9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		B5CFF00716BC81B10075C575 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B5CFF00816BC81B10075C575 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B5CFF00A16BC81B10075C575 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B5CFF00B16BC81B10075C575 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B552690016C4381300E36CD9 /* Build configuration list for PBXNativeTarget "silcat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B55268FE16C4381300E36CD9 /* Debug */,
+				B55268FF16C4381300E36CD9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B5CFEFFB16BC81B10075C575 /* Build configuration list for PBXProject "MatrixPilot-SIL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B5CFF00716BC81B10075C575 /* Debug */,
+				B5CFF00816BC81B10075C575 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B5CFF00916BC81B10075C575 /* Build configuration list for PBXNativeTarget "matrixpilot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B5CFF00A16BC81B10075C575 /* Debug */,
+				B5CFF00B16BC81B10075C575 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B5CFEFF816BC81B10075C575 /* Project object */;
+}
