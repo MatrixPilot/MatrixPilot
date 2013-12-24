@@ -81,9 +81,9 @@ void udb_init_capture(void)
 {
 	int16_t i;
 
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_radio_trim == 0)
-#endif
+	#if (USE_NV_MEMORY == 1)
+		if (udb_skip_flags.skip_radio_trim == 0)
+	#endif
 	{	
 		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
@@ -105,41 +105,40 @@ void udb_init_capture(void)
 	T2CONbits.TCS = 0;      // use the internal clock
 	T2CONbits.TON = 1;      // turn on timer 2
 
-#if (NORADIO != 1)
-
-#if (BOARD_TYPE == AUAV3_BOARD)
-#define REGTOK1 N1
-#define REGTOK2 N2
-#define IC1VAL 0x0401
-#else // UDB4 or 5
-#define REGTOK1 N
-#define REGTOK2 N
-#define IC1VAL 0x0081
-#endif
-#define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
-
-#define _IC_INIT(x, y, z) \
-{ \
-	IC##x##CO##z = IC2VAL; \
-	IC##x##CO##y = IC1VAL; \
-	_IC##x##IP = INT_PRI_IC; \
-	_IC##x##IF = 0; \
-	_IC##x##IE = 1; \
-}
-#define IC_INIT(x, y, z) _IC_INIT(x, y, z)
-
-	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
-#if (USE_PPM_INPUT == 0)
-	if (NUM_INPUTS > 1) IC_INIT(2, REGTOK1, REGTOK2);
-	if (NUM_INPUTS > 2) IC_INIT(3, REGTOK1, REGTOK2);
-	if (NUM_INPUTS > 3) IC_INIT(4, REGTOK1, REGTOK2);
-	if (NUM_INPUTS > 4) IC_INIT(5, REGTOK1, REGTOK2);
-	if (NUM_INPUTS > 5) IC_INIT(6, REGTOK1, REGTOK2);
-	if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
-
-	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
-#endif // USE_PPM_INPUT
-#endif // NORADIO
+	#if (NORADIO != 1)
+		#if (BOARD_TYPE == AUAV3_BOARD)
+			#define REGTOK1 N1
+			#define REGTOK2 N2
+			#define IC1VAL 0x0401
+			#else // UDB4 or 5
+			#define REGTOK1 N
+			#define REGTOK2 N
+			#define IC1VAL 0x0081
+		#endif
+		#define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
+		
+		#define _IC_INIT(x, y, z) \
+		{ \
+			IC##x##CO##z = IC2VAL; \
+			IC##x##CO##y = IC1VAL; \
+			_IC##x##IP = INT_PRI_IC; \
+			_IC##x##IF = 0; \
+			_IC##x##IE = 1; \
+		}
+		#define IC_INIT(x, y, z) _IC_INIT(x, y, z)
+		
+			if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
+		#if (USE_PPM_INPUT == 0)
+			if (NUM_INPUTS > 1) IC_INIT(2, REGTOK1, REGTOK2);
+			if (NUM_INPUTS > 2) IC_INIT(3, REGTOK1, REGTOK2);
+			if (NUM_INPUTS > 3) IC_INIT(4, REGTOK1, REGTOK2);
+			if (NUM_INPUTS > 4) IC_INIT(5, REGTOK1, REGTOK2);
+			if (NUM_INPUTS > 5) IC_INIT(6, REGTOK1, REGTOK2);
+			if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
+		
+			if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
+		#endif // USE_PPM_INPUT
+	#endif // NORADIO
 }
 
 void radioIn_failsafe_check(void)
@@ -169,9 +168,10 @@ void radioIn_failsafe_reset(void)
 	noisePulses = 0;
 }
 
+
 static void set_udb_pwIn(int pwm, int index)
 {
-#if (NORADIO != 1)
+#if (NORADIO != 1 && BOARD_TYPE == AUAV3_BOARD)
 	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
 
 	if (FAILSAFE_INPUT_CHANNEL == index)
@@ -223,94 +223,368 @@ static void set_udb_pwIn(int pwm, int index)
 #endif // NOARADIO !=1
 }
 
-#if (NORADIO != 1)
-	#if (USE_PPM_INPUT == 0)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+	#if (NORADIO != 1) 						// radio in use
+		#if (USE_PPM_INPUT == 0)  //NO PPM ENCODER  TODO:  NEST WITHIN THE SONAR CONDITION ABOVE
+			#define _IC_HANDLER(x, y, z) \
+			void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
+			{ \
+				indicate_loading_inter; \
+				interrupt_save_set_corcon; \
+				static uint16_t rise = 0; \
+				uint16_t time = 0; \
+				_IC##x##IF = 0; \
+				while (IC##x##CO##y##bits.ICBNE) \
+					time = IC##x##BUF; \
+				if (z) \
+					rise = time; \
+				else \
+					set_udb_pwIn(time - rise, x); \         			/////// >>>>>>>>>>>>>>>>>>
+					interrupt_restore_corcon; \
+			}
+			#define IC_HANDLER(x, y, z) _IC_HANDLER(x, y, z)
+			
+			IC_HANDLER(1, REGTOK1, IC_PIN1);
+			IC_HANDLER(2, REGTOK1, IC_PIN2);
+			IC_HANDLER(3, REGTOK1, IC_PIN3);
+			IC_HANDLER(4, REGTOK1, IC_PIN4);
+			IC_HANDLER(5, REGTOK1, IC_PIN5);
+			IC_HANDLER(6, REGTOK1, IC_PIN6);
+			IC_HANDLER(7, REGTOK1, IC_PIN7);
 	
-	#define _IC_HANDLER(x, y, z) \
-	void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
-	{ \
-		indicate_loading_inter; \
-		interrupt_save_set_corcon; \
-		static uint16_t rise = 0; \
-		uint16_t time = 0; \
-		_IC##x##IF = 0; \
-		while (IC##x##CO##y##bits.ICBNE) \
-			time = IC##x##BUF; \
-		if (z) \
-			rise = time; \
-		else \
-			set_udb_pwIn(time - rise, x); \
-		interrupt_restore_corcon; \
-	}
-	#define IC_HANDLER(x, y, z) _IC_HANDLER(x, y, z)
+			#if (USE_SONAR_INPUT != 8)
+				IC_HANDLER(8, REGTOK1, IC_PIN8);
+			#endif // USE_SONAR_INPUT != 8
+		
+		#else // (USE_PPM_INPUT != 0) USE PPM
+		
+			#if (PPM_SIGNAL_INVERTED == 1)
+				#define PPM_PULSE_VALUE 0
+			#else
+				#define PPM_PULSE_VALUE 1
+			#endif
 	
-	IC_HANDLER(1, REGTOK1, IC_PIN1);
-	IC_HANDLER(2, REGTOK1, IC_PIN2);
-	IC_HANDLER(3, REGTOK1, IC_PIN3);
-	IC_HANDLER(4, REGTOK1, IC_PIN4);
-	IC_HANDLER(5, REGTOK1, IC_PIN5);
-	IC_HANDLER(6, REGTOK1, IC_PIN6);
-	IC_HANDLER(7, REGTOK1, IC_PIN7);
-	#if (USE_SONAR_INPUT != 8)
-	IC_HANDLER(8, REGTOK1, IC_PIN8);
-	#endif // USE_SONAR_INPUT
+			#if (USE_SONAR == 1)  // SONAR IN USE  TODO:  MOVE THIS AT THE TOP
+				int16_t udb_pwm_sonar;          // pulse width of sonar signal
+				static int16_t udb_pwm_sonar_rise;
+				static uint16_t sonar_pwm_count;
 	
-	#else // (USE_PPM_INPUT != 0)
+				#if (BOARD_TYPE == AUAV3_BOARD)
+					#define ICBNE(x) IC##x##CON1bits.ICBNE
+				#endif
+				
+				int16_t get_sonar_value(void)   // used in sonarCntrl.c 
+				{
+					return udb_pwm_sonar;
+				}
+				
+				uint16_t get_sonar_count(void)
+				{
+					return sonar_pwm_count;
+				}
+				
+				void udb_init_sonar(void)
+				{
+					// See notes below for followint algorithm description
+					TMR3 = 0;               // initialize timer
+					T3CONbits.TCKPS = 2;    // prescaler = 64,  see page 175 at http://ww1.microchip.com/downloads/en/DeviceDoc/70593C.pdf
+					T3CONbits.TCS = 0;      // use the internal clock
+					T3CONbits.TON = 1;      // turn on timer 3
+				    IC8CONbits.ICTMR = 0;   // use timer 3,  TODO:  make this compatible with AUAV3
+					IC8CONbits.ICM = 1;     // capture every edge,  TODO:  make this compatible with AUAV3
+					_TRISD15 = 1;
+					_IC8IP = 6;
+					_IC8IF = 0; 
+					_IC8IE = 1;             // enable sonar intterupt
+				}
+				
+				void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
+				{
+					indicate_loading_inter;
+					interrupt_save_set_corcon;
+					uint16_t time;
+					_IC8IF = 0;               // clear the interrupt
 	
-	#if (PPM_SIGNAL_INVERTED == 1)
-	#define PPM_PULSE_VALUE 0
-	#else
-	#define PPM_PULSE_VALUE 1
-	#endif
+					while (IC8CONbits.ICBNE)  // TODO:  make this compatible with AUAV3
+					{
+						time = IC8BUF;
+					}
+					if (PORTDbits.RD15)        // TODO: make this portable to the AUAV3
+					{
+						udb_pwm_sonar_rise = time;
+						sonar_pwm_count++;
+					}
+					else
+					{
+						udb_pwm_sonar = time - udb_pwm_sonar_rise;	
+						udb_flags._.sonar_updated = 1;
+					}	
+					interrupt_restore_corcon;
+				}
 	
-	//#if (BOARD_TYPE == AUAV3_BOARD)
-	//#define ICBNE(x) IC##x##CON1bits.ICBNE
-	//#else
-	//#define ICBNE(x) IC##x##CONbits.ICBNE
-	//#endif
+				#if (USE_PPM_INPUT == 1)
+					#if (PPM_SIGNAL_INVERTED == 1)
+						#define PPM_PULSE_VALUE 0
+					#else
+						#define PPM_PULSE_VALUE 1
+					#endif
 	
-	//#define REGTOK1 N1
-	#define ICBNE(x, y) IC##x##CO##y##bits.ICBNE
+					static uint16_t rise_ppm = 0;
+					unsigned char ppm_ch = 0 ;
+					
+					// PPM Input on Channel 1
+					void __attribute__((__interrupt__,__no_auto_psv__)) _IC1Interrupt(void)
+					{
+						indicate_loading_inter ;
+						interrupt_save_set_corcon ;
+						unsigned int time ;	
+						_IC1IF = 0 ; // clear the interrupt
+						while ( IC1CONbits.ICBNE )
+						{
+							time = IC1BUF ;
+						}
+						#if ( NORADIO != 1 )
+							if (_RD8 == PPM_PULSE_VALUE)
+							{
+								unsigned int pulse = time - rise_ppm ;
+								rise_ppm = time ;
+								
+								if (pulse > MIN_SYNC_PULSE_WIDTH)			//sync pulse
+								{
+									ppm_ch = 1 ;
+								}
+								else
+								{
+									if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+									{
+									if (ppm_ch <= NUM_INPUTS)
+										{
+											udb_pwIn[ppm_ch] = pulse ;
+											
+											if ( ppm_ch == FAILSAFE_INPUT_CHANNEL )
+											{
+												if ( udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
+												{
+												failSafePulses++ ;
+												}
+												else
+												{
+													noisePulses++ ;
+												}
+											}
+										}
+										ppm_ch++ ;							//scan next channel
+									}
+								}
+							}
+						#endif
 	
-	#define _IC_TIME(x, y) \
-	static inline uint16_t ic_time(void) \
-	{ \
-		uint16_t time = 0; \
-		_IC##x##IF = 0; \
-		while (ICBNE(x, y)) time = IC##x##BUF; \
-		return time; \
-	}
-	#define IC_TIME(x, y) _IC_TIME(x, y)
+						interrupt_restore_corcon ;
+						return ;
+					}
+					
+				#endif // #if (USE_PPM_INPUT != 1)
 	
-	IC_TIME(PPM_IC, REGTOK1);
+			#else  //USE_SONAR == 0  OR NO SONAR
 	
-	#define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
-	#define IC_INTERRUPT(x) _IC_INTERRUPT(x)
+				//#if (BOARD_TYPE == AUAV3_BOARD)
+				//#define ICBNE(x) IC##x##CON1bits.ICBNE
+				//#else
+				//#define ICBNE(x) IC##x##CONbits.ICBNE
+				//#endif
+				//#define REGTOK1 N1
+				#define ICBNE(x, y) IC##x##CO##y##bits.ICBNE
+				#define _IC_TIME(x, y) \
 	
-	#define _IC_PIN(x) IC_PIN##x
-	#define __IC_PIN(x) _IC_PIN(x)
+				static inline uint16_t ic_time(void) \
+				{ \
+					uint16_t time = 0; \
+					_IC##x##IF = 0; \
+					while (ICBNE(x, y)) time = IC##x##BUF; \
+					return time; \
+				}
 	
-	// PPM Input on Channel PPM_IC
-	void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
-	{
-		indicate_loading_inter;
-		interrupt_save_set_corcon;
+				#define IC_TIME(x, y) _IC_TIME(x, y)
+				IC_TIME(PPM_IC, REGTOK1);
+				#define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
+				#define IC_INTERRUPT(x) _IC_INTERRUPT(x)
+				
+				// PPM Input on Channel PPM_IC
+				void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
+				{
+					indicate_loading_inter;
+					interrupt_save_set_corcon;
+					static uint16_t rise_ppm = 0;
+					static uint8_t ppm_ch = 0;
+					uint16_t time = 0;
+					time = ic_time();
 	
-		static uint16_t rise_ppm = 0;
-		static uint8_t ppm_ch = 0;
-		uint16_t time = 0;
-	
-		time = ic_time();
-	
-	#if (USE_PPM_INPUT == 1)
-		if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
+					#if (USE_PPM_INPUT == 1)
+						if (IC_PIN == PPM_PULSE_VALUE)
+						{
+							uint16_t pulse = time - rise_ppm;
+							rise_ppm = time;
+					
+							if (pulse > MIN_SYNC_PULSE_WIDTH)
+							{
+								ppm_ch = 1;
+							}
+							else
+							{
+								if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+								{
+									if (ppm_ch <= NUM_INPUTS)
+									{
+										set_udb_pwIn(pulse, ppm_ch);  				/////// >>>>>>>>>>>>>>>>>>
+									}
+									ppm_ch++;
+								}
+							}
+						}
+					#elif  (USE_PPM_INPUT == 2)
+						uint16_t pulse = time - rise_ppm;
+						rise_ppm = time;
+					
+						if (IC_PIN == PPM_PULSE_VALUE)
+						{
+							if (pulse > MIN_SYNC_PULSE_WIDTH)
+							{
+								ppm_ch = 1;
+							}
+						}
+						else
+						{
+							if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+							{
+								if (ppm_ch <= NUM_INPUTS)
+								{
+									set_udb_pwIn(pulse, ppm_ch);  					/////// >>>>>>>>>>>>>>>>>>
+								}
+								ppm_ch++;
+							}
+						}
+					#else  // USE_PPM_INPUT > 2
+						#error Invalid USE_PPM_INPUT setting
+					#endif // USE_PPM_INPUT => 1 or 2 
+					interrupt_restore_corcon;
+				}
+			#endif  //USE_SONAR == 1
+		#endif // USE_PPM_INPUT
+	#endif // NORADIO !=1
+#endif 
+
+#if (BOARD_TYPE == AUAV3_BOARD)
+	#if (NORADIO != 1)
+		#if (USE_PPM_INPUT == 0)
+		
+		#define _IC_HANDLER(x, y, z) \
+		void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
+		{ \
+			indicate_loading_inter; \
+			interrupt_save_set_corcon; \
+			static uint16_t rise = 0; \
+			uint16_t time = 0; \
+			_IC##x##IF = 0; \
+			while (IC##x##CO##y##bits.ICBNE) \
+				time = IC##x##BUF; \
+			if (z) \
+				rise = time; \
+			else \
+				set_udb_pwIn(time - rise, x); \
+			interrupt_restore_corcon; \
+		}
+		#define IC_HANDLER(x, y, z) _IC_HANDLER(x, y, z)
+		
+		IC_HANDLER(1, REGTOK1, IC_PIN1);
+		IC_HANDLER(2, REGTOK1, IC_PIN2);
+		IC_HANDLER(3, REGTOK1, IC_PIN3);
+		IC_HANDLER(4, REGTOK1, IC_PIN4);
+		IC_HANDLER(5, REGTOK1, IC_PIN5);
+		IC_HANDLER(6, REGTOK1, IC_PIN6);
+		IC_HANDLER(7, REGTOK1, IC_PIN7);
+		#if (USE_SONAR_INPUT != 8)
+		IC_HANDLER(8, REGTOK1, IC_PIN8);
+		#endif // USE_SONAR_INPUT
+		
+		#else // (USE_PPM_INPUT != 0)
+		
+		#if (PPM_SIGNAL_INVERTED == 1)
+		#define PPM_PULSE_VALUE 0
+		#else
+		#define PPM_PULSE_VALUE 1
+		#endif
+		
+		//#if (BOARD_TYPE == AUAV3_BOARD)
+		//#define ICBNE(x) IC##x##CON1bits.ICBNE
+		//#else
+		//#define ICBNE(x) IC##x##CONbits.ICBNE
+		//#endif
+		
+		//#define REGTOK1 N1
+		#define ICBNE(x, y) IC##x##CO##y##bits.ICBNE
+		
+		#define _IC_TIME(x, y) \
+		static inline uint16_t ic_time(void) \
+		{ \
+			uint16_t time = 0; \
+			_IC##x##IF = 0; \
+			while (ICBNE(x, y)) time = IC##x##BUF; \
+			return time; \
+		}
+		#define IC_TIME(x, y) _IC_TIME(x, y)
+		
+		IC_TIME(PPM_IC, REGTOK1);
+		
+		#define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
+		#define IC_INTERRUPT(x) _IC_INTERRUPT(x)
+		
+		#define _IC_PIN(x) IC_PIN##x
+		#define __IC_PIN(x) _IC_PIN(x)
+		
+		// PPM Input on Channel PPM_IC
+		void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 		{
+			indicate_loading_inter;
+			interrupt_save_set_corcon;
+		
+			static uint16_t rise_ppm = 0;
+			static uint8_t ppm_ch = 0;
+			uint16_t time = 0;
+		
+			time = ic_time();
+		
+		#if (USE_PPM_INPUT == 1)
+			if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
+			{
+				uint16_t pulse = time - rise_ppm;
+				rise_ppm = time;
+		
+				if (pulse > MIN_SYNC_PULSE_WIDTH)
+				{
+					ppm_ch = 1;
+				}
+				else
+				{
+					if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+					{
+						if (ppm_ch <= NUM_INPUTS)
+						{
+							set_udb_pwIn(pulse, ppm_ch);
+						}
+						ppm_ch++;
+					}
+				}
+			}
+		#elif  (USE_PPM_INPUT == 2)
 			uint16_t pulse = time - rise_ppm;
 			rise_ppm = time;
-	
-			if (pulse > MIN_SYNC_PULSE_WIDTH)
+		
+			if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
 			{
-				ppm_ch = 1;
+				if (pulse > MIN_SYNC_PULSE_WIDTH)
+				{
+					ppm_ch = 1;
+				}
 			}
 			else
 			{
@@ -323,37 +597,16 @@ static void set_udb_pwIn(int pwm, int index)
 					ppm_ch++;
 				}
 			}
+		#else  // USE_PPM_INPUT > 2
+		#error Invalid USE_PPM_INPUT setting
+		#endif // USE_PPM_INPUT
+			interrupt_restore_corcon;
 		}
-	#elif  (USE_PPM_INPUT == 2)
-		uint16_t pulse = time - rise_ppm;
-		rise_ppm = time;
-	
-		if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
-		{
-			if (pulse > MIN_SYNC_PULSE_WIDTH)
-			{
-				ppm_ch = 1;
-			}
-		}
-		else
-		{
-			if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
-			{
-				if (ppm_ch <= NUM_INPUTS)
-				{
-					set_udb_pwIn(pulse, ppm_ch);
-				}
-				ppm_ch++;
-			}
-		}
-	#else  // USE_PPM_INPUT > 2
-	#error Invalid USE_PPM_INPUT setting
-	#endif // USE_PPM_INPUT
-		interrupt_restore_corcon;
-	}
-	
-	#endif // USE_PPM_INPUT
-#endif // NORADIO !=1
+		
+		#endif // USE_PPM_INPUT
+	#endif // NORADIO !=1
+#endif
+
 
 /*
 PPM_2
