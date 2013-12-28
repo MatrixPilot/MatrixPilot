@@ -239,7 +239,7 @@ void udb_run(void)
 			{
 				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
 			}
-			
+
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
@@ -318,7 +318,7 @@ uint16_t get_current_milliseconds()
 	// *nix / mac implementation
 	struct timeval tv;
 	struct timezone tz;
-	
+
 	gettimeofday(&tv,&tz);
 	return tv.tv_usec / 1000;
 }
@@ -338,7 +338,7 @@ void sleep_milliseconds(uint16_t ms)
 void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 {
 	int i;
-	
+
 	uint8_t CK_A = 0;
 	uint8_t CK_B = 0;
 	uint8_t headerBytes = 0;

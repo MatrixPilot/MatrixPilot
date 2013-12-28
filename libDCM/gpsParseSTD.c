@@ -84,10 +84,8 @@ uint8_t * const msg2parse[] = {
 	&un, &un };
 */
 
-//union longbbbb lat_gps_, long_gps_, alt_sl_gps_, tow_;
 union intbb nav_valid_, nav_type_, sog_gps_, climb_gps_, week_no_;
 union uintbb cog_gps_;
-//uint8_t hdop_;
 union intbb checksum_; // included at the end of the GPS message
 union intbb calculated_checksum; // calculated locally
 #define INVALID_CHECKSUM -1

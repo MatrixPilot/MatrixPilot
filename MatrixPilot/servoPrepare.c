@@ -58,7 +58,7 @@ void init_servoPrepare(void) // initialize the PWM
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
 #endif
 	}
-	
+
 #if (NORADIO == 1)
 	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000;
 #endif
@@ -106,13 +106,12 @@ void dcm_heartbeat_callback(void)
 		}
 #else
 		// This is a simple check to send telemetry at 8hz
-//		if (udb_heartbeat_counter % 5 == 0)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
 // RobD			flight_state_8hz();
 			serial_output_8hz();
 		}
-#endif
+#endif // SERIAL_OUTPUT_FORMAT
 	}
 
 	osd_run_step();

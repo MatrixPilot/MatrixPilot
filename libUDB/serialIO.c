@@ -37,7 +37,7 @@
 
 void udb_init_GPS(void)
 {
-	// configure U2MODE
+	// configure U1MODE
 	U1MODEbits.UARTEN = 0;      // Bit15 TX, RX DISABLED, ENABLE at end of func
 	//                          // Bit14
 	U1MODEbits.USIDL = 0;       // Bit13 Continue in Idle
@@ -105,11 +105,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-#if (USE_HILSIM_USB != 1)
+#if (HILSIM_USB != 1)
 	int16_t txchar = udb_gps_callback_get_byte_to_send();
 #else
 	int16_t txchar = -1;
-#endif
+#endif // HILSIM_USB
 	if (txchar != -1)
 	{
 		U1TXREG = (uint8_t)txchar;
@@ -126,9 +126,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	while (U1STAbits.URXDA)
 	{
 		uint8_t rxchar = U1RXREG;
-#if (USE_HILSIM_USB != 1)
+#if (HILSIM_USB != 1)
 		udb_gps_callback_received_byte(rxchar);
-#endif // USE_HILSIM_USB
+#endif // HILSIM_USB
 	}
 	U1STAbits.OERR = 0;
 	interrupt_restore_corcon;
@@ -156,7 +156,7 @@ void udb_init_USART(void)
 	U2MODEbits.PDSEL = 0;       // Bits1,2 8bit, No Parity
 	U2MODEbits.STSEL = 0;       // Bit0 One Stop Bit
 
-	// Load all values in for U1STA SFR
+	// Load all values in for U2STA SFR
 	U2STAbits.UTXISEL1 = 0;     //Bit15 Int when Char is transferred (1/2 config!)
 	U2STAbits.UTXINV = 0;       //Bit14 N/A, IRDA config
 	U2STAbits.UTXISEL0 = 1;     //Bit13 Other half of Bit15
