@@ -54,8 +54,8 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../MatrixPilot/euler_angles.h"
 #include "../libUDB/events.h"
+#include "euler_angles.h"
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
@@ -88,6 +88,7 @@ mavlink_status_t r_mavlink_status;
 #include "../MAVLink/include/matrixpilot/testsuite.h"
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
+mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 
 #define	SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
 #define	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Convert 16 bit byte circular to radians
@@ -121,12 +122,13 @@ inline void preflight_storage_complete_callback(boolean success);
 
 void init_mavlink(void)
 {
+	int16_t index;
+
 	mavlink_process_message_handle = register_event_p(&handleMessage, EVENT_PRIORITY_MEDIUM);
 	mavlink_system.sysid = MAVLINK_SYSID; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1; // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
 
 	// Fill stream rates array with zeros to default all streams off;
-	int16_t index;
 	for (index = 0; index < MAV_DATA_STREAM_ENUM_END; index++)
 		streamRates[index] = 0;
 
@@ -169,14 +171,22 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
 // Note: Channel Number, chan, is currently ignored.
 {
+	int16_t start_index;
+	int16_t remaining;
+
+#if (USE_TELELOG == 1)
+//printf("calling log_telemetry with %u bytes\r\n", len);
+	log_telemetry(buf, len);
+#endif // USE_TELELOG
+
 	// Note at the moment, all channels lead to the one serial port
 	if (serial_interrupt_stopped == 1)
 	{
 		sb_index = 0;
 		end_index = 0;
 	}
-	int16_t start_index = end_index;
-	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
+	start_index = end_index;
+	remaining = SERIAL_BUFFER_SIZE - start_index;
 
 //	printf("%u\r\n", remaining);
 
@@ -374,14 +384,14 @@ static void handleMessage(void)
 	{
 		case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
 		{
+			int16_t freq = 0; // packet frequency
+
 			// decode
 			mavlink_request_data_stream_t packet;
 			mavlink_msg_request_data_stream_decode(handle_msg, &packet);
 			//send_text((const uint8_t*) "Action: Request data stream\r\n");
 			// QgroundControl sends data stream request to component ID 1, which is not our component for UDB.
 			if (packet.target_system != mavlink_system.sysid) break;
-
-			int16_t freq = 0; // packet frequency
 
 			if (packet.start_stop == 0) freq = 0; // stop sending
 			else if (packet.start_stop == 1) freq = packet.req_message_rate; // start sending
@@ -836,8 +846,8 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 14;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_POSITION], mavlink_counter_40hz + spread_transmission_load))
 	{
-		mavlink_heading = get_geo_heading_angle();
 		int16_t pwOut_max = 4000;
+		mavlink_heading = get_geo_heading_angle();
 		if (THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000;
 		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, (float)(air_speed_3DIMU / 100.0), (float)(ground_velocity_magnitudeXY / 100.0), (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
@@ -956,6 +966,9 @@ void mavlink_output_40hz(void)
 		mavlink_msg_command_ack_send(MAVLINK_COMM_0, mavlink_command_ack_command, mavlink_command_ack_result);
 		mavlink_send_command_ack = false;
 	}
+#if (USE_TELELOG == 1)
+	log_swapbuf();
+#endif
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 

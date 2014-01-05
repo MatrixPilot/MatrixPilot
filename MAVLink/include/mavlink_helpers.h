@@ -14,13 +14,15 @@ static inline void setAndSaveIPL(int newIPL);
 static inline void restoreIPL();
 #endif
 
+extern mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
+
 /*
  * Internal function to give access to the channel status for each channel
  */
 #ifndef MAVLINK_GET_CHANNEL_STATUS
 MAVLINK_HELPER mavlink_status_t* mavlink_get_channel_status(uint8_t chan)
 {
-	static mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
+//	static mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 	return &m_mavlink_status[chan];
 }
 #endif
