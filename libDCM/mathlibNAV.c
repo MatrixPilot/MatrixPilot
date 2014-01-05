@@ -163,7 +163,7 @@ void rotate_2D_vector_by_angle(int16_t vector[2], int8_t angle)
 	rotate_2D_vector_by_vector(vector, rotate);
 }
 
-void rotate(struct relative2D *xy, int8_t angle)
+void rotate(struct relative2D* xy, int8_t angle)
 {
 	// rotates xy by angle, measured in a counter clockwise sense.
 	// A mathematical angle of plus or minus pi is represented digitally as plus or minus 128.
@@ -180,7 +180,7 @@ void rotate(struct relative2D *xy, int8_t angle)
 	xy->y = newy;
 }
 
-int8_t rect_to_polar(struct relative2D *xy)
+int8_t rect_to_polar(struct relative2D* xy)
 {
 	// Convert from rectangular to polar coordinates using "CORDIC" arithmetic, which is basically
 	// a binary search for the angle.
@@ -221,7 +221,7 @@ int8_t rect_to_polar(struct relative2D *xy)
 	return (-theta);
 }
 
-int16_t rect_to_polar16(struct relative2D *xy)
+int16_t rect_to_polar16(struct relative2D* xy)
 {
 	// Convert from rectangular to polar coordinates using "CORDIC" arithmetic, which is basically
 	// a binary search for the angle.
@@ -454,7 +454,6 @@ int16_t find_first_bit_int32(int32_t argument)
 	{
 		input.WW = argument;
 	}
-
 	binw1 = FindFirstBitFromLeft(input._.W1);
 	binw0 = FindFirstBitFromLeft(input._.W0);
 	if (binw1 == 0)

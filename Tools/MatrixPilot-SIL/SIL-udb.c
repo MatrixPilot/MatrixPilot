@@ -145,13 +145,14 @@ void udb_skip_imu_calibration(boolean b)
 
 void udb_init(void)
 {
+	int16_t i;
+
 	// If we were reest:
 	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
 	{
 		mp_rcon = 128; // enable just the external/MCLR reset bit
 	}
 
-	int16_t i;
 	for (i = 0; i < 4; i++)
 	{
 		leds[i] = LED_OFF;
@@ -196,7 +197,7 @@ int initialised = 0;
 void udb_run(void)
 {
 	uint16_t currentTime;
-	uint16_t nextHeartbeatTime;
+	static uint16_t nextHeartbeatTime;
 
 	if (!initialised)
 	{
@@ -272,7 +273,7 @@ void udb_servo_record_trims(void)
 	for (i = 1; i <= NUM_INPUTS; i++)
 	{
 		udb_pwTrim[i] = udb_pwIn[i];
-		DPRINT("udb_pwTrim[%i] = %u\r\n", i, udb_pwTrim[i]);
+//		DPRINT("udb_pwTrim[%i] = %u\r\n", i, udb_pwTrim[i]);
 	}
 }
 
@@ -300,20 +301,21 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
+	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+
 	sil_ui_will_reset();
 
 	if (gpsSocket)       UDBSocket_close(gpsSocket);
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket)    UDBSocket_close(serialSocket);
 
-	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 	execv(mp_argv[0], args);
 	fprintf(stderr, "Failed to reset UDB %s\n", mp_argv[0]);
 	exit(1);
 }
 
 // time functions
-uint16_t get_current_milliseconds()
+uint16_t get_current_milliseconds(void)
 {
 	// *nix / mac implementation
 	struct timeval tv;

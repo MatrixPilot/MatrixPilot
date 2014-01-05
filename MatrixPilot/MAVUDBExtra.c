@@ -94,6 +94,8 @@ void MAVUDBExtraOutput_40hz(void)
 			{
 				if (mavlink_sue_telemetry_f2_a == true)
 				{
+					int16_t i;
+
 					mavlink_sue_telemetry_f2_a = false;
 					// Approximate time passing between each telemetry line, even though
 					// we may not have new GPS time data each time through.
@@ -129,7 +131,6 @@ void MAVUDBExtraOutput_40hz(void)
 					    svs, hdop);
 #endif // (MAG_YAW_DRIFT == 1)
 					// Save  pwIn and PwOut buffers for sending next time around in f2_b format message
-					int16_t i;
 					for (i = 0; i <= (NUM_INPUTS > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_INPUTS); i++)
 						pwIn_save[i] = udb_pwIn[i];
 					for (i = 0; i <= (NUM_OUTPUTS > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_OUTPUTS); i++)
@@ -137,11 +138,10 @@ void MAVUDBExtraOutput_40hz(void)
 					}
 					else
 					{
+						int16_t stack_free = 0;
 						mavlink_sue_telemetry_f2_a = true;
 #if (RECORD_FREE_STACK_SPACE == 1)
-						int16_t stack_free = (int16_t)(4096-maxstack); // This is actually wrong for the UDB4, but currently left the same as for telemetry.c
-#else
-						int16_t stack_free = 0;
+						stack_free = (int16_t)(4096-maxstack); // This is actually wrong for the UDB4, but currently left the same as for telemetry.c
 #endif // (RECORD_FREE_STACK_SPACE == 1)
 
 						mavlink_msg_serial_udb_extra_f2_b_send(MAVLINK_COMM_0, tow.WW,

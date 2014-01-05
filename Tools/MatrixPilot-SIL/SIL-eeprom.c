@@ -23,17 +23,18 @@ boolean EEPROMdirty = 0;
 
 void loadEEPROMFileIfNeeded(void)
 {
+	long n;
+	FILE* fp;
+
 	if (EEPROMloaded) return;
 	
 	EEPROMloaded = 1;
-	
-	FILE* fp;
 	fp = fopen(EEPROMFilePath, "r");
 	if (!fp) {
 		memset(EEPROMbuffer, 0, EE_DATA_SIZE);
 		return;
 	}
-	long n = fread(EEPROMbuffer, EE_PAGE_SIZE, EE_PAGE_COUNT, fp);
+	n = fread(EEPROMbuffer, EE_PAGE_SIZE, EE_PAGE_COUNT, fp);
 	fclose(fp);
 	if (n < EE_PAGE_COUNT) {
 		memset(EEPROMbuffer, 0, EE_DATA_SIZE);
@@ -42,9 +43,10 @@ void loadEEPROMFileIfNeeded(void)
 
 void writeEEPROMFileIfNeeded(void)
 {
+	FILE* fp;
+
 	if (!EEPROMdirty) return;
 	
-	FILE* fp;
 	fp = fopen(EEPROMFilePath, "w");
 	if (!fp) {
 		return;

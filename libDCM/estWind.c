@@ -34,8 +34,6 @@ static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
 void estimateWind(void)
 {
-	if (dcm_flags._.skip_yaw_drift) return;
-	
 	int16_t index;
 	int16_t groundVelocity[3];
 	int16_t groundVelocitySum[3];
@@ -53,6 +51,8 @@ void estimateWind(void)
 	union longww longaccum;
 	struct relative2D xy;
 	uint16_t estimatedAirspeed;
+
+	if (dcm_flags._.skip_yaw_drift) return;
 
 	groundVelocity[0] = GPSvelocity.x;
 	groundVelocity[1] = GPSvelocity.y;

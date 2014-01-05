@@ -109,6 +109,8 @@ uint8_t osd_spi_read(int8_t addr);
 
 #define _SPIEN          SPI2CONbits.ON
 
+#else
+#warning "OSD not configured for SPI port"
 #endif
 
 

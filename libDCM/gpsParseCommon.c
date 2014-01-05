@@ -208,7 +208,7 @@ static void udb_background_callback_triggered(void)
 		location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 		location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
 		location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
-#else
+#else // USE_EXTENDED_NAV
 		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 		location[1] = accum_nav._.W0;
 		accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
@@ -225,7 +225,7 @@ static void udb_background_callback_triggered(void)
 #endif // USE_EXTENDED_NAV
 
 		// convert GPS course of 360 degrees to a binary model with 256
-		accum.WW = __builtin_muluu (COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
+		accum.WW = __builtin_muluu(COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
 		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East
 		cog_circular = -accum.__.B2 + 64;
 
@@ -245,7 +245,7 @@ static void udb_background_callback_triggered(void)
 
 			location_deltaXY.x = location[0] - location_previous[0];
 			location_deltaXY.y = location[1] - location_previous[1];
-			location_deltaZ = location[2] - location_previous[2];
+			location_deltaZ    = location[2] - location_previous[2];
 		}
 		else
 		{
@@ -331,22 +331,29 @@ static uint8_t day_of_week;
 
 int16_t calculate_week_num(int32_t date)
 {
+	uint8_t year;
+	uint8_t month;
+	int16_t day;
+	uint8_t m;
+	uint8_t y;
+	int16_t c;
+	
 //	DPRINT("date %li\r\n", date);
 
 	// Convert date from DDMMYY to week_num and day_of_week
-	uint8_t year = date % 100;
+	year = date % 100;
 	date /= 100;
-	uint8_t month = date % 100;
+	month = date % 100;
 	date /= 100;
-	int16_t day = date % 100;
+	day = date % 100;
 
 	// Wait until we have real date data
 	if (day == 0 || month == 0) return 0;
 
 	// Begin counting at May 1, 2011 since this 1st was a Sunday
-	uint8_t m = 5;                          // May
-	uint8_t y = 11;                         // 2011
-	int16_t c = 0;                          // loop counter
+	m = 5;                          // May
+	y = 11;                         // 2011
+	c = 0;                          // loop counter
 
 	while (m < month || y < year)
 	{
@@ -369,16 +376,21 @@ int16_t calculate_week_num(int32_t date)
 
 int32_t calculate_time_of_week(int32_t time)
 {
+	int16_t ms;
+	uint8_t s;
+	uint8_t m;
+	uint8_t h;
+	
 //	DPRINT("time %li\r\n", time);
 
 	// Convert time from HHMMSSmil to time_of_week in ms
-	int16_t ms = time % 1000;
+	ms = time % 1000;
 	time /= 1000;
-	uint8_t s = time % 100;
+	s = time % 100;
 	time /= 100;
-	uint8_t m = time % 100;
+	m = time % 100;
 	time /= 100;
-	uint8_t h = time % 100;
+	h = time % 100;
 	time = (((((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms;
 	return (time + (((int32_t)day_of_week) * MS_PER_DAY));
 }

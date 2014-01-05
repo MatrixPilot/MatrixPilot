@@ -78,7 +78,7 @@ int16_t outputNum;
 void udb_init_pwm(void) // initialize the PWM
 {
 	int16_t i;
-	for (i=0; i <= NUM_OUTPUTS; i++)
+	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
 		udb_pwOut[i] = 0;
 	}
@@ -139,7 +139,6 @@ void start_pwm_outputs(void)
 	{
 		outputNum = 0;
 		PR4 = SCALE_FOR_PWM_OUT(200);   // set timer to delay 0.1ms
-		
 		TMR4 = 0;                       // start timer at 0
 		_T4IF = 0;                      // clear the interrupt
 		_T4IE = 1;                      // enable timer 4 interrupt

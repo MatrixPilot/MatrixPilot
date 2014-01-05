@@ -34,8 +34,8 @@
 #define HILSIM                              1
 #undef  MODE_SWITCH_TWO_POSITION
 #define MODE_SWITCH_TWO_POSITION            0
-#undef  USE_TELELOG
-#define USE_TELELOG                         0
+//#undef  USE_TELELOG
+//#define USE_TELELOG                         0
 #undef  USE_CONFIGFILE
 #define USE_CONFIGFILE                      0
 #undef  USE_USB

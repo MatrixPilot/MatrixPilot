@@ -181,6 +181,7 @@ void dcm_calibrate(void)
 void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)
 {
 	union longbbbb accum_nav;
+	unsigned char lat_cir;
 
 	lat_origin.WW = o_lat;
 	lon_origin.WW = o_lon;
@@ -189,7 +190,6 @@ void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)
 	// scale the latitude from GPS units to gentleNAV units
 	accum_nav.WW = __builtin_mulss(LONGDEG_2_BYTECIR, lat_origin._.W1);
 
-	unsigned char lat_cir;
 	lat_cir = accum_nav.__.B2;
 	// estimate the cosine of the latitude, which is used later computing desired course
 	cos_lat = cosine(lat_cir);

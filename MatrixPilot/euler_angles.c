@@ -33,12 +33,15 @@
  */
 uint16_t get_geo_heading_angle(void)
 {
+	int16_t accum;
+	int16_t angle;
 	struct relative2D matrix_accum;
+
 	matrix_accum.x = rmat[4];
 	matrix_accum.y = rmat[1];
-	int16_t accum = rect_to_polar(&matrix_accum);   // binary angle (0 to 180, -1 to -179 for complete 360 degrees)
-	int16_t angle = (accum * 180 + 64) >> 7;        // Angle measured counter clockwise, 0=Geographic North
-	angle = -angle;                                 // Angle measure clockwise, 0=Geographic North
+	accum = rect_to_polar(&matrix_accum);   // binary angle (0 to 180, -1 to -179 for complete 360 degrees)
+	angle = (accum * 180 + 64) >> 7;        // Angle measured counter clockwise, 0=Geographic North
+	angle = -angle;                         // Angle measure clockwise, 0=Geographic North
 	if (angle > 360)
 	{
 		angle = angle - 360;
@@ -47,5 +50,5 @@ uint16_t get_geo_heading_angle(void)
 	{
 		angle = angle + 360;
 	}
-	return angle;                                   // Aircraft heading in degrees from geographic north
+	return angle;                           // Aircraft heading in degrees from geographic north
 }

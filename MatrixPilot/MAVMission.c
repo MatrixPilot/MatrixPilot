@@ -363,12 +363,12 @@ boolean MAVHandleMissionMessage(mavlink_message_t* handle_msg)
 
 static inline void MissionRequestList(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_request_list_t packet;
+
 	// BULDING
 //	DPRINT("mission request list\r\n");
 
 	// decode
-	mavlink_mission_request_list_t packet;
-
 	mavlink_msg_mission_request_list_decode(handle_msg, &packet);
 	DPRINT("mission request list: target_system %u, target_component %u\r\n", packet.target_system, packet.target_component);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
@@ -384,6 +384,8 @@ static inline void MissionRequestList(mavlink_message_t* handle_msg)
 
 static inline void MissionRequest(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_request_t packet;
+
 	//send_text((uint8_t*)"waypoint request\r\n");
 	DPRINT("mission request\r\n");
 
@@ -394,7 +396,6 @@ static inline void MissionRequest(mavlink_message_t* handle_msg)
 		return;
 	}
 	// decode
-	mavlink_mission_request_t packet;
 	mavlink_msg_mission_request_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
 	mavlink_waypoint_timeout = MAVLINK_WAYPOINT_TIMEOUT;
@@ -463,11 +464,12 @@ static inline void MissionRequest(mavlink_message_t* handle_msg)
 
 static inline void MissionAck(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_ack_t packet;
+
 	//send_text((uint8_t*)"waypoint ack\r\n");
 	DPRINT("mission ack\r\n");
 
 	// decode
-	mavlink_mission_ack_t packet;
 	mavlink_msg_mission_ack_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
 
@@ -481,20 +483,21 @@ static inline void MissionAck(mavlink_message_t* handle_msg)
 
 static inline void MissionClearAll(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_clear_all_t packet;
+	uint8_t type = 0; // ok (0), error(1)
+	int16_t i;
+
 	//send_text((uint8_t*)"waypoint clear all\r\n");
 	DPRINT("mission clear all\r\n");
 
 	// decode
-	mavlink_mission_clear_all_t packet;
 	mavlink_msg_mission_clear_all_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
 
 	// clear all waypoints
-	uint8_t type = 0; // ok (0), error(1)
 	set(PARAM_WP_TOTAL, 0);
 
 	// send acknowledgement 3 times to makes sure it is received
-	int16_t i;
 	for (i = 0; i < 3; i++)
 	{
 		mavlink_msg_mission_ack_send(MAVLINK_COMM_0, handle_msg->sysid, handle_msg->compid, type);
@@ -503,11 +506,12 @@ static inline void MissionClearAll(mavlink_message_t* handle_msg)
 
 static inline void MissionSetCurrent(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_set_current_t packet;
+
 	//send_text((uint8_t*)"waypoint set current\r\n");
 	DPRINT("mission set current\r\n");
 
 	// decode
-	mavlink_mission_set_current_t packet;
 	mavlink_msg_mission_set_current_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
 
@@ -525,10 +529,11 @@ static inline void MissionSetCurrent(mavlink_message_t* handle_msg)
 
 static inline void MissionCount(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_count_t packet;
+
 	//send_text((uint8_t*)"waypoint count\r\n");
 	DPRINT("mission count\r\n");
 	// decode
-	mavlink_mission_count_t packet;
 	mavlink_msg_mission_count_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
 
@@ -548,6 +553,7 @@ static inline void MissionCount(mavlink_message_t* handle_msg)
 
 static inline void MissionItem(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_item_t packet;
 	//send_text((uint8_t*)"waypoint\r\n");
 //	DPRINT("mission item\r\n");
 
@@ -555,7 +561,6 @@ static inline void MissionItem(mavlink_message_t* handle_msg)
 	if (!mavlink_flags.mavlink_receiving_waypoints) return;
 
 	// decode
-	mavlink_mission_item_t packet;
 	mavlink_msg_mission_item_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
 
@@ -622,9 +627,9 @@ static inline void MissionItem(mavlink_message_t* handle_msg)
 
 	if (waypoint_request_i == get(PARAM_WP_TOTAL))
 	{
+		uint8_t type = 0; // ok (0), error(1)
 		//gcs.send_text("flight plane received");
 		DPRINT("flight plan received\r\n");
-		uint8_t type = 0; // ok (0), error(1)
 		mavlink_msg_mission_ack_send(MAVLINK_COMM_0, handle_msg->sysid, handle_msg->compid, type);
 		mavlink_flags.mavlink_receiving_waypoints = false;
 		// XXX ignores waypoint radius for individual waypoints, can
@@ -673,9 +678,12 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 
 #endif
 
+vect3D_32 getWaypoint3D(uint16_t wp);
+
 void MAVMissionOutput_40hz(void)
 {
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS) // LOGO_WAYPOINTS cannot be uploaded / downloaded
+	vect3D_32 wp;
 
 	if (mavlink_flags.mavlink_send_waypoint_reached == 1)
 	{
@@ -741,9 +749,6 @@ void MAVMissionOutput_40hz(void)
 //			struct waypoint3D getWaypoint3D(uint16_t wp);
 //			struct waypoint3D wp;
 //			wp = getWaypoint3D(mavlink_waypoint_requested_sequence_number);
-
-			vect3D_32 getWaypoint3D(uint16_t wp);
-			vect3D_32 wp;
 			wp = getWaypoint3D(mavlink_waypoint_requested_sequence_number);
 
 
@@ -756,9 +761,9 @@ void MAVMissionOutput_40hz(void)
 			//struct relWaypointDef current_waypoint = wp_to_relative(waypoints[waypointIndex]);
 			//alt_float =  ((float)(IMUlocationz._.W1)) + (float)(alt_origin.WW / 100.0);
 			mavlink_msg_mission_item_send(MAVLINK_COMM_0, mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, \
-				mavlink_waypoint_requested_sequence_number, mavlink_waypoint_frame, MAV_CMD_NAV_WAYPOINT, mavlink_waypoint_current, true, \
-				0.0, 0.0, 0.0, 0.0, \
-				(float)wp.y / 10000000.0, (float)wp.x / 10000000.0, wp.z);
+			    mavlink_waypoint_requested_sequence_number, mavlink_waypoint_frame, MAV_CMD_NAV_WAYPOINT, mavlink_waypoint_current, true, \
+			    0.0, 0.0, 0.0, 0.0, \
+			    (float)wp.y / 10000000.0, (float)wp.x / 10000000.0, wp.z);
 
 			mavlink_flags.mavlink_send_specific_waypoint = 0;
 	}
