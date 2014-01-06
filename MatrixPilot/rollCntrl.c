@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"

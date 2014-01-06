@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "behaviour.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
 

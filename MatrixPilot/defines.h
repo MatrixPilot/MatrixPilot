@@ -86,7 +86,10 @@ void calculate_sonar_height_above_ground(void);
 uint16_t wind_gain_adjustment(void);
 extern uint16_t wind_gain;
 
-extern int16_t pitch_control, roll_control, yaw_control, throttle_control;
+extern int16_t pitch_control;
+extern int16_t roll_control;
+extern int16_t yaw_control;
+extern int16_t throttle_control;
 extern union longww throttleFiltered;
 extern int16_t pitchAltitudeAdjust;
 

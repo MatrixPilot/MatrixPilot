@@ -21,6 +21,8 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
+#include "cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include <stdlib.h>

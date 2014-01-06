@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -344,12 +345,15 @@ void sio_fbdl_data(unsigned char inchar)
 
 void serial_output(char* format, ...)
 {
+	int16_t len;
+	int16_t start_index;
+	int16_t remaining;
 	char telebuf[200];
 
 	va_list arglist;
 	va_start(arglist, format);
 
-	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
+	len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
 
 //	static int maxlen = 0;
 //	if (len > maxlen) {
@@ -357,8 +361,8 @@ void serial_output(char* format, ...)
 //		DPRINT("maxlen %u\r\n", maxlen);
 //	}
 
-	int16_t start_index = end_index;
-	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index);
+	start_index = end_index;
+	remaining = (SERIAL_BUFFER_SIZE - start_index);
 	if (remaining < len) {
 		DPRINT("SERBUF discarding %u bytes\r\n", len - remaining);
 	}
@@ -380,12 +384,14 @@ void serial_output(char* format, ...)
 // add this text to the output buffer
 void serial_output(char* format, ...)
 {
+	int16_t start_index;
+	int16_t remaining;
 	va_list arglist;
 
 	va_start(arglist, format);
 
-	int16_t start_index = end_index;
-	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
+	start_index = end_index;
+	remaining = SERIAL_BUFFER_SIZE - start_index;
 
 	if (remaining > 1)
 	{
@@ -515,6 +521,7 @@ void serial_output_8hz(void)
 
 void serial_output_8hz(void)
 {
+	int16_t i;
 //	static int16_t telemetry_counter = 8;
 	static int toggle = 0;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
@@ -626,10 +633,9 @@ void serial_output_8hz(void)
 				if (tow.WW > 0) tow.WW += 250; 
 
 				// Save  pwIn and PwOut buffers for printing next time around
-				int16_t i;
-				for (i=0; i <= NUM_INPUTS; i++)
+				for (i = 0; i <= NUM_INPUTS; i++)
 					pwIn_save[i] = udb_pwIn[i];
-				for (i=0; i <= NUM_OUTPUTS; i++)
+				for (i = 0; i <= NUM_OUTPUTS; i++)
 					pwOut_save[i] = udb_pwOut[i];
 			}
 			else

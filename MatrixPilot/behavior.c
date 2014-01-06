@@ -20,14 +20,16 @@
 
 
 #include "defines.h"
+#include "behaviour.h"
 
 int16_t current_orientation;
 union bfbts_word desired_behavior;
-int16_t cyclesUntilStartTriggerAction = 0;
-int16_t cyclesUntilStopTriggerAction = 0;
-boolean currentTriggerActionValue = 0;
 
-void triggerActionSetValue(boolean newValue);
+static int16_t cyclesUntilStartTriggerAction = 0;
+static int16_t cyclesUntilStopTriggerAction = 0;
+static boolean currentTriggerActionValue = 0;
+
+static void triggerActionSetValue(boolean newValue);
 
 
 void init_behavior(void)
@@ -169,7 +171,7 @@ void updateTriggerAction(void)
 	}
 }
 
-void triggerActionSetValue(boolean newValue)
+static void triggerActionSetValue(boolean newValue)
 {
 	if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
 	{

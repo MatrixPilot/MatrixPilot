@@ -22,6 +22,7 @@
 
 
 #include "defines.h"
+#include "behaviour.h"
 #include "airspeedCntrl.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"

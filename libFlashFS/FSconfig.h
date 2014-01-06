@@ -19,10 +19,22 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef _FS_DEF_H_
-#define _FS_DEF_H_
+#ifndef _FSCONFIG_H_
+#define _FSCONFIG_H_
 
+//#define USE_AT45D_FLASH
+//#define USE_SD_INTERFACE_WITH_SPI
+#include "HardwareProfile.h"
+
+#ifdef USE_AT45D_FLASH
+//#warning USE_AT45D_FLASH
 #include "MDD_AT45D.h"
+#elif defined(USE_SD_INTERFACE_WITH_SPI)
+//#warning USE_SD_INTERFACE_WITH_SPI
+#include "MDD File System/SD-SPI.h"
+#else
+#error Must define a file system media interface
+#endif // USE_AT45D_FLASH
 
 
 // The FS_MAX_FILES_OPEN #define is only applicable when Dynamic
@@ -97,10 +109,40 @@
 	#endif
 #endif
 
-#define USE_AT45D_FLASH
-
 // Function definitions
 // Associate the physical layer functions with the correct physical layer
+
+#ifdef USE_SD_INTERFACE_WITH_SPI       // SD-SPI.c and .h
+
+// Description: Function pointer to the Media Initialize Physical Layer function
+#define MDD_MediaInitialize     MDD_SDSPI_MediaInitialize
+
+// Description: Function pointer to the Media Detect Physical Layer function
+#define MDD_MediaDetect         MDD_SDSPI_MediaDetect
+
+// Description: Function pointer to the Sector Read Physical Layer function
+#define MDD_SectorRead          MDD_SDSPI_SectorRead
+
+// Description: Function pointer to the Sector Write Physical Layer function
+#define MDD_SectorWrite         MDD_SDSPI_SectorWrite
+
+// Description: Function pointer to the I/O Initialization Physical Layer function
+#define MDD_InitIO              MDD_SDSPI_InitIO
+
+// Description: Function pointer to the Media Shutdown Physical Layer function
+#define MDD_ShutdownMedia       MDD_SDSPI_ShutdownMedia
+
+// Description: Function pointer to the Write Protect Check Physical Layer function
+#define MDD_WriteProtectState   MDD_SDSPI_WriteProtectState
+
+// Description: Function pointer to the Read Capacity Physical Layer function
+#define MDD_ReadCapacity        MDD_SDSPI_ReadCapacity
+
+// Description: Function pointer to the Read Sector Size Physical Layer Function
+#define MDD_ReadSectorSize      MDD_SDSPI_ReadSectorSize
+
+#elif defined USE_AT45D_FLASH
+
 #define MDD_MediaInitialize     MDD_AT45D_MediaInitialize
 #define MDD_MediaDetect         MDD_AT45D_MediaDetect
 #define MDD_SectorRead          MDD_AT45D_SectorRead
@@ -170,4 +212,4 @@
 
 //#define AT45D_FLASH_WRITE_PROTECT
 
-#endif // _FS_DEF_H_
+#endif // _FSCONFIG_H_

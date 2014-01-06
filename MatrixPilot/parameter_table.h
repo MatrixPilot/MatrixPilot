@@ -54,7 +54,7 @@ typedef struct tag_mavlink_parameter_parser
 	const mavlink_message_type_t mavlink_type;
 } mavlink_parameter_parser;
 
-extern const mavlink_parameter_parser   mavlink_parameter_parsers[];
+extern const mavlink_parameter_parser mavlink_parameter_parsers[];
 
 typedef struct tag_mavlink_parameter 
 {

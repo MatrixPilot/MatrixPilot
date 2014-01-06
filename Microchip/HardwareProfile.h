@@ -6,6 +6,23 @@
 #include "NetConfig.h"
 #include "../libUDB/oscillator.h"
 
+// Select a mass storage device interface type
+// This library currently only supports a single physical interface layer at a time
+
+//#if defined(__dsPIC33E__)   // AUAV3 Board
+//#define USE_AT45D_FLASH
+//#else
+// Description: Macro used to enable the SD-SPI physical layer (SD-SPI.c and .h)
+#define USE_SD_INTERFACE_WITH_SPI
+// Description: Macro used to enable the CF-PMP physical layer (CF-PMP.c and .h)
+//#define USE_CF_INTERFACE_WITH_PMP
+// Description: Macro used to enable the CF-Manual physical layer (CF-Bit transaction.c and .h)                                                                
+//#define USE_MANUAL_CF_INTERFACE
+// Description: Macro used to enable the USB Host physical layer (USB host MSD library)
+//#define USE_USB_INTERFACE
+//#endif
+
+
 // Hardware I/O pin mappings
 // These are just dummy values to keep the compiler quiet for stock modules that use them like Telnet
 #define BUTTON0_IO      (0)

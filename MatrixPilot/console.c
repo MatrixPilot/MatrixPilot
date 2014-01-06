@@ -51,12 +51,12 @@ char cmdstr[32];
 int show_cpu_load = 0;
 
 
-void cmd_ver(void)
+static void cmd_ver(void)
 {
 	printf("MatrixPilot v0.1, " __TIME__ " " __DATE__ "\r\n");
 }
 
-void cmd_format(void)
+static void cmd_format(void)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	printf("formatting dataflash\r\n");
@@ -64,36 +64,36 @@ void cmd_format(void)
 #endif // BOARD_TYPE
 }
 
-void cmd_start(void)
+static void cmd_start(void)
 {
 	printf("starting.\r\n");
 	show_cpu_load = 1;
 }
 
-void cmd_stop(void)
+static void cmd_stop(void)
 {
 	printf("stopped.\r\n");
 	show_cpu_load = 0;
 }
 
-void cmd_on(void)
+static void cmd_on(void)
 {
 	printf("on.\r\n");
 	SRbits.IPL = 0; // turn on all interrupt priorities
 }
 
-void cmd_off(void)
+static void cmd_off(void)
 {
 	printf("off.\r\n");
 	SRbits.IPL = 7; // turn off all interrupt priorities
 }
 
-void cmd_cpuload(void)
+static void cmd_cpuload(void)
 {
 	printf("CPU Load %u%%\r\n", udb_cpu_load());
 }
 
-void cmd_crash(void)
+static void cmd_crash(void)
 {
 	static int i;
 	char buffer[32];
@@ -103,12 +103,12 @@ void cmd_crash(void)
 	cmd_crash();
 }
 
-void cmd_adc(void)
+static void cmd_adc(void)
 {
 //	printf("ADC vcc %u, 5v %u, rssi %u\r\n", udb_vcc.value, udb_5v.value, udb_rssi.value);
 }
 
-void cmd_barom(void)
+static void cmd_barom(void)
 {
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
 	       get_barometer_temperature(),
@@ -118,11 +118,11 @@ void cmd_barom(void)
 	      );
 }
 
-void cmd_magno(void)
+static void cmd_magno(void)
 {
 }
 
-void cmd_options(void)
+static void cmd_options(void)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", ROLL_STABILIZATION_AILERONS);
@@ -138,7 +138,7 @@ void cmd_options(void)
 #endif
 }
 
-void cmd_gains(void)
+static void cmd_gains(void)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("YAWKP_AILERON: %f\r\n", (double)gains.YawKPAileron);
@@ -167,7 +167,7 @@ void cmd_gains(void)
 #endif
 }
 
-void printbin16(int a)
+static void printbin16(int a)
 {
 	unsigned int i;
 	for (i = 0x8000; i > 0; i >>= 1) {
@@ -176,7 +176,7 @@ void printbin16(int a)
 	}
 }
 
-const char *byte_to_binary(int x)
+const char* byte_to_binary(int x)
 {
 	static char b[9];
 	int z;
@@ -188,7 +188,7 @@ const char *byte_to_binary(int x)
 	return b;
 }
 
-const char *word_to_binary(int x)
+const char* word_to_binary(int x)
 {
 	static char b[17];
 	unsigned int z;
@@ -202,12 +202,12 @@ const char *word_to_binary(int x)
 
 void gentrap(void);
 
-void cmd_trap(void)
+static void cmd_trap(void)
 {
 	gentrap();
 }
 
-void cmd_reg(void)
+static void cmd_reg(void)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	printf("USB Registers:\r\n");
@@ -246,7 +246,7 @@ UxCNFG2: USB CONFIGURATION REGISTER 2
 extern uint16_t maxstack;
 #endif
 
-void cmd_stack(void)
+static void cmd_stack(void)
 {
 #if (RECORD_FREE_STACK_SPACE == 1)
 	printf("maxstack %x\r\n", maxstack);
@@ -259,16 +259,16 @@ void cmd_stack(void)
 #endif
 }
 
-void cmd_reset(void)
+static void cmd_reset(void)
 {
 	asm("reset");
 }
 
-void cmd_help(void);
+static void cmd_help(void);
 
 void log_close(void);
 
-void cmd_close(void)
+static void cmd_close(void)
 {
 #if (USE_TELELOG == 1)
 	log_close();
@@ -297,7 +297,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_close,  "close" },
 };
 
-void cmd_help(void)
+static void cmd_help(void)
 {
 	int i;
 
@@ -307,7 +307,7 @@ void cmd_help(void)
 	}
 }
 
-void command(char* cmdstr)
+static void command(char* cmdstr)
 {
 	int i;
 

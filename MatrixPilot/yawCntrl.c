@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
 
 #define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
@@ -129,14 +130,14 @@ void hoverYawCntrl(void)
 {
 	union longww yawAccum;
 	union longww gyroYawFeedback;
+	int16_t yawInput;
+	int16_t manualYawOffset;
 
 	if (flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW = __builtin_mulus(hoveryawkd, omegaAccum[2]);
-		
-		int16_t yawInput = (udb_flags._.radio_on == 1) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0;
-		int16_t manualYawOffset = yawInput * (int16_t)(RMAX/2000);
-		
+		yawInput = (udb_flags._.radio_on == 1) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0;
+		manualYawOffset = yawInput * (int16_t)(RMAX/2000);
 		yawAccum.WW = __builtin_mulsu(rmat[6] + HOVERYOFFSET + manualYawOffset, hoveryawkp);
 	}
 	else
@@ -144,6 +145,5 @@ void hoverYawCntrl(void)
 		gyroYawFeedback.WW = 0;
 		yawAccum.WW = 0;
 	}
-
 	yaw_control = (int32_t)yawAccum._.W1 - (int32_t)gyroYawFeedback._.W1;
 }

@@ -19,6 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Optionally enable the new power saving idle mode of the MCU during mainloop
+#define USE_MCU_IDLE    1
+
+
 #define INT_PRI_T1      6   // background.c : high priority HEARTBEAT of libUDB
 //#define INT_PRI_T2      ?   // radioIn.c : does not use the timer interrupt
 //#define INT_PRI_T3      ?   // unused

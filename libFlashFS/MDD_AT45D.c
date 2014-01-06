@@ -23,11 +23,13 @@
 #include "MDD File System/FSIO.h"
 #include "MDD File System/FSDefs.h"
 #include "FSconfig.h"
+
+#ifdef USE_AT45D_FLASH
+
 #include "MDD_AT45D.h"
 #include "AT45D.h"
 #include <stdint.h>
 #include <stdio.h>
-
 
 extern void Delayms(BYTE milliseconds);
 
@@ -88,6 +90,7 @@ DWORD MDD_AT45D_ReadCapacity(void)
  *****************************************************************************/
 BYTE MDD_AT45D_InitIO(void)
 {
+	init_dataflash();
 	return TRUE;
 }
 
@@ -178,3 +181,5 @@ BYTE MDD_AT45D_WriteProtectState(void)
 {
 	return FALSE;
 }
+
+#endif // USE_AT45D_FLASH

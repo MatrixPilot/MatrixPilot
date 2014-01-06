@@ -21,13 +21,18 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
+#include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/osd.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
 #include "flightplan-waypoints.h"
 
-int16_t pitch_control, roll_control, yaw_control, throttle_control;
+int16_t pitch_control;
+int16_t roll_control;
+int16_t yaw_control;
+int16_t throttle_control;
 uint16_t wind_gain;
 
 void manualPassthrough(void);

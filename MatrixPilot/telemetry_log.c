@@ -22,10 +22,24 @@
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
 #include "telemetry_log.h"
+#if (WIN == 1 || NIX == 1)
+#include <stdio.h>
+#include "SIL-filesystem.h"
+#else
 #include "MDD File System/FSIO.h"
 #include "AT45D.h"
+#endif
 #include <string.h>
 #include <stdarg.h>
+
+
+#if (WIN == 1 || NIX == 1)
+#define LOGFILE_ENABLE_PIN 0
+#else
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
+#define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
+#endif
 
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -33,8 +47,8 @@
 
 #define LOGBUF_BUFFER_SIZE 512
 
-static char logbuf1[LOGBUF_BUFFER_SIZE];
-static char logbuf2[LOGBUF_BUFFER_SIZE];
+static char logbuf1[LOGBUF_BUFFER_SIZE+1];  // TODO: added 1 byte until buffer overflow confirmed good
+static char logbuf2[LOGBUF_BUFFER_SIZE+1];  // TODO: added 1 byte until buffer overflow confirmed good
 static int lb1_end_index = 0;
 static int lb2_end_index = 0;
 static int lb_in_use = 1;
@@ -42,7 +56,7 @@ static char logfile_name[13];
 static FSFILE* fsp = NULL;
 
 
-static int16_t add_to_log(char* logbuf, int index, char* data, int len)
+static int16_t log_append(char* logbuf, int index, char* data, int len)
 {
 	int16_t end_index = 0;
 	int16_t remaining = LOGBUF_BUFFER_SIZE - index;
@@ -66,11 +80,11 @@ void log_telemetry(char* data, int len)
 {
 	if (lb_in_use == 1)
 	{
-		lb1_end_index = add_to_log(logbuf1, lb1_end_index, data, len);
+		lb1_end_index = log_append(logbuf1, lb1_end_index, data, len);
 	}
 	else
 	{
-		lb2_end_index = add_to_log(logbuf2, lb2_end_index, data, len);
+		lb2_end_index = log_append(logbuf2, lb2_end_index, data, len);
 	}
 }
 
@@ -115,7 +129,12 @@ void log_init(void)
 
 	if (!FSInit())
 	{
+#ifdef USE_AT45D_FLASH
 		AT45D_FormatFS();
+#elif (WIN == 1) || (NIX == 1)
+#else
+#warning No Mass Storage Device Format Function Defined
+#endif // USE_AT45D_FLASH
 		if (!FSInit())
 		{
 			printf("File system initialisation failed\r\n");
@@ -166,10 +185,6 @@ void log_close(void)
 	}
 }
 
-//#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
-//#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
-#define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
-
 void restart_telemetry(void);
 boolean inflight_state(void);
 
@@ -207,7 +222,7 @@ static void log_write(char* str, int len)
 		LED_BLUE = LED_ON;
 		if (FSfwrite(str, 1, len, fsp) != len)
 		{
-//			printf("ERROR: FSfwrite\r\n");
+			DPRINT("ERROR: FSfwrite\r\n");
 			log_close();
 		}
 	}

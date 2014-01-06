@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
 #include "../libDCM/deadReckoning.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
@@ -149,7 +150,7 @@ int16_t desiredSpeed = (DESIRED_SPEED*10);
 void altitudeCntrl(void)
 {
 #if (USE_SONAR_INPUT != 0)
-	calculate_sonar_height_above_ground();
+//	calculate_sonar_height_above_ground();
 #endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)
 	{
@@ -164,6 +165,7 @@ void altitudeCntrl(void)
 static void set_throttle_control(int16_t throttle)
 {
 	int16_t throttleIn;
+	int16_t temp;
 
 	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual)
 	{
@@ -175,9 +177,7 @@ static void set_throttle_control(int16_t throttle)
 		{
 			throttleIn = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
 		}
-
-		int16_t temp = throttleIn + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle);
-
+		temp = throttleIn + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle);
 		if (THROTTLE_CHANNEL_REVERSED)
 		{
 			if (temp > udb_pwTrim[THROTTLE_INPUT_CHANNEL]) throttle = throttleIn - udb_pwTrim[THROTTLE_INPUT_CHANNEL];
