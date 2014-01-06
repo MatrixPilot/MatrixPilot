@@ -235,25 +235,39 @@
 
 
 
-// Select a mass storage device interface type
-// This library currently only supports a single physical interface layer at a time
-
-#if defined(__dsPIC33E__)   // AUAV3 Board
-#define USE_AT45D_FLASH
-#else
-// Description: Macro used to enable the SD-SPI physical layer (SD-SPI.c and .h)
-#define USE_SD_INTERFACE_WITH_SPI
-// Description: Macro used to enable the CF-PMP physical layer (CF-PMP.c and .h)
-//#define USE_CF_INTERFACE_WITH_PMP
-// Description: Macro used to enable the CF-Manual physical layer (CF-Bit transaction.c and .h)                                                                
-//#define USE_MANUAL_CF_INTERFACE
-// Description: Macro used to enable the USB Host physical layer (USB host MSD library)
-//#define USE_USB_INTERFACE
-#endif
-
 // SD Card definitions: Change these to fit your application when using
 //   an SD-card-based physical layer
 #ifdef USE_SD_INTERFACE_WITH_SPI
+
+#if defined(__dsPIC33E__)   // AUAV3 Board
+
+#define MEDIA_SOFT_DETECT
+            #define SD_WE               0
+
+//            #define SD_CS               LATBbits.LATB9
+//            #define SD_CS_TRIS          TRISBbits.TRISB9
+            #define SD_CS               LATDbits.LATD2
+            #define SD_CS_TRIS          TRISDbits.TRISD2
+//            #define SD_CD               PORTAbits.RA12
+//            #define SD_CD_TRIS          TRISAbits.TRISA12
+//            #define SD_WE               PORTGbits.RG1
+//            #define SD_WE_TRIS          TRISGbits.TRISG1
+
+            #define SPICON1             SPI3CON1
+            #define SPISTAT             SPI3STAT
+            #define SPIBUF              SPI3BUF
+            #define SPISTAT_RBF         SPI3STATbits.SPIRBF
+            #define SPICON1bits         SPI3CON1bits
+            #define SPISTATbits         SPI3STATbits
+            #define SPIENABLE           SPI3STATbits.SPIEN
+            #define SPIBRG              SPI3BRG
+
+           // Tris pins for SCK/SDI/SDO lines
+            #define SPICLOCK            TRISGbits.TRISG6
+            #define SPIIN               TRISGbits.TRISG7
+            #define SPIOUT              TRISGbits.TRISG8
+
+#elif defined(__dsPIC33F__) // UDB4 or UDB5 board
 
             // Description: SD-SPI Chip Select Output bit
 //            #define SD_CS               LATBbits.LATB9
@@ -306,7 +320,7 @@
             #define SPIIN               TRISGbits.TRISG7
             // Description: The TRIS bit for the SDO pin
             #define SPIOUT              TRISGbits.TRISG8
-#else
+#else // 0/1
             // Description: The main SPI control register
             #define SPICON1             SPI1CON1
             // Description: The SPI status register
@@ -333,6 +347,7 @@
             // Description: The TRIS bit for the SDO pin
             #define SPIOUT              TRISFbits.TRISF8
 #endif // 0
+#endif // __dsPIC33?__
  
 #endif // USE_SD_INTERFACE_WITH_SPI
 
