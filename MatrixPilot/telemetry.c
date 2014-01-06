@@ -511,7 +511,7 @@ void serial_output_8hz(void)
 	}
 }
 
-#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
 
 void serial_output_8hz(void)
 {
@@ -652,6 +652,16 @@ void serial_output_8hz(void)
 #endif // RECORD_FREE_STACK_SPACE
 				serial_output("\r\n");
 			}
+
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
+extern int16_t magFieldRaw[3];
+extern int16_t udb_magOffset[3];
+
+                        serial_output("OFFx %i : OFFy %i : OFFz %i : RAWx %i : RAWy %i : RAWz %i :",
+                        udb_magOffset[0], udb_magOffset[1], udb_magOffset[2],
+                        magFieldRaw[0], magFieldRaw[1], magFieldRaw[2]);
+                        serial_output("\r\n");
+
 #endif // SERIAL_OUTPUT_FORMAT
 			if (flags._.f13_print_req == 1)
 			{
