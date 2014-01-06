@@ -212,4 +212,10 @@
 
 //#define AT45D_FLASH_WRITE_PROTECT
 
+#else
+
+#error Must define a file system media interface
+
+#endif
+
 #endif // _FSCONFIG_H_

@@ -29,6 +29,7 @@
 #include "options.h"
 
 #if (WIN == 1 || NIX == 1)
+#define inline __inline
 #define SILSIM                              1
 #undef  HILSIM
 #define HILSIM                              1

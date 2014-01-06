@@ -125,8 +125,7 @@ static int fs_nextlog(char* filename)
 // called at startup to initialise the telemetry log system
 void log_init(void)
 {
-	init_dataflash();
-
+//	init_dataflash(); // this should now be getting device specific called from lower layers via FSInit()
 	if (!FSInit())
 	{
 #ifdef USE_AT45D_FLASH

@@ -29,9 +29,10 @@ struct timezone
 	int tz_dsttime;     // type of dst correction to apply
 };
 
-#if 1
+#if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
 #else
+/*
 #ifndef _TIMEVAL_DEFINED // also in winsock[2].h
 #define _TIMEVAL_DEFINED
 struct timeval {
@@ -46,7 +47,7 @@ struct timeval {
 	 ((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)  (tvp)->tv_sec = (tvp)->tv_usec = 0
 #endif // _TIMEVAL_DEFINED
-
+ */
 //void  GetSystemTimeAsFileTime(FILETIME*);
 
 inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)

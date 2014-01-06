@@ -72,15 +72,15 @@ void ReadBarPres_callback(boolean I2CtrxOK);
 void ReadBarCalib_callback(boolean I2CtrxOK);
 
 #if (USE_BMP085_ON_I2C == 1)
-	#define I2C_Normal		I2C1_Normal
-	#define I2C_Read		I2C1_Read
-	#define I2C_Write		I2C1_Write
-	#define I2C_Reset		I2C1_Reset
+	#define I2C_Normal      I2C1_Normal
+	#define I2C_Read        I2C1_Read
+	#define I2C_Write       I2C1_Write
+	#define I2C_Reset       I2C1_Reset
 #elif (USE_BMP085_ON_I2C == 2)
-	#define I2C_Normal		I2C2_Normal
-	#define I2C_Read		I2C2_Read
-	#define I2C_Write		I2C2_Write
-	#define I2C_Reset		I2C2_Reset
+	#define I2C_Normal      I2C2_Normal
+	#define I2C_Read        I2C2_Read
+	#define I2C_Write       I2C2_Write
+	#define I2C_Reset       I2C2_Reset
 #endif
 
 
@@ -145,7 +145,7 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 int TestByteOrder()
 {
 	short int word = 0x0001;
-	char *byte = (char *) &word;
+	char* byte = (char*)&word;
 	return(byte[0] ? LITTLE_ENDIAN : BIG_ENDIAN);
 }
  */

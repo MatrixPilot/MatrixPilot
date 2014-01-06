@@ -18,22 +18,39 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#if (WIN == 1 || NIX == 1)
 
-#ifndef FLIGHT_MODE_SWITCH_H
-#define FLIGHT_MODE_SWITCH_H
+#include "libUDB_internal.h"
+#include "interrupt.h"
+#include "I2C.h"
+#include "NV_memory.h"
+#include "events.h"
 
+#if (USE_I2C1_DRIVER == 1)
 
-//inline int16_t flight_mode_switch_manual(void);
-//inline int16_t flight_mode_switch_stabilize(void);
-//inline int16_t flight_mode_switch_waypoints(void);
+void I2C1_Init(void)
+{
+}
 
-// removed 'inline' to keep VC++ happy
-int16_t flight_mode_switch_manual(void);
-int16_t flight_mode_switch_stabilize(void);
-int16_t flight_mode_switch_waypoints(void);
+// Trigger the I2C1 service routine to run at low priority
+void I2C1_Trigger(void)
+{
+}
 
-void flight_mode_switch_2pos_poll(void); // this is called at 40 hertz and scans the two postion switch option.
-void flight_mode_switch_check_set(void); // this is called at 2 hertz and changes the flight mode if req.
+boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback)
+{
+	return true;
+}
 
+boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode)
+{
+	return true;
+}
+// Only send command byte to check for ACK.
+boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback)
+{
+	return true;
+}
 
-#endif // FLIGHT_MODE_SWITCH_H
+#endif // USE_I2C1_DRIVER
+#endif // (WIN == 1 || NIX == 1)

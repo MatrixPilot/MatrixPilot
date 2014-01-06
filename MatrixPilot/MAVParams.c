@@ -32,7 +32,7 @@
 #include <math.h>
 
 #if (DECLINATIONANGLE_VARIABLE != 1)
-union intbb dcm_declination_angle = {.BB = 0};
+union intbb dcm_declination_angle = { 0 };
 #endif
 
 #include "parameter_table.h"
