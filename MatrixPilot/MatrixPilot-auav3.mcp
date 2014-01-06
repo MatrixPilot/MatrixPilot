@@ -336,6 +336,7 @@ file_308=MatrixPilot
 file_309=MatrixPilot
 file_310=MatrixPilot
 file_311=Microchip
+file_312=Microchip
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -649,6 +650,7 @@ file_308=no
 file_309=no
 file_310=no
 file_311=no
+file_312=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -962,6 +964,7 @@ file_308=no
 file_309=no
 file_310=no
 file_311=no
+file_312=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1275,6 +1278,7 @@ file_308=MAVLink.h
 file_309=MAVUDBExtra.h
 file_310=navigate.h
 file_311=..\Microchip\HardwareProfile.h
+file_312=..\Microchip\NetConfig.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

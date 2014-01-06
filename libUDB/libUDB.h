@@ -81,7 +81,7 @@ void mav_printf(const char * format, ...);
 #define DPRINT printf
 #endif // USE_MAVLINK_IO
 #else
-#define DPRINT(args...)
+#define DPRINT(args, ...)
 #endif // USE_DEBUG_IO
 
 #include "fixDeps.h"
