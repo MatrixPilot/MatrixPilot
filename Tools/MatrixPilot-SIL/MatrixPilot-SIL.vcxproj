@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{81C72BCE-FAF2-423A-B311-50BA1F7A010D}</ProjectGuid>
+    <RootNamespace>XP-netdata</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>MatrixPilot-SIL</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC70.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC70.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;..\..\libUDB;..\..\MatrixPilot;..\HILSIM_XPlane;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN;WIN32;_DEBUG;_WINDOWS;_USRDLL;XPNETDATA_EXPORTS;IBM=1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>NotSet</ShowProgress>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>.\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)XP-netdata.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)XP-netdata.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XPNETDATA_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)XP-netdata.dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)XP-netdata.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libDCM\deadReckoning.c" />
+    <ClCompile Include="..\..\libDCM\estAirspeed.c" />
+    <ClCompile Include="..\..\libDCM\estAltitude.c" />
+    <ClCompile Include="..\..\libDCM\estWind.c" />
+    <ClCompile Include="..\..\libDCM\estYawDrift.c" />
+    <ClCompile Include="..\..\libDCM\gpsParseCommon.c" />
+    <ClCompile Include="..\..\libDCM\gpsParseMTEK.c" />
+    <ClCompile Include="..\..\libDCM\gpsParseNMEA.c" />
+    <ClCompile Include="..\..\libDCM\gpsParseSTD.c" />
+    <ClCompile Include="..\..\libDCM\gpsParseUBX.c" />
+    <ClCompile Include="..\..\libDCM\libDCM.c" />
+    <ClCompile Include="..\..\libDCM\mathlibNAV.c" />
+    <ClCompile Include="..\..\libDCM\rmat.c" />
+    <ClCompile Include="..\..\MatrixPilot\airspeedCntrl.c" />
+    <ClCompile Include="..\..\MatrixPilot\altitudeCntrl.c" />
+    <ClCompile Include="..\..\MatrixPilot\altitudeCntrlVariable.c" />
+    <ClCompile Include="..\..\MatrixPilot\behavior.c" />
+    <ClCompile Include="..\..\MatrixPilot\cameraCntrl.c" />
+    <ClCompile Include="..\..\MatrixPilot\config.c" />
+    <ClCompile Include="..\..\MatrixPilot\config_tests.c" />
+    <ClCompile Include="..\..\MatrixPilot\data_services.c" />
+    <ClCompile Include="..\..\MatrixPilot\data_storage.c" />
+    <ClCompile Include="..\..\MatrixPilot\euler_angles.c" />
+    <ClCompile Include="..\..\MatrixPilot\flightplan-logo.c" />
+    <ClCompile Include="..\..\MatrixPilot\flightplan-waypoints.c" />
+    <ClCompile Include="..\..\MatrixPilot\main.c" />
+    <ClCompile Include="..\..\MatrixPilot\MAVFlexiFunctions.c" />
+    <ClCompile Include="..\..\MatrixPilot\MAVLink.c" />
+    <ClCompile Include="..\..\MatrixPilot\MAVMission.c" />
+    <ClCompile Include="..\..\MatrixPilot\MAVParams.c" />
+    <ClCompile Include="..\..\MatrixPilot\MAVUDBExtra.c" />
+    <ClCompile Include="..\..\MatrixPilot\mode_switch.c" />
+    <ClCompile Include="..\..\MatrixPilot\mp_osd.c" />
+    <ClCompile Include="..\..\MatrixPilot\navigate.c" />
+    <ClCompile Include="..\..\MatrixPilot\nv_memory_table.c" />
+    <ClCompile Include="..\..\MatrixPilot\parameter_table.c" />
+    <ClCompile Include="..\..\MatrixPilot\pitchCntrl.c" />
+    <ClCompile Include="..\..\MatrixPilot\rollCntrl.c" />
+    <ClCompile Include="..\..\MatrixPilot\servoMix.c" />
+    <ClCompile Include="..\..\MatrixPilot\servoPrepare.c" />
+    <ClCompile Include="..\..\MatrixPilot\states.c" />
+    <ClCompile Include="..\..\MatrixPilot\telemetry.c" />
+    <ClCompile Include="..\..\MatrixPilot\telemetry_log.c" />
+    <ClCompile Include="..\..\MatrixPilot\yawCntrl.c" />
+    <ClCompile Include="..\HILSIM_XPlane\UDBSocketWin.c" />
+    <ClCompile Include="flt2frct.c" />
+    <ClCompile Include="frct2flt.c" />
+    <ClCompile Include="SIL-24LC256.c" />
+    <ClCompile Include="SIL-dsp.c" />
+    <ClCompile Include="SIL-eeprom.c" />
+    <ClCompile Include="SIL-events.c" />
+    <ClCompile Include="SIL-filesystem.c" />
+    <ClCompile Include="SIL-I2C1.c" />
+    <ClCompile Include="SIL-serial.c" />
+    <ClCompile Include="SIL-udb.c" />
+    <ClCompile Include="SIL-ui-mp-term.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libDCM\dcmTypes.h" />
+    <ClInclude Include="..\..\libDCM\deadReckoning.h" />
+    <ClInclude Include="..\..\libDCM\estAltitude.h" />
+    <ClInclude Include="..\..\libDCM\gpsParseCommon.h" />
+    <ClInclude Include="..\..\libDCM\libDCM.h" />
+    <ClInclude Include="..\..\libDCM\libDCM_defines.h" />
+    <ClInclude Include="..\..\libDCM\libDCM_internal.h" />
+    <ClInclude Include="..\..\libDCM\mathlibNAV.h" />
+    <ClInclude Include="..\..\libDCM\rmat.h" />
+    <ClInclude Include="..\..\MatrixPilot\airspeedCntrl.h" />
+    <ClInclude Include="..\..\MatrixPilot\airspeed_options.h" />
+    <ClInclude Include="..\..\MatrixPilot\behaviour.h" />
+    <ClInclude Include="..\..\MatrixPilot\cameraCntrl.h" />
+    <ClInclude Include="..\..\MatrixPilot\config.h" />
+    <ClInclude Include="..\..\MatrixPilot\console.h" />
+    <ClInclude Include="..\..\MatrixPilot\data_services.h" />
+    <ClInclude Include="..\..\MatrixPilot\data_storage.h" />
+    <ClInclude Include="..\..\MatrixPilot\defines.h" />
+    <ClInclude Include="..\..\MatrixPilot\euler_angles.h" />
+    <ClInclude Include="..\..\MatrixPilot\flightplan-logo.h" />
+    <ClInclude Include="..\..\MatrixPilot\flightplan-waypoints.h" />
+    <ClInclude Include="..\..\MatrixPilot\fly_by_datalink.h" />
+    <ClInclude Include="..\..\MatrixPilot\FreeRTOSConfig.h" />
+    <ClInclude Include="..\..\MatrixPilot\gain_variables.h" />
+    <ClInclude Include="..\..\MatrixPilot\MAVFlexiFunctions.h" />
+    <ClInclude Include="..\..\MatrixPilot\MAVLink.h" />
+    <ClInclude Include="..\..\MatrixPilot\mavlink_options.h" />
+    <ClInclude Include="..\..\MatrixPilot\MAVMission.h" />
+    <ClInclude Include="..\..\MatrixPilot\MAVParams.h" />
+    <ClInclude Include="..\..\MatrixPilot\MAVUDBExtra.h" />
+    <ClInclude Include="..\..\MatrixPilot\mode_switch.h" />
+    <ClInclude Include="..\..\MatrixPilot\motorCntrl.h" />
+    <ClInclude Include="..\..\MatrixPilot\navigate.h" />
+    <ClInclude Include="..\..\MatrixPilot\options.h" />
+    <ClInclude Include="..\..\MatrixPilot\options_quad.h" />
+    <ClInclude Include="..\..\MatrixPilot\osd_config.h" />
+    <ClInclude Include="..\..\MatrixPilot\osd_layout.h" />
+    <ClInclude Include="..\..\MatrixPilot\osd_layout_remzibi.h" />
+    <ClInclude Include="..\..\MatrixPilot\parameter_datatypes.h" />
+    <ClInclude Include="..\..\MatrixPilot\parameter_table.h" />
+    <ClInclude Include="..\..\MatrixPilot\preflight.h" />
+    <ClInclude Include="..\..\MatrixPilot\quad.h" />
+    <ClInclude Include="..\..\MatrixPilot\redef.h" />
+    <ClInclude Include="..\..\MatrixPilot\ring_buffer.h" />
+    <ClInclude Include="..\..\MatrixPilot\telemetry_log.h" />
+    <ClInclude Include="..\..\MatrixPilot\util.h" />
+    <ClInclude Include="..\..\MatrixPilot\waypoints.h" />
+    <ClInclude Include="..\..\MatrixPilot\ymodem.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\MatrixPilot\MatrixPilot-auav3.hex" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
