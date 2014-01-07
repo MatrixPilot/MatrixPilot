@@ -74,7 +74,6 @@
         <itemPath>../preflight.h</itemPath>
         <itemPath>../redef.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
-        <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../MAVFlexiFunctions.h</itemPath>
@@ -84,6 +83,10 @@
         <itemPath>../MAVUDBExtra.h</itemPath>
         <itemPath>../flightplan-waypoints.h</itemPath>
         <itemPath>../navigate.h</itemPath>
+        <itemPath>../behaviour.h</itemPath>
+        <itemPath>../cameraCntrl.h</itemPath>
+        <itemPath>../osd_layout_remzibi.h</itemPath>
+        <itemPath>../ring_buffer.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -225,6 +228,8 @@
         <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
         <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
         <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
+        <itemPath>../../Microchip/HardwareProfile.h</itemPath>
+        <itemPath>../../Microchip/NetConfig.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -367,6 +372,7 @@
     <Elem>..</Elem>
     <Elem>../../libUDB</Elem>
     <Elem>../../libDCM</Elem>
+    <Elem>../../Microchip</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -415,7 +421,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="..;../../libFlashFS;../../MAVLink/include;../../Microchip/Include"/>
+                  value="..;../../libFlashFS;../../MAVLink/include;../../Microchip;../../Microchip/Include"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -438,6 +444,7 @@
         <property key="preprocessor-macros" value="AUAV3"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
@@ -592,6 +599,7 @@
         <property key="programoptions.preserveprogramrange.end" value="0x557ff"/>
         <property key="programoptions.preserveprogramrange.start" value="0x0"/>
         <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
         <property key="voltagevalue" value="3.25"/>

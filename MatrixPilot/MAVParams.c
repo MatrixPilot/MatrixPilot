@@ -32,6 +32,7 @@
 #include <math.h>
 
 #if (DECLINATIONANGLE_VARIABLE != 1)
+//union intbb dcm_declination_angle = { .BB = 0};
 union intbb dcm_declination_angle = { 0 };
 #endif
 
@@ -391,8 +392,9 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 
 void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 {
-	//send_text((uint8_t*)"param request list\r\n");
 	mavlink_param_request_list_t packet;
+
+	//send_text((uint8_t*)"param request list\r\n");
 	mavlink_msg_param_request_list_decode(handle_msg, &packet);
 	if (packet.target_system == mavlink_system.sysid)
 	{
@@ -404,8 +406,9 @@ void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 
 void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
 {
-	//send_text((uint8_t*)"Requested specific parameter\r\n");
 	mavlink_param_request_read_t packet;
+
+	//send_text((uint8_t*)"Requested specific parameter\r\n");
 	mavlink_msg_param_request_read_decode(handle_msg, &packet);
 	if (packet.target_system == mavlink_system.sysid)
 	{

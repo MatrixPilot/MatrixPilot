@@ -70,6 +70,9 @@
         <itemPath>../MAVUDBExtra.h</itemPath>
         <itemPath>../flightplan-waypoints.h</itemPath>
         <itemPath>../navigate.h</itemPath>
+        <itemPath>../behaviour.h</itemPath>
+        <itemPath>../cameraCntrl.h</itemPath>
+        <itemPath>../telemetry_log.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">

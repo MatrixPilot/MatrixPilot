@@ -133,7 +133,7 @@
     <ClCompile Include="..\..\MatrixPilot\mp_osd.c" />
     <ClCompile Include="..\..\MatrixPilot\navigate.c" />
     <ClCompile Include="..\..\MatrixPilot\nv_memory_table.c" />
-    <ClCompile Include="..\..\MatrixPilot\parameter_table.c" />
+    <ClCompile Include="..\..\MatrixPilot\parameter_table2.c" />
     <ClCompile Include="..\..\MatrixPilot\pitchCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\rollCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\servoMix.c" />

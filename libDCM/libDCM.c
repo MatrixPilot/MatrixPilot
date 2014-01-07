@@ -187,10 +187,10 @@ void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)
 	lon_origin.WW = o_lon;
 	alt_origin.WW = o_alt;
 
-	// scale the latitude from GPS units to gentleNAV units
+	// scale the low 16 bits of latitude from GPS units to gentleNAV units
 	accum_nav.WW = __builtin_mulss(LONGDEG_2_BYTECIR, lat_origin._.W1);
 
-	lat_cir = accum_nav.__.B2;
+	lat_cir = accum_nav.__.B2;  // effectively divides by 256
 	// estimate the cosine of the latitude, which is used later computing desired course
 	cos_lat = cosine(lat_cir);
 }

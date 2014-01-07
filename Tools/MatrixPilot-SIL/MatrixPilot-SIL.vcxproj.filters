@@ -191,9 +191,6 @@
     <ClCompile Include="..\HILSIM_XPlane\UDBSocketWin.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\MatrixPilot\parameter_table.c">
-      <Filter>Source Files\MatrixPilot</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\MatrixPilot\telemetry_log.c">
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
@@ -205,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="frct2flt.c">
       <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\parameter_table2.c">
+      <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

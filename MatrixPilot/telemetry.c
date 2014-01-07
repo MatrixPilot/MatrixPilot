@@ -663,10 +663,10 @@ void serial_output_8hz(void)
 extern int16_t magFieldRaw[3];
 extern int16_t udb_magOffset[3];
 
-                        serial_output("OFFx %i : OFFy %i : OFFz %i : RAWx %i : RAWy %i : RAWz %i :",
-                        udb_magOffset[0], udb_magOffset[1], udb_magOffset[2],
-                        magFieldRaw[0], magFieldRaw[1], magFieldRaw[2]);
-                        serial_output("\r\n");
+			serial_output("OFFx %i : OFFy %i : OFFz %i : RAWx %i : RAWy %i : RAWz %i :",
+			    udb_magOffset[0], udb_magOffset[1], udb_magOffset[2],
+			    magFieldRaw[0], magFieldRaw[1], magFieldRaw[2]);
+			    serial_output("\r\n");
 
 #endif // SERIAL_OUTPUT_FORMAT
 			if (flags._.f13_print_req == 1)

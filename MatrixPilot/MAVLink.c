@@ -264,6 +264,7 @@ void mp_mavlink_transmit(uint8_t ch)
 void send_text(uint8_t text[])
 {
 	uint16_t index = 0;
+
 	while (text[index++] != 0 && index < 80)
 	{
 		; // Do nothing, just measuring the length of the text
@@ -362,6 +363,7 @@ static void handleMessage(void)
 	//send_uint8(handle_msg->msgid);
 	//send_text((uint8_t*) "\r\n");
 	mavlink_message_t* handle_msg;
+
 	if (mavlink_message_index == 0)
 	{
 		handle_msg = &msg[1];

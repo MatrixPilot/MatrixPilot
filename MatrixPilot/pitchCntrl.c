@@ -124,12 +124,12 @@ static void normalPitchCntrl(void)
 	{
 		rtlkick = 0;
 	}
-#if(GLIDE_AIRSPEED_CONTROL == 1)
+#if (GLIDE_AIRSPEED_CONTROL == 1)
 	fractional aspd_pitch_adj = gliding_airspeed_pitch_adjust();
 #endif
 	if (PITCH_STABILIZATION && flags._.pitch_feedback)
 	{
-#if(GLIDE_AIRSPEED_CONTROL == 1)
+#if (GLIDE_AIRSPEED_CONTROL == 1)
 		pitchAccum.WW = __builtin_mulsu(rmat7 - rtlkick + aspd_pitch_adj + pitchAltitudeAdjust, pitchgain) 
 		              + __builtin_mulus(pitchkd, pitchrate);
 #else

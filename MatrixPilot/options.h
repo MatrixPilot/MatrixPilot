@@ -416,7 +416,7 @@
 // based on sonar distance to ground.
 
 // Set USE_SONAR_INPUT to the input capture channel which the sensor
-// is connected to. Currently on channel 8 is supported.
+// is connected to. Must be greater than the last used servo channel.
 #define USE_SONAR_INPUT                     0
 
 
