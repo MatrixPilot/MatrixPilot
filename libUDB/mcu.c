@@ -196,7 +196,7 @@ void configurePPS(void)
 
 	UART_TO_PORT(1, GPS_PORT)
 	UART_TO_PORT(2, TLM_PORT)
-	#if (CONSOLE_UART != 0)
+	#if (CONSOLE_UART != 0) && (CONSOLE_UART != 9)
 		UART_TO_PORT(CONSOLE_UART, DBG_PORT)
 	#endif // CONSOLE_UART
 

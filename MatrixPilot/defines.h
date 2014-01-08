@@ -78,6 +78,12 @@ void init_pitchCntrl(void);
 void init_altitudeCntrl(void);
 void init_altitudeCntrlVariable(void);
 
+void save_yawCntrl(void);
+void save_rollCntrl(void);
+void save_pitchCntrl(void);
+void save_altitudeCntrl(void);
+void save_altitudeCntrlVariable(void);
+
 
 void calculate_sonar_height_above_ground(void);
 
@@ -111,11 +117,18 @@ void cameraServoMix(void);
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
 // See options.h for a description of each type
-#define AIRFRAME_STANDARD   0
-#define AIRFRAME_VTAIL      1
-#define AIRFRAME_DELTA      2
-#define AIRFRAME_HELI       3    // Untested
-#define AIRFRAME_QUAD       4    // Under development
+//#define AIRFRAME_STANDARD   0
+//#define AIRFRAME_VTAIL      1
+//#define AIRFRAME_DELTA      2
+//#define AIRFRAME_HELI       3    // Untested
+//#define AIRFRAME_QUAD       4    // Under development
+
+#define AIRFRAME_NONE       0
+#define AIRFRAME_STANDARD   1
+#define AIRFRAME_VTAIL      2
+#define AIRFRAME_DELTA      3
+#define AIRFRAME_HELI       4    // Untested
+#define AIRFRAME_QUAD       5    // Under development
 
 // Negate VALUE if NEEDS_REVERSING is true
 #define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE) ((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
@@ -169,6 +182,7 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 ////////////////////////////////////////////////////////////////////////////////
 // behavior.c
+/*
 void init_behavior(void);
 void setBehavior(int16_t newBehavior);
 void updateBehavior(void);
@@ -217,7 +231,7 @@ extern union bfbts_word desired_behavior;
 #define TRIGGER_PULSE_LOW      8
 #define TRIGGER_TOGGLE        16
 #define TRIGGER_REPEATING     32
-
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // serialIO.c
@@ -241,14 +255,14 @@ void mavlink_output_40hz(void);
 
 ////////////////////////////////////////////////////////////////////////////////
 // cameraCntrl.c
-void set_camera_view(struct relative3D current_view);
-void compute_camera_view(void);
-void cameraCntrl(void);
+//void set_camera_view(struct relative3D current_view);
+//void compute_camera_view(void);
+//void cameraCntrl(void);
 
-void camera_live_begin(void);
-void camera_live_received_byte(uint8_t inbyte);
-void camera_live_commit(void);
-void camera_live_commit_values(const struct relative3D target);
+//void camera_live_begin(void);
+//void camera_live_received_byte(uint8_t inbyte);
+//void camera_live_commit(void);
+//void camera_live_commit_values(const struct relative3D target);
 
 //#define CAM_VIEW_LAUNCH     { 0, 0, 0 }
 

@@ -25,6 +25,8 @@
 
 #define BAUDRATEX       115200UL
 #define BRGHX           1
+//#define BAUDRATEX       9600UL
+//#define BRGHX           0
 #if (BRGHX == 0)
 	#define BRG_DIVX    16
 #elif (BRGHX == 1)

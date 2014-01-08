@@ -96,6 +96,7 @@ union config_word { struct config_bits _; int16_t W; };
 extern union config_word config;
 
 void init_config(void);
+void save_config(void);
 
 
 struct gains_variables {

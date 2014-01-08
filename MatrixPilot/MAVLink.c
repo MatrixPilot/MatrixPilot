@@ -56,6 +56,7 @@
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/events.h"
 #include "euler_angles.h"
+#include "config.h"
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
@@ -385,6 +386,7 @@ static void handleMessage(void)
 	switch (handle_msg->msgid)
 	{
 		case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
+			DPRINT("MAVLINK_MSG_ID_REQUEST_DATA_STREAM %u\r\n", handle_msg->msgid);
 		{
 			int16_t freq = 0; // packet frequency
 
@@ -412,6 +414,7 @@ static void handleMessage(void)
 			break;
 		}
 		case MAVLINK_MSG_ID_COMMAND_LONG:
+			DPRINT("MAVLINK_MSG_ID_COMMAND_LONG %u\r\n", handle_msg->msgid);
 		{
 			mavlink_command_long_t packet;
 			mavlink_msg_command_long_decode(handle_msg, &packet);
@@ -422,6 +425,7 @@ static void handleMessage(void)
 			switch (packet.command)
 			{
 			case MAV_CMD_PREFLIGHT_CALIBRATION:
+				DPRINT("MAV_CMD_PREFLIGHT_CALIBRATION %u\r\n", packet.command);
 				if (packet.param1 == 1)
 				{
 #if (USE_NV_MEMORY ==1)
@@ -444,6 +448,7 @@ static void handleMessage(void)
 				break;
 #if (USE_NV_MEMORY == 1)
 			case MAV_CMD_PREFLIGHT_STORAGE:
+				DPRINT("MAV_CMD_PREFLIGHT_STORAGE %u\r\n", packet.command);
 				if (packet.param1 == MAV_PFS_CMD_WRITE_ALL)
 				{
 					if (packet.param2 == MAV_PFS_CMD_WRITE_ALL)
@@ -462,6 +467,7 @@ static void handleMessage(void)
 					command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
 				break;
 			case MAV_CMD_PREFLIGHT_STORAGE_ADVANCED:
+				DPRINT("MAV_CMD_PREFLIGHT_STORAGE_ADVANCED %u\r\n", packet.command);
 				switch ((uint16_t)packet.param1)
 				{
 					case MAV_PFS_CMD_CLEAR_SPECIFIC:
@@ -479,17 +485,35 @@ static void handleMessage(void)
 				}
 				break;
 #endif // (USE_NV_MEMORY == 1)
+			case 245:
+				switch ((uint16_t)packet.param1)
+				{
+					case 0: // Read
+						DPRINT("Read (ROM)\r\n");
+						break;
+					case 1: // Write
+						DPRINT("Write (ROM)\r\n");
+						save_config();
+						break;
+					default:
+						DPRINT("245 packet.param1 %f packet.param2 %f\r\n", packet.param1, packet.param2);
+						break;
+				}
+				break;
 			default:
+				DPRINT("packet.command %u\r\n", packet.command);
 				command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
 				break;
 			}
 			break;
 
 //		case MAVLINK_MSG_ID_COMMAND:
+//			DPRINT("MAVLINK_MSG_ID_COMMAND %u\r\n", handle_msg->msgid);
 //			break;
 /*
 		case MAVLINK_MSG_ID_ACTION:
 			// send_text((uint8_t*) "Action: Specific Action Required\r\n");
+			DPRINT("MAVLINK_MSG_ID_ACTION %u\r\n", handle_msg->msgid);
 			DPRINT("action: Specific Action Required\r\n");
 			// decode
 			mavlink_action_t packet;

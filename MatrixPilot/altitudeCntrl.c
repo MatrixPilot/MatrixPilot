@@ -83,6 +83,21 @@ void init_altitudeCntrl(void)
 	desiredSpeed          = DESIRED_SPEED * 10; // Stored in 10ths of meters per second
 }
 
+#if (USE_CONFIGFILE == 1)
+void save_altitudeCntrl(void)
+{
+//	gains.YawKDAileron = yawkdail / (SCALEGYRO*RMAX);
+	gains.HeightTargetMax = height_target_max;
+	gains.HeightTargetMin = height_target_min;
+	gains.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
+	gains.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
+	gains.AltHoldPitchMin = alt_hold_pitch_min;
+	gains.AltHoldPitchMax = alt_hold_pitch_max;
+	gains.AltHoldPitchHigh = alt_hold_pitch_high;
+//	desiredSpeed / 10;
+}
+#endif // USE_CONFIGFILE
+
 #if (SPEED_CONTROL == 1)  // speed control loop
 
 static int32_t excess_energy_height(void) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)

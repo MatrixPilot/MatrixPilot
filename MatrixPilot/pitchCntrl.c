@@ -57,9 +57,21 @@ void init_pitchCntrl(void)
 	pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX);
 	hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX);
 	hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX);
-	rudderElevMixGain = (uint16_t)(RMAX*RUDDER_ELEV_MIX);
-	rollElevMixGain = (uint16_t)(RMAX*ROLL_ELEV_MIX);
+	rudderElevMixGain = (uint16_t)(RUDDER_ELEV_MIX*RMAX);
+	rollElevMixGain = (uint16_t)(ROLL_ELEV_MIX*RMAX);
 }
+
+#if (USE_CONFIGFILE == 1)
+void save_pitchCntrl(void)
+{
+	gains.Pitchgain      = (float)pitchgain         / (RMAX);
+	gains.PitchKD        = (float)pitchkd           / (SCALEGYRO*RMAX);
+	gains.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
+	gains.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
+	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
+	gains.RollElevMix    = (float)rollElevMixGain   / (RMAX);
+}
+#endif // USE_CONFIGFILE
 
 void pitchCntrl(void)
 {

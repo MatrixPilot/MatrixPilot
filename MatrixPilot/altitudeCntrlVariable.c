@@ -29,7 +29,7 @@
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
-#if(ALTITUDE_GAINS_VARIABLE == 1)
+#if (ALTITUDE_GAINS_VARIABLE == 1)
 
 
 #define THROTTLEFILTSHIFT 12
@@ -104,6 +104,23 @@ void init_altitudeCntrlVariable(void)
 	desiredSpeed = (DESIRED_SPEED*10);
 	speed_control = SPEED_CONTROL;
 }
+
+#if (USE_CONFIGFILE == 1)
+void save_altitudeCntrlVariable(void)
+{
+	gains.HeightTargetMax = height_target_max;
+	gains.HeightTargetMin = height_target_min;
+//	height_margin;
+	gains.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
+	gains.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
+	gains.AltHoldPitchMin = alt_hold_pitch_min;
+	gains.AltHoldPitchMax = alt_hold_pitch_max;
+	gains.AltHoldPitchHigh = alt_hold_pitch_high;
+//	rtl_pitch_down;
+//	desiredSpeed / 10;
+//	speed_control;
+}
+#endif // USE_CONFIGFILE
 
 static int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
 {

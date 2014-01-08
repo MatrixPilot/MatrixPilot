@@ -217,13 +217,13 @@
 	#error("Console UART's greater than 2 only supported on AUAV3 board"
 #endif
 
-#if ((USE_TELELOG == 1) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("USE_TELELOG only supported on AUAV3 board"
-#endif
+//#if ((USE_TELELOG == 1) && (BOARD_TYPE != AUAV3_BOARD))
+//	#error("USE_TELELOG only supported on AUAV3 board"
+//#endif
 
-#if ((USE_CONFIGFILE == 1) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("USE_CONFIGFILE only supported on AUAV3 board"
-#endif
+//#if ((USE_CONFIGFILE == 1) && (BOARD_TYPE != AUAV3_BOARD))
+//	#error("USE_CONFIGFILE only supported on AUAV3 board"
+//#endif
 
 #if ((USE_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("USE_USB only supported on AUAV3 board"

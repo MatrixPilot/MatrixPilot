@@ -33,9 +33,9 @@
 #error CONSOLE_UART must be defined
 #endif
 
-#if (CONSOLE_UART != 0)
-
 extern int __C30_UART;
+
+#if (CONSOLE_UART != 0) && (CONSOLE_UART != 9)
 
 //******************************************************************************
 // Constants
@@ -406,6 +406,9 @@ char Hex2Char(char hex)
 
 void init_uart(void)
 {
+#if (CONSOLE_UART == 9)
+	__C30_UART = CONSOLE_UART;
+#endif
 }
 
 #endif // CONSOLE_UART

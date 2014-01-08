@@ -206,13 +206,16 @@
     <ClCompile Include="..\..\MatrixPilot\parameter_table2.c">
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\parameter_table_init.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libFlashFS\minIni.c">
+      <Filter>Source Files\libFlashFS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\MatrixPilot\airspeed_options.h">
-      <Filter>Header Files\MatrixPilot</Filter>
     </ClInclude>
     <ClInclude Include="..\..\MatrixPilot\airspeedCntrl.h">
       <Filter>Header Files\MatrixPilot</Filter>
@@ -281,9 +284,6 @@
       <Filter>Header Files\MatrixPilot</Filter>
     </ClInclude>
     <ClInclude Include="..\..\MatrixPilot\navigate.h">
-      <Filter>Header Files\MatrixPilot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\MatrixPilot\osd_config.h">
       <Filter>Header Files\MatrixPilot</Filter>
     </ClInclude>
     <ClInclude Include="..\..\MatrixPilot\osd_layout.h">
@@ -450,6 +450,12 @@
     </ClInclude>
     <ClInclude Include="..\..\libFlashFS\usb_config.h">
       <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\osd_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\airspeed_options.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

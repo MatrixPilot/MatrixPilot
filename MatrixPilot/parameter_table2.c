@@ -71,16 +71,11 @@ typedef struct tag_mavlink_parameter
 	uint16_t param_size;                // parameter size in ram
 } mavlink_parameter;
  */
-
-float convert_param(int32_t x)
-{
-	mavlink_parameter mp;
-	mp.min.param_int32 = x;
-	printf("%li = %f\r\n", x, mp.min.param_float);
-	return mp.min.param_float;
-}
-
+#ifdef _MSC_VER
+mavlink_parameter mavlink_parameters_list[] = {
+#else
 const mavlink_parameter mavlink_parameters_list[] = {
+#endif // _MSC_VER
     {"PID_ROLLKP" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkp, sizeof(rollkp) },
     {"PID_ROLLKD" , {0.0} , {0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &rollkd, sizeof(rollkd) },
     {"PID_YAWKPAIL" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkpail, sizeof(yawkpail) },

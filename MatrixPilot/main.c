@@ -36,6 +36,9 @@
 #include "console.h"
 #endif
 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+void parameter_table_init(void);
+#endif
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -70,6 +73,12 @@ int main(void)
 		// a processor exception occurred and we're resuming execution here 
 		DPRINT("longjmp'd\r\n");
 	}
+
+#ifdef _MSC_VER
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+	parameter_table_init();
+#endif // SERIAL_OUTPUT_FORMAT
+#endif // _MSC_VER
 
 	while (1)
 	{

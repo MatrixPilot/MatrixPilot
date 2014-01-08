@@ -339,7 +339,7 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 
 	if (setting.type != MAVLINK_TYPE_INT32_T) return;
 
-	dec_angle.WW = __builtin_mulss((int16_t) setting.param_int32, (128.0 * 7.15)); //(int16_t)(RMAX * 128 / (57.3 * 40.0))
+	dec_angle.WW = __builtin_mulss((int16_t)setting.param_int32, (128.0 * 7.15)); //(int16_t)(RMAX * 128 / (57.3 * 40.0))
 	dec_angle.WW <<= 9;
 	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
 	*((int16_t*)mavlink_parameters_list[i].pparam) = dec_angle._.W1;
@@ -347,24 +347,76 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
+static int16_t get_param_index(const char* key)
+{
+	int16_t i;
 
+	// iterate known parameters
+	for (i = 0; i < count_of_parameters_list; i++)
+	{
+		// compare key with parameter name
+		if (!strcmp(key, (const char*)mavlink_parameters_list[i].name)) // TODO: why are we casting this to const, should not be required - RobD
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+/*
+typedef struct param_union {
+	union {
+		float param_float;
+		int32_t param_int32;
+		uint32_t param_uint32;
+		uint8_t param_uint8;
+		uint8_t bytes[4];
+	};
+	uint8_t type;
+} mavlink_param_union_t;
+ */
 void MAVParamsSet(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_set_t packet;
+	int16_t i;
 
 	mavlink_msg_param_set_decode(handle_msg, &packet);
-	if (mavlink_check_target(packet.target_system,packet.target_component) == true)
+	if (mavlink_check_target(packet.target_system, packet.target_component) == true)
 	{
+		DPRINT("\tfailed target system check on parameter set\r\n");
 //		send_text((uint8_t*)"failed target system check on parameter set \r\n");
 //		break;
 	}
 	else
 	{
 		// set parameter
-		const char* key = (const char*)packet.param_id;
+//		const char* key = (const char*)packet.param_id;
+		i = get_param_index((const char*)packet.param_id);
+		if (i != -1)
+		{
+			mavlink_param_union_t param;
+			param.type = packet.param_type;
+			param.param_float = packet.param_value;
 
+			if ((mavlink_parameters_list[i].readonly == false) &&
+			    (mavlink_parameter_out_of_bounds(param, i) == false))
+			{
+				mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].set_param(param, i);
+				DPRINT("parameter[%i] %s, %f set\r\n", i, (const char*)packet.param_id, param.param_float);
+			}
+			else
+			{
+				DPRINT("parameter[%i] %s, %f out of bounds\r\n", i, (const char*)packet.param_id, param.param_float);
+			}
+			// Send the parameter back to GCS as acknowledgement of success, or otherwise
+			if (mavlink_flags.mavlink_send_specific_variable == 0)
+			{
+				send_by_index = i;
+				mavlink_flags.mavlink_send_specific_variable = 1;
+			}
+		}
+/*
 		// iterate known parameters
-		int16_t i = 0;
 		for (i = 0; i < count_of_parameters_list; i++)
 		{
 			// compare key with parameter name
@@ -374,10 +426,15 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 				param.type = packet.param_type;
 				param.param_float = packet.param_value;
 
+				DPRINT("found parameter[%i] %s, %f\r\n", i, key, param.param_float);
+
 				if ((mavlink_parameters_list[i].readonly == false) &&
 				    (mavlink_parameter_out_of_bounds(param, i) == false))
 				{
 					mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].set_param(param, i);
+					DPRINT("parameter set\r\n");
+				}
+				{
 					// After setting parameter, re-send it to GCS as acknowledgement of success.
 					if (mavlink_flags.mavlink_send_specific_variable == 0)
 					{
@@ -387,6 +444,7 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 				}
 			}
 		}
+ */
 	}
 }
 
@@ -395,6 +453,7 @@ void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 	mavlink_param_request_list_t packet;
 
 	//send_text((uint8_t*)"param request list\r\n");
+	DPRINT("param request list\r\n");
 	mavlink_msg_param_request_list_decode(handle_msg, &packet);
 	if (packet.target_system == mavlink_system.sysid)
 	{
@@ -407,15 +466,22 @@ void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_request_read_t packet;
+//	int16_t index;
 
 	//send_text((uint8_t*)"Requested specific parameter\r\n");
+	//DPRINT("Requested specific parameter\r\n");
 	mavlink_msg_param_request_read_decode(handle_msg, &packet);
 	if (packet.target_system == mavlink_system.sysid)
 	{
-		if ((packet.param_index >= 0)&& (packet.param_index <= count_of_parameters_list))
+//		const char* key = (const char*)packet.param_id;
+		packet.param_index = get_param_index((const char*)packet.param_id);
+//		DPRINT("Requested specific parameter %u %u\r\n", packet.param_index, count_of_parameters_list);
+		DPRINT("Requested specific parameter %u %s\r\n", packet.param_index, (const char*)packet.param_id);
+		if ((packet.param_index >= 0) && (packet.param_index <= count_of_parameters_list))
 		{
 			send_by_index = packet.param_index;
 			mavlink_flags.mavlink_send_specific_variable = 1;
+			DPRINT("Sending specific parameter\r\n");
 		}
 	}
 }
@@ -427,79 +493,19 @@ boolean MAVParamsHandleMessage(mavlink_message_t* handle_msg)
 		case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 		{
 			MAVParamsRequestList(handle_msg);
-/*
-			//send_text((uint8_t*)"param request list\r\n");
-			mavlink_param_request_list_t packet;
-			mavlink_msg_param_request_list_decode(handle_msg, &packet);
-			if (packet.target_system != mavlink_system.sysid) break;
-			// Start sending parameters
-			send_variables_counter = 0;
-			mavlink_flags.mavlink_send_variables = 1;
- */
 			break;
 		}
 		case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
 		{
 			MAVParamsRequestRead(handle_msg);
-/*
-			//send_text((uint8_t*)"Requested specific parameter\r\n");
-			mavlink_param_request_read_t packet;
-			mavlink_msg_param_request_read_decode(handle_msg, &packet);
-			if (packet.target_system != mavlink_system.sysid) break;
-			if ((packet.param_index >= 0)&& (packet.param_index <= count_of_parameters_list))
-			{
-				send_by_index = packet.param_index;
-				mavlink_flags.mavlink_send_specific_variable = 1;
-			}
- */
 			break;
 		}
 		case MAVLINK_MSG_ID_PARAM_SET:
 		{
 			// decode
 			//send_text((uint8_t*)"Param Set\r\n");
-			DPRINT("Param Set\r\n");
+			//DPRINT("Param Set\r\n");
 			MAVParamsSet(handle_msg);
-/*
-			mavlink_param_set_t packet;
-			mavlink_msg_param_set_decode(handle_msg, &packet);
-			if (mavlink_check_target(packet.target_system,packet.target_component) == true)
-			{
-				send_text((uint8_t*) "failed target system check on parameter set \r\n");
-				break;
-			}
-			else
-			{
-				// set parameter
-				const char * key = (const char*) packet.param_id;
-
-				// iterate known parameters
-				int16_t i = 0;
-				for (i = 0; i < count_of_parameters_list; i++)
-				{
-					// compare key with parameter name
-					if (!strcmp(key,(const char *) mavlink_parameters_list[i].name))
-					{
-						mavlink_param_union_t param;
-						param.type = packet.param_type;
-						param.param_float = packet.param_value;
-
-						if ((mavlink_parameters_list[i].readonly == false) &&
-						    (mavlink_parameter_out_of_bounds(param, i) == false))
-						{
-
-							mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].set_param(param, i);
-							// After setting parameter, re-send it to GCS as acknowledgement of success.
-							if (mavlink_flags.mavlink_send_specific_variable == 0)
-							{
-								send_by_index = i;
-								mavlink_flags.mavlink_send_specific_variable = 1;
-							}
-						}
-					}
-				}
-			}
-*/
 			break;
 		}
 		default:

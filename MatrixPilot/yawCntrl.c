@@ -48,6 +48,17 @@ void init_yawCntrl(void)
 	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
 
+#if (USE_CONFIGFILE == 1)
+void save_yawCntrl(void)
+{
+	gains.YawKPRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
+	gains.YawKDRudder  = (float)rollkprud  / (RMAX);
+	gains.RollKPRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
+	gains.RollKDRudder = (float)hoveryawkp / (RMAX);
+	gains.RudderBoost  = (float)hoveryawkd / (SCALEGYRO*RMAX);
+}
+#endif // USE_CONFIGFILE
+
 void yawCntrl(void)
 {
 	if (canStabilizeHover() && current_orientation == F_HOVER)

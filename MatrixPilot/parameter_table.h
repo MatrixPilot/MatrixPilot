@@ -73,7 +73,11 @@ typedef enum
 	PARAMETER_READONLY,
 } PARAMETER_ACCESS;
 
+#ifdef _MSC_VER
+extern mavlink_parameter mavlink_parameters_list[];
+#else
 extern const mavlink_parameter mavlink_parameters_list[];
+#endif // _MSC_VER
 extern const uint16_t count_of_parameters_list;
 
 // callback type for data services user

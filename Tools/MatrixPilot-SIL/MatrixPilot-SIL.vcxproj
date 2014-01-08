@@ -50,7 +50,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;..\..\libUDB;..\..\MatrixPilot;..\HILSIM_XPlane;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\libUDB;..\..\MatrixPilot;..\..\libFlashFS;..\HILSIM_XPlane;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN;WIN32;_DEBUG;_WINDOWS;_USRDLL;XPNETDATA_EXPORTS;IBM=1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -111,6 +111,7 @@
     <ClCompile Include="..\..\libDCM\libDCM.c" />
     <ClCompile Include="..\..\libDCM\mathlibNAV.c" />
     <ClCompile Include="..\..\libDCM\rmat.c" />
+    <ClCompile Include="..\..\libFlashFS\minIni.c" />
     <ClCompile Include="..\..\MatrixPilot\airspeedCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\altitudeCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\altitudeCntrlVariable.c" />
@@ -134,6 +135,7 @@
     <ClCompile Include="..\..\MatrixPilot\navigate.c" />
     <ClCompile Include="..\..\MatrixPilot\nv_memory_table.c" />
     <ClCompile Include="..\..\MatrixPilot\parameter_table2.c" />
+    <ClCompile Include="..\..\MatrixPilot\parameter_table_init.c" />
     <ClCompile Include="..\..\MatrixPilot\pitchCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\rollCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\servoMix.c" />

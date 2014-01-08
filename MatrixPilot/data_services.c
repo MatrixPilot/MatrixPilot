@@ -239,7 +239,7 @@ uint16_t data_services_calc_item_size(uint16_t table_index)
 	uint16_t start_index = mavlink_parameter_blocks[table_index].block_start_index;
 	uint16_t count = mavlink_parameter_blocks[table_index].block_size;
 
-	for(item_index = 0; item_index < count; item_index++)
+	for (item_index = 0; item_index < count; item_index++)
 	{
 		size += mavlink_parameters_list[start_index + item_index].param_size;
 	}
@@ -281,7 +281,9 @@ void data_services_read_index(void)
 	else
 	{
 		if (data_services_do_all_areas == true)
+		{
 			data_services_table_index++;
+		}
 		else
 		{
 			if (data_services_user_callback != NULL) data_services_user_callback(false);

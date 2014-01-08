@@ -67,6 +67,9 @@
 #include "Compiler.h"
 #include "GenericTypeDefs.h"
 #include "HardwareProfile.h"
+
+#ifdef USE_SD_INTERFACE_WITH_SPI
+
 #include "MDD File System/FSIO.h"
 #include "MDD File System/FSDefs.h"
 #include "MDD File System/SD-SPI.h"
@@ -2682,4 +2685,6 @@ MEDIA_INFORMATION *  MDD_SDSPI_MediaInitialize(void)
 
     return &mediaInformation;
 }//end MediaInitialize
+
+#endif // USE_SD_INTERFACE_WITH_SPI
 
