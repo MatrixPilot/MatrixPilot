@@ -80,24 +80,28 @@ static void osd_update_horizon(void)
 {
 	// TODO: Change away from using roll degrees.  Use tangent as the slope.
 	struct relative2D matrix_accum;
+	int32_t earth_roll;
+	int32_t earth_pitch;
+	int8_t i;
+
 	matrix_accum.x = rmat[8];
 	matrix_accum.y = rmat[6];
-	int32_t earth_roll = rect_to_polar(&matrix_accum);      // binary angle (0 - 256 = 360 degrees)
+	earth_roll = rect_to_polar(&matrix_accum);              // binary angle (0 - 256 = 360 degrees)
 	earth_roll = (-earth_roll * BYTECIR_TO_DEGREE) >> 16;   // switch polarity, convert to -180 - 180 degrees
 #if (OSD_HORIZON_ROLL_REVERSED == 1)
 	earth_roll = -earth_roll;
 #endif
 
 	matrix_accum.y = rmat[7];
-	int32_t earth_pitch = rect_to_polar(&matrix_accum);     // binary angle (0 - 256 = 360 degrees)
+	earth_pitch = rect_to_polar(&matrix_accum);             // binary angle (0 - 256 = 360 degrees)
 	earth_pitch = (-earth_pitch * BYTECIR_TO_DEGREE) >> 16; // switch polarity, convert to -180 - 180 degrees
 #if (OSD_HORIZON_PITCH_REVERSED == 1)
 	earth_pitch = -earth_pitch;
 #endif
 
-	int8_t i;
 	for (i = -OSD_HORIZON_WIDTH; i < OSD_HORIZON_WIDTH; i++)
 	{
+		int8_t lastHeight;
 		int16_t h = earth_roll * i - earth_pitch * 16 + 60;
 		int8_t height = h / 120;
 		int8_t subHeight = ((h % 120) * 16 / 120);
@@ -105,7 +109,7 @@ static void osd_update_horizon(void)
 		subHeight &= 0x0F;
 
 		h = lastRoll * i - lastPitch * 16 + 60;
-		int8_t lastHeight = h / 120;
+		lastHeight = h / 120;
 		if (h < 0) lastHeight--;
 
 		if (height != 0 || OSD_SHOW_CENTER_DOT != 1 || (i != -1 && i != 0))
@@ -276,13 +280,14 @@ static void osd_update_values(void)
 		}
 		case 1:
 		{
+			int8_t earth_yaw;
 			int8_t dir_to_goal;
 			int16_t dist_to_goal;
-
 			struct relative2D curHeading;
+
 			curHeading.x = -rmat[1];
 			curHeading.y = rmat[4];
-			int8_t earth_yaw = rect_to_polar(&curHeading);  // 0-255 (0=East,  ccw)
+			earth_yaw = rect_to_polar(&curHeading);  // 0-255 (0=East,  ccw)
 
 			if (flags._.GPS_steering)
 			{
@@ -495,13 +500,12 @@ static void osd_update_values(void)
 void osd_run_step(void)
 {
 	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] >= 3000 || !udb_flags._.radio_on);
-	
 	int16_t countdown = 0;
+
 	if (!dcm_flags._.init_finished && udb_heartbeat_counter < 100)  // TODO: this will need updating for increased HEARTBEAT_HZ
 	{
 		countdown = 100 - udb_heartbeat_counter;
 	}
-
 	if (countdown == 61)
 	{
 		osd_spi_write_byte(0xFF);       // Terminate sending a string, in case that was happening (Prep for reset)
@@ -538,14 +542,12 @@ void osd_run_step(void)
 #endif
 			osd_was_on = 0;
 		}
-
 		if (osd_on)
 		{
 			if (!osd_phase)
 			{
 				osd_reset_cnt++;
 			}
-
 			if (!osd_reset_cnt)
 			{
 				osd_spi_write(MAX7456_DMM, 0x04);    // DMM set to clear display memory

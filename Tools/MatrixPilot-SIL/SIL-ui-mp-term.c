@@ -122,6 +122,8 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 	}
 }
 
+void save_config(void);
+
 #define KEYPRESS_INPUT_DELTA 50
 
 void sil_handle_key_input(char c)
@@ -214,6 +216,11 @@ void sil_handle_key_input(char c)
 					printf("\nReally reset? (y/N)");
 					fflush(stdout);
 					inputState = 2;
+					break;
+					
+				case '9':
+					printf("Saving Params to ini file\r\n");
+					save_config();
 					break;
 					
 				default:

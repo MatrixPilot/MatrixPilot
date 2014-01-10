@@ -353,77 +353,43 @@ static void command_ack(uint16_t command, uint16_t result)
 	}
 }
 
-// Portions of the following code in handlesmessage() are templated off source code written by James Goppert for the
-// ArdupilotMega, and are used by his kind permission and also in accordance with the GPS V3 licensing
-// of that code.
-
-// This is the main routine for taking action against a parsed message from the GCS
-static void handleMessage(void)
+void MAVLinkRequestDataStream(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_REQUEST_DATA_STREAM
 {
-	//send_text((uint8_t*) "Handling message ID 0x");
-	//send_uint8(handle_msg->msgid);
-	//send_text((uint8_t*) "\r\n");
-	mavlink_message_t* handle_msg;
+	int16_t freq = 0; // packet frequency
+	mavlink_request_data_stream_t packet;
+	mavlink_msg_request_data_stream_decode(handle_msg, &packet);
 
-	if (mavlink_message_index == 0)
+	DPRINT("MAVLINK_MSG_ID_REQUEST_DATA_STREAM %u\r\n", handle_msg->msgid);
+	//send_text((const uint8_t*) "Action: Request data stream\r\n");
+	// QgroundControl sends data stream request to component ID 1, which is not our component for UDB.
+	if (packet.target_system != mavlink_system.sysid) return;
+
+	if (packet.start_stop == 0) freq = 0; // stop sending
+	else if (packet.start_stop == 1) freq = packet.req_message_rate; // start sending
+	else return;
+	if (packet.req_stream_id == MAV_DATA_STREAM_ALL)
 	{
-		handle_msg = &msg[1];
+		// Warning: mavproxy automatically sets all.  Do not include all here, it will overide defaults.
+		streamRates[MAV_DATA_STREAM_RAW_SENSORS] = freq;
+		streamRates[MAV_DATA_STREAM_RC_CHANNELS] = freq;
 	}
 	else
 	{
-		handle_msg = &msg[0];
+		if (packet.req_stream_id < MAV_DATA_STREAM_ENUM_END)
+			streamRates[packet.req_stream_id] = freq;
 	}
+}
 
-	handling_of_message_completed |= MAVParamsHandleMessage(handle_msg);
-	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
-	handling_of_message_completed |= MAVFlexiFunctionsHandleMessage(handle_msg);
+void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND_LONG
+{
+	mavlink_command_long_t packet;
+	mavlink_msg_command_long_decode(handle_msg, &packet);
 
-	if (handling_of_message_completed == true)
+	DPRINT("MAVLINK_MSG_ID_COMMAND_LONG %u\r\n", handle_msg->msgid);
+	//if (mavlink_check_target(packet.target, packet.target_component) == false) break;
 	{
-		return;
-	}
-
-	switch (handle_msg->msgid)
-	{
-		case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
-			DPRINT("MAVLINK_MSG_ID_REQUEST_DATA_STREAM %u\r\n", handle_msg->msgid);
+		switch (packet.command)
 		{
-			int16_t freq = 0; // packet frequency
-
-			// decode
-			mavlink_request_data_stream_t packet;
-			mavlink_msg_request_data_stream_decode(handle_msg, &packet);
-			//send_text((const uint8_t*) "Action: Request data stream\r\n");
-			// QgroundControl sends data stream request to component ID 1, which is not our component for UDB.
-			if (packet.target_system != mavlink_system.sysid) break;
-
-			if (packet.start_stop == 0) freq = 0; // stop sending
-			else if (packet.start_stop == 1) freq = packet.req_message_rate; // start sending
-			else break;
-			if (packet.req_stream_id == MAV_DATA_STREAM_ALL)
-			{
-				// Warning: mavproxy automatically sets all.  Do not include all here, it will overide defaults.
-				streamRates[MAV_DATA_STREAM_RAW_SENSORS] = freq;
-				streamRates[MAV_DATA_STREAM_RC_CHANNELS] = freq;
-			}
-			else
-			{
-				if (packet.req_stream_id < MAV_DATA_STREAM_ENUM_END)
-					streamRates[packet.req_stream_id] = freq;
-			}
-			break;
-		}
-		case MAVLINK_MSG_ID_COMMAND_LONG:
-			DPRINT("MAVLINK_MSG_ID_COMMAND_LONG %u\r\n", handle_msg->msgid);
-		{
-			mavlink_command_long_t packet;
-			mavlink_msg_command_long_decode(handle_msg, &packet);
-			//if (mavlink_check_target(packet.target, packet.target_component) == false) break;
-			//send_text((uint8_t*) "Command ID 0x");
-			//send_uint8(packet.command);
-			//send_text((uint8_t*) "\r\n");
-			switch (packet.command)
-			{
 			case MAV_CMD_PREFLIGHT_CALIBRATION:
 				DPRINT("MAV_CMD_PREFLIGHT_CALIBRATION %u\r\n", packet.command);
 				if (packet.param1 == 1)
@@ -500,116 +466,179 @@ static void handleMessage(void)
 						break;
 				}
 				break;
+			case 22: // start
+				DPRINT("Start - packet.command %u\r\n", packet.command);
+				break;
+			case 252: // land
+				DPRINT("Land - packet.command %u\r\n", packet.command);
+				break;
 			default:
 				DPRINT("packet.command %u\r\n", packet.command);
 				command_ack(packet.command, MAV_CMD_ACK_ERR_NOT_SUPPORTED);
 				break;
-			}
-			break;
+		}
+	}
+}
 
+void MAVLinkSetMode(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_SET_MODE:
+{
+	mavlink_set_mode_t packet;
+
+	DPRINT("MAVLINK_MSG_ID_SET_MODE %u\r\n", handle_msg->msgid);
+	// send_text((uint8_t*) "Action: Specific Action Required\r\n");
+	// decode
+	mavlink_msg_set_mode_decode(handle_msg, &packet);
+//	if (mavlink_check_target(packet.target_system, packet.target_component) == false) break;
+	{
+		switch (packet.base_mode)
+		{
+			case 192: // Manual
+				DPRINT("Manual %u\r\n", packet.base_mode);
+				break;
+			case 208: // Manual/Stabilised
+				DPRINT("Manual/Stabilised %u\r\n", packet.base_mode);
+				break;
+			case 216: // Manual/Guided
+				DPRINT("Manual/Guided %u\r\n", packet.base_mode);
+				break;
+			case 156: // Auto
+				DPRINT("Auto %u\r\n", packet.base_mode);
+				break;
+/*
+			case MAV_ACTION_LAUNCH:
+				//send_text((uint8_t*) "Action: Launch !\r\n");
+				//DPRINT("Action: Launch !\r\n");
+				//set_mode(TAKEOFF);
+				break;
+			case MAV_ACTION_RETURN:
+				//send_text((uint8_t*) "Action: Return !\r\n");
+				//DPRINT("Action: Return !\r\n");
+				//set_mode(RTL);
+				break;
+			case MAV_ACTION_EMCY_LAND:
+				//send_text((uint8_t*) "Action: Emergency Land !\r\n");
+				//DPRINT("Action: Emergency Land !\r\n");
+				//set_mode(LAND);
+				break;
+			case MAV_ACTION_HALT:
+				//send_text((uint8_t*) "Action: Halt !\r\n");
+				//DPRINT("Action: Halt !\r\n");
+				//loiter_at_location();
+				break;
+			case MAV_ACTION_MOTORS_START:
+			case MAV_ACTION_CONFIRM_KILL:
+			case MAV_ACTION_EMCY_KILL:
+			case MAV_ACTION_MOTORS_STOP:
+			case MAV_ACTION_SHUTDOWN:
+				//set_mode(MANUAL);
+				break;
+			case MAV_ACTION_CONTINUE:
+				//process_next_command();
+				break;
+			case MAV_ACTION_SET_MANUAL:
+				//set_mode(MANUAL);
+				break;
+			case MAV_ACTION_SET_AUTO:
+				//set_mode(AUTO);
+				break;
+			case MAV_ACTION_STORAGE_READ:
+				//send_text((uint8_t*)"Action: Storage Read\r\n");
+				//DPRINT("Action: Storage Read\r\n");
+				break;
+			case MAV_ACTION_STORAGE_WRITE:
+				//send_text((uint8_t*)"Action: Storage Write\r\n");
+				//DPRINT("Action: Storage Write\r\n");
+				break;
+			case MAV_ACTION_CALIBRATE_RC:
+				//send_text((uint8_t*)"Action: Calibrate RC\r\n");
+				//DPRINT("Action: Calibrate RC\r\n");
+				break;
+			case MAV_ACTION_CALIBRATE_GYRO:
+			case MAV_ACTION_CALIBRATE_MAG:
+			case MAV_ACTION_CALIBRATE_ACC:
+			case MAV_ACTION_CALIBRATE_PRESSURE:
+			case MAV_ACTION_REBOOT:
+				//startup_IMU_ground();
+				break;
+			case MAV_ACTION_REC_START: break;
+			case MAV_ACTION_REC_PAUSE: break;
+			case MAV_ACTION_REC_STOP: break;
+			case MAV_ACTION_TAKEOFF:
+				//send_text((uint8_t*)"Action: Take Off !\r\n");
+				//DPRINT("Action: Take Off !\r\n");
+				//set_mode(TAKEOFF);
+				break;
+			case MAV_ACTION_NAVIGATE:
+				// send_text((uint8_t*)"Action: Navigate !\r\n");
+				// DPRINT("Action: Navigate !\r\n");
+				//set_mode(AUTO);
+				break;
+			case MAV_ACTION_LAND:
+				//set_mode(LAND);
+				break;
+			case MAV_ACTION_LOITER:
+				//set_mode(LOITER);
+				break;
+ */
+			default:
+				DPRINT("action: Specific Action Required %u\r\n", packet.base_mode);
+				break;
+		}
+	}
+}	
+
+// Portions of the following code in handlesmessage() are templated off source code written by James Goppert for the
+// ArdupilotMega, and are used by his kind permission and also in accordance with the GPS V3 licensing
+// of that code.
+
+// This is the main routine for taking action against a parsed message from the GCS
+static void handleMessage(void)
+{
+	mavlink_message_t* handle_msg;
+
+	if (mavlink_message_index == 0)
+	{
+		handle_msg = &msg[1];
+	}
+	else
+	{
+		handle_msg = &msg[0];
+	}
+
+	DPRINT("MAV MSG 0x%x\r\n", handle_msg->msgid);
+
+	handling_of_message_completed |= MAVParamsHandleMessage(handle_msg);
+	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
+	handling_of_message_completed |= MAVFlexiFunctionsHandleMessage(handle_msg);
+
+	if (handling_of_message_completed == true)
+	{
+		return;
+	}
+
+	switch (handle_msg->msgid)
+	{
+		case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
+			MAVLinkRequestDataStream(handle_msg);
+			break;
+		case MAVLINK_MSG_ID_COMMAND_LONG:
+			MAVLinkCommandLong(handle_msg);
+			break;
 //		case MAVLINK_MSG_ID_COMMAND:
 //			DPRINT("MAVLINK_MSG_ID_COMMAND %u\r\n", handle_msg->msgid);
 //			break;
-/*
-		case MAVLINK_MSG_ID_ACTION:
-			// send_text((uint8_t*) "Action: Specific Action Required\r\n");
-			DPRINT("MAVLINK_MSG_ID_ACTION %u\r\n", handle_msg->msgid);
-			DPRINT("action: Specific Action Required\r\n");
-			// decode
-			mavlink_action_t packet;
-			mavlink_msg_action_decode(handle_msg, &packet);
-			if (mavlink_check_target(packet.target, packet.target_component) == false) break;
-
-			switch (packet.action)
-			{
-				case MAV_ACTION_LAUNCH:
-					//send_text((uint8_t*) "Action: Launch !\r\n");
-					//DPRINT("Action: Launch !\r\n");
-					//set_mode(TAKEOFF);
-					break;
-				case MAV_ACTION_RETURN:
-					//send_text((uint8_t*) "Action: Return !\r\n");
-					//DPRINT("Action: Return !\r\n");
-					//set_mode(RTL);
-					break;
-				case MAV_ACTION_EMCY_LAND:
-					//send_text((uint8_t*) "Action: Emergency Land !\r\n");
-					//DPRINT("Action: Emergency Land !\r\n");
-					//set_mode(LAND);
-					break;
-				case MAV_ACTION_HALT:
-					//send_text((uint8_t*) "Action: Halt !\r\n");
-					//DPRINT("Action: Halt !\r\n");
-					//loiter_at_location();
-					break;
-				case MAV_ACTION_MOTORS_START:
-				case MAV_ACTION_CONFIRM_KILL:
-				case MAV_ACTION_EMCY_KILL:
-				case MAV_ACTION_MOTORS_STOP:
-				case MAV_ACTION_SHUTDOWN:
-					//set_mode(MANUAL);
-					break;
-				case MAV_ACTION_CONTINUE:
-					//process_next_command();
-					break;
-				case MAV_ACTION_SET_MANUAL:
-					//set_mode(MANUAL);
-					break;
-				case MAV_ACTION_SET_AUTO:
-					//set_mode(AUTO);
-					break;
-				case MAV_ACTION_STORAGE_READ:
-					//send_text((uint8_t*)"Action: Storage Read\r\n");
-					//DPRINT("Action: Storage Read\r\n");
-					break;
-				case MAV_ACTION_STORAGE_WRITE:
-					//send_text((uint8_t*)"Action: Storage Write\r\n");
-					//DPRINT("Action: Storage Write\r\n");
-					break;
-				case MAV_ACTION_CALIBRATE_RC:
-					//send_text((uint8_t*)"Action: Calibrate RC\r\n");
-					//DPRINT("Action: Calibrate RC\r\n");
-					break;
-				case MAV_ACTION_CALIBRATE_GYRO:
-				case MAV_ACTION_CALIBRATE_MAG:
-				case MAV_ACTION_CALIBRATE_ACC:
-				case MAV_ACTION_CALIBRATE_PRESSURE:
-				case MAV_ACTION_REBOOT:
-					//startup_IMU_ground();
-					break;
-				case MAV_ACTION_REC_START: break;
-				case MAV_ACTION_REC_PAUSE: break;
-				case MAV_ACTION_REC_STOP: break;
-				case MAV_ACTION_TAKEOFF:
-					//send_text((uint8_t*)"Action: Take Off !\r\n");
-					//DPRINT("Action: Take Off !\r\n");
-					//set_mode(TAKEOFF);
-					break;
-				case MAV_ACTION_NAVIGATE:
-					// send_text((uint8_t*)"Action: Navigate !\r\n");
-					// DPRINT("Action: Navigate !\r\n");
-					//set_mode(AUTO);
-					break;
-				case MAV_ACTION_LAND:
-					//set_mode(LAND);
-					break;
-				case MAV_ACTION_LOITER:
-					//set_mode(LOITER);
-					break;
-				default: break;
-			}
-			break;
-*/
-		}
+//		case MAVLINK_MSG_ID_ACTION:
+//			DPRINT("MAVLINK_MSG_ID_ACTION %u\r\n", handle_msg->msgid);
+//		case 11:
 		case MAVLINK_MSG_ID_SET_MODE:
-			DPRINT("MAVLINK_MSG_ID_SET_MODE %u\r\n", handle_msg->msgid);
+			MAVLinkSetMode(handle_msg);
 			break;
 		default:
 			DPRINT("handle_msg->msgid %u\r\n", handle_msg->msgid);
 			break;
-	} // end switch
+	}
 	handling_of_message_completed = true;
-} // end handle mavlink
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //

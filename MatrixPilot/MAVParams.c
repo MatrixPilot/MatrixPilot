@@ -360,6 +360,7 @@ static int16_t get_param_index(const char* key)
 			return i;
 		}
 	}
+	DPRINT("unknown parameter name: %s\r\n", key);
 	return -1;
 }
 
