@@ -456,15 +456,19 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 				{
 					case 0: // Read
 						DPRINT("Read (ROM)\r\n");
+						init_config();
 						break;
 					case 1: // Write
 						DPRINT("Write (ROM)\r\n");
 						save_config();
 						break;
 					default:
-						DPRINT("245 packet.param1 %f packet.param2 %f\r\n", packet.param1, packet.param2);
+						DPRINT("245 packet.param1 %f packet.param2 %f\r\n", (double)packet.param1, (double)packet.param2);
 						break;
 				}
+				break;
+			case 246: // halt
+				DPRINT("Halt - packet.command %u\r\n", packet.command);
 				break;
 			case 22: // start
 				DPRINT("Start - packet.command %u\r\n", packet.command);
@@ -503,6 +507,9 @@ void MAVLinkSetMode(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_SET_MODE:
 				break;
 			case 156: // Auto
 				DPRINT("Auto %u\r\n", packet.base_mode);
+				break;
+			case 65: // Disarm System
+				DPRINT("Disarm System %u\r\n", packet.base_mode);
 				break;
 /*
 			case MAV_ACTION_LAUNCH:

@@ -34,16 +34,16 @@ union config_word config;
 struct gains_variables gains;
 union network_module_word nw_mod;
 
-const char* strConfigFile = "config.ini";
-const char* strNetwork = "NETWORK";
-const char* strStabilise = "STABILISE";
-const char* strNavigation = "NAVIGATION";
-const char* strRoll = "ROLL";
-const char* strPitch = "PITCH";
-const char* strYaw = "YAW";
-const char* strAltitude = "ALTITUDE";
-const char* strRTL = "RTL";
-const char* strHover = "HOVER";
+static const char* strConfigFile = "config.ini";
+static const char* strNetwork = "NETWORK";
+static const char* strStabilise = "STABILISE";
+static const char* strNavigation = "NAVIGATION";
+static const char* strRoll = "ROLL";
+static const char* strPitch = "PITCH";
+static const char* strYaw = "YAW";
+static const char* strAltitude = "ALTITUDE";
+static const char* strRTL = "RTL";
+static const char* strHover = "HOVER";
 
 char address[16];
 char gateway[16];
@@ -59,7 +59,7 @@ int   ini_getkey(const mTCHAR *Section, int idx, mTCHAR *Buffer, int BufferSize,
 INI_REAL ini_getf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL DefValue, const mTCHAR *Filename);
  */
 
-void load_network(void)
+static void load_network(void)
 {
 	int port = 0;
 	int result;
@@ -93,11 +93,11 @@ void load_network(void)
 #endif
 }
 
-void load_settings(void)
+static void load_settings(void)
 {
 }
 
-void save_settings(void)
+static void save_settings(void)
 {
 }
 
@@ -125,7 +125,7 @@ pilot = "Not Defined"
 url = "http://www.diydrones.com"
  */
 
-void load_config(void)
+static void load_config(void)
 {
 /*
 	config._.RollStabilizaionAilerons = ROLL_STABILIZATION_AILERONS;
@@ -163,7 +163,7 @@ stabilised = 1
 waypoint = 1
  */
 
-void load_gains(void)
+static void load_gains(void)
 {
 /*
 	gains.YawKPAileron = YAWKP_AILERON;
@@ -242,7 +242,7 @@ void load_gains(void)
 //INI_REAL ini_getf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL DefValue, const mTCHAR *Filename);
 //int      ini_putf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL Value,    const mTCHAR *Filename);
 
-void save_gains(void)
+static void save_gains(void)
 {
 // Aileron/Roll Control Gains
 	ini_putf(strRoll, "rollkp", gains.RollKP, strConfigFile);
@@ -338,4 +338,3 @@ int   ini_putl(const mTCHAR *Section, const mTCHAR *Key, long Value, const mTCHA
 int   ini_puts(const mTCHAR *Section, const mTCHAR *Key, const mTCHAR *Value, const mTCHAR *Filename);
 int   ini_putf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL Value, const mTCHAR *Filename);
  */
-

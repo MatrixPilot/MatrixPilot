@@ -63,6 +63,7 @@ int main(void)
 	udb_init();
 	dcm_init();
 	init_config();  // this will need to be moved up in order to support runtime hardware options
+	init_waypoints();
 	init_servoPrepare();
 	init_states();
 	init_behavior();

@@ -403,11 +403,11 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 			    (mavlink_parameter_out_of_bounds(param, i) == false))
 			{
 				mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].set_param(param, i);
-				DPRINT("parameter[%i] %s, %f set\r\n", i, (const char*)packet.param_id, param.param_float);
+				DPRINT("parameter[%i] %s, %f set\r\n", i, (const char*)packet.param_id, (double)param.param_float);
 			}
 			else
 			{
-				DPRINT("parameter[%i] %s, %f out of bounds\r\n", i, (const char*)packet.param_id, param.param_float);
+				DPRINT("parameter[%i] %s, %f out of bounds\r\n", i, (const char*)packet.param_id, (double)param.param_float);
 			}
 			// Send the parameter back to GCS as acknowledgement of success, or otherwise
 			if (mavlink_flags.mavlink_send_specific_variable == 0)
@@ -415,6 +415,10 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 				send_by_index = i;
 				mavlink_flags.mavlink_send_specific_variable = 1;
 			}
+		}
+		else
+		{
+			DPRINT("Attempt to set unknown parameter name: %s\r\n", (const char*)packet.param_id);
 		}
 /*
 		// iterate known parameters

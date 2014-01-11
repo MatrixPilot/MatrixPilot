@@ -23,10 +23,14 @@
 #define FLIGHTPLAN_WAYPOINTS_H
 
 
-extern uint16_t number_of_waypoints;
+//#define USE_DYNAMIC_WAYPOINTS
+#define MAX_WAYPOINTS 20
+
+//extern uint16_t number_of_waypoints;
 extern int16_t waypointIndex;
 extern int8_t extended_range;  // TODO: move this to navigate.h
 
+void init_waypoints(void);
 
 void init_flightplan(int16_t flightplanNum);
 vect3D_32 getWaypoint3D(uint16_t wp);
@@ -36,6 +40,7 @@ void run_flightplan(void);
 void flightplan_live_begin(void);
 void flightplan_live_received_byte(uint8_t inbyte);
 void flightplan_live_commit(void);
-
+int16_t waypoint_count(void);
+void set_waypoint(int16_t index);
 
 #endif // FLIGHTPLAN_WAYPOINTS_H
