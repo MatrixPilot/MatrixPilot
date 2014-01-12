@@ -191,9 +191,6 @@ static inline void MissionAck(mavlink_message_t* handle_msg)
 	mavlink_waypoint_timeout  = 0;
 }
 
-void clear_flightplan(void);
-void add_waypoint(struct waypoint3D wp, int16_t flags);
-
 static inline void MissionClearAll(mavlink_message_t* handle_msg)
 {
 	mavlink_mission_clear_all_t packet;

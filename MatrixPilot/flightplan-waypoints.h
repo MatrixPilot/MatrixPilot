@@ -43,4 +43,8 @@ void flightplan_live_commit(void);
 int16_t waypoint_count(void);
 void set_waypoint(int16_t index);
 
+void clear_flightplan(void);
+void add_waypoint(struct waypoint3D wp, int16_t flags);
+
+
 #endif // FLIGHTPLAN_WAYPOINTS_H

@@ -119,8 +119,6 @@ static vect3D_32 wp_to_absolute_coords(struct waypointDef wp)
 	return v;
 }
 
-#ifdef USE_DYNAMIC_WAYPOINTS
-
 void clear_flightplan(void)
 {
 	numPointsInCurrentSet = 0;
@@ -164,7 +162,9 @@ void add_waypoint(int32_t x, int32_t y, int16_t z, int16_t flags)
 	}
 }
  */
-void load_flightplan(struct waypointDef* waypoints, int count)
+#ifdef USE_DYNAMIC_WAYPOINTS
+
+static void load_flightplan(const struct waypointDef* waypoints, int count)
 {
 	int i;
 
@@ -172,7 +172,7 @@ void load_flightplan(struct waypointDef* waypoints, int count)
 //struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D viewpoint; };
 
 	struct waypointDef* dst_wp;
-	struct waypointDef* src_wp;
+	const struct waypointDef* src_wp;
 
 
 	for (i = 0; i < count; i++)
@@ -191,7 +191,7 @@ void load_flightplan(struct waypointDef* waypoints, int count)
 
 #else
 
-void load_flightplan(struct waypointDef* waypoints, int count)
+static void load_flightplan(const struct waypointDef* waypoints, int count)
 {
 	currentWaypointSet = waypoints;
 	numPointsInCurrentSet = count;
