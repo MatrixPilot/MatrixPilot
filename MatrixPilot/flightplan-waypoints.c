@@ -130,6 +130,7 @@ void clear_flightplan(void)
 
 void add_waypoint(struct waypoint3D wp, int16_t flags)
 {
+#ifdef USE_DYNAMIC_WAYPOINTS
 	DPRINT("add_waypoint(%li, %li, %i\r\n", wp.x, wp.y, wp.z);
 	if (numPointsInCurrentSet < MAX_WAYPOINTS)
 	{
@@ -143,6 +144,10 @@ void add_waypoint(struct waypoint3D wp, int16_t flags)
 	{
 		DPRINT("waypoints list full, new point not added\r\n");
 	}
+#else
+	DPRINT("Must define USE_DYNAMIC_WAYPOINTS in order to add waypoints\r\n");
+
+#endif // USE_DYNAMIC_WAYPOINTS
 }
 /*
 void add_waypoint(int32_t x, int32_t y, int16_t z, int16_t flags)

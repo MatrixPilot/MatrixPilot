@@ -411,6 +411,7 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 			break;
 #endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 		default:
+			DPRINT("MAVMissionHandleMessage(handle_msg->msgid %u) - NOT HANDLED\r\n", handle_msg->msgid);
 			return false;
 	}
 	return true;

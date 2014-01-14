@@ -641,7 +641,7 @@ static void handleMessage(void)
 			MAVLinkSetMode(handle_msg);
 			break;
 		default:
-			DPRINT("handle_msg->msgid %u\r\n", handle_msg->msgid);
+			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
 			break;
 	}
 	handling_of_message_completed = true;
