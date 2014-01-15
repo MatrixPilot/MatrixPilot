@@ -63,6 +63,8 @@ union longww IMUvelocityx = { 0 };
 union longww IMUvelocityy = { 0 };
 union longww IMUvelocityz = { 0 };
 
+int16_t forward_ground_speed = 0 ;
+
 // location, as estimated by the IMU
 // high word is meters, low word is fractional meters
 union longww IMUlocationx = { 0 };
@@ -163,6 +165,10 @@ void dead_reckon(void)
 	air_speed_x = IMUvelocityx._.W1 - estimatedWind[0];
 	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1];
 	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2];
+
+	accum.WW = ((__builtin_mulss(-IMUintegralAccelerationx._.W1, rmat[1])
+	                          + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4])) << 2);
+	forward_ground_speed = accum._.W1 ;
 
 #if (HILSIM == 1)
 	air_speed_3DIMU = as_sim.BB;    // use Xplane as a pitot

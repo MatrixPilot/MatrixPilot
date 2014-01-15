@@ -29,6 +29,8 @@ extern fractional locationErrorEarth[3];
 
 extern union longww IMUlocationx, IMUlocationy, IMUlocationz;
 extern union longww IMUvelocityx, IMUvelocityy, IMUvelocityz;
+extern int16_t forward_ground_speed ;
+
 #define IMUheight IMUlocationz._.W1
 
 
