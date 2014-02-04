@@ -1,0 +1,229 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B527FA9D119242FB00C90881 /* HILSIM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA96119242FB00C90881 /* HILSIM.cpp */; };
+		B527FA9E119242FB00C90881 /* Setup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA97119242FB00C90881 /* Setup.cpp */; };
+		B527FA9F119242FB00C90881 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA99119242FB00C90881 /* stdafx.cpp */; };
+		B527FAA0119242FB00C90881 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B527FA9B119242FB00C90881 /* utility.cpp */; };
+		B53B5CBD11927FD700D289D3 /* SerialIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B53B5CBC11927FD700D289D3 /* SerialIO.cpp */; };
+		B5D2E01A16C2CE12004A0D12 /* UDBSocketUnix.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B527FA96119242FB00C90881 /* HILSIM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HILSIM.cpp; sourceTree = "<group>"; };
+		B527FA97119242FB00C90881 /* Setup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Setup.cpp; sourceTree = "<group>"; };
+		B527FA98119242FB00C90881 /* Setup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Setup.h; sourceTree = "<group>"; };
+		B527FA99119242FB00C90881 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
+		B527FA9A119242FB00C90881 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		B527FA9B119242FB00C90881 /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
+		B527FA9C119242FB00C90881 /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
+		B53B5CBB11927F1900D289D3 /* SerialIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SerialIO.h; sourceTree = "<group>"; };
+		B53B5CBC11927FD700D289D3 /* SerialIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SerialIO.cpp; sourceTree = "<group>"; };
+		B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UDBSocketUnix.c; sourceTree = "<group>"; };
+		B5D2E01916C2CE12004A0D12 /* UDBSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDBSocket.h; sourceTree = "<group>"; };
+		D607B19909A556E400699BC3 /* HILSIM.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = HILSIM.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D607B19709A556E400699BC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AC4E46B809C2E0B3006B7E1B /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				B527FA96119242FB00C90881 /* HILSIM.cpp */,
+				B527FA97119242FB00C90881 /* Setup.cpp */,
+				B527FA98119242FB00C90881 /* Setup.h */,
+				B527FA99119242FB00C90881 /* stdafx.cpp */,
+				B527FA9A119242FB00C90881 /* stdafx.h */,
+				B527FA9B119242FB00C90881 /* utility.cpp */,
+				B527FA9C119242FB00C90881 /* utility.h */,
+				B5D2E01816C2CE12004A0D12 /* UDBSocketUnix.c */,
+				B5D2E01916C2CE12004A0D12 /* UDBSocket.h */,
+				B53B5CBC11927FD700D289D3 /* SerialIO.cpp */,
+				B53B5CBB11927F1900D289D3 /* SerialIO.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		D607B15F09A5563000699BC3 = {
+			isa = PBXGroup;
+			children = (
+				AC4E46B809C2E0B3006B7E1B /* Source */,
+				D607B19A09A556E400699BC3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D607B19A09A556E400699BC3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D607B19909A556E400699BC3 /* HILSIM.xpl */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D607B19809A556E400699BC3 /* HILSIM */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D607B19B09A556E400699BC3 /* Build configuration list for PBXNativeTarget "HILSIM" */;
+			buildPhases = (
+				D607B19609A556E400699BC3 /* Sources */,
+				D607B19709A556E400699BC3 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HILSIM;
+			productName = StarterPlugin;
+			productReference = D607B19909A556E400699BC3 /* HILSIM.xpl */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D607B16109A5563100699BC3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+			};
+			buildConfigurationList = D607B16209A5563100699BC3 /* Build configuration list for PBXProject "HILSIM" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = D607B15F09A5563000699BC3;
+			productRefGroup = D607B19A09A556E400699BC3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D607B19809A556E400699BC3 /* HILSIM */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D607B19609A556E400699BC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B527FA9D119242FB00C90881 /* HILSIM.cpp in Sources */,
+				B527FA9E119242FB00C90881 /* Setup.cpp in Sources */,
+				B527FA9F119242FB00C90881 /* stdafx.cpp in Sources */,
+				B527FAA0119242FB00C90881 /* utility.cpp in Sources */,
+				B53B5CBD11927FD700D289D3 /* SerialIO.cpp in Sources */,
+				B5D2E01A16C2CE12004A0D12 /* UDBSocketUnix.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D607B16309A5563100699BC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				EXECUTABLE_EXTENSION = xpl;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"APL=1",
+					"IBM=0",
+					"LIN=0",
+				);
+				HEADER_SEARCH_PATHS = include;
+				OTHER_LDFLAGS = (
+					"$(OTHER_LDFLAGS)",
+					"-undefined",
+					dynamic_lookup,
+				);
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = macosx10.7;
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		D607B16409A5563100699BC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				EXECUTABLE_EXTENSION = xpl;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"APL=1",
+					"IBM=0",
+					"LIN=0",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(XPSDK_ROOT)/CHeaders/Widgets",
+					"$(XPSDK_ROOT)/CHeaders/XPLM",
+					"$(HEADER_SEARCH_PATHS)",
+				);
+				OTHER_LDFLAGS = (
+					"$(OTHER_LDFLAGS)",
+					"-undefined",
+					dynamic_lookup,
+				);
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = macosx10.7;
+				VALID_ARCHS = i386;
+				XPSDK_ROOT = SDK;
+			};
+			name = Release;
+		};
+		D607B19C09A556E400699BC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 0;
+			};
+			name = Debug;
+		};
+		D607B19D09A556E400699BC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D607B16209A5563100699BC3 /* Build configuration list for PBXProject "HILSIM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D607B16309A5563100699BC3 /* Debug */,
+				D607B16409A5563100699BC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D607B19B09A556E400699BC3 /* Build configuration list for PBXNativeTarget "HILSIM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D607B19C09A556E400699BC3 /* Debug */,
+				D607B19D09A556E400699BC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D607B16109A5563100699BC3 /* Project object */;
+}

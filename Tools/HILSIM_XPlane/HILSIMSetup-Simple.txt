@@ -1,0 +1,42 @@
+# HILSIM setup file - loads from HILSIMSetup.txt in the X-Plane executable directory
+# 
+#  Matthew Coleman - 10-05-05
+#  
+#  Using the following format
+# 
+#  Comm,COMx,Speed (or on a mac, something like: Comm,/dev/cu.usbserial-A600akaF)
+#  Port,PortNumber will use a UDB port instead of a serial connection.  Use for SILSIM.
+#  Override,***Override path description****
+#  Control,Servo Channel,Xplane control surface path,Servo zero,Servo High Travel,Servo Low Travel,Surface Max travel,Surface Min Travel
+#  Engine,Servo Channel,Engine Mask,Servo Zero,Servo High Travel,Servo Low Travel,Engine Max,Engine Min
+#  
+#  To comment out any line in the setup, change the first word before the comma.  
+# 
+#  The surface and override paths are defined in the xsquarkbox data references file
+#  http://www.xsquawkbox.net/xpsdk/docs/DataRefs.html
+#  
+#  If you need simple control choose the joystick override.
+#  If you need to translate servos to flying surfaces choose full surface override.
+#  
+#  Surface travel is normally in degrees.  Read the XPlane documentation
+#  Servo Hi and Low travel is defined by the relative count travelled from zero, 
+# 	not the absolute value.
+#  
+#  The engine mask is a bitfield Bit0 = engine 1, Bit 7 = engine 8.
+#  
+#  If you need to control all engines together on one channel, choose mask 255
+#  
+#  Use your transmitter and/or autopilot to do the mixing.
+#  
+#  THIS SETUP WILL NOT DO INTER-CHANNEL MIXING.  This feature is to be added if needed. 
+#  This might be a problem for some heli setups.
+
+Comm,COM4, 38400
+#Comm,/dev/ttyUSB0,38400
+#Comm,/dev/cu.usbserial-A600dP4v,38400
+Port,14551
+Overide,sim/operation/override/override_flightcontrol
+Control,1,sim/joystick/FC_roll,3000,1000,1000,-1,-1
+Control,2,sim/joystick/FC_ptch,3000,1000,1000,-1,-1
+Control,4,sim/joystick/FC_hdng,3000,1000,1000,-1,-1
+Engine,3,255,2000,2000,0,1,-1
