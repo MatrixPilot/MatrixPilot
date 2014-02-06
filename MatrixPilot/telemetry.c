@@ -650,7 +650,7 @@ void serial_output_8hz(void)
 				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
 					/* ***  sonar and barometer feed ***  */
 					#if  (USE_SONAR == 1)
-						serial_output("sr%i,sa%i:", sonar_rawaglaltitude, sonar_aglaltitude);
+						serial_output("sr%i,sa%i:", (int16_t)get_sonar_rawaglaltitude(), (int16_t)get_sonar_aglaltitude());
 					#endif
 					#if (USE_BAROMETER == 1)
 						serial_output("rt%i,rp%i,aa%i:",
@@ -790,14 +790,13 @@ extern uint16_t udb_pwm_sonar;
 extern uint32_t cos_sonarproll;
 void serial_output_8hz( void )
 {
-	if ( udb_flags._.sonar_print_telemetry == 1 ) 
+	if (flags._.sonar_inrange == 1) 
 	{
-		serial_output("ra%i,cp%i,ag%i,pc%i:\r\n",sonar_rawaglaltitude, cos_sonarproll, sonar_aglaltitude, udb_pwm_sonar) ;
-		udb_flags._.sonar_print_telemetry = 0 ;
+		serial_output("ra%i,ag%i,cp%i:\r\n",(int16_t)get_sonar_rawaglaltitude(),(int16_t)get_sonar_aglaltitude(),(uint32_t)get_cos_sonarproll()) ;
 	}
 	else 
 	{
-		serial_output("ra%i,cp%i,ag%i,pc%i:\r\n", SONAR_NOINPUT_VALUE, cos_sonarproll, SONAR_NOINPUT_VALUE,udb_pwm_sonar) ;
+		serial_output("ra%i,ag%i,cp%i:\r\n",SONAR_NOINPUT_VALUE, SONAR_NOINPUT_VALUE,(uint32_t)get_cos_sonarproll()) ;
 	}	
 	return ;
 }	

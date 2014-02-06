@@ -1,16 +1,17 @@
 
-/*  Release 3150qsb-aps2.4-t110.00, supports UDB4, UDB5 and AUAV3 
+/*  Release 3150qsb-aps2.4-t110.01, supports UDB4, UDB5 and AUAV3 
 
     Setup: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer, 406 Std. GPS, Breeze 2000 V-tail
     
-	Baseline: MatrixPilot trunk rel. 3150
+	Baseline: MatrixPilot trunk rel. 3150-60
   
-    Last modified date  Feb. 2, 2014
+    Last modified date  Feb. 3, 2014
 
     MODIFICATIONS :
 
     Iteration: MxPilot-3150qsb-aps-brz2k-t110.00
-	t00q-  Mods:  current trunk 3150 -  logo support bug fix, incorporated previous sonar and barometer functions 
+	Mods:  current trunk 3150-56 -- logo support bug fix, incorporated previous sonar and barometer functions, updated corr. comm
+			and interface components 
  		-  Code changes:
 			o - modified options.h, main.c, defines.h, telemetry.c and others, too many to list to adopt to previously tested sonar and 
 				barometer functions
@@ -24,6 +25,18 @@
 				stabilize
 			o - Barometer AGL alt now looks just a bit off but stable, perhaps can use fusion/corr algo with sonar AGL alt when in range
 
+    Iteration: MxPilot-3150qsb-aps-brz2k-t110.02
+	Mods: sonarCntrl modified to support inline calls for optimization and added "sonar_inrange" flag to trigger use of sonar AGL altitude.., 
+		optimized-simplified I2C driver to use queued algorithm, added magnetometer new available data callback in estYawDrift 
+ 		-  Code changes:
+			o - modified sonarCntrl.c and ~.h, telemetry.c, defines.h, deadReckoning.c, flighplan-logo.c and navigate.c
+			o - options.h, magnetometer.c and ~.h, barometer.c, I2C2.h, I2C.h to support new I2C queue algo
+			o - magnetometer.c and ~.h, barometer.c, I2C2.h, I2C.h to support new queue algo
+			o - magnetometer.c, estYawDrift.c, libUDB.h to support added callback
+		-  Ground Test results with both 10 and 4 cycle speed settings, alternately using 2 barometer sensors:   LOG00871~72, 83
+			o - Builds clean across  UDB4, UDB5 and AUAV3 
+			o - WIP
+
 	TODO:	1) retest barometer data feed and altitude and conduct flight tests as soon as weather permits
 			2) setup_origin(); in navigate.c, add call to capture lauch takeoff (x,y) point and angle for LOGO landing support
 			3) bullet proof and add health check and recovery or failover algo for sonar and barometer data
@@ -36,8 +49,8 @@
 //   	barometer functional enhancements
 // Creator:        Bill Premerlani's UAV Dev Board 
 //
-// Added acknowledgements and special thanks as well to the ardupilot authors, contributors and community for the barometer related 
-//   logic-algorithms (APM2.5 SW) used as reference for recent modifications in barometer functions and computations
+// Also, acknowledgements and special thanks as well to the ardupilot (APM2.5 SW) authors, contributors and community for the 
+//   barometer related logic-algorithms used as template-references for recent modifications in barometer functions
 //
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 
@@ -474,10 +487,6 @@
 //
 #define CAL_HZ_CYCLE						10		//  calibration speed
 #define BAR_HZ_CYCLE						10		//  10 (rec) estimation runtime speed
-
-//  MAGNETOMETER AND BAROMETER i2c modss:  0 to for alternate and 1 for queued (I2C2) 
-//
-#define I2C2_QUEUED                			1
 
 // Temperature scaled, high accuracy barometric altitude computation, 
 //  requires fast cpus 

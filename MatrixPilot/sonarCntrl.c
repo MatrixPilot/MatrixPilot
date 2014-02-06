@@ -14,11 +14,18 @@
 #include "defines.h"
 #include "sonarCntrl.h"
 extern int16_t get_sonar_value(void);   	// Get the raw pwm units from the sonar device driver
+static int16_t sonar_aglaltitude = 0;
+static int16_t sonar_rawaglaltitude = 0;
+static uint32_t cos_sonarproll = 0; 
+
+inline int16_t 	get_sonar_rawaglaltitude(void)	{return sonar_rawaglaltitude;}
+inline int16_t 	get_sonar_aglaltitude(void)	{return sonar_aglaltitude;}
+inline uint32_t	get_cos_sonarproll(void)	{return cos_sonarproll;}
 
 #if (USE_SONAR == 1 && HILSIM != 1)
 
 
-	static fractional cos_pitch_roll;      	// tilt of the plane in UDB fractional units * 2.
+	static fractional cos_pitch_roll;      		// tilt of the plane in UDB fractional units * 2.
 	extern int16_t udb_pwm_sonar;				// Raw pwm units from sonar device, from radioIn.c
 	static uint8_t valReadIndex=0;  			// valid reads index, loop until SONAR_MINIMUM_VALREADS is reached.
 	static uint8_t noReadIndex=0;   			// tracks number of no readings from sonar
@@ -40,11 +47,13 @@ extern int16_t get_sonar_value(void);   	// Get the raw pwm units from the sonar
 			if (sonar_rawaglaltitude > EFFECTV_SONAR_ALTRANGE)
 			{
 				sonar_aglaltitude = MAXIMUM_SONAR_ALTRANGE;
+				flags._.sonar_inrange = 0;
 				valReadIndex = 0; 
 			}
 			else 
 			{
 				valReadIndex++;
+				flags._.sonar_inrange = 1;
 				if (valReadIndex > SONAR_MINIMUM_VALREADS) 
 				{
 					valReadIndex = SONAR_MINIMUM_VALREADS;
@@ -52,20 +61,20 @@ extern int16_t get_sonar_value(void);   	// Get the raw pwm units from the sonar
 					accum.WW = __builtin_mulss(cos_pitch_roll, sonar_rawaglaltitude);
 					sonar_aglaltitude = accum._.W1 <<1; 
 					#if SERIAL_OUTPUT_FORMAT == SERIAL_SONAR 
-						cos_sonarproll = 0;
 						cos_sonarproll = (uint32_t)cos_pitch_roll;
 					#endif
 				}
 				else
 				{
-					sonar_aglaltitude = MAXIMUM_SONAR_ALTRANGE;
+					sonar_aglaltitude = SONAR_MINIMUM_VALREADS;  //MAXIMUM_SONAR_ALTRANGE;
 				}
 			}
 			udb_flags._.sonar_updated = 0;
-			udb_flags._.sonar_print_telemetry = 1;
+			//udb_flags._.sonar_print_telemetry = 1;
 		}
 		else
 		{
+			flags._.sonar_inrange = 0;
 			if (noReadIndex < 7)  // This assumes runnig at 40HZ UDB frame rate
 			{
 			 	noReadIndex++;
@@ -77,6 +86,7 @@ extern int16_t get_sonar_value(void);   	// Get the raw pwm units from the sonar
 		}
 	}
 #else
+	flags._.sonar_inrange = 0;
 	void calSonarAGLAltitude(void){}
 #endif // USE_SONAR	
 

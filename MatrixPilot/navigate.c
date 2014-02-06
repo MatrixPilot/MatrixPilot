@@ -85,9 +85,9 @@ static void setup_origin(void)
 		// ROUGHED-IN: IMPLEMENT UNDER A SONAR HEALTH CHECK, WITHIN
         //  RANGE FLAG, BAR ALT/GPS ALT FUSION, AND GLITCH FILTER ALGO IN PLACE
 		/*
-		#if ( SONAR_ALTITUDE == 1 )  	//  RECALIBRATE IF SONAR ALTITUDE IS ON
+		#if ( SONAR_ALTITUDE == 1 && flags._.sonar_inrange != 0)  	//  RECALIBRATE IF SONAR ALTITUDE IS ON
 			{
-			int alt_snr_rel_orgn = ((ASL_GROUND_ALT+sonar_aglaltitude)/100) ;
+			int alt_snr_rel_orgn = ((ASL_GROUND_ALT + get_sonar_aglaltitude())/100) ;
 			dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_snr_rel_orgn) ;
 			}
 		#else

@@ -52,6 +52,7 @@ struct flag_bits {
 	uint16_t f13_print_req              : 1;
 	uint16_t disable_throttle           : 1;
 	uint16_t update_autopilot_state_asap: 1;
+	uint16_t sonar_inrange				: 1;
 	uint16_t barometer_calibrated		: 1;
 	uint16_t barometer_calib_updated	: 1;
 	uint16_t origin_calibrated			: 1;
@@ -182,11 +183,13 @@ extern boolean use_fixed_origin(void);
 
 #if (USE_SONAR == 1 && HILSIM != 1)
 	extern void calSonarAGLAltitude(void);
-	extern int16_t sonar_rawaglaltitude;					// direct distance from sonar to a target in cm fr. altitudeCntrl.c
-	extern int16_t sonar_aglaltitude;						// rmat tilt compensated sonar altitude in cm  fr. altitudeCntrl.c
-	#if (SERIAL_OUTPUT_FORMAT == SERIAL_SONAR)
-		extern uint32_t cos_sonarproll;						// cosine of angle of tilt of plane in fractional * 2  fr. altitudeCntrl.c
-	#endif
+	extern inline int16_t get_sonar_aglaltitude(void);
+	extern inline int16_t get_sonar_rawaglaltitude(void);
+	//extern int16_t sonar_rawaglaltitude;					// direct distance from sonar to a target in cm fr. altitudeCntrl.c
+	//extern int16_t sonar_aglaltitude;						// rmat tilt compensated sonar altitude in cm  fr. altitudeCntrl.c
+//	#if (SERIAL_OUTPUT_FORMAT == SERIAL_SONAR)
+//		extern uint32_t cos_sonarproll;						// cosine of angle of tilt of plane in fractional * 2  fr. altitudeCntrl.c
+//	#endif
 #endif
  
 #if (USE_BAROMETER == 1 && HILSIM != 1)

@@ -20,9 +20,12 @@
 	// #define MAXIMUM_SONAR_ALTRANGE      	750	// in centimeters, 750 (7.5 m) for MAXBOTIX MB1230 and 5000 (50 m) for MB1260 XL
 	// #define SONAR_MINIMUM_VALREADS		1 	// Def 3, Number of validation readings threshold of a true reading.
 
-	int16_t sonar_rawaglaltitude;         		// distance to target in centimeters
-	int16_t sonar_aglaltitude; 					// calculated distance to ground in Earth's Z Plane allowing for tilt
-	uint32_t cos_sonarproll;      				// tilt of the plane in UDB fractional units * 2.
+	inline int16_t 	get_sonar_rawaglaltitude(void);
+	inline int16_t 	get_sonar_aglaltitude(void);
+
+	//int16_t sonar_rawaglaltitude;         		// distance to target in centimeters
+	//int16_t sonar_aglaltitude; 					// calculated distance to ground in Earth's Z Plane allowing for tilt
+	//uint32_t cos_sonarproll;      				// tilt of the plane in UDB fractional units * 2.
 	#define SONAR_PWM_CM_EQCONSTNT		4451 	// 64536.0 / 14.5 (True for Maxbotix devices using PWM of 58 microseconds / centimeter).
 	#define SONAR_NOREAD_TKNVAL			99999 	// Optional: return token value for no reading from PWM capture and sonar device.
 	void calSonarAGLAltitude(void);

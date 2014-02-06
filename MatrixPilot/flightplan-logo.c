@@ -601,7 +601,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 		case ALT_SONAR: // in centimeters
 			#if ( USE_SONAR == 1 )
 			{
-				return sonar_aglaltitude; // in centimeters
+				return (int16_t)get_sonar_aglaltitude(); // in centimeters
 			}
 			#else   //absence of sonar sensor device
 			{
@@ -987,7 +987,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				case 13: // Move ZB 
 				{ 
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
-					udb_flags._.barometer_altitude_on = 1;  
+					udb_flags._.barometer_altitude_on = 1;  // TODO TBR: temporary while barometer altitude is under flight testing
 					int16_t barometer_m_alt = instr.arg ;
 					turtleLocations[currentTurtle].z += (barometer_m_alt/100) ; //convert sonar alt, cm to meter
 
@@ -996,7 +996,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				case 14: // Set ZB location  
 				{ 
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
-					udb_flags._.barometer_altitude_on = 1; 
+					udb_flags._.barometer_altitude_on = 1;   // TODO TBR: temporary while barometer altitude is under flight testing
 					int16_t barometer_m_alt = instr.arg;  
 					turtleLocations[currentTurtle].z = (barometer_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
