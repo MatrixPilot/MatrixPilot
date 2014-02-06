@@ -97,92 +97,32 @@ void dcm_run_init_step(uint16_t count)
 //  result set via the callback. Also on first invocation the barometer driver
 //  reads calibration data, and hence requires one extra call
 
-#if (I2C2_QUEUED  == 1)
-	void runI2CQueuedSensors(void) // USE QUEUED I2C DRIVER at 40Hz
+void runI2CQueuedSensors(void) // USE QUEUED I2C DRIVER at 40Hz
+{
+	// This is a simple counter to run calls at 4hz
+	if ( udb_heartbeat_counter % BAR_HZ_CYCLE == 0 )  // def 10 for 4hz, 4 for 10hz and 2 for 20hz
 	{
-		// This is a simple counter to run calls at 4hz
-		if ( udb_heartbeat_counter % BAR_HZ_CYCLE == 0 )  // def 10 for 4hz, 4 for 10hz and 2 for 20hz
-		{
-			#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-				rxMagnetometer();
-			#endif
-			// include barometer calibration flag
-			#if (USE_BAROMETER  == 1 && HILSIM != 1)
-				//rxBarometer(); 		// RUN BAROMETER FUNCTION~ in barometer.c
-				//rxBarometer(barometer_callback_funcptr);
-				rxBarometer(udb_barometer_callback);
-			#endif
-		}
+		#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+			rxMagnetometer();
+		#endif
+		// include barometer calibration flag
+		#if (USE_BAROMETER  == 1 && HILSIM != 1)
+			rxBarometer(udb_barometer_callback);
+		#endif
 	}
-#else
-	void runI2CToggledSensors(void)  // USE TOGGLED (non-queued) I2C  driver at 8HZ
-	{
-		static int16_t toggle = 0;
-		static int16_t counter = 0;
-	
-		if (toggle) 
-		{
-			if (counter++ > 0) 
-			{
-				#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-					rxMagnetometer(udb_magnetometer_callback);
-				#endif
-				counter = 0;
-				toggle = 0;
-			}
-		} 
-		else 
-		{
-			rxBarometer(udb_barometer_callback);  		// RUN BAROMETER FUNCTION~ in barometer.c
-			if (counter++ > 6) 
-			{
-				counter = 0;
-				toggle = 1;
-			}
-		}
-	}
-#endif
+}
+
 
 // Called at HEARTBEAT_HZ currently set at 40HZ
 void udb_heartbeat_callback(void)
 {
-	#if (I2C2_QUEUED  == 1)
+	runI2CQueuedSensors();
 
-		runI2CQueuedSensors();
-
-		// TESTING runtime trigger location (defined in options.h ): 0- barometerCntrl.c (def); 1- gpsParseCommon.c, 2- libDCM.c (both 1, 2, at 4HZ) 
-		if ((USE_BAROMETER == 1 && HILSIM != 1) && flags._.barometer_calibrated == 1 && (ALTRUN_TRIG == 2 || ALTRUN_TRIG == 0))
-		{
-			if (udb_heartbeat_counter % BAR_HZ_CYCLE == 0){estBarometerAltitude();}	
-		}
-	#else
-
-		#if ((USE_BAROMETER == 1 && MAG_YAW_DRIFT == 1) && (HILSIM != 1))		// more than 1 device in use
-			if (udb_heartbeat_counter % (BAR_HZ_CYCLE*2) == 0)  				// 2 x whatever is the BAR_HZ_CYCLE defined in options.h
-			{
-				runI2CToggledSensors();											// for more than 1 device use toggled I2C
-			}
-		#elif ((USE_BAROMETER != 1 && MAG_YAW_DRIFT == 1) && (HILSIM != 1)) 	//only magnetometer in use
-				// This is a simple counter to do stuff at 4hz
-				//	if (udb_heartbeat_counter % 10 == 0)
-				if (udb_heartbeat_counter % BAR_HZ_CYCLE == 0)  	
-				{
-					rxMagnetometer(udb_magnetometer_callback);			
-				}
-		#elif   ((USE_BAROMETER == 1 && MAG_YAW_DRIFT != 1) && (HILSIM != 1)) 	//only barometer in use
-				// This is a simple counter to do stuff at 4hz
-				//	if (udb_heartbeat_counter % 10 == 0)
-				if (udb_heartbeat_counter % BAR_HZ_CYCLE == 0)  		
-				{
-					rxMagnetometer(udb_magnetometer_callback);
-				}
-		#endif 
-		// TESTING runtime trigger location (defined in options.h ): 0- barometerCntrl.c (def); 1- gpsParseCommon.c, 2- libDCM.c (both 1, 2, at 4HZ) 
-		if ((USE_BAROMETER==1)&&(ALTRUN_TRIG == 2)&&(HILSIM != 1)&&(flags._.barometer_calibrated==1))
-		{
-			if (udb_heartbeat_counter%BAR_HZ_CYCLE==0){estBarometerAltitude();}	
-		}
-	#endif
+	// TESTING runtime trigger location (defined in options.h ): 0- barometerCntrl.c (def); 1- gpsParseCommon.c, 2- libDCM.c (both 1, 2, at 4HZ) 
+	if ((USE_BAROMETER == 1 && HILSIM != 1) && flags._.barometer_calibrated == 1 && (ALTRUN_TRIG == 2 || ALTRUN_TRIG == 0))
+	{
+		if (udb_heartbeat_counter % BAR_HZ_CYCLE == 0){estBarometerAltitude();}	
+	}
 
 	//  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
 	if (dcm_flags._.calib_finished)

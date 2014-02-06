@@ -31,12 +31,7 @@ extern int16_t magFieldRaw[];
 extern int16_t magMessageb;         // message type
 
 typedef void (*magnetometer_callback_funcptr)(void);
-#if (I2C2_QUEUED == 0)
-	void rxMagnetometer(magnetometer_callback_funcptr); // service the magnetometer
-#else
-	void rxMagnetometer(void) ;		// This should be called every 250ms
-#endif
+void rxMagnetometer(void) ;		// This should be called every 250ms
 void HILSIM_MagData(magnetometer_callback_funcptr);
-
 
 #endif // MAGNETOMETER_H

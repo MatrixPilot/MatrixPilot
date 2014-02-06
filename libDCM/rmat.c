@@ -686,10 +686,6 @@ static void mag_drift(void)
 void udb_magnetometer_callback(void)
 {
 	dcm_flags._.mag_drift_req = 1;
-//#define USE_DEBUG_IO
-#ifdef USE_DEBUG_IO
-//	printf("magno %u %u %u\r\n", udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
-#endif
 }
 
 #endif // MAG_YAW_DRIFT

@@ -30,7 +30,7 @@
 //  the angle of the vector from the origin to the location of the plane.
 
 #if  (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-	void udb_magnetometer_callback_data_available( void )
+	void magnetometer_callback_newdata( void )
 	{
 		dcm_flags._.mag_drift_req = 1 ;
 		return ;

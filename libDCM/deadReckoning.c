@@ -145,14 +145,15 @@ void dead_reckon(void)
 			locationErrorEarth[1] = GPSlocation.y - IMUlocationy._.W1;
 			//locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;
 
-			// fuse sonar altitude only if within low alt range and over the field
-			if (SONAR_ALTITUDE == 1 && udb_flags._.sonar_altitude_on == 1)  //  apply boolean from LOGO 
+			// fuse sonar altitude only if within low alt range and over the field 
+			// TODO:add health or within range chk as condition
+			if (SONAR_ALTITUDE == 1 && udb_flags._.sonar_altitude_on == 1&& flags._.sonar_inrange != 0)  //  apply boolean from LOGO
 			{
 				/*#if ( USE_PA_PRESSURE == 1 )
 					//add back sonar alt
-					locationErrorEarth[2] = (GPSlocation.z - ((get_barometer_altorigin()+(sonar_aglaltitude/100))));
+					locationErrorEarth[2] = (GPSlocation.z - ((get_barometer_altorigin()+((int16_t)get_sonar_aglaltitude()/100))));
 				#else*/
-					locationErrorEarth[2] = (GPSlocation.z - ((ASL_GROUND_ALT+(sonar_aglaltitude/100)))) ;
+					locationErrorEarth[2] = GPSlocation.z - (ASL_GROUND_ALT+(((int16_t)get_sonar_aglaltitude()/100))) ;
 				//#endif
 			}
 			else
@@ -160,10 +161,11 @@ void dead_reckon(void)
 				locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;
 			}
 			// recalibrate with barometric altitude only as called from LOGO
+			// TODO:add health chk as condition and fuse IMU with barometer aslaltitude
 			if ( BAROMETER_ALTITUDE == 1  && udb_flags._.barometer_altitude_on == 1) 
 			{
 				locationErrorEarth[2] = GPSlocation.z - ((int32_t)get_barometer_aslaltitude()/100) ; 
-				locationErrorEarth[2] = GPSlocation.z - ((int32_t)get_barometer_aslaltitude()/100) ; 
+				udb_flags._.barometer_altitude_on = 0;
 			}
 			else
 			{	

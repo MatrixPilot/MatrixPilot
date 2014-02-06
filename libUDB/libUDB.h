@@ -242,7 +242,7 @@ extern fractional udb_magOffset[3];
 
 // Implement thiis callback to make use of the magetometer data.  This is called each
 // time the magnetometer reports new data.
-void udb_magnetometer_callback_data_available(void);	// Callback
+void magnetometer_callback_newdata(void);	// Callback
 
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs
