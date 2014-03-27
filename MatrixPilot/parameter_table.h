@@ -54,7 +54,7 @@ typedef struct tag_mavlink_parameter_parser
 	const mavlink_message_type_t mavlink_type;
 } mavlink_parameter_parser;
 
-extern const mavlink_parameter_parser   mavlink_parameter_parsers[];
+extern const mavlink_parameter_parser mavlink_parameter_parsers[];
 
 typedef struct tag_mavlink_parameter 
 {
@@ -73,7 +73,11 @@ typedef enum
 	PARAMETER_READONLY,
 } PARAMETER_ACCESS;
 
+#ifdef _MSC_VER
+extern mavlink_parameter mavlink_parameters_list[];
+#else
 extern const mavlink_parameter mavlink_parameters_list[];
+#endif // _MSC_VER
 extern const uint16_t count_of_parameters_list;
 
 // callback type for data services user

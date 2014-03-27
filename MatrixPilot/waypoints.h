@@ -36,7 +36,7 @@
 // Set it to 1 to use a fixed location as the origin, no matter where you power up.
 // FIXED_ORIGIN_LOCATION is the location to use as the origin for relative waypoints.  It uses the
 // format { X, Y, Z } where:
-// X is Logitude in degrees * 10^7
+// X is Longitude in degrees * 10^7
 // Y is Latitude in degrees * 10^7
 // Z is altitude above sea level, in meters, as a floating point value.
 // 

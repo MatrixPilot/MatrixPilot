@@ -208,9 +208,10 @@ void mavlink_send_int_circular(int16_t i)
 
 void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i)
 {
+	union longww dec_angle;
+
 	if (setting.type != MAVLINK_TYPE_INT32_T) return;
 
-	union longww dec_angle;
 	dec_angle.WW = __builtin_mulss((int16_t)setting.param_int32, (int16_t)(RMAX * (256.0 / 180.0)));
 	dec_angle.WW <<= 9;
 	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
@@ -232,9 +233,9 @@ void mavlink_send_dm_airspeed_in_cm(int16_t i)
 
 void mavlink_set_dm_airspeed_from_cm(mavlink_param_union_t setting, int16_t i)
 {
-	if (setting.type != MAVLINK_TYPE_INT32_T) return;
-
 	union longww airspeed;
+
+	if (setting.type != MAVLINK_TYPE_INT32_T) return;
 
 	airspeed.WW = __builtin_mulss((int16_t)setting.param_int32, (RMAX / 10.0));
 	airspeed.WW <<= 2;
@@ -253,9 +254,9 @@ void mavlink_send_cm_airspeed_in_m(int16_t i)
 
 void mavlink_set_cm_airspeed_from_m(mavlink_param_union_t setting, int16_t i)
 {
-	if (setting.type != MAVLINK_TYPE_FLOAT) return;
-
 	union longww airspeed;
+
+	if (setting.type != MAVLINK_TYPE_FLOAT) return;
 
 	airspeed.WW = __builtin_mulss((int16_t)setting.param_int32, (RMAX / 10.0));
 	airspeed.WW <<= 2;
@@ -274,9 +275,9 @@ void mavlink_send_dm_airspeed_in_m(int16_t i)
 
 void mavlink_set_dm_airspeed_from_m(mavlink_param_union_t setting, int16_t i)
 {
-	if (setting.type != MAVLINK_TYPE_FLOAT) return;
-
 	union longww airspeed;
+
+	if (setting.type != MAVLINK_TYPE_FLOAT) return;
 
 	airspeed.WW = __builtin_mulss((int16_t)setting.param_int32, (RMAX / 10.0));
 	airspeed.WW <<= 2;
@@ -303,9 +304,10 @@ void mavlink_send_dcm_angle(int16_t i)
 // set angle in dcm units
 void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i)
 {
+	union longww dec_angle;
+
 	if (setting.type != MAVLINK_TYPE_INT32_T) return;
 
-	union longww dec_angle;
 	dec_angle.WW = __builtin_mulss((int16_t)setting.param_int32, (RMAX * (16.0 / 57.3))); //(int16_t)(RMAX * 64 / 57.3)
 	dec_angle.WW <<= 12;
 	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
@@ -332,10 +334,11 @@ void mavlink_send_frame_anglerate(int16_t i)
 // set angle rate in units of angle per frame
 void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 {
+	union longww dec_angle;
+
 	if (setting.type != MAVLINK_TYPE_INT32_T) return;
 
-	union longww dec_angle;
-	dec_angle.WW = __builtin_mulss((int16_t) setting.param_int32, (128.0 * 7.15)); //(int16_t)(RMAX * 128 / (57.3 * 40.0))
+	dec_angle.WW = __builtin_mulss((int16_t)setting.param_int32, (128.0 * 7.15)); //(int16_t)(RMAX * 128 / (57.3 * 40.0))
 	dec_angle.WW <<= 9;
 	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
 	*((int16_t*)mavlink_parameters_list[i].pparam) = dec_angle._.W1;
@@ -343,12 +346,28 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
+static int16_t get_param_index(const char* key)
+{
+	int16_t i;
+
+	// iterate known parameters
+	for (i = 0; i < count_of_parameters_list; i++)
+	{
+		// compare key with parameter name
+		if (!strcmp(key, (const char*)mavlink_parameters_list[i].name)) // TODO: why are we casting this to const, should not be required - RobD
+		{
+			return i;
+		}
+	}
+	DPRINT("unknown parameter name: %s\r\n", key);
+	return -1;
+}
 
 void MAVParamsSet(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_set_t packet;
 	mavlink_msg_param_set_decode(handle_msg, &packet);
-	if (mavlink_check_target(packet.target_system,packet.target_component) == true)
+	if (mavlink_check_target(packet.target_system, packet.target_component) == true)
 	{
 //		send_text((uint8_t*)"failed target system check on parameter set \r\n");
 //		break;
@@ -356,14 +375,14 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 	else
 	{
 		// set parameter
-		const char * key = (const char*) packet.param_id;
+		const char* key = (const char*)packet.param_id;
 
 		// iterate known parameters
 		int16_t i = 0;
 		for (i = 0; i < count_of_parameters_list; i++)
 		{
 			// compare key with parameter name
-			if (!strcmp(key, (const char *)mavlink_parameters_list[i].name)) // TODO: why are we casting this to const, should not be required - RobD
+			if (!strcmp(key, (const char*)mavlink_parameters_list[i].name)) // TODO: why are we casting this to const, should not be required - RobD
 			{
 				mavlink_param_union_t param;
 				param.type = packet.param_type;

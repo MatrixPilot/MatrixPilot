@@ -23,7 +23,12 @@
 #define OSCILLATOR_H
 
 
-#define MIPS                    64
+#if (BOARD_TYPE == AUAV3_BOARD)
+//#define MIPS                    64
+#define MIPS                    16
+#else
+#define MIPS                    16
+#endif
 
 // clock-frequecy in Hz with suffix LL (64-bit-long), eg. 32000000LL for 32MHz
 #if (MIPS == 16)

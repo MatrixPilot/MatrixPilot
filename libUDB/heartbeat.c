@@ -34,8 +34,6 @@ int one_hertz_flag = 0;
 uint16_t udb_heartbeat_counter = 0;
 #define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
-//static void pulse(void);    // forward declaration
-
 //#define HEARTBEAT_FREQ(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
 //#define HEARTBEAT_CHK(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
 
@@ -73,7 +71,6 @@ inline void heartbeat(void) // called from ISR
 
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 
-//#if defined (USE_BACKGROUND_INT) || defined (USE_FREERTOS)
 #if defined (USE_FREERTOS)
 void TriggerIMU(void);
 //	TriggerIMU();
@@ -90,9 +87,6 @@ void TriggerIMU(void);
 //static void pulse(void)
 //inline void pulse(void)
 //{
-//#else
-//	SET_CPU_IPL(INT_PRI_T6);// switch from priority 6 to priority 3
-//#endif
 ////	LED_BLUE = LED_OFF;     // indicates logfile activity
 //#if (NORADIO != 1)
 //	// 20Hz testing of radio link
@@ -115,6 +109,8 @@ void TriggerIMU(void);
 //	calculate_analog_sensor_values();
 //	udb_callback_read_sensors();
 //	udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
+
+//	// process sensor data, run flight controller, generate outputs. implemented in libDCM.c
 //	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
 //	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 //	{

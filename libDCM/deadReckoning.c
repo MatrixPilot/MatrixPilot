@@ -84,6 +84,10 @@ fractional velocityErrorEarth[] = { 0, 0, 0 };
 
 void dead_reckon(void)
 {
+	int16_t air_speed_x, air_speed_y, air_speed_z;
+	union longww accum;
+	union longww energy;
+
 	if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
 	{
 		// integrate the accelerometers to update IMU velocity
@@ -156,9 +160,6 @@ void dead_reckon(void)
 		IMUlocationy.WW = 0;
 		IMUlocationz.WW = 0;
 	}
-
-	int16_t air_speed_x, air_speed_y, air_speed_z;
-
 	air_speed_x = IMUvelocityx._.W1 - estimatedWind[0];
 	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1];
 	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2];
@@ -168,9 +169,6 @@ void dead_reckon(void)
 #else
 	air_speed_3DIMU = vector3_mag(air_speed_x, air_speed_y, air_speed_z);
 #endif
-
-	union longww accum;
-	union longww energy;
 
 	accum.WW   = __builtin_mulsu(air_speed_x, 37877);
 	energy.WW  = __builtin_mulss(accum._.W1, accum._.W1);

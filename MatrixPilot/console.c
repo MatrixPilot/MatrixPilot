@@ -42,7 +42,7 @@ void AT45D_FormatFS(void);
 
 typedef struct tagCmds {
 	int index;
-	void (*fptr)(void);
+	void (*fptr)(char*);
 	const char const * cmdstr;
 } cmds_t;
 
@@ -52,12 +52,12 @@ char cmdstr[32];
 int show_cpu_load = 0;
 
 
-void cmd_ver(void)
+static void cmd_ver(char* arg)
 {
 	printf("MatrixPilot v0.1, " __TIME__ " " __DATE__ "\r\n");
 }
 
-void cmd_format(void)
+static void cmd_format(char* arg)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 //	printf("formatting dataflash\r\n");
@@ -65,51 +65,51 @@ void cmd_format(void)
 #endif // BOARD_TYPE
 }
 
-void cmd_start(void)
+static void cmd_start(char* arg)
 {
 	printf("starting.\r\n");
 	show_cpu_load = 1;
 }
 
-void cmd_stop(void)
+static void cmd_stop(char* arg)
 {
 	printf("stopped.\r\n");
 	show_cpu_load = 0;
 }
 
-void cmd_on(void)
+static void cmd_on(char* arg)
 {
 	printf("on.\r\n");
 	SRbits.IPL = 0; // turn on all interrupt priorities
 }
 
-void cmd_off(void)
+static void cmd_off(char* arg)
 {
 	printf("off.\r\n");
 	SRbits.IPL = 7; // turn off all interrupt priorities
 }
 
-void cmd_cpuload(void)
+static void cmd_cpuload(char* arg)
 {
 	printf("CPU Load %u%%\r\n", udb_cpu_load());
 }
 
-void cmd_crash(void)
+static void cmd_crash(char* arg)
 {
 	static int i;
 	char buffer[32];
 
 	sprintf(buffer, "overflowing stack %u.\r\n", i++);
 	printf(buffer);
-	cmd_crash();
+	cmd_crash(arg);
 }
 
-void cmd_adc(void)
+static void cmd_adc(char* arg)
 {
 //	printf("ADC vcc %u, 5v %u, rssi %u\r\n", udb_vcc.value, udb_5v.value, udb_rssi.value);
 }
 
-void cmd_barom(void)
+static void cmd_barom(char* arg)
 {
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
 	       get_barometer_temperature(),
@@ -119,11 +119,11 @@ void cmd_barom(void)
 	      );
 }
 
-void cmd_magno(void)
+static void cmd_magno(char* arg)
 {
 }
 
-void cmd_options(void)
+static void cmd_options(char* arg)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", ROLL_STABILIZATION_AILERONS);
@@ -139,7 +139,7 @@ void cmd_options(void)
 #endif
 }
 
-void cmd_gains(void)
+static void cmd_gains(char* arg)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("YAWKP_AILERON: %f\r\n", (double)gains.YawKPAileron);
@@ -168,7 +168,7 @@ void cmd_gains(void)
 #endif
 }
 
-void printbin16(int a)
+static void printbin16(int a)
 {
 	unsigned int i;
 	for (i = 0x8000; i > 0; i >>= 1) {
@@ -177,7 +177,7 @@ void printbin16(int a)
 	}
 }
 
-const char *byte_to_binary(int x)
+const char* byte_to_binary(int x)
 {
 	static char b[9];
 	int z;
@@ -189,7 +189,7 @@ const char *byte_to_binary(int x)
 	return b;
 }
 
-const char *word_to_binary(int x)
+const char* word_to_binary(int x)
 {
 	static char b[17];
 	unsigned int z;
@@ -203,12 +203,12 @@ const char *word_to_binary(int x)
 
 void gentrap(void);
 
-void cmd_trap(void)
+static void cmd_trap(char* arg)
 {
 	gentrap();
 }
 
-void cmd_reg(void)
+static void cmd_reg(char* arg)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	printf("USB Registers:\r\n");
@@ -247,7 +247,7 @@ UxCNFG2: USB CONFIGURATION REGISTER 2
 extern uint16_t maxstack;
 #endif
 
-void cmd_stack(void)
+static void cmd_stack(char* arg)
 {
 #if (RECORD_FREE_STACK_SPACE == 1)
 	printf("maxstack %x\r\n", maxstack);
@@ -260,16 +260,16 @@ void cmd_stack(void)
 #endif
 }
 
-void cmd_reset(void)
+static void cmd_reset(char* arg)
 {
 	asm("reset");
 }
 
-void cmd_help(void);
+static void cmd_help(char* arg);
 
 void log_close(void);
 
-void cmd_close(void)
+static void cmd_close(char* arg)
 {
 #if (USE_TELELOG == 1)
 	log_close();
@@ -279,23 +279,23 @@ void cmd_close(void)
 extern unsigned long ymodem_receive(unsigned char *buf, unsigned long length);
 extern unsigned long ymodem_send(unsigned char *buf, unsigned long size, char* filename);
 
-void cmd_send(void)
+static void cmd_send(char* arg)
 {
-	unsigned char* buf;
-	unsigned long length;
-	unsigned long result;
+//	unsigned char* buf;
+//	unsigned long length;
+//	unsigned long result;
 
-	result = ymodem_receive(buf, length);
+//	result = ymodem_receive(buf, length);
 }
 
-void cmd_receive(void)
+static void cmd_receive(char* arg)
 {
-	unsigned char* buf;
-	unsigned long size;
-	char* filename;
-	unsigned long result;
+//	unsigned char* buf;
+//	unsigned long size;
+//	char* filename;
+//	unsigned long result;
 
-	result = ymodem_send(buf, size, filename);
+//	result = ymodem_send(buf, size, filename);
 }
 
 const cmds_t cmdslist[] = {
@@ -322,7 +322,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_receive,"receive" },
 };
 
-void cmd_help(void)
+static void cmd_help(char* arg)
 {
 	int i;
 
@@ -332,17 +332,58 @@ void cmd_help(void)
 	}
 }
 
-void command(char* cmdstr)
+static void command(char* cmdstr, int cmdlen)
 {
 	int i;
+	char* argstr = NULL;
 
+	for (i = 0; i < cmdlen; i++) {
+		if (cmdstr[i] == ' ') {
+			cmdstr[i] = '\0';
+			argstr = cmdstr + i + 1;
+		}
+	}
 	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++) {
 		if (strcmp(cmdslist[i].cmdstr, cmdstr) == 0) {
-			cmdslist[i].fptr();
+			cmdslist[i].fptr(argstr);
 		}
 	}
 }
 
+void console_inbyte(char ch)
+{
+	if (cmdlen < sizeof(cmdstr)) {
+		cmdstr[cmdlen] = ch;
+		if ((ch == '\r') || (ch == '\n')) {
+			cmdstr[cmdlen] = '\0';
+//			cmdlen = 0;
+			if (strlen(cmdstr) > 0) {
+//				putch('\r');
+				printf("\r");
+				command(cmdstr, cmdlen);
+			}
+			cmdlen = 0;
+		} else {
+//			putch(ch);
+			printf("%c", ch);
+			cmdlen++;
+		}
+	} else {
+		cmdlen = 0;
+	}
+}
+
+void console(void)
+{
+#if (CONSOLE_UART != 9)
+	if (kbhit()) {
+		char ch = getch();
+		console_inbyte(ch);
+	}
+#endif
+}
+
+/*
 void console(void)
 {
 	if (kbhit()) {
@@ -351,10 +392,10 @@ void console(void)
 			cmdstr[cmdlen] = ch;
 			if ((ch == '\r') || (ch == '\n')) {
 				cmdstr[cmdlen] = '\0';
-				cmdlen = 0;
+//				cmdlen = 0;
 				if (strlen(cmdstr) > 0) {
 					putch('\r');
-					command(cmdstr);
+					command(cmdstr, cmdlen);
 				}
 			} else {
 				putch(ch);
@@ -365,5 +406,5 @@ void console(void)
 		}
 	}
 }
-
+ */
 #endif // CONSOLE_UART

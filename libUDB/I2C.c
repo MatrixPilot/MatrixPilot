@@ -19,12 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
-#include "interrupt.h"
+//#include "libUDB_internal.h"
 #include "I2C.h"
+#include "interrupt.h"
 #include "NV_memory.h"
 #include "events.h"
-
+/*
 #ifndef I2C_SOURCE_INCLUDED
 #if (BOARD_TYPE == AUAV3_BOARD)
 #define I2C_SDA         _RD9
@@ -56,9 +56,11 @@
 #define I2C_Reset       I2C1_Reset
 #define I2C_Write       I2C1_Write
 #define I2C_Read        I2C1_Read
-#define I2C_CheckAck    I2C1_CheckACK
-#define I2C_Trigger     I2C1_trigger_service
+#define I2C_CheckAck    I2C1_CheckAck
+#define I2C_Trigger     I2C1_Trigger
 #endif // I2C_SOURCE_INCLUDED
+ */
+#ifdef I2C_SOURCE_INCLUDED
 
 // Calculate the BRGvalue automatically - TODO: check and enable this
 //#define I2CBRGVAL ((int)(((1/100e3) - 130E-9) * FCY)-2) // 100 Khz
@@ -238,7 +240,8 @@ boolean I2C_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* dat
 }
 
 // Only send command byte to check for ACK.
-static boolean I2C_CheckACK(uint16_t addr, I2C_callbackFunc callback)
+//boolean I2C_CheckAck(uint16_t addr, I2C_callbackFunc callback)
+boolean I2C_CheckAck(uint8_t addr, I2C_callbackFunc callback)
 {
 	if (!I2C_CheckAvailable()) return false;
 
@@ -418,3 +421,5 @@ static void isr_failed(void)
 	if (x.callback != NULL)
 		x.callback(false);
 }
+
+#endif // I2C_SOURCE_INCLUDED

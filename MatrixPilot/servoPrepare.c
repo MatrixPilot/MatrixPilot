@@ -19,15 +19,22 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// TODO: rename this module to something such as MatrixPilot.c or FlightControl.c
+
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
+#include "../libCntrl/cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/osd.h"
 #include "mode_switch.h"
-#include "airspeedCntrl.h"
+#include "../libCntrl/airspeedCntrl.h"
 #include "flightplan-waypoints.h"
 
-int16_t pitch_control, roll_control, yaw_control, throttle_control;
+int16_t pitch_control;
+int16_t roll_control;
+int16_t yaw_control;
+int16_t throttle_control;
 uint16_t wind_gain;
 
 void init_servoPrepare(void) // initialize the PWM
@@ -53,16 +60,16 @@ void init_servoPrepare(void) // initialize the PWM
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
+		// initialise the throttle channel to zero, all others to servo midpoint
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
 #endif
 	}
-	
+
 #if (NORADIO == 1)
 	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000;
 #endif
 }
 
-//inline static void flight_controller(void)
 void flight_controller(void)
 {
 //	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
@@ -70,8 +77,8 @@ void flight_controller(void)
 //		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
 //	}
 #if (DEADRECKONING == 1)
-	process_flightplan();
-#endif	
+	navigate_process_flightplan();
+#endif
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 	airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
@@ -87,7 +94,6 @@ void flight_controller(void)
 	updateTriggerAction();
 }
 
-//inline static void manualPassthrough(void)
 void manualPassthrough(void)
 {
 	roll_control = pitch_control = yaw_control = throttle_control = 0;
@@ -96,7 +102,7 @@ void manualPassthrough(void)
 
 // Called at HEARTBEAT_HZ
 //void dcm_servo_callback_prepare_outputs(void)
-//void dcm_heartbeat_callback(void)
+//void dcm_heartbeat_callback(void)   // was called dcm_servo_callback_prepare_outputs()
 //{
 //	if (dcm_flags._.calib_finished)
 //	{

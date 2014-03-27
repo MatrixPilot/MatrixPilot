@@ -21,6 +21,8 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "servoMix.h"
+#include "behaviour.h"
 #include "../libDCM/deadReckoning.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
@@ -51,7 +53,6 @@ static void normalAltitudeCntrl(void);
 static void manualThrottle(int16_t throttleIn);
 static void hoverAltitudeCntrl(void);
 
-int32_t speed_height = 0;
 int16_t pitchAltitudeAdjust = 0;
 boolean filterManual = false;
 int16_t desiredHeight;
@@ -81,6 +82,21 @@ void init_altitudeCntrl(void)
 	rtl_pitch_down        = RTL_PITCH_DOWN;
 	desiredSpeed          = DESIRED_SPEED * 10; // Stored in 10ths of meters per second
 }
+
+#if (USE_CONFIGFILE == 1)
+void save_altitudeCntrl(void)
+{
+//	gains.YawKDAileron = yawkdail / (SCALEGYRO*RMAX);
+	gains.HeightTargetMax = height_target_max;
+	gains.HeightTargetMin = height_target_min;
+	gains.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
+	gains.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
+	gains.AltHoldPitchMin = alt_hold_pitch_min;
+	gains.AltHoldPitchMax = alt_hold_pitch_max;
+	gains.AltHoldPitchHigh = alt_hold_pitch_high;
+//	desiredSpeed / 10;
+}
+#endif // USE_CONFIGFILE
 
 #if (SPEED_CONTROL == 1)  // speed control loop
 
@@ -164,8 +180,9 @@ void altitudeCntrl(void)
 static void set_throttle_control(int16_t throttle)
 {
 	int16_t throttleIn;
+	int16_t temp;
 
-	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual)
+	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch || filterManual)
 	{
 		if (udb_flags._.radio_on == 1)
 		{
@@ -175,9 +192,7 @@ static void set_throttle_control(int16_t throttle)
 		{
 			throttleIn = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
 		}
-
-		int16_t temp = throttleIn + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle);
-
+		temp = throttleIn + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle);
 		if (THROTTLE_CHANNEL_REVERSED)
 		{
 			if (temp > udb_pwTrim[THROTTLE_INPUT_CHANNEL]) throttle = throttleIn - udb_pwTrim[THROTTLE_INPUT_CHANNEL];
@@ -207,6 +222,7 @@ static void normalAltitudeCntrl(void)
 	int16_t throttleIn;
 	int16_t throttleInOffset;
 	union longww heightError = { 0 };
+	int32_t speed_height;
 
 	speed_height = excess_energy_height(); // equivalent height of the airspeed
 	if (udb_flags._.radio_on == 1)
@@ -221,13 +237,13 @@ static void normalAltitudeCntrl(void)
 		throttleIn = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
 		throttleInOffset = 0;
 	}
-	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch)
+	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch)
 	{
 		if (THROTTLE_CHANNEL_REVERSED)
 		{
 			throttleInOffset = -throttleInOffset;
 		}
-		if (flags._.GPS_steering)
+		if (state_flags._.GPS_steering)
 		{
 			if (desired_behavior._.takeoff || desired_behavior._.altitude)
 			{
@@ -276,7 +292,7 @@ if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) {
 				throttleAccum.WW = (int16_t)(MAXTHROTTLE) + (__builtin_mulss((int16_t)(THROTTLEHEIGHTGAIN), (-heightError._.W0 - (int16_t)(HEIGHT_MARGIN*8.0))) >> 3);
 				if (throttleAccum.WW > (int16_t)(MAXTHROTTLE))throttleAccum.WW = (int16_t)(MAXTHROTTLE);
 			}
-			heightError._.W1 = - desiredHeight;
+			heightError._.W1 = -desiredHeight;
 			heightError.WW = (heightError.WW + IMUlocationz.WW - speed_height) >> 13;
 			if (heightError._.W0 < (- (int16_t)(HEIGHT_MARGIN*8.0)))
 			{
@@ -293,18 +309,18 @@ if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) {
 			}
 //#if (RACING_MODE == 1)
 if (RACING_MODE == 1) {
-			if (flags._.GPS_steering)
+			if (state_flags._.GPS_steering)
 			{
 				throttleAccum.WW = (int32_t)(FIXED_WP_THROTTLE);
 			}
 }
 //#endif
 		}
-		if (!flags._.altitude_hold_throttle)
+		if (!state_flags._.altitude_hold_throttle)
 		{
 			manualThrottle(throttleIn);
 		}
-		else if (flags._.GPS_steering && desired_behavior._.land)
+		else if (state_flags._.GPS_steering && desired_behavior._.land)
 		{
 			// place a ceiling, in other words, go down, but not up.
 			if (pitchAltitudeAdjust > 0)
@@ -324,7 +340,7 @@ if (RACING_MODE == 1) {
 			set_throttle_control(throttleFiltered._.W1 - throttleIn);
 			filterManual = true;
 		}
-		if (!flags._.altitude_hold_pitch)
+		if (!state_flags._.altitude_hold_pitch)
 		{
 			pitchAltitudeAdjust = 0;
 		}

@@ -22,11 +22,37 @@
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
 #include "telemetry_log.h"
+#if (WIN == 1 || NIX == 1)
+#include <stdio.h>
+#include "SIL-filesystem.h"
+#else
 #include "MDD File System/FSIO.h"
 #include "AT45D.h"
+#endif
 #include <string.h>
 #include <stdarg.h>
 
+
+#if (WIN == 1 || NIX == 1)
+#define LOGFILE_ENABLE_PIN 0
+#else
+#if defined( __dsPIC33E__ )
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
+#define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
+#elif defined( __dsPIC33F__ )
+//#define LOGFILE_ENABLE_PIN PORTAbits.RA5
+#define LOGFILE_ENABLE_PIN 1 // don't force logfile open
+#else
+#error unknown processor family
+#endif
+
+#endif
+
+boolean log_enabled(void)
+{
+	return (LOGFILE_ENABLE_PIN ? false : true);
+}
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
@@ -42,7 +68,7 @@ static char logfile_name[13];
 static FSFILE* fsp = NULL;
 
 
-static int16_t add_to_log(char* logbuf, int index, char* data, int len)
+static int16_t log_append(char* logbuf, int index, char* data, int len)
 {
 	int16_t end_index = 0;
 	int16_t remaining = LOGBUF_BUFFER_SIZE - index;
@@ -62,15 +88,15 @@ static int16_t add_to_log(char* logbuf, int index, char* data, int len)
 }
 
 // called from telemetry module at interrupt level to buffer new log data
-void log_telemetry(char* data, int len)
+void log_telemetry(const uint8_t* data, int len)
 {
 	if (lb_in_use == 1)
 	{
-		lb1_end_index = add_to_log(logbuf1, lb1_end_index, data, len);
+		lb1_end_index = log_append(logbuf1, lb1_end_index, data, len);
 	}
 	else
 	{
-		lb2_end_index = add_to_log(logbuf2, lb2_end_index, data, len);
+		lb2_end_index = log_append(logbuf2, lb2_end_index, data, len);
 	}
 }
 
@@ -111,11 +137,15 @@ static int fs_nextlog(char* filename)
 // called at startup to initialise the telemetry log system
 void log_init(void)
 {
-	init_dataflash();
-
+//	init_dataflash(); // this should now be getting device specific called from lower layers via FSInit()
 	if (!FSInit())
 	{
+#ifdef USE_AT45D_FLASH
 		AT45D_FormatFS();
+#elif (WIN == 1) || (NIX == 1)
+#else
+#warning No Mass Storage Device Format Function Defined
+#endif // USE_AT45D_FLASH
 		if (!FSInit())
 		{
 			printf("File system initialisation failed\r\n");
@@ -166,10 +196,6 @@ void log_close(void)
 	}
 }
 
-//#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
-//#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
-#define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
-
 void restart_telemetry(void);
 boolean inflight_state(void);
 
@@ -202,20 +228,22 @@ static void log_check(void)
 
 static void log_write(char* str, int len)
 {
+//	printf("log_write() %u bytes\r\n", len);
 	if (fsp)
 	{
 		LED_BLUE = LED_ON;
 		if (FSfwrite(str, 1, len, fsp) != len)
 		{
-//			printf("ERROR: FSfwrite\r\n");
+			DPRINT("ERROR: FSfwrite\r\n");
 			log_close();
 		}
 	}
 }
 
 // called from mainloop at background priority to write telemetry log data to log file
-void telemetry_log(void)
+void telemetry_log_service(void)
 {
+	log_check();
 	if (lb_in_use == 1)
 	{
 		if (lb2_end_index)
@@ -232,5 +260,4 @@ void telemetry_log(void)
 			lb1_end_index = 0;
 		}
 	}
-	log_check();
 }

@@ -35,13 +35,13 @@ typedef enum
 
 boolean I2C1_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback);
 boolean I2C1_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode);
-boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback);
+boolean I2C1_CheckAck(uint8_t addr, I2C_callbackFunc pCallback);
 boolean I2C1_Normal(void);
 void I2C1_Trigger(void);
 
 boolean I2C2_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback);
 boolean I2C2_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode);
-boolean I2C2_CheckACK(uint8_t addr, I2C_callbackFunc callback);
+boolean I2C2_CheckAck(uint8_t addr, I2C_callbackFunc callback);
 boolean I2C2_Normal(void);
 void I2C2_Trigger(void);
 void I2C2_Reset(void);

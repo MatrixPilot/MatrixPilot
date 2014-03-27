@@ -21,6 +21,9 @@
 
 #include "libUDB.h"
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 extern volatile uint16_t trap_flags;
 extern volatile uint32_t trap_source;
 extern volatile uint16_t osc_fail_count;
@@ -35,7 +38,6 @@ inline void udb_init_capture(void);
 //inline void udb_init_GPS(void);
 inline void udb_init_USART(void);
 inline void udb_init_pwm(void);
-inline void udb_eeprom_init(void);
 
 //inline void MPU6000_init16(void);
 inline void MPU6000_init16(callback_fptr_t fptr);

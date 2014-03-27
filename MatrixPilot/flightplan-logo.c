@@ -21,6 +21,8 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
+#include "../libCntrl/cameraCntrl.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
@@ -295,6 +297,11 @@ void process_instructions(void);
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
 void init_flightplan (int16_t flightplanNum)
 {
+	struct relative2D curHeading;
+	struct relative3D IMUloc;
+	int8_t earth_yaw;
+	int16_t angle;
+
 	if (flightplanNum == 1) // RTL instructions set
 	{
 		currentInstructionSet = (struct logoInstructionDef*)rtlInstructions;
@@ -326,17 +333,15 @@ void init_flightplan (int16_t flightplanNum)
 
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
-	struct relative2D curHeading;
 	curHeading.x = -rmat[1];
 	curHeading.y = rmat[4];
-	int8_t earth_yaw = rect_to_polar(&curHeading);  //  (0=East,  ccw)
-	int16_t angle = (earth_yaw * 180 + 64) >> 7;    //  (ccw, 0=East)
+	earth_yaw = rect_to_polar(&curHeading);  //  (0=East,  ccw)
+	angle = (earth_yaw * 180 + 64) >> 7;    //  (ccw, 0=East)
 	angle = -angle + 90;                            //  (clockwise, 0=North)
 	turtleAngles[PLANE] = turtleAngles[CAMERA] = angle;
 
 	setBehavior(0);
 
-	struct relative3D IMUloc;
 	IMUloc.x = IMUlocationx._.W1;
 	IMUloc.y = IMUlocationy._.W1;
 	IMUloc.z = IMUlocationz._.W1;
@@ -357,11 +362,11 @@ boolean use_fixed_origin(void)
 #endif
 }
 
-struct absolute3D get_fixed_origin(void)
+vect3_32t get_fixed_origin(void)
 {
 	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
 
-	struct absolute3D standardizedOrigin;
+	vect3_32t standardizedOrigin;
 	standardizedOrigin.x = origin.x;
 	standardizedOrigin.y = origin.y;
 	standardizedOrigin.z = (int32_t)(origin.z * 100);
@@ -391,7 +396,7 @@ void update_goal_from(struct relative3D old_goal)
 		old_goal.z = IMUlocationz._.W1;
 	}
 
-	set_goal(old_goal, new_goal);
+	navigate_set_goal(old_goal, new_goal);
 
 	new_goal.x = (turtleLocations[CAMERA].x._.W1);
 	new_goal.y = (turtleLocations[CAMERA].y._.W1);
@@ -433,7 +438,7 @@ void run_flightplan(void)
 			instructionIndex = interruptIndex+1;
 			interruptStackBase = logoStackIndex;
 			process_instructions();
-			update_goal_alt(turtleLocations[PLANE].z);
+			navigate_set_goal_height(turtleLocations[PLANE].z);
 			lastGoal.z = turtleLocations[PLANE].z;
 		}
 	}
@@ -444,7 +449,7 @@ void run_flightplan(void)
 
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
+		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
 		{
 			process_instructions();
 		}
@@ -461,9 +466,10 @@ void run_flightplan(void)
 // For DO and EXEC, find the location of the given subroutine
 int16_t find_start_of_subroutine(uint8_t subcmd)
 {
+	int16_t i;
+
 	if (subcmd == 0) return -1; // subcmd 0 is reserved to always mean the start of the logo program
 
-	int16_t i;
 	for (i = 0; i < numInstructionsInCurrentSet; i++)
 	{
 		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 2 && currentInstructionSet[i].arg == subcmd)
@@ -480,6 +486,7 @@ uint16_t find_end_of_current_if_block(void)
 {
 	int16_t i;
 	int16_t nestedDepth = 0;
+
 	for (i = instructionIndex+1; i < numInstructionsInCurrentSet; i++)
 	{
 		if (currentInstructionSet[i].cmd == 1 && currentInstructionSet[i].subcmd == 0) nestedDepth++; // into a REPEAT
@@ -499,6 +506,7 @@ uint16_t find_end_of_current_if_block(void)
 int16_t get_current_stack_parameter_frame_index(void)
 {
 	int16_t i;
+
 	for (i = logoStackIndex; i >= 0; i--)
 	{
 		if (logoStack[i].frameType == LOGO_FRAME_TYPE_SUBROUTINE)
@@ -514,10 +522,13 @@ int16_t get_current_angle(void)
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
 	struct relative2D curHeading;
+	int8_t earth_yaw;
+	int16_t angle;
+
 	curHeading.x = -rmat[1];
 	curHeading.y = rmat[4];
-	int8_t earth_yaw = rect_to_polar(&curHeading);  // (0=East,  ccw)
-	int16_t angle = (earth_yaw * 180 + 64) >> 7;    // (ccw, 0=East)
+	earth_yaw = rect_to_polar(&curHeading);  // (0=East,  ccw)
+	angle = (earth_yaw * 180 + 64) >> 7;    // (ccw, 0=East)
 	angle = -angle + 90;                            // (clockwise, 0=North)
 	if (angle < 0) angle += 360;
 	return angle;
@@ -526,12 +537,15 @@ int16_t get_current_angle(void)
 int16_t get_angle_to_point(int16_t x, int16_t y)
 {
 	struct relative2D vectorToGoal;
+	int8_t dir_to_goal;
+	int16_t angle;
+
 	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - x;
 	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - y;
-	int8_t dir_to_goal = rect_to_polar (&vectorToGoal);
+	dir_to_goal = rect_to_polar (&vectorToGoal);
 
 	// dir_to_goal                                  // 0-255 (ccw, 0=East)
-	int16_t angle = (dir_to_goal * 180 + 64) >> 7;  // 0-359 (ccw, 0=East)
+	angle = (dir_to_goal * 180 + 64) >> 7;  // 0-359 (ccw, 0=East)
 	angle = -angle + 90;                            // 0-359 (clockwise, 0=North)
 	if (angle < 0) angle += 360;
 	return angle;
@@ -801,15 +815,17 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				}
 				case 10: // Absolute set low Y value
 				{
+					struct waypoint3D wp;
+					struct relative3D rel;
 					union longww absoluteYLong;
+
 					absoluteYLong._.W1 = absoluteHighWord;
 					absoluteYLong._.W0 = instr.arg;
 					
-					struct waypoint3D wp;
 					wp.x = absoluteXLong.WW;
 					wp.y = absoluteYLong.WW;
 					wp.z = 0;
-					struct relative3D rel = dcm_absolute_to_relative(wp);
+					rel = dcm_absolute_to_relative(wp);
 					turtleLocations[currentTurtle].x._.W0 = 0;
 					turtleLocations[currentTurtle].x._.W1 = rel.x;
 					turtleLocations[currentTurtle].y._.W0 = 0;
@@ -1051,4 +1067,4 @@ void flightplan_live_commit(void)
 	}
 }
 
-#endif
+#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)

@@ -70,6 +70,7 @@ _SP_current:
 	mov w15,w0
 	return
 
+.ifdef __dsPIC33E
 .global _get_dsrpag
 .global _get_dswpag
 .global _get_tblpag
@@ -86,6 +87,7 @@ _get_dswpag:
 _get_tblpag:
 	mov TBLPAG,w0
 	return
+.endif
 
 .global _getErrLoc
 .section .text

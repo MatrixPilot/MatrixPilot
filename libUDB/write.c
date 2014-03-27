@@ -40,34 +40,42 @@ write(int handle, void *buffer, unsigned int len)
 				brg = &U4BRG;
 			}
 #endif // __dsPIC33E__
-			if ((umode->UARTEN) == 0)
-			{
-				*brg = 0;
-				umode->UARTEN = 1;
-			}
-			if ((ustatus->UTXEN) == 0)
-			{
-				ustatus->UTXEN = 1;
-			}
-			for (i = len; i; --i)
-			{
-				while ((ustatus->TRMT) ==0);
-				*txreg = *(char*)buffer++;
+			if (__C30_UART == 9) {
+
+//				putUSBUSART((char*)buffer, len);
+				for (i = len; i; --i)
+				{
+#ifdef USE_USB
+					putUSBUSART(*(char*)buffer++, 1);
+#endif
+				}
+
+			} else {
+				if ((umode->UARTEN) == 0)
+				{
+					*brg = 0;
+					umode->UARTEN = 1;
+				}
+				if ((ustatus->UTXEN) == 0)
+				{
+					ustatus->UTXEN = 1;
+				}
+				for (i = len; i; --i)
+				{
+					while ((ustatus->TRMT) ==0);
+					*txreg = *(char*)buffer++;
+				}
 			}
 			break;
-
 		default: {
-/*
-			SIMIO simio;
-			register PSIMIO psimio asm("w0") = &simio;
-
-			simio.method = SIM_WRITE;
-			simio.u.write.handle = handle;
-			simio.u.write.buffer = buffer;
-			simio.u.write.len = len;
-			dowrite(psimio);
-			len = simio.u.write.len;
- */
+//			SIMIO simio;
+//			register PSIMIO psimio asm("w0") = &simio;
+//			simio.method = SIM_WRITE;
+//			simio.u.write.handle = handle;
+//			simio.u.write.buffer = buffer;
+//			simio.u.write.len = len;
+//			dowrite(psimio);
+//			len = simio.u.write.len;
 			break;
 		}
 	}

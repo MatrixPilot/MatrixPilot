@@ -19,18 +19,21 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-extern union longbbbb tow;
-extern union intbb week_no;
-extern union intbb sog_gps;                 // speed over ground
-extern union uintbb cog_gps;                // course over ground, units: degrees * 100, range [0-35999]
-extern union intbb climb_gps;               // climb
-extern union intbb as_sim;
+extern union longbbbb lat_origin, lon_origin, alt_origin;
+extern volatile union longbbbb lat_gps, lon_gps, alt_sl_gps;
+extern volatile union intbb week_no;
+extern volatile union intbb sog_gps;                 // speed over ground
+extern volatile union uintbb cog_gps;                // course over ground, units: degrees * 100, range [0-35999]
+extern volatile union intbb climb_gps;               // climb
+extern volatile union intbb hilsim_airspeed;
+extern volatile union longbbbb tow;
+extern volatile uint8_t hdop;                        // horizontal dilution of precision
+extern volatile uint8_t svs;                         // number of satellites
+
 //extern union longbbbb as_sim_;
-extern uint8_t hdop;                        // horizontal dilution of precision
 extern union longbbbb xpg, ypg, zpg;        // gps x, y, z position
 extern union intbb xvg, yvg, zvg;           // gps x, y, z velocity
 //extern uint8_t mode1, mode2;              // gps mode1, mode2
-extern uint8_t svs;                         // number of satellites
 extern int16_t cos_lat;
 
 // the following variables are shared internally between the various GPS parsing modules only

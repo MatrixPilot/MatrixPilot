@@ -166,7 +166,7 @@ unsigned portBASE_TYPE uxCriticalNesting = 0xef;
 		"PUSH	DSWPAG						\n"																\
 
 #else
-	#define portSAVE_CONTEXTmem
+	#define portSAVE_CONTEXTmem                                                                             \
 		"PUSH	CORCON						\n"																\
 		"PUSH	PSVPAG						\n"																\
 
@@ -258,7 +258,8 @@ void vPortYieldfake() {		/* this skips the standard C pro/epilogue i.e. frame po
 /*
  * Setup the timer used to generate the tick interrupt.
  */
-void vApplicationSetupTickTimerInterrupt( void );
+//void vApplicationSetupTickTimerInterrupt( void );
+__attribute__(( weak )) void vApplicationSetupTickTimerInterrupt( void );
 
 /*
  * See header file for description.

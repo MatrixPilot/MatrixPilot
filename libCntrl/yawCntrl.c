@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
 
 #define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 
@@ -47,6 +48,17 @@ void init_yawCntrl(void)
 	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
 
+#if (USE_CONFIGFILE == 1)
+void save_yawCntrl(void)
+{
+	gains.YawKPRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
+	gains.YawKDRudder  = (float)rollkprud  / (RMAX);
+	gains.RollKPRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
+	gains.RollKDRudder = (float)hoveryawkp / (RMAX);
+	gains.RudderBoost  = (float)hoveryawkd / (SCALEGYRO*RMAX);
+}
+#endif // USE_CONFIGFILE
+
 void yawCntrl(void)
 {
 	if (canStabilizeHover() && current_orientation == F_HOVER)
@@ -67,12 +79,12 @@ void normalYawCntrl(void)
 	int16_t ail_rud_mix;
 
 #ifdef TestGains
-	flags._.GPS_steering = 0; // turn off navigation
-	flags._.pitch_feedback = 1; // turn on stabilization
+	state_flags._.GPS_steering = 0; // turn off navigation
+	state_flags._.pitch_feedback = 1; // turn on stabilization
 #endif 
-	if (RUDDER_NAVIGATION && flags._.GPS_steering)
+	if (RUDDER_NAVIGATION && state_flags._.GPS_steering)
 	{
-		yawNavDeflection = determine_navigation_deflection('y');
+		yawNavDeflection = navigate_determine_deflection('y');
 		
 		if (canStabilizeInverted() && current_orientation == F_INVERTED)
 		{
@@ -84,7 +96,7 @@ void normalYawCntrl(void)
 		yawNavDeflection = 0;
 	}
 
-	if (YAW_STABILIZATION_RUDDER && flags._.pitch_feedback)
+	if (YAW_STABILIZATION_RUDDER && state_flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW = __builtin_mulus(yawkdrud, omegaAccum[2]);
 	}
@@ -94,7 +106,7 @@ void normalYawCntrl(void)
 	}
 
 	rollStabilization.WW = 0; // default case is no roll rudder stabilization
-	if (ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback)
+	if (ROLL_STABILIZATION_RUDDER && state_flags._.pitch_feedback)
 	{
 		if (!desired_behavior._.inverted && !desired_behavior._.hover)  // normal
 		{
@@ -107,7 +119,7 @@ void normalYawCntrl(void)
 		rollStabilization.WW -= __builtin_mulus(rollkdrud, omegaAccum[1]);
 	}
 
-	if (flags._.pitch_feedback)
+	if (state_flags._.pitch_feedback)
 	{
 		int16_t ail_offset = (udb_flags._.radio_on) ? (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) : 0;
 		ail_rud_mix = MANUAL_AILERON_RUDDER_MIX * REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, ail_offset);
@@ -129,14 +141,14 @@ void hoverYawCntrl(void)
 {
 	union longww yawAccum;
 	union longww gyroYawFeedback;
+	int16_t yawInput;
+	int16_t manualYawOffset;
 
-	if (flags._.pitch_feedback)
+	if (state_flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW = __builtin_mulus(hoveryawkd, omegaAccum[2]);
-		
-		int16_t yawInput = (udb_flags._.radio_on == 1) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0;
-		int16_t manualYawOffset = yawInput * (int16_t)(RMAX/2000);
-		
+		yawInput = (udb_flags._.radio_on == 1) ? REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwIn[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) : 0;
+		manualYawOffset = yawInput * (int16_t)(RMAX/2000);
 		yawAccum.WW = __builtin_mulsu(rmat[6] + HOVERYOFFSET + manualYawOffset, hoveryawkp);
 	}
 	else
@@ -144,6 +156,5 @@ void hoverYawCntrl(void)
 		gyroYawFeedback.WW = 0;
 		yawAccum.WW = 0;
 	}
-
 	yaw_control = (int32_t)yawAccum._.W1 - (int32_t)gyroYawFeedback._.W1;
 }

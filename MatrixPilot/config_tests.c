@@ -19,12 +19,17 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
+#include "behaviour.h"
 
 
 // This file should generate no code.
 // It's just meant for precompiler tests, to catch problems and inconsistencies
 // with the user's configuration settings.
 
+
+#if (CONSOLE_UART == 9 && HILSIM_USB != 0)
+	#error("CONSOLE_USB and HILSIM_USB cannot be defined in the same build.")
+#endif
 
 // Check RC Inputs
 // UDB4

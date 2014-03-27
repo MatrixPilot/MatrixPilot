@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "eeprom_udb4.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
@@ -72,7 +73,7 @@ void udb_init(void)
 	udb_init_ADC();
 	init_events();
 #if (USE_I2C1_DRIVER == 1)
-	I2C1_Init();
+//	I2C1_Init();
 #endif
 #if (USE_NV_MEMORY == 1)
 	nv_memory_init();
@@ -120,52 +121,4 @@ void udb_run(void)
 	// pause cpu counting timer while not in an ISR
 	indicate_loading_main;
 #endif
-}
-
-#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
-	udb_yrate.offset = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-	udb_zrate.offset = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset = udb_vref.value;
-#endif
-}
-#else  // horizontal initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset  = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value;
-	udb_yrate.offset  = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
-	udb_zrate.offset  = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset   = udb_vref.value;
-#endif
-}
-#endif // INITIALIZE_VERTICAL
-
-// saturation logic to maintain pulse width within bounds
-int16_t udb_servo_pulsesat(int32_t pw)
-{
-	if (pw > SERVOMAX) pw = SERVOMAX;
-	if (pw < SERVOMIN) pw = SERVOMIN;
-	return (int16_t)pw;
 }

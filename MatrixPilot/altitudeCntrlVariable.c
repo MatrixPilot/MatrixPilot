@@ -22,13 +22,15 @@
 
 
 #include "defines.h"
-#include "airspeedCntrl.h"
+#include "servoMix.h"
+#include "behaviour.h"
+#include "../libCntrl/airspeedCntrl.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
-#if(ALTITUDE_GAINS_VARIABLE == 1)
+#if (ALTITUDE_GAINS_VARIABLE == 1)
 
 
 #define THROTTLEFILTSHIFT 12
@@ -104,6 +106,23 @@ void init_altitudeCntrlVariable(void)
 	speed_control = SPEED_CONTROL;
 }
 
+#if (USE_CONFIGFILE == 1)
+void save_altitudeCntrlVariable(void)
+{
+	gains.HeightTargetMax = height_target_max;
+	gains.HeightTargetMin = height_target_min;
+//	height_margin;
+	gains.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
+	gains.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
+	gains.AltHoldPitchMin = alt_hold_pitch_min;
+	gains.AltHoldPitchMax = alt_hold_pitch_max;
+	gains.AltHoldPitchHigh = alt_hold_pitch_high;
+//	rtl_pitch_down;
+//	desiredSpeed / 10;
+//	speed_control;
+}
+#endif // USE_CONFIGFILE
+
 static int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
 {
 	union longww accum;
@@ -142,7 +161,7 @@ static void set_throttle_control(int16_t throttle)
 {
 	int16_t throttleIn;
 
-	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual)
+	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch || filterManual)
 	{
 		if (udb_flags._.radio_on == 1)
 		{
@@ -241,11 +260,11 @@ static void normalAltitudeCntrl(void)
 		throttleInOffset = 0;
 	}
 
-	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch)
+	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch)
 	{
 		if (THROTTLE_CHANNEL_REVERSED) throttleInOffset = - throttleInOffset;
 
-		if (flags._.GPS_steering)
+		if (state_flags._.GPS_steering)
 		{
 			if (desired_behavior._.takeoff || desired_behavior._.altitude)
 			{
@@ -310,14 +329,14 @@ static void normalAltitudeCntrl(void)
 			}
 
 #if (RACING_MODE == 1)
-			if (flags._.GPS_steering)
+			if (state_flags._.GPS_steering)
 			{
 				throttleAccum.WW = (int32_t)(FIXED_WP_THROTTLE);
 			}
 #endif
 		}
 
-		if (!flags._.altitude_hold_throttle)
+		if (!state_flags._.altitude_hold_throttle)
 		{
 			manualThrottle(throttleIn);
 		}
@@ -342,7 +361,7 @@ static void normalAltitudeCntrl(void)
 			filterManual = true;
 		}
 
-		if (!flags._.altitude_hold_pitch)
+		if (!state_flags._.altitude_hold_pitch)
 		{
 			pitchAltitudeAdjust = 0;
 		}

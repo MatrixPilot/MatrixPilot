@@ -21,6 +21,8 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
+#include "../libCntrl/cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
@@ -41,21 +43,35 @@
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
-uint16_t yawkpail;
-uint16_t yawkprud;
+uint16_t yawkpail; // only exported for parameter_table
+uint16_t yawkprud; // only exported for parameter_table
 
-struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };
-int16_t tofinish_line = 0;
 int16_t progress_to_goal = 0;
+int16_t tofinish_line = 0;
 int8_t desired_dir = 0;
 int8_t extended_range = 0;
 
 int8_t desired_bearing_over_ground;
+struct waypointparameters goal;
 int16_t desired_bearing_over_ground_vector[2];
 
 extern union longww IMUintegralAccelerationx;
 extern union longww IMUintegralAccelerationy;
+
+
+// NEW STUFF:
+int16_t navigate_get_goal(vect3_16t* g)
+{
+//	*g = navgoal;
+	if (g != NULL)
+	{
+		g->x = goal.x;
+		g->y = goal.y;
+		g->z = goal.height;
+	}
+	return goal.height;
+}
 
 void init_navigation(void)
 {
@@ -63,28 +79,36 @@ void init_navigation(void)
 	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 }
 
+#if (USE_CONFIGFILE == 1)
+void save_navigation(void)
+{
+	gains.YawKPAileron = (float)yawkpail / (RMAX);
+	gains.YawKPRudder  = (float)yawkprud / (RMAX);
+}
+#endif // USE_CONFIGFILE
+
 static void setup_origin(void)
 {
 	if (use_fixed_origin())
 	{
-		struct absolute3D origin = get_fixed_origin();
+		vect3_32t origin = get_fixed_origin();
 		dcm_set_origin_location(origin.x, origin.y, origin.z);
 	}
 	else
 	{
 		dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW);
 	}
-	flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
+	state_flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
 }
 
 void dcm_callback_gps_location_updated(void)
 {
-	if (flags._.save_origin)
+	if (state_flags._.save_origin)
 	{
 		// capture origin information during power up. much of this is not
 		// actually used for anything, but is saved in case you decide to
 		// extend this code.
-		flags._.save_origin = 0;
+		state_flags._.save_origin = 0;
 		setup_origin();
 #if (BAROMETER_ALTITUDE == 1)
 		altimeter_calibrate();
@@ -101,9 +125,9 @@ void dcm_callback_gps_location_updated(void)
 }
 
 #ifdef USE_EXTENDED_NAV
-void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
+void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
 #else
-void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
+void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 #endif // USE_EXTENDED_NAV
 {
 	struct relative2D courseLeg;
@@ -180,14 +204,14 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 	goal.sinphi = courseDirection[1];
 }
 
-void update_goal_alt(int16_t z)
+void navigate_set_goal_height(int16_t z)
 {
 	goal.height = z;
 }
 
-void process_flightplan(void)
+void navigate_process_flightplan(void)
 {
-	if (gps_nav_valid() && flags._.GPS_steering)
+	if (gps_nav_valid() && state_flags._.GPS_steering)
 	{
 		compute_bearing_to_goal();
 		run_flightplan();
@@ -271,23 +295,23 @@ void compute_bearing_to_goal(void)
 		{
 			if (crosstrack > 0)
 			{
-				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (32));
+				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t)(32));
 			}
 			else
 			{
-				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (- 32));
+				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t)(-32));
 			}
 		}
 	}
 	else
 	{
-			// If not using Cross Tracking
-			// the desired bearing unit vector is simply the normalized to goal vector
-			desired_bearing_over_ground_vector[0] = togoal.x;
-			desired_bearing_over_ground_vector[1] = togoal.y;
-			vector2_normalize(desired_bearing_over_ground_vector, desired_bearing_over_ground_vector);
+		// If not using Cross Tracking
+		// the desired bearing unit vector is simply the normalized to goal vector
+		desired_bearing_over_ground_vector[0] = togoal.x;
+		desired_bearing_over_ground_vector[1] = togoal.y;
+		vector2_normalize(desired_bearing_over_ground_vector, desired_bearing_over_ground_vector);
 	}
-	if (flags._.GPS_steering)   // return to home or waypoints state
+	if (state_flags._.GPS_steering)   // return to home or waypoints state
 	{
 		desired_dir = goal.phi;
 		if (goal.legDist > 0)
@@ -361,7 +385,7 @@ uint16_t wind_gain_adjustment(void)
 
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
-int16_t determine_navigation_deflection(char navType)
+int16_t navigate_determine_deflection(char navType)
 {
 	union longww deflectionAccum;
 	union longww dotprod;

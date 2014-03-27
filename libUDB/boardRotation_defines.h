@@ -166,9 +166,9 @@
 
 
 #if ((BOARD_ORIENTATION == ORIENTATION_ROLLCW) || (BOARD_ORIENTATION == ORIENTATION_ROLLCW180))
-#define ZRATE_VALUE	 (XRATE_SIGN_ORIENTED ((udb_xrate.value>>1) - (udb_xrate.offset>>1) + vref_adj))
-#define YRATE_VALUE	 (YRATE_SIGN_ORIENTED ((udb_yrate.value>>1) - (udb_yrate.offset>>1) + vref_adj))
-#define XRATE_VALUE	 (ZRATE_SIGN_ORIENTED ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj)) 
+#define ZRATE_VALUE  (XRATE_SIGN_ORIENTED  ((udb_xrate.value>>1)  - (udb_xrate.offset>>1) + vref_adj))
+#define YRATE_VALUE  (YRATE_SIGN_ORIENTED  ((udb_yrate.value>>1)  - (udb_yrate.offset>>1) + vref_adj))
+#define XRATE_VALUE  (ZRATE_SIGN_ORIENTED  ((udb_zrate.value>>1)  - (udb_zrate.offset>>1) + vref_adj))
 #define ZACCEL_VALUE (XACCEL_SIGN_ORIENTED ((udb_xaccel.value>>1) - (udb_xaccel.offset>>1)))
 #define YACCEL_VALUE (YACCEL_SIGN_ORIENTED ((udb_yaccel.value>>1) - (udb_yaccel.offset>>1)))
 #define XACCEL_VALUE (ZACCEL_SIGN_ORIENTED ((udb_zaccel.value>>1) - (udb_zaccel.offset>>1)))
@@ -197,9 +197,9 @@
 
 
 #if ((BOARD_ORIENTATION == ORIENTATION_YAWCW) || (BOARD_ORIENTATION == ORIENTATION_YAWCCW))
-#define YRATE_VALUE	 (XRATE_SIGN_ORIENTED ((udb_xrate.value>>1) - (udb_xrate.offset>>1) + vref_adj))
-#define XRATE_VALUE	 (YRATE_SIGN_ORIENTED ((udb_yrate.value>>1) - (udb_yrate.offset>>1) + vref_adj))
-#define ZRATE_VALUE	 (ZRATE_SIGN_ORIENTED ((udb_zrate.value>>1) - (udb_zrate.offset>>1) + vref_adj)) 
+#define YRATE_VALUE  (XRATE_SIGN_ORIENTED  ((udb_xrate.value>>1)  - (udb_xrate.offset>>1) + vref_adj))
+#define XRATE_VALUE  (YRATE_SIGN_ORIENTED  ((udb_yrate.value>>1)  - (udb_yrate.offset>>1) + vref_adj))
+#define ZRATE_VALUE  (ZRATE_SIGN_ORIENTED  ((udb_zrate.value>>1)  - (udb_zrate.offset>>1) + vref_adj))
 #define YACCEL_VALUE (XACCEL_SIGN_ORIENTED ((udb_xaccel.value>>1) - (udb_xaccel.offset>>1)))
 #define XACCEL_VALUE (YACCEL_SIGN_ORIENTED ((udb_yaccel.value>>1) - (udb_yaccel.offset>>1)))
 #define ZACCEL_VALUE (ZACCEL_SIGN_ORIENTED ((udb_zaccel.value>>1) - (udb_zaccel.offset>>1)))

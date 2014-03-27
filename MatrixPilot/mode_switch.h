@@ -19,8 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef FLIGHT_MODE_SWITCH_H
-#define FLIGHT_MODE_SWITCH_H
+#ifndef MODE_SWITCH_H
+#define MODE_SWITCH_H
 
 
 inline int16_t flight_mode_switch_manual(void);
@@ -31,4 +31,4 @@ void flight_mode_switch_2pos_poll(void); // this is called at 40 hertz and scans
 void flight_mode_switch_check_set(void); // this is called at 2 hertz and changes the flight mode if req.
 
 
-#endif // FLIGHT_MODE_SWITCH_H
+#endif // MODE_SWITCH_H

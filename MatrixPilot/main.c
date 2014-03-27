@@ -20,6 +20,8 @@
 
 
 #include "defines.h"
+#include "behaviour.h"
+#include "flightplan-waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
 
@@ -36,6 +38,7 @@
 #endif
 
 void init_tasks(void);
+void vApplicationIdleHook(void);
 
 
 #if (SILSIM == 1)
@@ -62,11 +65,12 @@ int main(void)
 	udb_init();
 	dcm_init();
 	init_config();  // this will need to be moved up in order to support runtime hardware options
+	init_waypoints();
 	init_servoPrepare();
 	init_states();
 	init_behavior();
 	init_serial();
-	
+
 	if (setjmp())
 	{
 		// a processor exception occurred and we're resuming execution here 
@@ -101,5 +105,7 @@ void vApplicationIdleHook(void)
 #if (CONSOLE_UART != 0 && SILSIM == 0)
 	console();
 #endif
+//#ifndef (USE_FREERTOS)
 	udb_run();
+//#endif
 }

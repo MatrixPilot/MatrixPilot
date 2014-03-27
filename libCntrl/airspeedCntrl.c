@@ -47,6 +47,24 @@ void init_airspeedCntrl(void)
 	airspeed_pitch_max_aspd    = (AIRSPEED_PITCH_MAX_ASPD * (RMAX/57.3));
 }
 
+#if (USE_CONFIGFILE == 1)
+void save_airspeedCntrl(void)
+{
+/*
+	= minimum_groundspeed / MINIMUM_GROUNDSPEED * 100;
+	= minimum_airspeed    / MINIMUM_AIRSPEED    * 100;
+	= maximum_airspeed    / MAXIMUM_AIRSPEED    * 100;
+	= cruise_airspeed     / CRUISE_AIRSPEED     * 100;
+
+	= airspeed_pitch_adjust_rate / (AIRSPEED_PITCH_ADJ_RATE * (RMAX/(57.3 * 40.0)));
+	= airspeed_pitch_ki_limit    / (AIRSPEED_PITCH_KI_MAX   * (RMAX/57.3));
+	= airspeed_pitch_ki          / (AIRSPEED_PITCH_KI       * (RMAX));
+	= airspeed_pitch_min_aspd    / (AIRSPEED_PITCH_MIN_ASPD * (RMAX/57.3));
+	= airspeed_pitch_max_aspd    / (AIRSPEED_PITCH_MAX_ASPD * (RMAX/57.3));
+ */
+}
+#endif // USE_CONFIGFILE
+
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 
 int16_t airspeed            = 0;

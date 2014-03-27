@@ -23,7 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if 1
+#if 0
 
 #include "sio.h"
 
@@ -155,11 +155,11 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-#if (USE_HILSIM_USB != 1)
+#if (HILSIM_USB != 1)
 	int16_t txchar = udb_gps_callback_get_byte_to_send();
 #else
 	int16_t txchar = -1;
-#endif
+#endif // HILSIM_USB
 	if (txchar != -1)
 	{
 		U1TXREG = (uint8_t)txchar;
@@ -176,9 +176,9 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	while (U1STAbits.URXDA)
 	{
 		uint8_t rxchar = U1RXREG;
-#if (USE_HILSIM_USB != 1)
+#if (HILSIM_USB != 1)
 		udb_gps_callback_received_byte(rxchar);
-#endif // USE_HILSIM_USB
+#endif // HILSIM_USB
 	}
 	U1STAbits.OERR = 0;
 	interrupt_restore_corcon;

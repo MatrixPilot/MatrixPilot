@@ -51,5 +51,5 @@ void init_tasks(void)
 #endif
 		udb_run();
 	}
-	return 0;
+//	return 0;
 }

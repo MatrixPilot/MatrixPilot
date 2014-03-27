@@ -43,6 +43,7 @@ inline uint8_t udb_cpu_load(void)
 
 inline void init_heartbeat(void)
 {
+#ifndef USE_FREERTOS
 //#ifdef USE_MPU_HEARTBEAT
 //#if (HEARTBEAT_HZ != 200)
 //#error HEARTBEAT_HZ must be set to 200 when using the MPU6000 as a heartbeat
@@ -96,6 +97,7 @@ inline void init_heartbeat(void)
 	T1CONbits.TON = 1;      // turn on timer 1
 
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
+#endif // USE_FREERTOS
 }
 
 static inline void init_cpu_timer(void)
@@ -129,8 +131,6 @@ inline void cpu_load_calc(void)
 	T5CONbits.TON = 1;      // turn on timer 5
 }
 
-//#ifdef USE_BACKGROUND_INT
-
 static inline void init_callback_1(void)
 {
 	// The Timer7 interrupt is used to trigger background tasks such as
@@ -150,21 +150,15 @@ static inline void init_callback_2(void)
 	_T6IE = 1;              // enable the PWM interrupt
 }
 
-//#endif // USE_BACKGROUND_INT
-
 void udb_init_clock(void)   // initialize timers
 {
 	init_heartbeat();
 	init_cpu_timer();
-//#ifdef USE_BACKGROUND_INT
 	init_callback_1();
 	init_callback_2();
-//#endif // USE_BACKGROUND_INT
 }
 
-#ifdef USE_FREERTOS
-void T1Interrupt(void) {}
-#else
+#ifndef USE_FREERTOS
 // This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 {
@@ -183,11 +177,11 @@ void vApplicationTickHook(void) // 1000 Hz
 {
 	static int16_t i = 0;
 
-rtos_ticks++;
+	rtos_ticks++;
 
-	if (++i > 25) {
+	if (++i > 25) { // 40Hz
 		i = 0;
-		T1Interrupt();  // 40 Hz
+		// heartbeat() is now registered as a callback with the MPU6000 driver @ 200Hz
 	}
 }
 #endif // USE_FREERTOS
@@ -200,8 +194,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 	_T5IF = 0;              // clear the interrupt
 	interrupt_restore_corcon;
 }
-
-//#ifdef USE_BACKGROUND_INT
 
 static background_callback callback_fptr_1 = NULL;
 
@@ -246,5 +238,3 @@ void udb_background_trigger(background_callback callback)
 	callback_fptr_2 = callback;
 	_T7IF = 1;              // trigger the interrupt
 }
-
-//#endif // USE_BACKGROUND_INT

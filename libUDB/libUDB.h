@@ -29,6 +29,7 @@
 #include "options.h"
 
 #if (WIN == 1 || NIX == 1)
+#define inline __inline
 #define SILSIM                              1
 #undef  HILSIM
 #define HILSIM                              1
@@ -45,6 +46,7 @@
 #undef  FAILSAFE_INPUT_MIN
 #define FAILSAFE_INPUT_MIN                  1500
 #include "SIL-udb.h"
+#undef BAROMETER_ALTITUDE
 #else
 #define SILSIM                              0
 #include <dsp.h>
@@ -80,7 +82,7 @@ void mav_printf(const char * format, ...);
 #define DPRINT printf
 #endif // USE_MAVLINK_IO
 #else
-#define DPRINT(args...)
+#define DPRINT(args, ...)
 #endif // USE_DEBUG_IO
 
 #include "fixDeps.h"
@@ -155,7 +157,8 @@ void udb_background_trigger_pulse(background_callback callback);
 
 // Return the current CPU load as an integer percentage value from 0-100.
 uint8_t udb_cpu_load(void);
-inline void cpu_load_calc(void);
+//inline void cpu_load_calc(void);
+void cpu_load_calc(void);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,10 +184,6 @@ extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
 // This read-only value holds flags that tell you, among other things,
 // whether the receiver is currently receiving values from the transmitter.
 extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
-
-// This takes a servo out value, and clips it to be within
-// 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int16_t udb_servo_pulsesat(int32_t pw);
 
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
@@ -216,10 +215,10 @@ extern UDB_SKIP_FLAGS udb_skip_flags;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Raw Accelerometer and Gyroscope(rate) Values
-extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
-extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
-extern struct ADchannel udb_vref;                          // reference voltage
-extern struct ADchannel udb_analogInputs[];
+//extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
+//extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
+//extern struct ADchannel udb_vref;                          // reference voltage
+//extern struct ADchannel udb_analogInputs[];
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;        // battery_current._.W1 is in tenths of Amps
@@ -238,7 +237,6 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 // Calibrate the sensors
 // Call this function once, soon after booting up, after a few seconds of
 // holding the UDB very still.
-void udb_a2d_record_offsets(void);
 void udb_callback_read_sensors(void);       // Callback
 
 
@@ -284,21 +282,6 @@ int16_t udb_serial_callback_get_byte_to_send(void);     // Callback
 
 // Implement this callback to handle receiving a byte from the serial port
 void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
-
-
-////////////////////////////////////////////////////////////////////////////////
-// EEPROM (Supported on UDB4 and UDB5 only)
-
-// Write 1 byte to eeprom at address, or read 1 byte from address in eeprom into data
-void eeprom_ByteWrite(uint16_t address, uint8_t data);
-void eeprom_ByteRead(uint16_t address, uint8_t* data);
-
-// Write numbytes of data to eeprom, starting at address. The write area can not span a
-// page boundry.  Pages start on addresses of multiples of 64.
-// Read numbytes of data from address in eeprom into data.  Note that there is no 1-page
-// limit for sequential reads as there is for page writes.
-void eeprom_PageWrite(uint16_t address, uint8_t* data, uint8_t numbytes);
-void eeprom_SequentialRead(uint16_t address, uint8_t* data, uint16_t numbytes);
 
 
 #endif // LIB_UDB_H

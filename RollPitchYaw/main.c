@@ -23,16 +23,18 @@
 
 
 #include "../libDCM/libDCM.h"
+#include "../libDCM/gpsParseCommon.h"
 #include "../libUDB/heartbeat.h"
 
 // Used for serial debug output
 #include <stdio.h>
 
+
 char debug_buffer[128];
 int db_index = 0;
 void send_debug_line(void);
 
-int main (void)
+int main(void)
 {
 	mcu_init();
 
@@ -61,10 +63,12 @@ void init_events(void)
 void udb_heartbeat_40hz_callback(void)
 {
 	static int count = 0;
+
 	if (!dcm_flags._.calib_finished)
 	{
 		// If still calibrating, blink RED
-		if (++count > 20) {
+		if (++count > 20)
+		{
 			count = 0;
 			udb_led_toggle(LED_RED);
 		}
@@ -84,7 +88,7 @@ void dcm_callback_gps_location_updated(void)
 }
 
 // Called at HEARTBEAT_HZ, before sending servo pulses
-void dcm_servo_callback_prepare_outputs(void)
+void dcm_heartbeat_callback(void) // was called dcm_servo_callback_prepare_outputs()
 {
 	if (!dcm_flags._.calib_finished)
 	{
@@ -95,13 +99,13 @@ void dcm_servo_callback_prepare_outputs(void)
 	else
 	{
 		union longww accum;
-		
+
 		accum.WW = __builtin_mulss(rmat[6], 4000);
 		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
-		
+
 		accum.WW = __builtin_mulss(rmat[7], 4000);
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
-		
+
 		accum.WW = __builtin_mulss(rmat[4], 4000);
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 	}

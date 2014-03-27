@@ -8,7 +8,7 @@ dir_src=
 dir_bin=
 dir_tmp=build/udb4
 dir_sin=..\libVectorMatrix
-dir_inc=.;..\Microchip\Include
+dir_inc=.;.\Config;..\Microchip\Include
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
 [CAT_FILTERS]
@@ -19,7 +19,7 @@ filter_lib=*.a
 filter_lkr=*.gld
 [CAT_SUBFOLDERS]
 subfolder_src=RollPitchYaw;libDCM;libUDB;libVectorMatrix
-subfolder_inc=RollPitchYaw;libDCM;libUDB;libVectorMatrix
+subfolder_inc=Config;RollPitchYaw;libDCM;libUDB;libVectorMatrix
 subfolder_obj=
 subfolder_lib=
 subfolder_lkr=
@@ -300,7 +300,7 @@ enable=0
 transport=0
 format=0
 [CUSTOM_BUILD]
-Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
+Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir).\Config\options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
 Pre-BuildEnabled=1
 Post-Build=
 Post-BuildEnabled=1

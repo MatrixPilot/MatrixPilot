@@ -34,17 +34,20 @@ struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
 //struct waypoint3D    { int32_t x; int32_t y; int32_t z; };
 struct fixedOrigin3D { int32_t x; int32_t y; float z; };
 
-// Proposed new generic vector types
-//struct vect2D_16     { int16_t x; int16_t y; };
-//struct vect2D_32     { int32_t x; int32_t y; };
-//struct vect3D_16     { int16_t x; int16_t y; int16_t z; };
-//struct vect3D_32     { int32_t x; int32_t y; int32_t z; };
+// New generic vector types
 
-typedef struct { float x; float y; }                vect2D;
-typedef struct { float x; float y; float z; }       vect3D;
-typedef struct { int16_t x; int16_t y; }            vect2D_16;
-typedef struct { int16_t x; int16_t y; int16_t z; } vect3D_16;
-typedef struct { int32_t x; int32_t y; }            vect2D_32;
-typedef struct { int32_t x; int32_t y; int32_t z; } vect3D_32;
+typedef int8_t circ_t;
+typedef int16_t circ_16t;
+
+typedef struct { float x; float y; }                vect2_t;
+typedef struct { float x; float y; float z; }       vect3_t;
+typedef struct { int16_t x; int16_t y; }            vect2_16t;
+typedef struct { int16_t x; int16_t y; int16_t z; } vect3_16t;
+typedef struct { int32_t x; int32_t y; }            vect2_32t;
+typedef struct { int32_t x; int32_t y; int32_t z; } vect3_32t;
+
+typedef struct { float r; float p; }       polar_t;
+typedef struct { int16_t r; int8_t p; }    polar_16t;
+typedef struct { int32_t r; int16_t p; }   polar_32t;
 
 #endif // DCM_TYPES_H

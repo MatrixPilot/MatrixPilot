@@ -95,7 +95,7 @@ void udb_init_capture(void)
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
 	#endif
 	}
-	
+
 	TMR2 = 0;               // initialize timer
 #if (MIPS == 64)
 	T2CONbits.TCKPS = 2;    // prescaler = 64 option
@@ -143,6 +143,7 @@ void udb_init_capture(void)
 #endif // NORADIO
 }
 
+// called from heartbeat pulse at 20Hz
 void radioIn_failsafe_check(void)
 {
 	// check to see if at least one valid pulse has been received,
@@ -165,6 +166,7 @@ void radioIn_failsafe_check(void)
 	failSafePulses = 0;
 }
 
+// called from heartbeat pulse at 1Hz
 void radioIn_failsafe_reset(void)
 {
 	noisePulses = 0;

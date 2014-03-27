@@ -61,7 +61,7 @@ void dcm_heartbeat_callback(void);
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute);
 struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute);
 
-vect3D_32 dcm_rel2abs(vect3D_32 rel);
+vect3_32t dcm_rel2abs(vect3_32t rel);
 
 // FIXME: This should be handled internally, along with DCM calibration
 // Count down from 1000 at 40Hz
@@ -89,6 +89,7 @@ extern struct relative3D_32 GPSlocation;
 #else
 extern struct relative3D GPSlocation;
 #endif // USE_EXTENDED_NAV
+
 extern struct relative3D GPSvelocity;
 extern struct relative2D velocity_thru_air; // derived horizontal velocity relative to air in cm/sec
 extern int16_t estimatedWind[3];            // wind velocity vectors in cm / sec
@@ -100,7 +101,7 @@ extern int16_t estimatedWind[3];            // wind velocity vectors in cm / sec
 //extern union longww IMUvelocityx, IMUvelocityy, IMUvelocityz;
 //#define IMUheight IMUlocationz._.W1
 
-extern union longbbbb lat_gps,    lon_gps,    alt_sl_gps;
-extern union longbbbb lat_origin, lon_origin, alt_origin;
+//extern volatile union longbbbb lat_gps,    lon_gps,    alt_sl_gps;
+//extern union longbbbb lat_origin, lon_origin, alt_origin;
 
 #endif // LIB_DCM_H

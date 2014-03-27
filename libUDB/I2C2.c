@@ -18,14 +18,16 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "I2C.h"
 /*
 #include "libUDB_internal.h"
 #include "interrupt.h"
-#include "I2C.h"
 //#include "NV_memory.h"
 #include "events.h"
  */
+
 #define USE_I2C_SECOND_PORT_DRIVER 1
+
 #if (USE_I2C_SECOND_PORT_DRIVER == 1)
 
 #if (BOARD_TYPE == AUAV3_BOARD)
@@ -60,8 +62,8 @@
 #define I2C_Reset       I2C2_Reset
 #define I2C_Write       I2C2_Write
 #define I2C_Read        I2C2_Read
-#define I2C_CheckAck    I2C2_CheckACK
-#define I2C_Trigger     I2C2_trigger_service
+#define I2C_CheckAck    I2C2_CheckAck
+#define I2C_Trigger     I2C2_Trigger
 
 #define I2C_SOURCE_INCLUDED
 #include "I2C.c"

@@ -146,13 +146,14 @@ void udb_skip_imu_calibration(boolean b)
 
 void udb_init(void)
 {
+	int16_t i;
+
 	// If we were reest:
 	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
 	{
 		mp_rcon = 128; // enable just the external/MCLR reset bit
 	}
 
-	int16_t i;
 	for (i = 0; i < 4; i++)
 	{
 		leds[i] = LED_OFF;
@@ -197,7 +198,7 @@ int initialised = 0;
 void udb_run(void)
 {
 	uint16_t currentTime;
-	uint16_t nextHeartbeatTime;
+	static uint16_t nextHeartbeatTime;
 
 	if (!initialised)
 	{
@@ -222,7 +223,13 @@ void udb_run(void)
 		    !(nextHeartbeatTime <= UDB_STEP_TIME && 
 		    currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME))
 		{
-			udb_callback_read_sensors();
+			static int i = 0;
+			if (i++ > 400)
+			{
+				i = 0;
+//				printf("ten sec tick\r\n");
+			}
+//			udb_callback_read_sensors();  // this must be called at the correct rate
 
 			udb_flags._.radio_on = (sil_radio_on && 
 			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && 
@@ -275,7 +282,7 @@ void udb_servo_record_trims(void)
 	for (i = 1; i <= NUM_INPUTS; i++)
 	{
 		udb_pwTrim[i] = udb_pwIn[i];
-		DPRINT("udb_pwTrim[%i] = %u\r\n", i, udb_pwTrim[i]);
+//		DPRINT("udb_pwTrim[%i] = %u\r\n", i, udb_pwTrim[i]);
 	}
 }
 
@@ -303,20 +310,21 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
+	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+
 	sil_ui_will_reset();
 
 	if (gpsSocket)       UDBSocket_close(gpsSocket);
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket)    UDBSocket_close(serialSocket);
 
-	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 	execv(mp_argv[0], args);
 	fprintf(stderr, "Failed to reset UDB %s\n", mp_argv[0]);
 	exit(1);
 }
 
 // time functions
-uint16_t get_current_milliseconds()
+uint16_t get_current_milliseconds(void)
 {
 	// *nix / mac implementation
 	struct timeval tv;
@@ -331,13 +339,14 @@ void sleep_milliseconds(uint16_t ms)
 #ifdef WIN
 	// windows implementation
 	Sleep(ms);
+
 #else
 	// *nix / mac implementation
 	usleep(1000*ms);
 #endif
 }
 
-void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
+void sil_handle_serial_rc_input(uint8_t *buffer, int bytesRead)
 {
 	int i;
 
@@ -376,7 +385,7 @@ void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
 	}
 }
 
-#define GPS_LOGFILE "gps_log.txt"
+#define GPS_LOGFILE  "gps_log.txt"
 #define TELE_LOGFILE "tele_log.txt"
 //#define LOG_GPS_DATA
 //#define LOG_TELE_DATA
@@ -458,7 +467,7 @@ boolean handleUDBSockets(void)
 			for (i = 0; i < bytesRead; i++) {
 				udb_serial_callback_received_byte(buffer[i]);
 			}
-			if (bytesRead>0) didRead = true;
+			if (bytesRead > 0) didRead = true;
 		}
 	}
 	// Handle optional Serial RC input Socket
@@ -468,8 +477,8 @@ boolean handleUDBSockets(void)
 			UDBSocket_close(serialSocket);
 			serialSocket = NULL;
 		} else {
-			if (bytesRead>0) {
-				sil_handle_seial_rc_input(buffer, bytesRead);
+			if (bytesRead > 0) {
+				sil_handle_serial_rc_input(buffer, bytesRead);
 				didRead = true;
 			}
 		}

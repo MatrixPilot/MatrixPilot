@@ -27,10 +27,10 @@
 
 struct dcm_flag_bits {
 #ifdef CATAPULT_LAUNCH_ENABLE
-	uint16_t unused                 : 3;
+	uint16_t unused                 : 2;
 	uint16_t launch_detected        : 1;
 #else
-	uint16_t unused                 : 4;
+	uint16_t unused                 : 3;
 #endif
 	uint16_t rollpitch_req          : 1;
 	uint16_t gps_history_valid      : 1;
@@ -44,6 +44,7 @@ struct dcm_flag_bits {
 	uint16_t nmea_passthrough       : 1; // only used by ublox
 	uint16_t init_finished          : 1;
 	uint16_t calib_finished         : 1;
+	uint16_t integrate_req          : 1;
 };
 
 

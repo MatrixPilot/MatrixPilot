@@ -40,15 +40,20 @@ extern int16_t progress_to_goal; // Fraction of the way to the goal in the range
 extern int8_t desired_dir;
 
 void init_navigation(void);
+void save_navigation(void);
 #ifdef USE_EXTENDED_NAV
-void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
+void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
 #else
-void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
+void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint);
 #endif // USE_EXTENDED_NAV
-void update_goal_alt(int16_t z);
-void compute_bearing_to_goal (void);
-void process_flightplan(void);
-int16_t determine_navigation_deflection(char navType);
+void navigate_set_goal_height(int16_t z);
+void compute_bearing_to_goal(void);
+void navigate_process_flightplan(void);
+int16_t navigate_determine_deflection(char navType);
+int16_t navigate_desired_height(void);
+
+// NEW STUFF:
+int16_t navigate_get_goal(vect3_16t* goal);
 
 
 #endif // NAVIGATE_H

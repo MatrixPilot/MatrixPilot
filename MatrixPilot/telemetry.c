@@ -21,13 +21,15 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "../libCntrl/cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/osd.h"
-#include "../libUDB/magnetometerOptions.h"
+//#include "../libUDB/magnetometerOptions.h"
+#include "magnetometerOptions.h"
 #include "osd_config.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
@@ -344,12 +346,15 @@ void sio_fbdl_data(unsigned char inchar)
 
 void serial_output(char* format, ...)
 {
+	int16_t len;
+	int16_t start_index;
+	int16_t remaining;
 	char telebuf[200];
 
 	va_list arglist;
 	va_start(arglist, format);
 
-	int16_t len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
+	len = vsnprintf(telebuf, sizeof(telebuf), format, arglist);
 
 //	static int maxlen = 0;
 //	if (len > maxlen) {
@@ -357,8 +362,8 @@ void serial_output(char* format, ...)
 //		DPRINT("maxlen %u\r\n", maxlen);
 //	}
 
-	int16_t start_index = end_index;
-	int16_t remaining = (SERIAL_BUFFER_SIZE - start_index);
+	start_index = end_index;
+	remaining = (SERIAL_BUFFER_SIZE - start_index);
 	if (remaining < len) {
 		DPRINT("SERBUF discarding %u bytes\r\n", len - remaining);
 	}
@@ -380,12 +385,14 @@ void serial_output(char* format, ...)
 // add this text to the output buffer
 void serial_output(char* format, ...)
 {
+	int16_t start_index;
+	int16_t remaining;
 	va_list arglist;
 
 	va_start(arglist, format);
 
-	int16_t start_index = end_index;
-	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
+	start_index = end_index;
+	remaining = SERIAL_BUFFER_SIZE - start_index;
 
 	if (remaining > 1)
 	{
@@ -455,13 +462,13 @@ void serial_output_8hz(void)
 	desired_dir_deg  = accum._.W1 - 90; // "Convert UAV DevBoad Earth" to Compass Bearing
 	if (desired_dir_deg < 0) desired_dir_deg += 360; 
 
-	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+	if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 0)
 		mode = 1;
-	else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+	else if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 1)
 		mode = 2;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
+	else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		mode = 3;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
+	else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		mode = 0;
 	else
 		mode = 99; // Unknown
@@ -511,10 +518,11 @@ void serial_output_8hz(void)
 	}
 }
 
-#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
 
 void serial_output_8hz(void)
 {
+	int16_t i;
 //	static int16_t telemetry_counter = 8;
 	static int toggle = 0;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
@@ -582,7 +590,7 @@ void serial_output_8hz(void)
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 			              "as%i:wvx%i:wvy%i:wvz%i:\r\n",
-			    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+			    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
 			    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 			    rmat[0], rmat[1], rmat[2],
 			    rmat[3], rmat[4], rmat[5],
@@ -606,7 +614,7 @@ void serial_output_8hz(void)
 				              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
 				              "c%u:s%i:cpu%u:bmv%i:"
 				              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-				    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+				    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
 				    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 				    rmat[0], rmat[1], rmat[2],
 				    rmat[3], rmat[4], rmat[5],
@@ -626,10 +634,9 @@ void serial_output_8hz(void)
 				if (tow.WW > 0) tow.WW += 250; 
 
 				// Save  pwIn and PwOut buffers for printing next time around
-				int16_t i;
-				for (i=0; i <= NUM_INPUTS; i++)
+				for (i = 0; i <= NUM_INPUTS; i++)
 					pwIn_save[i] = udb_pwIn[i];
-				for (i=0; i <= NUM_OUTPUTS; i++)
+				for (i = 0; i <= NUM_OUTPUTS; i++)
 					pwOut_save[i] = udb_pwOut[i];
 			}
 			else
@@ -652,15 +659,25 @@ void serial_output_8hz(void)
 #endif // RECORD_FREE_STACK_SPACE
 				serial_output("\r\n");
 			}
+
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
+extern int16_t magFieldRaw[3];
+extern int16_t udb_magOffset[3];
+
+			serial_output("OFFx %i : OFFy %i : OFFz %i : RAWx %i : RAWy %i : RAWz %i :",
+			    udb_magOffset[0], udb_magOffset[1], udb_magOffset[2],
+			    magFieldRaw[0], magFieldRaw[1], magFieldRaw[2]);
+			    serial_output("\r\n");
+
 #endif // SERIAL_OUTPUT_FORMAT
-			if (flags._.f13_print_req == 1)
+			if (state_flags._.f13_print_req == 1)
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 				if (udb_heartbeat_counter % 10 != 0) return;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
-				flags._.f13_print_req = 0;
+				state_flags._.f13_print_req = 0;
 			}
 			break;
 		}

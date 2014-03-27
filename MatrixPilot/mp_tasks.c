@@ -66,7 +66,7 @@ static void TaskInit(void* pvParameters)
 
 	TaskIMU_Init();
 	TaskGPS_Init();
-	xTaskCreate(TaskI2C, (signed portCHAR*)"I2C", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+1, NULL);
+//	xTaskCreate(TaskI2C, (signed portCHAR*)"I2C", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+1, NULL);
 	vTaskDelete(NULL);
 }
 

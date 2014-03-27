@@ -24,6 +24,7 @@
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/magnetometer.h"
 #include "../libUDB/barometer.h"
+#include "../libUDB/ADchannel.h"
 #include "estAltitude.h"
 #include "mathlibNAV.h"
 #include "rmat.h"
@@ -223,9 +224,9 @@ struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute)
 }
 #endif // USE_EXTENDED_NAV
 
-vect3D_32 dcm_rel2abs(vect3D_32 rel)
+vect3_32t dcm_rel2abs(vect3_32t rel)
 {
-	vect3D_32 abs;
+	vect3_32t abs;
 
 	abs.z = rel.z;
 	abs.y = (rel.y * 90) + lat_origin.WW;

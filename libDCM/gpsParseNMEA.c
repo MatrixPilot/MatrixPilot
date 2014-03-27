@@ -25,7 +25,7 @@
 
 #if (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)
 
-#define DEBUG_NMEA
+//#define DEBUG_NMEA
 
 #ifdef DEBUG_NMEA
 static uint16_t RMCpos = 0;
@@ -56,7 +56,7 @@ void debug_gga(uint8_t ch)
 }
 #else
 #define debug_rmc(a)
-#define debug_rmc_send(int8_t ch)
+#define debug_rmc_send(a)
 #define debug_gga(a)
 #endif
 
@@ -149,7 +149,7 @@ void gps_startup_sequence(int16_t gpscount)
 		udb_gps_set_rate(DEFAULT_GPS_BAUD);
 		#else
 		udb_gps_set_rate(38400);
-		#warning "Default GPS BAUD not specified, now set at 38400"
+#pragma warning "Default GPS BAUD not specified, now set at 38400"
 		#endif
 	}
 	else if (gpscount == 50)
@@ -243,8 +243,8 @@ static void gps_id3(uint8_t gpschar)
 	{
 		gga_counter = 1;                    // Next gga message after the comma
 		msg_parse = &gps_comma;             // A comma ',' is expected now	
-		GGApos = 6;
 #ifdef DEBUG_NMEA
+		GGApos = 6;
 //	msg_parse = &msg_start;
 		strcpy(debug_GGA, "$GPGGA");
 #endif
@@ -668,5 +668,19 @@ void gps_commit_data(void)
 void init_gps_nmea(void)
 {
 }
+
+#if (HILSIM == 1)
+void commit_bodyrate_data(void)
+{
+}
+
+void HILSIM_set_gplane(void)
+{
+}
+
+void HILSIM_set_omegagyro(void)
+{
+}
+#endif // HILSIM
 
 #endif // (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)

@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2012 MatrixPilot Team
+// Copyright 2009-2014 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -179,18 +179,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
-// For classic UDB boards:
-// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
-// This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
-// If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
-// following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
-// With it set to 1, the RC outputs will be in this alternate configuration:
-// Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-//
-// For UDB4 boards:
-// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
-// The 8 standard output channels remain unaffected.  2 additional output channels are available
-// on pins RA4 and RA1.
+// For setups with an external Rx device:
+//   Use a single PPM input connection from the RC receiver to the UDB on RC input channel PPM_IC.
+//   The 8 standard output channels remain unaffected.
+//   For UDB4 and UDB5 boards:
+//     2 additional output channels are available on pins RA4 and RA1.
+//   For AUAV3 boards:
+//     support for additional output channels may be developed upon request
 //
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
@@ -211,11 +206,10 @@
 
 
 // NUM_INPUTS:
-// For classic boards: Set to 1-5 (or 1-8 when using PPM input)
-//   1-4 enables only the first 1-4 of the 4 standard input channels
-//   5 also enables E8 as the 5th input channel
-// For UDB4 boards: Set to 1-8
-#define NUM_INPUTS                          5
+// If using PWM inputs (parallel Rx connections), set to the number of cables connected, 1-8
+// If using PPM inputs (serial Rx connection), set to the number of Rx channels, up to PPM_NUMBER_OF_CHANNELS
+// If using LRS library (integrated SPI tranceiver), set to the number of Rx channels, up to 16
+#define NUM_INPUTS                          6
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -346,7 +340,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
+// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
 // This determines the format of the output sent out the spare serial port.
 // Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
@@ -354,6 +348,7 @@
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
+// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
 #define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
@@ -362,6 +357,7 @@
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
 //#define SERIAL_BAUDRATE                     19200
+//#define SERIAL_BAUDRATE                     115200
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -429,7 +425,7 @@
 // based on sonar distance to ground.
 
 // Set USE_SONAR_INPUT to the input capture channel which the sensor
-// is connected to. Currently on channel 8 is supported.
+// is connected to. Must be greater than the last used servo channel.
 #define USE_SONAR_INPUT                     0
 
 
@@ -752,11 +748,12 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-#define CONSOLE_UART                        3
+//#define CONSOLE_UART                        3
+#define CONSOLE_UART                        1
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
-#define USE_MAVLINK_IO
+//#define USE_MAVLINK_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////

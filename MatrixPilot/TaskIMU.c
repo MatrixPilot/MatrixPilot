@@ -20,6 +20,8 @@
 
 
 #include "defines.h"
+//#include "../libDCM/libDCM.h"
+#include "../libUDB/libUDB_internal.h"
 #include "../libUDB/heartbeat.h"
 
 #ifdef USE_FREERTOS
@@ -27,6 +29,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "TaskIMU.h"
 
 static xSemaphoreHandle xSemaphoreIMU = NULL;
 

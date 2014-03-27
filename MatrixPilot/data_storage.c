@@ -43,6 +43,45 @@
 #include "../MAVLink/include/mavlink_types.h"
 #include "../MAVLink/include/checksum.h"
 
+// CONFIGURATION OPTIONS
+
+// Defines the chunks size for data areas.  Can be used to allign with
+// NV memory page size.
+#define FAT_CHUNK_BYTE_SIZE     64
+
+// Size of data pre-amble used to mark the start of a memory area
+#define DATA_PREAMBLE_SIZE      4
+
+// Maximum number of data areas
+#define MAX_DATA_HANDLES        30
+
+// Structure for entry to data directory array
+typedef struct tagDATA_STORAGE_ENTRY
+{
+	uint16_t data_address;
+	uint16_t data_type;
+	uint16_t data_size;
+} DATA_STORAGE_ENTRY;
+
+// Structure of complete data directory including checksum.
+typedef struct tagDATA_STORAGE_TABLE
+{
+	uint8_t            table_preamble[DATA_PREAMBLE_SIZE];
+	DATA_STORAGE_ENTRY table[MAX_DATA_HANDLES];
+	uint16_t           table_checksum;
+} DATA_STORAGE_TABLE;
+
+typedef struct tagDATA_STORAGE_HEADER
+{
+	uint8_t  data_preamble[DATA_PREAMBLE_SIZE];
+	uint16_t data_handle;
+	uint16_t data_version;
+	uint16_t data_checksum;
+} DATA_STORAGE_HEADER;
+
+#if(DATA_HANDLE_MAX >= MAX_DATA_HANDLES)
+	#error("Number of defined data handles exceeds the maximum number of defined handles")
+#endif
 
 enum
 {
@@ -74,68 +113,68 @@ enum
 	DATA_STORAGE_AREA_CLEARING,
 } DATA_STORAGE_STATUS;
 
-uint16_t data_storage_status = DATA_STORAGE_STATUS_START;
+static uint16_t data_storage_status = DATA_STORAGE_STATUS_START;
 
 
 // store the data storage table
-//boolean data_storage_store_table(void);
+//static boolean data_storage_store_table(void);
 
 // Check the integrity of the data storage table
-boolean data_storage_check_table(void);
+static boolean data_storage_check_table(void);
 
 // Format the data storage table
-boolean data_storage_format_table(void);
+static boolean data_storage_format_table(void);
 
 // Find a hole of size data_storage_size and return its address.
-uint16_t data_storage_find_hole(uint16_t data_storage_size);
+static uint16_t data_storage_find_hole(uint16_t data_storage_size);
 
 // Clear a specific data area by invalidating the checksum and writing it to eeprom table
-void storage_clear_specific_area(void);
+static void storage_clear_specific_area(void);
 
 
 // Callbacks
 // The callbacks normally set the status so that the background service routine does the work.
-void data_storage_format_callback(boolean success);     // format write is completed
-void data_storage_init_read_callback(boolean success);  // initialisation read of storage table
+static void data_storage_format_callback(boolean success);     // format write is completed
+static void data_storage_init_read_callback(boolean success);  // initialisation read of storage table
 
-void storage_write_callback(boolean success);           // Data write callback
-void storage_write_header_callback(boolean success);    // Header write callback
+static void storage_write_callback(boolean success);           // Data write callback
+static void storage_write_header_callback(boolean success);    // Header write callback
 
-void storage_read_header_callback(boolean success);     // Header read callback
-void storage_read_data_callback(boolean success);       // Data read callback
+static void storage_read_header_callback(boolean success);     // Header read callback
+static void storage_read_data_callback(boolean success);       // Data read callback
 
-void data_storage_write_table_callback(boolean success);// Table write callback
+static void data_storage_write_table_callback(boolean success);// Table write callback
 
-void storage_clear_specific_area_callback(boolean success); // Clear specific data area finished callback
+static void storage_clear_specific_area_callback(boolean success); // Clear specific data area finished callback
 
 // A constant preamble used to determine the start of a data block
 // This also allows the data to be found if the FAT is broken
-const uint8_t data_storage_preamble[] = {0xAA, 0x5A, 0xA5, 0x55};
+static const uint8_t data_storage_preamble[] = {0xAA, 0x5A, 0xA5, 0x55};
 
 // A constant preamble used to determine the start of the data storage table
-const uint8_t table_storage_preamble[] = {0x55, 0xA5, 0x5A, 0xAA};
+static const uint8_t table_storage_preamble[] = {0x55, 0xA5, 0x5A, 0xAA};
 
 // Constant for invalid data
-const uint8_t table_invalid_preamble[] = {0x01, 0x10, 0x01, 0x10};
+static const uint8_t table_invalid_preamble[] = {0x01, 0x10, 0x01, 0x10};
 
 
 // Structure in ram of complete data directory including checksum.
-DATA_STORAGE_TABLE data_storage_table;
+static DATA_STORAGE_TABLE data_storage_table;
 
 // Callers data.  Used on initialisation, reading or writing an area.
-uint8_t* pdata_storage_data     = NULL;
-uint16_t data_storage_type      = DATA_STORAGE_NULL;
-uint16_t data_storage_size      = 0;     // Storage size including header
-uint16_t data_storage_data_size = 0;     // Storage size of data only
-uint16_t data_storage_handle    = INVALID_HANDLE;
-DS_callbackFunc data_storage_user_callback = NULL;
+static uint8_t* pdata_storage_data     = NULL;
+static uint16_t data_storage_type      = DATA_STORAGE_NULL;
+static uint16_t data_storage_size      = 0;     // Storage size including header
+static uint16_t data_storage_data_size = 0;     // Storage size of data only
+static uint16_t data_storage_handle    = INVALID_HANDLE;
+static DS_callbackFunc data_storage_user_callback = NULL;
 
-DATA_STORAGE_HEADER data_storage_header; // Buffer for header information
+static DATA_STORAGE_HEADER data_storage_header; // Buffer for header information
 
-uint16_t data_storage_event_handle = INVALID_HANDLE;
+static uint16_t data_storage_event_handle = INVALID_HANDLE;
 
-// Status of sotage services
-boolean storage_services_started()
+// Status of storage services
+boolean storage_services_started(void)
 {
 	switch (data_storage_status)
 	{
@@ -149,7 +188,7 @@ boolean storage_services_started()
 
 // Initialise the storage
 // If read has failed keep re-trying until the nv memory is ready.
-void data_storage_service(void)
+static void data_storage_service(void)
 {
 	switch (data_storage_status)
 	{
@@ -367,7 +406,7 @@ void data_storage_service(void)
 	}
 }
 
-void data_storage_write_table_callback(boolean success)
+static void data_storage_write_table_callback(boolean success)
 {
 	if (data_storage_user_callback != NULL)
 		data_storage_user_callback(success);
@@ -376,7 +415,7 @@ void data_storage_write_table_callback(boolean success)
 }
 
 // Initialise the data storage
-extern void data_storage_init(void)
+void data_storage_init(void)
 {
 	data_storage_event_handle = register_event(&data_storage_service);
 }
@@ -390,7 +429,7 @@ void storage_service_trigger(void)
 // Callback when in intialisation
 // If init read fails, keep retrying
 // If success, signal checking table in background process
-void data_storage_init_read_callback(boolean success)
+static void data_storage_init_read_callback(boolean success)
 {
 	if (success == false)
 	{
@@ -401,7 +440,7 @@ void data_storage_init_read_callback(boolean success)
 }
 
 // Check that the data storage table is valid with the correct checksum
-boolean data_storage_check_table(void)
+static boolean data_storage_check_table(void)
 {
 	uint16_t mem_checksum;
 
@@ -417,7 +456,7 @@ boolean data_storage_check_table(void)
 }
 
 // Format the data storage table
-boolean data_storage_format_table(void)
+static boolean data_storage_format_table(void)
 {
 	uint16_t mem_counter;
 
@@ -443,7 +482,7 @@ boolean data_storage_format_table(void)
 }
 
 // Callback after formatting
-void data_storage_format_callback(boolean success)
+static void data_storage_format_callback(boolean success)
 {
 	if (success == false)
 	{
@@ -457,7 +496,7 @@ void data_storage_format_callback(boolean success)
 
 // Test the data handle to see if it has allocated storage
 // return true if space is allocated
-boolean storage_test_handle(uint16_t data_handle)
+static boolean storage_test_handle(uint16_t data_handle)
 {
 	if (data_handle >= MAX_DATA_HANDLES) return false;
 	DATA_STORAGE_ENTRY* pEntry = &data_storage_table.table[data_handle];
@@ -502,7 +541,7 @@ boolean storage_write(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_
 	return true;
 }
 
-void storage_write_callback(boolean success)
+static void storage_write_callback(boolean success)
 {
 	if (success == false)
 	{
@@ -512,7 +551,7 @@ void storage_write_callback(boolean success)
 	data_storage_status = DATA_STORAGE_WRITING_DATA_COMPLETE;
 }
 
-void storage_write_header_callback(boolean success)
+static void storage_write_header_callback(boolean success)
 {
 	data_storage_status = DATA_STORAGE_STATUS_WAITING;
 	if (data_storage_user_callback != NULL) data_storage_user_callback(success);
@@ -551,7 +590,7 @@ boolean storage_read(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_c
 	return true;
 }
 
-void storage_read_data_callback(boolean success)
+static void storage_read_data_callback(boolean success)
 {
 	if (success)
 		data_storage_status = DATA_STORAGE_READ_DATA_COMPLETE;
@@ -562,7 +601,7 @@ void storage_read_data_callback(boolean success)
 	}
 }
 
-void storage_read_header_callback(boolean success)
+static void storage_read_header_callback(boolean success)
 {
 	if (success)
 		data_storage_status = DATA_STORAGE_READ_HEADER_COMPLETE;
@@ -631,7 +670,7 @@ boolean storage_create_area(uint16_t data_handle, uint16_t size, uint16_t type, 
 }
 
 // Find the address of the next page start
-inline uint16_t find_next_page_address(uint16_t address)
+static inline uint16_t find_next_page_address(uint16_t address)
 {
 	uint16_t temp = address / FAT_CHUNK_BYTE_SIZE;
 	temp++;
@@ -644,7 +683,7 @@ inline uint16_t find_next_page_address(uint16_t address)
 // TEMPORARY:  Finds next available space after all areas.
 // TEMPORARY:  Does not check max size
 //
-uint16_t data_storage_find_hole(uint16_t data_storage_size)
+static uint16_t data_storage_find_hole(uint16_t data_storage_size)
 {
 	// Start search at the next page address above the storage table
 	uint16_t lowestAddr = find_next_page_address(sizeof(data_storage_table));
@@ -725,7 +764,7 @@ boolean storage_clear_area(uint16_t data_handle, DS_callbackFunc callback)
 	return true;
 }
 
-void storage_clear_specific_area(void)
+static void storage_clear_specific_area(void)
 {
 	// If the data storage area has not been created, return false
 	// TODO: Fix this so that it reports an already clear memory area as correctly cleared
@@ -761,7 +800,7 @@ void storage_clear_specific_area(void)
 }
 
 // Clear specific storage area callback
-void storage_clear_specific_area_callback(boolean success)
+static void storage_clear_specific_area_callback(boolean success)
 {
 	if (data_storage_user_callback != NULL)
 		data_storage_user_callback(success);

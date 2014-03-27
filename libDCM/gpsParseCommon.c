@@ -35,25 +35,29 @@ struct relative3D_32 GPSlocation = { 0, 0, 0 };
 struct relative3D GPSlocation = { 0, 0, 0 };
 #endif // USE_EXTENDED_NAV
 struct relative3D GPSvelocity = { 0, 0, 0 };
+int16_t cos_lat = 0;
+int16_t gps_data_age;
 
 union longbbbb lat_origin, lon_origin, alt_origin;
-union longbbbb lat_gps, lon_gps, alt_sl_gps;        // latitude, longitude, altitude
-union intbb week_no;
-union intbb sog_gps;                                // speed over ground
-union uintbb cog_gps;                               // course over ground
-union intbb climb_gps;                              // climb
-union intbb as_sim;
-union longbbbb tow;
+volatile union longbbbb lat_gps, lon_gps, alt_sl_gps;// latitude, longitude, altitude
+volatile union intbb hilsim_airspeed;  // referenced in estWind and deadReckoning modules
+volatile uint8_t hdop;                              // horizontal dilution of precision
+volatile uint8_t svs;                               // number of satellites
 //union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
 //union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
 //uint8_t mode1, mode2;                             // gps mode1, mode2
-uint8_t hdop;                                       // horizontal dilution of precision
-uint8_t svs;                                        // number of satellites
-int16_t cos_lat = 0;
-int16_t gps_data_age;
-const uint8_t* gps_out_buffer = 0;
-int16_t gps_out_buffer_length = 0;
-int16_t gps_out_index = 0;
+
+// these are only exported for telemetry output
+volatile union intbb week_no;
+volatile union intbb sog_gps;                                // speed over ground
+volatile union uintbb cog_gps;                               // course over ground
+volatile union intbb climb_gps;                              // climb
+volatile union longbbbb tow;
+
+
+static const uint8_t* gps_out_buffer = 0;
+static int16_t gps_out_buffer_length = 0;
+static int16_t gps_out_index = 0;
 
 // GPS parser modules variables
 union longbbbb lat_gps_, lon_gps_;
@@ -198,9 +202,9 @@ static void udb_background_callback_triggered(void)
 	struct relative2D velocity_thru_air;
 	int16_t velocity_thru_airz;
 
-	dirovergndHRmat[0] = rmat[1];
-	dirovergndHRmat[1] = rmat[4];
-	dirovergndHRmat[2] = 0;
+	dirOverGndHrmat[0] = rmat[1];
+	dirOverGndHrmat[1] = rmat[4];
+	dirOverGndHrmat[2] = 0;
 
 	if (gps_nav_valid())
 	{
@@ -214,7 +218,7 @@ static void udb_background_callback_triggered(void)
 		location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 		location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
 		location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
-#else
+#else // USE_EXTENDED_NAV
 		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 		location[1] = accum_nav._.W0;
 		accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
@@ -231,7 +235,7 @@ static void udb_background_callback_triggered(void)
 #endif // USE_EXTENDED_NAV
 
 		// convert GPS course of 360 degrees to a binary model with 256
-		accum.WW = __builtin_muluu (COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
+		accum.WW = __builtin_muluu(COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
 		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East
 		cog_circular = -accum.__.B2 + 64;
 
@@ -251,11 +255,13 @@ static void udb_background_callback_triggered(void)
 
 			location_deltaXY.x = location[0] - location_previous[0];
 			location_deltaXY.y = location[1] - location_previous[1];
-			location_deltaZ = location[2] - location_previous[2];
+			location_deltaZ    = location[2] - location_previous[2];
 		}
 		else
 		{
-			cog_delta = sog_delta = climb_rate_delta = 0;
+			cog_delta = 0;
+			sog_delta = 0;
+			climb_rate_delta = 0;
 			location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0;
 		}
 		dcm_flags._.gps_history_valid = 1;
@@ -291,12 +297,12 @@ static void udb_background_callback_triggered(void)
 		velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
 
 #if (HILSIM == 1)
-		air_speed_3DGPS = as_sim.BB; // use Xplane as a pitot
+		air_speed_3DGPS = hilsim_airspeed.BB; // use Xplane as a pitot
 #else
 		air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
 #endif
 
-		calculated_heading  = rect_to_polar(&velocity_thru_air);
+		calculated_heading = rect_to_polar(&velocity_thru_air);
 		// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
 		air_speed_magnitudeXY = velocity_thru_air.x; // in cm / sec
 
@@ -323,9 +329,9 @@ static void udb_background_callback_triggered(void)
 	else
 	{
 		gps_data_age = GPS_DATA_MAX_AGE+1;
-		dirovergndHGPS[0] = dirovergndHRmat[0];
-		dirovergndHGPS[1] = dirovergndHRmat[1];
-		dirovergndHGPS[2] = 0;
+		dirOverGndHGPS[0] = dirOverGndHrmat[0];
+		dirOverGndHGPS[1] = dirOverGndHrmat[1];
+		dirOverGndHGPS[2] = 0;
 		dcm_flags._.yaw_req = 1;            // request yaw drift correction
 		dcm_flags._.gps_history_valid = 0;  // gps history has to be restarted
 	}
@@ -337,22 +343,29 @@ static uint8_t day_of_week;
 
 int16_t calculate_week_num(int32_t date)
 {
+	uint8_t year;
+	uint8_t month;
+	int16_t day;
+	uint8_t m;
+	uint8_t y;
+	int16_t c;
+	
 //	DPRINT("date %li\r\n", date);
 
 	// Convert date from DDMMYY to week_num and day_of_week
-	uint8_t year = date % 100;
+	year = date % 100;
 	date /= 100;
-	uint8_t month = date % 100;
+	month = date % 100;
 	date /= 100;
-	int16_t day = date % 100;
+	day = date % 100;
 
 	// Wait until we have real date data
 	if (day == 0 || month == 0) return 0;
 
 	// Begin counting at May 1, 2011 since this 1st was a Sunday
-	uint8_t m = 5;                          // May
-	uint8_t y = 11;                         // 2011
-	int16_t c = 0;                          // loop counter
+	m = 5;                          // May
+	y = 11;                         // 2011
+	c = 0;                          // loop counter
 
 	while (m < month || y < year)
 	{
@@ -375,16 +388,21 @@ int16_t calculate_week_num(int32_t date)
 
 int32_t calculate_time_of_week(int32_t time)
 {
+	int16_t ms;
+	uint8_t s;
+	uint8_t m;
+	uint8_t h;
+	
 //	DPRINT("time %li\r\n", time);
 
 	// Convert time from HHMMSSmil to time_of_week in ms
-	int16_t ms = time % 1000;
+	ms = time % 1000;
 	time /= 1000;
-	uint8_t s = time % 100;
+	s = time % 100;
 	time /= 100;
-	uint8_t m = time % 100;
+	m = time % 100;
 	time /= 100;
-	uint8_t h = time % 100;
+	h = time % 100;
 	time = (((((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms;
 	return (time + (((int32_t)day_of_week) * MS_PER_DAY));
 }

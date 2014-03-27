@@ -53,9 +53,15 @@
 #include "../libDCM/rmat.h" // Needed for access to internal DCM value
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../MatrixPilot/euler_angles.h"
+#include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
+#include "parameter_table.h"
+#include "telemetry_log.h"
+#include "euler_angles.h"
+#include "navigate.h"
+#include "config.h"
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
@@ -88,6 +94,7 @@ mavlink_status_t r_mavlink_status;
 #include "../MAVLink/include/matrixpilot/testsuite.h"
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
+mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 
 #define	SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
 #define	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Convert 16 bit byte circular to radians
@@ -121,12 +128,13 @@ inline void preflight_storage_complete_callback(boolean success);
 
 void init_mavlink(void)
 {
+	int16_t index;
+
 	mavlink_process_message_handle = register_event_p(&handleMessage, EVENT_PRIORITY_MEDIUM);
 	mavlink_system.sysid = MAVLINK_SYSID; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1; // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
 
 	// Fill stream rates array with zeros to default all streams off;
-	int16_t index;
 	for (index = 0; index < MAV_DATA_STREAM_ENUM_END; index++)
 		streamRates[index] = 0;
 
@@ -142,7 +150,7 @@ void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
-#warning SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink
+#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();
@@ -166,17 +174,25 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)
 // Note: Channel Number, chan, is currently ignored.
 {
+	int16_t start_index;
+	int16_t remaining;
+
+#if (USE_TELELOG == 1)
+//printf("calling log_telemetry with %u bytes\r\n", len);
+	log_telemetry(buf, len);
+#endif // USE_TELELOG
+
 	// Note at the moment, all channels lead to the one serial port
 	if (serial_interrupt_stopped == 1)
 	{
 		sb_index = 0;
 		end_index = 0;
 	}
-	int16_t start_index = end_index;
-	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
+	start_index = end_index;
+	remaining = SERIAL_BUFFER_SIZE - start_index;
 
 //	printf("%u\r\n", remaining);
 
@@ -254,6 +270,7 @@ void mp_mavlink_transmit(uint8_t ch)
 void send_text(uint8_t text[])
 {
 	uint16_t index = 0;
+
 	while (text[index++] != 0 && index < 80)
 	{
 		; // Do nothing, just measuring the length of the text
@@ -569,7 +586,7 @@ static void handleMessage(void)
 			DPRINT("MAVLINK_MSG_ID_SET_MODE %u\r\n", handle_msg->msgid);
 			break;
 		default:
-			DPRINT("handle_msg->msgid %u\r\n", handle_msg->msgid);
+			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
 			break;
 	} // end switch
 	handling_of_message_completed = true;
@@ -710,22 +727,22 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 1;
 	if (mavlink_frequency_send(MAVLINK_RATE_HEARTBEAT, mavlink_counter_40hz + spread_transmission_load))
 	{
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+		if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 0)
 		{
 			mavlink_base_mode = MAV_MODE_MANUAL_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL;
 		}
-		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+		else if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 1)
 		{
 			mavlink_base_mode = MAV_MODE_GUIDED_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_STABILIZE;
 		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
+		else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		{
 			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_AUTONOMOUS;
 		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
+		else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		{
 			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED; // Return to Landing (lost contact with transmitter)
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_RTL;
@@ -836,8 +853,8 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 14;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_POSITION], mavlink_counter_40hz + spread_transmission_load))
 	{
-		mavlink_heading = get_geo_heading_angle();
 		int16_t pwOut_max = 4000;
+		mavlink_heading = get_geo_heading_angle();
 		if (THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000;
 		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, (float)(air_speed_3DIMU / 100.0), (float)(ground_velocity_magnitudeXY / 100.0), (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),

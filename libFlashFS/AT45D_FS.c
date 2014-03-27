@@ -23,6 +23,9 @@
 #include "Compiler.h"
 #include "GenericTypeDefs.h"
 #include "FSconfig.h"
+
+#ifdef USE_AT45D_FLASH
+
 #include "AT45D.h"
 #include "MDD_AT45D.h"
 
@@ -152,3 +155,5 @@ void AT45D_FormatFS(void)
 	}
 	printf("AT45D_FormatFS() complete\r\n");
 }
+
+#endif // USE_AT45D_FLASH

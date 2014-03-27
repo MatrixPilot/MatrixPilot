@@ -21,6 +21,8 @@
 
 #include "defines.h"
 #include "navigate.h"
+#include "behaviour.h"
+#include "../libCntrl/cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include <stdlib.h>
@@ -85,9 +87,9 @@ static struct relWaypointDef wp_to_relative(struct waypointDef wp)
 //struct relWaypointDef wp_to_absolute(struct waypointDef wp)
 
 //struct waypoint3D wp_to_absolute(struct waypointDef wp)
-static vect3D_32 wp_to_absolute_coords(struct waypointDef wp)
+static vect3_32t wp_to_absolute_coords(struct waypointDef wp)
 {
-	vect3D_32 v;
+	vect3_32t v;
 
 	if (wp.flags & F_ABSOLUTE)
 	{
@@ -106,6 +108,11 @@ static vect3D_32 wp_to_absolute_coords(struct waypointDef wp)
 }
 
 
+void init_waypoints(void)
+{
+//	load_flightplan(waypoints, NUMBER_POINTS);
+}
+
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
 void init_flightplan(int16_t flightplanNum)
@@ -122,19 +129,19 @@ void init_flightplan(int16_t flightplanNum)
 	}
 	waypointIndex = 0;
 	current_waypoint = wp_to_relative(currentWaypointSet[0]);
-	set_goal(GPSlocation, current_waypoint.loc);
+	navigate_set_goal(GPSlocation, current_waypoint.loc);
 	set_camera_view(current_waypoint.viewpoint);
 	setBehavior(current_waypoint.flags);
 	// udb_background_trigger();    // trigger navigation immediately
 }
 
 //struct waypoint3D getWaypoint3D(uint16_t wp)
-vect3D_32 getWaypoint3D(uint16_t wp)
+vect3_32t getWaypoint3D(uint16_t wp)
 {
 //struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
 //	struct waypoint3D = currentWaypointSet[wp].loc;
 
-	vect3D_32 v;
+	vect3_32t v;
 	v = wp_to_absolute_coords(currentWaypointSet[wp]);
 	return v;
 
@@ -150,11 +157,11 @@ boolean use_fixed_origin(void)
 #endif
 }
 
-struct absolute3D get_fixed_origin(void)
+vect3_32t get_fixed_origin(void)
 {
 	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
 
-	struct absolute3D standardizedOrigin;
+	vect3_32t standardizedOrigin;
 	standardizedOrigin.x = origin.x;
 	standardizedOrigin.y = origin.y;
 	standardizedOrigin.z = (int32_t)(origin.z * 100);
@@ -189,13 +196,13 @@ static void next_waypoint(void)
 			{
 				struct relWaypointDef previous_waypoint = wp_to_relative(currentWaypointSet[numPointsInCurrentSet-1]);
 				current_waypoint  = wp_to_relative(currentWaypointSet[0]);
-				set_goal(previous_waypoint.loc, current_waypoint.loc);
+				navigate_set_goal(previous_waypoint.loc, current_waypoint.loc);
 				set_camera_view(current_waypoint.viewpoint);
 			}
 			else
 			{
 				current_waypoint = wp_to_relative(currentWaypointSet[0]);
-				set_goal(GPSlocation, current_waypoint.loc);
+				navigate_set_goal(GPSlocation, current_waypoint.loc);
 				set_camera_view(current_waypoint.viewpoint);
 			}
 			setBehavior(currentWaypointSet[0].flags);
@@ -204,14 +211,14 @@ static void next_waypoint(void)
 		{
 			struct relWaypointDef previous_waypoint = wp_to_relative(currentWaypointSet[waypointIndex-1]);
 			current_waypoint = wp_to_relative(currentWaypointSet[waypointIndex]);
-			set_goal(previous_waypoint.loc, current_waypoint.loc);
+			navigate_set_goal(previous_waypoint.loc, current_waypoint.loc);
 			set_camera_view(current_waypoint.viewpoint);
 			setBehavior(current_waypoint.flags);
 		}
 	}
 	else
 	{
-		set_goal(GPSlocation, current_waypoint.loc);
+		navigate_set_goal(GPSlocation, current_waypoint.loc);
 	}
 #if (DEADRECKONING == 0)
 	compute_bearing_to_goal();
@@ -224,7 +231,7 @@ void run_flightplan(void)
 	if (wp_inject_pos == WP_INJECT_READY)
 	{
 		current_waypoint = wp_to_relative(wp_inject);
-		set_goal(GPSlocation, current_waypoint.loc);
+		navigate_set_goal(GPSlocation, current_waypoint.loc);
 		set_camera_view(current_waypoint.viewpoint);
 		setBehavior(current_waypoint.flags);
 		compute_bearing_to_goal();
@@ -242,7 +249,7 @@ void run_flightplan(void)
 	
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - goal.height) < ((int16_t)HEIGHT_MARGIN))
+		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t)HEIGHT_MARGIN))
 		{
 			next_waypoint();
 		}
@@ -253,7 +260,7 @@ void run_flightplan(void)
 		{
 			if (desired_behavior._.loiter)
 			{
-				set_goal(GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc);
+				navigate_set_goal(GPSlocation, wp_to_relative(currentWaypointSet[waypointIndex]).loc);
 			}
 			else
 			{
