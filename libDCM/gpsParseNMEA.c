@@ -25,7 +25,7 @@
 
 #if (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)
 
-#define DEBUG_NMEA
+//#define DEBUG_NMEA
 
 #ifdef DEBUG_NMEA
 static uint16_t RMCpos = 0;
@@ -56,7 +56,7 @@ void debug_gga(uint8_t ch)
 }
 #else
 #define debug_rmc(a)
-#define debug_rmc_send(int8_t ch)
+#define debug_rmc_send(a)
 #define debug_gga(a)
 #endif
 
@@ -126,7 +126,6 @@ static uint8_t svs_;
 static uint8_t data_valid_, NS_, EW_;
 //static uint8_t hdop_;
 //static uint8_t day_of_week;
-static union longbbbb last_alt;
 
 //union longbbbb tow_;
 //union longbbbb date_gps_, time_gps_;
@@ -149,7 +148,7 @@ void gps_startup_sequence(int16_t gpscount)
 		udb_gps_set_rate(DEFAULT_GPS_BAUD);
 		#else
 		udb_gps_set_rate(38400);
-		#warning "Default GPS BAUD not specified, now set at 38400"
+#pragma warning "Default GPS BAUD not specified, now set at 38400"
 		#endif
 	}
 	else if (gpscount == 50)
@@ -243,8 +242,8 @@ static void gps_id3(uint8_t gpschar)
 	{
 		gga_counter = 1;                    // Next gga message after the comma
 		msg_parse = &gps_comma;             // A comma ',' is expected now	
-		GGApos = 6;
 #ifdef DEBUG_NMEA
+		GGApos = 6;
 //	msg_parse = &msg_start;
 		strcpy(debug_GGA, "$GPGGA");
 #endif
@@ -622,7 +621,7 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 #ifdef DEBUG_NMEA
 				debug_rmc_send(gpschar);
 #endif
-				udb_background_trigger();   // parsing is complete, schedule navigation
+				gps_parse_common();         // parsing is complete, schedule navigation
 			}
 		}
 		else
@@ -646,27 +645,40 @@ LED_RED = LED_OFF;
 
 void gps_commit_data(void)
 {
+	static union longbbbb last_alt = 0;
+
 	if (week_no.BB == 0)
 	{
 		week_no.BB = calculate_week_num(date_gps_.WW);
 	}
 	tow.WW = calculate_time_of_week(time_gps_.WW);
-
 	lat_gps      = lat_gps_;
 	lon_gps      = lon_gps_;
 	alt_sl_gps   = alt_sl_gps_;             // Altitude
 	sog_gps      = sog_gps_;                // Speed over ground
 	cog_gps      = cog_gps_;                // Course over ground
-
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
 	hdop         = hdop_._.B0;
 	svs          = svs_;
-
 	last_alt     = alt_sl_gps_;
 }
 
 void init_gps_nmea(void)
 {
 }
+
+#if (HILSIM == 1)
+void commit_bodyrate_data(void)
+{
+}
+
+void HILSIM_set_gplane(void)
+{
+}
+
+void HILSIM_set_omegagyro(void)
+{
+}
+#endif // HILSIM
 
 #endif // (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)

@@ -1,5 +1,4 @@
 Authors of MatrixPilot:
-
 Bill Premerlani
 Ben Levitt
 Peter Hollands
@@ -8,3 +7,4 @@ Matthew Coleman
 Robert Dickenson
 Mark Whitehorn
 Tom Pittenger
+Nick Arsov

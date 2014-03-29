@@ -25,7 +25,7 @@
 
 	; Local inclusions.
 	.nolist
-	.include	"dspcommon.inc"		; fractsetup
+	.include "dspcommon.inc"    ; fractsetup
 	.list
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -42,7 +42,7 @@
 ; Input:
 ;	w0 = number rows in source matrix (numRows)
 ;	w1 = number cols in source matrix (numCols)
-;		(NOTE: numRows*numCols < 2^14)
+;	    (NOTE: numRows*numCols < 2^14)
 ;	w2 = ptr to destination matrix (dstM)
 ;	w3 = ptr to source one matrix (srcM1)
 ;	w4 = ptr to source two matrix (srcM2)
@@ -50,10 +50,10 @@
 ;	w0 = ptr to destination matrix (dstM)
 ;
 ; System resources usage:
-;	{w0..w4}	used, not restored
-;	 AccuA		saved, used, restored
-;	 CORCON		saved, used, restored
-;	 DO			saved, used, restored
+;	{w0..w4}    used, not restored
+;	 AccuA      saved, used, restored
+;	 CORCON     saved, used, restored
+;	 DO         saved, used, restored
 ;
 ; DO and REPEAT instruction usage.
 ;	1 level DO instruction
@@ -66,86 +66,86 @@
 ;	20 + 3*(numRows*numCols)
 ;............................................................................
 
-	.global	_MatrixAdd	; export
+	.global _MatrixAdd  ; export
 _MatrixAdd:
 
 ;	save the 40 bit A accumulator
-	push	ACCAL
-	push	ACCAH
-	push	ACCAU
+	push    ACCAL
+	push    ACCAH
+	push    ACCAU
 
 ;............................................................................
 
 	; Prepare operation.
-	mul.uu	w0,w1,w0			; w0 = numRows*numCols
-						; w1 available for reuse
-	dec	w0,w0				; w0 = num elements-1
+	mul.uu  w0,w1,w0    ; w0 = numRows*numCols
+	                    ; w1 available for reuse
+	dec	w0,w0           ; w0 = num elements-1
 
 ;............................................................................
 
 	; Prepare CORCON for fractional computation.
-	push	CORCON
-	fractsetup	w1
+	push    CORCON
+	fractsetup  w1
 
 ;............................................................................
 
-	mov	w2,w1				; save return value (dstV)
+	mov     w2,w1       ; save return value (dstV)
 
 ;............................................................................
 
 ;	save the do loop registers
-	push	DCOUNT
-	push	DOSTARTL
-	push	DOSTARTH
-	push	DOENDL
-	push	DOENDH
+	push    DCOUNT
+	push    DOSTARTL
+	push    DOSTARTH
+	push    DOENDL
+	push    DOENDH
 
 	; Perform operation.
-	do	w0,_endAdd		; {	; do (num elems-1)+1 times
+	do      w0,_endAdd  ; { ; do (num elems-1)+1 times
 .ifdef PSV_ERRATA
-	mov	[w3++],w5
-	lac	w5,a			; a  = srcM1[r][c]
-						; w3-> srcM1[r][c+1]
-	mov	[w4++],w5
-	add	w5,a			; a += srcM2[r][c]
-						; w4-> srcM2[r][c+1]
+	mov     [w3++],w5
+	lac     w5,a        ; a  = srcM1[r][c]
+	                    ; w3-> srcM1[r][c+1]
+	mov     [w4++],w5
+	add     w5,a        ; a += srcM2[r][c]
+	                    ; w4-> srcM2[r][c+1]
 .else
-	lac	[w3++],a			; a  = srcM1[r][c]
-						; w3-> srcM1[r][c+1]
-	add	[w4++],a			; a += srcM2[r][c]
-						; w4-> srcM2[r][c+1]
+	lac     [w3++],a    ; a  = srcM1[r][c]
+	                    ; w3-> srcM1[r][c+1]
+	add     [w4++],a    ; a += srcM2[r][c]
+	                    ; w4-> srcM2[r][c+1]
 .endif
 _endAdd:
-	sac	a,[w2++]			; dstM[n] =
-						;    srcM1[r][c] + srcM2[r][c]
-						; w2-> dstM[r][c+1]
+	sac     a,[w2++]    ; dstM[n] =
+	                    ;    srcM1[r][c] + srcM2[r][c]
+	                    ; w2-> dstM[r][c+1]
 
 ;	restore the do loop registers
-	pop		DOENDH
-	pop		DOENDL
-	pop		DOSTARTH
-	pop		DOSTARTL
-	pop		DCOUNT
+	pop     DOENDH
+	pop     DOENDL
+	pop     DOSTARTH
+	pop     DOSTARTL
+	pop     DCOUNT
 
 ; }
 
 ;............................................................................
 
-	mov	w1,w0				; restore return value
+	mov     w1,w0       ; restore return value
 
 ;............................................................................
 
 	; restore CORCON.
-	pop	CORCON
+	pop     CORCON
 
 ;............................................................................
 
 ;	restore the 40 bit A accumulator
-	pop		ACCAU
-	pop		ACCAH
-	pop		ACCAL
+	pop     ACCAU
+	pop     ACCAH
+	pop     ACCAL
 
-	return	
+	return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

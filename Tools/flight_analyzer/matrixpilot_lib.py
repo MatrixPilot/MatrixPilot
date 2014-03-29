@@ -45,16 +45,20 @@ class raw_mavlink_telemetry_file:
                 pass
             else :  # We have a good mavlink packet
                 self.track_dropped_packets(self.msg.get_seq())
+                #print self.msg.get_seq()
                 if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
                         self.last_F2_A_msg = self.msg
                         self.SUE_F2_A_needs_printing = True
                         continue
                 elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
                         try:
-                            if self.msg.sue_time >= self.last_F2_A_msg.sue_time : #A and B halves of message are a pair
-                                self.last_F2_A_msg.sue_time = self.msg.sue_time
+                            if self.msg.sue_time >= (self.last_F2_A_msg.sue_time - 250) : #A and B halves of message are a pair
+                                # Note for above: -250 is because time can go backwards by 1/4 of a second in MP when GPS updates.
+                                # self.last_F2_A_msg.sue_time = self.msg.sue_time
                                 return self.msg 
                             else:
+                                #print self.msg.get_seq(),"DEBUG F2_B without F2_A:", self.msg.get_type()
+                                #print "F2 A Time",self.last_F2_A_msg.sue_time,"F2_B",self.msg.sue_time
                                 pass
                         except:
                             # If the above python fails, it could be because the first F2_B message
@@ -69,6 +73,7 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
+                            #print self.msg.get_seq(),"DEBUG: ", self.msg.get_type()
                             return self.msg                
                 else :
                         #print "Ignoring non SUE MAVLink message", self.msg.get_type()
@@ -83,9 +88,10 @@ class raw_mavlink_telemetry_file:
     
     def track_dropped_packets(self,seq) :
         self.total_mavlink_packets_received += 1
-        # print seq
+        #print "Debug printout of sequence number:" seq
         if (self.first_packet_flag == True) :
             self.last_seq = seq
+            self.first_packet_flag = False
             return
         else :
             # Mavlink seqence numbers are modulo 255
@@ -93,18 +99,19 @@ class raw_mavlink_telemetry_file:
                 print "Error: Mavlink packet sequence number greater than 255"
                 return
             elif ( seq == 0 )and ( self.last_seq == 255) :
-                self.last_seq = seq
-                return
+                pass # All ok as modulo 255 rollover to 0
             elif (seq == self.last_seq + 1 ) :
-                self.last_seq = seq
-                return
+                pass # All ok as expect sequence number to increment
             else : # We have dropped packets
                 if ( seq > self.last_seq ): # most likely case
                     self.dropped_mavlink_packets += seq - self.last_seq
+                    print "packets dropped A: ", seq-self.last_seq
                 elif (self.last_seq > seq): # assumes no more than 255 packets drop in one go
                     self.dropped_mavlink_packets += (255 - self.last_seq )+ seq
+                    print "packets dropped B: ", (255 - self.last_seq )+ seq
                 elif (self.last_seq == seq) :
                     self.dropped_mavlink_packets += 255 # best guess
+                    print "packets dropped C: Seq:", self.msg.get_seq(),"Inferring 255 packets dropped"
             self.last_seq = seq
             return
         
@@ -230,7 +237,7 @@ class mavlink_telemetry(base_telemetry):
                         print "Executing code for GPS weekly seconds rollover"
                         self.tm = self.tm_actual + max_tm_actual
                 elif (self.tm_actual < max_tm_actual) :
-                        self.tm = max_tm_actual
+                        self.tm = max_tm_actual +150
                         # takes account of occassional time entry which precedes time of previous entry.
                         # This can happen when EM406A first starts up near beginning of telemetry.
                         # It is caused by a synchronisation issue between GPS time, and synthesized time

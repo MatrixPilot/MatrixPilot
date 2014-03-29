@@ -23,7 +23,8 @@
 #include "config.h"
 #include <stdio.h>
 
-#include "airspeedCntrl.h"
+#include "navigate.h"
+#include "../libCntrl/airspeedCntrl.h"
 
 #if (USE_CONFIGFILE == 1)
 
@@ -33,16 +34,16 @@ union config_word config;
 struct gains_variables gains;
 union network_module_word nw_mod;
 
-const char* strConfigFile = "config.ini";
-const char* strNetwork = "NETWORK";
-const char* strStabilise = "STABILISE";
-const char* strNavigation = "NAVIGATION";
-const char* strRoll = "ROLL";
-const char* strPitch = "PITCH";
-const char* strYaw = "YAW";
-const char* strAltitude = "ALTITUDE";
-const char* strRTL = "RTL";
-const char* strHover = "HOVER";
+static const char* strConfigFile = "config.ini";
+static const char* strNetwork = "NETWORK";
+static const char* strStabilise = "STABILISE";
+static const char* strNavigation = "NAVIGATION";
+static const char* strRoll = "ROLL";
+static const char* strPitch = "PITCH";
+static const char* strYaw = "YAW";
+static const char* strAltitude = "ALTITUDE";
+static const char* strRTL = "RTL";
+static const char* strHover = "HOVER";
 
 char address[16];
 char gateway[16];
@@ -58,7 +59,7 @@ int   ini_getkey(const mTCHAR *Section, int idx, mTCHAR *Buffer, int BufferSize,
 INI_REAL ini_getf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL DefValue, const mTCHAR *Filename);
  */
 
-void load_network(void)
+static void load_network(void)
 {
 	int port = 0;
 	int result;
@@ -92,7 +93,11 @@ void load_network(void)
 #endif
 }
 
-void load_settings(void)
+static void load_settings(void)
+{
+}
+
+static void save_settings(void)
 {
 }
 
@@ -120,7 +125,7 @@ pilot = "Not Defined"
 url = "http://www.diydrones.com"
  */
 
-void load_config(void)
+static void load_config(void)
 {
 /*
 	config._.RollStabilizaionAilerons = ROLL_STABILIZATION_AILERONS;
@@ -158,7 +163,7 @@ stabilised = 1
 waypoint = 1
  */
 
-void load_gains(void)
+static void load_gains(void)
 {
 /*
 	gains.YawKPAileron = YAWKP_AILERON;
@@ -232,7 +237,60 @@ void load_gains(void)
     gains.HoverYawOffset = ini_getf(strHover, "yaw", HOVER_YAW_OFFSET, strConfigFile);
     gains.HoverPitchTowardsWP = ini_getf(strHover, "wp", HOVER_PITCH_TOWARDS_WP, strConfigFile);
     gains.HoverNavMaxPitchRadius = ini_getf(strHover, "radius", HOVER_NAV_MAX_PITCH_RADIUS, strConfigFile);
+}
 
+//INI_REAL ini_getf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL DefValue, const mTCHAR *Filename);
+//int      ini_putf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL Value,    const mTCHAR *Filename);
+
+static void save_gains(void)
+{
+// Aileron/Roll Control Gains
+	ini_putf(strRoll, "rollkp", gains.RollKP, strConfigFile);
+	ini_putf(strRoll, "rollkd", gains.RollKD, strConfigFile);
+	ini_putf(strRoll, "yawkp", gains.YawKPAileron, strConfigFile);
+	ini_putf(strRoll, "yawkd", gains.YawKDAileron, strConfigFile);
+	ini_putf(strRoll, "boost", gains.AileronBoost, strConfigFile);
+
+// Elevator/Pitch Control Gains
+	ini_putf(strPitch, "gain", gains.Pitchgain, strConfigFile);
+	ini_putf(strPitch, "pitchkd", gains.PitchKD, strConfigFile);
+	ini_putf(strPitch, "rudder", gains.RudderElevMix, strConfigFile);
+	ini_putf(strPitch, "roll", gains.RollElevMix, strConfigFile);
+	ini_putf(strPitch, "boost", gains.ElevatorBoost, strConfigFile);
+	// = ini_putf(strPitch, "invert", gains.INVERTED_NEUTRALPitch, strConfigFile);
+
+// Rudder/Yaw Control Gains
+	ini_putf(strYaw, "yawkp", gains.YawKPRudder, strConfigFile);
+	ini_putf(strYaw, "yawkd", gains.YawKDRudder, strConfigFile);
+	ini_putf(strYaw, "rollkp", gains.RollKPRudder, strConfigFile);
+	ini_putf(strYaw, "rollkd", gains.RollKDRudder, strConfigFile);
+	// = ini_putf(strYaw, "mix", gains.MANUAL_AILERON_Rudder_MIX, strConfigFile);
+	ini_putf(strYaw, "boost", gains.RudderBoost, strConfigFile);
+
+// Altitude Hold
+	ini_putf(strAltitude, "height_max", gains.HeightTargetMax, strConfigFile);
+	ini_putf(strAltitude, "height_min", gains.HeightTargetMin, strConfigFile);
+	ini_putf(strAltitude, "throt_min", gains.AltHoldThrottleMin, strConfigFile);
+	ini_putf(strAltitude, "throt_max", gains.AltHoldThrottleMax, strConfigFile);
+	ini_putf(strAltitude, "pitch_min", gains.AltHoldPitchMin, strConfigFile);
+	ini_putf(strAltitude, "pitch_max", gains.AltHoldPitchMax, strConfigFile);
+	ini_putf(strAltitude, "pitch_high", gains.AltHoldPitchHigh, strConfigFile);
+	// = ini_getl(strAltitude, "margin", gains.Height_MARGIN, strConfigFile);
+
+// Return To Launch Pitch Down
+	ini_putf(strRTL, "pitch", gains.RtlPitchDown, strConfigFile);
+
+// Hover
+	ini_putf(strHover, "rollkp", gains.HoverRollKP, strConfigFile);
+	ini_putf(strHover, "rollkd", gains.HoverRollKD, strConfigFile);
+	ini_putf(strHover, "gain", gains.HoverPitchGain, strConfigFile);
+	ini_putf(strHover, "pitchkd", gains.HoverPitchKD, strConfigFile);
+	ini_putf(strHover, "pitch", gains.HoverPitchOffset, strConfigFile);
+	ini_putf(strHover, "yawkp", gains.HoverYawKP, strConfigFile);
+	ini_putf(strHover, "yawkd", gains.HoverYawKD, strConfigFile);
+	ini_putf(strHover, "yaw", gains.HoverYawOffset, strConfigFile);
+	ini_putf(strHover, "wp", gains.HoverPitchTowardsWP, strConfigFile);
+	ini_putf(strHover, "radius", gains.HoverNavMaxPitchRadius, strConfigFile);
 }
 
 #endif // USE_CONFIGFILE
@@ -255,9 +313,28 @@ void init_config(void)
 	init_altitudeCntrlVariable();
 }
 
+void save_config(void)
+{
+#if (USE_CONFIGFILE == 1)
+	save_yawCntrl();
+	save_rollCntrl();
+	save_pitchCntrl();
+
+	save_navigation();
+//	save_airspeedCntrl();
+#if (ALTITUDE_GAINS_VARIABLE == 1)
+	save_altitudeCntrlVariable();
+#else
+	save_altitudeCntrl();
+#endif
+
+	save_settings();
+	save_gains();
+#endif // USE_CONFIGFILE
+}
+
 /*
 int   ini_putl(const mTCHAR *Section, const mTCHAR *Key, long Value, const mTCHAR *Filename);
 int   ini_puts(const mTCHAR *Section, const mTCHAR *Key, const mTCHAR *Value, const mTCHAR *Filename);
 int   ini_putf(const mTCHAR *Section, const mTCHAR *Key, INI_REAL Value, const mTCHAR *Filename);
  */
-

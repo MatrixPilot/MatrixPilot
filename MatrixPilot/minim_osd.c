@@ -20,8 +20,10 @@
 
 
 #include "defines.h"
+#include "flightplan.h"
 #include "../libDCM/libDCM_internal.h"
 #include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/osd.h"
 #include "osd_config.h"
@@ -33,8 +35,6 @@
 
 #include <string.h>
 #include "osd_layout_remzibi.h"
-
-extern int16_t waypointIndex;
 
 static int16_t telemetry_counter = 0;
 
@@ -134,7 +134,7 @@ static void update_wp(void)
 	int16_t dir_to_goal = desired_dir - earth_yaw;
 
 	// wp_target_bearing, wp_dist, wp_number
-	serial_output("$M,%li,%li,%i,\r\n", dir_to_goal, abs(tofinish_line), waypointIndex); 
+	serial_output("$M,%li,%li,%i,\r\n", dir_to_goal, abs(tofinish_line), flightplan_index_get()); 
 }
 
 static void serial_show_AH(void)

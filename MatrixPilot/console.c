@@ -20,6 +20,10 @@
 
 
 #include "defines.h"
+#include "MDD File System/FSIO.h"
+#include "MDD File System/FSDefs.h"
+
+#include "ymodem.h"
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
@@ -34,8 +38,6 @@
 
 #if (CONSOLE_UART != 0)
 
-extern int __C30_UART;
-
 #define LOWORD(a) ((WORD)(a))
 #define HIWORD(a) ((WORD)(((DWORD)(a) >> 16) & 0xFFFF))
 
@@ -43,7 +45,7 @@ void AT45D_FormatFS(void);
 
 typedef struct tagCmds {
 	int index;
-	void (*fptr)(void);
+	void (*fptr)(char*);
 	const char const * cmdstr;
 } cmds_t;
 
@@ -53,64 +55,64 @@ char cmdstr[32];
 int show_cpu_load = 0;
 
 
-void cmd_ver(void)
+static void cmd_ver(char* arg)
 {
 	printf("MatrixPilot v0.1, " __TIME__ " " __DATE__ "\r\n");
 }
 
-void cmd_format(void)
+static void cmd_format(char* arg)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
-	printf("formatting dataflash\r\n");
-	AT45D_FormatFS();
+//	printf("formatting dataflash\r\n");
+//	AT45D_FormatFS();
 #endif // BOARD_TYPE
 }
 
-void cmd_start(void)
+static void cmd_start(char* arg)
 {
 	printf("starting.\r\n");
 	show_cpu_load = 1;
 }
 
-void cmd_stop(void)
+static void cmd_stop(char* arg)
 {
 	printf("stopped.\r\n");
 	show_cpu_load = 0;
 }
 
-void cmd_on(void)
+static void cmd_on(char* arg)
 {
 	printf("on.\r\n");
 	SRbits.IPL = 0; // turn on all interrupt priorities
 }
 
-void cmd_off(void)
+static void cmd_off(char* arg)
 {
 	printf("off.\r\n");
 	SRbits.IPL = 7; // turn off all interrupt priorities
 }
 
-void cmd_cpuload(void)
+static void cmd_cpuload(char* arg)
 {
 	printf("CPU Load %u%%\r\n", udb_cpu_load());
 }
 
-void cmd_crash(void)
+static void cmd_crash(char* arg)
 {
 	static int i;
 	char buffer[32];
 
 	sprintf(buffer, "overflowing stack %u.\r\n", i++);
 	printf(buffer);
-	cmd_crash();
+	cmd_crash(arg);
 }
 
-void cmd_adc(void)
+static void cmd_adc(char* arg)
 {
 //	printf("ADC vcc %u, 5v %u, rssi %u\r\n", udb_vcc.value, udb_5v.value, udb_rssi.value);
 }
 
-void cmd_barom(void)
+static void cmd_barom(char* arg)
 {
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
 	       get_barometer_temperature(),
@@ -120,11 +122,11 @@ void cmd_barom(void)
 	      );
 }
 
-void cmd_magno(void)
+static void cmd_magno(char* arg)
 {
 }
 
-void cmd_options(void)
+static void cmd_options(char* arg)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", ROLL_STABILIZATION_AILERONS);
@@ -140,7 +142,7 @@ void cmd_options(void)
 #endif
 }
 
-void cmd_gains(void)
+static void cmd_gains(char* arg)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("YAWKP_AILERON: %f\r\n", (double)gains.YawKPAileron);
@@ -169,7 +171,7 @@ void cmd_gains(void)
 #endif
 }
 
-void printbin16(int a)
+static void printbin16(int a)
 {
 	unsigned int i;
 	for (i = 0x8000; i > 0; i >>= 1) {
@@ -178,7 +180,7 @@ void printbin16(int a)
 	}
 }
 
-const char *byte_to_binary(int x)
+const char* byte_to_binary(int x)
 {
 	static char b[9];
 	int z;
@@ -190,7 +192,7 @@ const char *byte_to_binary(int x)
 	return b;
 }
 
-const char *word_to_binary(int x)
+const char* word_to_binary(int x)
 {
 	static char b[17];
 	unsigned int z;
@@ -204,12 +206,12 @@ const char *word_to_binary(int x)
 
 void gentrap(void);
 
-void cmd_trap(void)
+static void cmd_trap(char* arg)
 {
 	gentrap();
 }
 
-void cmd_reg(void)
+static void cmd_reg(char* arg)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	printf("USB Registers:\r\n");
@@ -248,7 +250,7 @@ UxCNFG2: USB CONFIGURATION REGISTER 2
 extern uint16_t maxstack;
 #endif
 
-void cmd_stack(void)
+static void cmd_stack(char* arg)
 {
 #if (RECORD_FREE_STACK_SPACE == 1)
 	printf("maxstack %x\r\n", maxstack);
@@ -261,21 +263,157 @@ void cmd_stack(void)
 #endif
 }
 
-void cmd_reset(void)
+static void cmd_reset(char* arg)
 {
 	asm("reset");
 }
 
-void cmd_help(void);
+static void cmd_help(char* arg);
 
 void log_close(void);
 
-void cmd_close(void)
+static void cmd_close(char* arg)
 {
 #if (USE_TELELOG == 1)
 	log_close();
 #endif
 }
+
+extern unsigned long ymodem_receive(unsigned char *buf, unsigned long length);
+extern unsigned long ymodem_send(unsigned char *buf, unsigned long size, char* filename);
+
+static void cmd_send(char* arg)
+{
+#if (USE_YMODEM == 1)
+	unsigned char* buf;
+	unsigned long length;
+	unsigned long result;
+
+	result = ymodem_receive(buf, length);
+#endif
+}
+
+static void cmd_receive(char* arg)
+{
+#if (USE_YMODEM == 1)
+	unsigned char* buf;
+	unsigned long size;
+	char* filename;
+	unsigned long result;
+
+	result = ymodem_send(buf, size, filename);
+#endif
+}
+/*
+// Summary: A structure used for searching for files on a device.
+// Description: The SearchRec structure is used when searching for file on a device.  It contains parameters that will be loaded with
+//              file information when a file is found.  It also contains the parameters that the user searched for, allowing further
+//              searches to be perfomed in the same directory for additional files that meet the specified criteria.
+typedef struct
+{
+    char            filename[FILE_NAME_SIZE_8P3 + 2];   // The name of the file that has been found
+    unsigned char   attributes;                     // The attributes of the file that has been found
+    unsigned long   filesize;                       // The size of the file that has been found
+    unsigned long   timestamp;                      // The last modified time of the file that has been found (create time for directories)
+	#ifdef SUPPORT_LFN
+		BOOL			AsciiEncodingType;          // Ascii file name or Non-Ascii file name indicator
+		unsigned short int *utf16LFNfound;		    // Pointer to long file name found in UTF16 format
+		unsigned short int utf16LFNfoundLength;     // LFN Found length in terms of words including the NULL word at the last.
+	#endif
+    unsigned int    entry;                          // The directory entry of the last file found that matches the specified attributes. (Internal use only)
+    char            searchname[FILE_NAME_SIZE_8P3 + 2]; // The 8.3 format name specified when the user began the search. (Internal use only)
+    unsigned char   searchattr;                     // The attributes specified when the user began the search. (Internal use only)
+    unsigned long   cwdclus;                        // The directory that this search was performed in. (Internal use only)
+    unsigned char   initialized;                    // Check to determine if the structure was initialized by FindFirst (Internal use only)
+} SearchRec;
+ */
+static void cmd_dir(char* arg)
+{
+#if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
+	SearchRec rec;
+	char* fileName = "*.*";
+
+//int FindFirst(const char* fileName, unsigned int attr, SearchRec* rec);
+//int FindNext(SearchRec* rec); 
+
+	if (arg != NULL) {
+		fileName = arg;
+	}
+	if (FindFirst(fileName, ATTR_MASK, &rec) != -1) {
+		do {
+			printf("%s\r\n", rec.filename);
+		} while (FindNext(&rec) != -1);
+	}
+#endif
+}
+
+//size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
+static void cmd_cat(char* arg)
+{
+#if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
+	char buf[2];
+	FSFILE* fp;
+
+	printf("cmd_cat(%s)\r\n", arg);
+
+	fp = FSfopen(arg, "r");
+	if (fp != NULL) {
+		while (FSfread(buf, 1, sizeof(char), fp) == 1) {
+			printf("%c", buf[0]);
+		}
+		FSfclose(fp);
+	}
+#endif
+}
+
+double gcdist(double lat1, double lon1, double lat2, double lon2);
+
+double gcdist(double lat1, double lon1, double lat2, double lon2) // Compute distance from [lat1,lon1] to [lat2,lon2]
+{
+	double result;
+
+//	double pow(double, double);
+//	double p1, p2;
+
+//	p1 = pow((sin((lat1 - lat2) / 2)), 2);
+//	p2 = 
+	result = 2 * asin(sqrt( pow((sin((lat1 - lat2) / 2)), 2) + cos(lat1) * cos(lat2) * pow((sin((lon1 - lon2) / 2)), 2)));
+	return result;
+}
+
+//	  radians = degrees * 3.1415926 / 180;
+
+static void cmd_nav(char* arg)
+{
+	double lat1 = -0.025244442;
+	double lon1 = 1.892460508;
+	double lat2 = -0.645946356;
+	double lon2 = -3.052929928;
+	double dist;
+
+	dist = gcdist(lat1, lon1, lat2, lon2);
+	printf("lat1 %f lon1 %f lat2 %f lon2 %f\r\n", lat1, lon1, lat2, lon2);
+	printf("gcdist = %f rad\r\n", dist);
+
+	dist = dist * 180 * 60 / 3.1415926;
+	printf("gcdist = %f Nm\r\n", dist);
+}
+/*
+	deg:min:sec	rad			rad	nm
+latitude1	S1.4464	-0.025244442		distance	1.36993292	4709.482
+longitude1	W108.43	1.892460508				deg
+latitude2	S37.01	-0.645946356		bearing 1->2	4.057135924	232.4568
+longitude2	E174.92	-3.052929928		bearing 2->1	1.449270091	83.0371
+ */
+
+/*
+lat1 -0.025244 lon1 1.892460 lat2 -0.645946 lon2
+gcdist = 1.369933
+
+lat1 -0.025244 lon1 1.892460 lat2 -0.645946 lon2 -3.052930
+gcdist = 1.369933 rad
+gcdist = 4709.484375 Nm
+ */
 
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
@@ -297,9 +435,14 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_reset,  "reset" },
 	{ 0, cmd_trap,   "trap" },
 	{ 0, cmd_close,  "close" },
+	{ 0, cmd_send,   "send" },
+	{ 0, cmd_receive,"receive" },
+	{ 0, cmd_dir,    "dir" },
+	{ 0, cmd_cat,    "cat" },
+	{ 0, cmd_nav,    "nav" },
 };
 
-void cmd_help(void)
+static void cmd_help(char* arg)
 {
 	int i;
 
@@ -309,38 +452,55 @@ void cmd_help(void)
 	}
 }
 
-void command(char* cmdstr)
+static void command(char* cmdstr, int cmdlen)
 {
 	int i;
+	char* argstr = NULL;
 
+	for (i = 0; i < cmdlen; i++) {
+		if (cmdstr[i] == ' ') {
+			cmdstr[i] = '\0';
+			argstr = cmdstr + i + 1;
+		}
+	}
 	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++) {
 		if (strcmp(cmdslist[i].cmdstr, cmdstr) == 0) {
-			cmdslist[i].fptr();
+			cmdslist[i].fptr(argstr);
 		}
+	}
+}
+
+void console_inbyte(char ch)
+{
+	if (cmdlen < sizeof(cmdstr)) {
+		cmdstr[cmdlen] = ch;
+		if ((ch == '\r') || (ch == '\n')) {
+			cmdstr[cmdlen] = '\0';
+//			cmdlen = 0;
+			if (strlen(cmdstr) > 0) {
+//				putch('\r');
+				printf("\r");
+				command(cmdstr, cmdlen);
+			}
+			cmdlen = 0;
+		} else {
+//			putch(ch);
+			printf("%c", ch);
+			cmdlen++;
+		}
+	} else {
+		cmdlen = 0;
 	}
 }
 
 void console(void)
 {
+#if (CONSOLE_UART != 9)
 	if (kbhit()) {
 		char ch = getch();
-		if (cmdlen < sizeof(cmdstr)) {
-			cmdstr[cmdlen] = ch;
-			if ((ch == '\r') || (ch == '\n')) {
-				cmdstr[cmdlen] = '\0';
-				cmdlen = 0;
-				if (strlen(cmdstr) > 0) {
-					putch('\r');
-					command(cmdstr);
-				}
-			} else {
-				putch(ch);
-				cmdlen++;
-			}
-		} else {
-			cmdlen = 0;
-		}
+		console_inbyte(ch);
 	}
+#endif
 }
 
 #endif // CONSOLE_UART

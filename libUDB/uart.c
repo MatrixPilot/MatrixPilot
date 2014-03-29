@@ -19,7 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+//#include "defines.h"
+#include "libUDB_internal.h"
+
 #include "oscillator.h"
 #include "uart.h"
 
@@ -33,7 +35,9 @@
 #error CONSOLE_UART must be defined
 #endif
 
-#if (CONSOLE_UART != 0)
+extern int __C30_UART;
+
+#if (CONSOLE_UART != 0) && (CONSOLE_UART != 9)
 
 //******************************************************************************
 // Constants
@@ -114,8 +118,8 @@ char GetChar(void) \
 #define _PUTCHAR(x) \
 void PutChar(char ch) \
 { \
-	U##x##TXREG = ch; \
 	while (U##x##STAbits.TRMT == 0); \
+	U##x##TXREG = ch; \
 }
 
 #define _CLRERROR(x) \
@@ -187,12 +191,22 @@ Input: Pointer to a null terminated character string.
 Output: None.
 
 *******************************************************************************/
-void PrintString(char *str)
+void PrintString(const char *str)
 {
 	unsigned char c;
 
 	while ((c = *str++))
 		PutChar(c);
+}
+
+void Puts(const char *str)
+{
+	unsigned char c;
+
+	while ((c = *str++))
+		PutChar(c);
+//	PutChar('\r');
+//	PutChar('\n');
 }
 
 /*******************************************************************************
@@ -209,7 +223,7 @@ Input: Binary data.
 Output: None.
 
 *******************************************************************************/
-void  PutDec(unsigned char dec)
+void PutDec(unsigned char dec)
 {
 	unsigned char res;
 	unsigned char printed_already = 0;
@@ -404,6 +418,9 @@ char Hex2Char(char hex)
 
 void init_uart(void)
 {
+#if (CONSOLE_UART == 9)
+	__C30_UART = CONSOLE_UART;
+#endif
 }
 
 #endif // CONSOLE_UART

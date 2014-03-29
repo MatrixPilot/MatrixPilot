@@ -23,23 +23,14 @@
 #define DCM_DEFINES_H
 
 
-// Types
-//struct relative2D    { int16_t x; int16_t y; };
-//struct absolute2D    { int32_t x; int32_t y; };
-//struct relative3D    { int16_t x; int16_t y; int16_t z; };
-//struct relative3D_32   { int32_t x; int32_t y; int16_t z; };
-//struct absolute3D    { int32_t x; int32_t y; int32_t z; };
-//struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
-////struct waypoint3D    { int32_t x; int32_t y; int32_t z; };
-//struct fixedOrigin3D { int32_t x; int32_t y; float z; };
 #include "dcmTypes.h"
 
 struct dcm_flag_bits {
 #ifdef CATAPULT_LAUNCH_ENABLE
-	uint16_t unused                 : 3;
+	uint16_t unused                 : 2;
 	uint16_t launch_detected        : 1;
 #else
-	uint16_t unused                 : 4;
+	uint16_t unused                 : 3;
 #endif
 	uint16_t rollpitch_req          : 1;
 	uint16_t gps_history_valid      : 1;
@@ -53,6 +44,7 @@ struct dcm_flag_bits {
 	uint16_t nmea_passthrough       : 1; // only used by ublox
 	uint16_t init_finished          : 1;
 	uint16_t calib_finished         : 1;
+	uint16_t integrate_req          : 1;
 };
 
 
@@ -91,7 +83,6 @@ struct dcm_flag_bits {
 
 #define LONGDEG_2_BYTECIR   305 // = (256/360)*((256)**4)/(10**7)
 #define COURSEDEG_2_BYTECIR 466 // = (256/360)*((256)**2)/(10**2)
-#define LONGDEG_2_BYTECIR   305 // = (256/360)*((256)**4)/(10**7)
 
 #define RADPERSEC ((int64_t)5632.0/SCALEGYRO)
 // one radian per second, in AtoD/2 units

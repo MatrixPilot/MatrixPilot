@@ -23,8 +23,15 @@
 #define _UART_H_
 
 
+#ifdef USE_BLUETOOTH_UART
+#define BAUDRATEX       9600UL
+#define BRGHX           0
+#else
 #define BAUDRATEX       115200UL
 #define BRGHX           1
+#endif
+
+
 #if (BRGHX == 0)
 	#define BRG_DIVX    16
 #elif (BRGHX == 1)
@@ -33,14 +40,16 @@
 	#error Must select a valid BRGHX value
 #endif
 
+void init_uart(void);
+
 char GetBaudError(void);
 char GetChar(void);
 void PutChar(char ch);
-void Init(void);
 char IsPressed(void);
-void PrintString(char* str);
+void PrintString(const char* str);
 void PutDec(unsigned char dec);
 void PutHex(int toPrint);
+void Puts(const char *str);
 
 #if defined(__C30__) || defined(__PIC32MX__)
 void PutHexWord(unsigned int toPrint);

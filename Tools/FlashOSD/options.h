@@ -28,26 +28,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type
-// See the MatrixPilot wiki for more details on different board types.
-/*
-#ifdef UDB4
-#define BOARD_TYPE                          UDB4_BOARD
-#endif
-#ifdef UDB5
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
-#ifdef AUAV3
-#define BOARD_TYPE                          AUAV3_BOARD
-#endif
-
-#ifndef BOARD_TYPE
-#define BOARD_TYPE                          UDB5_BOARD
-#endif
- */
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
 // you actually use this since there is no automatic landing code yet, and you'd have no manual

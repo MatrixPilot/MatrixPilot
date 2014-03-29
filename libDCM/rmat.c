@@ -21,8 +21,12 @@
 
 #include "libDCM_internal.h"
 #include "mathlibNAV.h"
-#include "../libUDB/magnetometerOptions.h"
+#include "deadReckoning.h"
+#include "gpsParseCommon.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/ADchannel.h"
+#include "../libUDB/magnetometer.h"
+#include "magnetometerOptions.h"
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane
@@ -60,18 +64,6 @@ fractional spin_axis[] = { 0, 0, RMAX };
 #error Unsupported BOARD_TYPE
 #endif // BOARD_TYPE
 
-/*
-#if (BOARD_TYPE == UDB3_BOARD || BOARD_TYPE == AUAV1_BOARD || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-// Paul's gains corrected for GGAIN
-#define KPROLLPITCH 256*5
-#define KIROLLPITCH 256
-#else
-// Paul's gains:
-#define KPROLLPITCH 256*10
-#define KIROLLPITCH 256*2
-#endif
- */
-
 #define KPYAW 256*4
 //#define KIYAW 32
 #define KIYAW (1280/HEARTBEAT_HZ)
@@ -83,6 +75,12 @@ fractional spin_axis[] = { 0, 0, RMAX };
 // the body and earth coordinate systems.
 // The columns of rmat are the axis vectors of the plane,
 // as measured in the earth reference frame.
+// The rows of rmat are the unit vectors defining the body frame in the earth frame.
+// rmat therefore describes the body frame B relative to the Earth frame E
+// and in Craig's notation is represented as (B->E)R: LateX format: presupsub{E}{B}R
+// To transform a point from body frame to Earth frame, multiply from the left
+// with rmat.
+
 // rmat is initialized to the identity matrix in 2.14 fractional format
 
 #ifdef INITIALIZE_VERTICAL  // for VTOL vertical initialization
@@ -127,10 +125,10 @@ fractional gplane[] = { 0, 0, GRAVITY };
 #endif
 
 // horizontal velocity over ground, as measured by GPS (Vz = 0)
-fractional dirovergndHGPS[] = { 0, RMAX, 0 };
+fractional dirOverGndHGPS[] = { 0, RMAX, 0 };
 
 // horizontal direction over ground, as indicated by Rmatrix
-fractional dirovergndHRmat[] = { 0, RMAX, 0 };
+fractional dirOverGndHrmat[] = { 0, RMAX, 0 };
 
 // rotation angle equal to omega times integration factor:
 //fractional theta[] = { 0, 0, 0 };
@@ -140,7 +138,7 @@ fractional dirovergndHRmat[] = { 0, RMAX, 0 };
 
 // vector buffer
 static fractional errorRP[] = { 0, 0, 0 };
-fractional errorYawground[] = { 0, 0, 0 };
+static fractional errorYawground[] = { 0, 0, 0 };
 static fractional errorYawplane[]  = { 0, 0, 0 };
 
 // measure of error in orthogonality, used for debugging purposes:
@@ -153,6 +151,11 @@ static fractional declinationVector[2];
 #if (DECLINATIONANGLE_VARIABLE == 1)
 union intbb dcm_declination_angle;
 #endif
+
+void yaw_drift_reset(void)
+{
+	errorYawground[0] = errorYawground[1] = errorYawground[2] = 0; // turn off yaw drift
+}
 
 void dcm_init_rmat(void)
 {
@@ -183,17 +186,17 @@ static void VectorCross(fractional * dest, fractional * src1, fractional * src2)
 	dest[2] = crossaccum._.W1;
 }
 
-
-void read_gyros(void)
+static inline void read_gyros(void)
 {
 	// fetch the gyro signals and subtract the baseline offset, 
 	// and adjust for variations in supply voltage
 	unsigned spin_rate_over_2;
 
 #if (HILSIM == 1)
-	omegagyro[0] = q_sim.BB;
-	omegagyro[1] = p_sim.BB;
-	omegagyro[2] = r_sim.BB;
+	HILSIM_set_omegagyro();
+//	omegagyro[0] = q_sim.BB;
+//	omegagyro[1] = p_sim.BB;
+//	omegagyro[2] = r_sim.BB;
 #else
 	omegagyro[0] = XRATE_VALUE;
 	omegagyro[1] = YRATE_VALUE;
@@ -211,12 +214,13 @@ void read_gyros(void)
 	}
 }
 
-void read_accel(void)
+static inline void read_accel(void)
 {
 #if (HILSIM == 1)
-	gplane[0] = g_a_x_sim.BB;
-	gplane[1] = g_a_y_sim.BB;
-	gplane[2] = g_a_z_sim.BB;
+	HILSIM_set_gplane();
+//	gplane[0] = g_a_x_sim.BB;
+//	gplane[1] = g_a_y_sim.BB;
+//	gplane[2] = g_a_z_sim.BB;
 #else
 	gplane[0] = XACCEL_VALUE;
 	gplane[1] = YACCEL_VALUE;
@@ -240,6 +244,12 @@ void read_accel(void)
 //	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5;
 //	accelEarthFiltered[1].WW += ((((int32_t)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5;
 //	accelEarthFiltered[2].WW += ((((int32_t)accelEarth[2])<<16) - accelEarthFiltered[2].WW)>>5;
+}
+
+void udb_callback_read_sensors(void)
+{
+	read_gyros(); // record the average values for both DCM and for offset measurements
+	read_accel();
 }
 
 static int16_t omegaSOG(int16_t omega, uint16_t speed)
@@ -384,7 +394,7 @@ static void yaw_drift(void)
 		if (ground_velocity_magnitudeXY > GPS_SPEED_MIN)
 		{
 			// vector cross product to get the rotation error in ground frame
-			VectorCross(errorYawground, dirovergndHRmat, dirovergndHGPS);
+			VectorCross(errorYawground, dirOverGndHrmat, dirOverGndHGPS);
 			// convert to plane frame:
 			// *** Note: this accomplishes multiplication rmat transpose times errorYawground!!
 			MatrixMultiply(1, 3, 3, errorYawplane, errorYawground, rmat);
@@ -401,8 +411,8 @@ static void yaw_drift(void)
 #if (MAG_YAW_DRIFT == 1)
 
 fractional magFieldEarth[3];
-extern fractional udb_magFieldBody[3];
-extern fractional udb_magOffset[3];
+//extern fractional udb_magFieldBody[3];
+//extern fractional udb_magOffset[3];
 fractional rmatPrevious[9];
 fractional magFieldEarthNormalizedPrevious[3];
 fractional magAlignment[4] = { 0, 0, 0, RMAX };
@@ -548,7 +558,7 @@ static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_v
 // will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
 // Since rxMagnetometer is called  at multiples of .25 seconds, this initial
 // delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
-static int16_t mag_latency_counter = 10 - MAG_LATENCY_COUNT;
+static int16_t mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
 
 static void mag_drift(void)
 {
@@ -806,14 +816,11 @@ void output_IMUvelocity(void)
 }
  */
 
-extern void dead_reckon(void);
-extern uint16_t air_speed_3DIMU;
-
 void dcm_run_imu_step(void)
 {
 	// update the matrix, renormalize it, adjust for roll and
 	// pitch drift, and send it to the servos.
-	dead_reckon();              // in libDCM:deadReconing.c
+	dead_reckon(GPSvelocity);   // in libDCM:deadReconing.c
 	adj_accel();                // local
 	rupdate();                  // local
 	normalize();                // local

@@ -19,18 +19,22 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
+#include "deadReckoning.h"
 #include "mathlibNAV.h"
+#include "rmat.h"
 #include "../libUDB/heartbeat.h"
 
 
-// seconds
+// heartbeats
 #define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+4)
 
 // seconds
 #define DR_TIMESTEP (1.0/HEARTBEAT_HZ)
 
+// 1.0 in 0.16 format
 #define MAX16 (4.0*RMAX)
 
 // seconds
@@ -47,18 +51,21 @@
 // The factor of 16 is so that the gain is more precise.
 // There is a subsequent right shift by 4 to cancel the multiply by 16.
 
-// 1/seconds^2
+// dimensionless
 #define DR_FILTER_GAIN (int16_t)(DR_TIMESTEP*MAX16/DR_TAU)
+
+// 1/seconds
 #define ONE_OVER_TAU (uint16_t)(MAX16/DR_TAU)
 
 int16_t dead_reckon_clock = DR_PERIOD;
 
-// velocity, as estimated by the IMU
+// velocity, as estimated by the IMU: high word is cm/sec
 union longww IMUvelocityx = { 0 };
 union longww IMUvelocityy = { 0 };
 union longww IMUvelocityz = { 0 };
 
 // location, as estimated by the IMU
+// high word is meters, low word is fractional meters
 union longww IMUlocationx = { 0 };
 union longww IMUlocationy = { 0 };
 union longww IMUlocationz = { 0 };
@@ -71,15 +78,17 @@ union longww IMUintegralAccelerationz = { 0 };
 uint16_t air_speed_3DIMU = 0;
 int16_t total_energy = 0;
 
-// GPSlocation - IMUlocation
+// GPSlocation - IMUlocation: meters
 fractional locationErrorEarth[] = { 0, 0, 0 };
-// GPSvelocity - IMUvelocity
+// gps_velocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0, 0, 0 };
 
-extern int16_t errorYawground[];
-
-void dead_reckon(void)
+void dead_reckon(struct relative3D gps_velocity)
 {
+	int16_t air_speed_x, air_speed_y, air_speed_z;
+	union longww accum;
+	union longww energy;
+
 	if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
 	{
 		// integrate the accelerometers to update IMU velocity
@@ -116,7 +125,7 @@ void dead_reckon(void)
 		}
 		else  // GPS has gotten disconnected
 		{
-			errorYawground[0] = errorYawground[1] = errorYawground[2] = 0; // turn off yaw drift
+			yaw_drift_reset();
 			dcm_flags._.gps_history_valid = 0; // restart GPS history variables
 			IMUvelocityx.WW = IMUintegralAccelerationx.WW;
 			IMUvelocityy.WW = IMUintegralAccelerationy.WW;
@@ -133,9 +142,9 @@ void dead_reckon(void)
 			locationErrorEarth[1] = GPSlocation.y - IMUlocationy._.W1;
 			locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1;
 
-			velocityErrorEarth[0] = GPSvelocity.x - IMUintegralAccelerationx._.W1;
-			velocityErrorEarth[1] = GPSvelocity.y - IMUintegralAccelerationy._.W1;
-			velocityErrorEarth[2] = GPSvelocity.z - IMUintegralAccelerationz._.W1;
+			velocityErrorEarth[0] = gps_velocity.x - IMUintegralAccelerationx._.W1;
+			velocityErrorEarth[1] = gps_velocity.y - IMUintegralAccelerationy._.W1;
+			velocityErrorEarth[2] = gps_velocity.z - IMUintegralAccelerationz._.W1;
 		}
 	}
 	else
@@ -152,21 +161,15 @@ void dead_reckon(void)
 		IMUlocationy.WW = 0;
 		IMUlocationz.WW = 0;
 	}
-
-	int16_t air_speed_x, air_speed_y, air_speed_z;
-
-	air_speed_x = IMUvelocityx._.W1 - estimatedWind[0];
-	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1];
-	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2];
+	air_speed_x = IMUvelocityx._.W1 - estimatedWind.x;
+	air_speed_y = IMUvelocityy._.W1 - estimatedWind.y;
+	air_speed_z = IMUvelocityz._.W1 - estimatedWind.z;
 
 #if (HILSIM == 1)
-	air_speed_3DIMU = as_sim.BB;    // use Xplane as a pitot
+	air_speed_3DIMU = hilsim_airspeed.BB;    // use Xplane as a pitot
 #else
 	air_speed_3DIMU = vector3_mag(air_speed_x, air_speed_y, air_speed_z);
 #endif
-
-	union longww accum;
-	union longww energy;
 
 	accum.WW   = __builtin_mulsu(air_speed_x, 37877);
 	energy.WW  = __builtin_mulss(accum._.W1, accum._.W1);
@@ -180,3 +183,119 @@ void dead_reckon(void)
 	energy.WW += IMUlocationz.WW;
 	total_energy = energy._.W1;
 }
+
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
+#else
+#warning("Including integrate_loc_cm function")
+
+// estimate position in cm, using only GPSloc_cm, gps_velocity and accelEarth
+union longww IMUcmx = { 0 };
+union longww IMUcmy = { 0 };
+union longww IMUcmz = { 0 };
+
+// estimated velocity
+union longww IMUvx = { 0 };
+union longww IMUvy = { 0 };
+union longww IMUvz = { 0 };
+
+//	integral of acceleration
+union longww integralAccelx = { 0 };
+union longww integralAccely = { 0 };
+union longww integralAccelz = { 0 };
+
+fractional cmErrorEarth[]  = { 0, 0, 0 };
+fractional velErrorEarth[] = { 0, 0, 0 };
+
+extern struct relative3D GPSloc_cm;
+
+#define A2DV ((DR_TIMESTEP * GRAVITYM * MAX16) / GRAVITY)
+
+// cm/sec * V2X = centimeters; at 400Hz, V2X = SCALE_VAL/400 in 1.15 fractional form
+// result of fractional multiply must be right shifted by SCALE_SHIFT
+//FIXME: HEARTBEAT_HZ: SCALE_SHIFT and SCALE_VAL should be calculated from HEARTBEAT_HZ
+// optimal SCALE_SHIFT is floor(log2(HEARTBEAT_HZ = 1/DR_TIMESTEP)) (assuming INT_TAU >= 1)
+#define SCALE_SHIFT 8
+#define SCALE_VAL 256
+#define V2X (SCALE_VAL * DR_TIMESTEP * MAX16)
+
+// seconds
+#define INT_TAU (2.5)
+#define INT_TAU_INV ((unsigned int)(MAX16 / INT_TAU))
+
+// at 400 Hz with 2.5 second integration time constant, filter gain is 1/1000
+#define SCALE_SHIFT2 8
+#define SCALE_VAL2 256
+// 1/seconds^2
+#define INT_FILTER_GAIN ((int)((SCALE_VAL2 * DR_TIMESTEP * MAX16) / INT_TAU))
+
+int integrate_clock = DR_PERIOD;
+
+void integrate_loc_cm(struct relative3D gps_velocity)
+{
+	if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
+	{
+		// integrate the accelerometers to update IMU velocity
+		// accelEarth is acceleration-offset in earth frame
+		integralAccelx.WW += __builtin_mulss(((int)(A2DV)), accelEarth[0]);
+		integralAccely.WW += __builtin_mulss(((int)(A2DV)), accelEarth[1]);
+		integralAccelz.WW += __builtin_mulss(((int)(A2DV)), accelEarth[2]);
+
+		// integrate IMU velocity to update the IMU location
+		IMUcmx.WW += (__builtin_mulss(((int)(V2X)), integralAccelx._.W1) >> SCALE_SHIFT);
+		IMUcmy.WW += (__builtin_mulss(((int)(V2X)), integralAccely._.W1) >> SCALE_SHIFT);
+		IMUcmz.WW += (__builtin_mulss(((int)(V2X)), integralAccelz._.W1) >> SCALE_SHIFT);
+
+		if (integrate_clock > 0)
+		// apply drift adjustments only while valid GPS data is in force.
+		// This is done with a countdown clock that gets reset each time new data comes in.
+		{
+			integrate_clock --;
+
+			// without these terms IMUcm doesn't track with GPS
+			integralAccelx.WW += (__builtin_mulss(INT_FILTER_GAIN, velErrorEarth[0]) >> SCALE_SHIFT2);
+			integralAccely.WW += (__builtin_mulss(INT_FILTER_GAIN, velErrorEarth[1]) >> SCALE_SHIFT2);
+			integralAccelz.WW += (__builtin_mulss(INT_FILTER_GAIN, velErrorEarth[2]) >> SCALE_SHIFT2);
+
+			IMUcmx.WW += (__builtin_mulss(INT_FILTER_GAIN, cmErrorEarth[0]) >> SCALE_SHIFT2);
+			IMUcmy.WW += (__builtin_mulss(INT_FILTER_GAIN, cmErrorEarth[1]) >> SCALE_SHIFT2);
+			IMUcmz.WW += (__builtin_mulss(INT_FILTER_GAIN, cmErrorEarth[2]) >> SCALE_SHIFT2);
+
+			IMUvx.WW = integralAccelx.WW + __builtin_mulus(INT_TAU_INV, cmErrorEarth[0]);
+			IMUvy.WW = integralAccely.WW + __builtin_mulus(INT_TAU_INV, cmErrorEarth[1]);
+			IMUvz.WW = integralAccelz.WW + __builtin_mulus(INT_TAU_INV, cmErrorEarth[2]);
+		}
+		else
+		{
+			IMUvx.WW = integralAccelx.WW;
+			IMUvy.WW = integralAccely.WW;
+			IMUvz.WW = integralAccelz.WW;
+		}
+
+		if (gps_nav_valid() && (dcm_flags._.integrate_req == 1))
+		{
+			// compute error indications and restart the dead reckoning clock to apply them
+			dcm_flags._.integrate_req = 0;
+			integrate_clock = DR_PERIOD;
+
+			cmErrorEarth[0] = GPSloc_cm.x - IMUcmx._.W1;
+			cmErrorEarth[1] = GPSloc_cm.y - IMUcmy._.W1;
+			cmErrorEarth[2] = GPSloc_cm.z - IMUcmz._.W1;
+
+			velErrorEarth[0] = gps_velocity.x - integralAccelx._.W1;
+			velErrorEarth[1] = gps_velocity.y - integralAccely._.W1;
+			velErrorEarth[2] = gps_velocity.z - integralAccelz._.W1;
+		}
+	}
+	else
+	{
+		integralAccelx.WW = 0;
+		integralAccely.WW = 0;
+		integralAccelz.WW = 0;
+
+		IMUcmx.WW = 0;
+		IMUcmy.WW = 0;
+		IMUcmz.WW = 0;
+	}
+}
+
+#endif // AIRFRAME_TYPE

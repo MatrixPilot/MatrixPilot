@@ -26,6 +26,8 @@
 #define SCALEGYRO           4.95
 #define SCALEACCEL          2.64
 
+#define NUM_ANALOG_INPUTS   4
+
 #define xrateBUFF           2
 #define yrateBUFF           1
 #define zrateBUFF           3
@@ -58,6 +60,13 @@
 #define LED_GREEN           _LATE2
 #define LED_RED             _LATE1
 
+// SPI SS pin definitions
+#define SPI1_SS             _LATB2
+#define SPI2_SS             _LATG9
+#define SPI1_TRIS           _TRISB2
+#define SPI2_TRIS           _TRISG9
+
+// Input Capture pin difinitions
 #define IC_PIN1             _RD8
 #define IC_PIN2             _RD9
 #define IC_PIN3             _RD10

@@ -20,6 +20,7 @@
 
 
 #include "libUDB_internal.h"
+#include "ADchannel.h"
 #include "analogs.h"
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
@@ -37,6 +38,7 @@ uint8_t rc_signal_strength;
 #define RSSI_RANGE ((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 #endif
 
+extern int one_hertz_flag;
 
 void init_analogs(void)
 {
@@ -52,6 +54,10 @@ void init_analogs(void)
 #endif
 }
 
+extern fractional Float2Fract(float aVal);  /* Converts float into fractional */
+                                            /* float value in range [-1, 1) */
+extern float Fract2Float(fractional aVal);  /* Converts fractional into float */
+                                            /* fract value in range {-1, 1-2^-15} */
 void calculate_analog_sensor_values(void)
 {
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
@@ -79,5 +85,21 @@ void calculate_analog_sensor_values(void)
 		rc_signal_strength = 100;
 	else
 		rc_signal_strength = (uint8_t)rssi_accum._.W1;
+
 #endif
+
+/*
+	if (one_hertz_flag)
+	{
+//		printf("R %f     \r\n", (double)Fract2Float(udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value));
+//		printf("1 %li    \r\n", (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768));
+//		printf("2 %li    \r\n", (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE));
+//		printf("3 %li    \r\n", ((udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE) + (((int32_t)(VOLTAGE_SENSOR_OFFSET)) << 16)));
+
+		printf("A %i   \r\n", battery_current._.W1);
+		printf("V %i   \r\n", battery_voltage._.W1); // in tenths of Volts
+
+		one_hertz_flag = 0;
+	}
+ */
 }

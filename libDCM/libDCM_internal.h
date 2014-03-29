@@ -21,48 +21,14 @@
 
 #include "libDCM.h"
 
-void dcm_init_rmat(void);
+//void dcm_init_rmat(void);
 
-void estYawDrift(void);
-void estimateWind(void);
+//void estYawDrift(void);
+//void estWind(struct relative3D gps_velocity);
+//void estWind(vect3_16t* est_wind, struct relative3D gps_velocity);
 
-void gps_commit_data(void);
+//void gps_commit_data(void);
+//void gpsoutline(const char* message);
+//void gpsoutbin(int16_t length, const uint8_t* msg);
 
-void gpsoutline(const char* message);
-void gpsoutbin(int16_t length, const uint8_t* msg);
-
-void dcm_run_imu_step(void);    // This needs to be run every 25ms
-
-void read_accel();
-void read_gyros();
-
-extern fractional dirovergndHRmat[];
-extern fractional dirovergndHGPS[];
-extern fractional locationErrorEarth[3];
-
-//#if (MAG_YAW_DRIFT == 1)
-//extern fractional magFieldEarth[3];
-//#endif
-
-//extern union longbbbb tow;
-//extern union intbb sog_gps, climb_gps, week_no;
-//extern union uintbb cog_gps;
-//extern union intbb as_sim;
-////extern union longbbbb as_sim_;
-//extern uint8_t hdop;
-//extern union longbbbb xpg, ypg, zpg;
-//extern union intbb xvg, yvg, zvg;
-////extern uint8_t mode1, mode2;
-//extern uint8_t svs;
-
-extern int16_t forward_acceleration;
-extern uint16_t air_speed_3DGPS;
-
-extern int16_t cos_lat;
-
-#if (HILSIM == 1)
-extern union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
-extern union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
-extern union intbb p_sim_,     q_sim_,     r_sim_;
-extern union intbb p_sim,      q_sim,      r_sim;
-#endif // HILSIM
+//void dcm_run_imu_step(void);    // This needs to be run every 25ms

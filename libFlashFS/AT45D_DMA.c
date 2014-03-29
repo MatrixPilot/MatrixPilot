@@ -60,8 +60,14 @@ void init_AT45D_DMA(void)
 	DMA2CNT = SPI2_DMA_SIZE - 1;
 	DMA2REQ = 0x021;            // SPI2
 	DMA2PAD = (volatile unsigned int)&SPI2BUF;
+#if defined(__dsPIC33F__)
+	DMA2STA = &Spi2TxBuffA;
+#elif defined(__dsPIC33E__)
 	DMA2STAH = 0x0000;
 	DMA2STAL = __builtin_dmaoffset(&Spi2TxBuffA);
+#else
+#error here
+#endif
 //	_DMA2IP = INT_PRI_DMA2;     // Set the DMA2 ISR priority
 //	IFS0bits.DMA2IF  = 0;       // Clear DMA interrupt
 //	IEC0bits.DMA2IE  = 1;       // Enable DMA interrupt
@@ -75,8 +81,14 @@ void init_AT45D_DMA(void)
 	DMA1CNT = SPI2_DMA_SIZE;
 	DMA1REQ = 0x021;            // SPI2
 	DMA1PAD = (volatile unsigned int)&SPI2BUF;
+#if defined(__dsPIC33F__)
+	DMA1STA = &Spi2RxBuffA;
+#elif defined(__dsPIC33E__)
 	DMA1STAH = 0x0000;
 	DMA1STAL = __builtin_dmaoffset(&Spi2RxBuffA);
+#else
+#error here
+#endif
 //	_DMA1IP = INT_PRI_DMA1;     // Set the DMA1 ISR priority
 	IFS0bits.DMA1IF  = 0;       // Clear DMA interrupt
 	IEC0bits.DMA1IE  = 1;       // Enable DMA interrupt

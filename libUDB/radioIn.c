@@ -33,8 +33,11 @@
 // very tight airframes, as it allows alternative input pins to be
 // assigned for connection to the receiver.
 // If not using PPM, then this must be left set to '1'
+#ifndef PPM_IC
 #define PPM_IC 1
-#define IC_PIN IC_PIN1
+#endif // PPM_IC
+
+#define MAX_NOISE_RATE 5    // up to 5 PWM "glitches" per second are allowed
 
 #if (MIPS == 64)
 #define TMR_FACTOR 4
@@ -61,8 +64,8 @@
 int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
 int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 
-int16_t failSafePulses = 0;
-int16_t noisePulses = 0;
+static int16_t failSafePulses = 0;
+static int16_t noisePulses = 0;
 
 
 void udb_servo_record_trims(void)
@@ -92,7 +95,7 @@ void udb_init_capture(void)
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
 	#endif
 	}
-	
+
 	TMR2 = 0;               // initialize timer
 #if (MIPS == 64)
 	T2CONbits.TCKPS = 2;    // prescaler = 64 option
@@ -125,20 +128,54 @@ void udb_init_capture(void)
 }
 #define IC_INIT(x, y, z) _IC_INIT(x, y, z)
 
-	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
+//	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
 #if (USE_PPM_INPUT == 0)
+	if (NUM_INPUTS > 0) IC_INIT(1, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 1) IC_INIT(2, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 2) IC_INIT(3, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 3) IC_INIT(4, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 4) IC_INIT(5, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 5) IC_INIT(6, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
+#if (USE_SONAR_INPUT != 8)
 	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
+#endif // USE_SONAR_INPUT
+#else
+	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
 #endif // USE_PPM_INPUT
 #endif // NORADIO
 }
 
-void set_udb_pwIn(int pwm, int index)
+// called from heartbeat pulse at 20Hz
+void radioIn_failsafe_check(void)
+{
+	// check to see if at least one valid pulse has been received,
+	// and also that the noise rate has not been exceeded
+	if ((failSafePulses == 0) || (noisePulses > MAX_NOISE_RATE))
+	{
+		if (udb_flags._.radio_on == 1)
+		{
+			udb_flags._.radio_on = 0;
+			udb_callback_radio_did_turn_off();
+		}
+		LED_GREEN = LED_OFF;
+		noisePulses = 0; // reset count of noise pulses
+	}
+	else
+	{
+		udb_flags._.radio_on = 1;
+		LED_GREEN = LED_ON;
+	}
+	failSafePulses = 0;
+}
+
+// called from heartbeat pulse at 1Hz
+void radioIn_failsafe_reset(void)
+{
+	noisePulses = 0;
+}
+
+static void set_udb_pwIn(int pwm, int index)
 {
 #if (NORADIO != 1)
 	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
@@ -220,7 +257,9 @@ IC_HANDLER(4, REGTOK1, IC_PIN4);
 IC_HANDLER(5, REGTOK1, IC_PIN5);
 IC_HANDLER(6, REGTOK1, IC_PIN6);
 IC_HANDLER(7, REGTOK1, IC_PIN7);
+#if (USE_SONAR_INPUT != 8)
 IC_HANDLER(8, REGTOK1, IC_PIN8);
+#endif // USE_SONAR_INPUT
 
 #else // (USE_PPM_INPUT != 0)
 
@@ -235,6 +274,26 @@ IC_HANDLER(8, REGTOK1, IC_PIN8);
 //#else
 //#define ICBNE(x) IC##x##CONbits.ICBNE
 //#endif
+
+/*
+PPM_2
+
+    1   2  3  4   5  6  7   
+   ___     _     ___   ___    
+  |   |   | |   |   | |   |   
+  |   |   | |   |   | |   |   
+__|   |___| |___|   |_|   |____________________
+
+
+PPM_1
+
+    1     2    3      4     5    6      7
+   ___   ___   _     ___   ___   _     ___
+  |   | |   | | |   |   | |   | | |   |   |
+  |   | |   | | |   |   | |   | | |   |   |
+__|   |_|   |_| |___|   |_|   |_| |___|   |____
+
+ */
 
 //#define REGTOK1 N1
 #define ICBNE(x, y) IC##x##CO##y##bits.ICBNE
@@ -254,6 +313,11 @@ IC_TIME(PPM_IC, REGTOK1);
 #define _IC_INTERRUPT(x) _IC##x##Interrupt(void)
 #define IC_INTERRUPT(x) _IC_INTERRUPT(x)
 
+#define _IC_PIN(x) IC_PIN##x
+#define __IC_PIN(x) _IC_PIN(x)
+
+extern int one_hertz_flag;
+
 // PPM Input on Channel PPM_IC
 void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 {
@@ -267,17 +331,27 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 	time = ic_time();
 
 #if (USE_PPM_INPUT == 1)
-	if (IC_PIN == PPM_PULSE_VALUE)
+	if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
 	{
 		uint16_t pulse = time - rise_ppm;
 		rise_ppm = time;
 
 		if (pulse > MIN_SYNC_PULSE_WIDTH)
 		{
+//			if (one_hertz_flag)
+//			{
+//				one_hertz_flag = 0;
+//				DPRINT("**: %u %u\r\n", pulse, MIN_SYNC_PULSE_WIDTH);
+//			}
 			ppm_ch = 1;
 		}
 		else
 		{
+//			if (one_hertz_flag)
+//			{
+//				one_hertz_flag = 0;
+//				DPRINT("--: %u\r\n", pulse);
+//			}
 			if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
 			{
 				if (ppm_ch <= NUM_INPUTS)
@@ -288,11 +362,19 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 			}
 		}
 	}
+	else
+	{
+//		if (one_hertz_flag)
+//		{
+//			one_hertz_flag = 0;
+//			DPRINT("DIS %u\r\n", time);
+//		}
+	}
 #elif  (USE_PPM_INPUT == 2)
 	uint16_t pulse = time - rise_ppm;
 	rise_ppm = time;
 
-	if (IC_PIN == PPM_PULSE_VALUE)
+	if (__IC_PIN(PPM_IC) == PPM_PULSE_VALUE)
 	{
 		if (pulse > MIN_SYNC_PULSE_WIDTH)
 		{

@@ -120,7 +120,7 @@ extern boolean storage_create_area(uint16_t data_handle, uint16_t size, uint16_t
 extern boolean storage_check_area_exists(uint16_t data_handle, uint16_t size, uint16_t type);
 
 // Status of sotage services
-boolean storage_services_started();
+boolean storage_services_started(void);
 
 // For access to a checksummed array data area
 extern boolean storage_write_array(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback);

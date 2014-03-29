@@ -20,6 +20,8 @@
 
 //	routines to drive the PWM pins for the servos,
 
+#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
+#include "options.h"
 #include "libUDB_internal.h"
 #include "../libDCM/libDCM.h"
 #include "oscillator.h"
@@ -72,13 +74,15 @@
 #endif
 
 int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
-int16_t outputNum;
+static volatile int16_t outputNum;
 
 
-void udb_init_pwm(void) // initialize the PWM
+// initialize the PWM
+//void udb_init_pwm(void)
+void init_servoOut(void) // was called udb_init_pwm()
 {
 	int16_t i;
-	for (i=0; i <= NUM_OUTPUTS; i++)
+	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
 		udb_pwOut[i] = 0;
 	}
@@ -127,6 +131,16 @@ void udb_init_pwm(void) // initialize the PWM
 #endif
 }
 
+// saturation logic to maintain pulse width within bounds
+// This takes a servo out value, and clips it to be within
+// 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
+int16_t udb_servo_pulsesat(int32_t pw)
+{
+	if (pw > SERVOMAX) pw = SERVOMAX;
+	if (pw < SERVOMIN) pw = SERVOMIN;
+	return (int16_t)pw;
+}
+
 void udb_set_action_state(boolean newValue)
 {
 	ACTION_OUT_PIN = newValue;
@@ -139,7 +153,6 @@ void start_pwm_outputs(void)
 	{
 		outputNum = 0;
 		PR4 = SCALE_FOR_PWM_OUT(200);   // set timer to delay 0.1ms
-		
 		TMR4 = 0;                       // start timer at 0
 		_T4IF = 0;                      // clear the interrupt
 		_T4IE = 1;                      // enable timer 4 interrupt
@@ -225,7 +238,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			_T4IE = 0;              // disable timer 4 interrupt
 			break;
 #else
-	case 9:
+		case 9:
 			SERVO_OUT_PIN_9 = 0;
 			_T4IE = 0;              // disable timer 4 interrupt
 			break;

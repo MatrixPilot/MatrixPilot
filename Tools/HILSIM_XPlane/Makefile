@@ -1,4 +1,4 @@
-CC 	 = gcc
+CC       = gcc
 CPP      = g++
 CFLAGS   = -pipe -Wall -W -O2 -DLIN=1 -fPIC
 INCPATH  = -Iinclude 

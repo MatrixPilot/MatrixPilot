@@ -18,322 +18,56 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
+#include "I2C.h"
+/*
 #include "libUDB_internal.h"
 #include "interrupt.h"
 #include "I2C.h"
 #include "NV_memory.h"
 #include "events.h"
+ */
+
+//#undef USE_I2C1_DRIVER
+#define USE_I2C1_DRIVER 1
 
 #if (USE_I2C1_DRIVER == 1)
 
-#define I2C1_SDA        _RG3
-#define I2C1_SCL        _RG2
-#define I2C1_SDA_TRIS   _TRISG3
-#define I2C1_SCL_TRIS   _TRISG2
-#define _I2C1EN         I2C1CONbits.I2CEN
-#define I2C1BRGVAL      60 // 200 Khz
-#define I2C1_NORMAL     (((I2C1CON & 0b0000000000011111) == 0) && ((I2C1STAT & 0b0100010011000001) == 0))
+#if (BOARD_TYPE == AUAV3_BOARD)
+#define I2C_SDA         _RD9
+#define I2C_SCL         _RD10
+#else // UDB4 or 5
+#define I2C_SDA         _RG3
+#define I2C_SCL         _RG2
+//#define I2C_SDA_TRIS    _TRISG3
+//#define I2C_SCL_TRIS    _TRISG2
+#endif // BOARD_TYPE
 
-static void I2C1_idle(void);
-static void I2C1_doneRead(void);
-static void I2C1_recstore(void);
-static void I2C1_rerecen(void);
-static void I2C1_recen(void);
-static void I2C1_writeStop(void);
-static void I2C1_stopRead(void);
-static void I2C1_writeData(void);
-static void I2C1_readAddress(void);
-static void I2C1_writeAddress(void);
-static void I2C1_startWrite(void);
-static void I2C1_readStart(void);
-static void I2C1_Failed(void);
-static void I2C1_doneWrite(void);
-static void I2C1_writeCommandData(void);
-static void serviceI2C1(void);              // service the I2C
+#define I2C_IP          _MI2C1IP
+#define I2C_IE          _MI2C1IE
+#define I2C_IF          _MI2C1IF
+#define I2C_CON         I2C1CON
+#define I2C_PEN         I2C1CONbits.PEN
+#define I2C_SEN         I2C1CONbits.SEN
+#define I2C_RCEN        I2C1CONbits.RCEN
+#define I2C_ACKDT       I2C1CONbits.ACKDT
+#define I2C_ACKEN       I2C1CONbits.ACKEN
+#define I2C_EN          I2C1CONbits.I2CEN
+#define I2C_ACKSTAT     I2C1STATbits.ACKSTAT
+#define I2C_STAT        I2C1STAT
+#define I2C_RCV         I2C1RCV
+#define I2C_TRN         I2C1TRN
+#define I2C_RCV         I2C1RCV
 
-static int16_t I2C1ERROR = 0;
-static boolean I2C1_Busy = true;            // Port busy flag. Set true until initialized
-static uint16_t I2C1_Index = 0;             // index into the write buffer
-static uint8_t I2C1_AddressByte = 0;
-static uint16_t I2C1_tx_data_size = 0;      // tx data size
-static uint16_t I2C1_rx_data_size = 0;      // rx data size
-static uint16_t I2C1_command_data_size = 0; // command data size
-static uint8_t* pI2C1Buffer = NULL;         // pointer to buffer
-static uint8_t* pI2C1commandBuffer = NULL;  // pointer to receive buffer
-static uint16_t I2C1_service_handle = INVALID_HANDLE;
-static void (*I2C1_state)(void) = &I2C1_idle;
-static I2C_callbackFunc pI2C_callback = NULL;
+#define INT_PRI_I2C     INT_PRI_I2C1
+#define MI2C            MI2C1
+#define I2C_Normal      I2C1_Normal
+#define I2C_Reset       I2C1_Reset
+#define I2C_Write       I2C1_Write
+#define I2C_Read        I2C1_Read
+#define I2C_CheckAck    I2C1_CheckAck
+#define I2C_Trigger     I2C1_Trigger
 
-
-void I2C1_Init(void)
-{
-//	I2C1_SDA_TRIS = I2C1_SCL_TRIS = 0;  // SDA and SCL as outputs
-	I2C1BRG = I2C1BRGVAL; 
-	_I2C1EN = 1;                        // enable I2C1
-
-	_MI2C1IP = INT_PRI_I2C1;            // set interrupt priority
-	_MI2C1IF = 0;                       // clear the I2C1 master interrupt
-	_MI2C1IE = 1;                       // enable the interrupt
-
-	I2C1_service_handle = register_event(&serviceI2C1);
-
-	I2C1_Busy = false;
-}
-
-// Trigger the I2C1 service routine to run at low priority
-void I2C1_trigger_service(void)
-{
-	trigger_event(I2C1_service_handle);
-}
-
-static void serviceI2C1(void) // service the I2C
-{
-	if (_I2C1EN == 0)                   // I2C is off
-	{
-		I2C1_state = &I2C1_idle;        // disable response to any interrupts
-		I2C1_Init();                    // turn the I2C back on
-		// Put something here to reset state machine.  Make sure attached servies exit nicely.
-	}
-}
-
-void __attribute__((__interrupt__,__no_auto_psv__)) _MI2C1Interrupt(void)
-{
-	indicate_loading_inter;
-	interrupt_save_set_corcon;
-	
-	_MI2C1IF = 0;                       // clear the interrupt
-	(*I2C1_state)();                    // execute the service routine
-	
-	interrupt_restore_corcon;
-}
-
-// Check if I2C port is available for use.
-static inline boolean I2C1_CheckAvailable(void)
-{
-	if (_I2C1EN == 0) return false;
-	if (!I2C1_NORMAL) return false;
-	if (I2C1_Busy == true) return false;
-	I2C1_Busy = true;
-
-	return true;
-}
-
-boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback)
-{
-	if (!I2C1_CheckAvailable()) return false;
-
-	pI2C_callback = pCallback;
-
-	I2C1_command_data_size = commandDataSize;
-	pI2C1commandBuffer = pcommandData;
-	I2C1_AddressByte = address;
-	pI2C1Buffer = ptxData;
-
-	I2C1_tx_data_size = txSize;         // tx data size
-	I2C1_rx_data_size = 0;              // rx data size
-
-	// Set ISR callback and trigger the ISR
-	I2C1_state = &I2C1_startWrite;
-	_MI2C1IF = 1;
-	return true;
-}
-
-boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode)
-{
-	if (!I2C1_CheckAvailable()) return false;
-
-	pI2C_callback = pCallback;
-
-	I2C1_command_data_size = commandDataSize;
-	pI2C1commandBuffer = pcommandData;
-	I2C1_AddressByte = address;
-	pI2C1Buffer = prxData;
-
-	I2C1_tx_data_size = 0;              // tx data size
-	I2C1_rx_data_size = rxSize;         // rx data size
-
-	// Set ISR callback and trigger the ISR
-	I2C1_state = &I2C1_startWrite;
-	_MI2C1IF = 1;
-	return true;
-}
-
-// Only send command byte to check for ACK.
-boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback)
-{
-	if (!I2C1_CheckAvailable()) return false;
-
-	pI2C_callback = pCallback;
-
-	I2C1_command_data_size = 0;
-	I2C1_AddressByte = address;
-	pI2C1Buffer = NULL;
-
-	I2C1_tx_data_size = 0;              // tx data size
-	I2C1_rx_data_size = 0;              // rx data size
-
-	// Set ISR callback and trigger the ISR
-	I2C1_state = &I2C1_startWrite;
-	_MI2C1IF = 1;
-	return true;
-}
-
-static void I2C1_startWrite(void)
-{
-	I2C1_Index = 0;                     // Reset index into buffer
-
-	I2C1_state = &I2C1_writeAddress;
-	I2C1CONbits.SEN = 1;
-}
-
-// Write command byte without checking ACK first.
-static void I2C1_writeAddress(void)
-{
-	I2C1_state = &I2C1_writeCommandData;
-	I2C1TRN = I2C1_AddressByte & 0xFE;
-}
-
-// Write command data (address or similar)
-static void I2C1_writeCommandData(void)
-{
-	if (I2C1STATbits.ACKSTAT == 1)      // Device not responding
-	{
-		I2C1_Failed(); 
-		return;
-	}
-
-	// If there is no command data, do not send any, do a stop.
-	if (I2C1_command_data_size == 0)
-	{
-		I2C1_writeStop();
-		return;
-	}
-
-	I2C1TRN = pI2C1commandBuffer[I2C1_Index++];
-
-	if (I2C1_Index >= I2C1_command_data_size)
-	{
-		I2C1_Index = 0;                 // Reset index into the buffer
-
-		if (I2C1_rx_data_size > 0)
-			I2C1_state = &I2C1_readStart;
-		else
-			I2C1_state = &I2C1_writeData;
-	}
-}
-
-static void I2C1_writeData(void)
-{
-	uint8_t data;
-
-	if (I2C1STATbits.ACKSTAT == 1)      // Device not responding
-	{
-		I2C1_Failed();
-		return;
-	}
-	data = pI2C1Buffer[I2C1_Index++];
-
-	if (I2C1_Index >= I2C1_tx_data_size)
-	{
-		if (I2C1_rx_data_size == 0)
-			I2C1_state = &I2C1_writeStop;
-		else
-			I2C1_state = &I2C1_readStart;
-	}
-	I2C1TRN = data;
-}
-
-// Stop a write
-static void I2C1_writeStop(void)
-{
-	I2C1_state = &I2C1_doneWrite;
-	I2C1CONbits.PEN = 1;
-}
-
-static void I2C1_doneWrite(void)
-{
-	I2C1_Busy = false;
-	if (pI2C_callback != NULL)
-		pI2C_callback(true);
-}
-
-// Start a read after a write by settign the start bit again
-static void I2C1_readStart(void)
-{
-	I2C1_Index = 0;                     // Reset index into buffer
-	I2C1_state = &I2C1_readAddress;
-	I2C1CONbits.SEN = 1;	
-}
-
-// Send the address to read
-static void I2C1_readAddress(void)
-{
-	I2C1_state = &I2C1_recen;
-	I2C1TRN =  I2C1_AddressByte | 0x01;
-}
-
-// Check for ACK.  If ok, start receive mode, otherwise abandon.
-static void I2C1_recen(void)
-{
-	if (I2C1STATbits.ACKSTAT == 1)      // Device not responding
-	{
-		I2C1_Failed();
-	}
-	else
-	{
-		I2C1_state = &I2C1_recstore;
-		I2C1CONbits.RCEN = 1;
-	}
-}
-
-static void I2C1_rerecen(void)
-{
-	I2C1_state = &I2C1_recstore;
-	I2C1CONbits.RCEN = 1;
-}
-
-static void I2C1_recstore(void)
-{
-	pI2C1Buffer[I2C1_Index++] = I2C1RCV;
-	if (I2C1_Index >= I2C1_rx_data_size)
-	{
-		I2C1_state = &I2C1_stopRead;
-		I2C1CONbits.ACKDT = 1;
-	}
-	else
-	{
-		I2C1_state = &I2C1_rerecen;
-		I2C1CONbits.ACKDT = 0;
-	}
-	I2C1CONbits.ACKEN = 1;
-}
-
-static void I2C1_stopRead(void)
-{
-	I2C1CONbits.PEN = 1;
-	I2C1_state = &I2C1_doneRead;
-}
-
-static void I2C1_idle(void)
-{
-}
-
-static void I2C1_doneRead(void)
-{
-	I2C1_Busy = false;
-	if (pI2C_callback != NULL)
-		pI2C_callback(true);
-}
-
-// On failure, stop the bus, go into idle and callback with failure
-static void I2C1_Failed(void)
-{
-	I2C1_state = &I2C1_idle;
-	I2C1CONbits.PEN = 1;
-	I2C1_Busy = false;
-	if (pI2C_callback != NULL)
-		pI2C_callback(false);
-}
+#define I2C_SOURCE_INCLUDED
+#include "I2C.c"
 
 #endif // USE_I2C1_DRIVER

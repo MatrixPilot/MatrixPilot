@@ -45,6 +45,17 @@ class MAVWPLoader(object):
         self.wpoints.append(w)
         self.last_change = time.time()
 
+    def add_latlonalt(self, lat, lon, altitude):
+        '''add a point via latitude/longitude/altitude'''
+        p = mavutil.mavlink.MAVLink_mission_item_message(self.target_system,
+                                                         self.target_component,
+                                                         0,
+                                                         mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                                                         mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                                                         0, 0, 0, 0, 0, 0,
+                                                         lat, lon, altitude)
+        self.add(p)
+
     def set(self, w, idx):
         '''set a waypoint'''
         w.seq = idx
@@ -305,12 +316,93 @@ class MAVWPLoader(object):
                 ret.append(p)
         return ret
 
+class MAVRallyError(Exception):
+    '''MAVLink rally point error class'''
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
+        self.message = msg
+
+class MAVRallyLoader(object):
+    '''MAVLink Rally points and Rally Land ponts loader'''
+    def __init__(self, target_system=0, target_component=0):
+        self.rally_points = []
+        self.rally_land_points = []
+        self.target_system = target_system
+        self.target_component = target_component
+        self.last_change = time.time()
+
+    def rally_count(self):
+        '''return number of rally points'''
+        return len(self.rally_points)
+
+    def rally_point(self, i):
+        '''return rally point i'''
+        return self.rally_points[i]
+   
+    def append_rally_point(self, p):
+        '''add rallypoint to end of list'''
+        if (self.rally_count() > 9):
+           print "Can't have more than 10 rally points, not adding."
+           return
+
+        self.rally_points.append(p)
+        self.last_change = time.time()
+        self.last_change = time.time()
+        for i in range(self.rally_count()):
+            self.rally_points[i].count = self.rally_count()
+
+    def create_and_append_rally_point(self, lat, lon, alt, break_alt, land_dir, flags):
+        '''add a point via latitude/longitude'''
+        p = mavutil.mavlink.MAVLink_rally_point_message(self.target_system, self.target_component, self.rally_count(), 0, lat, lon, alt, break_alt, land_dir, flags)
+        self.append_rally_point(p)
+
+    def clear(self):
+        '''clear all point lists (rally and rally_land)'''
+        self.rally_points = []
+        self.rally_land_points = []
+        self.last_change = time.time()
+
+    def load(self, filename):
+        '''load rally and rally_land points from a file.
+         returns number of points loaded'''
+        f = open(filename, mode='r')
+        self.clear()
+        for line in f:
+            if line.startswith('#'):
+                continue
+            line = line.strip()
+            if not line:
+                continue
+            a = line.split()
+            if len(a) != 7:
+                raise MAVRallyError("invalid rally file line: %s" % line)
+
+            if (a[0].lower() == "rally"):
+                self.create_and_append_rally_point(float(a[1]) * 1e7, float(a[2]) * 1e7,
+                                                   float(a[3]), float(a[4]), float(a[5]) * 100.0, int(a[6]))
+# Coming Soon:
+#            elif (a[0].lower().equals("rally_land"):
+#                self.add_rally_land_from_file(float(a[1]), float(a[2]), float(a[3]))
+
+        f.close()
+        return len(self.rally_points)
+
+    def save(self, filename):
+        '''save fence points to a file'''
+        f = open(filename, mode='w')
+        for p in self.rally_points:
+            f.write("RALLY %f\t%f\t%f\t%f\t%f\t%d\n" % (p.lat * 1e-7, p.lng * 1e-7, p.alt,
+                                                        p.break_alt, p.land_dir, p.flags))
+        #Coming soon
+        #for p in self.rally_land_points:
+        #    f.write("RALLY_LAND %f\t%f\t%f\n" & (p.lat, p.lng, p.atl)
+        f.close()
+
 class MAVFenceError(Exception):
         '''MAVLink fence error class'''
         def __init__(self, msg):
             Exception.__init__(self, msg)
             self.message = msg
-
 
 class MAVFenceLoader(object):
     '''MAVLink geo-fence loader'''
@@ -332,6 +424,14 @@ class MAVFenceLoader(object):
         '''add a point'''
         self.points.append(p)
         self.last_change = time.time()
+        for i in range(self.count()):
+            self.points[i].count = self.count()
+
+    def add_latlon(self, lat, lon):
+        '''add a point via latitude/longitude'''
+        p = mavutil.mavlink.MAVLink_fence_point_message(self.target_system, self.target_component,
+                                                        self.count(), 0, lat, lon)
+        self.add(p)
 
     def clear(self):
         '''clear point list'''
@@ -352,12 +452,8 @@ class MAVFenceLoader(object):
             a = line.split()
             if len(a) != 2:
                 raise MAVFenceError("invalid fence point line: %s" % line)
-            p = mavutil.mavlink.MAVLink_fence_point_message(self.target_system, self.target_component,
-                                                            self.count(), 0, float(a[0]), float(a[1]))
-            self.add(p)
+            self.add_latlon(float(a[0]), float(a[1]))
         f.close()
-        for i in range(self.count()):
-            self.points[i].count = self.count()
         return len(self.points)
 
     def save(self, filename):

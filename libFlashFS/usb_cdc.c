@@ -31,6 +31,7 @@ USB_HANDLE USBOutHandle = 0;  // Needs to be initialized to 0 at startup.
 USB_HANDLE USBInHandle = 0;   // Needs to be initialized to 0 at startup.
 BOOL blinkStatusValid = TRUE;
 
+void console_inbyte(char ch);
 
 void CDCTasks(void)
 {
@@ -83,47 +84,60 @@ void CDCTasks(void)
 
 			for (i = 0; i < numBytesRead; i++)
 			{
-				switch (USB_Out_Buffer[i])
-				{
-					case 0x0A:
-					case 0x0D:
-						USB_In_Buffer[i] = USB_Out_Buffer[i];
-						break;
-					default:
-						USB_In_Buffer[i] = USB_Out_Buffer[i] + 1;
-						break;
-				}
+				console_inbyte(USB_Out_Buffer[i]);
+//				switch (USB_Out_Buffer[i])
+//				{
+//					case 0x0A:
+//					case 0x0D:
+//						USB_In_Buffer[i] = USB_Out_Buffer[i];
+//						break;
+//					default:
+//						USB_In_Buffer[i] = USB_Out_Buffer[i] + 1;
+//						break;
+//				}
 			}
-			putUSBUSART(USB_In_Buffer, numBytesRead);
+//			putUSBUSART(USB_In_Buffer, numBytesRead);
 		}
 	}
 #endif
 	CDCTxService();
 }
 
-#define LED_BLUE			LATBbits.LATB2
-#define LED_ORANGE			LATBbits.LATB5
+#if (CONSOLE_UART == 9)
+char GetChar(void)
+{
+}
+void PutChar(char ch)
+{
+}
+//char IsPressed(void)
+//{
+//}
+#endif
 
-#define LED_ON				0
-#define LED_OFF				1
+#define LED_BLUE            LATBbits.LATB2
+#define LED_ORANGE          LATBbits.LATB5
 
-#define led_toggle(x)		((x) = !(x))
+#define LED_ON              0
+#define LED_OFF             1
 
-#define mLED_Both_Off()		{LED_BLUE = LED_OFF; LED_ORANGE = LED_OFF;}
-#define mLED_Both_On()		{LED_BLUE = LED_ON;  LED_ORANGE = LED_ON;}
-#define mLED_Only_1_On()	{LED_BLUE = LED_ON;  LED_ORANGE = LED_OFF;}
-#define mLED_Only_2_On()	{LED_BLUE = LED_OFF; LED_ORANGE = LED_ON;}
+#define led_toggle(x)       ((x) = !(x))
 
-#define mLED_1_Toggle()		{led_toggle(LED_BLUE);}
-#define mLED_2_Toggle()		{led_toggle(LED_ORANGE);}
+#define mLED_Both_Off()     {LED_BLUE = LED_OFF; LED_ORANGE = LED_OFF;}
+#define mLED_Both_On()      {LED_BLUE = LED_ON;  LED_ORANGE = LED_ON;}
+#define mLED_Only_1_On()    {LED_BLUE = LED_ON;  LED_ORANGE = LED_OFF;}
+#define mLED_Only_2_On()    {LED_BLUE = LED_OFF; LED_ORANGE = LED_ON;}
 
-#define mLED_1_On()			{LED_BLUE = LED_ON;}
-#define mLED_2_On()			{LED_ORANGE = LED_ON;}
-#define mLED_1_Off()		{LED_BLUE = LED_OFF;}
-#define mLED_2_Off()		{LED_ORANGE = LED_OFF;}
+#define mLED_1_Toggle()     {led_toggle(LED_BLUE);}
+#define mLED_2_Toggle()     {led_toggle(LED_ORANGE);}
 
-#define mGetLED_1()			LED_BLUE
-#define mGetLED_2()			LED_ORANGE
+#define mLED_1_On()         {LED_BLUE = LED_ON;}
+#define mLED_2_On()         {LED_ORANGE = LED_ON;}
+#define mLED_1_Off()        {LED_BLUE = LED_OFF;}
+#define mLED_2_Off()        {LED_ORANGE = LED_OFF;}
+
+#define mGetLED_1()         LED_BLUE
+#define mGetLED_2()         LED_ORANGE
 
 //    #define mLED_Both_Off()         {mLED_1_Off();mLED_2_Off();}
 //    #define mLED_Both_On()          {mLED_1_On();mLED_2_On();}
@@ -132,113 +146,113 @@ void CDCTasks(void)
 
 void BlinkUSBStatus(void)
 {
-    static WORD led_count = 0;
-    
-    if (led_count == 0) led_count = 10000U;
-    led_count--;
+	static WORD led_count = 0;
+	
+	if (led_count == 0) led_count = 10000U;
+	led_count--;
 
-    if (USBSuspendControl == 1)
-    {
-        if (led_count == 0)
-        {
-            mLED_1_Toggle();
-            if (mGetLED_1())
-            {
-                mLED_2_On();
-            }
-            else
-            {
-                mLED_2_Off();
-            }
-        }
-    }
-    else
-    {
-        if (USBDeviceState == DETACHED_STATE)
-        {
-            mLED_Both_Off();
-        }
-        else if (USBDeviceState == ATTACHED_STATE)
-        {
-            mLED_Both_On();
-        }
-        else if (USBDeviceState == POWERED_STATE)
-        {
-            mLED_Only_1_On();
-        }
-        else if (USBDeviceState == DEFAULT_STATE)
-        {
-            mLED_Only_2_On();
-        }
-        else if (USBDeviceState == ADDRESS_STATE)
-        {
-            if (led_count == 0)
-            {
-                mLED_1_Toggle();
-                mLED_2_Off();
-            }
-        }
-        else if (USBDeviceState == CONFIGURED_STATE)
-        {
-            if (led_count == 0)
-            {
-                mLED_1_Toggle();
-                if (mGetLED_1())
-                {
-                    mLED_2_Off();
-                }
-                else
-                {
-                    mLED_2_On();
-                }
-            }
-        }
-    }
+	if (USBSuspendControl == 1)
+	{
+		if (led_count == 0)
+		{
+			mLED_1_Toggle();
+			if (mGetLED_1())
+			{
+				mLED_2_On();
+			}
+			else
+			{
+				mLED_2_Off();
+			}
+		}
+	}
+	else
+	{
+		if (USBDeviceState == DETACHED_STATE)
+		{
+			mLED_Both_Off();
+		}
+		else if (USBDeviceState == ATTACHED_STATE)
+		{
+			mLED_Both_On();
+		}
+		else if (USBDeviceState == POWERED_STATE)
+		{
+			mLED_Only_1_On();
+		}
+		else if (USBDeviceState == DEFAULT_STATE)
+		{
+			mLED_Only_2_On();
+		}
+		else if (USBDeviceState == ADDRESS_STATE)
+		{
+			if (led_count == 0)
+			{
+				mLED_1_Toggle();
+				mLED_2_Off();
+			}
+		}
+		else if (USBDeviceState == CONFIGURED_STATE)
+		{
+			if (led_count == 0)
+			{
+				mLED_1_Toggle();
+				if (mGetLED_1())
+				{
+					mLED_2_Off();
+				}
+				else
+				{
+					mLED_2_On();
+				}
+			}
+		}
+	}
 }
 
 #if defined(USB_CDC_SET_LINE_CODING_HANDLER)
 void mySetLineCodingHandler(void)
 {
-    //If the request is not in a valid range
-    if (cdc_notice.GetLineCoding.dwDTERate.Val > 115200)
-    {
-        //NOTE: There are two ways that an unsupported baud rate could be
-        //handled.  The first is just to ignore the request and don't change
-        //the values.  That is what is currently implemented in this function.
-        //The second possible method is to stall the STATUS stage of the request.
-        //STALLing the STATUS stage will cause an exception to be thrown in the 
-        //requesting application.  Some programs, like HyperTerminal, handle the
-        //exception properly and give a pop-up box indicating that the request
-        //settings are not valid.  Any application that does not handle the
-        //exception correctly will likely crash when this requiest fails.  For
-        //the sake of example the code required to STALL the status stage of the
-        //request is provided below.  It has been left out so that this demo
-        //does not cause applications without the required exception handling
-        //to crash.
-        //---------------------------------------
-        //USBStallEndpoint(0,1);
-    }
-    else
-    {
-        //DWORD_VAL dwBaud;
+	//If the request is not in a valid range
+	if (cdc_notice.GetLineCoding.dwDTERate.Val > 115200)
+	{
+		//NOTE: There are two ways that an unsupported baud rate could be
+		//handled.  The first is just to ignore the request and don't change
+		//the values.  That is what is currently implemented in this function.
+		//The second possible method is to stall the STATUS stage of the request.
+		//STALLing the STATUS stage will cause an exception to be thrown in the 
+		//requesting application.  Some programs, like HyperTerminal, handle the
+		//exception properly and give a pop-up box indicating that the request
+		//settings are not valid.  Any application that does not handle the
+		//exception correctly will likely crash when this requiest fails.  For
+		//the sake of example the code required to STALL the status stage of the
+		//request is provided below.  It has been left out so that this demo
+		//does not cause applications without the required exception handling
+		//to crash.
+		//---------------------------------------
+		//USBStallEndpoint(0,1);
+	}
+	else
+	{
+		//DWORD_VAL dwBaud;
 
-        //Update the baudrate info in the CDC driver
-        CDCSetBaudRate(cdc_notice.GetLineCoding.dwDTERate.Val);
-        
-        //Update the baudrate of the UART
-//        #if defined(__18CXX)
-//            dwBaud.Val = (GetSystemClock()/4)/line_coding.dwDTERate.Val-1;
-//            SPBRG = dwBaud.v[0];
-//            SPBRGH = dwBaud.v[1];
-//        #elif defined(__C30__) || defined __XC16__
-//            dwBaud.Val = (((GetPeripheralClock()/2)+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
-//            U2BRG = dwBaud.Val;
-//        #elif defined(__C32__)
-//            U2BRG = ((GetPeripheralClock()+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
-//            //U2MODE = 0;
-//            U2MODEbits.BRGH = BRGH2;
-//            //U2STA = 0;
-//        #endif
-    }
+		//Update the baudrate info in the CDC driver
+		CDCSetBaudRate(cdc_notice.GetLineCoding.dwDTERate.Val);
+		
+		//Update the baudrate of the UART
+//		#if defined(__18CXX)
+//			dwBaud.Val = (GetSystemClock()/4)/line_coding.dwDTERate.Val-1;
+//			SPBRG = dwBaud.v[0];
+//			SPBRGH = dwBaud.v[1];
+//		#elif defined(__C30__) || defined __XC16__
+//			dwBaud.Val = (((GetPeripheralClock()/2)+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
+//			U2BRG = dwBaud.Val;
+//		#elif defined(__C32__)
+//			U2BRG = ((GetPeripheralClock()+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
+//			//U2MODE = 0;
+//			U2MODEbits.BRGH = BRGH2;
+//			//U2STA = 0;
+//		#endif
+	}
 }
 #endif // USB_CDC_SET_LINE_CODING_HANDLER

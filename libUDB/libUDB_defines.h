@@ -23,17 +23,6 @@
 #define UDB_DEFINES_H
 
 
-// Types
-//struct bb { uint8_t B0; uint8_t B1; };
-//struct bbbb { uint8_t B0; uint8_t B1; uint8_t B2; uint8_t B3; };
-//struct ww { int16_t W0; int16_t W1; };
-//struct wwww { int16_t W0; int16_t W1; int16_t W2; int16_t W3; };
-//struct LL { int32_t L0; int32_t L1; };
-
-//union intbb { int16_t BB; struct bb _; };
-//union longbbbb { int32_t WW; struct ww _; struct bbbb __; };
-//union longww { int32_t  WW; struct ww _; };
-//union longlongLL { int64_t LL; struct LL _; struct wwww __; };
 #include "udbTypes.h"
 
 //#if SILSIM
@@ -109,6 +98,7 @@
 // DEADRECKONING 1 selects the dead reckoning computations to perform navigation, at 40 Hz.
 #ifndef DEADRECKONING           // define only if not already defined in options.h
 #define DEADRECKONING           1
+//#define DEADRECKONING           0
 #endif
 
 // Wind Estimation and Navigation
@@ -117,7 +107,8 @@
 // Every time the plane performs a significant turn, the plane estimates the wind.
 // This facility only requires a working GPS and the UAV DevBoard. 
 #ifndef WIND_ESTIMATION         // define only if not already defined in options.h
-#define WIND_ESTIMATION         1
+//#define WIND_ESTIMATION         1
+#define WIND_ESTIMATION         0
 #endif
 
 // Enforce that if DEADRECKONING is on, WIND_ESTIMATION must be on as well.
@@ -136,18 +127,12 @@ typedef uint8_t boolean;
 #define true                    1
 #define false                   0
 
-struct ADchannel {
-	int16_t input;  // raw input
-	int16_t value;  // average of the sum of inputs between report outs
-	int16_t offset; // baseline at power up 
-	int32_t sum;    // used as an integrator
-}; // variables for processing an AD channel
-
-
 struct udb_flag_bits {
-	uint16_t unused     : 6;   // shouldn't this be 14 bits?
-	uint16_t a2d_read   : 1;
-	uint16_t radio_on   : 1;
+	uint16_t unused                 : 12;
+	uint16_t a2d_read               : 1;
+	uint16_t radio_on               : 1;
+	uint16_t sonar_updated          : 1;
+	uint16_t sonar_print_telemetry  : 1;
 };
 
 

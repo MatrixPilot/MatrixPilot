@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include <stdio.h>
 #include "SIL-udb.h"
 #include "libUDB.h"
@@ -36,21 +38,21 @@ boolean udb_gps_check_rate(int32_t rate)
 	return (rate == gpsRate);
 }
 
-
-// Call this function to initiate sending a data to the GPS
+// Call this function to initiate sending data to the GPS
 void udb_gps_start_sending_data(void)
 {
-	if (!gpsSocket) return;
-	
 	uint8_t buffer[BUFLEN];
+	int16_t bytesWritten;
 	int16_t c;
 	int16_t pos=0;
-	
+
+	if (!gpsSocket) return;
+
 	while (pos < BUFLEN && (c = udb_gps_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
-	};
+	}
 	
-	int16_t bytesWritten = UDBSocket_write(gpsSocket, (uint8_t*)buffer, pos);
+	bytesWritten = UDBSocket_write(gpsSocket, (uint8_t*)buffer, pos);
 	
 	if (bytesWritten < 0) {
 		UDBSocket_close(gpsSocket);
@@ -74,20 +76,21 @@ boolean udb_serial_check_rate(int32_t rate)
 // Call this function to initiate sending a data to the serial port
 void udb_serial_start_sending_data(void)
 {
-	if (!telemetrySocket) return;
-	
 	uint8_t buffer[BUFLEN];
+	int16_t bytesWritten;
 	int16_t c;
-	int16_t pos=0;
-	
+	int16_t pos = 0;
+
+	if (!telemetrySocket) return;
+
 	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
 	}
-	
-	int16_t bytesWritten = UDBSocket_write(telemetrySocket, (uint8_t*)buffer, pos);
-	
+	bytesWritten = UDBSocket_write(telemetrySocket, (uint8_t*)buffer, pos);
 	if (bytesWritten == -1) {
 		UDBSocket_close(telemetrySocket);
 		telemetrySocket = NULL;
 	}
 }
+
+#endif // (WIN == 1 || NIX == 1)

@@ -1,11 +1,12 @@
 //
-//  SIL-udb.h
+//  SIL-udb.c
 //  MatrixPilot-SIL
 //
 //  Created by Ben Levitt on 2/1/13.
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +14,7 @@
 
 #include "libUDB.h"
 #include "../../libUDB/magnetometer.h"
+#include "../../libUDB/barometer.h"
 #include "../../libUDB/heartbeat.h"
 #include "SIL-config.h"
 
@@ -28,9 +30,10 @@ struct timezone
 	int tz_dsttime;     // type of dst correction to apply
 };
 
-#if 1
+#if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
 #else
+/*
 #ifndef _TIMEVAL_DEFINED // also in winsock[2].h
 #define _TIMEVAL_DEFINED
 struct timeval {
@@ -41,11 +44,11 @@ struct timeval {
 #define timerisset(tvp)  ((tvp)->tv_sec || (tvp)->tv_usec)
 #define timercmp(tvp, uvp, cmp) \
 	(((tvp)->tv_sec != (uvp)->tv_sec) ? \
-	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
-	((tvp)->tv_usec cmp (uvp)->tv_usec))
+	 ((tvp)->tv_sec cmp (uvp)->tv_sec) : \
+	 ((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)  (tvp)->tv_sec = (tvp)->tv_usec = 0
 #endif // _TIMEVAL_DEFINED
-
+ */
 //void  GetSystemTimeAsFileTime(FILETIME*);
 
 inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
@@ -71,6 +74,7 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 #endif // WIN
 
 #include "libUDB.h"
+#include "ADchannel.h"
 #include "magnetometer.h"
 #include "magnetometerOptions.h"
 #include "events.h"
@@ -144,45 +148,65 @@ void udb_skip_imu_calibration(boolean b)
 
 void udb_init(void)
 {
+	int16_t i;
+
 	// If we were reest:
-	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0) {
+	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
+	{
 		mp_rcon = 128; // enable just the external/MCLR reset bit
 	}
-	
-	int16_t i;
-	for (i=0; i<4; i++) {
+
+	for (i = 0; i < 4; i++)
+	{
 		leds[i] = LED_OFF;
 	}
-	
+
 	udb_heartbeat_counter = 0;
-	
 	udb_flags.B = 0;
 	sil_radio_on = 1;
-	
+
 	sil_ui_init(mp_rcon);
-	
-	gpsSocket = UDBSocket_init((SILSIM_GPS_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_GPS_PORT, SILSIM_GPS_HOST, NULL, 0);
-	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient, SILSIM_TELEMETRY_PORT, SILSIM_TELEMETRY_HOST, NULL, 0);
-	
-	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) > 0) {
-		serialSocket = UDBSocket_init(UDBSocketSerial, 0, NULL, SILSIM_SERIAL_RC_INPUT_DEVICE, SILSIM_SERIAL_RC_INPUT_BAUD);
+
+	gpsSocket = UDBSocket_init((SILSIM_GPS_RUN_AS_SERVER) ?
+	                            UDBSocketUDPServer :
+	                            UDBSocketUDPClient,
+	                            SILSIM_GPS_PORT,
+	                            SILSIM_GPS_HOST,
+	                            NULL,
+	                            0);
+	telemetrySocket = UDBSocket_init((SILSIM_TELEMETRY_RUN_AS_SERVER) ?
+	                                  UDBSocketUDPServer :
+	                                  UDBSocketUDPClient,
+	                                  SILSIM_TELEMETRY_PORT,
+	                                  SILSIM_TELEMETRY_HOST,
+	                                  NULL,
+	                                  0);
+	if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) > 0)
+	{
+		serialSocket = UDBSocket_init(UDBSocketSerial,
+		                              0,
+		                              NULL,
+		                              SILSIM_SERIAL_RC_INPUT_DEVICE,
+		                              SILSIM_SERIAL_RC_INPUT_BAUD);
 	}
 }
 
 #define UDB_WRAP_TIME 1000
-#define UDB_STEP_TIME 25
-//#define UDB_STEP_TIME (UDB_WRAP_TIME/HEARTBEAT_HZ)
+//#define UDB_STEP_TIME 25
+#define UDB_STEP_TIME (UDB_WRAP_TIME/HEARTBEAT_HZ)
 
 int initialised = 0;
 
 void udb_run(void)
 {
 	uint16_t currentTime;
-	uint16_t nextHeartbeatTime;
+	static uint16_t nextHeartbeatTime;
 
-	if (!initialised) {
+	if (!initialised)
+	{
 		initialised = 1;
-		if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0) {
+		if (strlen(SILSIM_SERIAL_RC_INPUT_DEVICE) == 0)
+		{
 			udb_pwIn[THROTTLE_INPUT_CHANNEL] = 2000;
 			udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
 		}
@@ -190,28 +214,36 @@ void udb_run(void)
 	}
 
 //	while (1) {
-		if (!handleUDBSockets()) {
+		if (!handleUDBSockets())
+		{
 			sleep_milliseconds(1);
 		}
 
 		currentTime = get_current_milliseconds();
 
-		if (currentTime >= nextHeartbeatTime && !(nextHeartbeatTime <= UDB_STEP_TIME && currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME)) {
+		if (currentTime >= nextHeartbeatTime &&
+		    !(nextHeartbeatTime <= UDB_STEP_TIME && 
+		    currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME))
+		{
 			udb_callback_read_sensors();
 
-			udb_flags._.radio_on = (sil_radio_on && udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
+			udb_flags._.radio_on = (sil_radio_on && 
+			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && 
+			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
+
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 
-			udb_background_callback_periodic(); // Run at 40Hz
-			udb_servo_callback_prepare_outputs();
+			udb_heartbeat_40hz_callback(); // Run at 40Hz
+			udb_heartbeat_callback(); // Run at HEARTBEAT_HZ
 
 			sil_ui_update();
 
-			if (udb_heartbeat_counter % 80 == 0) {
-//			if (udb_heartbeat_counter % (2 * HEARTRATE_HZ) == 0) {
+//			if (udb_heartbeat_counter % 80 == 0)
+			if (udb_heartbeat_counter % (2 * HEARTBEAT_HZ) == 0)
+			{
 				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
 			}
-			
+
 			udb_heartbeat_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
@@ -220,9 +252,9 @@ void udb_run(void)
 //	}
 }
 
-void udb_background_trigger(void)
+void udb_background_trigger(background_callback callback)
 {
-	udb_background_callback_triggered();
+	if (callback) callback();
 }
 
 uint8_t udb_cpu_load(void)
@@ -242,8 +274,10 @@ void udb_servo_record_trims(void)
 	int16_t i;
 
 	for (i = 1; i <= NUM_INPUTS; i++)
+	{
 		udb_pwTrim[i] = udb_pwIn[i];
-	return;
+//		DPRINT("udb_pwTrim[%i] = %u\r\n", i, udb_pwTrim[i]);
+	}
 }
 
 void udb_set_action_state(boolean newValue)
@@ -270,25 +304,26 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
+	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+
 	sil_ui_will_reset();
 
 	if (gpsSocket)       UDBSocket_close(gpsSocket);
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket)    UDBSocket_close(serialSocket);
 
-	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 	execv(mp_argv[0], args);
 	fprintf(stderr, "Failed to reset UDB %s\n", mp_argv[0]);
 	exit(1);
 }
 
 // time functions
-uint16_t get_current_milliseconds()
+uint16_t get_current_milliseconds(void)
 {
 	// *nix / mac implementation
 	struct timeval tv;
 	struct timezone tz;
-	
+
 	gettimeofday(&tv,&tz);
 	return tv.tv_usec / 1000;
 }
@@ -305,42 +340,97 @@ void sleep_milliseconds(uint16_t ms)
 #endif
 }
 
-void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
+void sil_handle_serial_rc_input(uint8_t *buffer, int bytesRead)
 {
 	int i;
-	
+
 	uint8_t CK_A = 0;
 	uint8_t CK_B = 0;
 	uint8_t headerBytes = 0;
 	uint8_t numServos = 0;
 
-	if (bytesRead >= 2 && buffer[0]==0xFF && buffer[1]==0xEE) {
+	if (bytesRead >= 2 && buffer[0] == 0xFF && buffer[1] == 0xEE)
+	{
 		headerBytes = 2;
 		numServos = 8;
 	}
-	else if (bytesRead >= 3 && buffer[0]==0xFE && buffer[1]==0xEF) {
+	else if (bytesRead >= 3 && buffer[0] == 0xFE && buffer[1] == 0xEF)
+	{
 		headerBytes = 3;
 		numServos = buffer[2];
 	}
 
-	if (numServos && bytesRead >= headerBytes + numServos*2 + 2) {
-		for (i=headerBytes; i < headerBytes + numServos*2; i++)
+	if (numServos && bytesRead >= headerBytes + numServos*2 + 2)
+	{
+		for (i = headerBytes; i < headerBytes + numServos*2; i++)
 		{
 			CK_A += buffer[i];
 			CK_B += CK_A;
 		}
-		if (CK_A == buffer[headerBytes + numServos*2] && CK_B == buffer[headerBytes + numServos*2 + 1]) {
-			for (i=1; i <= numServos; i++) {
-				udb_pwIn[i] = (uint16_t)(buffer[headerBytes + (i-1)*2])*256 + buffer[headerBytes + (i-1)*2 + 1];
+		if (CK_A == buffer[headerBytes + numServos*2] &&
+		    CK_B == buffer[headerBytes + numServos*2 + 1])
+		{
+			for (i = 1; i <= numServos; i++)
+			{
+				udb_pwIn[i] = (uint16_t)(buffer[headerBytes + (i-1)*2])*256 +
+				                         buffer[headerBytes + (i-1)*2 + 1];
 			}
 		}
 	}
 }
 
-#define BUFLEN 512
+#define GPS_LOGFILE  "gps_log.txt"
+#define TELE_LOGFILE "tele_log.txt"
+#define SIO_LOGFILE  "sio_log.txt"
+//#define LOG_GPS_DATA
+//#define LOG_TELE_DATA
+//#define LOG_SIO_DATA
 
+static void log_data(char* filename, uint8_t* buffer, int len)
+{
+	FILE* fp;
+	fp = fopen(filename, "a");
+	if (fp)
+	{
+		fwrite(buffer, 1, len, fp);
+		fclose(fp);
+	}
+}
+
+//#define SIM_READ
+#ifdef SIM_READ
 boolean handleUDBSockets(void)
 {
+#define BUFLEN 32
+	uint8_t buffer[BUFLEN];
+	int32_t bytesRead = 0;
+	int16_t i;
+	boolean didRead = false;
+
+	static FILE* fp = 0;
+	if (!fp) {
+		fp = fopen(GPS_LOGFILE, "r");
+		if (!fp) {
+			printf("ERROR: failed to open %s\r\n", GPS_LOGFILE);
+		}
+	}
+	if (fp) {
+		bytesRead = fread(buffer, 1, BUFLEN, fp);
+		if (!bytesRead) {
+			rewind(fp);
+			bytesRead = fread(buffer, 1, BUFLEN, fp);
+		}
+		for (i = 0; i < bytesRead; i++) {
+			udb_gps_callback_received_byte(buffer[i]);
+		}
+	}
+	if (bytesRead > 0) didRead = true;
+	return didRead;
+}
+#else
+boolean handleUDBSockets(void)
+{
+#define BUFLEN 512
 	uint8_t buffer[BUFLEN];
 	int32_t bytesRead;
 	int16_t i;
@@ -352,47 +442,48 @@ boolean handleUDBSockets(void)
 		if (bytesRead < 0) {
 			UDBSocket_close(gpsSocket);
 			gpsSocket = NULL;
-		}
-		else {
-			for (i=0; i<bytesRead; i++) {
+		} else {
+#ifdef LOG_GPS_DATA
+			log_data(GPS_LOGFILE, buffer, bytesRead);
+#endif // LOG_GPS_DATA
+			for (i = 0; i < bytesRead; i++) {
 				udb_gps_callback_received_byte(buffer[i]);
 			}
-			if (bytesRead>0) didRead = true;
+			if (bytesRead > 0) didRead = true;
 		}
 	}
-
 	// Handle Telemetry Socket
 	if (telemetrySocket) {
 		bytesRead = UDBSocket_read(telemetrySocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
 			UDBSocket_close(telemetrySocket);
 			telemetrySocket = NULL;
-		}
-		else {
-			for (i=0; i<bytesRead; i++) {
+		} else {
+#ifdef LOG_TELE_DATA
+			log_data(TELE_LOGFILE, buffer, bytesRead);
+#endif // LOG_TELE_DATA
+			for (i = 0; i < bytesRead; i++) {
 				udb_serial_callback_received_byte(buffer[i]);
 			}
-			if (bytesRead>0) didRead = true;
+			if (bytesRead > 0) didRead = true;
 		}
 	}
-
 	// Handle optional Serial RC input Socket
 	if (serialSocket) {
 		bytesRead = UDBSocket_read(serialSocket, buffer, BUFLEN);
 		if (bytesRead < 0) {
 			UDBSocket_close(serialSocket);
 			serialSocket = NULL;
-		}
-		else {
-			if (bytesRead>0) {
-				sil_handle_seial_rc_input(buffer, bytesRead);
+		} else {
+			if (bytesRead > 0) {
+				sil_handle_serial_rc_input(buffer, bytesRead);
 				didRead = true;
 			}
 		}
 	}
-
 	return didRead;
 }
+#endif // SIM_READ
 
 #if (MAG_YAW_DRIFT == 1)
 
@@ -405,9 +496,9 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)
 
 void I2C_doneReadMagData(void)
 {
-	magFieldRaw[0] = (magreg[0]<<8)+magreg[1];
-	magFieldRaw[1] = (magreg[2]<<8)+magreg[3];
-	magFieldRaw[2] = (magreg[4]<<8)+magreg[5];
+	magFieldRaw[0] = (magreg[0]<<8) + magreg[1];
+	magFieldRaw[1] = (magreg[2]<<8) + magreg[3];
+	magFieldRaw[2] = (magreg[4]<<8) + magreg[5];
 
 	if (magMessage == 7)
 	{
@@ -438,6 +529,7 @@ void I2C_doneReadMagData(void)
 
 void HILSIM_MagData(magnetometer_callback_funcptr callback)
 {
+	(void)callback;
 //	magnetometer_callback = callback;
 	magMessage = 7;                 // indicate valid magnetometer data
 	I2C_doneReadMagData();          // run the magnetometer computations
@@ -452,15 +544,29 @@ int setjmp(void)
 
 int16_t FindFirstBitFromLeft(int16_t val)
 {
-	int16_t i;
+	int16_t i = 0;
 
-	if (val == 0) return 0;
-
-	for (i = 1; i <= 16; i++)
+	if (val != 0) 
 	{
-		if (val & 0x8000) break;
-		val <<= 1;
+		for (i = 1; i <= 16; i++)
+		{
+			if (val & 0x8000) break;
+			val <<= 1;
+		}
 	}
 	return i;
 }
 
+void vApplicationTickHook(void) {}
+void vApplicationIdleHook(void) {}
+
+//void *pvPortMalloc( size_t xWantedSize )
+//{
+//	return malloc(xWantedSize);
+//}
+//void vPortFree( void *pv )
+//{
+//	free(pv);
+//}
+
+#endif // (WIN == 1 || NIX == 1)

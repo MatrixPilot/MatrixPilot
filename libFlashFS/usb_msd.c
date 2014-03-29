@@ -21,7 +21,15 @@
 
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
+#include "FSconfig.h"
+
+#ifdef USE_AT45D_FLASH
 #include "MDD_AT45D.h"
+#elif defined USE_SD_INTERFACE_WITH_SPI
+#include "MDD File System/SD-SPI.h"
+#else
+#error here
+#endif // USE_AT45D_FLASH
 
 
 //The LUN variable definition is critical to the MSD function driver.  This
@@ -32,6 +40,8 @@
 //  In this example the media initialization function is named 
 //  "MediaInitialize", the read capacity function is named "ReadCapacity",
 //  etc.
+
+#ifdef USE_AT45D_FLASH
 LUN_FUNCTIONS LUN[MAX_LUN + 1] = 
 {
 	{
@@ -44,18 +54,34 @@ LUN_FUNCTIONS LUN[MAX_LUN + 1] =
 		&MDD_AT45D_SectorWrite
 	}
 };
+#elif defined USE_SD_INTERFACE_WITH_SPI
+LUN_FUNCTIONS LUN[MAX_LUN + 1] = 
+{
+	{
+		&MDD_SDSPI_MediaInitialize,
+		&MDD_SDSPI_ReadCapacity,
+		&MDD_SDSPI_ReadSectorSize,
+		&MDD_SDSPI_MediaDetect,
+		&MDD_SDSPI_SectorRead,
+		&MDD_SDSPI_WriteProtectState,
+		&MDD_SDSPI_SectorWrite
+	}
+};
+#else
+#error here
+#endif // USE_AT45D_FLASH
 
 // Standard Response to INQUIRY command stored in ROM
 const ROM InquiryResponse inq_resp = {
-	0x00,		// peripheral device is connected, direct access block device
-	0x80,		// removable
-	0x04,		// version = 00=> does not conform to any standard, 4=> SPC-2
-	0x02,		// response is in format specified by SPC-2
-	0x20,		// n-4 = 36-4=32= 0x20
-	0x00,		// sccs etc.
-	0x00,		// bque=1 and cmdque=0,indicates simple queueing 00 is obsolete,
-				// but as in case of other device, we are just using 00
-	0x00,		// 00 obsolete, 0x80 for basic task queueing
+	0x00,       // peripheral device is connected, direct access block device
+	0x80,       // removable
+	0x04,       // version = 00=> does not conform to any standard, 4=> SPC-2
+	0x02,       // response is in format specified by SPC-2
+	0x20,       // n-4 = 36-4=32= 0x20
+	0x00,       // sccs etc.
+	0x00,       // bque=1 and cmdque=0,indicates simple queueing 00 is obsolete,
+	            // but as in case of other device, we are just using 00
+	0x00,       // 00 obsolete, 0x80 for basic task queueing
 	{'M','i','c','r','o','c','h','p'
 	},
 	// this is the T10 assigned Vendor ID

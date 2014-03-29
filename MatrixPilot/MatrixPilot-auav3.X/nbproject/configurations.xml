@@ -4,6 +4,18 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="f4" displayName="Config" projectFiles="true">
+        <itemPath>../../Config/airspeed_options.h</itemPath>
+        <itemPath>../../Config/magnetometerOptions.h</itemPath>
+        <itemPath>../../Config/nv_memory_options.h</itemPath>
+        <itemPath>../../Config/options.h</itemPath>
+        <itemPath>../../Config/options_quad.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5" displayName="libCntrl" projectFiles="true">
+        <itemPath>../../libCntrl/airspeedCntrl.h</itemPath>
+        <itemPath>../../libCntrl/cameraCntrl.h</itemPath>
+        <itemPath>../../libCntrl/motorCntrl.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
@@ -13,6 +25,8 @@
         <itemPath>../../libDCM/rmat.h</itemPath>
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
         <itemPath>../../libDCM/mathlibNAV.h</itemPath>
+        <itemPath>../../libDCM/deadReckoning.h</itemPath>
+        <itemPath>../../libDCM/estWind.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.h</itemPath>
@@ -24,7 +38,6 @@
         <itemPath>../../libFlashFS/usb_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
         <itemPath>../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../libUDB/libUDB_defines.h</itemPath>
@@ -34,7 +47,6 @@
         <itemPath>../../libUDB/events.h</itemPath>
         <itemPath>../../libUDB/I2C.h</itemPath>
         <itemPath>../../libUDB/NV_memory.h</itemPath>
-        <itemPath>../../libUDB/nv_memory_options.h</itemPath>
         <itemPath>../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
@@ -49,6 +61,8 @@
         <itemPath>../../libUDB/fixDeps.h</itemPath>
         <itemPath>../../libUDB/mpu_spi.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../libUDB/ADchannel.h</itemPath>
+        <itemPath>../../libUDB/filters.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -64,16 +78,12 @@
         <itemPath>../parameter_datatypes.h</itemPath>
         <itemPath>../parameter_table.h</itemPath>
         <itemPath>../mode_switch.h</itemPath>
-        <itemPath>../airspeed_options.h</itemPath>
-        <itemPath>../airspeedCntrl.h</itemPath>
         <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
-        <itemPath>../options.h</itemPath>
         <itemPath>../config.h</itemPath>
         <itemPath>../preflight.h</itemPath>
         <itemPath>../redef.h</itemPath>
         <itemPath>../fly_by_datalink.h</itemPath>
-        <itemPath>../HardwareProfile.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
         <itemPath>../MAVFlexiFunctions.h</itemPath>
@@ -81,6 +91,8 @@
         <itemPath>../MAVParams.h</itemPath>
         <itemPath>../MAVLink.h</itemPath>
         <itemPath>../MAVUDBExtra.h</itemPath>
+        <itemPath>../flightplan-waypoints.h</itemPath>
+        <itemPath>../navigate.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -231,6 +243,17 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f4" displayName="libCntrl" projectFiles="true">
+        <itemPath>../../libCntrl/airspeedCntrl.c</itemPath>
+        <itemPath>../../libCntrl/altitudeCntrl.c</itemPath>
+        <itemPath>../../libCntrl/altitudeCntrlVariable.c</itemPath>
+        <itemPath>../../libCntrl/cameraCntrl.c</itemPath>
+        <itemPath>../../libCntrl/motorCntrl.c</itemPath>
+        <itemPath>../../libCntrl/pitchCntrl.c</itemPath>
+        <itemPath>../../libCntrl/rollCntrl.c</itemPath>
+        <itemPath>../../libCntrl/sonarCntrl.c</itemPath>
+        <itemPath>../../libCntrl/yawCntrl.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/estWind.c</itemPath>
         <itemPath>../../libDCM/estYawDrift.c</itemPath>
@@ -285,6 +308,9 @@
         <itemPath>../../libUDB/osd_bit.c</itemPath>
         <itemPath>../../libUDB/osd_spi.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../libUDB/heartbeat.c</itemPath>
+        <itemPath>../../libUDB/ADchannel.c</itemPath>
+        <itemPath>../../libUDB/filters.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -309,27 +335,20 @@
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../config_tests.c</itemPath>
         <itemPath>../behavior.c</itemPath>
-        <itemPath>../cameraCntrl.c</itemPath>
         <itemPath>../navigate.c</itemPath>
-        <itemPath>../pitchCntrl.c</itemPath>
-        <itemPath>../rollCntrl.c</itemPath>
         <itemPath>../servoMix.c</itemPath>
         <itemPath>../states.c</itemPath>
-        <itemPath>../yawCntrl.c</itemPath>
         <itemPath>../telemetry.c</itemPath>
         <itemPath>../servoPrepare.c</itemPath>
         <itemPath>../flightplan-waypoints.c</itemPath>
         <itemPath>../flightplan-logo.c</itemPath>
         <itemPath>../mp_osd.c</itemPath>
-        <itemPath>../altitudeCntrl.c</itemPath>
         <itemPath>../MAVLink.c</itemPath>
         <itemPath>../mode_switch.c</itemPath>
         <itemPath>../data_services.c</itemPath>
         <itemPath>../data_storage.c</itemPath>
         <itemPath>../nv_memory_table.c</itemPath>
         <itemPath>../parameter_table.c</itemPath>
-        <itemPath>../airspeedCntrl.c</itemPath>
-        <itemPath>../altitudeCntrlVariable.c</itemPath>
         <itemPath>../euler_angles.c</itemPath>
         <itemPath>../main.c</itemPath>
         <itemPath>../preflight.c</itemPath>
@@ -351,6 +370,7 @@
         <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
         <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
         <itemPath>../../Microchip/USB/CDC Device Driver/usb_function_cdc.c</itemPath>
+        <itemPath>../../Microchip/MDD File System/SD-SPI.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -363,6 +383,9 @@
     <Elem>..</Elem>
     <Elem>../../libUDB</Elem>
     <Elem>../../libDCM</Elem>
+    <Elem>../../libCntrl</Elem>
+    <Elem>../../Config</Elem>
+    <Elem>../../Microchip/MDD File System</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -411,7 +434,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="..;../../libFlashFS;../../MAVLink/include;../../Microchip/Include"/>
+                  value="..;../../Config;../../libFlashFS;../../MAVLink/include;../../Microchip;../../Microchip/Include"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -434,6 +457,7 @@
         <property key="preprocessor-macros" value="AUAV3"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
@@ -588,6 +612,7 @@
         <property key="programoptions.preserveprogramrange.end" value="0x557ff"/>
         <property key="programoptions.preserveprogramrange.start" value="0x0"/>
         <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
         <property key="voltagevalue" value="3.25"/>

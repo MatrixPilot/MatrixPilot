@@ -19,15 +19,19 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for AIRFRAME_TYPE
 #include "libUDB_internal.h"
+#include "eeprom_udb4.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
 #include "analogs.h"
 #include "events.h"
+#include "osd.h"
 
-#if (USE_I2C1_DRIVER == 1)
-#include "I2C.h"
-#endif
+//#if (USE_I2C1_DRIVER == 1)
+//#include "I2C.h"
+//#endif
 
 // Include the NV memory services if required
 #if (USE_NV_MEMORY == 1)
@@ -57,27 +61,24 @@ void udb_skip_imu_calibration(boolean b)
 {
 	udb_skip_flags.skip_imu_cal = 1;
 }
+#endif // (USE_NV_MEMORY == 1)
 
-#endif
-
-
-//#if(USE_NV_MEMORY == 1)
-//if(udb_skip_flags.skip_radio_trim == 1)
-//if(udb_skip_flags.skip_imu_cal == 1)
-//#endif
-//
+void TriggerIMU(void);
+void init_micros(void);
 
 void udb_init(void)
 {
 	udb_flags.B = 0;
 
+//	init_micros();
+
 	init_analogs();
 
 	udb_init_ADC();
 	init_events();
-#if (USE_I2C1_DRIVER == 1)
-	I2C1_Init();
-#endif
+//#if (USE_I2C1_DRIVER == 1)
+//	I2C1_Init(); // moved into nv_memory_init()
+//#endif
 #if (USE_NV_MEMORY == 1)
 	nv_memory_init();
 	data_storage_init();
@@ -97,8 +98,13 @@ void udb_init(void)
 #if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif
-	udb_init_pwm();
-	udb_init_osd();
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
+	init_servoOut(); // was called udb_init_pwm()
+#else
+#error here 1
+	init_motorOut();
+#endif // AIRFRAME_TYPE
+	osd_init();
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
@@ -106,7 +112,11 @@ void udb_init(void)
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	MPU6000_init16();
+//#if (USE_FREERTOS)
+//	MPU6000_init16(&TriggerIMU);
+//#else
+	MPU6000_init16(&heartbeat);
+//#endif
 #endif
 
 	SRbits.IPL = 0; // turn on all interrupt priorities
@@ -120,52 +130,4 @@ void udb_run(void)
 	// pause cpu counting timer while not in an ISR
 	indicate_loading_main;
 #endif
-}
-
-#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
-	udb_yrate.offset = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-	udb_zrate.offset = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset = udb_vref.value;
-#endif
-}
-#else  // horizontal initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset  = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value;
-	udb_yrate.offset  = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
-	udb_zrate.offset  = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset   = udb_vref.value;
-#endif
-}
-#endif // INITIALIZE_VERTICAL
-
-// saturation logic to maintain pulse width within bounds
-int16_t udb_servo_pulsesat(int32_t pw)
-{
-	if (pw > SERVOMAX) pw = SERVOMAX;
-	if (pw < SERVOMIN) pw = SERVOMIN;
-	return (int16_t)pw;
 }

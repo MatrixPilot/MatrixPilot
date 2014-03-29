@@ -19,30 +19,27 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsParseCommon.h"
 #include "mathlibNAV.h"
+#include "estWind.h"
 
-int16_t estimatedWind[3] = { 0, 0, 0 };
 
-static int16_t groundVelocityHistory[3] = { 0, 0, 0 };
-static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
+#if (WIND_ESTIMATION == 1)
+
+static vect3_16t groundVelocityHistory = { 0, 0, 0 };
+static vect3_16t fuselageDirectionHistory = { 0, 0, 0 };
 
 #define MINROTATION ((int16_t)(0.2 * RMAX))
 
-void estimateWind(void)
+void estWind(vect3_16t* est_wind, struct relative3D gps_velocity)
 {
-#if (WIND_ESTIMATION == 1)
-
-	if (dcm_flags._.skip_yaw_drift) return;
-	
-	int16_t index;
-	int16_t groundVelocity[3];
-	int16_t groundVelocitySum[3];
-	int16_t groundVelocityDiff[3];
-	int16_t fuselageDirection[3];
-	int16_t fuselageDirectionSum[3];
-	int16_t fuselageDirectionDiff[3];
+	vect3_16t groundVelocity;
+	vect3_16t groundVelocitySum;
+	vect3_16t groundVelocityDiff;
+	vect3_16t fuselageDirection;
+	vect3_16t fuselageDirectionSum;
+	vect3_16t fuselageDirectionDiff;
 	uint16_t magVelocityDiff;
 	uint16_t magDirectionDiff;
 	int8_t angleVelocityDiff;
@@ -54,74 +51,94 @@ void estimateWind(void)
 	struct relative2D xy;
 	uint16_t estimatedAirspeed;
 
-	groundVelocity[0] = GPSvelocity.x;
-	groundVelocity[1] = GPSvelocity.y;
-	groundVelocity[2] = GPSvelocity.z;
+	if (dcm_flags._.skip_yaw_drift) return;
 
-	fuselageDirection[0] = -rmat[1];
-	fuselageDirection[1] =  rmat[4];
-	fuselageDirection[2] = -rmat[7];
+	groundVelocity.x = gps_velocity.x >>= 1;
+	groundVelocity.y = gps_velocity.y >>= 1;
+	groundVelocity.z = gps_velocity.z >>= 1;
 
-	for (index = 0; index < 3; index++)
-	{
-		groundVelocity[index] >>= 1;
-		fuselageDirection[index] >>= 1;
-		groundVelocitySum[index]  = groundVelocity[index] + groundVelocityHistory[index];
-		groundVelocityDiff[index] = groundVelocity[index] - groundVelocityHistory[index];
-		fuselageDirectionSum[index]  = fuselageDirection[index] + fuselageDirectionHistory[index];
-		fuselageDirectionDiff[index] = fuselageDirection[index] - fuselageDirectionHistory[index];
-	}
+	fuselageDirection.x = -(rmat[1] >>= 1);
+	fuselageDirection.y =  (rmat[4] >>= 1);
+	fuselageDirection.z = -(rmat[7] >>= 1);
 
-	xy.x = fuselageDirectionDiff[0];
-	xy.y = fuselageDirectionDiff[1];
+//	for (index = 0; index < 3; index++)
+//	{
+//		groundVelocity >>= 1;
+//		fuselageDirection >>= 1;
+		groundVelocitySum.x  = groundVelocity.x + groundVelocityHistory.x;
+		groundVelocitySum.y  = groundVelocity.y + groundVelocityHistory.y;
+		groundVelocitySum.z  = groundVelocity.z + groundVelocityHistory.z;
+		groundVelocityDiff.x = groundVelocity.x - groundVelocityHistory.x;
+		groundVelocityDiff.y = groundVelocity.y - groundVelocityHistory.y;
+		groundVelocityDiff.z = groundVelocity.z - groundVelocityHistory.z;
+		fuselageDirectionSum.x  = fuselageDirection.x + fuselageDirectionHistory.x;
+		fuselageDirectionSum.y  = fuselageDirection.y + fuselageDirectionHistory.y;
+		fuselageDirectionSum.z  = fuselageDirection.z + fuselageDirectionHistory.z;
+		fuselageDirectionDiff.x = fuselageDirection.x - fuselageDirectionHistory.x;
+		fuselageDirectionDiff.y = fuselageDirection.y - fuselageDirectionHistory.y;
+		fuselageDirectionDiff.z = fuselageDirection.z - fuselageDirectionHistory.z;
+//	}
+
+	xy.x = fuselageDirectionDiff.x;
+	xy.y = fuselageDirectionDiff.y;
 	angleDirectionDiff = rect_to_polar(&xy);
 
-	xy.x = groundVelocityDiff[0];
-	xy.y = groundVelocityDiff[1];
+	xy.x = groundVelocityDiff.x;
+	xy.y = groundVelocityDiff.y;
 	angleVelocityDiff = rect_to_polar(&xy);
 
 	thetaDiff = angleVelocityDiff - angleDirectionDiff;
 	costhetaDiff = cosine(thetaDiff);
 	sinthetaDiff = sine(thetaDiff);
 
-	magDirectionDiff = vector3_mag(fuselageDirectionDiff[0],
-	                               fuselageDirectionDiff[1],
-	                               fuselageDirectionDiff[2]);
+	magDirectionDiff = vector3_mag(fuselageDirectionDiff.x,
+	                               fuselageDirectionDiff.y,
+	                               fuselageDirectionDiff.z);
 
-	magVelocityDiff = vector3_mag(groundVelocityDiff[0],
-	                              groundVelocityDiff[1],
-	                              groundVelocityDiff[2]);
+	magVelocityDiff = vector3_mag(groundVelocityDiff.x,
+	                              groundVelocityDiff.y,
+	                              groundVelocityDiff.z);
 
 	if (magDirectionDiff > MINROTATION)
 	{
 		longaccum._.W1 = magVelocityDiff >> 2;
 		longaccum._.W0 = 0;
 #if (HILSIM == 1)
-		estimatedAirspeed = as_sim.BB; // use the simulation as a pitot tube
+		estimatedAirspeed = hilsim_airspeed.BB; // use the simulation as a pitot tube
 #else
 		estimatedAirspeed = __builtin_divud(longaccum.WW, magDirectionDiff);
 #endif
-		longaccum.WW = (__builtin_mulss(costhetaDiff, fuselageDirectionSum[0])
-		              - __builtin_mulss(sinthetaDiff, fuselageDirectionSum[1])) << 2;
+		longaccum.WW = (__builtin_mulss(costhetaDiff, fuselageDirectionSum.x)
+		              - __builtin_mulss(sinthetaDiff, fuselageDirectionSum.y)) << 2;
 		longaccum.WW = (__builtin_mulus(estimatedAirspeed, longaccum._.W1)) << 2;
-		estimatedWind[0] = estimatedWind[0] + 
-		    ((groundVelocitySum[0] - longaccum._.W1 - estimatedWind[0]) >> 4);
+		est_wind->x = est_wind->x + 
+		    ((groundVelocitySum.x - longaccum._.W1 - est_wind->x) >> 4);
 
-		longaccum.WW = (__builtin_mulss(sinthetaDiff, fuselageDirectionSum[0])
-		              + __builtin_mulss(costhetaDiff, fuselageDirectionSum[1])) << 2;
+		longaccum.WW = (__builtin_mulss(sinthetaDiff, fuselageDirectionSum.x)
+		              + __builtin_mulss(costhetaDiff, fuselageDirectionSum.y)) << 2;
 		longaccum.WW = (__builtin_mulus(estimatedAirspeed, longaccum._.W1)) << 2;
-		estimatedWind[1] = estimatedWind[1] +
-		    ((groundVelocitySum[1] - longaccum._.W1 - estimatedWind[1]) >> 4);
+		est_wind->y = est_wind->y +
+		    ((groundVelocitySum.y - longaccum._.W1 - est_wind->y) >> 4);
 
-		longaccum.WW = (__builtin_mulus(estimatedAirspeed, fuselageDirectionSum[2])) << 2;
-		estimatedWind[2] = estimatedWind[2] +
-		((groundVelocitySum[2] - longaccum._.W1 - estimatedWind[2]) >> 4);
+		longaccum.WW = (__builtin_mulus(estimatedAirspeed, fuselageDirectionSum.z)) << 2;
+		est_wind->z = est_wind->z +
+		((groundVelocitySum.z - longaccum._.W1 - est_wind->z) >> 4);
 
-		for (index = 0; index < 3; index++)
-		{
-			groundVelocityHistory[index] = groundVelocity[index];
-			fuselageDirectionHistory[index] = fuselageDirection[index];
-		}
+//		for (index = 0; index < 3; index++)
+//		{
+			groundVelocityHistory = groundVelocity;
+			fuselageDirectionHistory = fuselageDirection;
+//		}
 	}
-#endif // WIND_ESTIMATION
 }
+
+#else
+
+void estWind(vect3_16t* est_wind, struct relative3D gps_velocity)
+{
+	est_wind->x = 0;
+	est_wind->y = 0;
+	est_wind->z = 0;
+}
+
+#endif // WIND_ESTIMATION

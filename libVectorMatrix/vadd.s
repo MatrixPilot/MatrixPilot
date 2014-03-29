@@ -25,7 +25,7 @@
 
 	; Local inclusions.
 	.nolist
-	.include	"dspcommon.inc"		; fractsetup
+	.include "dspcommon.inc"    ; fractsetup
 	.list
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -50,9 +50,9 @@
 ;	w0 = ptr to destination vector (dstV)
 ;
 ; System resources usage:
-;	{w0..w4}	used, not restored
-;	 AccuA		saved, used, restored
-;	 CORCON		saved, used, restored
+;	{w0..w4}    used, not restored
+;	 AccuA      saved, used, restored
+;	 CORCON     saved, used, restored
 ;
 ; DO and REPEAT instruction usage.
 ;	1 level DO instruction
@@ -65,81 +65,80 @@
 ;	17 + 3*numElems
 ;............................................................................
 
-	.global	_VectorAdd	; export
+	.global _VectorAdd  ; export
 _VectorAdd:
 
 ;	save the 40 bit A accumulator
-	push	ACCAL
-	push	ACCAH
-	push	ACCAU
+	push    ACCAL
+	push    ACCAH
+	push    ACCAU
 
 ;............................................................................
 
 	; Prepare CORCON for fractional computation.
-	push	CORCON
-	fractsetup	w4
+	push     CORCON
+	fractsetup  w4
 
 ;............................................................................
 
-	mov	w1,w4				; save return value (dstV)
+	mov      w1,w4      ; save return value (dstV)
 
 ;............................................................................
 
 	; Prepare operation.
-	dec	w0,w0				; w0 = numElems-1
+	dec     w0,w0       ; w0 = numElems-1
 
 ;	save the do loop registers
-	push	DCOUNT
-	push	DOSTARTL
-	push	DOSTARTH
-	push	DOENDL
-	push	DOENDH
+	push    DCOUNT
+	push    DOSTARTL
+	push    DOSTARTH
+	push    DOENDL
+	push    DOENDH
 
 	; Perform operation.
-	do	w0,_endAdd		; {	; do (numElems-1)+1 times
+	do      w0,_endAdd  ; { ; do (numElems-1)+1 times
 .ifdef PSV_ERRATA
-	mov	[w2++],w5
-	lac	w5,a			; a  = srcV1[n]
-						; w2-> srcV1[n+1]
-	mov	[w3++],w5
-	add	w5,a			; a += srcV2[n]
-						; w3-> srcV2[n+1]
+	mov     [w2++],w5
+	lac     w5,a        ; a  = srcV1[n]
+	                    ; w2-> srcV1[n+1]
+	mov     [w3++],w5
+	add     w5,a        ; a += srcV2[n]
+	                    ; w3-> srcV2[n+1]
 .else
-	lac	[w2++],a			; a  = srcV1[n]
-						; w2-> srcV1[n+1]
-	add	[w3++],a			; a += srcV2[n]
-						; w3-> srcV2[n+1]
+	lac     [w2++],a    ; a  = srcV1[n]
+	                    ; w2-> srcV1[n+1]
+	add     [w3++],a    ; a += srcV2[n]
+	                    ; w3-> srcV2[n+1]
 .endif
 _endAdd:
-	sac	a,[w1++]			; dstV[n] = srcV1[n] + srcV2[n]
+	sac      a,[w1++]   ; dstV[n] = srcV1[n] + srcV2[n]
 
 ;	restore the do loop registers
-	pop		DOENDH
-	pop		DOENDL
-	pop		DOSTARTH
-	pop		DOSTARTL
-	pop		DCOUNT
+	pop     DOENDH
+	pop     DOENDL
+	pop     DOSTARTH
+	pop     DOSTARTL
+	pop     DCOUNT
 
 ; }
 
 ;............................................................................
 
-	mov	w4,w0				; restore return value
+	mov     w4,w0       ; restore return value
 
 ;............................................................................
 
 	; restore CORCON.
-	pop	CORCON
+	pop     CORCON
 
 ;............................................................................
 
 ;	restore the 40 bit A accumulator
-	pop		ACCAU
-	pop		ACCAH
-	pop		ACCAL
+	pop     ACCAU
+	pop     ACCAH
+	pop     ACCAL
 
-
-	return	
+	return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

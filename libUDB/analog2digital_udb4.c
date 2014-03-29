@@ -23,6 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "ADchannel.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -33,9 +34,9 @@
 // A first order digital lowpass filter with a time constant of about 32 milliseconds
 // is applied to improve signal to noise.
 
-struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;  // x, y, and z accelerometer channels
-struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;   // x, y, and z gyro channels
-struct ADchannel udb_vref;                            // reference voltage
+//struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;  // x, y, and z accelerometer channels
+//struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;   // x, y, and z gyro channels
+//struct ADchannel udb_vref;                            // reference voltage
 
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo pwIn/Out/Trim arrays
@@ -44,8 +45,8 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 // Number of locations for ADC buffer = 10 (AN1,4,6,9,10,11,15,16,17,18) x 1 = 10 words
 // Align the buffer to 10 words or 20 bytes. This is needed for peripheral indirect mode
 #define NUM_AD_CHAN 10
-int16_t  BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
-int16_t  BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
+int16_t BufferA[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
+int16_t BufferB[NUM_AD_CHAN] __attribute__((space(dma),aligned(32)));
 
 
 #if 0   // these are the original/legacy values, switch this off to test Mark's new timing constants

@@ -20,6 +20,8 @@
 
 
 #include "libDCM.h"
+//#include "estAltitude.h"
+#include "gpsParseCommon.h"
 #include "../libUDB/barometer.h"
 #include "estAltitude.h"
 #include <math.h>
@@ -36,55 +38,55 @@ int barometer_temperature_gnd = 0;
 long barometer_altitude;        // above sea level altitude - ASL (millimeters)
 long barometer_agl_altitude;    // above ground level altitude - AGL
 long barometer_pressure;
-int barometer_temperature;
+int16_t barometer_temperature;
 float sea_level_pressure;
 
-inline int get_barometer_temperature(void)   { return barometer_temperature; }
+inline int16_t get_barometer_temperature(void)   { return barometer_temperature; }
 inline long get_barometer_pressure(void)     { return barometer_pressure; }
 inline long get_barometer_altitude(void)     { return barometer_altitude; }
 inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
 void altimeter_calibrate(void)
 {
-	int ground_altitude = alt_origin.WW / 100;    // meters
+//	int ground_altitude = alt_origin.WW / 100;    // meters
+	int ground_altitude = 15;    // meters
 	barometer_temperature_gnd = barometer_temperature;
 	barometer_pressure_gnd = barometer_pressure;
 
 	sea_level_pressure = ((float)barometer_pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
 
 #ifdef USE_DEBUG_IO
-	printf("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
+	printf("altimeter_calibrate: initial temperature & pressure set: %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
+	printf("altimeter_calibrate: sea_level_pressure %f ground_altitude %i\r\n", (double)sea_level_pressure, ground_altitude);
+
+{
+	float barometer_alt;
+	barometer_alt = 44330.0f * ((1-pow((barometer_pressure/sea_level_pressure),(1/5.255f)))); // Meters
+	printf("barometer_alt %f (should equal ground_altitude)\r\n", (double)barometer_alt);
+}
 #endif
 }
 
 #if (BAROMETER_ALTITUDE == 1)
 void udb_barometer_callback(long pressure, int temperature, char status)
 {
-	barometer_temperature = temperature;
-	barometer_pressure = pressure;
+	barometer_temperature = temperature; // units of 0.1 deg C
+	barometer_pressure = pressure; // units are Pascals so this could be reduced to an uint16_t
 }
 #endif
 
 void estAltitude(void)
 {
 #if (BAROMETER_ALTITUDE == 1)
-	float pressure_ambient = barometer_pressure;    // Pascals?
-//	float pressure_sea_level = barometer_pressure_gnd;
-	float barometer_alt;
-
 	if (barometer_pressure_gnd != 0)
 	{
-//		barometer_alt = 44330.0f * ((1-pow((pressure_ambient/pressure_sea_level),(1/5.255f)))); // Meters
-		barometer_alt = 44330.0f * ((1-pow((pressure_ambient/sea_level_pressure),(1/5.255f)))); // Meters
-		barometer_altitude = (long)(barometer_alt * 1000); // millimeters
-//		barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
-#ifdef USE_DEBUG_IO
-		// estimate sea level pressure assuming we're still on the ground
-		int ground_altitude = alt_origin.WW / 100; // meters
-		sea_level_pressure = ((float) barometer_pressure / powf((1 - (ground_altitude / 44330.0)), 5.255));
-		// print pressure altitude, pressure and current SLP estimate
-		printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
-#endif
+//		float barometer_alt;
+//		barometer_alt = 44330.0f * ((1-pow((barometer_pressure/sea_level_pressure),(1/5.255f)))); // Meters
+//		barometer_altitude = (long)(barometer_alt * 1000); // millimeters
+//		printf("estAltitude() barometer_alt %f, barometer_altitude %li\r\n", (double)barometer_alt, barometer_altitude);
+
+		barometer_altitude = (long)((44330.0f*(1-pow((barometer_pressure/sea_level_pressure),(1/5.255f))))*1000); // millimeters
+		DPRINT("estAltitude() barometer_pressure %li barometer_altitude %li\r\n", barometer_pressure, barometer_altitude);
 	}
 #endif // BAROMETER_ALTITUDE
 }
@@ -115,23 +117,6 @@ void estAltitude(void)
 #endif
  */
 
-// MAVLINK_MESSAGE_INFO_SCALED_PRESSURE
-/*
-// MESSAGE SCALED_PRESSURE PACKING
-
-#define MAVLINK_MSG_ID_SCALED_PRESSURE 29
-
-typedef struct __mavlink_scaled_pressure_t
-{
-	uint32_t time_boot_ms; ///< Timestamp (microseconds since UNIX epoch or microseconds since system boot)
-	float press_abs; ///< Absolute pressure (hectopascal)
-	float press_diff; ///< Differential pressure 1 (hectopascal)
-	int16_t temperature; ///< Temperature measurement (0.01 degrees celsius)
-} mavlink_scaled_pressure_t;
-
-#define MAVLINK_MSG_ID_SCALED_PRESSURE_LEN 14
-#define MAVLINK_MSG_ID_29_LEN 14
- */
 
 /*
 Peter Hollands peter.hollands@gmail.com

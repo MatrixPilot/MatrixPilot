@@ -71,7 +71,6 @@ typedef enum
 	DATAPOS_CONTROL_LAST_INDEX,
 } ControlDataPos;
 
-
 typedef enum
 {	
 	DATAPOS_ENGINE_DATATYPE = 0,
@@ -85,7 +84,6 @@ typedef enum
 	DATAPOS_ENGINE_LAST_INDEX,
 } EngineDataPos;
 
-
 typedef enum
 {	
 	DATAPOS_OVERIDE_DATATYPE = 0,
@@ -93,14 +91,12 @@ typedef enum
 	DATAPOS_OVERIDE_LAST_INDEX,
 } OverideDataPos;
 
-
 typedef enum
 {	
 	DATAPOS_COMM_DATATYPE = 0,
 	DATAPOS_COMM_IDENTITY,
 	DATAPOS_COMM_LAST_INDEX
 } CommDataPos;
-
 
 typedef enum
 {
@@ -132,11 +128,9 @@ public:
 	unsigned int mEngineMask;
 };
 
-
 class Channels : public vector<ChannelSetup>
 {
 };
-
 
 class SetupFile
 {
@@ -157,7 +151,6 @@ public:
 	void ParseOverideLine(string& ParseString, string& OverideStr);
 };
 
-
 class LogFile
 {
 public:
@@ -167,6 +160,5 @@ public:
 	
 	ofstream mLogFile;
 };
-
 
 static LogFile LoggingFile;

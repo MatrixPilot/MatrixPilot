@@ -220,7 +220,7 @@ static void PageToBuffer(uint16_t PageAdr, uint8_t BufferNo)
 	DF_SPI_RW((uint8_t)(PageAdr << (PAGE_BITS - 8)));  // lower part of page address
 	DF_SPI_RW(0x00);                    // don't cares
 	DF_reset();                         // init transfer
-	while(!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
+	while (!(ReadDFStatus() & 0x80));    // monitor the status register, wait until busy-flag is high
 }
 
 static void BufferReadStr(uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_bytes, uint8_t *BufferPtr)
@@ -276,14 +276,14 @@ static void BufferWriteStr(uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of
 
 void ReadSector(uint16_t sector, uint8_t* buffer)
 {
-	PageToBuffer(sector, 2);
-	BufferReadStr(2, 0, 512, buffer);
+	PageToBuffer(sector, 2);            // transfer AT45D internal page 'sector' into AT45D internal buffer 2
+	BufferReadStr(2, 0, 512, buffer);   // read 512 bytes from beginning (offset 0) of AT45D internal buffer 2
 }
 
 void WriteSector(uint16_t sector, uint8_t* buffer)
 {
-	BufferWriteStr(2, 0, 512, buffer);
-	BufferToPage(2, sector);
+	BufferWriteStr(2, 0, 512, buffer);  // write 512 bytes to beginning (offset 0) of AT45D internal buffer 2
+	BufferToPage(2, sector);            // transfer AT45D internal buffer 2 into AT45D internal page 'sector'  
 }
 
 #endif // !USE_AT45D_DMA

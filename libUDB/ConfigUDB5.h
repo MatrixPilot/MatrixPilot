@@ -27,6 +27,8 @@
 #define SCALEGYRO           3.0016  // 500 degree/second range
 #define SCALEACCEL          1.29    // 4 g range
 
+#define NUM_ANALOG_INPUTS   4
+
 // A/D channels:
 #define analogInput1BUFF    3
 #define analogInput2BUFF    4

@@ -22,39 +22,35 @@
 #include "libDCM_internal.h"
 #include "gpsParseCommon.h"
 #include "mathlibNAV.h"
+#include "rmat.h"
 
 //  Compute actual and desired courses.
 //  Actual course is simply the scaled GPS course over ground information.
-//  Desired course is a "return home" course, which is simply the negative of the
-//  angle of the vector from the origin to the location of the plane.
-
-//  The origin is recorded as the location of the plane during power up of the control.
-
+//  Desired course is a "return home" course, which is simply the negative of
+//  the angle of the vector from the origin to the location of the plane.
 
 void dcm_enable_yaw_drift_correction(boolean enabled)
 {
 	dcm_flags._.skip_yaw_drift = !enabled;
 }
 
-extern int8_t actual_dir;
-extern int8_t calculated_heading;
-
 void estYawDrift(void)
 {
 	// Don't update Yaw Drift while hovering, since that doesn't work right yet
 	if (gps_nav_valid() && !dcm_flags._.skip_yaw_drift)
 	{
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) || (air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN))
+		if ((estimatedWind.x == 0 && estimatedWind.y == 0) ||
+		    (air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN))
 		{
-			dirovergndHGPS[0] = -cosine(actual_dir);
-			dirovergndHGPS[1] = sine(actual_dir);
-			dirovergndHGPS[2] = 0;
+			dirOverGndHGPS[0] = -cosine(actual_dir);
+			dirOverGndHGPS[1] = sine(actual_dir);
+			dirOverGndHGPS[2] = 0;
 		}
 		else
 		{
-			dirovergndHGPS[0] = -cosine(calculated_heading);
-			dirovergndHGPS[1] = sine(calculated_heading);
-			dirovergndHGPS[2] = 0;
+			dirOverGndHGPS[0] = -cosine(calculated_heading);
+			dirOverGndHGPS[1] = sine(calculated_heading);
+			dirOverGndHGPS[2] = 0;
 		}
 	}
 }

@@ -32,8 +32,17 @@
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
 #define PID_HZ 40
 
+// PWM rate for ESCs
+#define ESC_HZ 400
+
 // Read-only value increments with each heartbeat
 extern uint16_t udb_heartbeat_counter;
+
+
+inline void heartbeat(void);
+inline uint16_t heartbeat_cnt(void);
+inline boolean heartbeat_chk(uint16_t hertz);
+inline void pulse(void);
 
 
 #endif // HEARTBEAT_H

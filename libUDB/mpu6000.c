@@ -26,6 +26,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "ADchannel.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
@@ -39,15 +40,19 @@
 uint16_t mpu_data[8], mpuCnt = 0;
 boolean mpuDAV = false;
 
-struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
-struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
+//struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
+//struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
 struct ADchannel mpu_temp;
 int16_t vref_adj;
 
 // MPU6000 Initialization and configuration
 
-void MPU6000_init16(void)
+static callback_fptr_t callback = NULL;
+
+void MPU6000_init16(callback_fptr_t fptr)
 {
+	callback = fptr;
+
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz
@@ -206,7 +211,9 @@ void process_MPU_data(void)
  */
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
-	_T1IF = 1;              // trigger the heartbeat interrupt
+//	_T1IF = 1;              // trigger the heartbeat interrupt
+//	heartbeat();
+	if (callback) callback();
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 
@@ -241,9 +248,11 @@ void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 #endif
 
 // Used for debugging:
-void MPU6000_print(void) {
-	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n", mpuCnt,
-	       mpu_data[0], mpu_data[1], mpu_data[2], mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+void MPU6000_print(void)
+{
+	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
+	    mpuCnt,      mpu_data[0], mpu_data[1], mpu_data[2], 
+	    mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
 #endif // (BOARD_TYPE != UDB4_BOARD)

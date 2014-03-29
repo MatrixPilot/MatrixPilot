@@ -9,17 +9,14 @@
         <itemPath>../font_data.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../../libUDB/ConfigGreen.h</itemPath>
-        <itemPath>../../../libUDB/ConfigIXZ500.h</itemPath>
-        <itemPath>../../../libUDB/ConfigRed.h</itemPath>
-        <itemPath>../../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../../libUDB/libUDB.h</itemPath>
         <itemPath>../../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../../libUDB/libUDB_defines.h</itemPath>
-        <itemPath>../../../libUDB/ConfigIXZ500RAD2a.h</itemPath>
         <itemPath>../../../libUDB/ConfigUDB4.h</itemPath>
         <itemPath>../../../libUDB/boardRotation_defines.h</itemPath>
-        <itemPath>../../../libUDB/events.h</itemPath>
+        <itemPath>../../../libUDB/heartbeat.h</itemPath>
+        <itemPath>../../../libUDB/interrupt.h</itemPath>
+        <itemPath>../../../libUDB/udbTypes.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -35,14 +32,11 @@
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/background.c</itemPath>
         <itemPath>../../../libUDB/libUDB.c</itemPath>
-        <itemPath>../../../libUDB/analog2digital_udb4.c</itemPath>
-        <itemPath>../../../libUDB/magneto_udb4.c</itemPath>
-        <itemPath>../../../libUDB/radioIn_udb4.c</itemPath>
-        <itemPath>../../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../../libUDB/serialIO_udb4.c</itemPath>
         <itemPath>../../../libUDB/osd.c</itemPath>
-        <itemPath>../../../libUDB/events.c</itemPath>
-        <itemPath>../../../libUDB/eeprom_udb4.c</itemPath>
+        <itemPath>../../../libUDB/heartbeat.c</itemPath>
+        <itemPath>../../../libUDB/osd_bit.c</itemPath>
+        <itemPath>../../../libUDB/osd_spi.c</itemPath>
+        <itemPath>../../../libUDB/mcu.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -53,6 +47,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>../</Elem>
+    <Elem>../../../libUDB</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -65,7 +60,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -100,7 +95,7 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories" value="..;../../../libUDB;"/>
+        <property key="extra-include-directories" value="..;../../../libUDB"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -120,9 +115,10 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value=""/>
+        <property key="preprocessor-macros" value="UDB4"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value=""/>
@@ -145,6 +141,7 @@
         <appendMe value="-g"/>
       </C30-AS>
       <C30-LD>
+        <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
         <property key="boot-flash" value="no_flash"/>
         <property key="boot-ram" value="no_ram"/>
@@ -155,7 +152,7 @@
         <property key="enable-handles" value="true"/>
         <property key="enable-pack-data" value="true"/>
         <property key="extra-lib-directories"
-                  value="../C:/Program Files/Microchip/MPLAB C30/lib;"/>
+                  value="../C:/Program Files/Microchip/MPLAB C30/lib"/>
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
@@ -187,11 +184,72 @@
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="coff"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
-        <property key="tracecontrol.disablemacros" value="true"/>
-        <property key="tracecontrol.medium" value="0"/>
-        <property key="tracecontrol.select" value="0"/>
+        <property key="ADC 1" value="true"/>
+        <property key="ADC 2" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="DCI" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C1" value="true"/>
+        <property key="I2C2" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="SPI 1" value="true"/>
+        <property key="SPI 2" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART 1" value="true"/>
+        <property key="UART 2" value="true"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="true"/>
+        <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.eeprom" value="true"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="true"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
+        <property key="memories.programmemory.start" value="0x0"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmertogo.imagename" value=""/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.pgmspeed" value="2"/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveprogramrange.end" value="0x2abff"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
       </PICkit3PlatformTool>
     </conf>
   </confs>

@@ -48,16 +48,13 @@ extern fractional omegaAccum[];             //  accumulator for computing adjust
 extern fractional omegagyro[];
 extern fractional accelEarth[];             //  acceleration, as measured in GPS earth coordinate system
 extern fractional gplane[];
-extern fractional dirovergndHGPS[];         //  horizontal velocity over ground, as measured by GPS (Vz = 0 )
-extern fractional dirovergndHRmat[];        //  horizontal direction over ground, as indicated by Rmatrix
-
+extern fractional dirOverGndHGPS[];         //  horizontal velocity over ground, as measured by GPS (Vz = 0 )
+extern fractional dirOverGndHrmat[];        //  horizontal direction over ground, as indicated by Rmatrix
 extern union intbb dcm_declination_angle;   //  Declination +-32767 = +-360deg
 
 void dcm_init_rmat(void);
 void dcm_run_imu_step(void);
-
-void read_gyros(void);
-void read_accel(void);
+void yaw_drift_reset(void);
 
 
 #endif // RMAT_H

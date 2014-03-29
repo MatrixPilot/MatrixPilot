@@ -20,14 +20,16 @@
 
 
 #include "defines.h"
+#include "behaviour.h"
 
 int16_t current_orientation;
 union bfbts_word desired_behavior;
-int16_t cyclesUntilStartTriggerAction = 0;
-int16_t cyclesUntilStopTriggerAction = 0;
-boolean currentTriggerActionValue = 0;
 
-void triggerActionSetValue(boolean newValue);
+static int16_t cyclesUntilStartTriggerAction = 0;
+static int16_t cyclesUntilStopTriggerAction = 0;
+static boolean currentTriggerActionValue = 0;
+
+static void triggerActionSetValue(boolean newValue);
 
 
 void init_behavior(void)
@@ -62,14 +64,14 @@ void setBehavior(int16_t newBehavior)
 
 boolean canStabilizeInverted(void)
 {
-	return ((INVERTED_FLIGHT_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-	        (INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
+	return ((INVERTED_FLIGHT_STABILIZED_MODE && (state_flags._.pitch_feedback && !state_flags._.GPS_steering)) ||
+	        (INVERTED_FLIGHT_WAYPOINT_MODE && (state_flags._.pitch_feedback && state_flags._.GPS_steering)));
 }
 
 boolean canStabilizeHover(void)
 {
-	return ((HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-	        (HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
+	return ((HOVERING_STABILIZED_MODE && (state_flags._.pitch_feedback && !state_flags._.GPS_steering)) ||
+	        (HOVERING_WAYPOINT_MODE && (state_flags._.pitch_feedback && state_flags._.GPS_steering)));
 }
 
 void updateBehavior(void)
@@ -119,7 +121,7 @@ void updateBehavior(void)
 			current_orientation = F_NORMAL;
 		}
 	}
-	if (flags._.pitch_feedback && !flags._.GPS_steering)
+	if (state_flags._.pitch_feedback && !state_flags._.GPS_steering)
 	{
 		desired_behavior.W = current_orientation;
 	}
@@ -169,7 +171,7 @@ void updateTriggerAction(void)
 	}
 }
 
-void triggerActionSetValue(boolean newValue)
+static void triggerActionSetValue(boolean newValue)
 {
 	if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
 	{

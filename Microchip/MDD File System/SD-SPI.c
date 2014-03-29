@@ -67,6 +67,9 @@
 #include "Compiler.h"
 #include "GenericTypeDefs.h"
 #include "HardwareProfile.h"
+
+#ifdef USE_SD_INTERFACE_WITH_SPI
+
 #include "MDD File System/FSIO.h"
 #include "MDD File System/FSDefs.h"
 #include "MDD File System/SD-SPI.h"
@@ -433,17 +436,19 @@ DWORD MDD_SDSPI_ReadCapacity(void)
 void MDD_SDSPI_InitIO (void)
 {
     // Turn off the card
+#ifndef MEDIA_SOFT_DETECT
     SD_CD_TRIS = INPUT;            //Card Detect - input
+#endif
     SD_CS = 1;                     //Initialize Chip Select line
-    SD_CS_TRIS = OUTPUT;           //Card Select - output
-    SD_WE_TRIS = INPUT;            //Write Protect - input
+//    SD_CS_TRIS = OUTPUT;           //Card Select - output
+//    SD_WE_TRIS = INPUT;            //Write Protect - input
 
 #if defined	(__dsPIC33E__) || defined (__PIC24E__)
-    SD_CS_ANSEL = 0;
-    SD_SCK_ANSEL = 0;
-    SD_SDI_ANSEL = 0;
-    SD_SDO_ANSEL = 0;
-#endif    
+//    SD_CS_ANSEL = 0;
+//    SD_SCK_ANSEL = 0;
+//    SD_SDI_ANSEL = 0;
+//    SD_SDO_ANSEL = 0;
+#endif
 }
 
 
@@ -2288,7 +2293,12 @@ MEDIA_INFORMATION *  MDD_SDSPI_MediaInitialize(void)
 	#ifdef __DEBUG_UART
 	InitUART();
 	#endif
- 
+
+//#define __DEBUG_UART
+#define PrintROMASCIIStringUART          printf
+#define PrintRAMBytesUART(a, b)          printf("%i", a)
+#define UARTSendLineFeedCarriageReturn() printf("\r\n")
+
     //Initialize global variables.  Will get updated later with valid data once
     //the data is known.
     mediaInformation.errorCode = MEDIA_NO_ERROR;
@@ -2346,6 +2356,7 @@ MEDIA_INFORMATION *  MDD_SDSPI_MediaInitialize(void)
     //we can try to recover by issuing CMD12 (STOP_TRANSMISSION).
     if(timeout == 0)
     {
+        printf("Media failed CMD0 too many times. R1 response byte = %i\r\n", response);
         #ifdef __DEBUG_UART  
         PrintROMASCIIStringUART("Media failed CMD0 too many times. R1 response byte = ");
         PrintRAMBytesUART(((unsigned char*)&response + 1), 1);
@@ -2682,4 +2693,6 @@ MEDIA_INFORMATION *  MDD_SDSPI_MediaInitialize(void)
 
     return &mediaInformation;
 }//end MediaInitialize
+
+#endif // USE_SD_INTERFACE_WITH_SPI
 

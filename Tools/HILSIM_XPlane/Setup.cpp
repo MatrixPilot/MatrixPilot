@@ -40,34 +40,33 @@ It will give you details of what has been loaded from the setup file.
 
 **************************************************************************************/
 
-
 // Default constructor for setups
 ChannelSetup::ChannelSetup()
 {
-	mServoChannel		= 0;
-	mChannelOffset		= 3000;
-	mChannelLoTravel	= 1000;
-	mChannelHiTravel	= 1000;
-	mControlSurfaceRef	= 0;
-	mMaxDeflection		= 20;
-	mMinDeflection		= -20;
-	mControlType		= CONTROL_TYPE_NULL;
-	mEngineMask			= 0;
-};
+	mServoChannel      = 0;
+	mChannelOffset     = 3000;
+	mChannelLoTravel   = 1000;
+	mChannelHiTravel   = 1000;
+	mControlSurfaceRef = 0;
+	mMaxDeflection     = 20;
+	mMinDeflection     = -20;
+	mControlType       = CONTROL_TYPE_NULL;
+	mEngineMask        = 0;
+}
 
 // Copy constructor for setups
 ChannelSetup::ChannelSetup(const ChannelSetup* pCopyChannel)
 {
-	mServoChannel		= pCopyChannel->mServoChannel;
-	mChannelOffset		= pCopyChannel->mChannelOffset;
-	mChannelHiTravel	= pCopyChannel->mChannelHiTravel;
-	mChannelLoTravel	= pCopyChannel->mChannelLoTravel;
-	mControlSurfaceRef	= pCopyChannel->mControlSurfaceRef;
-	mMaxDeflection		= pCopyChannel->mMaxDeflection;
-	mMinDeflection		= pCopyChannel->mMinDeflection;
-	mControlType		= pCopyChannel->mControlType;
-	mEngineMask			= pCopyChannel->mEngineMask;
-};
+	mServoChannel      = pCopyChannel->mServoChannel;
+	mChannelOffset     = pCopyChannel->mChannelOffset;
+	mChannelHiTravel   = pCopyChannel->mChannelHiTravel;
+	mChannelLoTravel   = pCopyChannel->mChannelLoTravel;
+	mControlSurfaceRef = pCopyChannel->mControlSurfaceRef;
+	mMaxDeflection     = pCopyChannel->mMaxDeflection;
+	mMinDeflection     = pCopyChannel->mMinDeflection;
+	mControlType       = pCopyChannel->mControlType;
+	mEngineMask        = pCopyChannel->mEngineMask;
+}
 
 // Calculate control deflection from the setup
 float ChannelSetup::GetControlDeflection(int ServoPosition)
@@ -89,84 +88,74 @@ float ChannelSetup::GetControlDeflection(int ServoPosition)
 			Deflection = float(ServoDiff) * mMinDeflection / float(mChannelLoTravel);
 		}
 	}
-
 	return Deflection;
-};
-
+}
 
 /*
 ChannelSetup::ChannelSetup(int mChannelOffset, int mChannelMax, int mChannelMin, SurfaceType mControlSurface, float mMaxDeflection, float mMinDeflection)
 {
-};
+}
 */
 
 // Reload the setup file
 void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr)
 {
-	string		FileLine;
+	string FileLine;
 
 	ChannelInfo.clear();
-
-	ifstream 	ChannelFile("HILSIMSetup.txt");
-
+	ifstream ChannelFile("HILSIMSetup.txt");
 	if (ChannelFile.is_open())
 	{
 		string FoundLine = string("Found File Line: ");
-		
-		while (! ChannelFile.eof() )
+		while (!ChannelFile.eof())
 		{
-			getline (ChannelFile,FileLine);
-
+			getline(ChannelFile, FileLine);
 			size_t endpos = FileLine.find_last_not_of(" \t\r\n");
 			if (string::npos != endpos)
-				FileLine = FileLine.substr(0, endpos+1);
-			
+				FileLine = FileLine.substr(0, endpos + 1);
 			LoggingFile.AppendString(FoundLine);
 			LoggingFile.AppendString(FileLine);
 			LoggingFile.mLogFile << endl;
-
-
 			ParseLine(FileLine, ChannelInfo, CommStr, CommSpeed, PortNum, OverideStr);
 		}
 		ChannelFile.close();
-	};
-};
+	}
+}
 
 // PArse a line of the setup file
-void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr)
+void SetupFile::ParseLine(string& ParseString, Channels& ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr)
 {
-	unsigned int iSearchPos	= 0;		// The next position found fora delimeter;
+	unsigned int iSearchPos	= 0;        // The next position found for a delimeter
 
 	string TypeStr;
 	TypeStr.resize(60);
 	TypeStr.erase();
 
-	iSearchPos = ParseString.find(",",0);
-	if(iSearchPos == ParseString.npos) return;
+	iSearchPos = ParseString.find(",", 0);
+	if (iSearchPos == ParseString.npos) return;
 
-	TypeStr.append(ParseString,0,iSearchPos);
-
-	if(TypeStr == ControlString)
+	TypeStr.append(ParseString, 0, iSearchPos);
+	if (TypeStr == ControlString)
 	{
 		LoggingFile.mLogFile << "Parse Control Line :";
 		ParseControlLine(ParseString, ChannelInfo);
 	}
-	else if(TypeStr == CommString)
+	else if (TypeStr == CommString)
 	{
 		LoggingFile.mLogFile << "Parse Comm :";
 		ParseCommLine(ParseString, CommStr, CommSpeed);
 	}
-	else if(TypeStr == PortString)
+	else if (TypeStr == PortString)
 	{
 		LoggingFile.mLogFile << "Parse Server Port :";
 		ParsePortLine(ParseString, PortNum);
 	}
-	else if(TypeStr == EngineString)
+	else if (TypeStr == EngineString)
 	{
 		LoggingFile.mLogFile << "Parse Engine Line :";
 		ParseEngineLine(ParseString, ChannelInfo);
 	}
-	else if(TypeStr == OverideString)
+	else if (TypeStr == OverideString)
 	{
 		ParseOverideLine(ParseString, OverideStr);
 	}
@@ -174,51 +163,42 @@ void SetupFile::ParseLine(string& ParseString, Channels &ChannelInfo, string& Co
 	{
 		LoggingFile.mLogFile << "Did not understand information type";
 		LoggingFile.mLogFile << endl;
-	};
-
-
-
-//	
-};
+	}
+}
 
 // Parse a Control line in the setup file
 void SetupFile::ParseControlLine(string& ParseString, Channels &ChannelInfo)
 {
-	int iValueIndex = 0;		// Index of the number of values found
-	unsigned int iSearchPos	= 0;		// The next position found fora delimeter;
-	unsigned int iLastPos	= 0;		// The next position found fora delimeter;
+	int iValueIndex = 0;            // Index of the number of values found
+	unsigned int iSearchPos	= 0;    // The next position found fora delimeter;
+	unsigned int iLastPos = 0;      // The next position found fora delimeter;
 	bool EndFound = false;
 
 	ChannelSetup ParseSetup;
-	ChannelSetup* pParseSetup = (ChannelSetup*) &ParseSetup; // new ChannelSetup();
+	ChannelSetup* pParseSetup = (ChannelSetup*)&ParseSetup; // new ChannelSetup();
 
 	string FindStr;
 	FindStr.resize(60);
-
-	do
-	{	
+	do {
 		FindStr.erase();
-
-		iSearchPos = ParseString.find(",",iLastPos);
-		if(iSearchPos == ParseString.npos)
+		iSearchPos = ParseString.find(",", iLastPos);
+		if (iSearchPos == ParseString.npos)
 		{
-			FindStr.append(ParseString,iLastPos,ParseString.length()-iLastPos);
+			FindStr.append(ParseString, iLastPos, ParseString.length() - iLastPos);
 			EndFound = true;
 		}
 		else
 		{
-			FindStr.append(ParseString,iLastPos,iSearchPos-iLastPos);
-		};
-
+			FindStr.append(ParseString, iLastPos, iSearchPos - iLastPos);
+		}
 		ParseControlString(FindStr, iValueIndex, pParseSetup);
-
 		iValueIndex++;
-		iSearchPos++;				// Increment search position to avoid repeat finding the same character
+		iSearchPos++;               // Increment search position to avoid repeat finding the same character
 		iLastPos = iSearchPos;
-	} while( !EndFound );
+	} while (!EndFound);
 
-// Only create new data channel if we have the right number of data points
-	if(iValueIndex == DATAPOS_CONTROL_LAST_INDEX)
+	// Only create new data channel if we have the right number of data points
+	if (iValueIndex == DATAPOS_CONTROL_LAST_INDEX)
 	{
 		ChannelSetup* pNewSetup = new ChannelSetup(pParseSetup);
 		ChannelInfo.push_back(pNewSetup);
@@ -227,8 +207,7 @@ void SetupFile::ParseControlLine(string& ParseString, Channels &ChannelInfo)
 	else
 	{
 		LoggingFile.mLogFile << "New channel failed: ";
-	};
-
+	}
 	LoggingFile.mLogFile << endl;
 }
 
@@ -241,7 +220,7 @@ void SetupFile::ParseControlString(string& ValueString, int Index, ChannelSetup*
 	LoggingFile.mLogFile << ValueString;
 	LoggingFile.mLogFile << " ";
 
-	switch(Index)
+	switch (Index)
 	{
 		case DATAPOS_CONTROL_DATATYPE:
 			pSetup->mControlType = CONTROL_TYPE_SURFACE;
@@ -250,7 +229,7 @@ void SetupFile::ParseControlString(string& ValueString, int Index, ChannelSetup*
 			pSetup->mServoChannel = strtol(ValueString.data(), NULL, 10) - 1;
 			break;
 		case DATAPOS_CONTROL_IDENTITY:
-			pSetup->mControlSurfaceRef = XPLMFindDataRef(ValueString.data() ); 
+			pSetup->mControlSurfaceRef = XPLMFindDataRef(ValueString.data()); 
 			break;
 		case DATAPOS_CONTROL_SERVO_ZERO:
 			pSetup->mChannelOffset = strtol(ValueString.data(), NULL, 10);
@@ -262,56 +241,49 @@ void SetupFile::ParseControlString(string& ValueString, int Index, ChannelSetup*
 			pSetup->mChannelLoTravel = strtol(ValueString.data(), NULL, 10);
 			break;
 		case DATAPOS_CONTROL_SURFACE_MAX:
-			pSetup->mMaxDeflection = (float) strtod(ValueString.data(), NULL);
+			pSetup->mMaxDeflection = (float)strtod(ValueString.data(), NULL);
 			break;
 		case DATAPOS_CONTROL_SURFACE_MIN:
-			pSetup->mMinDeflection = (float) strtod(ValueString.data(), NULL);
+			pSetup->mMinDeflection = (float)strtod(ValueString.data(), NULL);
 			break;
 		default:
 			break;
 	}
 }
 
-
 void SetupFile::ParseEngineLine(string& ParseString, Channels &ChannelInfo)
 {
-	int iValueIndex = 0;		// Index of the number of values found
-	unsigned int iSearchPos	= 0;		// The next position found fora delimeter;
-	unsigned int iLastPos	= 0;		// The next position found fora delimeter;
+	int iValueIndex = 0;            // Index of the number of values found
+	unsigned int iSearchPos	= 0;    // The next position found fora delimeter;
+	unsigned int iLastPos = 0;      // The next position found fora delimeter;
 	bool EndFound = false;
 
 	ChannelSetup ParseSetup;
-	ChannelSetup* pParseSetup = (ChannelSetup*) &ParseSetup; // new ChannelSetup();
+	ChannelSetup* pParseSetup = (ChannelSetup*)&ParseSetup; // new ChannelSetup();
 
 	string FindStr;
-
 	string TypeStr;
 	FindStr.resize(60);
-
-	do
-	{	
+	do {
 		FindStr.erase();
-
-		iSearchPos = ParseString.find(",",iLastPos);
-		if(iSearchPos == ParseString.npos)
+		iSearchPos = ParseString.find(",", iLastPos);
+		if (iSearchPos == ParseString.npos)
 		{
-			FindStr.append(ParseString,iLastPos,ParseString.length()-iLastPos);
+			FindStr.append(ParseString, iLastPos, ParseString.length() - iLastPos);
 			EndFound = true;
 		}
 		else
 		{
-			FindStr.append(ParseString,iLastPos,iSearchPos-iLastPos);
-		};
-
+			FindStr.append(ParseString, iLastPos, iSearchPos - iLastPos);
+		}
 		ParseEngineString(FindStr, iValueIndex, pParseSetup);
-
 		iValueIndex++;
-		iSearchPos++;				// Increment search position to avoid repeat finding the same character
+		iSearchPos++;               // Increment search position to avoid repeat finding the same character
 		iLastPos = iSearchPos;
-	} while( !EndFound );
+	} while (!EndFound);
 
-// Only create new data channel if we have the right number of data points
-	if(iValueIndex == DATAPOS_ENGINE_LAST_INDEX)
+	// Only create new data channel if we have the right number of data points
+	if (iValueIndex == DATAPOS_ENGINE_LAST_INDEX)
 	{
 		ChannelSetup* pNewSetup = new ChannelSetup(pParseSetup);
 		ChannelInfo.push_back(pNewSetup);
@@ -320,9 +292,8 @@ void SetupFile::ParseEngineLine(string& ParseString, Channels &ChannelInfo)
 	else
 	{
 		LoggingFile.mLogFile << "New engine failed: ";
-	};
-};
-
+	}
+}
 
 void SetupFile::ParseEngineString(string& ValueString, int Index, ChannelSetup* pSetup)
 {
@@ -331,7 +302,7 @@ void SetupFile::ParseEngineString(string& ValueString, int Index, ChannelSetup* 
 	LoggingFile.mLogFile << ValueString;
 	LoggingFile.mLogFile << " ";
 
-	switch(Index)
+	switch (Index)
 	{
 		case DATAPOS_ENGINE_DATATYPE:
 			pSetup->mControlType = CONTROL_TYPE_ENGINE;
@@ -352,93 +323,85 @@ void SetupFile::ParseEngineString(string& ValueString, int Index, ChannelSetup* 
 			pSetup->mChannelLoTravel = strtol(ValueString.data(), NULL, 10);
 			break;
 		case DATAPOS_ENGINE_MAX:
-			pSetup->mMaxDeflection = (float) strtod(ValueString.data(), NULL);
+			pSetup->mMaxDeflection = (float)strtod(ValueString.data(), NULL);
 			break;
 		case DATAPOS_ENGINE_MIN:
-			pSetup->mMinDeflection = (float) strtod(ValueString.data(), NULL);
+			pSetup->mMinDeflection = (float)strtod(ValueString.data(), NULL);
 			break;
 		default:
 			break;
 	}
-};
+}
 
 void SetupFile::ParseCommLine(string& ParseString, string& CommStr, long& CommSpeed)
 {
-	unsigned int iSearchPos	= 0;		// The next position found fora delimeter;
+	unsigned int iSearchPos = 0;    // The next position found fora delimeter;
 
-	iSearchPos = ParseString.find(",",0);
-	if(iSearchPos == ParseString.npos) return;
+	iSearchPos = ParseString.find(",", 0);
+	if (iSearchPos == ParseString.npos) return;
 
 	iSearchPos++;
-	
-	unsigned int sSearchPos = ParseString.find(",",iSearchPos);
-	if (sSearchPos == ParseString.npos) {
+	unsigned int sSearchPos = ParseString.find(",", iSearchPos);
+	if (sSearchPos == ParseString.npos)
+	{
 		CommStr.clear();
-		CommStr.append(ParseString,iSearchPos, ParseString.length()-iSearchPos);
+		CommStr.append(ParseString, iSearchPos, ParseString.length() - iSearchPos);
 		CommSpeed = 19200;
 	}
-	else {
+	else
+	{
 		sSearchPos++;
-		
 		CommStr.clear();
 		CommStr.append(ParseString,iSearchPos, sSearchPos-iSearchPos-1);
-		CommSpeed = strtol(ParseString.substr(sSearchPos, ParseString.length()-sSearchPos).data(), NULL, 10);
+		CommSpeed = strtol(ParseString.substr(sSearchPos, ParseString.length() - sSearchPos).data(), NULL, 10);
 	}
-	
 	LoggingFile.mLogFile << "Comm port set for :";
 	LoggingFile.mLogFile << CommStr;
 	LoggingFile.mLogFile << " at ";
 	LoggingFile.mLogFile << CommSpeed;
 	LoggingFile.mLogFile << endl;
-};
+}
 
 void SetupFile::ParsePortLine(string& ParseString, uint16_t& PortNum)
 {
-	unsigned int iSearchPos	= 0;		// The next position found fora delimeter;
-	
-	iSearchPos = ParseString.find(",",0);
-	if(iSearchPos == ParseString.npos) return;
-	
+	unsigned int iSearchPos = 0;    // The next position found fora delimeter;
+
+	iSearchPos = ParseString.find(",", 0);
+	if (iSearchPos == ParseString.npos) return;
+
 	iSearchPos++;
-	
-	PortNum = (uint16_t)strtol(ParseString.substr(iSearchPos, ParseString.length()-iSearchPos).data(), NULL, 10);
-	
+	PortNum = (uint16_t)strtol(ParseString.substr(iSearchPos, ParseString.length() - iSearchPos).data(), NULL, 10);
 	LoggingFile.mLogFile << "Server port set for: ";
 	LoggingFile.mLogFile << PortNum;
 	LoggingFile.mLogFile << endl;
-	
 }
 
 void SetupFile::ParseOverideLine(string& ParseString, string& OverideStr)
 {
-	unsigned int iSearchPos	= 0;		// The next position found fora delimeter;
+	unsigned int iSearchPos = 0;    // The next position found fora delimeter;
 
-	iSearchPos = ParseString.find(",",0);
-	if(iSearchPos == ParseString.npos) return;
+	iSearchPos = ParseString.find(",", 0);
+	if (iSearchPos == ParseString.npos) return;
 
 	iSearchPos++;
-
 	OverideStr.clear();
-	OverideStr.append(ParseString,iSearchPos, ParseString.length()-iSearchPos);
-
+	OverideStr.append(ParseString, iSearchPos, ParseString.length() - iSearchPos);
 	LoggingFile.mLogFile << "Overide set for :";
 	LoggingFile.mLogFile << OverideStr;
 	LoggingFile.mLogFile << endl;
-};
-
+}
 
 LogFile::LogFile()
 {
 	mLogFile.open("HILSIMLogFile.txt");
-};
+}
 
 LogFile::~LogFile()
 {
-	if(mLogFile.is_open()) mLogFile.close();
-};
+	if (mLogFile.is_open()) mLogFile.close();
+}
 
 void LogFile::AppendString(string& AddString)
 {
 	mLogFile << AddString;
-};
-
+}

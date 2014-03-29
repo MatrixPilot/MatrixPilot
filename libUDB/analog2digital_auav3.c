@@ -23,6 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "ADchannel.h"
 
 #if (BOARD_TYPE == AUAV3_BOARD)
 
@@ -44,7 +45,7 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 struct ADchannel udb_vcc;
 struct ADchannel udb_5v;
 struct ADchannel udb_rssi;
-struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
+//struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
 
 // Align the buffer. This is needed for peripheral indirect mode
 #define NUM_AD_CHAN 7
@@ -92,8 +93,22 @@ const uint32_t adc_clk = ADC_CLK;
 #define ADC_RATE (ADC_CLK / (ADSAMP_TIME_N + 14))
 const uint32_t adc_rate = ADC_RATE;
 
-//#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
+//#define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2) // TODO: this macro is wrong for different MIPS settings
+
+#if (MIPS == 70)
+#define ALMOST_ENOUGH_SAMPLES 90
+#elif (MIPS == 64)
+#define ALMOST_ENOUGH_SAMPLES 87
+#elif (MIPS == 40)
+#define ALMOST_ENOUGH_SAMPLES 50
+#elif (MIPS == 32)
+#define ALMOST_ENOUGH_SAMPLES 42
+#elif (MIPS == 16)
 #define ALMOST_ENOUGH_SAMPLES 20
+#else
+#error Invalid MIPS Configuration
+#endif // MIPS
+
 const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
 //#define _SELECTED_VALUE(l,v) #l#v
@@ -105,11 +120,11 @@ const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
 void udb_init_ADC(void)
 {
-	DPRINT("ADCLK_DIV_N_MINUS_1 = %li\r\n", (int32_t)ADCLK_DIV_N_MINUS_1);
-	DPRINT("ADC_CLK = %li\r\n", (int32_t)ADC_CLK);
-	DPRINT("ADC_RATE = %li\r\n", (int32_t)ADC_RATE);
-	DPRINT("ADSAMP_TIME_N = %li\r\n", (int32_t)ADSAMP_TIME_N);
-	DPRINT("ALMOST_ENOUGH_SAMPLES = %li\r\n", (int32_t)ALMOST_ENOUGH_SAMPLES);
+//	DPRINT("ADCLK_DIV_N_MINUS_1 = %li\r\n", (int32_t)ADCLK_DIV_N_MINUS_1);
+//	DPRINT("ADC_CLK = %li\r\n", (int32_t)ADC_CLK);
+//	DPRINT("ADC_RATE = %li\r\n", (int32_t)ADC_RATE);
+//	DPRINT("ADSAMP_TIME_N = %li\r\n", (int32_t)ADSAMP_TIME_N);
+//	DPRINT("ALMOST_ENOUGH_SAMPLES = %li\r\n", (int32_t)ALMOST_ENOUGH_SAMPLES);
 /*
 MatrixPilot 10:37:23 Aug 17 2013 @ 16 mips
 ADCLK_DIV_N_MINUS_1 = 13
@@ -197,10 +212,8 @@ ALMOST_ENOUGH_SAMPLES = 88
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 {
-	DIG2 = 1;
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-
 
 #if (RECORD_FREE_STACK_SPACE == 1)
 	uint16_t stack = SP_current();
@@ -236,7 +249,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 //		static int i = 0;
 //		if (i++ > HEARTBEAT_HZ) {
 //			i = 0;
-//			printf("sc %u\r\n", sample_count);
+//			printf("sc %u %u        \r\n", sample_count, ALMOST_ENOUGH_SAMPLES);
+//			printf("sc %u %lu        \r\n", sample_count, almost_enough);
 //		}
 //
 		sample_count = 0;
@@ -259,7 +273,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 		}
 	}
 	interrupt_restore_corcon;
-	DIG2 = 0;
 }
 
 #endif // BOARD_TYPE

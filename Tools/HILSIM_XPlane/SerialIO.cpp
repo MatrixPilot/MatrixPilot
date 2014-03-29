@@ -1,34 +1,26 @@
 #include "stdafx.h"
 #include "SerialIO.h"
 
-
 extern "C" {
 #include "UDBSocket.h" // MS Visual C++, XCode, linux builds
 }
 
-
-UDBSocket		serialSock = NULL;
-UDBSocket		udpSock = NULL;
-UDBSocket		activeSock = NULL; // points to one of the other two, only 1 of which remains active
-
+UDBSocket serialSock = NULL;
+UDBSocket udpSock = NULL;
+UDBSocket activeSock = NULL; // points to one of the other two, only 1 of which remains active
 
 extern LogFile LoggingFile;
-extern string	CommPortString;
+extern string CommPortString;
 extern long CommPortSpeed;
 extern uint16_t PortNum;
 
-
 void StartSerial(void);
 void StartServer(void);
-
-
-//---------------------------------------------------------------------------
 
 int IsConnected(void)
 {
 	return (activeSock != NULL);
 }
-
 
 void OpenComms(void)
 {
@@ -39,8 +31,6 @@ void OpenComms(void)
 		StartServer();
 	}
 }
-
-//---------------------------------------------------------------------------
 
 void CloseComms(void)
 {
@@ -59,23 +49,18 @@ void CloseComms(void)
 	activeSock = NULL;
 }
 
-//---------------------------------------------------------------------------
-
-
 void StartSerial(void)
 {
 	fprintf(stderr, "--- trying comm port %s\n", CommPortString.c_str());
-	serialSock = UDBSocket_init(UDBSocketSerial, 0, NULL, (char *)CommPortString.c_str(), CommPortSpeed);
+	serialSock = UDBSocket_init(UDBSocketSerial, 0, NULL, (char*)CommPortString.c_str(), CommPortSpeed);
 	if (serialSock) {
 		LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
-	}
-	else {
+	} else {
 		LoggingFile.mLogFile << "Open serial port " << CommPortString.c_str() << " failed." << endl;
 		LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
 		printf("%s\n", UDBSocketLastErrorMessage());
 	}
 }
-
 
 void StartServer(void)
 {
@@ -83,18 +68,14 @@ void StartServer(void)
 	udpSock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, NULL, 0);
 	if (udpSock) {
 		LoggingFile.mLogFile << "Opened UDP server on port " << PortNum << endl;
-	}
-	else {
+	} else {
 		LoggingFile.mLogFile << "Open UDP server on port " << PortNum << " failed." << endl;
 		LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
 		printf("%s\n", UDBSocketLastErrorMessage());
 	}
 }
 
-//---------------------------------------------------------------------------
-
-
-void SendToComPort(unsigned long ResponseLength, unsigned char *Buffer)
+void SendToComPort(unsigned long ResponseLength, unsigned char* Buffer)
 {
 	if (activeSock) {
 		int written = UDBSocket_write(activeSock, Buffer, ResponseLength);
@@ -106,8 +87,6 @@ void SendToComPort(unsigned long ResponseLength, unsigned char *Buffer)
 		}
 	}
 }
-//---------------------------------------------------------------------------
-
 
 #define BUFLEN 512
 
@@ -126,14 +105,12 @@ int ReceiveFromSocket(UDBSocket sock)
 				printf("%s\n", UDBSocketLastErrorMessage());
 				CloseComms();
 				break;
-			}
-			else {
+			} else {
 				if (n == 0) {
 					break;
-				}
-				else {
+				} else {
 					int i;
-					for (i=0; i<n; i++) {
+					for (i = 0; i < n; i++) {
 						if (HandleMsgByte(Buffer[i]) == 1) {
 							didReceive = 1;
 						}
@@ -144,7 +121,6 @@ int ReceiveFromSocket(UDBSocket sock)
 	}
 	return didReceive;
 }
-
 
 void ReceiveFromComPort(void)
 {
@@ -168,11 +144,7 @@ void ReceiveFromComPort(void)
 	}
 }
 
-
-//---------------------------------------------------------------------------
-
-
-void ShowMessage(const char *pErrorString)
+void ShowMessage(const char* pErrorString)
 {
 	LoggingFile.mLogFile << "MESSAGE: " << pErrorString << endl;
 	cerr << "MESSAGE: " << pErrorString << endl;

@@ -4,15 +4,20 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="f2" displayName="Config" projectFiles="true">
+        <itemPath>../Config/magnetometerOptions.h</itemPath>
+        <itemPath>../Config/nv_memory_options.h</itemPath>
+        <itemPath>../Config/options.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
         <itemPath>../../libDCM/estAltitude.h</itemPath>
         <itemPath>../../libDCM/rmat.h</itemPath>
+        <itemPath>../../libDCM/estWind.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../libUDB/libUDB.h</itemPath>
         <itemPath>../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../libUDB/libUDB_defines.h</itemPath>
@@ -23,6 +28,9 @@
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
         <itemPath>../../libUDB/mpu_spi.h</itemPath>
         <itemPath>../../libUDB/analogs.h</itemPath>
+        <itemPath>../../libUDB/ADchannel.h</itemPath>
+        <itemPath>../../libUDB/filters.h</itemPath>
+        <itemPath>../../libUDB/uart.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -30,7 +38,6 @@
       <logicalFolder name="RollPitchYaw"
                      displayName="RollPitchYaw"
                      projectFiles="true">
-        <itemPath>../options.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -70,6 +77,10 @@
         <itemPath>../../libUDB/serialIO.c</itemPath>
         <itemPath>../../libUDB/mpu_spi.c</itemPath>
         <itemPath>../../libUDB/analogs.c</itemPath>
+        <itemPath>../../libUDB/heartbeat.c</itemPath>
+        <itemPath>../../libUDB/ADchannel.c</itemPath>
+        <itemPath>../../libUDB/filters.c</itemPath>
+        <itemPath>../../libUDB/uart.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -154,7 +165,8 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories" value="..;../../libUDB;../../libDCM"/>
+        <property key="extra-include-directories"
+                  value="..;../Config;../../libUDB;../../libDCM"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -177,6 +189,7 @@
         <property key="preprocessor-macros" value="UDB5"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
@@ -244,11 +257,72 @@
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
-        <property key="tracecontrol.disablemacros" value="true"/>
-        <property key="tracecontrol.medium" value="0"/>
-        <property key="tracecontrol.select" value="0"/>
+        <property key="ADC 1" value="true"/>
+        <property key="ADC 2" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="DCI" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C1" value="true"/>
+        <property key="I2C2" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="SPI 1" value="true"/>
+        <property key="SPI 2" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART 1" value="true"/>
+        <property key="UART 2" value="true"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="true"/>
+        <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.eeprom" value="true"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="true"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.end" value="0x2abff"/>
+        <property key="memories.programmemory.start" value="0x0"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmertogo.imagename" value=""/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.pgmspeed" value="2"/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveprogramrange.end" value="0x2abff"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
       </PICkit3PlatformTool>
     </conf>
   </confs>

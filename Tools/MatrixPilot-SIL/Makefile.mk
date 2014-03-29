@@ -1,11 +1,12 @@
 CC = gcc
-INCPATH = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot
+INCPATH = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot -I../../FreeRTOS/include -I../../FreeRTOS/portable/MSVC-MingW
+
 RM_FILE = rm -f
 ifeq ($(OS),Windows_NT)
 	TARGET_EXTENSION = .exe
 	FLAGS = -DWIN=1
 	LFLAGS = 
-	LIBS = -lws2_32
+	LIBS = -lws2_32 -lWinmm
 	SOCK_OBJECTS = ../HILSIM_XPlane/UDBSocketWin.o
 	QT = "
 else
@@ -35,6 +36,12 @@ MPSIL_OBJECTS = \
 MPCAT_TARGET = silcat$(TARGET_EXTENSION)
 MPCAT_OBJECTS =  $(SOCK_OBJECTS) SILcat.o
 
+MPSILPLANE_TARGET = silplane$(TARGET_EXTENSION)
+MPSILPLANE_OBJECTS =  $(SOCK_OBJECTS) SILplane.o
+
+TEST_TARGET = test$(TARGET_EXTENSION)
+TEST_OBJECTS =  $(SOCK_OBJECTS) TestSocket.o
+
 first: all
 
 %.o: %.c
@@ -63,17 +70,27 @@ first: all
 # pull in dependency info for *existing* .o files
 -include $(MPSIL_OBJECTS:.o=.d)
 
-all: $(MPSIL_TARGET) $(MPCAT_TARGET)
+all: $(MPSIL_TARGET) $(MPCAT_TARGET) $(MPSILPLANE_TARGET)
 
 sil: $(MPSIL_TARGET)
 
 cat: $(MPCAT_TARGET)
+
+test: $(TEST_TARGET)
+
+silplane: $(MPSILPLANE_TARGET)
 
 $(MPSIL_TARGET): $(MPSIL_OBJECTS)
 	$(CC) -o $(MPSIL_TARGET) $(LFLAGS) $(MPSIL_OBJECTS) $(LIBS)
 
 $(MPCAT_TARGET): $(MPCAT_OBJECTS)
 	$(CC) -o $(MPCAT_TARGET) $(LFLAGS) $(MPCAT_OBJECTS) $(LIBS)
+
+$(MPSILPLANE_TARGET): $(MPSILPLANE_OBJECTS)
+	$(CC) -o $(MPSILPLANE_TARGET) $(LFLAGS) $(MPSILPLANE_OBJECTS) $(LIBS)
+
+$(TEST_TARGET): $(TEST_OBJECTS)
+	$(CC) -o $(TEST_TARGET) $(LFLAGS) $(TEST_OBJECTS) $(LIBS)
 
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)

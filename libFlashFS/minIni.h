@@ -19,8 +19,11 @@
 #ifndef MININI_H
 #define MININI_H
 
-//#include "minGlue.h"
+#if (WIN == 1 || NIX ==1)
+#include "minGlue.h"
+#else
 #include "minGlue-mdd.h"
+#endif
 
 #if (defined _UNICODE || defined __UNICODE__ || defined UNICODE) && !defined MININI_ANSI
   #include <tchar.h>

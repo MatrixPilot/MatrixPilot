@@ -84,10 +84,8 @@ uint8_t * const msg2parse[] = {
 	&un, &un };
 */
 
-//union longbbbb lat_gps_, long_gps_, alt_sl_gps_, tow_;
 union intbb nav_valid_, nav_type_, sog_gps_, climb_gps_, week_no_;
 union uintbb cog_gps_;
-//uint8_t hdop_;
 union intbb checksum_; // included at the end of the GPS message
 union intbb calculated_checksum; // calculated locally
 #define INVALID_CHECKSUM -1
@@ -319,7 +317,7 @@ static void msg_B0(uint8_t gpschar)
 		int16_t masked = calculated_checksum.BB & 0x7FFF;
 		if (calculated_checksum.BB != INVALID_CHECKSUM && checksum_.BB == masked)
 		{
-			udb_background_trigger(); // parsing is complete and valid, schedule navigation
+			gps_parse_common(); // parsing is complete and valid, schedule navigation
 		}
 		msg_parse = &msg_B3;
 	}

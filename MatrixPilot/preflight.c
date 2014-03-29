@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include "usb_cdc.h"
 
-#if (HILSIM_USB != 1)
+#if (HILSIM_USB != 1) && (CONSOLE_UART != 9)
 
 void preflight(void)
 {

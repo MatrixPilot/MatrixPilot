@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
+#if (WIN == 1 || NIX == 1)
+
 #include <stdio.h>
 #include "libUDB.h"
 #include "events.h"
@@ -37,9 +39,10 @@ void trigger_event(uint16_t hEvent)
 
 void process_queued_events(void)
 {
+	int16_t i;
+
 	if (eventFlags == 0) return;
 	
-	int16_t i;
 	for (i = 0; i < MAX_EVENTS; i++) {
 		if (eventFlags & (1 << i)) {
 			events[i]();
@@ -48,3 +51,4 @@ void process_queued_events(void)
 	eventFlags = 0;
 }
 
+#endif // (WIN == 1 || NIX == 1)

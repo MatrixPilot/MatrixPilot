@@ -29,10 +29,10 @@
 #define USE_BMP085_ON_I2C 2
 
 // BMP085 oversampling can be set from 0 thru 3
-#define OSS 3
+//#define OSS 3
 //#define OSS 2
 //#define OSS 1
-//#define OSS 0
+#define OSS 0
 
 typedef union
 {
@@ -64,78 +64,68 @@ static unsigned char bmp085read_barPres[]        = { 0x34 + (OSS<<6) };
 
 static unsigned char barData[3];
 
-static int barMessage = 0;      // message type, state machine counter
-static int barCalibPause = 0;
-
 void ReadBarTemp_callback(boolean I2CtrxOK);
 void ReadBarPres_callback(boolean I2CtrxOK);
 void ReadBarCalib_callback(boolean I2CtrxOK);
 
 #if (USE_BMP085_ON_I2C == 1)
-	#define I2C_Normal		I2C1_Normal
-	#define I2C_Read		I2C1_Read
-	#define I2C_Write		I2C1_Write
-	#define I2C_Reset		I2C1_Reset
+	#define I2C_Normal      I2C1_Normal
+	#define I2C_Read        I2C1_Read
+	#define I2C_Write       I2C1_Write
+	#define I2C_Reset       I2C1_Reset
 #elif (USE_BMP085_ON_I2C == 2)
-	#define I2C_Normal		I2C2_Normal
-	#define I2C_Read		I2C2_Read
-	#define I2C_Write		I2C2_Write
-	#define I2C_Reset		I2C2_Reset
+	#define I2C_Normal      I2C2_Normal
+	#define I2C_Read        I2C2_Read
+	#define I2C_Write       I2C2_Write
+	#define I2C_Reset       I2C2_Reset
 #endif
 
 
 barometer_callback_funcptr barometer_callback = NULL;
 
-void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
+//void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
+int rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 {
+	static int state = 0;
+
 	barometer_callback = callback;
 
-	if (I2C_Normal() == false)  // if I2C is not ok
+	if (I2C_Normal())
 	{
-		barMessage = 0;         // start over again
-		I2C_Reset();            // reset the I2C
-		return;
-	}
-
-	if (barCalibPause == 0)
-	{
-		barMessage++;
-		if (barMessage > 7)
-		{
-			barMessage = 4;
-		}
-		switch (barMessage)
+		switch (state++)
 		{ 
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
+		case 0: // on first pass we get the barometer calibration constants
 			I2C_Read(BMP085_ADDRESS, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback, I2C_MODE_WRITE_ADDR_READ);
 			break;
-		case 4:
-			barCalibPause = 2;  // probably not required
+		case 1:
 			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barTemp, 1, NULL);
 			break;
-		case 5:
+		case 2:
+		case 3:
+			break;
+		case 4:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 2, &ReadBarTemp_callback, I2C_MODE_WRITE_ADDR_READ);
 			break;
-		case 6:
-			barCalibPause = 2;  // probably not required
+		case 5:
 			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barPres, 1, NULL);
 			break;
+		case 6:
 		case 7:
+			break;
+		case 8:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 3, &ReadBarPres_callback, I2C_MODE_WRITE_ADDR_READ);
-			break;
+			state = 1;  // on next pass go back and read the temperature
+//			break;
 		default:
-			barMessage = 0;
-			break;
+			return 0;   // barometer driver has finished a cycle
 		}
 	}
 	else
 	{
-		barCalibPause--;
+		state = 0;
+		I2C_Reset();
 	}
+	return 1;           // barometer driver is busy with the bus
 }
 
 /*
@@ -145,7 +135,7 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 int TestByteOrder()
 {
 	short int word = 0x0001;
-	char *byte = (char *) &word;
+	char* byte = (char*)&word;
 	return(byte[0] ? LITTLE_ENDIAN : BIG_ENDIAN);
 }
  */
