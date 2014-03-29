@@ -1,0 +1,253 @@
+////////////////////////////////////////////////////////////////////////////////
+// MatrixPilot LOGO script: (max 100 defines & 80 chars per command line)
+//
+// Main Flight Plan
+// Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
+
+#define SQUARE 1 // example of a comment on a define line
+
+	SET_ALT(100) // example of a comment on an instruction line
+	
+	// Go Home and point North
+	HOME
+	
+	REPEAT_FOREVER
+		DO_ARG(SQUARE, 100)
+	END
+	
+	
+	TO (SQUARE)
+		REPEAT(4)
+			FD_PARAM
+			RT(90)
+		END
+	END
+
+
+////////////////////////////////////////////////////////////////////////////////
+// RTL Flight Plan
+	
+	// Use cross-tracking for navigation
+	FLAG_ON(F_CROSS_TRACK)
+	
+	// Turn off engine for RTL
+	// Move this line down below the HOME to return home with power before circling unpowered.
+	FLAG_ON(F_LAND)
+	
+	// Fly home
+	HOME
+	
+	// Once we arrive home, aim the turtle in the
+	// direction that the plane is already moving.
+	USE_CURRENT_ANGLE
+	
+	REPEAT_FOREVER
+		// Fly a circle (36-point regular polygon)
+		REPEAT(36)
+			RT(10)
+			FD(8)
+		END
+	END
+	
+////////////////////////////////////////////////////////////////////////////////
+// More Examples
+
+// Fly a 200m square starting at the current location and altitude, in the current direction
+	REPEAT(4)
+		FD(200)
+		RT(90)
+	END
+
+// Fly a round-cornered square
+	FLAG_ON(F_CROSS_TRACK)
+	
+	REPEAT(4)
+		FD(170)
+		REPEAT(6)
+			LT(15)
+			FD(10)
+		END
+	END
+
+// Set the camera target to a point 100m North of the origin, then circle that point
+	SET_TURTLE(CAMERA)
+	HOME
+	FD(100)
+	SET_TURTLE(PLANE)
+	
+	FLAG_ON(F_CROSS_TRACK)
+	
+	HOME
+	LT(90)
+	
+	REPEAT_FOREVER
+		// Fly a circle (36-point regular polygon)
+		REPEAT(36)
+			RT(10)
+			FD(20)
+		END
+	END
+
+// Fly a giant, 2.5km diameter, 10-pointed star with external loops at each point
+	FLAG_ON(F_CROSS_TRACK)
+	
+	REPEAT(10)
+		FD(2000)
+		
+		REPEAT(18)
+			RT(14) 
+// == RT((180+72)/18)
+			FD(50)
+		END
+	END
+
+// Come in for an automatic landing at the HOME position
+// from the current direction of the plane.
+// 1. Aim for 32m altitude at 250m from HOME
+// 2. Fly to 200m from HOME and turn off power
+// 3. Aim for -32m altitude, 200m past home, which should
+//    touch down very close to HOME.
+
+	FLAG_ON(F_CROSS_TRACK)
+	
+	SET_ALT(32)
+	
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	BK(250)
+	PEN_DOWN
+	
+	FLAG_ON(F_LAND)
+	
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	BK(200)
+	PEN_DOWN
+	
+	SET_ALT(-32)
+	
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	FD(200)
+	PEN_DOWN
+
+// Example of using some math on PARAM values to make cool spirals
+#define SPIRAL_IN					1
+#define SPIRAL_OUT					2
+#define FWD_100_MINUS_PARAM_OVER_2	3
+
+DO_ARG(SPIRAL_IN, 10)
+RT(100)
+//DO_ARG(SPIRAL_OUT, 70)
+DO_ARG(SPIRAL_OUT,  70)
+
+END
+
+
+
+TO (SPIRAL_IN)
+	REPEAT(30)
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+		RT_PARAM
+		PARAM_ADD(2)
+	END
+END
+
+
+TO (SPIRAL_OUT)
+	REPEAT(30)
+		PARAM_SUB(2)
+		RT_PARAM
+		DO_PARAM(FWD_100_MINUS_PARAM_OVER_2)
+	END
+END
+
+
+TO (FWD_100_MINUS_PARAM_OVER_2)
+	PARAM_MUL(-1)
+	PARAM_ADD(100)
+	PARAM_DIV(2)
+	FD_PARAM
+END
+
+// Example of using an interrupt handler to stop the plane from getting too far away
+// Notice mid-pattern if we get >200m away from home, and if so, fly home.
+#define INT_HANDLER					1
+
+SET_INTERRUPT(INT_HANDLER)
+
+REPEAT_FOREVER
+	FD(20)
+	RT(10)
+END
+
+END
+
+
+TO (INT_HANDLER)
+	IF_GT(DIST_TO_HOME, 200)
+		HOME
+	END
+END
+
+// Example of using an interrupt handler to toggle between 2 flight plans.
+// When starting the flightplan, decide whether to circle left or right, based on which direction
+// initially turns towards home.  From then on, the circling direction can be changed by moving the
+// rudder input channel to one side or the other.
+
+#define CIRCLE_RIGHT				1
+#define CIRCLE_LEFT					2
+#define INT_HANDLER_RIGHT			3
+#define INT_HANDLER_LEFT			4
+
+
+IF_GT(REL_ANGLE_TO_HOME, 0)
+	EXEC(CIRCLE_RIGHT)
+ELSE
+	EXEC(CIRCLE_LEFT)
+END
+
+
+TO (CIRCLE_RIGHT)
+	USE_CURRENT_POS
+	SET_INTERRUPT(INT_HANDLER_RIGHT)
+	REPEAT_FOREVER
+		FD(10)
+		RT(10)
+	END
+END
+
+TO (CIRCLE_LEFT)
+	USE_CURRENT_POS
+	SET_INTERRUPT(INT_HANDLER_LEFT)
+	REPEAT_FOREVER
+		FD(10)
+		LT(10)
+	END
+END
+
+
+TO (INT_HANDLER_RIGHT)
+	IF_LT(RUDDER_INPUT_CHANNEL, 2800)
+		EXEC(CIRCLE_LEFT)
+	END
+END
+
+TO (INT_HANDLER_LEFT)
+	IF_GT(RUDDER_INPUT_CHANNEL, 3200)
+		EXEC(CIRCLE_RIGHT)
+	END
+END
+
+
+
+// The three compound (multi-opcode) instructions
+
+SET_POS(21930, 43605)
+SET_ABS_POS_X(2857740885)
+SET_ABS_POS_Y(1437226410)
+END
+
