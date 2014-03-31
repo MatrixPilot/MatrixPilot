@@ -17,5 +17,6 @@ typedef struct logoInstructionDef {
 	int16_t arg         : 16;
 } logoInstructionDef_t;
 
-uint8_t logo_compose(logoInstructionDef_t opcode[], uint8_t size, char* filename);
-uint8_t logo_compile(char* source_filename, char* logo_filename);
+logoInstructionDef_t* logo_compile(uint16_t* count, const char* source_filename);
+uint16_t logo_save(logoInstructionDef_t* logo, uint16_t count, const char* logo_filename);
+uint16_t logo_save_hex(logoInstructionDef_t* logo, uint16_t count, const char* logo_filename);

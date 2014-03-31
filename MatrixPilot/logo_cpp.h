@@ -210,8 +210,11 @@ enum {
 #define IF_LE_PARAM(val)        _IF_LE(val, 1, 1)
 
 #define SET_POS(x, y)           _SET_X(x, 0, 0) _SET_Y(y, 1, 0)
-#define SET_ABS_POS(x, y)       _SET_ABS_VAL_HIGH((((uint32_t)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((uint32_t)(x))&0xFFFF) \
-                                _SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
+//#define SET_ABS_POS(x, y)       _SET_ABS_VAL_HIGH((((uint32_t)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((uint32_t)(x))&0xFFFF) \
+//                                _SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
+#define SET_ABS_POS_X(x)        _SET_ABS_VAL_HIGH((((uint32_t)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((uint32_t)(x))&0xFFFF)
+#define SET_ABS_POS_Y(y)        _SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
+
 #define HOME                    _HOME(1)
 
 #endif // LOGO_CPP_H

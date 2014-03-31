@@ -157,82 +157,46 @@ typedef struct tagCmds {
 } cmds_t;
 
 
-/*
-typedef struct logoDef {
-	uint16_t cmd        :  6;
-	uint16_t do_fly     :  1;
-	uint16_t use_param  :  1;
-	uint16_t subcmd     :  4;
-	int16_t arg         :  4;
-} logoDef_t;
-
-Variable arg in logoDef_t can be assigned the following values:
-	-1
-	 0
-	 1
-	 P_A
-	-P_A
-	 P_B
-
-1:	-1
-2:	 0
-3:	 1
-4:	-P_A
-5:	 P_A
-6:	-P_B
-7:	 P_B
-8:	-P_A_C2
-9:	 P_A_C2
-10:	-P_B_C2
-11:	 P_B_C2
-12:	-P_A_C3
-13:	 P_A_C3
-14:	-P_B_C3
-15:	 P_B_C3
-16:
-*/
-
-#define P_A 8  // parameter A substitution value (first argument)
-#define P_B 9  // parameter B substitution value (second argument)
-
-#define P_A_C2 9  // compound command, 2 opcodes
-#define P_B_C3 10 // compound command, 3 opcodes
+#define P_A -2   // parameter A substitution value (first argument)
+#define P_C -3   // parameter A substitution value negated (first argument)
+#define P_B -4   // parameter B substitution value (second argument)
+#define P_D 14   // parameter D substitution value (second argument)
 
 static const cmds_t cmdslist[] = {
 //                           cmd, fly, prm, sub,   x
 	{ "FD",                   {3,   1,   0,   0,  P_A}, }, //(x)  _FD(x, 1, 0)
-	{ "BK",                   {3,   1,   0,   0, -P_A}, }, //(x)  _FD(-x, 1, 0)
+	{ "BK",                   {3,   1,   0,   0,  P_C}, }, //(x)  _FD(-x, 1, 0)
 	{ "FD_PARAM",             {3,   1,   1,   0,    1}, }, //     _FD(1, 1, 1)
 	{ "BK_PARAM",             {3,   1,   1,   0,   -1}, }, //     _FD(-1, 1, 1)
-	{ "RT",                   {4,   0,  -1,   0,  P_A}, }, //(x)  _RT(x, 0)
-	{ "LT",                   {4,   0,  -1,   0, -P_A}, }, //(x)  _RT(-x, 0)
+	{ "RT",                   {4,   0,   0,   0,  P_A}, }, //(x)  _RT(x, 0)
+	{ "LT",                   {4,   0,   0,   0,  P_C}, }, //(x)  _RT(-x, 0)
 	{ "SET_ANGLE",            {4,   0,  -1,   1,  P_A}, }, //(x)  _SET_ANGLE(x, 0)
-	{ "RT_PARAM",             {4,   0,  -1,   0,   -1}, }, //     _RT(1, 1)
-	{ "LT_PARAM",             {4,   0,  -1,   0,   -1}, }, //	  _RT(-1, 1)
+	{ "RT_PARAM",             {4,   0,   1,   0,    1}, }, //     _RT(1, 1)
+	{ "LT_PARAM",             {4,   0,   1,   0,   -1}, }, //	  _RT(-1, 1)
 	{ "SET_ANGLE_PARAM",      {4,   0,  -1,   1,   -1}, }, //     _SET_ANGLE(0, 1)
 	{ "USE_CURRENT_ANGLE",    {4,   0,   0,   2,    0}, }, //     _USE_CURRENT_ANGLE
 	{ "USE_ANGLE_TO_GOAL",    {4,   0,   0,   3,    0}, }, //     _USE_ANGLE_TO_GOAL
 	{ "EAST",                 {5,   1,   0,   0,  P_A}, }, //(x)  _MV_X(x, 1, 0)
-	{ "WEST",                 {5,   1,   0,   0, -P_A}, }, //(x)  _MV_X(-x, 1, 0)
+	{ "WEST",                 {5,   1,   0,   0,  P_C}, }, //(x)  _MV_X(-x, 1, 0)
 	{ "SET_X_POS",            {5,   1,   0,   1,  P_A}, }, //(x)  _SET_X(x, 1, 0)
 	{ "EAST_PARAM",           {5,   1,   1,   0,    1}, }, //     _MV_X(1, 1, 1)
 	{ "WEST_PARAM",           {5,   1,   1,   0,   -1}, }, //     _MV_X(-1, 1, 1)
 	{ "SET_X_POS_PARAM",      {5,   1,   1,   1,    1}, }, //     _SET_X(1, 1, 1)
 	{ "USE_CURRENT_POS",      {5,   1,   0,   6,    0}, }, //     _USE_CURRENT_POS(1)
 	{ "NORTH",                {5,   1,   0,   2,  P_A}, }, //(y)  _MV_Y(y, 1, 0)
-	{ "SOUTH",                {5,   1,   0,   2, -P_A}, }, //(y)  _MV_Y(-y, 1, 0)
+	{ "SOUTH",                {5,   1,   0,   2,  P_C}, }, //(y)  _MV_Y(-y, 1, 0)
 	{ "SET_Y_POS",            {5,   1,   0,   3,  P_A}, }, //(y)  _SET_Y(y, 1, 0)
 	{ "NORTH_PARAM",          {5,   1,   1,   2,    1}, }, //     _MV_Y(1, 1, 1)
 	{ "SOUTH_PARAM",          {5,   1,   1,   2,   -1}, }, //     _MV_Y(-1, 1, 1)
 	{ "SET_Y_POS_PARAM",      {5,   1,   1,   3,    1}, }, //      _SET_Y(1, 1, 1)
 	{ "ALT_UP",               {5,   0,   0,   4,  P_A}, }, //(z)  _MV_Z(z, 0, 0)
-	{ "ALT_DOWN",             {5,   0,   0,   4, -P_A}, }, //(z)  _MV_Z(-z, 0, 0)
+	{ "ALT_DOWN",             {5,   0,   0,   4,  P_C}, }, //(z)  _MV_Z(-z, 0, 0)
 	{ "SET_ALT",              {5,   0,   0,   5,  P_A}, }, //(z)  _SET_Z(z, 0, 0)
 	{ "ALT_UP_PARAM",         {5,   0,   1,   4,    1}, }, //     _MV_Z(1, 0, 1)
 	{ "ALT_DOWN_PARAM",       {5,   0,   1,   4,   -1}, }, //     _MV_Z(-1, 0, 1)
 	{ "SET_ALT_PARAM",        {5,   0,   1,   5,    1}, }, //     _SET_Z(1, 0, 1)
 	{ "SPEED_INCREASE",       {11,  0,   0,   0,  P_A}, }, //(x)  _SPEED_INCREASE(x, 0)
-	{ "SPEED_DECREASE",       {11,  0,   0,   0, -P_A}, }, //(x)  _SPEED_INCREASE(-x, 0)
+	{ "SPEED_DECREASE",       {11,  0,   0,   0,  P_C}, }, //(x)  _SPEED_INCREASE(-x, 0)
 	{ "SET_SPEED",            {11,  0,   0,   1,  P_A}, }, //(x)  _SET_SPEED(x, 0)
 	{ "SPEED_INCREASE_PARAM", {11,  0,   1,   0,    1}, }, //     _SPEED_INCREASE(1, 1)
 	{ "SPEED_DECREASE_PARAM", {11,  0,   1,   0,   -1}, }, //     _SPEED_INCREASE(-1, 1)
@@ -250,79 +214,40 @@ static const cmds_t cmdslist[] = {
 	{ "END",                  {1,   0,   0,   1,    0}, }, //     _END
 	{ "ELSE",                 {1,   0,   0,   3,    0}, }, //     _ELSE
 	{ "TO",                   {1,   0,   0,   2,  P_A}, }, //(fn)      _TO(fn)
-	{ "DO",                   {2,   0,   0, P_A,    0}, }, //(fn)      _DO(fn, 0, 0)
-	{ "DO_ARG",               {2,   0,   0, P_A,  P_B}, }, //(fn, arg) _DO(fn, arg, 0)
-	{ "DO_PARAM",             {2,   0,   1, P_A,    1}, }, //(fn)      _DO(fn, 1, 1)
-	{ "EXEC",                 {10,  0,   0, P_A,    0}, }, //(fn)      _EXEC(fn, 0, 0)
-	{ "EXEC_ARG",             {10,  0,   0, P_A,  P_B}, }, //(fn, arg) _EXEC(fn, arg, 0)
-	{ "EXEC_PARAM",           {10,  0,   1, P_A,    1}, }, //(fn)      _EXEC(fn, 1, 1)
+	{ "DO",                   {2,   0,   0, P_D,    0}, }, //(fn)      _DO(fn, 0, 0)
+	{ "DO_ARG",               {2,   0,   0, P_D,  P_B}, }, //(fn, arg) _DO(fn, arg, 0)
+	{ "DO_PARAM",             {2,   0,   1, P_D,    1}, }, //(fn)      _DO(fn, 1, 1)
+	{ "EXEC",                 {10,  0,   0, P_D,    0}, }, //(fn)      _EXEC(fn, 0, 0)
+	{ "EXEC_ARG",             {10,  0,   0, P_D,  P_B}, }, //(fn, arg) _EXEC(fn, arg, 0)
+	{ "EXEC_PARAM",           {10,  0,   1, P_D,    1}, }, //(fn)      _EXEC(fn, 1, 1)
 	{ "PARAM_SET",            {9,   0,   0,   0,  P_A}, }, //(x)       _PARAM_SET(x)
 	{ "PARAM_ADD",            {9,   0,   0,   1,  P_A}, }, //(x)       _PARAM_ADD(x)
-	{ "PARAM_SUB",            {9,   0,   0,   1, -P_A}, }, //(x)       _PARAM_ADD(-x)
+	{ "PARAM_SUB",            {9,   0,   0,   1,  P_C}, }, //(x)       _PARAM_ADD(-x)
 	{ "PARAM_MUL",            {9,   0,   0,   2,  P_A}, }, //(x)       _PARAM_MUL(x)
 	{ "PARAM_DIV",            {9,   0,   0,   3,  P_A}, }, //(x)       _PARAM_DIV(x)
 	{ "SET_INTERRUPT",        {12,  0,   0,   1,  P_A}, }, //(fn)      _SET_INTERRUPT(fn)
 	{ "CLEAR_INTERRUPT",      {12,  0,   0,   0,    0}, }, //          _CLEAR_INTERRUPT
-	{ "LOAD_TO_PARAM",        {13,  0,   0, P_A,    0}, }, //(val)     _LOAD_TO_PARAM(val)
-	{ "IF_EQ",                {14,  0,   0, P_A,  P_B}, }, //(val, x)  _IF_EQ(val, x, 0)
-	{ "IF_NE",                {15,  0,   0, P_A,  P_B}, }, //(val, x)  _IF_NE(val, x, 0)
-	{ "IF_GT",                {16,  0,   0, P_A,  P_B}, }, //(val, x)  _IF_GT(val, x, 0)
-	{ "IF_LT",                {17,  0,   0, P_A,  P_B}, }, //(val, x)  _IF_LT(val, x, 0)
-	{ "IF_GE",                {18,  0,   0, P_A,  P_B}, }, //(val, x)  _IF_GE(val, x, 0)
-	{ "IF_LE",                {19,  0,   0, P_A,  P_B}, }, //(val, x)  _IF_LE(val, x, 0)
-	{ "IF_EQ_PARAM",          {14,  0,   1, P_A,    1}, }, //(val)     _IF_EQ(val, 1, 1)
-	{ "IF_NE_PARAM",          {15,  0,   1, P_A,    1}, }, //(val)     _IF_NE(val, 1, 1)
-	{ "IF_GT_PARAM",          {16,  0,   1, P_A,    1}, }, //(val)     _IF_GT(val, 1, 1)
-	{ "IF_LT_PARAM",          {17,  0,   1, P_A,    1}, }, //(val)     _IF_LT(val, 1, 1)
-	{ "IF_GE_PARAM",          {18,  0,   1, P_A,    1}, }, //(val)     _IF_GE(val, 1, 1)
-	{ "IF_LE_PARAM",          {19,  0,   1, P_A,    1}, }, //(val)     _IF_LE(val, 1, 1)
+	{ "LOAD_TO_PARAM",        {13,  0,   0, P_D,    0}, }, //(val)     _LOAD_TO_PARAM(val)
+	{ "IF_EQ",                {14,  0,   0, P_D,  P_B}, }, //(val, x)  _IF_EQ(val, x, 0)
+	{ "IF_NE",                {15,  0,   0, P_D,  P_B}, }, //(val, x)  _IF_NE(val, x, 0)
+	{ "IF_GT",                {16,  0,   0, P_D,  P_B}, }, //(val, x)  _IF_GT(val, x, 0)
+	{ "IF_LT",                {17,  0,   0, P_D,  P_B}, }, //(val, x)  _IF_LT(val, x, 0)
+	{ "IF_GE",                {18,  0,   0, P_D,  P_B}, }, //(val, x)  _IF_GE(val, x, 0)
+	{ "IF_LE",                {19,  0,   0, P_D,  P_B}, }, //(val, x)  _IF_LE(val, x, 0)
+	{ "IF_EQ_PARAM",          {14,  0,   1, P_D,    1}, }, //(val)     _IF_EQ(val, 1, 1)
+	{ "IF_NE_PARAM",          {15,  0,   1, P_D,    1}, }, //(val)     _IF_NE(val, 1, 1)
+	{ "IF_GT_PARAM",          {16,  0,   1, P_D,    1}, }, //(val)     _IF_GT(val, 1, 1)
+	{ "IF_LT_PARAM",          {17,  0,   1, P_D,    1}, }, //(val)     _IF_LT(val, 1, 1)
+	{ "IF_GE_PARAM",          {18,  0,   1, P_D,    1}, }, //(val)     _IF_GE(val, 1, 1)
+	{ "IF_LE_PARAM",          {19,  0,   1, P_D,    1}, }, //(val)     _IF_LE(val, 1, 1)
 	{ "HOME",                 {5,   1,   0,   7,    0}, }, //          _HOME(1)
-
-	{ "SET_POS",              {5,   1,   0,   1,  P_A}, }, //          _SET_X()  -- Compound Command
+	{ "SET_POS",              {5,   0,   0,   1,  P_A}, }, //          _SET_X()  -- Compound Command
 	{ "SET_POS_",             {5,   1,   0,   3,  P_B}, }, //          _SET_Y()
 	{ "SET_ABS_POS_X",        {5,   0,   0,   8,  P_A}, }, //          _SET_ABS_VAL_HIGH()
 	{ "SET_ABS_POS_X_",       {5,   0,   0,   9,  P_B}, }, //          _SET_ABS_X_LOW()
 	{ "SET_ABS_POS_Y",        {5,   0,   0,   8,  P_A}, }, //          _SET_ABS_VAL_HIGH()
 	{ "SET_ABS_POS_Y_",       {5,   1,   0,  10,  P_B}, }, //          _SET_ABS_Y_LOW()
-/*
-#define CC 37
-//                           cmd, fly, prm, sub,   x
-	{ "SET_POS",              {CC,  1,   0,   1,  P_A}, }, //          _SET_X()  -- Compound Command
-	{ "SET_POS-CC1",          {CC,  1,   0,   3,  P_B}, }, //          _SET_Y()
-	{ "SET_ABS_POS",          {CC,  0,   0,   8,  P_A}, }, //          _SET_ABS_VAL_HIGH()
-	{ "SET_ABS_POS-CC2",      {CC,  0,   0,   9,  P_B}, }, //          _SET_ABS_X_LOW()
-	{ "SET_ABS_POS",          {CC,  0,   0,   8,  P_A}, }, //          _SET_ABS_VAL_HIGH()
-	{ "SET_ABS_POS-CC3",      {CC,  1,   0,  10,  P_C}, }, //          _SET_ABS_Y_LOW()
- */
 };
-/* 
-	{ "SET_X_POS",            {5,   1,   0,   1,  P_A}, }, //(x)  _SET_X(x, 1, 0)
-	{ "SET_Y_POS",            {5,   1,   0,   3,  P_A}, }, //(y)  _SET_Y(y, 1, 0)
-
-#define _SET_X(x, fl, pr)       {5,   fl,  pr,  1,   x},
-#define SET_X_POS(x)            _SET_X(x, 1, 0)
-
-#define _SET_Y(y, fl, pr)       {5,   fl,  pr,  3,   y},
-#define SET_Y_POS(y)            _SET_Y(y, 1, 0)
-
-
-TODO: work out how to handle the compound instructions
-
-#define _SET_X(x, fl, pr)       {5,   fl,  pr,  1,   x},
-#define _SET_Y(y, fl, pr)       {5,   fl,  pr,  3,   y},
-
-#define SET_POS(x, y)           _SET_X(x, 0, 0) _SET_Y(y, 1, 0)
-
-#define _SET_ABS_VAL_HIGH(x)    {5,   0,   0,   8,   x}, // Set the high and then low words for X and
-#define _SET_ABS_X_LOW(x)       {5,   0,   0,   9,   x}, // then Y, as 4 consecutive instructions.
-#define _SET_ABS_Y_LOW(y, fl)   {5,   fl,  0,   10,  y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
-
-#define SET_ABS_POS(x, y)       _SET_ABS_VAL_HIGH((((uint32_t)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((uint32_t)(x))&0xFFFF) \
-                                _SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
-
-#define SET_ABS_POS_X(x)       _SET_ABS_VAL_HIGH((((uint32_t)(x))>>16)&0xFFFF) _SET_ABS_X_LOW(((uint32_t)(x))&0xFFFF)
-#define SET_ABS_POS_Y(y)       _SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
-*/
 
  static void logo_hash_write(FILE* fp)
 {
@@ -336,21 +261,6 @@ TODO: work out how to handle the compound instructions
 	fprintf(fp, "strsize\t%u\n", strsize);
 }
 
-//const cmds_t cmdslist[] = {
-//                           cmd, fly, prm, sub,   x
-//	{ "FD",                   {3,   1,   0,   0,  P_A}, }, //(x)  _FD(x, 1, 0)
-//typedef struct logoInstructionDef {
-//	uint16_t cmd        :  6;
-//	uint16_t do_fly     :  1;
-//	uint16_t use_param  :  1;
-//	uint16_t subcmd     :  8;
-//	int16_t arg         : 16;
-//} logoInstructionDef_t;
-//typedef struct tagCmds {
-//	const char* cmd;
-//	logoInstructionDef_t opcode;
-//} cmds_t;
-
 char* compound_cmds[] = { "SET_POS", "SET_ABS_POS_X", "SET_ABS_POS_Y" };
 
 void logo_code_write(FILE* fp)
@@ -359,6 +269,8 @@ void logo_code_write(FILE* fp)
 
 	fprintf(fp, "#define P_A %u\n", P_A);
 	fprintf(fp, "#define P_B %u\n", P_B);
+	fprintf(fp, "#define P_C %u\n", P_C);
+	fprintf(fp, "#define P_D %u\n", P_D);
 	fprintf(fp, "static const logo_cmd_t logo_cmd_list[] = {\n");
 	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++) {
 		int8_t compound_cmd_flag = 0;

@@ -188,7 +188,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
 	_INT1IF = 0; // Clear the INT1 interrupt flag
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-	RFM22B_Int();
+//	RFM22B_Int();
 	interrupt_restore_corcon;
 }
 #elif (RFM_SPI == 2)

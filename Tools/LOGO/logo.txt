@@ -247,7 +247,7 @@ END
 // The three compound (multi-opcode) instructions
 
 SET_POS(21930, 43605)
-SET_ABS_POS_X(2857740885)
+SET_ABS_POS_X(2147483646)
 SET_ABS_POS_Y(1437226410)
 END
 
