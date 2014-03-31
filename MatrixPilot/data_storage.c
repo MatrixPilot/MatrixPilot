@@ -376,7 +376,7 @@ void data_storage_write_table_callback(boolean success)
 }
 
 // Initialise the data storage
-extern void data_storage_init(void)
+void data_storage_init(void)
 {
 	data_storage_event_handle = register_event(&data_storage_service);
 }

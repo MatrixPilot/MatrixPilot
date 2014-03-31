@@ -72,7 +72,7 @@
 #endif
 
 int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
-int16_t outputNum;
+static volatile int16_t outputNum;
 
 
 void udb_init_pwm(void) // initialize the PWM
