@@ -134,8 +134,8 @@ DATA_STORAGE_HEADER data_storage_header; // Buffer for header information
 
 uint16_t data_storage_event_handle = INVALID_HANDLE;
 
-// Status of sotage services
-boolean storage_services_started()
+// Status of storage services
+boolean storage_services_started(void)
 {
 	switch (data_storage_status)
 	{
