@@ -32,38 +32,39 @@ void init_states(void);
 
 extern int16_t waggle;
 
-// these all moved to states.c as they are purely local defines
-//#define CALIB_PAUSE 21        // wait for 10.5 seconds of runs through the state machine
-//#define STANDBY_PAUSE 48      // pause for 24 seconds of runs through the state machine
-//#define NUM_WAGGLES 4         // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
-//#define WAGGLE_SIZE 300
-
 struct flag_bits {
-	uint16_t unused                     : 4;
-	uint16_t save_origin                : 1;
-	uint16_t GPS_steering               : 1;
-	uint16_t pitch_feedback             : 1;
-	uint16_t altitude_hold_throttle     : 1;
-	uint16_t altitude_hold_pitch        : 1;
-	uint16_t man_req                    : 1;
-	uint16_t auto_req                   : 1;
-	uint16_t home_req                   : 1;
-	uint16_t rtl_hold                   : 1;
-	uint16_t f13_print_req              : 1;
-	uint16_t disable_throttle           : 1;
-	uint16_t update_autopilot_state_asap: 1;
-	uint16_t sonar_inrange				: 1;
-	uint16_t barometer_calibrated		: 1;
-	uint16_t barometer_calib_updated	: 1;
-	uint16_t origin_calibrated			: 1;
-	uint16_t gpslocked					: 1;
-	uint16_t i_init						: 1;
-	uint16_t o_initrun					: 1;
-	uint16_t d_init						: 1;
-	uint16_t e_initrun					: 1;
+    uint16_t unused : 4;
+    uint16_t save_origin : 1;
+    uint16_t GPS_steering : 1;
+    uint16_t pitch_feedback : 1;
+    uint16_t altitude_hold_throttle : 1;
+    uint16_t altitude_hold_pitch : 1;
+    uint16_t man_req : 1;
+    uint16_t auto_req : 1;
+    uint16_t home_req : 1;
+    uint16_t rtl_hold : 1;
+    uint16_t f13_print_req : 1;
+    uint16_t disable_throttle : 1;
+    uint16_t update_autopilot_state_asap : 1;
+    uint16_t sonar_inrange : 1;
+    uint16_t bar_cbinitdone : 1;
+    uint16_t bar_ucinitdone : 1;
+    uint8_t barometer_calibrated : 1;
+    uint8_t barometer_calalt_ready : 1;
+    uint8_t barometer_calalt_updated : 1;
+    uint8_t barometer_calalt_updtrun : 1;
+    uint8_t barometer_calalt_initrun : 1;
+    uint8_t barometer_alt_ready : 1;
+    uint8_t gps_locked : 1;
+    uint8_t fltrs_init : 1;
+    uint8_t i_init : 1;
+    uint8_t d_init : 1;
 };
 
-union fbts_int { struct flag_bits _; int16_t WW; };
+union fbts_int {
+    struct flag_bits _;
+    int16_t WW;
+};
 extern union fbts_int flags;
 
 
@@ -73,12 +74,13 @@ void init_servoPrepare(void);
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Control code - rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c
+// Control code - rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c, sonarCntrl.c
 void rollCntrl(void);
 void pitchCntrl(void);
 void yawCntrl(void);
 void altitudeCntrl(void);
 void setTargetAltitude(int16_t targetAlt);
+void updateOriginCals(void);
 
 void init_yawCntrl(void);
 void init_rollCntrl(void);
@@ -92,9 +94,9 @@ void save_pitchCntrl(void);
 void save_altitudeCntrl(void);
 void save_altitudeCntrlVariable(void);
 
-
-void calculate_sonar_height_above_ground(void);
-
+#if (USE_SONAR == 1)
+void calSonarAGLAltitude(void);
+#endif
 
 // wind gain adjustment
 uint16_t wind_gain_adjustment(void);
@@ -125,12 +127,6 @@ void cameraServoMix(void);
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
 // See options.h for a description of each type
-//#define AIRFRAME_STANDARD   0
-//#define AIRFRAME_VTAIL      1
-//#define AIRFRAME_DELTA      2
-//#define AIRFRAME_HELI       3    // Untested
-//#define AIRFRAME_QUAD       4    // Under development
-
 #define AIRFRAME_NONE       0
 #define AIRFRAME_STANDARD   1
 #define AIRFRAME_VTAIL      2
@@ -141,69 +137,40 @@ void cameraServoMix(void);
 // Negate VALUE if NEEDS_REVERSING is true
 #define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE) ((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
 
-extern int16_t cam_pitch_servo_pwm_delta;  
+extern int16_t cam_pitch_servo_pwm_delta;
 extern int16_t cam_yaw_servo_pwm_delta;
 int32_t cam_pitchServoLimit(int32_t pwm_pulse);
 int32_t cam_yawServoLimit(int32_t pwm_pulse);
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// navigation.c
-//void init_navigation(void);
-//#ifdef USE_EXTENDED_NAV
-//void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
-//#else
-//void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
-//#endif // USE_EXTENDED_NAV
-//void update_goal_alt(int16_t z);
-//void compute_bearing_to_goal (void);
-//void process_flightplan(void);
-//int16_t determine_navigation_deflection(char navType);
-
-//struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
-//extern struct waypointparameters goal;
-//extern struct relative2D togoal;
-//extern int16_t tofinish_line;
-//extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
-//extern int8_t desired_dir;
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Flight Planning modules - flightplan-waypoints.c and flightplan-logo.c
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
-	extern void init_waypoints(void);
+extern void init_waypoints(void);
 #endif
 //void init_flightplan(int16_t flightplanNum);
 extern boolean use_fixed_origin(void);
-//struct absolute3D get_fixed_origin(void);
-//void run_flightplan(void);
-//void flightplan_live_begin(void);
-//void flightplan_live_received_byte(uint8_t inbyte);
-//void flightplan_live_commit(void);
 
 #if (USE_SONAR == 1 && HILSIM != 1)
-	extern void calSonarAGLAltitude(void);
-	extern inline int16_t get_sonar_aglaltitude(void);
-	extern inline int16_t get_sonar_rawaglaltitude(void);
-	//extern int16_t sonar_rawaglaltitude;					// direct distance from sonar to a target in cm fr. altitudeCntrl.c
-	//extern int16_t sonar_aglaltitude;						// rmat tilt compensated sonar altitude in cm  fr. altitudeCntrl.c
+extern void calSonarAGLAltitude(void);
+extern inline int16_t get_sonar_aglaltitude(void);
+extern inline int16_t get_sonar_rawaglaltitude(void);
+
 //	#if (SERIAL_OUTPUT_FORMAT == SERIAL_SONAR)
 //		extern uint32_t cos_sonarproll;						// cosine of angle of tilt of plane in fractional * 2  fr. altitudeCntrl.c
 //	#endif
+
 #endif
- 
+
 #if (USE_BAROMETER == 1 && HILSIM != 1)
-	extern void barometerCalibrate(void);
-	extern void barometerCalibrationUpdate(void);
-	extern int32_t setBarOriginAlt(float barpres,int16_t bartemp);
-	extern inline float get_barometer_pressure(void);
-	extern inline int16_t get_barometer_temperature(void);
-	extern inline float get_barometer_pressureorgn(void);
-	extern inline int16_t get_barometer_temperatureorgn(void);
-	extern inline int32_t get_barometer_altitudeorgn(void);
-	extern inline float get_barometer_rtavepressure(void);
-	extern inline int16_t get_barometer_rtavetemperature(void);
-	extern inline int32_t get_barometer_aslaltitude(void);
+extern void estBarometerAltitude(void);
+extern void barometerCalibrate(void);
+extern inline int16_t get_barometer_temp_rtf(void); //  Runtime barometer.c temperature feed
+extern inline int32_t get_barometer_pres_rtf(void); //  Runtime barometer.c pressure feed
+extern inline int32_t get_barometer_aslalt_est(void); //  Runtime ASL altitude estimate
+extern inline int16_t get_barometer_temp_ogn(void); //  temperature  at origin
+extern inline int32_t get_barometer_pres_ogn(void); // pressure at origin
+extern inline int32_t get_barometer_aslalt_ogn(void); //   ASL altitude  at origin
 #endif
 
 // Failsafe Type
@@ -218,6 +185,74 @@ extern boolean use_fixed_origin(void);
 boolean setjmp(void);
 
 ////////////////////////////////////////////////////////////////////////////////
+// serialIO.c
+void init_serial(void);
+void serial_output(char* format, ...);
+void serial_output_8hz(void);
+void mavlink_output_40hz(void);
+
+// Serial Output Format
+#define SERIAL_NONE         0    // No serial data is sent
+#define SERIAL_DEBUG        1    // UAV Dev Board debug info
+#define SERIAL_ARDUSTATION  2    // Compatible with ArduStation
+#define SERIAL_UDB          3    // Pete's efficient UAV Dev Board format
+#define SERIAL_OSD_REMZIBI  4    // Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
+#define SERIAL_OSD_IF       5    // Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
+#define SERIAL_MAGNETOMETER 6    // Debugging the magnetometer
+#define SERIAL_UDB_EXTRA    7    // Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
+#define SERIAL_CAM_TRACK    8    // Output Location in a format usable by a 2nd UDB to target its camera at this plane
+#define SERIAL_MAVLINK      9    // The Micro Air Vehicle Link protocol from the PixHawk Project
+
+
+////////////////////////////////////////////////////////////////////////////////
+// mp_osd.c
+void osd_run_step(void);
+
+
+#include "gain_variables.h"
+
+// GNU compiler specific macros for specifically marking variables as unused
+// If not using GNU, then macro makes no alteration to the code
+#ifdef __GNUC__
+#define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
+#else
+#define UNUSED(x) UNUSED_ ## x
+#endif
+
+#ifdef __GNUC__
+#define UNUSED_FUNCTION(x) __attribute__((__unused__)) UNUSED_ ## x
+#else
+#define UNUSED_FUNCTION(x) UNUSED_ ## x
+#endif
+
+#endif // _DEFINES_H_
+
+// GOOFY'S PARKING
+
+/*  **Deprecated**
+
+//	extern inline float  	get_barometer_pres_rtavg(void);				//  Runtime averaged pressure 
+//	extern inline int16_t 	get_barometer_temp_rtavg(void);				//  Runtime averaged temperature
+//	extern inline float 	get_barometer_pres_orgn(void);				//  Pressure at origin
+//	extern inline int16_t	get_barometer_temp_orgn(void);				//  Temperature at origin
+//	extern inline int32_t	get_barometer_aslalt_orgn(void);			//  ASL altitude at origin
+        extern int32_t estBarometerAltitude(float pres_rt,float pres_orgn,int16_t temp_orgn);
+
+//	uint16_t barometer_calalt_updaterun	: 1;
+        extern int32_t estBarometerAltitudeOrigin(float pres_rt, float pres_orgn, int16_t temp_orgn);
+
+int32_t calcNScBarASLAlt(float pres_rt);
+
+        //extern inline int32_t 	get_barometer_aslalt_lvr(void);
+ */
+
+// these all moved to states.c as they are purely local defines
+//#define CALIB_PAUSE 21        // wait for 10.5 seconds of runs through the state machine
+//#define STANDBY_PAUSE 48      // pause for 24 seconds of runs through the state machine
+//#define NUM_WAGGLES 4         // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
+//#define WAGGLE_SIZE 300
+
+////////////////////////////////////////////////////////////////////////////////
 // behavior.c
 /*
 void init_behavior(void);
@@ -228,18 +263,18 @@ boolean canStabilizeInverted(void);
 boolean canStabilizeHover(void);
 
 struct behavior_flag_bits {
-	uint16_t takeoff        : 1;    // disable altitude interpolation for faster climbout
-	uint16_t inverted       : 1;    // fly iverted
-	uint16_t hover          : 1;    // hover the plane
-	uint16_t rollLeft       : 1;    // unimplemented
-	uint16_t rollRight      : 1;    // unimplemented
-	uint16_t trigger        : 1;    // trigger action
-	uint16_t loiter         : 1;    // stay on the current waypoint
-	uint16_t land           : 1;    // throttle off
-	uint16_t absolute       : 1;    // absolute waypoint
-	uint16_t altitude       : 1;    // climb/descend to goal altitude
-	uint16_t cross_track    : 1;    // use cross-tracking navigation
-	uint16_t unused         : 5;
+        uint16_t takeoff        : 1;    // disable altitude interpolation for faster climbout
+        uint16_t inverted       : 1;    // fly iverted
+        uint16_t hover          : 1;    // hover the plane
+        uint16_t rollLeft       : 1;    // unimplemented
+        uint16_t rollRight      : 1;    // unimplemented
+        uint16_t trigger        : 1;    // trigger action
+        uint16_t loiter         : 1;    // stay on the current waypoint
+        uint16_t land           : 1;    // throttle off
+        uint16_t absolute       : 1;    // absolute waypoint
+        uint16_t altitude       : 1;    // climb/descend to goal altitude
+        uint16_t cross_track    : 1;    // use cross-tracking navigation
+        uint16_t unused         : 5;
 };
 
 #define F_NORMAL               0
@@ -269,26 +304,14 @@ extern union bfbts_word desired_behavior;
 #define TRIGGER_TOGGLE        16
 #define TRIGGER_REPEATING     32
  */
+//#define OSD_NTSC            0
+//#define OSD_PAL             1
 
-////////////////////////////////////////////////////////////////////////////////
-// serialIO.c
-void init_serial(void);
-void serial_output(char* format, ...);
-void serial_output_8hz(void);
-void mavlink_output_40hz(void);
-
-// Serial Output Format
-#define SERIAL_NONE         0    // No serial data is sent
-#define SERIAL_DEBUG        1    // UAV Dev Board debug info
-#define SERIAL_ARDUSTATION  2    // Compatible with ArduStation
-#define SERIAL_UDB          3    // Pete's efficient UAV Dev Board format
-#define SERIAL_OSD_REMZIBI  4    // Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
-#define SERIAL_OSD_IF       5    // Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
-#define SERIAL_MAGNETOMETER 6    // Debugging the magnetometer
-#define SERIAL_UDB_EXTRA    7    // Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
-#define SERIAL_CAM_TRACK    8    // Output Location in a format usable by a 2nd UDB to target its camera at this plane
-#define SERIAL_MAVLINK      9    // The Micro Air Vehicle Link protocol from the PixHawk Project
-
+// new OSD types
+//#define OSD_NONE            0   // OSD disabled
+//#define OSD_NATIVE          1   // native OSD
+//#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
+//#define OSD_MINIM           3   // Output data formatted for minim OSD
 
 ////////////////////////////////////////////////////////////////////////////////
 // cameraCntrl.c
@@ -303,35 +326,38 @@ void mavlink_output_40hz(void);
 
 //#define CAM_VIEW_LAUNCH     { 0, 0, 0 }
 
+//struct absolute3D get_fixed_origin(void);
+//void run_flightplan(void);
+//void flightplan_live_begin(void);
+//void flightplan_live_received_byte(uint8_t inbyte);
+//void flightplan_live_commit(void);
+
+//#define AIRFRAME_STANDARD   0
+//#define AIRFRAME_VTAIL      1
+//#define AIRFRAME_DELTA      2
+//#define AIRFRAME_HELI       3    // Untested
+//#define AIRFRAME_QUAD       4    // Under development
+
 
 ////////////////////////////////////////////////////////////////////////////////
-// mp_osd.c
-void osd_run_step(void);
+// navigation.c
+//void init_navigation(void);
+//#ifdef USE_EXTENDED_NAV
+//void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
+//#else
+//void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
+//#endif // USE_EXTENDED_NAV
+//void update_goal_alt(int16_t z);
+//void compute_bearing_to_goal (void);
+//void process_flightplan(void);
+//int16_t determine_navigation_deflection(char navType);
 
-//#define OSD_NTSC            0
-//#define OSD_PAL             1
-
-// new OSD types
-//#define OSD_NONE            0   // OSD disabled
-//#define OSD_NATIVE          1   // native OSD
-//#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
-//#define OSD_MINIM           3   // Output data formatted for minim OSD
+//struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
+//extern struct waypointparameters goal;
+//extern struct relative2D togoal;
+//extern int16_t tofinish_line;
+//extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+//extern int8_t desired_dir;
 
 
-#include "gain_variables.h"
 
-// GNU compiler specific macros for specifically marking variables as unused
-// If not using GNU, then macro makes no alteration to the code
-#ifdef __GNUC__
-#  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
-#else
-#  define UNUSED(x) UNUSED_ ## x
-#endif
-
-#ifdef __GNUC__
-#  define UNUSED_FUNCTION(x) __attribute__((__unused__)) UNUSED_ ## x
-#else
-#  define UNUSED_FUNCTION(x) UNUSED_ ## x
-#endif
-
-#endif // _DEFINES_H_

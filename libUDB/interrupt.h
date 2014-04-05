@@ -19,11 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE    1
-
-
 #define INT_PRI_T1      6   // background.c : high priority HEARTBEAT of libUDB
 //#define INT_PRI_T2      ?   // radioIn.c : does not use the timer interrupt
 //#define INT_PRI_T3      ?   // unused
@@ -65,10 +60,6 @@ uint16_t SP_start(void);
 uint16_t SP_limit(void);
 uint16_t SP_current(void);
 
-#if (USE_MCU_IDLE == 1)
-#define indicate_loading_inter {}
-#define indicate_loading_main  {}
-#else
 #define indicate_loading_inter \
 	{ \
 		T5CONbits.TON = 1; \
@@ -78,7 +69,6 @@ uint16_t SP_current(void);
 	{ \
 		T5CONbits.TON = 0; \
 	}
-#endif // USE_MCU_IDLE
 
 // The dsp math calls change and restore CORCON internally, so if we fire an
 // ISR in the middle of a dsp math call, CORCON can be set to an unexpected value.

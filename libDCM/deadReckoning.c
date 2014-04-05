@@ -147,14 +147,16 @@ void dead_reckon(void)
 
 			// fuse sonar altitude only if within low alt range and over the field 
 			// TODO:add health or within range chk as condition
-			if (SONAR_ALTITUDE == 1 && udb_flags._.sonar_altitude_on == 1&& flags._.sonar_inrange != 0)  //  apply boolean from LOGO
+			if (SONAR_ALTITUDE && udb_flags._.sonar_altitude_on && flags._.sonar_inrange)  //  apply boolean from LOGO
 			{
-				/*#if ( USE_PA_PRESSURE == 1 )
-					//add back sonar alt
-					locationErrorEarth[2] = (GPSlocation.z - ((get_barometer_altorigin()+((int16_t)get_sonar_aglaltitude()/100))));
-				#else*/
-					locationErrorEarth[2] = GPSlocation.z - (ASL_GROUND_ALT+(((int16_t)get_sonar_aglaltitude()/100))) ;
-				//#endif
+				if (USE_PA_PRESSURE && flags._.barometer_calalt_ready && udb_flags._.barometer_altitude_on) {    // TODO:  add sonar calibration function and add flag here
+                                    //add back sonar alt
+					locationErrorEarth[2] = (GPSlocation.z - (((int32_t) get_barometer_aslalt_ogn() + ((int32_t) get_sonar_aglaltitude()/100))));
+                                        udb_flags._.barometer_altitude_on = 0;
+                                }
+                                else{
+					locationErrorEarth[2] = GPSlocation.z - (ASL_GROUND_ALT + (((int32_t) get_sonar_aglaltitude()/100))) ;
+                                }
 			}
 			else
 			{
@@ -162,16 +164,21 @@ void dead_reckon(void)
 			}
 			// recalibrate with barometric altitude only as called from LOGO
 			// TODO:add health chk as condition and fuse IMU with barometer aslaltitude
-			if ( BAROMETER_ALTITUDE == 1  && udb_flags._.barometer_altitude_on == 1) 
+#if (USE_BAROMETER && !HILSIM && BAROMETER_ALTITUDE)
+			if (udb_flags._.barometer_altitude_on == 1) 
 			{
-				locationErrorEarth[2] = GPSlocation.z - ((int32_t)get_barometer_aslaltitude()/100) ; 
+				locationErrorEarth[2] = GPSlocation.z - ((int32_t) get_barometer_aslalt_est()/100) ;
 				udb_flags._.barometer_altitude_on = 0;
 			}
 			else
 			{	
+				locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1;
+			}
+#else
+			{	
 				locationErrorEarth[2] = GPSlocation.z - IMUlocationz._.W1 ;
 			}
-
+#endif
 			velocityErrorEarth[0] = GPSvelocity.x - IMUintegralAccelerationx._.W1;
 			velocityErrorEarth[1] = GPSvelocity.y - IMUintegralAccelerationy._.W1;
 			velocityErrorEarth[2] = GPSvelocity.z - IMUintegralAccelerationz._.W1;

@@ -17,6 +17,7 @@
 #include "interrupt.h"
 #include "NV_memory.h"
 #include "events.h"
+
 #include "oscillator.h"
 
 #define I2C2_SDA 		_LATA3    //  from _RA3, _RA2, mods per Bill P.
@@ -44,7 +45,8 @@ void I2C2_doneWrite(void);
 void I2C2_writeCommandData(void);
 
 void serviceI2C2(void);  // service the I2C
-	
+void I2C2_trigger_service(void);
+
 int16_t I2C2ERROR	= 0 ;
 int16_t I2C2MAXS	= 0 ;
 int16_t I2C2MAXQ	= 0 ;
@@ -61,7 +63,7 @@ void (* I2C2_state ) ( void ) = &I2C2_idle ;
 #define I2C2_QUEUE_DEPTH	3									
 I2Cqueue		i2c2_queue[I2C2_QUEUE_DEPTH];
 
-uint16_t I2C2_Index = 0;  				// index into the write buffer
+static uint16_t I2C2_Index = 0;  				// index into the write buffer
 
 uint8_t I2C2_CommandByte 	= 0;
 uint16_t I2C2_tx_data_size = 0;			// tx data size
@@ -72,12 +74,11 @@ uint8_t* pI2C2Buffer = NULL;			// pointer to buffer
 uint8_t* pI2C2commandBuffer = NULL;		// pointer to receive  buffer
 
 uint16_t I2C2_service_handle = INVALID_HANDLE;
-uint16_t	I2C2_ERROR = 0;		
+uint16_t I2C2_ERROR = 0;		
 
 void I2C2_init(void)
 {
-	int16_t queueIndex;
-
+	static uint16_t queueIndex;
 	for(queueIndex = 0; queueIndex < I2C2_QUEUE_DEPTH; queueIndex++)
 	{
 		i2c2_queue[queueIndex].pending = false;
@@ -177,8 +178,7 @@ boolean I2C2_Normal(void)
 
 boolean I2C2_serve_queue()
 {
-	int queueIndex;
-	
+	static uint16_t queueIndex;
 	for(queueIndex = 0; queueIndex < I2C2_QUEUE_DEPTH; queueIndex++)
 	{
 		if(i2c2_queue[queueIndex].pending == true)
@@ -220,8 +220,7 @@ boolean I2C2_serve_queue()
 
 boolean I2C2_Write(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback)
 {
-	uint16_t queueIndex;
-
+	static uint16_t queueIndex;
 	for(queueIndex = 0; queueIndex < I2C2_QUEUE_DEPTH; queueIndex++)
 	{
 		if(i2c2_queue[queueIndex].pending == false)
@@ -246,8 +245,7 @@ boolean I2C2_Write(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSi
 
 boolean I2C2_Read(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback)
 {
-	int queueIndex;
-
+	static uint16_t queueIndex;
 	for(queueIndex = 0; queueIndex < I2C2_QUEUE_DEPTH; queueIndex++)
 	{
 		if(i2c2_queue[queueIndex].pending == false)
@@ -466,4 +464,6 @@ void I2C2_Failed(void)
 	if(	pI2C2_callback != NULL)
 		pI2C2_callback(false);
 }
+
+
 

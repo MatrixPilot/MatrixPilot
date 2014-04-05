@@ -109,10 +109,12 @@ static void cmd_adc(void)
 
 static void cmd_barom(void)
 {
-	printf("%i, ot %u, op %u, oa %u, rt %u, rp %u, at %u, ap %u, aa %u\r\n"
-	(int16_t)get_barometer_temperatureorgn(), (float)get_barometer_pressureorgn(),(int32_t)get_barometer_altitudeorgn()  
-	(int16_t)get_barometer_temperature(),(float)get_barometer_pressure(), (int16_t)get_barometer_rtavetemperature(),
-	(float)get_barometer_rtavepressure(), (int32_t)get_barometer_aslaltitude());
+	printf("%i, rt %u, rp %u, aa %u\r\n"
+	//printf("%i, ot %u, op %u, oa %u, rt %u, rp %u, aa %u\r\n"
+	//printf("%i, ot %u, op %u, oa %u, at %u, ap %u, aa %u\r\n"
+	//(int16_t)get_barometer_temp_orgn(), (int32_t)get_barometer_pres_orgn(),(int32_t)get_barometer_aslalt_orgn()  
+	(int16_t)get_barometer_temp_rtf(),(int32_t)get_barometer_pres_rtf(),
+	(int32_t)get_barometer_aslalt_rt());
 }
 
 static void cmd_magno(void)

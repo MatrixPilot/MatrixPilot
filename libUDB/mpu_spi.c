@@ -26,7 +26,7 @@
 #include "oscillator.h"
 #include "delay.h"
 
-#if (BOARD_TYPE != UDB4_BOARD)
+#if (BOARD_TYPE != UDB4_BOARD) // && BOARD_TYPE != UDB5_BOARD)
 
 #include <stdbool.h>
 #include <spi.h>

@@ -108,12 +108,8 @@ void udb_init(void)
 
 void udb_run(void)
 {
-	#if (USE_MCU_IDLE == 1)
-		Idle();
-	#else
-		// pause cpu counting timer while not in an ISR
-		indicate_loading_main;
-	#endif
+	// pause cpu counting timer while not in an ISR
+	indicate_loading_main;
 }
 
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization

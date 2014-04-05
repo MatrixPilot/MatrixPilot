@@ -91,9 +91,6 @@ inline void init_heartbeat(void)
 static inline void init_cpu_timer(void)
 {
 	// Timer 5 is used to measure CPU usage
-	// Two techniques are supported, depending on whether USE_MCU_IDLE is selected
-	//   Timer 5 free runs until stopped during CPU idle
-	// else
 	// Timer 5 will be turned on in interrupt routines and turned off in main()
 	TMR5 = 0;               // initialize timer
 	PR5 = 16*256;           // measure instructions in groups of 16*256 
@@ -103,12 +100,7 @@ static inline void init_cpu_timer(void)
 	_T5IP = INT_PRI_T5;     // set interrupt priority
 	_T5IF = 0;              // clear the interrupt
 	_T5IE = 1;              // enable the interrupt
-#if (USE_MCU_IDLE == 1)
-	T5CONbits.TSIDL = 1;    // stop the timer during CPU IDLE
-	T5CONbits.TON = 1;      // turn the timer 5 on until we idle
-#else
 	T5CONbits.TON = 0;      // turn off timer 5 until we enter an interrupt
-#endif // USE_MCU_IDLE
 }
 
 inline void cpu_load_calc(void)

@@ -289,7 +289,7 @@ static void set_udb_pwIn(int pwm, int index)
 					T3CONbits.TCKPS = 2;    // prescaler = 64,  see page 175 at http://ww1.microchip.com/downloads/en/DeviceDoc/70593C.pdf
 					T3CONbits.TCS = 0;      // use the internal clock
 					T3CONbits.TON = 1;      // turn on timer 3
-				    IC8CONbits.ICTMR = 0;   // use timer 3,  TODO:  make this compatible with AUAV3
+                                        IC8CONbits.ICTMR = 0;   // use timer 3,  TODO:  make this compatible with AUAV3
 					IC8CONbits.ICM = 1;     // capture every edge,  TODO:  make this compatible with AUAV3
 					_TRISD15 = 1;
 					_IC8IP = 6;
@@ -364,11 +364,11 @@ static void set_udb_pwIn(int pwm, int index)
 											{
 												if ( udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN && udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX )
 												{
-												failSafePulses++ ;
+                                                                                                    failSafePulses++ ;
 												}
 												else
 												{
-													noisePulses++ ;
+                                                                                                    noisePulses++ ;
 												}
 											}
 										}

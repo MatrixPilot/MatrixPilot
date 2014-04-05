@@ -22,8 +22,17 @@
 #ifndef BAROMETER_H
 #define BAROMETER_H
 
-typedef void (*barometer_callback_funcptr)(int32_t pressure, int16_t temperature, int8_t status);
+typedef void (*barometer_callback_funcptr)(int32_t pressure, int16_t temperature, uint8_t status);
 
 void rxBarometer(barometer_callback_funcptr);  	// service the barometer
+
+#define I2C_Normal		I2C2_Normal
+#define I2C_Read		I2C2_Read
+#define I2C_Write		I2C2_Write
+#define I2C_reset		I2C2_reset
+
+#define BPXD                    0
+
+//inline boolean bar_DataReady(void);
 
 #endif // BAROMETER_H

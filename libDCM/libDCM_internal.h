@@ -33,4 +33,8 @@ void gpsoutbin(int16_t length, const uint8_t* msg);
 
 void dcm_run_imu_step(void);    // This needs to be run every 25ms
 
+#if (USE_BAROMETER == 1)
+	void udb_barometer_callback(int32_t pressure, int16_t temperature, uint8_t status);
+#endif
+
 

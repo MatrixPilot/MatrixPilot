@@ -145,14 +145,12 @@ struct ADchannel {
 
 
 struct udb_flag_bits {
-	uint16_t unused            		: 12;
+	uint16_t unused            	: 12;
 	uint16_t a2d_read               : 1;
 	uint16_t radio_on               : 1;
-	uint16_t sonar_updated       	: 1;
-	//uint16_t sonar_print_telemetry 	: 1;
-	uint16_t sonar_altitude_on		: 1;
-	uint16_t barometer_altitude_on	: 1;
-	uint16_t healthy				: 1;
+	uint8_t sonar_updated       	: 1;
+	uint8_t sonar_altitude_on	: 1;
+	uint8_t barometer_altitude_on	: 1;
 };
 
 

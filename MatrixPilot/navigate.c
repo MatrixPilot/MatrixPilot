@@ -100,6 +100,7 @@ static void setup_origin(void)
 	flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
 }
 
+//  Called when GPS lock is achieved
 void dcm_callback_gps_location_updated(void)
 {
 	if (flags._.save_origin)
@@ -108,7 +109,7 @@ void dcm_callback_gps_location_updated(void)
 		// actually used for anything, but is saved in case you decide to
 		// extend this code.
 		flags._.save_origin = 0;
-		setup_origin();   //  TODO:  look into this call to capture lauch takeoff point and angle
+		setup_origin();
 	}
 
 // Ideally, navigate should take less than one second.

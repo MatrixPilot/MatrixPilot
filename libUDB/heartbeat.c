@@ -23,9 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
-#if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
-#endif
 #if (USE_NV_MEMORY == 1)
 #include "NV_memory.h"
 #endif
@@ -115,6 +113,10 @@ static void pulse(void)
 	{
 #if (USE_I2C1_DRIVER == 1)
 		I2C1_trigger_service();
+#endif
+
+#if (USE_I2C2_DRIVER == 1)  //  service queued i2c2 if USE_I2C2_DRIVER == 1
+		I2C2_trigger_service();
 #endif
 
 #if (USE_NV_MEMORY == 1)

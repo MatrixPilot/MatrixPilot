@@ -1,0 +1,22 @@
+build/default/production/_ext/1077454706/osd.o:  \
+../../libUDB/osd.c  \
+ ../../libUDB/libUDB_internal.h  \
+../../libUDB/libUDB.h  \
+../options.h  \
+ ../../libUDB/fixDeps.h  \
+../../libUDB/libUDB_defines.h  \
+ ../../libUDB/udbTypes.h  \
+../../libUDB/ConfigUDB4.h  \
+ ../../libUDB/boardRotation_defines.h  \
+../../libUDB/nv_memory_options.h  \
+ ../../libUDB/oscillator.h  \
+../defines.h  \
+../../libDCM/libDCM.h  \
+ ../../libDCM/../libUDB/libUDB.h  \
+../../libDCM/libDCM_defines.h  \
+ ../../libDCM/dcmTypes.h  \
+../../libDCM/../libUDB/udbTypes.h  \
+ ../gain_variables.h  \
+../../libUDB/libUDB.h  \
+../osd_config.h  \
+ ../../libUDB/osd.h 

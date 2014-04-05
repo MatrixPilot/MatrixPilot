@@ -58,12 +58,14 @@ enum {
 	DIST_TO_GOAL,
 	ALT,
     //  NEW PARAMS ///
-	ALT_SONAR,	
-	ALT_BAR_GND,  //	barometer_gndaltitude = get_barometer_gndaltitude();
-	ALT_BAR_ASL,	
-	ALT_BAR_AGL,	
-	TEMPRTR_BAR,	
-	PRESSURE_BAR,
+	ALT_SONAR,
+        PRES_BAR_RT,
+	TEMP_BAR_RT,
+	ALT_BAR_ASL,
+        ALT_BAR_ORG, 		//  barometer altitude at origin
+	ALT_BAR_FOGN,		//  barometer altitude from origin
+	PRES_BAR_OGN,
+	TEMP_BAR_OGN,
 	//TAKEOFF_ANGLE,  	// room for capturing the take off angle for auto land use 
 	//TAKEOFF_POS,  	// room for capturing the take off position for auto land use 
 	/////////////////
@@ -196,7 +198,6 @@ enum {
 #define ALT_UP_PARAM_SNR	_MV_ZS(1, 0, 1)
 #define ALT_DOWN_PARAM_SNR	_MV_ZS(-1, 0, 1)
 #define SET_ALT_PARAM_SNR	_SET_ZS(1, 0, 1)
-//boolean altitude_sonar_on = false ;  	
 
 //BAROMETER ALTITUDE
 #define ALT_UP_BAR(z)		_MV_ZB(z, 0, 0)
@@ -205,7 +206,6 @@ enum {
 #define ALT_UP_PARAM_BAR	_MV_ZB(1, 0, 1)
 #define ALT_DOWN_PARAM_BAR	_MV_ZB(-1, 0, 1)
 #define SET_ALT_PARAM_BAR	_SET_ZB(1, 0, 1)
-//boolean altitude_bar_on = false ; 
 
 #define SPEED_INCREASE(x)       _SPEED_INCREASE(x, 0)
 #define SPEED_DECREASE(x)       _SPEED_INCREASE(-x, 0)
@@ -601,7 +601,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 		case ALT_SONAR: // in centimeters
 			#if ( USE_SONAR == 1 )
 			{
-				return (int16_t)get_sonar_aglaltitude(); // in centimeters
+				return (int32_t) get_sonar_aglaltitude(); // in centimeters
 			}
 			#else   //absence of sonar sensor device
 			{
@@ -612,11 +612,21 @@ int16_t logo_value_for_identifier(uint8_t ident)
 		/************************************************
 		BAROMETER SYSTEMS VALUE SUPPORT
 		*************************************************/
-		case ALT_BAR_GND: // centimeters, above sea level altitude 
-			
+                case PRES_BAR_RT: // in hPA
+
 			#if ( USE_BAROMETER == 1 )
 			{
-				return (int32_t)get_barometer_altitudeorgn(); // in centimeters
+				return (int32_t) get_barometer_pres_rtf(); // in centimeters
+			}
+			#else   //absence of barometer sensor device
+			{
+				return -999;  //  return dummy value in the absence of sonar sensor device
+			}
+			#endif
+                case TEMP_BAR_RT: // in celcius
+			#if ( USE_BAROMETER == 1 )
+			{
+				return (int16_t) get_barometer_temp_rtf(); // in centimeters
 			}
 			#else   //absence of barometer sensor device
 			{
@@ -628,13 +638,13 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				if (flags._.barometer_calibrated == 1)
+				if (flags._.barometer_calalt_ready)  // TODO: trap after takeoff altitude
 				{
-					return (int32_t)get_barometer_aslaltitude(); // in centimeters
+					return (int32_t)get_barometer_aslalt_est(); // in centimeters
 				}
 				else
 				{
-					return (int32_t)get_barometer_altitudeorgn(); // in centimeters
+					return 0; // TODO: change to  (int32_t)get_barometer_aslaltitude_lvr() last valid reading
 				}
 			}
 			#else   //absence of barometer sensor device
@@ -642,36 +652,12 @@ int16_t logo_value_for_identifier(uint8_t ident)
 				return -999;      //  return dummy value in the absence of sonar sensor device
 			}
 			#endif
-		case ALT_BAR_AGL: // centimeters, above ground level altitude
-			
+
+            case ALT_BAR_ORG: // centimeters, origin ASL altitude
+
 			#if ( USE_BAROMETER == 1 )
 			{
-				if (flags._.barometer_calibrated == 1)  // TODO: trap after takeoff altitude
-				{
-					return ((int32_t)get_barometer_aslaltitude()-(int32_t)get_barometer_altitudeorgn()); // in centimeters
-				}
-				else
-				{
-					return (int32_t)get_barometer_altitudeorgn(); // in centimeters
-				}
-			}
-			#else   //absence of barometer sensor device
-			{
-				return -999;      //  return dummy value in the absence of sonar sensor device
-			}
-			#endif
-		case TEMPRTR_BAR: // in celcius
-			
-			#if ( USE_BAROMETER == 1 )
-			{
-				if (flags._.barometer_calibrated == 1)
-				{
-					return (int16_t)get_barometer_rtavetemperature(); // in centimeters
-				}
-				else
-				{
-					return (int16_t)get_barometer_temperatureorgn(); // in centimeters
-				}
+				return get_barometer_aslalt_ogn(); // in centimeters
 			}
 			#else   //absence of barometer sensor device
 			{
@@ -679,24 +665,48 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			}
 			#endif
 
-		case PRESSURE_BAR: // in hPA
+       		case ALT_BAR_FOGN: // centimeters, from origin altitude
 			
 			#if ( USE_BAROMETER == 1 )
 			{
-				if (flags._.barometer_calibrated == 1)
+				if (flags._.barometer_calalt_ready)  // TODO: trap after takeoff altitude
 				{
-					return (float)get_barometer_rtavepressure(); // in centimeters
+					return ((int32_t) get_barometer_aslalt_est() - (int32_t) get_barometer_aslalt_ogn()); // in centimeters
 				}
 				else
 				{
-					return (float)get_barometer_pressureorgn(); // in centimeters
+					return 0; // TODO: change to  (int32_t) get_barometer_aslaltitude_lvr() last valid reading
 				}
+			}
+			#else   //absence of barometer sensor device
+			{
+				return -999;      //  return dummy value in the absence of sonar sensor device
+			}
+			#endif
+
+		case PRES_BAR_OGN: // in hPA, pressure origin
+			
+			#if ( USE_BAROMETER == 1 )
+			{
+				return (int32_t) get_barometer_pres_ogn(); // in centimeters
 			}
 			#else   //absence of barometer sensor device
 			{
 				return -999;  //  return dummy value in the absence of sonar sensor device
 			}
 			#endif
+
+		case TEMP_BAR_OGN: // in celcius, temperature origin
+			#if ( USE_BAROMETER == 1 )
+			{
+				return (int16_t) get_barometer_temp_ogn(); // in centimeters
+			}
+			#else   //absence of barometer sensor device
+			{
+				return -999;  //  return dummy value in the absence of sonar sensor device
+			}
+			#endif
+
 		/************************************************/
 
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
@@ -990,7 +1000,6 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 					udb_flags._.barometer_altitude_on = 1;  // TODO TBR: temporary while barometer altitude is under flight testing
 					int16_t barometer_m_alt = instr.arg ;
 					turtleLocations[currentTurtle].z += (barometer_m_alt/100) ; //convert sonar alt, cm to meter
-
 					break ;
 				}
 				case 14: // Set ZB location  

@@ -11,7 +11,6 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include "../libDCM/libDCM.h"
 #include "../libUDB/barometer.h"
 #include "barometerCntrl.h"
@@ -20,320 +19,345 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-//  altitude offset default
-int32_t alt_offset=BAR_ALT_OFFSET;				// auto calibrated altitude offset: WIP
-
 //	The origin is recorded as the altitude of the plane during power up of the control board.
 //  ..Stored prior sampled and averaged runtime barometric data
 
-//RUN-TIME-INLINE BAROMETER DATA
-static float barometer_pressure				= 0;	// RT raw pressure
-static int16_t barometer_temperature		= 0;	// RT raw temperature
-static float barometer_pressure_origin		= 0;	// Origin pressure
-static int16_t barometer_temperature_origin	= 0;	// Origin pressure
-static int32_t barometer_altitude_origin	= 0;	// Origin altitude
-static float  barometer_rtavepres			= 0;	// Runtime averaged-sampled pressure
-static int16_t barometer_rtavetemp			= 0;	// Runtime averaged-sampled temperature
-static int32_t barometer_aslaltitude		= 0;	// Runtime averaged-sampled above sea level altitude - ASL (millimeters)
-//static int32_t barometer_aslaltitude_pvr	= 0;	// Runtime previous value, above sea level altitude - ASL (millimeters)
+int32_t il_pressure = 0; // inline pressure feed
+int16_t il_temperature = 0; // inline temperature feed
+int32_t il_aslaltitude = 0; // inline  ASL (above sea level) altitude, in Cm
 
-// calibration loop counter and constant data
+int32_t il_pressure_ogn = 0; //  inline  pressure at origin
+int16_t il_temperature_ogn = 0; //   inline temperature at origin
+int32_t il_aslaltitude_ogn = 0; //   inline ASL altitude estimate at origin
+
+
+static int32_t barometer_pressure = 0; // RT barometer.c pressure feed
+static int16_t barometer_temperature = 0; // RT barometer.c temperature feed
+static int32_t baralt_offset = 0;
+static int32_t calpressure_ogn = 0; // calibrated origin pressure  persistent data
+static int16_t caltemperature_ogn = 0; // calibrated origin temperature persistent data
 static const int16_t room_temp = 15;
-static int8_t d		= 0;
-static int16_t dd	= 0;
-static int8_t i		= 0;
-static int8_t ii	= 0;
-static int8_t ui	= 0;
-static int8_t ei	= 0;
-static int8_t ww	= 0;
+static uint8_t barometer_dataready = 0; // RT barometer.c feed status
 
-//INLINES
-inline float 	get_barometer_pressure(void)		{return barometer_pressure;}
-inline int16_t 	get_barometer_temperature(void)		{return barometer_temperature;}
-inline float 	get_barometer_pressureorgn(void)	{return barometer_pressure_origin;}
-inline int16_t 	get_barometer_temperatureorgn(void)	{return barometer_temperature_origin;}
-inline int32_t 	get_barometer_altitudeorgn(void)	{return barometer_altitude_origin;}
-inline float 	get_barometer_rtavepressure(void)	{return barometer_rtavepres;}
-inline int16_t 	get_barometer_rtavetemperature(void){return barometer_rtavetemp;}
-inline int32_t 	get_barometer_aslaltitude(void)		{return barometer_aslaltitude;}
+// INLINES:
 
-// Retreive barometer data, run calibration and estimation functions, populate inlines
-#if (USE_BAROMETER==1&&HILSIM!=1)
-	void udb_barometer_callback(int32_t pressure, int16_t temperature, int8_t status) 
-	{
-		barometer_pressure = (float)pressure;
-		//  in units of 0.1 deg. C
-		barometer_temperature = (int16_t)temperature;  
-		//  runtime trigger location (defined in options.h ): 0- here, barometerCntrl.c (def); 
-		//	1- gpsParseCommon.c, 2- libDCM.c
-		#if (ALTRUN_TRIG == 0)
-			if (flags._.barometer_calibrated == 1)
-			{
-				estBarometerAltitude();	
-			}
-		#endif
-		#if (ALTCAL_TRIG == 0)
-			if (flags._.barometer_calibrated!=1)
-			{
-				barometerCalibrate();	
-			}
-		#endif
-	}
+inline int16_t get_barometer_temp_rtf(void) {
+    return il_temperature;
+} //  Runtime barometer.c temperature feed
+inline int32_t get_barometer_pres_rtf(void) {
+    return il_pressure;
+} //  Runtime barometer.c pressure feed
+inline int32_t get_barometer_aslalt_est(void) {
+    return il_aslaltitude;
+} //  Runtime ASL altitude estimate
+
+inline int16_t get_barometer_temp_ogn(void) {
+    return il_temperature_ogn;
+} //  temperature at origin
+inline int32_t get_barometer_pres_ogn(void) {
+    return il_pressure_ogn;
+} // pressure at origin
+inline int32_t get_barometer_aslalt_ogn(void) {
+    return il_aslaltitude_ogn;
+} //  ASL altitude estimate  at origin
+
+
+// Point of origin and runtime PA-pressure and temperature sampling and definition
+
+void barometerCalibrate(void) {
+
+    static int32_t calpressure_sum = 0;
+    static int16_t caltemperature_sum = 0;
+    static int16_t dd = 0;
+    static int16_t d = 0;
+    static int16_t dc = 0;
+    static int16_t ii = 0;
+    static int16_t ww = 0;
+
+    if (flags._.barometer_calalt_updtrun == 1 && flags._.bar_ucinitdone != 1) {
+        dc = 4; // update run delay count eq. to 1 sec @ CHZ 10/4 Hz
+        flags._.bar_ucinitdone = 1;
+    } else {
+
+        // First run requires a longer delay as defined in options.h
+        // Let the barometer settle for a minimum of >4 seconds after power on. Depending on ambient
+        // temperature, it reads quite a long way off w/in the first 2-3 seconds, leading to about
+        // >2 M and 100 C of error if there's no wait.
+
+        dc = CAL_WU_TD;
+    }
+
+    if (!flags._.d_init) {
+
+        // Depending on cycle speed setting defined in options.h,
+        //  auto adjust delay: 10 for 4Hz (def), 8 for 5Hz, 5 for 8Hz, 4 for 10Hz and 2 for
+        //  Finaly, a SWAG to auto adjust delay timer (SWAG) to ensure 2 second delay for warm
+        //  and about 4 seconds, for cold or lower than typical room temperature of 15 C.
+
+        if (d < dc ) {
+            d++ ;
+        }
+        if (d >= dc) {
+            if (flags._.barometer_calalt_updtrun) {
+                if (barometer_temperature >= room_temp) {
+                    ww = 2;  // 3
+                } else {
+                    ww = 4;  // 5
+                }
+            } else {
+                if (barometer_temperature >= room_temp) {
+                    ww = 4;  // 5
+                } else {
+                    ww = 8;  // 7
+                }
+            }
+            if (CHZ == 20) {
+                dd = 3 * ww;
+            } else if (CHZ == 10) {
+                dd = 5 * ww;
+            } else if (CHZ == 8) {
+                dd = 8 * ww;
+            } else if (CHZ == 5) {
+                dd = 15 * ww;
+            } else if (CHZ == 4) {
+                dd = 22 * ww;
+            } else if (CHZ == 2) {
+                dd = 26 * ww;
+            }
+            flags._.d_init = 1;
+
+            if (flags._.barometer_calalt_updtrun) {
+                calpressure_sum = 0;
+                caltemperature_sum = 0;
+            }
+        }
+    }
+
+    //  Calibrate ORIGIN barometer temperature and pressure data
+    if (flags._.d_init && !flags._.i_init) {
+        if (ii < dd) {
+            ii++ ;
+            caltemperature_sum += barometer_temperature;
+            calpressure_sum += barometer_pressure;
+        }
+        if (ii >= dd) {
+            ii /= 2;
+            caltemperature_sum *= 0.5;
+            calpressure_sum *= 0.5;
+            caltemperature_sum = (int16_t) (caltemperature_sum / ii) ;
+            calpressure_sum = (int32_t) (calpressure_sum / ii);
+            caltemperature_ogn = caltemperature_sum;
+            calpressure_ogn = calpressure_sum;
+
+            il_temperature_ogn = caltemperature_ogn;
+            il_pressure_ogn = calpressure_ogn;
+
+            // Update runtime/inline variables with calibrated origin data
+            il_temperature = caltemperature_ogn;
+            il_pressure = calpressure_ogn;
+
+            //  turn on flag to estimate origin altitude
+            flags._.barometer_calalt_initrun = 1;
+            flags._.barometer_calibrated = 1;
+            flags._.i_init = 1;
+            ii = 0;
+        }
+    }
+}
+
+// Retrieve barometer data, run calibration and estimation functions, populate inlines
+#if (USE_BAROMETER == 1 && HILSIM != 1)
+
+void udb_barometer_callback(int32_t pressure, int16_t temperature, uint8_t dataready) {
+    static int32_t barometer_pressure_pvr = 0;
+    static int16_t barometer_temperature_pvr = 0;
+    barometer_dataready = dataready;
+
+    if (!flags._.bar_cbinitdone) {
+        initFlags();
+        flags._.bar_cbinitdone = 1;
+    }
+    if (dataready == 1 && temperature > 0 && pressure >= PA_PRESSURE * BAR_PAPCT_THRESH) {
+        il_pressure = pressure;
+        il_temperature = temperature; 
+        barometer_pressure_pvr = pressure;
+        barometer_temperature_pvr = temperature;
+        barometer_pressure = pressure;
+        barometer_temperature = temperature;
+    } else {
+        //  For now pass on the previously validated readings
+        //   TODO:  see if velocity scaling can be used to estimate best readings
+        il_pressure = barometer_pressure_pvr;
+        il_temperature = barometer_temperature_pvr;
+        barometer_pressure = barometer_pressure_pvr;
+        barometer_temperature = barometer_temperature_pvr;
+    }
+
+    //  0- barometerCntrl.c,  1- libDCM.c (40Hz, rec. def.);  2- altitudeCntrl.c (40Hz); 3- states.c (40Hz, high priority);
+#if (BARCAL_TRIG == 0)
+    if (!flags._.barometer_calibrated && flags._.fltrs_init) {
+        barometerCalibrate();
+    }
 #endif
+}
+#endif  //(USE_BAROMETER == 1 && HILSIM != 1)
+
+// Estimate the ASL altitude once calibration is finished
+
+void estBarometerAltitude(void) {
+
+    static int32_t aslaltitude_est = 0; // ASL (above sea level) altitude, in Cm
+
+    // update-estimate the ASL altitude, initially with no offset after calibration at origin,
+    if (flags._.barometer_calalt_initrun) {
+
+        baralt_offset = 0;
+        aslaltitude_est = calcSHABarASLAlt( calpressure_ogn, calpressure_ogn, caltemperature_ogn, caltemperature_ogn);
+
+        // compute the offset as part of calibration
+        baralt_offset = estBarAltOffset(aslaltitude_est);
+        aslaltitude_est += baralt_offset;
+
+        // Synchronize runtime/inline variables with calibrated origin data
+        il_pressure = calpressure_ogn;
+        il_temperature = caltemperature_ogn;
+
+        il_aslaltitude_ogn = aslaltitude_est;
+        il_aslaltitude = aslaltitude_est;
+
+        //  re-initialize flags to let this run again when triggered from an update RT function
+        flags._.barometer_calalt_initrun = 0;
+        flags._.barometer_calalt_ready = 1;
+
+        //  tidy up
+        if (flags._.barometer_calalt_updtrun) {
+            flags._.barometer_calalt_updated = 1;
+            flags._.barometer_calalt_updtrun = 0;
+        }
+    } else {
+        aslaltitude_est = calcSHABarASLAlt(barometer_pressure, calpressure_ogn, barometer_temperature, caltemperature_ogn);
+        il_aslaltitude = aslaltitude_est;
+        flags._.barometer_alt_ready = 1;
+    }
+
+}
+
+// IMPORTANT: THESE ARE COMPUTATIONS STILL TO BE FLIGHT TESTED TO SEE HOW IT PERFORMS UNDER VARYING
+//  ATMOSPHERIC CONDITIONS
+
+// This is using a super high accuracy barometric altitude computation, technicaly, +-1.5 M of the standard
+// atmosphere tables in the troposphere (up to 11,000 m amsl), however requires faster cpus
+
+int32_t calcSHABarASLAlt(int32_t pres_rt, int32_t pres_ogn, int16_t temp_rt, int16_t temp_ogn) {
+    float scaling = 0, temp = 0;
+    int32_t alt_asl = 0;
+    if (pres_rt != pres_ogn) {
+        scaling = (float) pres_rt / (float) pres_ogn;
+    } else {
+        scaling = 1.0f;
+    }
+    if (temp_ogn != temp_rt) {
+        temp = (float) ((temp_ogn + temp_rt) >> 1) + 273.15f;
+    } else {
+        temp = (float) temp_ogn + 273.15f;
+    }
+    alt_asl = (int32_t) (153.8462f * temp * (1.0f - expf(0.190259f * logf(scaling))));
+    return alt_asl + baralt_offset;
+}
+
+void initFlags(void) {
+    flags._.barometer_calibrated = 0;
+    flags._.barometer_calalt_ready = 0;
+    flags._.barometer_calalt_updated = 0;
+    flags._.barometer_calalt_initrun = 0;
+    flags._.barometer_calalt_updtrun = 0;
+    flags._.barometer_alt_ready = 0;
+    flags._.bar_ucinitdone = 0;
+    flags._.gps_locked = 0;
+    flags._.i_init = 0;
+    flags._.d_init = 0;
+}
+
+// Altitude offset in centimeters subtracted/added to barometric ASL altitude. This is used to
+//  allow for the automatic adjustment/correction of the base barometric altitude by a ground .
+//  station equipped with a barometer. The value is subtracted/added above to the barometric
+//  altitude read by the aircraft.
+
+int32_t estBarAltOffset(int32_t estaslalt) {
+    int32_t offset = 0;
+    if (ASL_GROUND_ALT != estaslalt) {
+        offset = ASL_GROUND_ALT - estaslalt;
+    } else {
+        offset = ASL_GROUND_ALT;
+    }
+    return offset;
+}
 
 
-// POWER-ON CALIBRATIONS
-//  Trigger location options for running calibration functions: 
-//  ALTCAL_TRIG	(options.h): options 1- states.c  2- libDCM.c  both at 4Hz default with 
-//  BAR_HZ_CYCLE at 10
+// GOOFY'S PARKING LOT
 
-void barometerCalibrate(void)   		
-{
-    // Let the barometer settle for a minimum of 3-4 seconds after power on. Depending on ambient 
-	// temperature, it reads quite a long way off w/in the first 2-3 seconds, leading to about 
-	// >2 M and 100 C of error if there's no wait.  Depending on cycle speed setting defined in 
-	// options.h, auto adjust delay: 10 for 4Hz (def), 8 for 5Hz, 5 for 8Hz, 4 for 10Hz and 2 for 
-	// Finaly, auto adjust delay timer to ensure 2 second delay for warm and about 4 seconds 
-	//  20hz, for cold or lower than typical room temperature of 15 C:
-	if(flags._.d_init != 1)
-	{
-		if(d < CAL_WU_TD && d++ < CAL_WU_TD){}  // initial warmup time for improved temperature reading accuracy
-		else if(d >= CAL_WU_TD) 
-		{
-			if (barometer_temperature/10 >= room_temp){ww = 1;}else{ww = 2;} 
-			if (CAL_HZ_CYCLE >= 20){dd = 3*ww;} 
-			else if (CAL_HZ_CYCLE >= 10){dd = 4*ww;} 
-			else if (CAL_HZ_CYCLE >= 8){dd = 5*ww;} 
-			else if (CAL_HZ_CYCLE >= 5){dd = 8*ww;}
-			else if (CAL_HZ_CYCLE >= 4){dd = 10*ww;} 
-			else if (CAL_HZ_CYCLE >= 2){dd = 20*ww;}
-			else if (CAL_HZ_CYCLE < 2){dd = 40*ww;}
-			flags._.d_init=1;
-		} 
-	}
+/*  **Deprecated**
 
-	//  Then, let's get the initial barometer sensor feed, validate and store these values for final calibration
-	if((flags._.d_init==1)&&(flags._.i_init!=1))
-	{
-	    if(i < dd && i++ < dd){} // warm-up time delay loop
-		else if(i >= dd)
-		{
-			flags._.i_init=1;
-		}
-	} 	
+// Determine which calculation scaling level to use as defined in options.h
 
-    // Use BAR_CALSAMPLING value for the final calibration of point of origin pressure (Pa) and temperature(0.1 deg. C)
-	if((flags._.d_init==1)&&(flags._.i_init==1))
-	{
-	    if(ii<BAR_CALSAMPLING&&ii++<BAR_CALSAMPLING)
-		{
-	        if((udb_flags._.healthy==true)&&(barometer_pressure>0)&&(barometer_pressure>=(int32_t)(PA_PRESSURE*BAR_PAPCT_THRESH))
-				&&(barometer_temperature>0)&&(barometer_temperature<BAR_TEMP_THRESH))
-			{
-				if (flags._.o_initrun != 1)
-				{ 
-					barometer_pressure_origin = (float)barometer_pressure;
-					barometer_temperature_origin = (int16_t)barometer_temperature;
-					flags._.o_initrun = 1;
-				}
-				barometer_pressure_origin = (float)(barometer_pressure_origin*0.8f + barometer_pressure*0.2f);
-				barometer_temperature_origin = (int16_t)(barometer_temperature_origin*0.8f + barometer_temperature*0.2f);
-			} 
-			else 
-			{
-				if(ii>0){ii--;}
-			}
-	    }
-		else if(ii>=BAR_CALSAMPLING)
-		{
-			// TODO: see if moving this to states.c can improve bar origin data accuracy 
-			barometer_altitude_origin = setBarOriginAlt(barometer_pressure,barometer_temperature); 
+// Determine which calculation scaling level to use as defined in options.h
+
+int32_t calcBarASLAlt(int32_t pres_rt, int32_t pres_ogn, int16_t temp_ogn) {
+    int32_t asl_alt = 0;
+#if  (BARAE_SCALE==1)
+    asl_alt = (int32_t)calcSMABarASLAlt(pres_rt, pres_ogn, temp_ogn);
+#elif  (BARAE_SCALE==2)
+    asl_alt = (int32_t)calcSHABarASLAlt(pres_rt, pres_ogn, temp_ogn);
+#endif
+    return asl_alt + baralt_offset;
+}
+
+// This is using a super-high accurate barometric altitude computation, technicaly, +-2.5 M of the standard
+// atmosphere tables in the troposphere (up to 11,000 m amsl), however requires faster cpus
+
+int32_t calcVHABarASLAlt(int32_t pres_rt, int32_t pres_ogn, int16_t temp_ogn) {
+    float scaling = 0, temp = 0;
+    int32_t alt_asl = 0;
+    if (pres_rt != pres_ogn) {
+        scaling = (float) pres_rt / (float) pres_ogn;
+    } else {
+        scaling = 1.0f;
+    }
+    temp = (float) temp_ogn + 273.15f;
+    alt_asl = (int32_t) (153.8462f * temp * (1.0f - expf(0.190259f * logf(scaling))));
+    return alt_asl + baralt_offset;
+}
+ * 
+// on slower board/CPUs, use a less semi-medium high, +- 4m, and faster, less demanding calculation
+
+int32_t calcSMABarASLAlt(int32_t pres_rt, int32_t pres_ogn, int16_t temp_ogn) {
+    float scaling = 0, temp = 0;
+    float alt_asl = 0;
+    scaling = (float) pres_ogn / (float) pres_rt;
+    temp = (float) temp_ogn + 273.15f;
+    alt_asl = logf(scaling) * temp * 29.271267f;
+    return (int32_t) alt_asl;
+}
+
+ *
+// simple altitude computation, less exact, faster, less demanding calculation
+
+int32_t calcNScBarASLAlt(int32_t pres_rt) {
+    float alt_asl = 0;
+    float pa_pressure = 0;
+    pa_pressure = (float) (pres_rt * 10); // convert to PA
+#if (USE_PA_PRESSURE==1)  // eg. 101325 defined in options.h option, average or current SL Pa (newton / sq. M)
+    static const float p0 = (float) PA_PRESSURE; // Current pressure at sea level (SL Pa) defined in options.h
+#elif (USE_PA_PRESSURE==2)  // use mercury value
+    static const float p0 = (float) (MC_PRESSURE / 0.0295333727112); // Current pressure at sea level (SL METAR  mercury in.) defined in options.h
+#elif (USE_PA_PRESSURE==3)  // fuse Pa and mercury value
+    static const float p0 = (float) ((PA_PRESSURE * 0.5f)+((MC_PRESSURE / 0.0295333727112)*0.5f));
+#endif
+    alt_asl = (float) 44330 * (1 - pow(((float) pa_pressure / p0), 0.190295));
+    return (int32_t) alt_asl;
+}
  
-			if (barometer_altitude_origin <0)		// re-run 3rd stage calibration if asl alt value is not positive 
-			{
-				flags._.barometer_calibrated=0; 
-				flags._.o_initrun = 0;
-				initOriginVars();
-			} 
-			else
-			{  
-				flags._.barometer_calibrated=1; 
-			}
-		}
-	}
-}		//  barometerCalibrate()
-
-//  Triggered from states.c, UPDATE calibration upon GPS lock for improving accuracy of ground barometric data
-//  TODO: update only if the difference is significant (> 500 Pa or newtons/sq. M) and  
-//  everything is go-green
-
-void barometerCalibrationUpdate(void) 						
-{
-	if(ui<BAR_CALSAMPLING&&ui++<BAR_CALSAMPLING)
-	{
-	    if((udb_flags._.healthy==true)&&(barometer_pressure>0)&&((float)barometer_pressure>=(float)(PA_PRESSURE*BAR_PAPCT_THRESH))
-		&&(barometer_temperature>0)&&(barometer_temperature<BAR_TEMP_THRESH))
-		{
-			barometer_pressure_origin = (float)(barometer_pressure_origin*0.8f + barometer_pressure*0.2f);
-			barometer_temperature_origin = (int16_t)(barometer_temperature_origin*0.8f + barometer_temperature*0.2f);
-		} 
-		else 
-		{
-			if(ui>0){ui--;}  // reject any filtered invalid data
-			// TODO: add an error management or health recovery algo here later
-		}
-	}
-	else if(ui>=BAR_CALSAMPLING)
-	{
-		// TODO: see if moving this somewhere in states.c can improve bar origin data accuracy 
-		barometer_altitude_origin = setBarOriginAlt(barometer_pressure,barometer_temperature);
-
-			if (barometer_altitude_origin <0)		// re-run calibration update if alt value is not positive
-			{
-				flags._.barometer_calib_updated = 0; 
-			} 
-			else
-			{  
-				flags._.barometer_calib_updated = 1; 
-			}
-	}
-}
-
-//  estimate runtime barometric pressure, temperature and altitude
-void estBarometerAltitude(void)  	
-{
-#if (USE_BAROMETER==1&&HILSIM!=1)
-    if(ei<BAR_RTSAMPLING&&ei++<BAR_RTSAMPLING)
-	{
-
-	    if((udb_flags._.healthy==true)&&(barometer_pressure>0)&&((float)barometer_pressure >= (float)(PA_PRESSURE*BAR_PAPCT_THRESH))
-			&&(barometer_temperature>0)&&(barometer_temperature<BAR_TEMP_THRESH))
-		{
-			if (flags._.e_initrun != 1)  // after calibration, use the initial values from calibration for the 1st cycle
-			{
-				barometer_rtavepres=(float)barometer_pressure_origin;
-				barometer_rtavetemp=(int16_t)barometer_temperature_origin;
-				flags._.e_initrun=1;
-			}
-			barometer_rtavepres=(float)(barometer_rtavepres * 0.8f + barometer_pressure * 0.2f);
-			barometer_rtavetemp=(int16_t)(barometer_rtavetemp * 0.8f + barometer_temperature * 0.2f);
-		} 
-		else 
-		{
-			if(ei>0){ei--;}  // reject any filtered-out invalid data
-			// TODO: add an error management or health recovery algo here later
-		}
-	}
-	else if(ei>=BAR_RTSAMPLING)
-	{
-		//  calculate ASL altitude
-		barometer_aslaltitude = (int32_t)(calcBarASLAlt((float)barometer_rtavepres,(int16_t)barometer_rtavetemp,
-			(float)barometer_pressure_origin,(int16_t)barometer_temperature_origin));						
-		ei=0;
-	}
-#endif
-}
-
-//  save launch point or origin barometer altitude
-int32_t setBarOriginAlt(float barpres,int16_t bartemp)
-{
-	static int32_t origin_altitude = 0;
-	origin_altitude = (int32_t)((calcBarASLAlt((float)barpres,(int16_t)bartemp,
-			(float)barometer_pressure_origin,(int16_t)barometer_temperature_origin)));	// converted to Cm
-	return (int32_t)origin_altitude;
-}
-
-// simple altitude computation, less exact, faster, less demanding calculation
-int32_t calcBarASLAlt(float barpres,int16_t bartemp,float orig_barpres,int16_t orig_bartemp)  	
-{
-	static int32_t asl_altitude = 0;
-	#if  (EST_BARALT_SCALED==0)
-		asl_altitude=(int32_t)calcNScBarASLAlt((float)barpres);
-	#elif  (EST_BARALT_SCALED==1)
-		asl_altitude=(int32_t)calcSMABarASLAlt((float)barpres,(int16_t)bartemp,(float)orig_barpres,(int16_t)orig_bartemp);
-	#elif  (EST_BARALT_SCALED==2)
-		asl_altitude=(int32_t)calcSHABarASLAlt((float)barpres,(int16_t)bartemp,(float)orig_barpres,(int16_t)orig_bartemp);
-	#endif
-	return (int32_t)asl_altitude;
-}
-
-// Temperature scaled, this is an accurate barometric altitude computation, technicaly, +-2.5 M of the standard 
-// atmosphere tables in the troposphere (up to 11,000 m amsl), however requires faster cpus 
-int32_t calcSHABarASLAlt(float barpres,int16_t bartemp,float gnd_barpres,int16_t gnd_bartemp)  	
-{
-  	static int32_t scaling = 0, temp = 0;
-	static int32_t asl_altitude = 0;
-
-   	scaling				=((float)barpres/(float)gnd_barpres);
- 	temp				=((float)gnd_bartemp)+273.15f;
-   	// This is an exact calculation that is within +-2m of the standard atmospheric tables
-   	// in the troposphere (up to 11,000 M AMSL).  
-	asl_altitude=(float)(153.8462f*temp*(1.0f-expf(0.190259f*logf(scaling))));
-
-	return (int32_t)(asl_altitude+alt_offset);
-}
-
-// on slower CPUs, use a less exact, faster, and less demanding calculation
-int32_t calcSMABarASLAlt(float barpres,int16_t bartemp,float gnd_barpres,int16_t gnd_bartemp)  	
-{
-  	static int32_t scaling = 0, temp = 0;
-	static int32_t asl_altitude = 0;
-   	scaling				=((float)gnd_barpres)/(float)barpres;
- 	temp				=((float)gnd_bartemp)+273.15f;
-	asl_altitude=(float)(logf(scaling)*temp*29.271267f);
-
-	return (int32_t)(asl_altitude+alt_offset);
-}
-
-// simple altitude computation, less exact, faster, less demanding calculation
-int32_t calcNScBarASLAlt(float barpres)  	
-{
-	static int32_t asl_altitude=0;
-	#if (USE_PA_PRESSURE==1)				     				// eg. 101325 defined in options.h option, average or current SL Pa (newton / sq. M) 
-		static const float p0=(float)PA_PRESSURE;    					// Current pressure at sea level (SL Pa) defined in options.h  
-	#elif (USE_PA_PRESSURE==2)    								// use mercury value
-		static const float p0=(float)(MC_PRESSURE/0.0295333727112); 	// Current pressure at sea level (SL METAR  mercury in.) defined in options.h  
-	#elif (USE_PA_PRESSURE==3)    								// fuse Pa and mercury value
-		static const float p0=(float)((PA_PRESSURE*0.5f)+((MC_PRESSURE/0.0295333727112)*0.5f)); 
-	#endif
-	asl_altitude=(float)44330*(1-pow(((float)barpres/p0),0.190295));
-
-	return (int32_t)(asl_altitude+alt_offset);
-}
+ *
+ *  */
 
 
-// initialize to zero all runtime variables
-void initOriginVars(void)  	
-{
-	barometer_pressure_origin=0;
-	barometer_temperature_origin=0; 
-	barometer_altitude_origin=0; 
-	return;
-}
-
-///	 GOOFY'S PARKING AREA:
-/*
-		//union longbbbb barpress;
-		//union longbbbb bartemp;
-				//barpress.WW = __builtin_mulss((int32_t)bar_gndpressure_pvr,(int32_t)barometer_pressure);
-				//bar_gndpressure_pvr=(int32_t)(barpress._.W1<<1);
-				//bartemp.WW = __builtin_mulss((int16_t)bar_gndtemperature_pvr,(int16_t)barometer_temperature);
-				//bar_gndtemperature_pvr=(int16_t)(bartemp._.W1<<1);
-			//barpress.WW = __builtin_mulss((int32_t)rtime_pressure_pvr,(int32_t)barometer_pressure);
-			//rtime_pressure_pvr=(int32_t)(barpress._.W1<<1);
-			//bartemp.WW = __builtin_mulss((int16_t)rtime_temperature_pvr,(int16_t)barometer_temperature);
-			//rtime_temperature_pvr=(int16_t)(bartemp._.W1<<1);
-#define PA_PRESSURE							101325   	// in Pa is the typical average pressure at sea level
-#define MC_PRESSURE							3016     	// 30.16 in. mercury (METAR), set USE_PA_PRESSURE to 2
-#define ASL_GROUND_ALT						13200		// above sea level (ASL) altitude in centimeters or 132 m ASL
-
-
-		//union longww barpress;
-		//union longww bartemp;
-
-			//barpress.WW = __builtin_mulss(barometer_pressure,rtime_pressure_pvr);
-			//rtime_pressure_pvr=(float)barpress.WW;
-			//bartemp.WW = __builtin_mulss(barometer_temperature,rtime_temperature_pvr);
-			//rtime_temperature_pvr=(int16_t)(bartemp.WW<<1);
-*/

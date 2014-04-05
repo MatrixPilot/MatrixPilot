@@ -1,48 +1,31 @@
 
-/*  Release 3150qsb-aps2.4-t110.01, supports UDB4, UDB5 and AUAV3 
+#define APSVERSION "3156.2.5.111.rc15mx4a"
 
-    Setup: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer, 406 Std. GPS, Breeze 2000 V-tail
-    
-	Baseline: MatrixPilot trunk rel. 3150-60
-  
-    Last modified date  Feb. 3, 2014
+/*  Release candidate 3150qsb-aps2.4-t111.13, supports UDB4, UDB5 (wip) and AUAV3 (wip)
+
+    Setup: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer, 406 Std. GPS, Breeze 2000 V-tail / SkyW standard
+
+    Last modified date  April 4, 2014
 
     MODIFICATIONS :
-
-    Iteration: MxPilot-3150qsb-aps-brz2k-t110.00
-	Mods:  current trunk 3150-56 -- logo support bug fix, incorporated previous sonar and barometer functions, updated corr. comm
-			and interface components 
- 		-  Code changes:
-			o - modified options.h, main.c, defines.h, telemetry.c and others, too many to list to adopt to previously tested sonar and 
-				barometer functions
-			o - modified barometer.c and barometerCntrl.c for computation bug fixes and changes, included barometer altitude offset (in Cm).
-			o - sonarCntrl.c, sonarCntrl.h modifications (too many to list)
-			o - barometerCntrl.c, barometerCntrl.h modifications (too many to list)
-			o - barometerCntrl.c, barometerCntrl.h modifications (too many to list)
-		-  Ground Test results with both 10 and 4 cycle speed settings, alternately using 2 barometer sensors:   LOG00871~72, 83
-			o - Builds clean across  UDB4, UDB5 and AUAV3 
-			o - Barometer pressure feed calibrated and sampled ASL data now working well with added delay algo.. takes roughly 3-5 min to 
-				stabilize
-			o - Barometer AGL alt now looks just a bit off but stable, perhaps can use fusion/corr algo with sonar AGL alt when in range
-
-    Iteration: MxPilot-3150qsb-aps-brz2k-t110.02
-	Mods: sonarCntrl modified to support inline calls for optimization and added "sonar_inrange" flag to trigger use of sonar AGL altitude.., 
-		optimized-simplified I2C driver to use queued algorithm, added magnetometer new available data callback in estYawDrift 
- 		-  Code changes:
-			o - modified sonarCntrl.c and ~.h, telemetry.c, defines.h, deadReckoning.c, flighplan-logo.c and navigate.c
-			o - options.h, magnetometer.c and ~.h, barometer.c, I2C2.h, I2C.h to support new I2C queue algo
-			o - magnetometer.c and ~.h, barometer.c, I2C2.h, I2C.h to support new queue algo
-			o - magnetometer.c, estYawDrift.c, libUDB.h to support added callback
-		-  Ground Test results with both 10 and 4 cycle speed settings, alternately using 2 barometer sensors:   LOG00871~72, 83
-			o - Builds clean across  UDB4, UDB5 and AUAV3 
-			o - WIP
-
-	TODO:	1) retest barometer data feed and altitude and conduct flight tests as soon as weather permits
-			2) setup_origin(); in navigate.c, add call to capture lauch takeoff (x,y) point and angle for LOGO landing support
-			3) bullet proof and add health check and recovery or failover algo for sonar and barometer data
-			4) add barometer temp and pressure related LOGO conditionals/functions (particulary to support auto thermal FP)
-
-*/
+    ~~~
+    Iteration: 3156.2.5.111.rc15mx4a
+        Fixed barometer data errors, algorithm changed (incl. i2c2), added barometer temp, pressure and ASL alt related LOGO
+        conditionals/functions/triggers, navigation and deadReckoning (WIP) fusion of ASL alt, telemetry, etc.
+                -  Code changes:
+                        o - barometer.h~c, barometerCntrl.h~c, states.c, defines.h, flight-logo.c~h, radionIn.c, telemetry.c
+                        o - options.h, libDCM.c, deadReckoning.c, i2c.h~c, i2c2.c, sonarCntrl.h~c, magnetometer~, others..
+                -  Ground Testing Results:
+                        o - Barometer feed and ASL altitude estimates very stable and accurate, on the ground < .10 of a meter +-
+                            variance at recommended settings below (see barometer section)
+                        o - Stress test (for break point):  40 Hz (0 setting) breaks the system, incl. other sensors, stops GPS from locking
+                        o - Flight tests, soon as weather permits..
+                        o - UDB5 compiles clean,however, tesing logs indicated sonar errors, fix WIP
+                        o - AUAV3 compiles clean, to be tested, WIP
+                -  logs:  Interior ground testing: Dev15 ~ 243  Rc15 ~ 262, consistently stable and accurate barometric data/ASL alt
+                          Exterior ground testing: 263 ~ wip  excellent results so far
+                          Flight testing: none yet.. waiting for weather to clear.
+ */
 
 // ACKNOWLEDGEMENTS AND SPECIAL THANKS :
 // MatrixPilot Group, especially Robert, Guilio and Pete for contributions and continued assistance in my effort to include sonar and 
@@ -84,7 +67,7 @@
 //    AIRFRAME_VTAIL            Ailerons(optional), and Elevator and Rudder as V-tail controls
 //    AIRFRAME_DELTA            Aileron and Elevator as Elevons, and Rudder(optional)
 //
-#define AIRFRAME_TYPE                       AIRFRAME_STANDARD
+#define AIRFRAME_TYPE                      AIRFRAME_STANDARD 
 
 
 // Define the board:   UDB5_BOARD,  UDB4_BOARD or AUAV3 -- NOW DEPRECATED
@@ -133,7 +116,7 @@
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 // 
 #define USE_PPM_INPUT						1
-#define PPM_NUMBER_OF_CHANNELS				8
+#define PPM_NUMBER_OF_CHANNELS                                  8
 #define PPM_SIGNAL_INVERTED					0
 #define PPM_ALT_OUTPUT_PINS					0
 
@@ -142,7 +125,7 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 //  For UDB4 boards: Set to 1-8
-#define NUM_INPUTS                          8
+#define NUM_INPUTS                                              8
 
 // INPUT CHANNELS OPTIONS
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
@@ -157,7 +140,7 @@
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
-#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL                   CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -166,49 +149,49 @@
 /*  Other options relative to the Radio TX type:
 //  Multiplex 12-16 C M-Link W/ 8C PPM encoder             		 physical PPM IN and direct connected board IN channels to MPX Tx / 8 TO 11C RX
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_1            // PPM/C1 to RxC3  Throttle
-#define AILERON_INPUT_CHANNEL				CHANNEL_2 		     // PPM/C2 to RxC1  Ail
+#define AILERON_INPUT_CHANNEL				CHANNEL_2 	     // PPM/C2 to RxC1  Ail
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_3            //	PPM/C3 to RxC2  Elev
 #define RUDDER_INPUT_CHANNEL				CHANNEL_4            // PPM/C4 to RxC4  Rudder
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5            // PPM/C5 to RxC6  MPX AUX 2 3p toggle, FM (flight mode)
-#define LOGO_A_CHANNEL						CHANNEL_6		  	 // PPM/C6 to RxC5  MPX Gear 3p toggle, 1st LOGO plan change 		  
-#define LOGO_B_CHANNEL						CHANNEL_7		  	 // PPM/C7 to RxC7  MPX Aux1 3p toggle, 2nd LOGO plan change 
-#define LOGO_C_CHANNEL						CHANNEL_8		  	 // PPM/C8 to RxC5  MPX Aux1, 3rd LOGO HI/LO speed select
-//DIRECT-CONNECT 			 				>>>>>>>>			 // RX/C9 3p toggle to Landing Gear
-//DIRECT-CONNECT 			 				>>>>>>>>			 // RX/C10 3p toggle to Spoiler / air brake OR crow/butterfly mixing
-//DIRECT-CONNECT 			 				>>>>>>>>			 // RX/C11 3p toggle to camber-thermal / normal / reflex-speed with deg. slider mixing
+#define LOGO_A_CHANNEL					CHANNEL_6            // PPM/C6 to RxC5  MPX Gear 3p toggle, 1st LOGO plan change
+#define LOGO_B_CHANNEL					CHANNEL_7            // PPM/C7 to RxC7  MPX Aux1 3p toggle, 2nd LOGO plan change
+#define LOGO_C_CHANNEL					CHANNEL_8            // PPM/C8 to RxC5  MPX Aux1, 3rd LOGO HI/LO speed select
+//DIRECT-CONNECT 			 		>>>>>>>>             // RX/C9 3p toggle to Landing Gear
+//DIRECT-CONNECT 			 		>>>>>>>>             // RX/C10 3p toggle to Spoiler / air brake OR crow/butterfly mixing
+//DIRECT-CONNECT 			 		>>>>>>>>             // RX/C11 3p toggle to camber-thermal / normal / reflex-speed with deg. slider mixing
 //
 //  Multiplex BASIC 7 CHANNEL RX, W/O an 8C PPM                  physical IN channels to MPX Tx / 7C RX (a sonar attached to Input 1)
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_2            // Input 2 to RxC3  Throttle
-#define AILERON_INPUT_CHANNEL				CHANNEL_3 		     // Input 3 to RxC1  Ail
+#define AILERON_INPUT_CHANNEL				CHANNEL_3            // Input 3 to RxC1  Ail
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_4            //	Input 4 to RxC2  Elev
 #define RUDDER_INPUT_CHANNEL				CHANNEL_5            // Input 5 to RxC4  Rudder
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_6            // Input 6 to RxC6  MPX AUX 2 3p toggle, FM
-#define LOGO_A_CHANNEL						CHANNEL_7		  	 // Input 7 to RxC5  MPX Gear 3p toggle, 1st LOGO plan change 	  
-#define LOGO_B_CHANNEL						CHANNEL_8		  	 // Input 8 to RxC7  MPX Aux1 3p toggle, 2nd LOGO plan change 
+#define LOGO_A_CHANNEL                                  CHANNEL_7            // Input 7 to RxC5  MPX Gear 3p toggle, 1st LOGO plan change
+#define LOGO_B_CHANNEL                                  CHANNEL_8            // Input 8 to RxC7  MPX Aux1 3p toggle, 2nd LOGO plan change
 //  
 //  Spektrum DX8, W/O an 8C PPM	  		    			         physical IN channels to AR8000 Rx / DX8 Tx (C1 is used for Voltage sensor)
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_2            // Input 2 to RxC1  Throttle
-#define AILERON_INPUT_CHANNEL				CHANNEL_3 		     // Input 3 to RxC2  Ail
+#define AILERON_INPUT_CHANNEL				CHANNEL_3            // Input 3 to RxC2  Ail
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_4            //	Input 4 to RxC3  Elev
 #define RUDDER_INPUT_CHANNEL				CHANNEL_5            // Input 5 to RxC4  Rudder
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_6            // Input 6 to RxC6  AUX1, flight mode
-#define LOGO_A_CHANNEL						CHANNEL_7		  	 // Input 7 to RxC6  AUX2,3p toggle, 1st LOGO plan change 	  
-#define LOGO_B_CHANNEL						CHANNEL_8		  	 // Input 8 to RxC7  AUX3,3p toggle, 2nd LOGO plan change 
+#define LOGO_A_CHANNEL                                  CHANNEL_7            // Input 7 to RxC6  AUX2,3p toggle, 1st LOGO plan change
+#define LOGO_B_CHANNEL					CHANNEL_8            // Input 8 to RxC7  AUX3,3p toggle, 2nd LOGO plan change
 */
 //  Spektrum DX8                                                 physical PPM IN channels to AR8000 Rx / DX8 Tx
 #define THROTTLE_INPUT_CHANNEL				CHANNEL_1            // PPM/C1 to RxC1  Throttle
-#define AILERON_INPUT_CHANNEL				CHANNEL_2 		     // PPM/C2 to RxC2  Ail
+#define AILERON_INPUT_CHANNEL				CHANNEL_2            // PPM/C2 to RxC2  Ail
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_3            //	PPM/C3 to RxC3  Elev
 #define RUDDER_INPUT_CHANNEL				CHANNEL_4            // PPM/C4 to RxC4  Rudder
 #define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5            // PPM/C5 to RxC6  AUX1, flight mode
-#define LOGO_A_CHANNEL						CHANNEL_6		  	 // PPM/C6 to RxC7  AUX2,3p toggle, 1st LOGO plan change 	  
-#define LOGO_B_CHANNEL						CHANNEL_7		  	 // PPM/C7 to RxC8  AUX3,3p toggle, 2nd LOGO plan change 
-#define LOGO_C_CHANNEL						CHANNEL_8		  	 // PPM/C8 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
+#define LOGO_A_CHANNEL					CHANNEL_6            // PPM/C6 to RxC7  AUX2,3p toggle, 1st LOGO plan change
+#define LOGO_B_CHANNEL					CHANNEL_7            // PPM/C7 to RxC8  AUX3,3p toggle, 2nd LOGO plan change
+#define LOGO_C_CHANNEL					CHANNEL_8            // PPM/C8 to RxC5  GR,2p toggle, 3rd LOGO HI/LO speed select
 // Unused 
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED       
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED       
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
-#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL                   CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -219,8 +202,8 @@
 // Often the Flap channel will be controlled by a 3-position switch.
 // These are the thresholds for the cutoffs between low and middle, and between middle and high.
 // Normal signals should fall within about 2000 - 4000.
-#define MODE_SWITCH_THRESHOLD_LOW           2600
-#define MODE_SWITCH_THRESHOLD_HIGH          3400
+#define MODE_SWITCH_THRESHOLD_LOW                       2600
+#define MODE_SWITCH_THRESHOLD_HIGH                      3400
 
 // TWO POSITION SWITCH SETUP
 // Setting MODE_SWITCH_TWO_POSITION to 1,  allows a two state mode switch on the transmitter to be used
@@ -241,7 +224,7 @@
 // For UDB4/5 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
 // For AUAV3 boards:  Set to 3-8 (or up to 11 using pins RE1, RA6 and RA7.)
 //                               (this needs developing, so contact the list)
-#define NUM_OUTPUTS							5
+#define NUM_OUTPUTS					5
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -258,30 +241,30 @@
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
-#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
+#define AILERON_SECONDARY_OUTPUT_CHANNEL                CHANNEL_UNUSED
+#define CAMERA_PITCH_OUTPUT_CHANNEL                     CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
-#define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_D_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_A_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_B_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_C_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_D_OUTPUT_CHANNEL                    CHANNEL_UNUSED
 */
 //                                                                physical pin to servo/controls connections
 //  UDB4/UDB3/PPM_ALT_OUTPUT_PINS=1 OPTIONS 
-#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3            // Out3 to ESC/BL Motor  
+#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_3            // Out3 to ESC/BL Motor
 #define AILERON_OUTPUT_CHANNEL				CHANNEL_4            // Out4/IN3/RE0 to AIL 1
 #define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_2            // Out2 to Elevator 
 #define RUDDER_OUTPUT_CHANNEL				CHANNEL_1            // Out1 to Rudder 
-#define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_5	     	 // Out5/IN2/RE2 to AIL 2
+#define AILERON_SECONDARY_OUTPUT_CHANNEL                CHANNEL_5            // Out5/IN2/RE2 to AIL 2
 // Unused 
 #define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
-#define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
-#define PASSTHROUGH_D_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define PASSTHROUGH_A_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_B_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_C_OUTPUT_CHANNEL                    CHANNEL_UNUSED
+#define PASSTHROUGH_D_OUTPUT_CHANNEL                    CHANNEL_UNUSED
 
 
 /////////////////////////    I.4 SERVOS CONFIGURATION  //////////////////////////
@@ -304,7 +287,7 @@
 
 // Throttle altitude control deadband when on stabilized and mission mode, recommended range: 30 to 120
 //
-#define THR_DEADBAND 						50
+#define THR_DEADBAND 					50
 
 
 ////////////////////////   II. CONFIGURING OPTIONAL SENSORS AND DEVICES   /////////////////////////
@@ -316,12 +299,16 @@
 
 
 ////////////////////////    II.1. MAGNETOMETER (DIGITAL COMPASS) SUPPORT   ////////////////////////
-///
+//
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT 						1
+// With a AUAV3 board, it is strongly recommended to use an external magnetometer 
+// to avoid issues of erroneous yaw navigation due to the onboard magnetometer 
+// being exposed to EMF sources. Note that the onboard mag would need to be disabled.
+//
+#define MAG_YAW_DRIFT 					1
 
 // Define which magnetometer is used
 // HMC5843 is the 3DRobotics HMC5843 (now out of production).
@@ -366,21 +353,21 @@
 //     If this is turned off, when used in LOGO, ALT_SNR will have a 0 default value
 //     Turned on, the baud rate for the SERIAL_OUTPUT_FORMAT will default to 57600.
 //     Adjust any serial telemetry logging and transmitting device to same baud rate.
-#define USE_SONAR							1
+#define USE_SONAR					1
 
 // Works with UDB4, UDB5 and AUAV3. This feature can only be combined with USE_SONAR set to 1, below.
 // Design for supporting autonomous and soft precision landing flight plan in LOGO.  
 // Otherwise, set to 0 to use GPS and IMU estimated ALTITUDE. 
 // When enabled, sonar altitude will be used to recalibrate altitude in navigation (navigate.c) and 
 // deadreckoning within .2 to 4m altitude range, depending on the sensor class used.
-#define SONAR_ALTITUDE 						1
+#define SONAR_ALTITUDE 					1
 
 // This specifies the tested effective and vendor max range of the type of sonar being used: . 
 // 	400 cm (4 m) effective and 750 cm max (vendor rated) for an MB1230 XL-MaxSonar-EZ3 
 // 	500 cm (5 m) effective and 1000 cm max (10 m vendor rated) for an  MB1261 XL-MaxSonar-EZL1
 #define EFFECTV_SONAR_ALTRANGE                400 // Def 450 Reliable Sonar measurement distance (centimeters) 
 #define MAXIMUM_SONAR_ALTRANGE                700 // Distance in centimeters close to vendor max. range spec
-#define SONAR_MINIMUM_VALREADS                  3 // Def 3, number of readings used threshold, for  integrity/error 
+#define SONAR_VALREADS                          3 // Def 3, number of readings used threshold, for  integrity/error
                                                   //   filtering, will slow down the aglaltitude feed
 
 
@@ -397,7 +384,7 @@
 // 29,000 ft  (manufacturer's data). 
 // uncomment to enable for testing and debugging barometer program only
 // 	
-#define USE_BAROMETER						1  
+#define USE_BAROMETER					1  
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
@@ -406,21 +393,18 @@
 // If set to 1, barometer altitude will be used to recalibrate altitude in navigation and 
 // deadreckoning, starting 0 to 20m above altitude range, depending on the whether a SONAR sensor 
 // is attached and if so, what sonar sensor class used is used.
-#define BAROMETER_ALTITUDE                  1 
-
-// Set your takeoff/launch/initialisation altitude in meters.
-//#define LAUNCH_ALTITUDE                     300
+#define BAROMETER_ALTITUDE                              1
 
 // Home position fix above-sea-level(ASL) ground altitude in centimeter, USED BY sonar and barometer
 //   altitude computation when USE_PA_PRESSURE is set to 0 and a barometer sensor is enabled
 //   eg. PN: Home front yard 13200, OMFC, SF 16950
-#define ASL_GROUND_ALT						13200	// above sea level (ASL) altitude in centimeters
+#define ASL_GROUND_ALT					13200	// above sea level (ASL) altitude in centimeters
 
 // USE_PA_PRESSURE 
 // 1 uses  hPA PA_PRESSURE, 2 uses MC_PRESSURE mercury inch per METAR/station computation and
 // 3 fuses both values
 //
-#define USE_PA_PRESSURE						1    
+#define USE_PA_PRESSURE					1    
 
 // PA_PRESSURE below is for Ontario, Canada as of 11-16-2012, 1029.6826 hPA from
 // http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query=Mississauga%2C+Canada
@@ -429,84 +413,53 @@
 //       kilopascal (1 kPa = 1000 Pa), megapascal (1 MPa = 1,000,000 Pa), and 
 //       gigapascal (1 GPa = 1,000,000,000 Pa).  101325 is default as average SL Pa. 
 //
-#define PA_PRESSURE							101325   // in Pa is the typical average pressure at sea level
-#define MC_PRESSURE							3016     // 30.16 in. mercury (METAR), set USE_PA_PRESSURE to 2
-
-//  FUTURE USE FOR ESTIMATING GROUND ALTITUDE
-//  0 ASL ground altitude will use defined ASL_GROUND_ALT
-//  1 ASL ground altitude computation will use calibrated ground pressure and PA_PRESSURE Pa value. 
-//  2 ASL ground altitude will be derived from libDCM GPS alt estimate (after a GPS lock is obtained)
-//   IMPORTANT: PA_PRESSURE must be set either to 1 or 2.
-//
-//#define USE_CALIBRATED_GRDPRES 				1 
-
-// Barometer oversampling [OSS] can be set from 0 thru 3
-//				  [ms]  Ave/cur/uA   [hPA]      [m]
-// Set  Samples  Time  /1 sample   RMS noise  RMS noise
-//  0	 1		  4.5		3		  0.06		0.5  [ultra low power]
-//  1	 2		  7.5		5		  0.05		0.4  [standard]
-//  2	 4		 13.5		7		  0.04		0.3  [high resolution]
-//  3	 8		 25.5		12		  0.03		0.25 [ultra high resolution]
-// 3's recommended, works best for reliable readings, however requires CAL_HZ_CYCLE and
-//   BAR_HZ_CYCLE set to lower values with slower less powerful processors
-//
-#define OSS 								3  
-
-// Alternate barometer calibrations trigger locations 
-// options: 0- barometerCntrl.c, 1- states.c, 2- libDCM.c, 1 & 2 at 4Hz default with 
-#define ALTCAL_TRIG	 						0		// 1, 2(def)
-
-// estBarometerAltitude - estimate barometer altitude runtime trigger location options:
-//  0- barometerCntrl.c (def); 1- gpsParseCommon.c; 2- libDCM.c; 
-// 
-#define ALTRUN_TRIG	 						0  
-
-// Calibrate warm up time set to 10 to 30 recommended
-//
-#define CAL_WU_TD	 						10		// Calibration warm-up time delay
-
-//  Barometer ground data calibration and runtime validation-sampling, range of 3 to 8 recommended
-//
-#define BAR_CALSAMPLING						5
-#define BAR_RTSAMPLING						5
+#define PA_PRESSURE					101325   // in Pa is the typical average pressure at sea level
+#define MC_PRESSURE					3016     // 30.16 in. mercury (METAR), set USE_PA_PRESSURE to 2
 
 //  Barometer max PA read threshold, a fraction of PA_PRESSURE,  should depend on takeoff 
 //  altitude in reference to sealevel, i.e., use higher values as take off altitude is closer 
 //  to sealevel, eg., rough est. range of 0.60f-0.50f for 30-100m ASL,  0.30f-0.10f for 100-180m ASL, 
-//  0.10f-0.06f. for 180-250
+//  0.10f-0.06f. for 180-250 (0.12f tg)
 //
-#define BAR_PAPCT_THRESH					0.10
+#define BAR_PAPCT_THRESH				0.12f
 
-//  Barometer max temperatur read threshold, in units of 0.1 degrees Celsius 
-//  shouldn't be within range of 600 (boiling point) to 800 units 
+// Barometer oversampling [BOS] can be setup from 0 thru 3
+//			[ms]        Ave/cur/uA          [hPA]        [m]
+// Setup Samples        Time        /1 sample           RMS noise   RMS noise
+//  0	 1		  4.5		3		  0.06		0.5  [ultra low power]
+//  1	 2		  7.5		5		  0.05		0.4  [standard]
+//  2	 4		 13.5		7		  0.04		0.3  [high resolution]
+//  3	 8		 25.5		12		  0.03		0.25 [ultra high resolution]
+// 3's recommended, works best for reliable readings, however needs high CPU processing capacity
+//  1 (tg with BPXD 0~2, noisy) ~ 3 (tvg with BPXD 0~2) best rec. for UDB4-5, AUAV3
 //
-#define BAR_TEMP_THRESH						610
-//  Hz (cycle per second) of barometer sensor read and functions execution speed: lower values 
-//    increases cycle speed, but may decrease reliability/accuracy. Recommended options:
-//    20 for 2 Hz, 10 for 4Hz, 8 for 5Hz, 5 for 8Hz, 4 for 10Hz, 2 for 20Hz and 1 for 40Hz
-//
-#define CAL_HZ_CYCLE						10		//  calibration speed
-#define BAR_HZ_CYCLE						10		//  10 (rec) estimation runtime speed
+#define BOS						3
 
-// Temperature scaled, high accuracy barometric altitude computation, 
-//  requires fast cpus 
-//  Barometer estimate algorithm options:  
-//  0 linear, non temperature scaled, makes full use of all barometer parameters and options settings
-//  1 scaled (APM based) less accurate but takes less processing resources, appropriate for weaker processors
-//  2 high accuracy, temperature scaled but takes more processing resources and requires faster processors
-// 	Additional note: 2 is an accurate barometric altitude computation option, +-2.5 M of the standard 
-// 	atmosphere tables in the troposphere (up to 11,000 m amsl), however  requires faster processor
-// 		0-1 recommended for UDB4, UDB5 (2 takes 4-5 min to stabilize) and 2 for AUAV3 or higher
-//
-#define EST_BARALT_SCALED  					2		
+// Let the barometer settle for a minimum of >4 seconds after power on. Depending on ambient
+// temperature, it reads quite a long way off w/in the first 2-3 seconds, leading to about
+// >2 M and 100 C of error if there's no wait.
+// Calibration warm up time range rec: 30 to 150 depending on  speed with I2C_HZ_CYCLE
+//  Tested: 50 very stable for a 4Hz general speed, kicks in feed JIT. Perfect (so far ;-)!
+#define CAL_WU_TD	 				100
 
-//  Altitude offset in centimeters subtracted/added to barometric altitude. This is used to allow for the 
-//  automatic adjustment of the base barometric altitude by a ground station equipped with a barometer. 
-//  The value is subtracted/added to the barometric altitude read by the aircraft. TODO: Automatically reset 
-//  to 0 when the barometer is calibrated on each reboot or when a preflight calibration is performed.
-//  Recommended range is -12800 to 12800 centimeters (-128 to 127 meters).
+// Hz (cycle per second) of barometer sensor read and functions execution speed: lower values 
+//  increases cycle speed, but will  decrease reliability/accuracy with slow processors.
+//  Boards UDB4~5 and AUAV3: 20 = 2  Hz, 10  (tg, stable, with BPXD = 0~2) = 4Hz,  5 (tvg) = 8Hz,
+//  4  (tvg) = 10Hz, 2 (tg)  = 20Hz (set BPXD >=2) and for future/improved boards: 0 = 40Hz (set BPXD >=3)
 //
-#define BAR_ALT_OFFSET						-10000	// TODO: move this to flash mem. based parameters when implemented
+#define I2C_HZ_CYCLE                                    5
+
+// ASL alt est. & calibration speed if ALTRUN_TRIG OR BARCAL_TRIG is set to 2/3, triggered in altitudeCntrl/states~.c
+//  20 (tvg)= 2 Hz, 10 (tvg) = 4Hz, 5 (tg, but noisy) = 8Hz, 4 = 10Hz, 2 = 20Hz and 0 = 40Hz @ 40Hz ~_TRIGs settings,
+//  10 (tvg)  recommended when I2C_HZ_CYCLE is set to 10
+#define CHZ                                             5 // Calibration
+#define AHZ                                             5  // Altitude estimation
+
+// Set to 1 to re-estitmate origin ASL altitude, triggered in stats.c after a GPS lock event,
+//  to improve alt. accuracy
+// WIP (DO NOT USE, YET!):  re-run of calibration of temp/pres data, TBT, probably not necessary based
+//   on test results..
+#define UPDATE_BARCAL                                   0
 
 // EXTENDED FLIGHT RANGE (EXPERIMENTAL AND NOT FLIGHT TESTED)
 // Optionally enable experimental extended range navigation support (merged from ballon launch branch)
@@ -525,10 +478,10 @@
 // On Screen Display
 // USE_OSD enables the OSD system.  OSD Layout can be customized in the osd_layout.h file.
 // Option for USE_OSD:  OSD_NONE. OSD_NATIVE, OSD_REMZIBI
-#define USE_OSD                         OSD_NATIVE
+#define USE_OSD                                         OSD_NATIVE
 
 // OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL
-#define OSD_VIDEO_FORMAT                OSD_PAL
+#define OSD_VIDEO_FORMAT                                OSD_PAL
 
 // set this to 1 to use the SPI peripheral, 0 to bit-bash 
 // while osd_spi.c identifies SPI1 port (CK1 DO1 DI1) used for native osd applies to UDB5
@@ -548,11 +501,11 @@
 // SERIAL_SONAR for debugging sonar sensor, displays data feed, combined with USE_SONAR set to 1
 // SERIAL_BAROMETER for debugging barometer sensor, displays complete data feed, combined with USE_BAROMETER set to 1
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
-#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA  
+#define SERIAL_OUTPUT_FORMAT                            SERIAL_UDB_EXTRA
 
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 
-#define SERIAL_BAUDRATE                     57600
+// #define SERIAL_BAUDRATE                              57600
 
 
 /////////////////////     II.5. ANALOG INPUT CURRENT-VOLTAGE-RSSI SENSORS      ////////////////////
@@ -562,7 +515,7 @@
 //   2 also enables Radio In 2 as another analog Input
 //   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS					2 
+#define NUM_ANALOG_INPUTS				2 
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
@@ -808,11 +761,11 @@
 #define YAWKD_AILERON                       0.05
 #define AILERON_BOOST                       1.00
 */
-#define ROLLKP								0.25  // 0.25
-#define ROLLKD								0.07  // 0.08
-#define YAWKP_AILERON						0.09  // 0.08, 0.18
-#define YAWKD_AILERON						0.05
-#define AILERON_BOOST						1.00
+#define ROLLKP                              0.25  // 0.25
+#define ROLLKD                              0.07  // 0.08
+#define YAWKP_AILERON                       0.09  // 0.08, 0.18
+#define YAWKD_AILERON                       0.05
+#define AILERON_BOOST                       1.00
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
@@ -827,11 +780,11 @@
 #define ROLL_ELEV_MIX                       0.05
 #define ELEVATOR_BOOST                      0.50
 */
-#define PITCHGAIN							0.11  // 0.12
-#define PITCHKD								0.04  // 0.07
-#define RUDDER_ELEV_MIX						0.16  // reduced for vtail configuration
-#define ROLL_ELEV_MIX						0.06
-#define ELEVATOR_BOOST						0.55
+#define PITCHGAIN                           0.11  // 0.12
+#define PITCHKD                             0.04  // 0.07
+#define RUDDER_ELEV_MIX                     0.16  // reduced for vtail configuration
+#define ROLL_ELEV_MIX                       0.06
+#define ELEVATOR_BOOST                      0.55
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
 // Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
@@ -853,12 +806,12 @@
 #define MANUAL_AILERON_RUDDER_MIX           0.00
 #define RUDDER_BOOST                        1.00
 */
-#define YAWKP_RUDDER						0.06   //  0.08, 0.11
-#define YAWKD_RUDDER						0.06   //  0.12
-#define ROLLKP_RUDDER						0.08 
-#define ROLLKD_RUDDER						0.05
-#define MANUAL_AILERON_RUDDER_MIX			0.02
-#define RUDDER_BOOST						1.00
+#define YAWKP_RUDDER                        0.06   //  0.08, 0.11
+#define YAWKD_RUDDER                        0.06   //  0.12
+#define ROLLKP_RUDDER                       0.08
+#define ROLLKD_RUDDER                       0.05
+#define MANUAL_AILERON_RUDDER_MIX           0.02
+#define RUDDER_BOOST                        1.00
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
@@ -1017,10 +970,10 @@
 // ID_DIY_DRONES_URL should be the URL of your member page on DIY Drones.
 // That will allow Google Earth viewers of your flights to click straight through to your latest discussions.
 
-#define ID_VEHICLE_MODEL_NAME "SkyW-t107-01"
-#define ID_VEHICLE_REGISTRATION "MP-APS2.4-3128"
+#define ID_VEHICLE_MODEL_NAME "SkyW-t111.15"  //"SkyW-t111.15"  ..  "Brz2-t111.15"
+#define ID_VEHICLE_REGISTRATION "MP3156-APS2.4"
 #define ID_LEAD_PILOT "DB-EZFLIER"
-#define ID_DIY_DRONES_URL ""
+#define ID_URL ""
 
 /////////////////////////    IV.2  DATA COM AND OTHER ADVANCE OPTIONS    //////////////////////////
 //
@@ -1050,10 +1003,6 @@
 // The following define is used to enable vertical initialization for VTOL
 // To enable vertical initialization, uncomment the line
 //#define INITIALIZE_VERTICAL
-
-// Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE                        1
-
 
 ///////////////////////////////////    IV.3  DEBUG OPTIONS      ///////////////////////////////////
 // Debugging defines
@@ -1118,3 +1067,35 @@
 //
 //#define SETUP_WARNINGS_ON  
 
+
+//  GOOFY'S PARKING LOT:
+
+/*  DEPRECATED
+ *
+(mostly MACROS used in iterative development and optimization, and for the beta rc, now deprecated.)
+ *
+// Barometer ASL altitude estimation scaling (temperature) levels:
+//  1 Temperature scaled, less accurate than #2 but requires less processor power and capacity
+//  2 (tvg) high accuracy, temperature scaled but requires high processing capacity and power uses altitude
+//  computation with accuracy +-2.5 M of the standard atmosphere tables in the troposphere (up to 11,000 m amsl)
+//  Tests: opt. 1 is noisy, 2 works well with UDB4 and up, very accurate and stable at 4Hz speed
+#define BARAE_SCALE					2
+ *
+//  Barometer ASL altitude estimation min/max margin of error filter: rec.  0.70f to 0.99f
+ #define BARAE_MERR					0.75f
+ *
+// Suplementary barometer pressure-temperature callback final sampling
+//  0 to disable, 1 to 3 to be tested if further narrow down the device's noise, downside, latency
+#define SBS 						0
+ *
+//  0 (default, tg) to auto estimate the number of readings threshold value for filtering and averaging calibration data
+//   >= 1 to manually override (proporionately increase from 10 to 60 range recommended per I2C_HZ_CYCLE setting)
+#define BARCAL_VALRDS                                   0
+ *
+//  REPEATED TESTS PROVES THIS TO CAUSE REBOOT, TIMING-PROCESSOR OVERLOAD SUSPECTED, UNDER DIFF. SPEEDS, PERMUTATIONS
+// Use with caution though may increased but with (downside/penalty of) increased latency in barometer ASL
+//   altitude feed into nav.  0 to 3 max..  (> 1 tb w ALTRUN_TRIG 3, 2, ~Hz 5 up)
+//   TODO: alternative, fuse estimates with z accelleration
+#define BARALT_VALRDS                                   0
+ */
+ 

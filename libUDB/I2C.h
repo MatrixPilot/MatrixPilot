@@ -49,24 +49,24 @@
 	typedef void (*I2C_callbackFunc)(boolean);
 	
 	//  I2C1 PORT/DRIVER
-		
 	extern boolean I2C1_Write(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback);
 	extern boolean I2C1_Read(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback);
 	
 	// Check for I2C ACK on command
 	extern boolean I2C1_checkACK(uint16_t command, I2C_callbackFunc pCallback);
 	
-	// Trigger the I2C1 service routine to run at 4HZ in libUDB.c
+	// Trigger the I2C1 service routine to run at 4HZ in heartbeat.c if USE_I2C1_DRIVER == 1
 	extern void I2C1_trigger_service(void);
-	
+
+	// Trigger the I2C2 service routine to run at 4HZ in heartbeat.c USE_I2C2_DRIVER == 1
+	extern void I2C2_trigger_service(void);
+
 	// Trigger the I2C1 and I2C2 service routine to run at 4HZ in libUDB.c
 	//extern void I2C1_init(void);
 	//extern void I2C2_init(void);
 
 	// I2C2 PORT/DRIVER
-
-	#define USE_I2C2_DRIVER 1
-
+	#define USE_I2C2_DRIVER 	1  //  use queued I2C driver to support magnetometer and/or barometer
 	extern boolean I2C2_Write(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback);
 	extern boolean I2C2_Read(uint8_t command, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback);
 	
@@ -75,7 +75,8 @@
 	
 	// Check if the I2C2CON and I2C2STAT register are normal
 	extern boolean I2C2_Normal(void);
-	
+	extern inline boolean I2C2_CheckAvailable(void);
+	//extern 	boolean I2C2_Busy;
 	// Common
 	typedef struct tag_I2Cqueue
 	{

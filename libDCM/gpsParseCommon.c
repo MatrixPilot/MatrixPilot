@@ -309,19 +309,11 @@ static void udb_background_callback_triggered(void)
 		velocity_previous = air_speed_3DGPS;
 
 		estimateWind();
-		//estAltitude();
+
 		estYawDrift();
 		dcm_flags._.yaw_req = 1;       // request yaw drift correction
 		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
-
-		// TESTING runtime trigger location (defined in options.h ): 0- barometerCntrl.c (def); 1- gpsParseCommon.c, 2- libDCM.c (both 1, 2, at 4Hz) 
-
-		if((USE_BAROMETER==1)&&(ALTRUN_TRIG ==1)&&(HILSIM != 1)&&(flags._.barometer_calibrated==1))
-		{
-			static int16_t fc = BAR_HZ_CYCLE*6.25;			// factored by 6.25 to reduce 25 milliseconds or 250Hz to 4Hz
-			if (udb_heartbeat_counter%fc==0){estBarometerAltitude();}
-		}
 
 		#if (DEADRECKONING == 0)
 			process_flightplan();

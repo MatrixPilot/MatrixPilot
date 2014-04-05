@@ -15,27 +15,23 @@
 #ifndef BAROMETERCNTRL_H
 #define BAROMETERCNTRL_H
 
-void udb_barometer_callback(int32_t pressure, int16_t temperature, int8_t status);
+void udb_barometer_callback(int32_t pressure, int16_t temperature, uint8_t status);
 void barometerCalibrate(void);
-void barometerCalibrationUpdate(void);
 void estBarometerAltitude(void);
-void initOriginVars(void);
-int32_t setBarOriginAlt(float barpres,int16_t bartemp);
 
-inline float get_barometer_pressure(void);
-inline int16_t get_barometer_temperature(void);
-inline float get_barometer_pressureorgn(void);
-inline int16_t get_barometer_temperatureorgn(void);
-inline int32_t get_barometer_altitudeorgn(void);
-inline float get_barometer_rtavepressure(void);
-inline int16_t get_barometer_rtavetemperature(void);
-inline int32_t get_barometer_aslaltitude(void);
+void initFlags(void);
 
-int32_t calcSHABarASLAlt(float barpres,int16_t bartemp,float gnd_barpres,int16_t gnd_bartemp);
-int32_t calcSMABarASLAlt(float barpres,int16_t bartemp,float gnd_barpres,int16_t gnd_bartemp);
-int32_t calcNScBarASLAlt(float barpres);
-int32_t calcBarASLAlt(float barpres,int16_t bartemp,float gnd_barpres,int16_t gnd_bartemp);
-
+int32_t calcSHABarASLAlt(int32_t pres_rt, int32_t pres_ogn, int16_t temp_rt, int16_t temp_ogn);
+int32_t estBarAltOffset(int32_t estaslalt );
 
 #endif // BAROMETERCNTRL_H
+
+// GOOFY'S PARKING
+
+/*  **Deprecated**
+int32_t calcSMABarASLAlt(int32_t pres_rt, int32_t pres_orgn, int16_t temp_orgn);
+int32_t calcBarASLAlt(int32_t pres_rt, int32_t pres_orgn, int16_t temp_orgn);
+int32_t calcNScBarASLAlt(int32_t pres_rt);
+ *
+*/
 
