@@ -1,0 +1,626 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\MatrixPilot">
+      <UniqueIdentifier>{ee0f694e-cbd5-49be-bc4a-b6c0158b951d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MatrixPilot">
+      <UniqueIdentifier>{c4576743-41c9-4e97-998f-73c679cc4160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SIL">
+      <UniqueIdentifier>{999516ab-101d-4b37-a0a1-954b70f2fe8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libDCM">
+      <UniqueIdentifier>{7bd2d843-aba7-4bd5-adf3-cf556bbdb9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libDCM">
+      <UniqueIdentifier>{d1bbf368-20b3-49dc-990c-9d65e84b8c0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libUDB">
+      <UniqueIdentifier>{5101f421-f26a-4d8d-a4d2-8d74b9a9bf8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libFlashFS">
+      <UniqueIdentifier>{44f3753e-ceb9-4a92-abb6-8960cc7b0dac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libFlashFS">
+      <UniqueIdentifier>{ea19c55d-a288-4357-b923-30294bc47078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libUDB">
+      <UniqueIdentifier>{3824688d-0ed8-4283-ae32-33dd7fab24d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Config">
+      <UniqueIdentifier>{5a5047cd-9d1e-4cce-985d-86a4b90d8a4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libCntrl">
+      <UniqueIdentifier>{981d2f93-7da8-4021-9834-be1b4ca0e2c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libCntrl">
+      <UniqueIdentifier>{1c0bbf58-8fae-40b6-87cf-01a7b1314ae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MAVLink">
+      <UniqueIdentifier>{bb453e6e-6e95-4bec-81ea-d2c51185b2ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink">
+      <UniqueIdentifier>{55b9b5aa-6e40-4d7d-a01d-433dc6d4d406}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\MatrixPilot\behavior.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\config.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\config_tests.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\data_services.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\data_storage.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\euler_angles.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\flightplan-logo.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\flightplan-waypoints.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\main.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\mode_switch.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\mp_osd.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\navigate.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\nv_memory_table.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\servoMix.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\servoPrepare.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\states.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\telemetry.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-24LC256.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-dsp.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-eeprom.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-events.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-I2C1.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-serial.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-udb.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-ui-mp-term.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\deadReckoning.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\estAirspeed.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\estAltitude.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\estWind.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\estYawDrift.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsParseCommon.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsParseMTEK.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsParseNMEA.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsParseSTD.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsParseUBX.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\libDCM.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\mathlibNAV.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\rmat.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HILSIM_XPlane\UDBSocketWin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\telemetry_log.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="SIL-filesystem.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="flt2frct.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="frct2flt.c">
+      <Filter>Source Files\SIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\parameter_table2.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\parameter_table_init.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libFlashFS\minIni.c">
+      <Filter>Source Files\libFlashFS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\airspeedCntrl.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\altitudeCntrl.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\cameraCntrl.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\pitchCntrl.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\rollCntrl.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\sonarCntrl.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\yawCntrl.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libCntrl\altitudeCntrlVariable.c">
+      <Filter>Source Files\libCntrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\24LC256.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\analog2digital_auav3.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\analog2digital_udb4.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\analog2digital_udb5.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\analogs.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\background.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\barometer.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\eeprom_udb4.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\events.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\filters.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\flt2frct.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\frct2flt.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\heartbeat.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\HMC5883.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\HMC5883L.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\I2C.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\I2C1.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\I2C2.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\libUDB.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\LPS331.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\magnetometer.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\MAX21000.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\mcu.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\motorOut.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\mpu_spi.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\mpu6000.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\osd.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\osd_bit.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\osd_spi.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\radioIn.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\read.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\RFM22B.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\serialIO.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\servoOut.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\sonarIn.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\traps.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\uart.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libUDB\write.c">
+      <Filter>Source Files\libUDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\estLocation.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsData.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\hilsim.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\flightplan.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\mathlib.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MAVLink\MAVFlexiFunctions.c">
+      <Filter>Source Files\MAVLink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MAVLink\MAVLink.c">
+      <Filter>Source Files\MAVLink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MAVLink\MAVMission.c">
+      <Filter>Source Files\MAVLink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MAVLink\MAVParams.c">
+      <Filter>Source Files\MAVLink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MAVLink\MAVUDBExtra.c">
+      <Filter>Source Files\MAVLink</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\behaviour.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\config.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\console.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\data_services.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\data_storage.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\defines.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\euler_angles.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\flightplan-logo.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\flightplan-waypoints.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\fly_by_datalink.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\FreeRTOSConfig.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\gain_variables.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\mavlink_options.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\mode_switch.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\navigate.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\osd_layout.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\osd_layout_remzibi.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\parameter_datatypes.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\parameter_table.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\preflight.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\quad.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\redef.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\ring_buffer.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\telemetry_log.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\util.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\ymodem.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\dcmTypes.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\deadReckoning.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\estAltitude.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\gpsParseCommon.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\libDCM.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\libDCM_defines.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\libDCM_internal.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\mathlibNAV.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\rmat.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\analogs.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\barometer.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\boardRotation_defines.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\ConfigAUAV3.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\ConfigHILSIM.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\ConfigUDB4.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\ConfigUDB5.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\events.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\heartbeat.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\I2C.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\interrupt.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\libUDB.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\libUDB_defines.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\libUDB_internal.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\magnetometer.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\magnetometerOptions.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\mpu_spi.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\mpu6000.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\NV_memory.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\nv_memory_options.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\oscillator.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\osd.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\uart.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\udbTypes.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\AT45D.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\FSconfig.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\MDD_AT45D.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\minGlue.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\minGlue-mdd.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\minIni.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\usb_cdc.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\usb_config.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\osd_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SIL-config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\waypoints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\options.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libCntrl\airspeedCntrl.h">
+      <Filter>Header Files\libCntrl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libCntrl\cameraCntrl.h">
+      <Filter>Header Files\libCntrl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libCntrl\motorCntrl.h">
+      <Filter>Header Files\libCntrl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\flightplan.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\flightplan_logo.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\flightplan_waypoints.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\mathlib.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\MAVFlexiFunctions.h">
+      <Filter>Header Files\MAVLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\MAVLink.h">
+      <Filter>Header Files\MAVLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\mavlink_options.h">
+      <Filter>Header Files\MAVLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\MAVMission.h">
+      <Filter>Header Files\MAVLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\MAVParams.h">
+      <Filter>Header Files\MAVLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\MAVUDBExtra.h">
+      <Filter>Header Files\MAVLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\estWind.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\logo_cpp.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
