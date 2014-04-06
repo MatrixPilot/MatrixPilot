@@ -22,6 +22,8 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "logo.h"
+#include "logo_parser.h"
 #include "flightplan_logo.h"
 #include "../libCntrl/cameraCntrl.h"
 #include "../libDCM/mathlibNAV.h"
@@ -31,6 +33,7 @@
 
 #include <stdio.h>
 
+/*
 typedef struct logoInstructionDef {
 	uint16_t cmd        :  6;
 	uint16_t do_fly     :  1;
@@ -38,7 +41,7 @@ typedef struct logoInstructionDef {
 	uint16_t subcmd     :  8;
 	int16_t arg         : 16;
 } logoInstructionDef_t;
-
+ */
 
 #include "logo_cpp.h"
 #include "flightplan-logo.h"
@@ -100,7 +103,7 @@ static int16_t penState;
 static boolean process_one_instruction(struct logoInstructionDef instr);
 static void update_goal_from(struct relative3D old_waypoint);
 static void process_instructions(void);
-
+/*
 uint16_t logo_save_hex(const logoInstructionDef_t* logo, uint16_t count, const char* logo_filename)
 {
 	FILE* fp;
@@ -119,7 +122,7 @@ uint16_t logo_save_hex(const logoInstructionDef_t* logo, uint16_t count, const c
 	}
 	return count;
 }
-
+ */
 void load_flightplan(uint8_t id)
 {
 	// id == 0 -> builtin RTL plan
@@ -145,14 +148,15 @@ const struct logoInstructionDef* stdInstructions = stdInstructions_default;
 uint16_t rtlInstructionsCount = RTL_INSTRUCTIONS_COUNT;
 uint16_t stdInstructionsCount = STD_INSTRUCTIONS_COUNT;
 
+char* logo_std_filename = "logo_std.txt";
+char* logo_rtl_filename = "logo_rtl.txt";
+
 void flightplan_logo_init(void)
 {
 	DPRINT("flightplan_logo_init()\r\n");
 #ifdef USE_LOGO_SCRIPT
-	rtlInstructions = rtlInstructions_default;
-	stdInstructions = stdInstructions_default;
-	rtlInstructionsCount = RTL_INSTRUCTIONS_COUNT;
-	stdInstructionsCount = STD_INSTRUCTIONS_COUNT;
+	rtlInstructions = logo_compile(&rtlInstructionsCount, logo_rtl_filename);
+	stdInstructions = logo_compile(&stdInstructionsCount, logo_std_filename);
 #else
 	rtlInstructions = rtlInstructions_default;
 	stdInstructions = stdInstructions_default;

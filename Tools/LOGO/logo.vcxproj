@@ -51,6 +51,7 @@
       <PreprocessorDefinitions>WIN=1;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>../../Config;../../MatrixPilot;../MatrixPilot-SIL</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -77,16 +78,18 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="crc16.h" />
-    <ClInclude Include="logo_parser.h" />
-    <ClInclude Include="stptok.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="crc16.c" />
-    <ClCompile Include="logo_parser.c" />
+    <ClCompile Include="..\..\MatrixPilot\crc16.c" />
+    <ClCompile Include="..\..\MatrixPilot\logo_parser.c" />
+    <ClCompile Include="..\..\MatrixPilot\stptok.c" />
     <ClCompile Include="logo_source_gen.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="stptok.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\MatrixPilot\crc16.h" />
+    <ClInclude Include="..\..\MatrixPilot\logo.h" />
+    <ClInclude Include="..\..\MatrixPilot\logocode.h" />
+    <ClInclude Include="..\..\MatrixPilot\logo_parser.h" />
+    <ClInclude Include="..\..\MatrixPilot\stptok.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

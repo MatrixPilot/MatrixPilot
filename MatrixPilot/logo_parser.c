@@ -1,11 +1,34 @@
+// This file is part of MatrixPilot.
+//
+//    http://code.google.com/p/gentlenav/
+//
+// Copyright 2009-2011 MatrixPilot Team
+// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
+//
+// MatrixPilot is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MatrixPilot is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
+
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-#include "crc16.h"
+#include "defines.h"
 #include "stptok.h"
+#include "crc16.h"
+#include "logo.h"
 #include "logo_parser.h"
 
 #define MAX_LINE_LEN 80
@@ -135,7 +158,7 @@ static int8_t logo_parse_command(const defs_t* defs, uint8_t size, logoInstructi
 //						printf("long parameter detected: %li\r\n", param);
 						param1 = param >> 16;
 						param2 = param & 0xFFFF;
-						printf("long parameter detected: %li %04x:%04x\r\n", param, param1, param2);
+//						printf("long parameter detected: %li %04x:%04x\r\n", param, param1, param2);
 					} else {
 						param1 = atoi(tok);
 					}
@@ -287,13 +310,15 @@ logoInstructionDef_t* logo_compile(uint16_t* count, const char* source_filename)
 	logoInstructionDef_t* logo = NULL;
 
 	*count = logo_parse(NULL, NULL, NULL, 0, source_filename);
-	DPRINT("%u instructions found in %s\r\n", *count, source_filename);
-	logo = calloc(*count, sizeof(logoInstructionDef_t));
-	if (logo) {
-		memset(logo, 0, *count * sizeof(logoInstructionDef_t));
-		if (!(*count = logo_compose(logo, *count, source_filename))) {
-			DPRINT("ERROR: parsing logo script %s\r\n", source_filename);
-		} else {
+	if (*count != 0) {
+		DPRINT("%u instructions found in %s\r\n", *count, source_filename);
+		logo = calloc(*count, sizeof(logoInstructionDef_t));
+		if (logo) {
+			memset(logo, 0, *count * sizeof(logoInstructionDef_t));
+			if (!(*count = logo_compose(logo, *count, source_filename))) {
+				DPRINT("ERROR: parsing logo script %s\r\n", source_filename);
+			} else {
+			}
 		}
 	}
 	return logo;

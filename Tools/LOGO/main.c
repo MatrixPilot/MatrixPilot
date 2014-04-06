@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <conio.h>
 
+#include "defines.h"
+#include "logo.h"
 #include "logo_parser.h"
 
 #define FILENAME  "logo.txt"

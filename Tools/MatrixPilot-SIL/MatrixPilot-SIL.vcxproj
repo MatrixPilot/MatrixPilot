@@ -242,12 +242,14 @@
     <ClCompile Include="..\..\MatrixPilot\behavior.c" />
     <ClCompile Include="..\..\MatrixPilot\config.c" />
     <ClCompile Include="..\..\MatrixPilot\config_tests.c" />
+    <ClCompile Include="..\..\MatrixPilot\crc16.c" />
     <ClCompile Include="..\..\MatrixPilot\data_services.c" />
     <ClCompile Include="..\..\MatrixPilot\data_storage.c" />
     <ClCompile Include="..\..\MatrixPilot\euler_angles.c" />
     <ClCompile Include="..\..\MatrixPilot\flightplan-logo.c" />
     <ClCompile Include="..\..\MatrixPilot\flightplan-waypoints.c" />
     <ClCompile Include="..\..\MatrixPilot\flightplan.c" />
+    <ClCompile Include="..\..\MatrixPilot\logo_parser.c" />
     <ClCompile Include="..\..\MatrixPilot\main.c" />
     <ClCompile Include="..\..\MatrixPilot\mode_switch.c" />
     <ClCompile Include="..\..\MatrixPilot\mp_osd.c" />
@@ -258,6 +260,7 @@
     <ClCompile Include="..\..\MatrixPilot\servoMix.c" />
     <ClCompile Include="..\..\MatrixPilot\servoPrepare.c" />
     <ClCompile Include="..\..\MatrixPilot\states.c" />
+    <ClCompile Include="..\..\MatrixPilot\stptok.c" />
     <ClCompile Include="..\..\MatrixPilot\telemetry.c" />
     <ClCompile Include="..\..\MatrixPilot\telemetry_log.c" />
     <ClCompile Include="..\..\MAVLink\MAVFlexiFunctions.c" />
@@ -329,6 +332,7 @@
     <ClInclude Include="..\..\MatrixPilot\behaviour.h" />
     <ClInclude Include="..\..\MatrixPilot\config.h" />
     <ClInclude Include="..\..\MatrixPilot\console.h" />
+    <ClInclude Include="..\..\MatrixPilot\crc16.h" />
     <ClInclude Include="..\..\MatrixPilot\data_services.h" />
     <ClInclude Include="..\..\MatrixPilot\data_storage.h" />
     <ClInclude Include="..\..\MatrixPilot\defines.h" />
@@ -341,7 +345,9 @@
     <ClInclude Include="..\..\MatrixPilot\fly_by_datalink.h" />
     <ClInclude Include="..\..\MatrixPilot\FreeRTOSConfig.h" />
     <ClInclude Include="..\..\MatrixPilot\gain_variables.h" />
+    <ClInclude Include="..\..\MatrixPilot\logo.h" />
     <ClInclude Include="..\..\MatrixPilot\logo_cpp.h" />
+    <ClInclude Include="..\..\MatrixPilot\logo_parser.h" />
     <ClInclude Include="..\..\MatrixPilot\mavlink_options.h" />
     <ClInclude Include="..\..\MatrixPilot\mode_switch.h" />
     <ClInclude Include="..\..\MatrixPilot\navigate.h" />
@@ -354,6 +360,7 @@
     <ClInclude Include="..\..\MatrixPilot\quad.h" />
     <ClInclude Include="..\..\MatrixPilot\redef.h" />
     <ClInclude Include="..\..\MatrixPilot\ring_buffer.h" />
+    <ClInclude Include="..\..\MatrixPilot\stptok.h" />
     <ClInclude Include="..\..\MatrixPilot\telemetry_log.h" />
     <ClInclude Include="..\..\MatrixPilot\util.h" />
     <ClInclude Include="..\..\MatrixPilot\waypoints.h" />
