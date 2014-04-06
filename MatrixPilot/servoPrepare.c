@@ -34,6 +34,7 @@ boolean telem_on = false;
 
 void dcm_servo_callback_prepare_outputs(void) {
     static int pidCounter = 0;
+    static int mavCounter = 0;
 
 #if (BOARD_TYPE == AUAV2_BOARD_ALPHA1)
     if (sbusDAV) parseSbusData();
@@ -46,7 +47,11 @@ void dcm_servo_callback_prepare_outputs(void) {
     }
 
 #if ( SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK )
-    mavlink_output_40hz() ;
+    // PID loop at x Hz
+    if (++mavCounter >= HEARTBEAT_HZ / 40) {
+        mavCounter = 0;
+        mavlink_output_40hz() ;
+    }
 #else
 
     // don't send telemetry till calibrated
