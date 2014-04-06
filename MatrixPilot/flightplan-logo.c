@@ -29,28 +29,30 @@
 #include "../libDCM/gpsParseCommon.h"
 #include <stdlib.h>
 
+#include <stdio.h>
 
-struct logoInstructionDef {
+typedef struct logoInstructionDef {
 	uint16_t cmd        :  6;
 	uint16_t do_fly     :  1;
 	uint16_t use_param  :  1;
 	uint16_t subcmd     :  8;
 	int16_t arg         : 16;
-};
+} logoInstructionDef_t;
+
 
 #include "logo_cpp.h"
 #include "flightplan-logo.h"
 
 
-#define NUM_INSTRUCTIONS ((sizeof instructions) / sizeof (struct logoInstructionDef))
-#define NUM_RTL_INSTRUCTIONS ((sizeof rtlInstructions) / sizeof (struct logoInstructionDef))
+#define STD_INSTRUCTIONS_COUNT (sizeof(stdInstructions_default) / sizeof(struct logoInstructionDef))
+#define RTL_INSTRUCTIONS_COUNT (sizeof(rtlInstructions_default) / sizeof(struct logoInstructionDef))
 static int16_t instructionIndex = 0;
 static int16_t waypointIndex = 0; // used for telemetry
 static int16_t absoluteHighWord = 0;
 static union longww absoluteXLong;
 
-static struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions;
-static int16_t numInstructionsInCurrentSet = NUM_INSTRUCTIONS;
+static const struct logoInstructionDef* currentInstructionSet = (struct logoInstructionDef*)stdInstructions_default;
+static int16_t numInstructionsInCurrentSet = STD_INSTRUCTIONS_COUNT;
 
 // If we've processed this many instructions without commanding the plane to fly,
 // then stop and continue on the next run through
@@ -63,7 +65,7 @@ static uint8_t logo_inject_pos = 0;
 #define LOGO_INJECT_READY 255
 
 // Storage for interrupt handling
-static int16_t interruptIndex = 0;     // intruction index of the beginning of the interrupt function
+static int16_t interruptIndex = 0;     // instruction index of the beginning of the interrupt function
 static int8_t interruptStackBase = 0;  // stack depth when entering interrupt (clear interrupt when dropping below this depth)
 
 // How many layers deep can Ifs, Repeats and Subroutines be nested
@@ -99,51 +101,23 @@ static boolean process_one_instruction(struct logoInstructionDef instr);
 static void update_goal_from(struct relative3D old_waypoint);
 static void process_instructions(void);
 
-typedef union tagOpcodes {
-	uint32_t code;
-//	logoInstructionDef_t instruction;
-	struct logoInstructionDef opcode;
-} opcodes_t;
-
-void echo_opcode(opcodes_t* cmd)
+uint16_t logo_save_hex(const logoInstructionDef_t* logo, uint16_t count, const char* logo_filename)
 {
-	uint32_t code;
-	opcodes_t op = *cmd;
-
-//(cmds_t a)
-//	opcodes_t op = a;
-//	opcodes_t* cmd = &a.opcode;
-//	opcodes_t a = *cmd;
-//	logoInstructionDef_t* logo = &op;
-
-/*	printf("cmd %i  ", a.opcode.cmd);
-	printf("do_fly %i  ", a.opcode.do_fly);
-	printf("use_param %i  ", a.opcode.use_param);
-	printf("subcmd %i  ", a.opcode.subcmd);
-	printf("arg %i\r\n", a.opcode.arg);
-*/
-	code = op.code;
-	printf("\t%04X%04X\r\n", (uint16_t)(code >> 16), (uint16_t)(code & 0xffff));
-}
-
-void echo_logo_code(void)
-{
-//		currentInstructionSet = (struct logoInstructionDef*)instructions;
-//		numInstructionsInCurrentSet = NUM_INSTRUCTIONS;
-	int16_t i;
-	uint32_t opcode;
-
-	printf("sizeof(logoInstructionDef_t) %u\r\n", sizeof(struct logoInstructionDef));
-//	printf("sizeof(cmds_t) %u\r\n", sizeof(cmds_t));
-	printf("sizeof(opcodes_t) %u\r\n", sizeof(opcodes_t));
-
-	printf("logo opcodes:\r\n");
-	for (i = 0; i < numInstructionsInCurrentSet; i++)
-	{
-//		opcode = (uint32_t)currentInstructionSet[i];
-//		echo_opcode(&opcode);
-		echo_opcode(&currentInstructionSet[i]);
+	FILE* fp;
+	uint16_t i;
+	
+	fp = fopen(logo_filename, "w+");
+	if (fp) {
+		for (i = 0; i < count; i++) {
+			printf("%08X\n", logo[i]);
+			fprintf(fp, "%08X\n", logo[i]);
+		}
+		fclose(fp);
+	} else {
+		DPRINT("ERROR: opening %s\r\n", logo_filename);
+		count = 0;
 	}
+	return count;
 }
 
 void load_flightplan(uint8_t id)
@@ -151,36 +125,68 @@ void load_flightplan(uint8_t id)
 	// id == 0 -> builtin RTL plan
 	// id == 1 -> builtin default plan
 	// id > 1  -> load logo script file logoXX.txt from filesystem
-
 }
 
 int16_t flightplan_logo_index_get(void)
 {
 	return waypointIndex;
 }
+/*
+typedef struct mission {
+	logoInstructionDef* instructions;
+	uint16_t count;
+
+	uint16_t current_index;
+	uint16_t last_index;
+} mission_t;
+ */
+const struct logoInstructionDef* rtlInstructions = rtlInstructions_default;
+const struct logoInstructionDef* stdInstructions = stdInstructions_default;
+uint16_t rtlInstructionsCount = RTL_INSTRUCTIONS_COUNT;
+uint16_t stdInstructionsCount = STD_INSTRUCTIONS_COUNT;
+
+void flightplan_logo_init(void)
+{
+	DPRINT("flightplan_logo_init()\r\n");
+#ifdef USE_LOGO_SCRIPT
+	rtlInstructions = rtlInstructions_default;
+	stdInstructions = stdInstructions_default;
+	rtlInstructionsCount = RTL_INSTRUCTIONS_COUNT;
+	stdInstructionsCount = STD_INSTRUCTIONS_COUNT;
+#else
+	rtlInstructions = rtlInstructions_default;
+	stdInstructions = stdInstructions_default;
+	rtlInstructionsCount = RTL_INSTRUCTIONS_COUNT;
+	stdInstructionsCount = STD_INSTRUCTIONS_COUNT;
+#endif //  USE_LOGO_SCRIPT
+//	echo_logo_code();
+//uint16_t logo_save_hex(logoInstructionDef_t* logo, uint16_t count, const char* logo_filename)
+//	logo_save_hex(stdInstructions, stdInstructionsCount, "logosave.txt");
+}
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void flightplan_logo_init(int16_t flightplanNum)
+void flightplan_logo_begin(int16_t flightplanNum)
 {
 	struct relative2D curHeading;
 	struct relative3D IMUloc;
 	int8_t earth_yaw;
 	int16_t angle;
 
-	DPRINT("flightplan_logo_init(%i)\r\n", flightplanNum);
+	DPRINT("flightplan_logo_begin(%i)\r\n", flightplanNum);
 
 	if (flightplanNum == 1) // RTL instructions set
 	{
-		currentInstructionSet = (struct logoInstructionDef*)rtlInstructions;
-		numInstructionsInCurrentSet = NUM_RTL_INSTRUCTIONS;
+//		currentInstructionSet = (struct logoInstructionDef*)rtlInstructions;
+		currentInstructionSet = rtlInstructions;
+		numInstructionsInCurrentSet = rtlInstructionsCount;
 	}
 	else if (flightplanNum == 0) // Main instructions set
 	{
-		currentInstructionSet = (struct logoInstructionDef*)instructions;
-		numInstructionsInCurrentSet = NUM_INSTRUCTIONS;
+//		currentInstructionSet = (struct logoInstructionDef*)stdInstructions;
+		currentInstructionSet = stdInstructions;
+		numInstructionsInCurrentSet = stdInstructionsCount;
 	}
-	echo_logo_code();
 
 	instructionIndex = 0;
 
@@ -225,8 +231,8 @@ void flightplan_logo_init(int16_t flightplanNum)
 static boolean logo_goal_has_moved(void)
 {
 	return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
-			lastGoal.y != turtleLocations[PLANE].y._.W1 ||
-			lastGoal.z != turtleLocations[PLANE].z);
+	        lastGoal.y != turtleLocations[PLANE].y._.W1 ||
+	        lastGoal.z != turtleLocations[PLANE].z);
 }
 
 static void update_goal_from(struct relative3D old_goal)
@@ -877,7 +883,7 @@ void flightplan_logo_live_received_byte(uint8_t inbyte)
 			break;
 
 		case 2:
-			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F);
+			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F); // TODO: WARNING, right shift by too large amount, data loss
 			logo_inject_instr.use_param = (inbyte & 0x0F);
 			break;
 

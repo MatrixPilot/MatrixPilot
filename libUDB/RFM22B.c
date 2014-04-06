@@ -19,16 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libUDB_internal.h"
-//#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "RFM22B.h"
 #include "delay.h"
+#include "../MatrixPilot/TaskLRS.h"
 
-//#include <stdbool.h>
 #include <spi.h>
 
-// define which SPI port the RFM is using by defining RFM_SPI to be 1 or 2
+// configure the SPI port by defining SPI_PORT to be 1, 2, etc
 // on UDB4, either SPI port can be used to connect RFM.
 // on UDB5, SPI2 connects to MPU6000, SPI1 is available for off board.
 // on AUAV3, SPI1 connects to MPU6000, SPI2 is available for off board.
@@ -39,33 +38,33 @@
 // SPI1 interface uses INT1, RG12 for external interrupt
 
 #if (BOARD_TYPE == UDB4_BOARD)
-#define RFM_SPI 1
+#define SPI_PORT 1
 #define _TRISRFMINT _TRISA12
 
 #elif (BOARD_TYPE == UDB5_BOARD)
-#define RFM_SPI 2
+#define SPI_PORT 2
 #define _TRISRFMINT _TRISA13
 
 #elif (BOARD_TYPE == AUAV2_BOARD)
-#define RFM_SPI 1
+#define SPI_PORT 1
 #define _TRISRFMINT _TRISE8
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
-#define RFM_SPI 1
+#define SPI_PORT 1
 #define _TRISRFMINT _TRISG12
 
 #elif (BOARD_TYPE == AUAV4_BOARD)
-#define RFM_SPI 1
+#define SPI_PORT 1
 #define _TRISRFMINT _TRISG12
 
 #else
 #error "Only BOARD_TYPEs UDB5, UDB4 and AUAV3 supported"
 #endif
 
-#if (RFM_SPI == 1)
+#if (SPI_PORT == 1)
 
-#define RFM_SS       SPI1_SS
-#define RFM_SS_TRIS  SPI1_TRIS
+#define _SS          SPI1_SS
+#define _SS_TRIS     SPI1_TRIS
 #define _SPIRBF      SPI1STATbits.SPIRBF
 #define _SPIROV      SPI1STATbits.SPIROV
 #define _SRXMPT      SPI1STATbits.SRXMPT
@@ -81,10 +80,10 @@
 #define ConfigIntSPI ConfigIntSPI1
 #define SPIInterrupt _SPI1Interrupt
 
-#elif (RFM_SPI == 2)
+#elif (SPI_PORT == 2)
 
-#define RFM_SS       SPI2_SS
-#define RFM_SS_TRIS  SPI2_TRIS
+#define _SS          SPI2_SS
+#define _SS_TRIS     SPI2_TRIS
 #undef  _SPIRBF
 #define _SPIRBF      SPI2STATbits.SPIRBF
 #undef  _SPIROV
@@ -103,8 +102,10 @@
 #define SPIInterrupt _SPI2Interrupt
 
 #else
-#error "Select either 1 or 2 for RFM SPI."
+#error "SPI_PORT requires defining."
 #endif
+
+static void init_spi(uint16_t priPre, uint16_t secPre);
 
 // RFM22B registers
 #define RFM_DEVICE_TYPE      0x00
@@ -116,7 +117,7 @@
 #define RFM_INT2_ENABLE      0x06
 
 
-#ifdef ENABLE_RFM_SPI_INT
+#ifdef ENABLE_SPI_PORT_INT
 static void no_call_back(void);
 static void (*_call_back)(void) = &no_call_back;
 static uint16_t* SPI_data;
@@ -127,9 +128,8 @@ static int16_t SPI_i;
 static int16_t SPI_j;
 static int16_t SPI_n;
 #endif
-#endif // ENABLE_RFM_SPI_INT
+#endif // ENABLE_SPI_PORT_INT
 
-static void rfmInitSPI(uint16_t priPre, uint16_t secPre);
 
 
 boolean init_RFM22B(void)
@@ -137,26 +137,26 @@ boolean init_RFM22B(void)
 // RFM22B maximum SPI clock is specified as 10 MHz
 //    NOTE!!: the SPI limit on the dsPIC is 9 Mhz
 
-// 10 MHz is the maximum specified for the RFM-22B SPI SCLK
+// 10 MHz is the maximum specified for the RFM22B SPI SCLK
 // however 9 MHz is the maximum specified for the dsPIC33EP
 // Primary prescaler options   1:1/4/16/64
 // Secondary prescaler options 1:1 to 1:8
 #if (MIPS == 70)
 	// set prescaler for FCY/32 = 2.2 MHz at 70MIPS
-	rfmInitSPI(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
+	init_spi(SEC_PRESCAL_2_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 64)
 	// set prescaler for FCY/8 = 8 MHz at 64 MIPS
-	rfmInitSPI(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
+	init_spi(SEC_PRESCAL_2_1, PRI_PRESCAL_4_1);
 #elif (MIPS == 40)
 	// UDB5 only
 	// set prescaler for FCY/5 = 8 MHz at 40MIPS
-	rfmInitSPI(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
+	init_spi(SEC_PRESCAL_5_1, PRI_PRESCAL_1_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/4 = 8 MHz at 32 MIPS
-	rfmInitSPI(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
+	init_spi(SEC_PRESCAL_1_1, PRI_PRESCAL_4_1);
 #elif (MIPS == 16)
 	// set prescaler for FCY/2 = 8 MHz at 16 MIPS
-	rfmInitSPI(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
+	init_spi(SEC_PRESCAL_2_1, PRI_PRESCAL_1_1);
 #else
 #error Invalid MIPS Configuration
 #endif // MIPS
@@ -167,12 +167,12 @@ boolean init_RFM22B(void)
 		return false;
 	}
 	_TRISRFMINT = 1; // this is probably already taken care of in mcu.c for most boards
-#if (RFM_SPI == 1)
+#if (SPI_PORT == 1)
 	_INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
 	_INT1IP = INT_PRI_INT1;
 	_INT1IF = 0; // Reset INT1 interrupt flag
 	_INT1IE = 1; // Enable INT1 Interrupt Service Routine 
-#elif (RFM_SPI == 2)
+#elif (SPI_PORT == 2)
 	_INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
 	_INT3IP = INT_PRI_INT3;
 	_INT3IF = 0; // Reset INT3 interrupt flag
@@ -182,43 +182,51 @@ boolean init_RFM22B(void)
 	return true;
 }
 
-#if (RFM_SPI == 1)
+#if (SPI_PORT == 1)
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
 {
 	_INT1IF = 0; // Clear the INT1 interrupt flag
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 //	RFM22B_Int();
+//	TaskLRS_Trigger();
 	interrupt_restore_corcon;
 }
-#elif (RFM_SPI == 2)
+#elif (SPI_PORT == 2)
 void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 {
 	_INT3IF = 0; // Clear the INT3 interrupt flag
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	RFM22B_Int();
+//	TaskLRS_Trigger();
 	interrupt_restore_corcon;
 }
 #else
-#error("invalid selection for RFM SPI port, must be 1 or 2")
+#error("invalid setting for SPI_PORT, must be 1 or 2")
 #endif
 
+//#define USE_SPI_PORT_16BIT_MODE
+#ifdef USE_SPI_PORT_16BIT_MODE
+#else
+#endif // USE_SPI_PORT_16BIT_MODE
+
 // Configure SPI module in 16-bit master mode
-static void rfmInitSPI(uint16_t priPre, uint16_t secPre)
+static void init_spi(uint16_t priPre, uint16_t secPre)
 {
 	uint16_t SPICON1Value;      // holds the information about SPI configuration
 	uint16_t SPICON2Value;
 	uint16_t SPISTATValue;      // holds the information about SPI Enable/Disable
 
-	RFM_SS = 1;                 // deassert RFM SS
-	RFM_SS_TRIS = 0;            // make RFM SS an output
+	_SS = 1;                 // deassert SS
+	_SS_TRIS = 0;            // make SS an output
 	CloseSPI();                 // turn off SPI module
 	ConfigIntSPI(SPI_INT_DIS & SPI_INT_PRI_6);
 
 #if defined(__dsPIC33E__)
 	SPICON1Value =
-	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+//	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+	    ENABLE_SDO_PIN & ENABLE_SCK_PIN &
 	    SPI_SMP_OFF & SPI_CKE_OFF &
 	    SLAVE_ENABLE_OFF &
 	    CLK_POL_ACTIVE_LOW &
@@ -229,7 +237,8 @@ static void rfmInitSPI(uint16_t priPre, uint16_t secPre)
 	// BUF_INT_SEL_5 == Interrupt when the last bit is shifted out of SPIxSR, and the transmit is complete
 #else
 	SPICON1Value =
-	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+//	    ENABLE_SDO_PIN & SPI_MODE16_ON & ENABLE_SCK_PIN &
+	    ENABLE_SDO_PIN & ENABLE_SCK_PIN &
 	    SPI_SMP_ON & SPI_CKE_OFF &
 	    SLAVE_ENABLE_OFF &
 	    CLK_POL_ACTIVE_LOW &
@@ -237,7 +246,13 @@ static void rfmInitSPI(uint16_t priPre, uint16_t secPre)
 	    secPre & priPre;
 	SPICON2Value = FRAME_ENABLE_OFF & FRAME_SYNC_OUTPUT;
 	SPISTATValue = SPI_ENABLE & SPI_IDLE_CON & SPI_RX_OVFLOW_CLR;
-#endif
+#endif // __dsPIC33E__
+
+#ifdef USE_SPI_PORT_16BIT_MODE
+	SPICON1Value |= 0x0400; // add the MODE16 bit
+#else // USE_SPI_PORT_8BIT_MODE
+	SPICON1Value ^= 0x0400; // remove the MODE16 bit
+#endif // USE_SPI_PORT_16BIT_MODE
 
 #ifdef __PIC32MX__
 //	 * Example: OpenSPI1(SPI_MODE32_ON|SPI_SMP_ON|MASTER_ENABLE_ON|SEC_PRESCAL_1_1|PRI_PRESCAL_1_1, SPI_ENABLE);
@@ -250,16 +265,18 @@ static void rfmInitSPI(uint16_t priPre, uint16_t secPre)
 	_SPIROV = 0;                // clear SPI receive overflow
 	_SPIIF  = 0;                // clear any pending interrupts
 	_SPIIP  = INT_PRI_RFMSPI;   // set interrupt priority
-#ifdef ENABLE_RFM_SPI_INT
+#ifdef ENABLE_SPI_PORT_INT
 //	_SPIIE  = 1;                // turn on SPI interrupts
 #endif
 }
+
+#ifdef USE_SPI_PORT_16BIT_MODE
 
 void rfmWriteRegister(uint8_t addr, uint8_t data)
 {
 	int16_t k;
 
-	RFM_SS = 0;                 // assert chip select
+	_SS = 0;                    // assert chip select
 	k = SPIBUF;
 	_SPIIE = 0;                 // ensure the interrupt is disabled
 	_SPIIF = 0;                 // ensure the interrupt flag is clear
@@ -272,7 +289,7 @@ void rfmWriteRegister(uint8_t addr, uint8_t data)
 	delay_us(32+2);             // allow 16 cycles at 500kHz for the write
 #endif
 	k = SPIBUF;                 // dump received data
-	RFM_SS = 1;                 // deassert chip select
+	_SS = 1;                    // deassert chip select
 	// this delay is necessary; it appears that SS must be deasserted for one or
 	// more SPI clock cycles between writes
 }
@@ -287,7 +304,7 @@ uint8_t rfmReadRegister(uint8_t addr)
 	{
 		data = SPIBUF;          // empty receive buffer
 	}
-	RFM_SS = 0;                 // assert chip select
+	_SS = 0;                    // assert chip select
 	_SPIIE = 0;                 // ensure the interrupt is disabled
 	_SPIIF = 0;                 // ensure the interrupt flag is clear
 //	addr |= 0x80;               // set the read bit in addr byte
@@ -296,12 +313,114 @@ uint8_t rfmReadRegister(uint8_t addr)
 	while (!_SPIIF);            // wait for transfer to complete
 	_SPIIF = 0;                 // clear interrupt flag
 	data = SPIBUF;
-	RFM_SS = 1;
+	_SS = 1;
 	return data;
 }
 
+#else
+
+void rfmWriteRegister(uint8_t addr, uint8_t data)
+{
+	int8_t k;
+
+	_SS = 0;                    // assert chip select
+	k = SPIBUF;
+	_SPIIE = 0;                 // ensure the interrupt is disabled
+	_SPIIF = 0;                 // ensure the interrupt flag is clear
+	addr |= 0x80;               // set the write bit in addr byte
+
+	SPIBUF = addr;              // send address
+	while (!_SPIIF);            // wait for transfer to complete
+	_SPIIF = 0;                 // clear interrupt flag
+	k = SPIBUF;                 // dump received data
+
+	SPIBUF = data;              // send data
+	while (!_SPIIF);            // wait for transfer to complete
+	_SPIIF = 0;                 // clear interrupt flag
+	k = SPIBUF;                 // dump received data
+
+	_SS = 1;                    // deassert chip select
+}
+
+uint8_t rfmReadRegister(uint8_t addr)
+{
+	int8_t data;
+
+#if defined(__dsPIC33E__)
+	while (_SRXMPT == 0)        // clear receive FIFO
+#endif
+	{
+		data = SPIBUF;          // empty receive buffer
+	}
+	_SS = 0;                    // assert chip select
+	_SPIIE = 0;                 // ensure the interrupt is disabled
+	_SPIIF = 0;                 // ensure the interrupt flag is clear
+
+	SPIBUF = addr;              // issue read command
+//	while (!_SRMPT);            // wait for transfer to complete
+	while (!_SPIIF);            // wait for transfer to complete
+	_SPIIF = 0;                 // clear interrupt flag
+	data = SPIBUF;
+
+	SPIBUF = 0xff;              // send dummy data
+//	while (!_SRMPT);            // wait for transfer to complete
+	while (!_SPIIF);            // wait for transfer to complete
+	_SPIIF = 0;                 // clear interrupt flag
+	data = SPIBUF;
+
+	_SS = 1;
+	return data;
+}
+
+#if 1
+void rfmReceive(uint8_t* data, uint8_t size)
+{
+	while (size--)
+	{
+	*(data++) = rfmReadRegister(0x7f);
+	}
+}
+#else
+void rfmReceive(uint8_t* data, uint8_t size)
+{
+	int8_t foo;
+
+#if defined(__dsPIC33E__)
+	while (_SRXMPT == 0)        // clear receive FIFO
+#endif
+	{
+		data = SPIBUF;          // empty receive buffer
+	}
+	_SS = 0;                    // assert chip select
+	_SPIIE = 0;                 // ensure the interrupt is disabled
+	_SPIIF = 0;                 // ensure the interrupt flag is clear
+
+	SPIBUF = 0x7f;              // issue read command
+//	while (!_SRMPT);            // wait for transfer to complete
+	while (!_SPIIF);            // wait for transfer to complete
+	_SPIIF = 0;                 // clear interrupt flag
+	foo = SPIBUF;
+
+	while (size--)
+	{
+		SPIBUF = 0xff;                 // send dummy data
+//		while (!_SRMPT);            // wait for transfer to complete
+		while (!_SPIIF);            // wait for transfer to complete
+		_SPIIF = 0;                 // clear interrupt flag
+		*(data++) = SPIBUF;
+	}
+	_SS = 1;
+}
+#endif
+
+#endif // USE_SPI_PORT_16BIT_MODE
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 /*
-#ifdef ENABLE_RFM_SPI_INT
+#ifdef ENABLE_SPI_PORT_INT
 
 static void no_call_back(void)
 {
@@ -316,7 +435,7 @@ void rfmReadBuffer(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(
 {
 	uint16_t i;
 
-	RFM_SS = 0;                 // assert chip select
+	_SS = 0;                 // assert chip select
 	_call_back = call_back;  // store the address of the call back routine
 	SPI_data = &data[0];        // store address of data buffer
 	i = SPIBUF;                 // empty read buffer
@@ -347,7 +466,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 		*SPI_data++ = SPI_high << 8 | SPI_low;
 		SPI_high = 0xFF & spibuf;
 	}
-	RFM_SS = 1;
+	_SS = 1;
 	(*_call_back)();
 	interrupt_restore_corcon;
 }
@@ -359,7 +478,7 @@ void rfmReadBuffer(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(
 {
 	uint16_t spibuf;
 
-	RFM_SS = 0;                 // assert chip select
+	_SS = 0;                 // assert chip select
 	_call_back = call_back;  // save address of call back routine
 	SPI_i = 0;                  // initialize indices
 	SPI_j = 0;
@@ -396,7 +515,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 		spibuf = SPIBUF;                               // could move this to before the conditional
 		SPI_low = spibuf >> 8;                         // could move this to before the conditional
 		*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low; // could move this to before the conditional
-		RFM_SS = 1;
+		_SS = 1;
 		_SPIIE = 0;             // turn off SPI interrupts
 		(*_call_back)();
 	}
@@ -411,7 +530,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 		SPIBUF = 0x0000;
 		SPI_j++;
 	} else {
-		RFM_SS = 1;
+		_SS = 1;
 		_SPIIE = 0;             // turn off SPI interrupts
 		(*_call_back)();
 	}
@@ -419,7 +538,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 #endif // 0
 	interrupt_restore_corcon;
 }
-#endif // ENABLE_RFM_SPI_INT
+#endif // ENABLE_SPI_PORT_INT
 
 #endif // (__dsPIC33E__)
  */

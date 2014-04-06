@@ -132,6 +132,7 @@ static int8_t logo_parse_command(const defs_t* defs, uint8_t size, logoInstructi
 				if (i == 2) {
 					param = atol(tok);
 					if (param > 0x7FFF) { // 16 bit signed full scale
+//						printf("long parameter detected: %li\r\n", param);
 						param1 = param >> 16;
 						param2 = param & 0xFFFF;
 						printf("long parameter detected: %li %04x:%04x\r\n", param, param1, param2);
@@ -155,11 +156,13 @@ static int8_t logo_parse_command(const defs_t* defs, uint8_t size, logoInstructi
 						*opcode = logo_build_instruction(logo_cmd_list[i].opcode, param1, param2);
 						DPRINT("%04u %08X: %s %i %i\r\n", line_num, *opcode, token, param1, param2);
 					} else {
+//						*opcode = logo_build_instruction(logo_cmd_list[i+next].opcode, param2, 0);
 						*opcode = logo_build_instruction(logo_cmd_list[i+1].opcode, param1, param2);
 						DPRINT("%04u %08X: %s %i %i -- xxxxxxxxxx\r\n", line_num, *opcode, token, param1, param2);
 					}
 				}
 				if (logo_cmd_list[i].opcode.compound_cmd) {
+//					printf("compound command: %s\r\n", token);
 					return 2; // this instruction requires two opcodes
 				}
 				return 1;
@@ -208,10 +211,12 @@ static uint8_t logo_parse(defs_t* defslist, uint8_t* defscnt, logoInstructionDef
 							int8_t opcodes = 0;
 							opcodes = logo_parse_command(defslist, *defscnt, &instlist[count], line, line_num, opcodes);
 							if (opcodes > 1) {
+//								printf("parsing second opcode: %s\r\n", line);
 								logo_parse_command(defslist, *defscnt, &instlist[count+1], line, line_num, opcodes);
 							}
 							count += opcodes;
 						} else {
+//							count += logo_parse_command(defslist, *defscnt, NULL, line, line_num, 0);
 							count += logo_parse_command(NULL, 0, NULL, line, line_num, 0);
 						}
 					}
@@ -278,6 +283,59 @@ static uint8_t logo_compose(logoInstructionDef_t opcode[], uint16_t size, const 
 
 logoInstructionDef_t* logo_compile(uint16_t* count, const char* source_filename)
 {
+//	uint8_t count = 0;
+	logoInstructionDef_t* logo = NULL;
+
+	*count = logo_parse(NULL, NULL, NULL, 0, source_filename);
+	DPRINT("%u instructions found in %s\r\n", *count, source_filename);
+	logo = calloc(*count, sizeof(logoInstructionDef_t));
+	if (logo) {
+		memset(logo, 0, *count * sizeof(logoInstructionDef_t));
+		if (!(*count = logo_compose(logo, *count, source_filename))) {
+			DPRINT("ERROR: parsing logo script %s\r\n", source_filename);
+		} else {
+		}
+	}
+	return logo;
+}
+
+uint16_t logo_save(logoInstructionDef_t* logo, uint16_t count, const char* logo_filename)
+{
+	FILE* fp;
+	
+	DPRINT("opcodes = %u\r\n", count);
+	fp = fopen(logo_filename, "w+");
+	if (fp) {
+		fwrite(logo, sizeof(logoInstructionDef_t), count, fp);
+		fclose(fp);
+	} else {
+		DPRINT("ERROR: opening %s\r\n", logo_filename);
+		count = 0;
+	}
+	return count;
+}
+
+uint16_t logo_save_hex(logoInstructionDef_t* logo, uint16_t count, const char* logo_filename)
+{
+	FILE* fp;
+	uint16_t i;
+	
+	fp = fopen(logo_filename, "w+");
+	if (fp) {
+		for (i = 0; i < count; i++) {
+			fprintf(fp, "%08X\n", logo[i]);
+		}
+		fclose(fp);
+	} else {
+		DPRINT("ERROR: opening %s\r\n", logo_filename);
+		count = 0;
+	}
+	return count;
+}
+
+/*
+uint8_t logo_compile(char* source_filename, char* logo_filename)
+{
 	logoInstructionDef_t* logo = NULL;
 
 	*count = logo_parse(NULL, NULL, NULL, 0, source_filename);
@@ -328,3 +386,4 @@ uint16_t logo_save_hex(logoInstructionDef_t* logo, uint16_t count, const char* l
 	}
 	return count;
 }
+ */

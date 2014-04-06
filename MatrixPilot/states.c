@@ -295,7 +295,7 @@ static void ent_waypointS(void)
 
 	if (!(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS))
 	{
-		flightplan_init(0); // Only reset non-rtl waypoints if not already following waypoints
+		flightplan_begin(0); // Only reset non-rtl waypoints if not already following waypoints
 	}
 
 	waggle = 0;
@@ -316,11 +316,11 @@ static void ent_returnS(void)
 	mode_switch_rtl_hold_set();
 #endif
 #if (FAILSAFE_TYPE == FAILSAFE_RTL)
-	flightplan_init(1);
+	flightplan_begin(1);
 #elif (FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN)
 	if (stateS != &waypointS)
 	{
-		flightplan_init(0); // Only reset non-rtl waypoints if not already following waypoints
+		flightplan_begin(0); // Only reset non-rtl waypoints if not already following waypoints
 	}
 #endif
 

@@ -68,10 +68,7 @@ int main(void)
 	udb_init();
 	dcm_init();
 	init_config();  // this will need to be moved up in order to support runtime hardware options
-#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
-	init_waypoints();
-#endif
-//	flightplan_init(0); // Only reset non-rtl waypoints if not already following waypoints
+	flightplan_init();
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 	quad_init();

@@ -20,8 +20,6 @@
 
 
 #include "defines.h"
-//#include "navigate.h"
-//#include "behaviour.h"
 #include "flightplan.h"
 #include "flightplan_logo.h"
 #include "flightplan_waypoints.h"
@@ -48,17 +46,24 @@ vect3_32t get_fixed_origin(void)
 
 static boolean flightplan_logo_active = false;
 
-void flightplan_init(int16_t flightplanNum)
+void flightplan_init(void)
 {
+	DPRINT("flightplan_init() - %s\r\n", flightplan_logo_active ? "LOGO" : "WAYPOINTS");
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
-	boolean flightplan_logo_active = true;
+	flightplan_logo_active = true;
 #endif
-	DPRINT("flightplan_init(%u)\r\n", flightplanNum);
+	flightplan_logo_init();
+	flightplan_waypoints_init();
+}
+
+void flightplan_begin(int16_t flightplanNum)
+{
+	DPRINT("flightplan_begin(%u)\r\n", flightplanNum);
 
 	if (flightplan_logo_active) {
-		flightplan_logo_init(flightplanNum);
+		flightplan_logo_begin(flightplanNum);
 	} else {
-		flightplan_waypoints_init(flightplanNum);
+		flightplan_waypoints_begin(flightplanNum);
 	}
 }
 
@@ -71,7 +76,6 @@ void flightplan_update(void)
 	}	
 }
 
-
 int16_t flightplan_index_get(void)
 {
 	if (flightplan_logo_active) {
@@ -80,7 +84,6 @@ int16_t flightplan_index_get(void)
 		return flightplan_waypoints_index_get();
 	}
 }
-
 
 void flightplan_live_begin(void)
 {

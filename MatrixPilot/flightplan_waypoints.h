@@ -36,7 +36,8 @@ void clear_flightplan(void);
 void add_waypoint(struct waypoint3D wp, int16_t flags);
 
 
-void flightplan_waypoints_init(int16_t flightplanNum);
+void flightplan_waypoints_init(void);
+void flightplan_waypoints_begin(int16_t flightplanNum);
 void flightplan_waypoints_update(void);
 int16_t flightplan_waypoints_index_get(void);
 void flightplan_waypoints_live_begin(void);

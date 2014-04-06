@@ -28,6 +28,7 @@ boolean init_RFM22B(void);
 //void rfmInitSPI(uint16_t priPre, uint16_t secPre);
 void rfmWriteRegister(uint8_t reg, uint8_t data);
 uint8_t rfmReadRegister(uint8_t reg);
+void rfmReceive(uint8_t* data, uint8_t size);
 
 //#define ENABLE_RFM_SPI_INT
 #ifdef ENABLE_RFM_SPI_INT

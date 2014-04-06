@@ -40,60 +40,8 @@ union dcm_fbts_word dcm_flags;
 void send_HILSIM_outputs(void);
 
 
-void foo_test(union longww longfoo)
-{
-	int16_t a1, a0;
-
-	a1 = longfoo._.W1;
-	a0 = longfoo._.W0;
-	printf("foo_test() W1 = %i, W0 = %i\r\n", a1, a0);
-}
-/*
-void foo_test2(union longww longfoo)
-{
-#define _LOWORD(a) (a._.W0)
-#define LOWORD(a) _LOWORD((int16_t)((union longww)a))
-#define _HIWORD(a) (a._.W1)
-#define HIWORD(a) _HIWORD((int16_t)((union longww)a))
-
-	int16_t b, c;
-	int32_t x = longfoo.WW;
-
-	b = HIWORD(x);
-	c = LOWORD(x);
-	printf("foo_test() HIWORD = %i, LOWORD = %i\r\n", b, c);
-}
- */
-void vect_test(void)
-{
-	vect2_16t a;
-	vect2_16t b;
-
-	a.x = 5;
-	a.y = 34;
-
-	b = a;
-
-	printf("vect_test() b.x %i b.y %i\r\n", b.x, b.y);
-
-}
-
 void dcm_init(void)
 {
-	union longww longfoo = { 0 };
-
-	longfoo._.W1 = 1;
-	longfoo._.W0 = 0;
-	printf("longfoo W1:1 W0:0 = %li\r\n", longfoo.WW);
-	foo_test(longfoo);
-
-	longfoo._.W1 = 0;
-	longfoo._.W0 = 1;
-	printf("longfoo W1:0 W0:1 = %li\r\n", longfoo.WW);
-	foo_test(longfoo);
-
-	vect_test();
-
 	dcm_flags.W = 0;
 	dcm_flags._.first_mag_reading = 1;
 	dcm_init_rmat();

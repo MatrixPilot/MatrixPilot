@@ -24,10 +24,10 @@ int main(int argc, char* argv[])
 	}
 	logo = logo_compile(&count, source_filename);
 	if (argc > 2) {
+//		if (!logo_save(logo, count, argv[2])) {
 		if (!logo_save_hex(logo, count, argv[2])) {
-			printf("ERROR: failed to save logo %s\r\n", argv[2]);
+			printf("ERROR: failed to save compiled logo %s\r\n", argv[2]);
 		}
-
 	}
 	printf("Hit any key to exit\r\n");
 	while (!_kbhit());

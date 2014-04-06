@@ -37,10 +37,10 @@ struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D vie
 
 #include "waypoints.h"
 
-#define NUMBER_POINTS ((sizeof waypoints) / sizeof (struct waypointDef))
-#define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))
+#define STD_WAYPOINTS_COUNT (sizeof(stdWaypoints_default) / sizeof(struct waypointDef))
+#define RTL_WAYPOINTS_COUNT (sizeof(rtlWaypoints_default) / sizeof(struct waypointDef))
 
-//uint16_t number_of_waypoints = NUMBER_POINTS;
+//uint16_t number_of_waypoints = STD_WAYPOINTS_COUNT;
 static int16_t waypointIndex = 0;
 
 #ifdef USE_DYNAMIC_WAYPOINTS
@@ -48,8 +48,8 @@ static struct waypointDef WaypointSet[MAX_WAYPOINTS];
 static struct waypointDef* currentWaypointSet = (struct waypointDef*)WaypointSet;
 static int16_t numPointsInCurrentSet = 0;
 #else
-static struct waypointDef* currentWaypointSet = (struct waypointDef*)waypoints;
-static int16_t numPointsInCurrentSet = NUMBER_POINTS;
+static const struct waypointDef* currentWaypointSet = (struct waypointDef*)stdWaypoints_default;
+static int16_t numPointsInCurrentSet = STD_WAYPOINTS_COUNT;
 #endif
 
 static struct relWaypointDef current_waypoint;
@@ -207,32 +207,44 @@ int16_t flightplan_waypoints_index_get(void)
 	return waypointIndex;
 }
 
-void init_waypoints(void)
+const struct waypointDef* rtlWaypoints = rtlWaypoints_default;
+const struct waypointDef* stdWaypoints = stdWaypoints_default;
+uint16_t rtlWaypoints_count = RTL_WAYPOINTS_COUNT;
+uint16_t stdWaypoints_count = STD_WAYPOINTS_COUNT;
+
+void flightplan_waypoints_init(void)
 {
-	load_flightplan(waypoints, NUMBER_POINTS);
+	DPRINT("flightplan_waypoints_init()\r\n");
+
+#ifdef USE_DYNAMIC_WAYPOINTS
+	load_flightplan(rtlWaypoints_default, RTL_WAYPOINTS_COUNT);
+	load_flightplan(stdWaypoints_default, STD_WAYPOINTS_COUNT);
+#else
+	rtlWaypoints = rtlWaypoints_default;
+	stdWaypoints = stdWaypoints_default;
+	rtlWaypoints_count = RTL_WAYPOINTS_COUNT;
+	stdWaypoints_count = STD_WAYPOINTS_COUNT;
+#endif // USE_DYNAMIC_WAYPOINTS
 }
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
-void flightplan_waypoints_init(int16_t flightplanNum)
+void flightplan_waypoints_begin(int16_t flightplanNum)
 {
-	DPRINT("flightplan_waypoints_init(%i)\r\n", flightplanNum);
+	DPRINT("flightplan_waypoints_begin(%i)\r\n", flightplanNum);
 
 	if (flightplanNum == 1)         // RTL waypoint set
 	{
-//		load_flightplan(rtlWaypoints, NUMBER_RTL_POINTS);
-
 //		currentWaypointSet = (struct waypointDef*)rtlWaypoints;
-//		numPointsInCurrentSet = NUMBER_RTL_POINTS;
+		currentWaypointSet = rtlWaypoints;
+		numPointsInCurrentSet = RTL_WAYPOINTS_COUNT;
 	}
-#ifndef USE_DYNAMIC_WAYPOINTS
 	else if (flightplanNum == 0)    // Main waypoint set
 	{
-		load_flightplan(waypoints, NUMBER_POINTS);
-//		currentWaypointSet = (struct waypointDef*)waypoints;
-//		numPointsInCurrentSet = NUMBER_POINTS;
+//		currentWaypointSet = (struct waypointDef*)stdWaypoints;
+		currentWaypointSet = stdWaypoints;
+		numPointsInCurrentSet = STD_WAYPOINTS_COUNT;
 	}
-#endif // USE_DYNAMIC_WAYPOINTS
 
 	if (numPointsInCurrentSet != 0)
 	{

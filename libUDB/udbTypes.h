@@ -37,14 +37,6 @@ union longbbbb   { int32_t WW;  struct ww _; struct bbbb __; };
 union longww     { int32_t WW;  struct ww _; };
 union longlongLL { int64_t LL;  struct LL _; struct wwww __; };
 
-//#define LOWORD(a) ((WORD)(a))
-//#define HIWORD(a) ((WORD)(((DWORD)(a) >> 16) & 0xFFFF))
-
-//#define LOWORD(a) (a)
-//#define HIWORD(a) ((a) >> 16)
-//#define HIWORD(a) (((a) >> 16) & 0xFFFF)
-
-
 // UDB Constants
 #define RMAX 16384 // 0b0100000000000000    // 1.0 in 2.14 fractional format
 

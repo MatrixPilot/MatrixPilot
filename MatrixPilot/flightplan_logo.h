@@ -23,7 +23,8 @@
 #define FLIGHTPLAN_LOGO_H
 
 
-void flightplan_logo_init(int16_t flightplanNum);
+void flightplan_logo_init(void);
+void flightplan_logo_begin(int16_t flightplanNum);
 void flightplan_logo_update(void);
 int16_t flightplan_logo_index_get(void);
 void flightplan_logo_live_begin(void);

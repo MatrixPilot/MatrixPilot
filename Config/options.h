@@ -680,8 +680,8 @@
 // Set this to either FP_WAYPOINTS or FP_LOGO
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
-//#define FLIGHT_PLAN_TYPE                    FP_WAYPOINTS
-#define FLIGHT_PLAN_TYPE                    FP_LOGO
+#define FLIGHT_PLAN_TYPE                    FP_WAYPOINTS
+//#define FLIGHT_PLAN_TYPE                    FP_LOGO
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -748,14 +748,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // The UDB4/5 has two UART's, while the AUAV3 has four UART's.
-// Three MatrixPilot features are currently defined for using a UART. 
+// Three MatrixPilot features are currently defined for using a UART.
 // These being the GPS, Telemetry and a 'debug' console.
 // Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
 //
 // CONSOLE_UART specfies which UART is used for stdio support, aka the console.
 // Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
 // Setting CONSOLE_UART to 0 disables console support.
-// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
+// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
@@ -794,7 +794,7 @@
 // On the AUAV3, the external UART connections are known as ports 1 through 4.
 // The definitions below specifies which feature maps to an external port.
 //
-// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
+// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the
 // external port assignment.
 // Assign the console to an internal UART with CONSOLE_UART, map this console to
 // external port connection with DBG_PORT.

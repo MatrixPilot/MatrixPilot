@@ -53,13 +53,13 @@ void estWind(vect3_16t* est_wind, struct relative3D gps_velocity)
 
 	if (dcm_flags._.skip_yaw_drift) return;
 
-	groundVelocity.x = gps_velocity.x >>= 1;
-	groundVelocity.y = gps_velocity.y >>= 1;
-	groundVelocity.z = gps_velocity.z >>= 1;
+	groundVelocity.x = gps_velocity.x >> 1;
+	groundVelocity.y = gps_velocity.y >> 1;
+	groundVelocity.z = gps_velocity.z >> 1;
 
-	fuselageDirection.x = -(rmat[1] >>= 1);
-	fuselageDirection.y =  (rmat[4] >>= 1);
-	fuselageDirection.z = -(rmat[7] >>= 1);
+	fuselageDirection.x = -(rmat[1] >> 1);
+	fuselageDirection.y =  (rmat[4] >> 1);
+	fuselageDirection.z = -(rmat[7] >> 1);
 
 //	for (index = 0; index < 3; index++)
 //	{

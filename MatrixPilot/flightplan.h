@@ -61,7 +61,8 @@
 boolean use_fixed_origin(void);
 vect3_32t get_fixed_origin(void);
 
-void flightplan_init(int16_t flightplanNum);
+void flightplan_init(void);
+void flightplan_begin(int16_t flightplanNum);
 void flightplan_update(void);
 int16_t flightplan_index_get(void);
 void flightplan_live_begin(void);

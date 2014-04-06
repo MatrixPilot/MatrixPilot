@@ -61,7 +61,7 @@
 // 
 // Define the main course as:
 // 
-// const struct waypointDef waypoints[] = {
+// const struct waypointDef stdWaypoints_default[] = {
 //                      waypoint1 ,
 //                      waypoint2 ,
 //                      etc.
@@ -69,7 +69,7 @@
 // 
 // and the Failsafe RTL course as:
 // 
-// const struct waypointDef rtlWaypoints[] = {
+// const struct waypointDef rtlWaypoints_default[] = {
 //                      waypoint1 ,
 //                      waypoint2 ,
 //                      etc.
@@ -143,13 +143,13 @@
 // By default the only waypoint is defined to be 75 meters above the starting point.
 
 /*
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
 };
  */
 
 /*
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 		{ { 1000,    0  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ { 1000, 1000  , 750 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ {    0, 1000  , 750 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
@@ -168,7 +168,7 @@ const struct waypointDef waypoints[] = {
 
 // Here is the T3 course definition:
 /*
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 		{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
@@ -184,27 +184,27 @@ const struct waypointDef waypoints[] = {
 };
  */
 /*
-//const struct waypointDef waypoints[] = {
+//const struct waypointDef stdWaypoints_default[] = {
 //		{ {    CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //};
-//const struct waypointDef waypoints[] = {
+//const struct waypointDef stdWaypoints_default[] = {
 //		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {    CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //};
 
-//const struct waypointDef waypoints[] = {
+//const struct waypointDef stdWaypoints_default[] = {
 //		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {    2000,        CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //};
 
-//const struct waypointDef waypoints[] = {
+//const struct waypointDef stdWaypoints_default[] = {
 //		{ {  - CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {    CORNER  ,    CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //		{ {  - CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
@@ -213,7 +213,7 @@ const struct waypointDef waypoints[] = {
  */
 
 // Innsbruck inverted/reversed T3 course
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 		{ {  113236490, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
 		{ {  113579820, 472496320, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
 		{ {  113579820, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
@@ -222,7 +222,7 @@ const struct waypointDef waypoints[] = {
 
 /*
 #if 0
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 		{ { 1749200000, -370100000, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH }, // Auckland, New Zealand
 		{ {-1495000000, -175000000, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH }, // Papeete, Tahiti
 
@@ -230,7 +230,7 @@ const struct waypointDef waypoints[] = {
 };
 
 #else
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 {{ -1084960970, -14971790, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
 {{ -1085621970, -15479560, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
 {{ -1086944070, -16495040, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
@@ -268,7 +268,7 @@ const struct waypointDef waypoints[] = {
  */
 /*
 // Great Circle path from Balboa, Panama to Papeete, Tahiti
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 {{ -796000000, 89200000, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH }, // Balboa, Panama
 {{ -835161020, 73919350, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
 {{ -874049130, 58299710, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
@@ -292,7 +292,7 @@ const struct waypointDef waypoints[] = {
  */
 /*
 // Great Circle path from Agena to Auckland, New Zealand
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 {{ -1110659870, -21779540, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
 {{ -1111319780, -22289050, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
 {{ -1112639740, -23307990, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
@@ -331,7 +331,7 @@ const struct waypointDef waypoints[] = {
  */
 /*
 // Great Circle path from Auckland, New Zealand to Agena
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 {{  1749200000, -370100000, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH }, // Auckland, New Zealand
 {{ -1799618430, -362986430, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
 {{ -1749498190, -353735220, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
@@ -355,7 +355,7 @@ const struct waypointDef waypoints[] = {
  */
 /*
 // Great Circle path from Rockhampton, to waypoint near north cape, New Zealand (Agena)
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 {{ 1505000000, -235000000, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH }, // Rockhampton, Australia
 {{ 1543362510, -257816480, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
 {{ 1583194260, -279588400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH },
@@ -382,7 +382,7 @@ const struct waypointDef waypoints[] = {
 // WARNING: If you set this not to include the F_LAND flag, then be very careful during ground testing
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
-const struct waypointDef rtlWaypoints[] = {
+const struct waypointDef rtlWaypoints_default[] = {
 		{ { 0, 0,  50 } , F_LOITER + F_LAND, CAM_VIEW_LAUNCH } ,
 };
 
@@ -410,7 +410,7 @@ const struct waypointDef rtlWaypoints[] = {
 // Note that this is not likely to be an especially smooth landing...
 
 /*
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 		{ { 100,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ { 100, 100  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
 		{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
@@ -438,7 +438,7 @@ const struct waypointDef waypoints[] = {
 
 // Here is the T3 course definition:
 
-const struct waypointDef waypoints[] = {
+const struct waypointDef stdWaypoints_default[] = {
 		{ {    CORNER  ,    CORNER  , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 		{ {    CORNER  ,  - CORNER  , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 		{ {  - CORNER  ,    CORNER  , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
