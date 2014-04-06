@@ -22,7 +22,6 @@ extern "C" {
     extern int pwManual[];
     extern int poscmd_north, poscmd_east;
     extern int roll_error, pitch_error, yaw_error, yaw_rate_error;
-    extern int angle_error[3];
     extern int rotz, roty, rotx;
     extern int rate_error[3], rate_error_dot[2];
     extern int rate_des_damping[3], rate_desired[3];
