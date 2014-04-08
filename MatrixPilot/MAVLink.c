@@ -1578,7 +1578,7 @@ void mavlink_output_40hz( void )
 				mavlink_base_mode = MAV_MODE_TEST_ARMED ; // Unknown state
 				mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL ;
 		}
-		mavlink_msg_heartbeat_send(MAVLINK_COMM_0,MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE ) ;
+		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_QUADROTOR, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE ) ;
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
 
@@ -1629,7 +1629,7 @@ void mavlink_output_40hz( void )
 	//  Roll: Earth Frame of Reference
 	spread_transmission_load = 12 ;
 
-	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_POSITION] , mavlink_counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send( MAVLINK_RATE_ATTITUDE , mavlink_counter_40hz + spread_transmission_load))
 	{ 
 		matrix_accum.x = rmat[8] ;
 		matrix_accum.y = rmat[6] ;
@@ -1717,7 +1717,7 @@ void mavlink_output_40hz( void )
 	//    uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw,
 	//    uint16_t chan8_raw, uint8_t rssi)
 	spread_transmission_load = 24 ;
-	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load)) 
+	if (mavlink_frequency_send( streamRates[MAV_DATA_STREAM_RC_CHANNELS], mavlink_counter_40hz + spread_transmission_load))
 	{			
 	 mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0, msec,
 				(uint16_t)((udb_pwIn[0])>>1),
