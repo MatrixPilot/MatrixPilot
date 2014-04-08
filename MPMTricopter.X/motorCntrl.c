@@ -295,7 +295,7 @@ void motorOut(int throttle, struct int_RPY *command) {
         long_accum.WW = __builtin_mulss(32768, command->yaw);
         long_accum.WW <<= 1; // drop extra sign bit
 
-        udb_pwOut[SERVO_TAIL_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL] + long_accum._.W1;
+        udb_pwOut[SERVO_TAIL_CHANNEL] = udb_servo_pulsesat(udb_pwTrim[RUDDER_INPUT_CHANNEL] + long_accum._.W1);
     #endif
 }
 
@@ -325,8 +325,7 @@ void x_rotate(struct int_RPY* command) {
 // yaw is always a rate command
 
 void updateYaw(struct int_RPY* command) {
-    int yawRate = (pwManual[RUDDER_INPUT_CHANNEL]
-            - udb_pwTrim[RUDDER_INPUT_CHANNEL]);
+    int yawRate = (pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) << 1;
     // apply deadband and slew rate limiter
     deadBand(&yawRate, YAW_DEADBAND);
     magClamp(&yawRate, MAX_SLEW_RATE);
@@ -536,7 +535,7 @@ void motorCntrl(void) {
         // command motors to spin at rates proportional to command
         get_angleMode_commands(&cmd_RPY, 1);
         cmd_RPY.yaw = YAW_SIGN * (pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]);
-        magClampRPY(&cmd_RPY, 500);
+        magClampRPY(&cmd_RPY, 300);
         motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL], &cmd_RPY);
 
         // init desired heading to current IMU heading

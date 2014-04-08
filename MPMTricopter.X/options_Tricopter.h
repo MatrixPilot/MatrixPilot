@@ -212,16 +212,16 @@
 #define AILERON_INPUT_CHANNEL				CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL				CHANNEL_2
 #define RUDDER_INPUT_CHANNEL				CHANNEL_4
-#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_6
+#define MODE_SWITCH_INPUT_CHANNEL			CHANNEL_5
 
-#define ROLL_INPUT_CHANNEL	CHANNEL_1
-#define PITCH_INPUT_CHANNEL	CHANNEL_2
-#define YAW_INPUT_CHANNEL	CHANNEL_4
+#define ROLL_INPUT_CHANNEL                              CHANNEL_1
+#define PITCH_INPUT_CHANNEL                             CHANNEL_2
+#define YAW_INPUT_CHANNEL                               CHANNEL_4
 
 #define CAMERA_PITCH_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL			CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL			CHANNEL_UNUSED
-#define OSD_MODE_SWITCH_INPUT_CHANNEL		CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL                   CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL			CHANNEL_UNUSED
@@ -234,10 +234,10 @@
 //OPTIONS: check HARD_TRIMS options.h setting
 //#error("HARD_TRIMS option not set")
 // make this non-zero if you want the UDB to respect your TX trim settings
-#define HARD_TRIMS      0
+#define HARD_TRIMS      1
 // set these to the zero-trim values for your RX/TX if you use HARD_TRIMS
-#define NEUTRAL_TRIM    3040
-#define THROTTLE_IDLE   2250
+#define NEUTRAL_TRIM    3000
+#define THROTTLE_IDLE   2000
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -246,11 +246,11 @@
 // 
 //OPTIONS: check output channel mappings in options.h
 //#error("output channel mappings not set")
-#define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_2		// + front or X left front, CCW
-#define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_3		// + right or X right front, CW
-#define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
-#define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_4		// + left or X left rear,   CW
-#define SERVO_TAIL_CHANNEL	CHANNEL_4		// + left or X left rear,   CW
+#define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_2		// front right, CCW
+#define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_3		// tail motor, CW
+#define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// front left, CW
+#define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_4		// unused
+#define SERVO_TAIL_CHANNEL	CHANNEL_4		// tail servo
 
 
 // Channel numbers for each output
@@ -264,14 +264,14 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 //
-#define THROTTLE_OUTPUT_CHANNEL				CHANNEL_1
-#define AILERON_OUTPUT_CHANNEL				CHANNEL_2
-#define ELEVATOR_OUTPUT_CHANNEL				CHANNEL_3
-#define RUDDER_OUTPUT_CHANNEL				CHANNEL_4
+#define THROTTLE_OUTPUT_CHANNEL			CHANNEL_1
+#define AILERON_OUTPUT_CHANNEL			CHANNEL_2
+#define ELEVATOR_OUTPUT_CHANNEL			CHANNEL_3
+#define RUDDER_OUTPUT_CHANNEL			CHANNEL_4
 #define AILERON_SECONDARY_OUTPUT_CHANNEL	CHANNEL_UNUSED
-#define CAMERA_PITCH_OUTPUT_CHANNEL			CHANNEL_UNUSED
-#define CAMERA_YAW_OUTPUT_CHANNEL			CHANNEL_UNUSED
-#define TRIGGER_OUTPUT_CHANNEL				CHANNEL_UNUSED
+#define CAMERA_PITCH_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define CAMERA_YAW_OUTPUT_CHANNEL		CHANNEL_UNUSED
+#define TRIGGER_OUTPUT_CHANNEL			CHANNEL_UNUSED
 #define PASSTHROUGH_A_OUTPUT_CHANNEL		CHANNEL_UNUSED
 #define PASSTHROUGH_B_OUTPUT_CHANNEL		CHANNEL_UNUSED
 #define PASSTHROUGH_C_OUTPUT_CHANNEL		CHANNEL_UNUSED
@@ -283,14 +283,14 @@
 
 // PWM rate for ESCs
 #define ESC_HZ 400
-// If set to 1, pwm rate is reduced, useful when output x is a servo while putput y is a fast esc (tricopter case)
+// If set to 1, pwm rate is reduced, useful when output x is a servo while output y is a fast esc (tricopter case)
 #define CHANNEL_1_REDUCED_RATE 0
 #define CHANNEL_2_REDUCED_RATE 0
 #define CHANNEL_3_REDUCED_RATE 0
 #define CHANNEL_4_REDUCED_RATE 1
 #define CHANNEL_5_REDUCED_RATE 0
 #define CHANNEL_6_REDUCED_RATE 0
-// Define how many pwm pulses we have to skip
+// Define how many pwm pulses are skipped when REDUCED_RATE =1
 #define REDUCED_RATE_SKIPS 7
 // amount of throttle before fly-by-wire controls engage
 #define THROTTLE_DEADBAND 100
@@ -409,7 +409,7 @@
 #endif
 
 // use RX channel 5 (gear) for failsafe mux on/off
-#define FAILSAFE_MUX_CHANNEL    5
+#define FAILSAFE_MUX_CHANNEL    6
 #define FAILSAFE_MUX_THRESH     3000
 
 // use RX channel 6 (flight mode) to select gain for modification
@@ -422,8 +422,8 @@
 #define POS_MODE        2
 #define RATE_MODE       3
 #define FLIGHT_MODE_0   TILT_MODE
-#define FLIGHT_MODE_1   RATE_MODE
-#define FLIGHT_MODE_2   TILT_MODE
+#define FLIGHT_MODE_1   TILT_MODE
+#define FLIGHT_MODE_2   RATE_MODE
 
 #define POS_HOLD_KP 10
 #define POS_HOLD_KD 50
@@ -468,7 +468,7 @@
 // PID2 with gplane is type 5: parser parseLogpid2.py, analyzer procLogpid2.m
 #define TELEMETRY_TYPE  10
 #define TELEMETRY_HZ    10
-#define TELEMETRY_BAUD  115200
+#define TELEMETRY_BAUD  57600
 
 // if non-zero, start telemetry immediately instead of after calibration
 #define TEL_ALWAYS_ON   1
@@ -527,7 +527,7 @@
 #define TILT_KI 0.0
 #define RATE_KI 0.0
 
-#define ROLL_KP 0.6
+#define ROLL_KP 0.3
 #define ROLL_KD 0.0
 #define RRATE_KP 1.0
 #define RRATE_KD 0.0
@@ -541,7 +541,7 @@
 // Yaw PID control gains
 #define YAW_KP 1.0
 #define YAW_KI 0.1
-#define YAW_KD 0.6
+#define YAW_KD 1.0
 //
 // Vertical damping
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
@@ -557,12 +557,14 @@
 
 // currently unused
 //#define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-//#define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
+#define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
 
 // Specify maximum tilt angle setpoint as 45 degrees
 // PWM command input range is +/-1000 counts
 // tilt angle is angle / pi as Q15 fractional
 #define CMD_TILT_GAIN (unsigned int) (16384 / 1250)
+                                                                //= ANGLE_DEG* D2R       R2Q15    tx pulses
+//#define CMD_TILT_GAIN (unsigned int) (MAX_TILT * 0.182044F)  //= MAX_TILT * PI/180 /PI*32768 / 1000
 
 
 ////////////////////////////////////////////////////////////////////////////////
