@@ -93,9 +93,9 @@
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to read magnetometer for yaw drift correction.
-#define MAG_YAW_DRIFT 	0
+#define MAG_YAW_DRIFT 	1
 // disable MAG drift correction if this is not 1
-#define ENABLE_MAG_DRIFT_CORRECTION 0
+#define ENABLE_MAG_DRIFT_CORRECTION 1
 
 // if defined, enable magnetometer offset and alignment adjustments
 // 17 May: mag offsets grow when sitting still on bench, stopped test at 277,251,458
@@ -422,8 +422,8 @@
 #define POS_MODE        2
 #define RATE_MODE       3
 #define FLIGHT_MODE_0   TILT_MODE
-#define FLIGHT_MODE_1   TILT_MODE
-#define FLIGHT_MODE_2   RATE_MODE
+#define FLIGHT_MODE_1   COMPASS_MODE
+#define FLIGHT_MODE_2   POS_MODE
 
 #define POS_HOLD_KP 10
 #define POS_HOLD_KD 50
@@ -524,23 +524,23 @@
 #define PID_GAINS_N             14
 //
 // Tilt PID(DD) control gains: valid range [0,3.99]
-#define TILT_KI 0.0
-#define RATE_KI 0.0
+#define TILT_KI 0.0     // Not used with new algorithm
+#define RATE_KI 0.0     // Not used with new algorithm
 
-#define ROLL_KP 0.3
-#define ROLL_KD 0.0
-#define RRATE_KP 1.0
-#define RRATE_KD 0.0
+#define ROLL_KP 0.8
+#define ROLL_KD 1.1
+#define RRATE_KP 0.8     // Not used with new algorithm
+#define RRATE_KD 0.0     // Not used with new algorithm
 
-#define PITCH_KP 0.6
-#define PITCH_KD 0.0
-#define PRATE_KP 1.0
-#define PRATE_KD 0.0
-#define ACRO_KP 2.6
+#define PITCH_KP 0.8
+#define PITCH_KD 1.1
+#define PRATE_KP 1.0     // Not used with new algorithm
+#define PRATE_KD 0.0     // Not used with new algorithm
+#define ACRO_KP 2.6     // Not used with new algorithm
 //
 // Yaw PID control gains
-#define YAW_KP 1.0
-#define YAW_KI 0.1
+#define YAW_KP 0.6
+#define YAW_KI 0.1     // Not used with new algorithm
 #define YAW_KD 1.0
 //
 // Vertical damping

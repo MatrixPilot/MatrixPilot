@@ -24,8 +24,10 @@
 
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define RP_DEADBAND     4       // prevent Tx pulse variation from causing yaw drift
-#define YAW_DEADBAND    10
+#define YAW_DEADBAND    70
 #define MAX_SLEW_RATE   1092    // 1092 * 50Hz * pi/32K * 180/pi = 300 deg/sec
+
+#define USE_NEW_ALGORITHM 1
 
 extern int theta[3];
 extern boolean didCalibrate;
@@ -589,18 +591,24 @@ void motorCntrl(void) {
         matrix_accum.y = prmat[1];
         earth_yaw = rect_to_polar16(&matrix_accum); // binary angle (0 - 65536 = 360 degrees)
 
+        int roll, pitch;
         if (flight_mode == POS_MODE) {
             // add manual and position control inputs
             get_angleMode_commands(&cmd_RPY, CMD_TILT_GAIN);
-            cmd_RPY.roll += poscmd_east;
-            cmd_RPY.pitch += poscmd_north;
+            roll = cmd_RPY.roll;
+            pitch = cmd_RPY.pitch;
+            cmd_RPY.roll = poscmd_east;
+            cmd_RPY.pitch = poscmd_north;
             // rotate forward stick North (angle -heading)
             rotateRP(&cmd_RPY, (-earth_yaw) >> 8);
+            cmd_RPY.roll += roll;
+            cmd_RPY.pitch += pitch;
         } else if (flight_mode == COMPASS_MODE) {
             // manual mode: forward cyclic is North
             get_angleMode_commands(&cmd_RPY, CMD_TILT_GAIN);
             // rotate forward stick North (angle -heading)
             rotateRP(&cmd_RPY, (-earth_yaw) >> 8);
+//            cmd_RPY.yaw = 0;    // Point straight north
         } else if (flight_mode == RATE_MODE) {
             // manual (rate) flight mode
             get_rateMode_commands(&cmd_RPY);
@@ -650,6 +658,24 @@ void motorCntrl(void) {
         //        }
 
         // in all flight modes, control orientation
+#if USE_NEW_ALGORITHM
+
+        long_accum.WW = __builtin_mulus(pid_gains[ROLL_KP_INDEX], roll_error) >> 2;
+        roll_control = long_accum._.W1;
+        long_accum.WW = __builtin_mulus((unsigned int) (RMAX * ROLL_KD), -pomega[1]) >> 1;
+        roll_control += long_accum._.W1;
+
+        long_accum.WW = __builtin_mulus(pid_gains[PITCH_KP_INDEX], pitch_error) >> 2;
+        pitch_control = long_accum._.W1;
+        long_accum.WW = __builtin_mulus((unsigned int) (RMAX * PITCH_KD), -pomega[0]) >> 1;
+        pitch_control += long_accum._.W1;
+
+        long_accum.WW = __builtin_mulus(pid_gains[YAW_KP_INDEX], yaw_error);
+        yaw_control = YAW_SIGN * long_accum._.W1;
+        long_accum.WW = __builtin_mulus(pid_gains[YAW_KD_INDEX], -pomega[2]);
+        yaw_control += YAW_SIGN * long_accum._.W1;
+
+#else
         {
             // Compute the tilt error integrals
             roll_error_integral.WW += ((__builtin_mulus(pid_gains[TILT_KI_INDEX], roll_error)) >> 8);
@@ -722,7 +748,7 @@ void motorCntrl(void) {
 
         long_accum.WW = __builtin_mulus(pid_gains[YAW_KD_INDEX], rate_error[2]);
         yaw_control = YAW_SIGN * long_accum._.W1;
-
+#endif
         // compensate for gyroscopic reaction torque proportional to omegagyro[2]
         // Suppose the relative magnitude of gyro. reaction is omega_z in rad/sec:
         // if this is the ratio of gyroscopic torque to applied torque, then the
