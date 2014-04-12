@@ -55,6 +55,7 @@ struct flag_bits {
     uint8_t barometer_calalt_updtrun : 1;
     uint8_t barometer_calalt_initrun : 1;
     uint8_t barometer_alt_ready : 1;
+    uint8_t barometer_fogalt_ready : 1;
     uint8_t gps_locked : 1;
     uint8_t fltrs_init : 1;
     uint8_t i_init : 1;
@@ -170,7 +171,8 @@ extern inline int32_t get_barometer_pres_rtf(void); //  Runtime barometer.c pres
 extern inline int32_t get_barometer_aslalt_est(void); //  Runtime ASL altitude estimate
 extern inline int16_t get_barometer_temp_ogn(void); //  temperature  at origin
 extern inline int32_t get_barometer_pres_ogn(void); // pressure at origin
-extern inline int32_t get_barometer_aslalt_ogn(void); //   ASL altitude  at origin
+extern inline int32_t get_barometer_aslalt_ogn(void); // ASL altitude  at origin
+extern inline int32_t get_barometer_fogalt_est(void); // ASL (above ground level) or FOG (from origin) altitude
 #endif
 
 // Failsafe Type

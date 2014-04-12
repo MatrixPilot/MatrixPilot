@@ -23,6 +23,7 @@ void initFlags(void);
 
 int32_t calcSHABarASLAlt(int32_t pres_rt, int32_t pres_ogn, int16_t temp_rt, int16_t temp_ogn);
 int32_t estBarAltOffset(int32_t estaslalt );
+int32_t calcFOGAlt(int32_t alt_rt, int32_t alt_ogn);
 
 #endif // BAROMETERCNTRL_H
 

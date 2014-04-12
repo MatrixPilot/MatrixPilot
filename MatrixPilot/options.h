@@ -1,11 +1,13 @@
 
-#define APSVERSION "3156.2.5.111.rc15mx4a"
+#define APSVERSION "3156.2.5.111.rc15mx4b"
 
 /*  Release candidate 3150qsb-aps2.4-t111.13, supports UDB4, UDB5 (wip) and AUAV3 (wip)
+ *
+ * 
 
     Setup: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer, 406 Std. GPS, Breeze 2000 V-tail / SkyW standard
 
-    Last modified date  April 4, 2014
+    Last modified date  April 12, 2014
 
     MODIFICATIONS :
     ~~~
@@ -25,6 +27,14 @@
                 -  logs:  Interior ground testing: Dev15 ~ 243  Rc15 ~ 262, consistently stable and accurate barometric data/ASL alt
                           Exterior ground testing: 263 ~ wip  excellent results so far
                           Flight testing: none yet.. waiting for weather to clear.
+      Iteration: 3156.2.5.111.rc15mx4b
+         Added new inline function providing FOG (from origin) or AGL (above ground level) altitude
+                -  Code changes:
+                        o - barometerCntrl.h~c,  defines.h, flightplan-logo.c~h, telemetry.c, options.h
+                -  Ground Testing Results: compiles clean on all boards, barometer altitude estimates consistently accurate
+                -  Logs: ~1273, ~1274
+ * 
+ *
  */
 
 // ACKNOWLEDGEMENTS AND SPECIAL THANKS :
@@ -50,6 +60,19 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+// Vehicle and Pilot Identification
+// This will be embedded in your telemetry, and used to make more interesting flights in Google Earth.
+// ID_VEHICLE_MODEL_NAME provides indication of what model of plane, quad, car etc you are using
+// ID_VEHICLE_REGISTRATION should be short (less than 12 continuous characters with no space
+// it will be used in Google Earth as the folder name containing your flights.
+// ID_LEAD_PILOT is your lead pilot flight name or alias e.g. "UAV Flight Director"
+// ID_DIY_DRONES_URL should be the URL of your member page on DIY Drones.
+// That will allow Google Earth viewers of your flights to click straight through to your latest discussions.
+
+#define ID_VEHICLE_MODEL_NAME "Brz2-t111.15"  //e.g. "SkyW-t111.15" ~ "Brz2-t111.15"
+#define ID_VEHICLE_REGISTRATION "MP3156-A34"
+#define ID_LEAD_PILOT "DB-EZFLIER"
+#define ID_URL ""
 
 
 ///////////////////////////////////  I.  BASIC CONFIGURATION   ////////////////////////////////////
@@ -67,7 +90,7 @@
 //    AIRFRAME_VTAIL            Ailerons(optional), and Elevator and Rudder as V-tail controls
 //    AIRFRAME_DELTA            Aileron and Elevator as Elevons, and Rudder(optional)
 //
-#define AIRFRAME_TYPE                      AIRFRAME_STANDARD 
+#define AIRFRAME_TYPE                      AIRFRAME_STANDARD
 
 
 // Define the board:   UDB5_BOARD,  UDB4_BOARD or AUAV3 -- NOW DEPRECATED
@@ -400,7 +423,7 @@
 //   eg. PN: Home front yard 13200, OMFC, SF 16950
 #define ASL_GROUND_ALT					13200	// above sea level (ASL) altitude in centimeters
 
-// USE_PA_PRESSURE 
+// USE_PA_PRESSURE, applies only when BARAE_SCALE is set to 0 (deprecated on this scrubbed release)
 // 1 uses  hPA PA_PRESSURE, 2 uses MC_PRESSURE mercury inch per METAR/station computation and
 // 3 fuses both values
 //
@@ -430,7 +453,7 @@
 //  1	 2		  7.5		5		  0.05		0.4  [standard]
 //  2	 4		 13.5		7		  0.04		0.3  [high resolution]
 //  3	 8		 25.5		12		  0.03		0.25 [ultra high resolution]
-// 3's recommended, works best for reliable readings, however needs high CPU processing capacity
+// 3's recommended, works best for reliable readings, however needs high CPU (floating) processing capacity
 //  1 (tg with BPXD 0~2, noisy) ~ 3 (tvg with BPXD 0~2) best rec. for UDB4-5, AUAV3
 //
 #define BOS						3
@@ -942,7 +965,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-/////////////////   IV.1  HARDWARE IN THE LOOP, FLIGHT SIMULATION AND IDENTITY   //////////////////
+///////////////////////   IV.1  HARDWARE IN THE LOOP, FLIGHT SIMULATION   /////////////////////////
 //
 // Hardware In the Loop Simulation
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
@@ -958,22 +981,6 @@
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID                       138
 
-// Vehicle and Pilot Identification
-
-// Once you are flying your plane and swapping flights and telemetry with other's across
-// the world, you may like to fill in some of the fields below. This will be embedded in your
-// telemetry, and used to make more interesting flights in Google Earth.
-// ID_VEHICLE_MODEL_NAME provides indication of what model of plane, quad, car etc you are using
-// ID_VEHICLE_REGISTRATION should be short (less than 12 continuous characters with no space
-// it will be used in Google Earth as the folder name containing your flights.
-// ID_LEAD_PILOT is your lead pilot flight name or alias e.g. "UAV Flight Director"
-// ID_DIY_DRONES_URL should be the URL of your member page on DIY Drones.
-// That will allow Google Earth viewers of your flights to click straight through to your latest discussions.
-
-#define ID_VEHICLE_MODEL_NAME "SkyW-t111.15"  //"SkyW-t111.15"  ..  "Brz2-t111.15"
-#define ID_VEHICLE_REGISTRATION "MP3156-APS2.4"
-#define ID_LEAD_PILOT "DB-EZFLIER"
-#define ID_URL ""
 
 /////////////////////////    IV.2  DATA COM AND OTHER ADVANCE OPTIONS    //////////////////////////
 //

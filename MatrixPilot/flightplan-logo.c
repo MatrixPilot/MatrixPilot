@@ -62,12 +62,12 @@ enum {
         PRES_BAR_RT,
 	TEMP_BAR_RT,
 	ALT_BAR_ASL,
-        ALT_BAR_ORG, 		//  barometer altitude at origin
-	ALT_BAR_FOGN,		//  barometer altitude from origin
+        ALT_BAR_OGN, 		//  barometer ASL altitude at origin
+	ALT_BAR_FOG,		//  barometer altitude from origin or ground (AGL altitude)
 	PRES_BAR_OGN,
 	TEMP_BAR_OGN,
-	//TAKEOFF_ANGLE,  	// room for capturing the take off angle for auto land use 
-	//TAKEOFF_POS,  	// room for capturing the take off position for auto land use 
+	//TAKEOFF_ANGLE,  	// room for capturing the take off angle for auto land use
+	//TAKEOFF_POS,  	// room for capturing the take off position for auto land use
 	/////////////////
 	CURRENT_ANGLE,
 	ANGLE_TO_HOME,
@@ -114,11 +114,11 @@ enum {
 #define _SET_ABS_X_LOW(x)       {5,   0,   0,   9,   x}, // then Y, as 4 consecutive instructions.
 #define _SET_ABS_Y_LOW(y, fl)   {5,   fl,  0,   10,  y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
 
-/* SONAR SUPPORT  */ 
+/* SONAR SUPPORT  */
 #define _MV_ZS(z, fl, pr)		{5,	fl,	pr,	11,	z},  //  move to SNR based altitude
 #define _SET_ZS(z, fl, pr)		{5,	fl,	pr,	12,	z},  //  set to SNR based altitude
 
-/* BAROMETER SUPPORT  */ 
+/* BAROMETER SUPPORT  */
 #define _MV_ZB(z, fl, pr)		{5,	fl,	pr,	13,	z},  //  move to BAR based altitude
 #define _SET_ZB(z, fl, pr)		{5,	fl,	pr,	14,	z},  //  set to BAR based altitude
 
@@ -364,7 +364,7 @@ void init_flightplan (int16_t flightplanNum)
 	turtleLocations[CAMERA].y._.W1 = IMUlocationy._.W1;
 	turtleLocations[CAMERA].z = IMUlocationz._.W1;
 
-	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
+	// Calculate heading from Direction Cosine Matrix (rather than GPS),
 	// So that this code works when the plane is static. e.g. at takeoff
 	struct relative2D curHeading;
 	curHeading.x = -rmat[1];
@@ -423,7 +423,7 @@ void update_goal_from(struct relative3D old_goal)
 	lastGoal.x = new_goal.x = (turtleLocations[PLANE].x._.W1);
 	lastGoal.y = new_goal.y = (turtleLocations[PLANE].y._.W1);
 	lastGoal.z = new_goal.z = turtleLocations[PLANE].z;
-	
+
 	if (old_goal.x == new_goal.x && old_goal.y == new_goal.y)
 	{
 		old_goal.x = IMUlocationx._.W1;
@@ -551,7 +551,7 @@ int16_t get_current_stack_parameter_frame_index(void)
 
 int16_t get_current_angle(void)
 {
-	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
+	// Calculate heading from Direction Cosine Matrix (rather than GPS),
 	// So that this code works when the plane is static. e.g. at takeoff
 	struct relative2D curHeading;
 	curHeading.x = -rmat[1];
@@ -634,8 +634,8 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			}
 			#endif
 
-		case ALT_BAR_ASL: // centimeters, above sea level altitude 
-			
+		case ALT_BAR_ASL: // centimeters, above sea level altitude
+
 			#if ( USE_BAROMETER == 1 )
 			{
 				if (flags._.barometer_calalt_ready)  // TODO: trap after takeoff altitude
@@ -653,11 +653,11 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			}
 			#endif
 
-            case ALT_BAR_ORG: // centimeters, origin ASL altitude
+		case ALT_BAR_OGN: // centimeters, origin ASL altitude
 
 			#if ( USE_BAROMETER == 1 )
 			{
-				return get_barometer_aslalt_ogn(); // in centimeters
+				return (int32_t)get_barometer_aslalt_ogn(); // in centimeters
 			}
 			#else   //absence of barometer sensor device
 			{
@@ -665,13 +665,13 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			}
 			#endif
 
-       		case ALT_BAR_FOGN: // centimeters, from origin altitude
-			
+       		case ALT_BAR_FOG: // centimeters, from origin altitude
+
 			#if ( USE_BAROMETER == 1 )
 			{
 				if (flags._.barometer_calalt_ready)  // TODO: trap after takeoff altitude
 				{
-					return ((int32_t) get_barometer_aslalt_est() - (int32_t) get_barometer_aslalt_ogn()); // in centimeters
+					return (int32_t) get_barometer_fogalt_est(); // in centimeters
 				}
 				else
 				{
@@ -685,7 +685,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			#endif
 
 		case PRES_BAR_OGN: // in hPA, pressure origin
-			
+
 			#if ( USE_BAROMETER == 1 )
 			{
 				return (int32_t) get_barometer_pres_ogn(); // in centimeters
@@ -829,7 +829,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 						interruptStackBase = 0;
 					}
 					break;
-				
+
 				case 3: // Else
 					if (logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF)
 					{
@@ -837,7 +837,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 						logoStackIndex--;
 					}
 					break;
-				
+
 				case 2: // To (define a function)
 				{
 					// Shouldn't ever run these lines.
@@ -876,7 +876,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 					int16_t cangle = turtleAngles[currentTurtle];   // 0-359 (clockwise, 0=North)
 					int8_t b_angle = (cangle * 182 + 128) >> 8;     // 0-255 (clockwise, 0=North)
 					b_angle = -b_angle - 64;                        // 0-255 (ccw, 0=East)
-					
+
 					turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), instr.arg) << 2);
 					turtleLocations[currentTurtle].y.WW += (__builtin_mulss(-sine(b_angle), instr.arg) << 2);
 				}
@@ -959,7 +959,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 					union longww absoluteYLong;
 					absoluteYLong._.W1 = absoluteHighWord;
 					absoluteYLong._.W0 = instr.arg;
-					
+
 					struct waypoint3D wp;
 					wp.x = absoluteXLong.WW;
 					wp.y = absoluteYLong.WW;
@@ -974,8 +974,8 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				/************************************************
 				SONAR SUPPORT  11 n 12 sub routines _MV_ZS _SET_ZS
 				*************************************************/
-				case 11: // Move ZS 
-				{ 
+				case 11: // Move ZS
+				{
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.sonar_altitude_on = 1;
 					int16_t sonar_m_alt = instr.arg ;
@@ -983,36 +983,36 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 
 					break ;
 				}
-				case 12: // Set ZS location  
-				{ 
+				case 12: // Set ZS location
+				{
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.sonar_altitude_on = 1;
-					int16_t sonar_m_alt = instr.arg;  
+					int16_t sonar_m_alt = instr.arg;
 					turtleLocations[currentTurtle].z = (sonar_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
 				}
 				/************************************************
 				BAROMETER SUPPORT  13 n 14 sub routines _MV_ZB _SET_ZB
 				*************************************************/
-				case 13: // Move ZB 
-				{ 
+				case 13: // Move ZB
+				{
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.barometer_altitude_on = 1;  // TODO TBR: temporary while barometer altitude is under flight testing
 					int16_t barometer_m_alt = instr.arg ;
 					turtleLocations[currentTurtle].z += (barometer_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
 				}
-				case 14: // Set ZB location  
-				{ 
+				case 14: // Set ZB location
+				{
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.barometer_altitude_on = 1;   // TODO TBR: temporary while barometer altitude is under flight testing
-					int16_t barometer_m_alt = instr.arg;  
+					int16_t barometer_m_alt = instr.arg;
 					turtleLocations[currentTurtle].z = (barometer_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
 				}
 			}
 			break ;
-		
+
 		case 6: // Flags
 			switch (instr.subcmd)
 			{
@@ -1102,7 +1102,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				case 1: // Set
 					interruptIndex = find_start_of_subroutine(instr.arg);
 					break;
-					
+
 				case 0: // Clear
 					interruptIndex = 0;
 					break;
@@ -1125,7 +1125,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 		{
 			int16_t val = logo_value_for_identifier(instr.subcmd);
 			boolean condTrue = false;
-			
+
 			if (instr.cmd == 14 && val == instr.arg) condTrue = true;       // IF_EQ
 			else if (instr.cmd == 15 && val != instr.arg) condTrue = true;  // IF_NE
 			else if (instr.cmd == 16 && val > instr.arg) condTrue = true;   // IF_GT
@@ -1165,14 +1165,14 @@ void process_instructions(void)
 	while (1)
 	{
 		boolean do_fly = process_one_instruction(currentInstructionSet[instructionIndex]);
-		
+
 		instructionsProcessed++;
 		instructionIndex++;
 		if (instructionIndex >= numInstructionsInCurrentSet) instructionIndex = 0;
-		
+
 		if (do_fly && penState == 0 && currentTurtle == PLANE)
 			break;
-		
+
 		if (instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
 			return;  // don't update goal if we didn't hit a FLY command
 	}

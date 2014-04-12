@@ -609,9 +609,10 @@ void serial_output_8hz(void) {
                 serial_output("sr%i,sa%i:", (int16_t) get_sonar_rawaglaltitude(), (int16_t) get_sonar_aglaltitude());
 #endif
 #if (USE_BAROMETER)
-                serial_output("rt%i,rp%i,aa%i,to%i,po%i,ao%i:",
+                serial_output("rt%i,rp%i,aa%i,to%i,po%i,ao%i:,af%i:",
                         (int16_t) get_barometer_temp_rtf(), (int16_t) get_barometer_pres_rtf(), (int16_t) get_barometer_aslalt_est(),
-                        (int16_t) get_barometer_temp_ogn(), (int16_t) get_barometer_pres_ogn(), (int16_t) get_barometer_aslalt_ogn());
+                        (int16_t) get_barometer_temp_ogn(), (int16_t) get_barometer_pres_ogn(), (int16_t) get_barometer_aslalt_ogn(),
+                        (int16_t) get_barometer_fogalt_est());
 #endif  //USE_BAROMETER == 1
 
 #if (RECORD_FREE_STACK_SPACE == 1)
@@ -754,10 +755,10 @@ void serial_output_8hz(void) {
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_BAROMETER)
 
 void serial_output_8hz(void) {
-
-    serial_output("rt%i,rp%i,aa%i,to%i,po%i,ao%i:\r\n",
+    serial_output("rt%i,rp%i,aa%i,to%i,po%i,ao%i:,af%i:\r\n",
             (int16_t) get_barometer_temp_rtf(), (int16_t) get_barometer_pres_rtf(), (int16_t) get_barometer_aslalt_est(),
-            (int16_t) get_barometer_temp_ogn(), (int16_t) get_barometer_pres_ogn(), (int16_t) get_barometer_aslalt_ogn());
+            (int16_t) get_barometer_temp_ogn(), (int16_t) get_barometer_pres_ogn(), (int16_t) get_barometer_aslalt_ogn(),
+            (int16_t) get_barometer_fogalt_est());
     return;
 }
 

@@ -154,6 +154,7 @@ void udb_heartbeat_40hz_callback(void) {
     }
     flags._.update_autopilot_state_asap = 0;
 
+#if (USE_BAROMETER == 1 && HILSIM != 1)
     //  Barometer origin data calibration
     static int16_t barCalDelay = 0;
     if (!flags._.barometer_calibrated && flags._.fltrs_init){ 
@@ -175,6 +176,7 @@ void udb_heartbeat_40hz_callback(void) {
             barAlEstDelay--;
         }
     }
+#endif
 
     //  WIP:  Barometer calibration and ASL altitude estimate re-run and update
 #if (USE_BAROMETER == 1 && HILSIM != 1 && UPDATE_BARCAL == 1)

@@ -29,7 +29,7 @@ int32_t il_aslaltitude = 0; // inline  ASL (above sea level) altitude, in Cm
 int32_t il_pressure_ogn = 0; //  inline  pressure at origin
 int16_t il_temperature_ogn = 0; //   inline temperature at origin
 int32_t il_aslaltitude_ogn = 0; //   inline ASL altitude estimate at origin
-
+int32_t il_fogaltitude = 0; // inline  AGL (above ground level) or FOG (from origin) altitude, in Cm
 
 static int32_t barometer_pressure = 0; // RT barometer.c pressure feed
 static int16_t barometer_temperature = 0; // RT barometer.c temperature feed
@@ -60,6 +60,9 @@ inline int32_t get_barometer_pres_ogn(void) {
 inline int32_t get_barometer_aslalt_ogn(void) {
     return il_aslaltitude_ogn;
 } //  ASL altitude estimate  at origin
+inline int32_t get_barometer_fogalt_est(void) {
+    return il_fogaltitude;
+} //  Runtime FOG (from origin) altitude estimate
 
 
 // Point of origin and runtime PA-pressure and temperature sampling and definition
@@ -192,13 +195,6 @@ void udb_barometer_callback(int32_t pressure, int16_t temperature, uint8_t datar
         barometer_pressure = barometer_pressure_pvr;
         barometer_temperature = barometer_temperature_pvr;
     }
-
-    //  0- barometerCntrl.c,  1- libDCM.c (40Hz, rec. def.);  2- altitudeCntrl.c (40Hz); 3- states.c (40Hz, high priority);
-#if (BARCAL_TRIG == 0)
-    if (!flags._.barometer_calibrated && flags._.fltrs_init) {
-        barometerCalibrate();
-    }
-#endif
 }
 #endif  //(USE_BAROMETER == 1 && HILSIM != 1)
 
@@ -206,7 +202,7 @@ void udb_barometer_callback(int32_t pressure, int16_t temperature, uint8_t datar
 
 void estBarometerAltitude(void) {
 
-    static int32_t aslaltitude_est = 0; // ASL (above sea level) altitude, in Cm
+    static int32_t aslaltitude_est = 0, aslaltitude_ognest = 0; // ASL (above sea level) and origin altitude, in Cm
 
     // update-estimate the ASL altitude, initially with no offset after calibration at origin,
     if (flags._.barometer_calalt_initrun) {
@@ -223,6 +219,7 @@ void estBarometerAltitude(void) {
         il_temperature = caltemperature_ogn;
 
         il_aslaltitude_ogn = aslaltitude_est;
+        aslaltitude_ognest = aslaltitude_est;
         il_aslaltitude = aslaltitude_est;
 
         //  re-initialize flags to let this run again when triggered from an update RT function
@@ -237,9 +234,9 @@ void estBarometerAltitude(void) {
     } else {
         aslaltitude_est = calcSHABarASLAlt(barometer_pressure, calpressure_ogn, barometer_temperature, caltemperature_ogn);
         il_aslaltitude = aslaltitude_est;
+        il_fogaltitude = calcFOGAlt(aslaltitude_est, aslaltitude_ognest);
         flags._.barometer_alt_ready = 1;
     }
-
 }
 
 // IMPORTANT: THESE ARE COMPUTATIONS STILL TO BE FLIGHT TESTED TO SEE HOW IT PERFORMS UNDER VARYING
@@ -265,18 +262,17 @@ int32_t calcSHABarASLAlt(int32_t pres_rt, int32_t pres_ogn, int16_t temp_rt, int
     return alt_asl + baralt_offset;
 }
 
-void initFlags(void) {
-    flags._.barometer_calibrated = 0;
-    flags._.barometer_calalt_ready = 0;
-    flags._.barometer_calalt_updated = 0;
-    flags._.barometer_calalt_initrun = 0;
-    flags._.barometer_calalt_updtrun = 0;
-    flags._.barometer_alt_ready = 0;
-    flags._.bar_ucinitdone = 0;
-    flags._.gps_locked = 0;
-    flags._.i_init = 0;
-    flags._.d_init = 0;
+// AGL (above ground level) altitude computation
+
+int32_t calcFOGAlt(int32_t alt_rt, int32_t alt_ogn) {
+    int32_t alt_agl= 0;
+
+    // TODO:  put some accel rate and scaling algo here to compensate for speed and latency
+    //   When in range, use sonar AGL altitude to correct and update altitude calculations
+    alt_agl = alt_rt - alt_ogn;
+    return (int32_t) alt_agl;
 }
+
 
 // Altitude offset in centimeters subtracted/added to barometric ASL altitude. This is used to
 //  allow for the automatic adjustment/correction of the base barometric altitude by a ground .
@@ -293,11 +289,33 @@ int32_t estBarAltOffset(int32_t estaslalt) {
     return offset;
 }
 
+void initFlags(void) {
+    flags._.barometer_calibrated = 0;
+    flags._.barometer_calalt_ready = 0;
+    flags._.barometer_calalt_updated = 0;
+    flags._.barometer_calalt_initrun = 0;
+    flags._.barometer_calalt_updtrun = 0;
+    flags._.barometer_alt_ready = 0;
+    flags._.bar_ucinitdone = 0;
+    flags._.gps_locked = 0;
+    flags._.i_init = 0;
+    flags._.d_init = 0;
+}
+
+
 
 // GOOFY'S PARKING LOT
 
 /*  **Deprecated**
 
+
+    //  0- barometerCntrl.c,  1- libDCM.c (40Hz, rec. def.);  2- altitudeCntrl.c (40Hz); 3- states.c (40Hz, high priority);
+#if (BARCAL_TRIG == 0)
+    if (!flags._.barometer_calibrated && flags._.fltrs_init) {
+        barometerCalibrate();
+    }
+#endif
+ *
 // Determine which calculation scaling level to use as defined in options.h
 
 // Determine which calculation scaling level to use as defined in options.h
