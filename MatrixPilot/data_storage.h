@@ -119,7 +119,7 @@ extern boolean storage_create_area(uint16_t data_handle, uint16_t size, uint16_t
 // Does not require callback.  Always has immediate return
 extern boolean storage_check_area_exists(uint16_t data_handle, uint16_t size, uint16_t type);
 
-// Status of sotage services
+// Status of storage services
 boolean storage_services_started();
 
 // For access to a checksummed array data area

@@ -59,15 +59,19 @@ enum {
 	ALT,
     //  NEW PARAMS ///
 	ALT_SONAR,
+#if (BNAV_SCALE >= 1)
         PRES_BAR_RT,
 	TEMP_BAR_RT,
 	ALT_BAR_ASL,
+#endif
+#if (BNAV_SCALE == 2)
         ALT_BAR_OGN, 		//  barometer ASL altitude at origin
 	ALT_BAR_FOG,		//  barometer altitude from origin or ground (AGL altitude)
 	PRES_BAR_OGN,
 	TEMP_BAR_OGN,
-	//TAKEOFF_ANGLE,  	// room for capturing the take off angle for auto land use
-	//TAKEOFF_POS,  	// room for capturing the take off position for auto land use
+#endif
+	//TAKEOFF_ANGLE,  	// room for capturing the take off angle for auto land use 
+	//TAKEOFF_POS,  	// room for capturing the take off position for auto land use 
 	/////////////////
 	CURRENT_ANGLE,
 	ANGLE_TO_HOME,
@@ -114,11 +118,11 @@ enum {
 #define _SET_ABS_X_LOW(x)       {5,   0,   0,   9,   x}, // then Y, as 4 consecutive instructions.
 #define _SET_ABS_Y_LOW(y, fl)   {5,   fl,  0,   10,  y}, // (as VAL_HIGH, X_LOW, VAL_HIGH, Y_LOW)
 
-/* SONAR SUPPORT  */
+/* SONAR SUPPORT  */ 
 #define _MV_ZS(z, fl, pr)		{5,	fl,	pr,	11,	z},  //  move to SNR based altitude
 #define _SET_ZS(z, fl, pr)		{5,	fl,	pr,	12,	z},  //  set to SNR based altitude
 
-/* BAROMETER SUPPORT  */
+/* BAROMETER SUPPORT  */ 
 #define _MV_ZB(z, fl, pr)		{5,	fl,	pr,	13,	z},  //  move to BAR based altitude
 #define _SET_ZB(z, fl, pr)		{5,	fl,	pr,	14,	z},  //  set to BAR based altitude
 
@@ -275,27 +279,27 @@ enum {
 
 #define NUM_INSTRUCTIONS ((sizeof instructions) / sizeof (struct logoInstructionDef))
 #define NUM_RTL_INSTRUCTIONS ((sizeof rtlInstructions) / sizeof (struct logoInstructionDef))
-int16_t instructionIndex = 0;
+static int16_t instructionIndex = 0;
 int16_t waypointIndex = 0; // used for telemetry
-int16_t absoluteHighWord = 0;
-union longww absoluteXLong;
+static int16_t absoluteHighWord = 0;
+static union longww absoluteXLong;
 
-struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions;
-int16_t numInstructionsInCurrentSet = NUM_INSTRUCTIONS;
+static struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions;
+static int16_t numInstructionsInCurrentSet = NUM_INSTRUCTIONS;
 
 // If we've processed this many instructions without commanding the plane to fly,
 // then stop and continue on the next run through
 #define MAX_INSTRUCTIONS_PER_CYCLE  32
-int16_t instructionsProcessed = 0;
+static int16_t instructionsProcessed = 0;
 
 // Storage for command injection
-struct logoInstructionDef logo_inject_instr;
-uint8_t logo_inject_pos = 0;
+static struct logoInstructionDef logo_inject_instr;
+static uint8_t logo_inject_pos = 0;
 #define LOGO_INJECT_READY 255
 
 // Storage for interrupt handling
-int16_t interruptIndex = 0;     // intruction index of the beginning of the interrupt function
-int8_t interruptStackBase = 0;  // stack depth when entering interrupt (clear interrupt when dropping below this depth)
+static int16_t interruptIndex = 0;     // intruction index of the beginning of the interrupt function
+static int8_t interruptStackBase = 0;  // stack depth when entering interrupt (clear interrupt when dropping below this depth)
 
 // How many layers deep can Ifs, Repeats and Subroutines be nested
 #define LOGO_STACK_DEPTH            12
@@ -306,7 +310,7 @@ struct logoStackFrame {
 	int16_t arg                     : 16;
 };
 struct logoStackFrame logoStack[LOGO_STACK_DEPTH];
-int16_t logoStackIndex = 0;
+static int16_t logoStackIndex = 0;
 
 #define LOGO_FRAME_TYPE_IF          1
 #define LOGO_FRAME_TYPE_REPEAT      2
@@ -317,24 +321,29 @@ int16_t logoStackIndex = 0;
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
 struct logoLocation { union longww x; union longww y; int16_t z; };
-struct logoLocation turtleLocations[2];
-struct relative3D lastGoal = {0, 0, 0};
+static struct logoLocation turtleLocations[2];
+static struct relative3D lastGoal = {0, 0, 0};
 
 // Angles are stored as 0-359
-int16_t turtleAngles[2] = {0, 0};
+static int16_t turtleAngles[2] = {0, 0};
 
-uint8_t currentTurtle;
-int16_t penState;
+static uint8_t currentTurtle;
+static int16_t penState;
 
-boolean process_one_instruction(struct logoInstructionDef instr);
-void update_goal_from(struct relative3D old_waypoint);
-void process_instructions(void);
+static boolean process_one_instruction(struct logoInstructionDef instr);
+static void update_goal_from(struct relative3D old_waypoint);
+static void process_instructions(void);
 
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
 void init_flightplan (int16_t flightplanNum)
 {
+        struct relative2D curHeading;      ///////////////////////////////////////
+	int8_t earth_yaw;
+	int16_t angle;
+	struct relative3D IMUloc;
+
 	if (flightplanNum == 1) // RTL instructions set
 	{
 		currentInstructionSet = (struct logoInstructionDef*)rtlInstructions;
@@ -364,11 +373,14 @@ void init_flightplan (int16_t flightplanNum)
 	turtleLocations[CAMERA].y._.W1 = IMUlocationy._.W1;
 	turtleLocations[CAMERA].z = IMUlocationz._.W1;
 
-	// Calculate heading from Direction Cosine Matrix (rather than GPS),
+	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
-	struct relative2D curHeading;
 	curHeading.x = -rmat[1];
 	curHeading.y = rmat[4];
+
+        //earth_yaw = rect_to_polar(&curHeading);  //  (0=East,  ccw)      ///////////////////////////////////////
+	//angle = (earth_yaw * 180 + 64) >> 7;    //  (ccw, 0=East)
+
 	int8_t earth_yaw = rect_to_polar(&curHeading);  //  (0=East,  ccw)
 	int16_t angle = (earth_yaw * 180 + 64) >> 7;    //  (ccw, 0=East)
 	angle = -angle + 90;                            //  (clockwise, 0=North)
@@ -376,7 +388,6 @@ void init_flightplan (int16_t flightplanNum)
 
 	setBehavior(0);
 
-	struct relative3D IMUloc;
 	IMUloc.x = IMUlocationx._.W1;
 	IMUloc.y = IMUlocationy._.W1;
 	IMUloc.z = IMUlocationz._.W1;
@@ -409,21 +420,20 @@ struct absolute3D get_fixed_origin(void)
 	return standardizedOrigin;
 }
 
-boolean logo_goal_has_moved(void)
-{
-	return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
-			lastGoal.y != turtleLocations[PLANE].y._.W1 ||
-			lastGoal.z != turtleLocations[PLANE].z);
+static boolean logo_goal_has_moved(void) {
+    return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
+            lastGoal.y != turtleLocations[PLANE].y._.W1 ||
+            lastGoal.z != turtleLocations[PLANE].z);
 }
 
-void update_goal_from(struct relative3D old_goal)
+static void update_goal_from(struct relative3D old_goal)
 {
 	struct relative3D new_goal;
 
 	lastGoal.x = new_goal.x = (turtleLocations[PLANE].x._.W1);
 	lastGoal.y = new_goal.y = (turtleLocations[PLANE].y._.W1);
 	lastGoal.z = new_goal.z = turtleLocations[PLANE].z;
-
+	
 	if (old_goal.x == new_goal.x && old_goal.y == new_goal.y)
 	{
 		old_goal.x = IMUlocationx._.W1;
@@ -499,7 +509,7 @@ void run_flightplan(void)
 }
 
 // For DO and EXEC, find the location of the given subroutine
-int16_t find_start_of_subroutine(uint8_t subcmd)
+static int16_t find_start_of_subroutine(uint8_t subcmd)
 {
 	if (subcmd == 0) return -1; // subcmd 0 is reserved to always mean the start of the logo program
 
@@ -516,7 +526,7 @@ int16_t find_start_of_subroutine(uint8_t subcmd)
 
 // When an IF condition was false, use this to skip to ELSE or END
 // When an IF condition was true, and we ran the block, and reach an ELSE, skips to the END
-uint16_t find_end_of_current_if_block(void)
+static uint16_t find_end_of_current_if_block(void)
 {
 	int16_t i;
 	int16_t nestedDepth = 0;
@@ -536,7 +546,7 @@ uint16_t find_end_of_current_if_block(void)
 
 // Referencing PARAM in a LOGO program uses the PARAM from the current subroutine frame, even if
 // we're also nested deeper inside of IF or REPEAT frames.  This finds the current subroutine's frame.
-int16_t get_current_stack_parameter_frame_index(void)
+static int16_t get_current_stack_parameter_frame_index(void)
 {
 	int16_t i;
 	for (i = logoStackIndex; i >= 0; i--)
@@ -549,9 +559,9 @@ int16_t get_current_stack_parameter_frame_index(void)
 	return 0;
 }
 
-int16_t get_current_angle(void)
+static int16_t get_current_angle(void)
 {
-	// Calculate heading from Direction Cosine Matrix (rather than GPS),
+	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
 	struct relative2D curHeading;
 	curHeading.x = -rmat[1];
@@ -563,7 +573,7 @@ int16_t get_current_angle(void)
 	return angle;
 }
 
-int16_t get_angle_to_point(int16_t x, int16_t y)
+static int16_t get_angle_to_point(int16_t x, int16_t y)
 {
 	struct relative2D vectorToGoal;
 	vectorToGoal.x = turtleLocations[currentTurtle].x._.W1 - x;
@@ -578,7 +588,7 @@ int16_t get_angle_to_point(int16_t x, int16_t y)
 }
 
 /* ******************  SYSTEMS VALUES   ******************  */
-int16_t logo_value_for_identifier(uint8_t ident)
+static int16_t logo_value_for_identifier(uint8_t ident)
 {
 	if (ident > 0 && ident <= NUM_INPUTS)
 	{
@@ -612,6 +622,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 		/************************************************
 		BAROMETER SYSTEMS VALUE SUPPORT
 		*************************************************/
+#if (BNAV_SCALE >= 1)
                 case PRES_BAR_RT: // in hPA
 
 			#if ( USE_BAROMETER == 1 )
@@ -634,8 +645,8 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			}
 			#endif
 
-		case ALT_BAR_ASL: // centimeters, above sea level altitude
-
+		case ALT_BAR_ASL: // centimeters, above sea level altitude 
+			
 			#if ( USE_BAROMETER == 1 )
 			{
 				if (flags._.barometer_calalt_ready)  // TODO: trap after takeoff altitude
@@ -652,7 +663,8 @@ int16_t logo_value_for_identifier(uint8_t ident)
 				return -999;      //  return dummy value in the absence of sonar sensor device
 			}
 			#endif
-
+#endif
+#if (BNAV_SCALE == 2)
 		case ALT_BAR_OGN: // centimeters, origin ASL altitude
 
 			#if ( USE_BAROMETER == 1 )
@@ -666,7 +678,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			#endif
 
        		case ALT_BAR_FOG: // centimeters, from origin altitude
-
+			
 			#if ( USE_BAROMETER == 1 )
 			{
 				if (flags._.barometer_calalt_ready)  // TODO: trap after takeoff altitude
@@ -685,7 +697,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			#endif
 
 		case PRES_BAR_OGN: // in hPA, pressure origin
-
+			
 			#if ( USE_BAROMETER == 1 )
 			{
 				return (int32_t) get_barometer_pres_ogn(); // in centimeters
@@ -707,6 +719,8 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			}
 			#endif
 
+
+#endif
 		/************************************************/
 
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
@@ -762,7 +776,7 @@ int16_t logo_value_for_identifier(uint8_t ident)
 	return 0;
 }
 
-boolean process_one_instruction(struct logoInstructionDef instr)
+static boolean process_one_instruction(struct logoInstructionDef instr)
 {
 	if (instr.use_param)
 	{
@@ -829,7 +843,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 						interruptStackBase = 0;
 					}
 					break;
-
+				
 				case 3: // Else
 					if (logoStack[logoStackIndex].frameType == LOGO_FRAME_TYPE_IF)
 					{
@@ -837,7 +851,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 						logoStackIndex--;
 					}
 					break;
-
+				
 				case 2: // To (define a function)
 				{
 					// Shouldn't ever run these lines.
@@ -876,7 +890,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 					int16_t cangle = turtleAngles[currentTurtle];   // 0-359 (clockwise, 0=North)
 					int8_t b_angle = (cangle * 182 + 128) >> 8;     // 0-255 (clockwise, 0=North)
 					b_angle = -b_angle - 64;                        // 0-255 (ccw, 0=East)
-
+					
 					turtleLocations[currentTurtle].x.WW += (__builtin_mulss(-cosine(b_angle), instr.arg) << 2);
 					turtleLocations[currentTurtle].y.WW += (__builtin_mulss(-sine(b_angle), instr.arg) << 2);
 				}
@@ -956,15 +970,18 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				}
 				case 10: // Absolute set low Y value
 				{
+                                    	struct waypoint3D wp; 
+					struct relative3D rel;
+
 					union longww absoluteYLong;
 					absoluteYLong._.W1 = absoluteHighWord;
 					absoluteYLong._.W0 = instr.arg;
-
-					struct waypoint3D wp;
+					
 					wp.x = absoluteXLong.WW;
 					wp.y = absoluteYLong.WW;
 					wp.z = 0;
-					struct relative3D rel = dcm_absolute_to_relative(wp);
+                                        rel = dcm_absolute_to_relative(wp);
+
 					turtleLocations[currentTurtle].x._.W0 = 0;
 					turtleLocations[currentTurtle].x._.W1 = rel.x;
 					turtleLocations[currentTurtle].y._.W0 = 0;
@@ -974,8 +991,8 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				/************************************************
 				SONAR SUPPORT  11 n 12 sub routines _MV_ZS _SET_ZS
 				*************************************************/
-				case 11: // Move ZS
-				{
+				case 11: // Move ZS 
+				{ 
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.sonar_altitude_on = 1;
 					int16_t sonar_m_alt = instr.arg ;
@@ -983,36 +1000,36 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 
 					break ;
 				}
-				case 12: // Set ZS location
-				{
+				case 12: // Set ZS location  
+				{ 
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.sonar_altitude_on = 1;
-					int16_t sonar_m_alt = instr.arg;
+					int16_t sonar_m_alt = instr.arg;  
 					turtleLocations[currentTurtle].z = (sonar_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
 				}
 				/************************************************
 				BAROMETER SUPPORT  13 n 14 sub routines _MV_ZB _SET_ZB
 				*************************************************/
-				case 13: // Move ZB
-				{
+				case 13: // Move ZB 
+				{ 
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.barometer_altitude_on = 1;  // TODO TBR: temporary while barometer altitude is under flight testing
 					int16_t barometer_m_alt = instr.arg ;
 					turtleLocations[currentTurtle].z += (barometer_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
 				}
-				case 14: // Set ZB location
-				{
+				case 14: // Set ZB location  
+				{ 
 					// use barometer alt in deadreckoning  TODO: in gpsParseCommon as well once verified as accurate
 					udb_flags._.barometer_altitude_on = 1;   // TODO TBR: temporary while barometer altitude is under flight testing
-					int16_t barometer_m_alt = instr.arg;
+					int16_t barometer_m_alt = instr.arg;  
 					turtleLocations[currentTurtle].z = (barometer_m_alt/100) ; //convert sonar alt, cm to meter
 					break ;
 				}
 			}
 			break ;
-
+		
 		case 6: // Flags
 			switch (instr.subcmd)
 			{
@@ -1102,7 +1119,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 				case 1: // Set
 					interruptIndex = find_start_of_subroutine(instr.arg);
 					break;
-
+					
 				case 0: // Clear
 					interruptIndex = 0;
 					break;
@@ -1125,7 +1142,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 		{
 			int16_t val = logo_value_for_identifier(instr.subcmd);
 			boolean condTrue = false;
-
+			
 			if (instr.cmd == 14 && val == instr.arg) condTrue = true;       // IF_EQ
 			else if (instr.cmd == 15 && val != instr.arg) condTrue = true;  // IF_NE
 			else if (instr.cmd == 16 && val > instr.arg) condTrue = true;   // IF_GT
@@ -1158,21 +1175,21 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 	return instr.do_fly;
 }
 
-void process_instructions(void)
+static void process_instructions(void)
 {
 	instructionsProcessed = 0;
 
 	while (1)
 	{
 		boolean do_fly = process_one_instruction(currentInstructionSet[instructionIndex]);
-
+		
 		instructionsProcessed++;
 		instructionIndex++;
 		if (instructionIndex >= numInstructionsInCurrentSet) instructionIndex = 0;
-
+		
 		if (do_fly && penState == 0 && currentTurtle == PLANE)
 			break;
-
+		
 		if (instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
 			return;  // don't update goal if we didn't hit a FLY command
 	}
