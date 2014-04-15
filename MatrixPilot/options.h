@@ -1,17 +1,17 @@
 
-#define APSVERSION "3156.2.5.111.rc15mx4b"
+#define APSVERSION "3172.2.5.111.rc17mx4b"
 
-/*  Release candidate 3150qsb-aps2.4-t111.13, supports UDB4, UDB5 (wip) and AUAV3 (wip)
+/*  Release candidate 3172qsb-aps2.4-t111.17, supports UDB4, UDB5 (wip) and AUAV3 (wip)
  *
  * 
 
     Setup: UDB4, SF HMC5883L magnetometer, Sonar Maxbotix MB1230, BMP085 Barometer, 406 Std. GPS, Breeze 2000 V-tail / SkyW standard
 
-    Last modified date  April 12, 2014
+    Last modified date  April 15, 2014
 
     MODIFICATIONS :
     ~~~
-    Iteration: 3156.2.5.111.rc15mx4a
+    Baseline: 3156.2.5.111.rc15mx4a
         Fixed barometer data errors, algorithm changed (incl. i2c2), added barometer temp, pressure and ASL alt related LOGO
         conditionals/functions/triggers, navigation and deadReckoning (WIP) fusion of ASL alt, telemetry, etc.
                 -  Code changes:
@@ -27,18 +27,25 @@
                 -  logs:  Interior ground testing: Dev15 ~ 243  Rc15 ~ 262, consistently stable and accurate barometric data/ASL alt
                           Exterior ground testing: 263 ~ wip  excellent results so far
                           Flight testing: none yet.. waiting for weather to clear.
-      Iteration: 3156.2.5.111.rc15mx4b
+
+      Baseline: 3156.2.5.111.rc15mx4b
          Added new inline function providing FOG (from origin) or AGL (above ground level) altitude
                 -  Code changes:
                         o - barometerCntrl.h~c,  defines.h, flightplan-logo.c~h, telemetry.c, options.h
                 -  Ground Testing Results: compiles clean on all boards, barometer altitude estimates consistently accurate
                 -  Logs: ~1273, ~1274
- * 
- *
+
+     Iteration: 3172.2.5.111.dev17mx4a
+         Uptdated to trunk latest revision 3172 with Robert Dickenson's mod: make flightplan-logo module VC++ compiler friendly and add
+         static qualifier where appropriate.
+                -  Code changes:
+                        o - data_storage.c ~ h; flightplan-logo.c
+                -  Logs: wip
+
  */
 
 // ACKNOWLEDGEMENTS AND SPECIAL THANKS :
-// MatrixPilot Group, especially Robert, Guilio and Pete for contributions and continued assistance in my effort to include sonar and 
+// MatrixPilot Group, especially Robert, Guilio and Pete for contributions and continued assistance in the effort to include sonar and
 //   	barometer functional enhancements
 // Creator:        Bill Premerlani's UAV Dev Board 
 //
@@ -60,18 +67,17 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-// Vehicle and Pilot Identification
-// This will be embedded in your telemetry, and used to make more interesting flights in Google Earth.
+///////////////////////////////   VEHICLE AND PILOT IDENTIFICATION  ///////////////////////////////
+// These data will be included in the telemetry as identification of your airframe.
 // ID_VEHICLE_MODEL_NAME provides indication of what model of plane, quad, car etc you are using
-// ID_VEHICLE_REGISTRATION should be short (less than 12 continuous characters with no space
-// it will be used in Google Earth as the folder name containing your flights.
+// ID_VEHICLE_REGISTRATION should be short (less than 12 continuous characters with no space)
 // ID_LEAD_PILOT is your lead pilot flight name or alias e.g. "UAV Flight Director"
 // ID_DIY_DRONES_URL should be the URL of your member page on DIY Drones.
-// That will allow Google Earth viewers of your flights to click straight through to your latest discussions.
-
-#define ID_VEHICLE_MODEL_NAME "Brz2-t111.15"  //e.g. "SkyW-t111.15" ~ "Brz2-t111.15"
-#define ID_VEHICLE_REGISTRATION "MP3156-A34"
-#define ID_LEAD_PILOT "DB-EZFLIER"
+//    ex.: "SkyW-t111.16" ~ "Brz2-t111.16"  "AglW2-t111.16"
+//
+#define ID_VEHICLE_MODEL_NAME "SkyW-t111.16"
+#define ID_VEHICLE_REGISTRATION "M3156-A25"
+#define ID_LEAD_PILOT "DBFLIER"
 #define ID_URL ""
 
 
