@@ -158,6 +158,8 @@ void MPU6000_init16(void)
 #endif
 }
 
+int16_t MPUtemperature ;
+
 void process_MPU_data(void)
 {
 	mpuDAV = true;
@@ -168,6 +170,10 @@ void process_MPU_data(void)
 	udb_zaccel.value = mpu_data[zaccel_MPU_channel];
 
 	mpu_temp.value = mpu_data[temp_MPU_channel];
+
+	int16_t mpu_temp_signed = mpu_data[temp_MPU_channel] ;
+
+	MPUtemperature = (( mpu_temp_signed )/340) + 36 ;
 
 	udb_xrate.value = mpu_data[xrate_MPU_channel];
 	udb_yrate.value = mpu_data[yrate_MPU_channel];
