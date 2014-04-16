@@ -490,8 +490,8 @@ void serial_output_8hz(void) {
             break;
         case 7:
 #if  (USE_BAROMETER == 1)
-            serial_output("F6:USEBAR=%i:USEBALT=%i:USEPAPRS=%i:BOS=%i:WUTD=%i:I2CHZ=%i:CHZ=%i:AHZ=%i:UPBC=%i:",
-                    USE_BAROMETER, BAROMETER_ALTITUDE, USE_PA_PRESSURE, BOS, CAL_WU_TD, I2C_HZ_CYCLE, CHZ, AHZ, UPDATE_BARCAL);
+            serial_output("F6:USEBAR=%i:USEBALT=%i:USEPAPRS=%i:BOS=%i:SBS=%i:WUTD=%i:I2CHZ=%i:CHZ=%i:AHZ=%i:UPBC=%i:",
+                    USE_BAROMETER, BAROMETER_ALTITUDE, USE_PA_PRESSURE, BOS, SBS, CAL_WU_TD, I2C_HZ_CYCLE, CHZ, AHZ, UPDATE_BARCAL);
 #else
             serial_output("F6:USEBAR=");
             serial_output(USE_BAROMETER);

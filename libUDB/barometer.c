@@ -57,7 +57,12 @@ static uint8_t barData[3];
 static int16_t brindex; // index into the read write buffer
 static int16_t barMessage = 0; // message type, state machine counter
 static int16_t barCalibPause = 0;
-
+#if (SBS != 0)
+static int16_t p_i = 0; // index for pressure
+static int16_t t_i = 0; // index for temperature
+#endif
+static int32_t p_s = 0; // pressure sum
+static int16_t t_s = 0; // index into the read write buffer
 static int32_t temperature;
 
 void ReadBarTemp_callback(boolean I2CtrxOK);
@@ -137,6 +142,7 @@ void ReadBarCalib_callback(boolean I2CtrxOK) {
         byteswaparray(bc.buf, 22);
     }
 }
+
 // Calculate temperature given ut.
 // Value returned originally in units of 0.1 deg C
 
@@ -145,7 +151,21 @@ static int32_t bmp085CalcTemperature(uint16_t ut) {
     x1 = ((int32_t) ut - bc.ac6) * bc.ac5 >> 15;
     x2 = ((int32_t) bc.mc << 11) / (x1 + bc.md);
     b5 = x1 + x2;
-    return ((b5 + 8) >> 4);
+
+#if (SBS == 0)
+    t_s = (b5 + 8) >> 4;
+#else
+    t_s += (b5 + 8) >> 4;
+
+    // final sampling
+    t_i++;
+    if (t_i == SBS) {
+        t_s *= 0.5;
+        t_i /= 2;
+    }
+#endif	// (SBS == 0)
+
+    return t_s;
 
 }
 
@@ -176,11 +196,19 @@ static int32_t bmp085CalcPressure(uint32_t up) {
     p = b7 < 0x80000000 ? (b7 * 2) / b4 : (b7 / b4) * 2;
 
     x1 = (p >> 8) * (p >> 8);
-    x1 = (x1 * 3038) >> 16;
+    x1 = (x1 * 3038) >> 16; 
     x2 = (-7357 * p) >> 16;
-    p += p + ((x1 + x2 + 3791) >> 4);
-
-    return p;
+#if (SBS == 0)
+    p_s = p + (x1 + x2 + 3791) >> 4;
+#else
+    p_s += p + ((x1 + x2 + 3791) >> 4);
+    p_i++;
+    if (p_i == SBS) {
+        p_s *= 0.5;
+        p_i /= 2;
+    }
+#endif	// (SBS == 0)
+    return p_s;
 }
 
 void ReadBarTemp_callback(boolean I2CtrxOK) {
@@ -188,8 +216,15 @@ void ReadBarTemp_callback(boolean I2CtrxOK) {
 
     if (I2CtrxOK == true) {
         ut = (int16_t) (barData[0] << 8 | barData[1]);
-        ut = bmp085CalcTemperature(ut);
-        temperature = 0.1f * ut;
+        t_s = bmp085CalcTemperature(ut);
+#if (SBS == 0)
+        temperature = 0.1f * t_s;
+#else
+        t_s = 0.1f * (t_s / t_i);
+        temperature = t_s;
+        t_i = 0;
+#endif // (SBS == 0)
+        t_s = 0;
     } else {
         temperature = 0;
     }
@@ -202,10 +237,19 @@ void ReadBarPres_callback(boolean I2CtrxOK) {
         up = ((uint32_t) barData[0] << 16
                 | (uint32_t) barData[1] << 8
                 | (uint32_t) barData[2]) >> (8 - BOS);
-        up = bmp085CalcPressure(up);
+        p_s = bmp085CalcPressure(up);
         if (barometer_callback != NULL) {
-            pressure = 0.1f * up;
+#if (SBS == 0)
+            pressure = 0.1f * p_s;
             barometer_callback(pressure, temperature, 1);
+#else
+            p_s = 0.1f * (p_s / p_i);
+            pressure = p_s;
+            barometer_callback(pressure, temperature, 1);
+            p_i = 0;
+#endif	// (SBS == 0)
+            p_s = 0;
+            temperature = 0;
         }
     } else {
         // the operation failed

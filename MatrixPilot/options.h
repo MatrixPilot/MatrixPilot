@@ -37,9 +37,11 @@
 
      Iteration: 3172.2.5.111.dev17mx4a
          Uptdated to trunk latest revision 3172 with Robert Dickenson's mod: make flightplan-logo module VC++ compiler friendly and add
-         static qualifier where appropriate.
+         static qualifier where appropriate.  SBS (suplementary barometer sampling) re-introduced as quick way to prevent possible double
+         pressure accummulation (sum totaling, thanks to Giulio Berti for the nice catch).
                 -  Code changes:
                         o - data_storage.c ~ h; flightplan-logo.c
+                        o - options.h, barometer.c; telemetry.c
                 -  Logs: wip
 
  */
@@ -463,6 +465,10 @@
 //  1 (tg with BPXD 0~2, noisy) ~ 3 (tvg with BPXD 0~2) best rec. for UDB4-5, AUAV3
 //
 #define BOS						3
+//  suplementary barometric sensor feed sampling, note, testing have indicated that adding this sampling is not necessary
+//   and is kept here for posterity...
+//
+#define SBS						0
 
 // Let the barometer settle for a minimum of >4 seconds after power on. Depending on ambient
 // temperature, it reads quite a long way off w/in the first 2-3 seconds, leading to about
