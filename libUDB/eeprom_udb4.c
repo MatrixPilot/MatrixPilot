@@ -23,6 +23,7 @@
 
 
 #include "libUDB_internal.h"
+#include "eeprom_udb4.h"
 
 #define SCL         PORTGbits.RG2       // I2C SCL (Clock) PORT
 #define SDA         PORTGbits.RG3       // I2C SDA (Data) PORT
@@ -34,16 +35,16 @@
 #define NAKBIT      0x80                // NAK bit
 
 /** V A R I A B L E S **********************************************/
-uint8_t eeprom_control = CONTROLBYTE;   // Control byte variable
+static uint8_t eeprom_control = CONTROLBYTE;    // Control byte variable
 
 // Function Prototypes
-void bit_in(uint8_t *data);         // Bit Input function
-void bit_out(uint8_t data);         // Bit Out function
-void bstart(void);                  // Start condition
-void bstop(void);                   // Stop condition
-uint8_t byte_out(uint8_t);          // Byte output
-uint8_t byte_in(uint8_t);           // Byte input
-void ACK_Poll(void);                // Acknowledge polling
+static void bit_in(uint8_t *data);      // Bit Input function
+static void bit_out(uint8_t data);      // Bit Out function
+static void bstart(void);               // Start condition
+static void bstop(void);                // Stop condition
+static uint8_t byte_out(uint8_t);       // Byte output
+static uint8_t byte_in(uint8_t);        // Byte input
+static void ack_poll(void);             // Acknowledge polling
 
 
 void udb_eeprom_init(void)
@@ -57,7 +58,7 @@ void udb_eeprom_init(void)
  *
  * Description:     This function generates an I2C Start condition.
  *******************************************************************/
-void bstart(void)
+static void bstart(void)
 {
 	SDA_TRIS = 1;                   // Ensure SDA is high
 	SCL = 1;                        // Ensure SCL is high
@@ -73,7 +74,7 @@ void bstart(void)
  *
  * Description:     This function generates an I2C Stop condition.
  *******************************************************************/
-void bstop(void)
+static void bstop(void)
 {
 	SCL = 0;                        // Ensure SCL is low
 	SDA_TRIS = 0;                   // Configure SDA as an output
@@ -89,7 +90,7 @@ void bstop(void)
  *
  * Description:     This function outputs a bit to the I2C bus.
  *******************************************************************/
-void bit_out(uint8_t data)
+static void bit_out(uint8_t data)
 {
 	SCL = 0;                        // Ensure SCL is low
 	if (data & 0x80)                // Check if next bit is high
@@ -117,7 +118,7 @@ void bit_out(uint8_t data)
  *
  * Description:     This function inputs a bit from the I2C bus.
  *******************************************************************/
-void bit_in(uint8_t *data)
+static void bit_in(uint8_t *data)
 {
 	SCL = 0;                        // Ensure SCL is low	
 	Nop();
@@ -140,7 +141,7 @@ void bit_in(uint8_t *data)
  *                  It also receives the ACK bit and returns 0 if
  *                  successfully received, or 1 if not.
  *******************************************************************/
-uint8_t byte_out(uint8_t data)
+static uint8_t byte_out(uint8_t data)
 {
 	uint8_t i;                      // Loop counter
 	uint8_t ack;                    // ACK bit
@@ -163,7 +164,7 @@ uint8_t byte_out(uint8_t data)
  *                  Depending on the value of ack, it will also
  *                  transmit either an ACK or a NAK bit.
  *******************************************************************/
-uint8_t byte_in(uint8_t ack)
+static uint8_t byte_in(uint8_t ack)
 {
 	uint8_t i;                      // Loop counter
 	uint8_t retval;                 // Return value
@@ -180,11 +181,11 @@ uint8_t byte_in(uint8_t ack)
 }
 
 /********************************************************************
- * Function:        void ACK_Poll(void)
+ * Function:        void ack_poll(void)
  *
  * Description:     This function implements Acknowledge polling.
  *******************************************************************/
-void ACK_Poll(void)
+static void ack_poll(void)
 {
 	uint8_t result;                 // Polling result
 
@@ -201,7 +202,8 @@ void ACK_Poll(void)
 
 void eeprom_ByteWrite(uint16_t address, uint8_t data)
 {
-	ACK_Poll();                     // Begin ACK polling
+//DPRINT("eeprom_ByteWrite(%u, %u)\r\n", address, data);
+	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
 	byte_out(eeprom_control);       // Output control byte
 	byte_out((uint8_t)(address>>8));// Output address MSB
@@ -213,22 +215,26 @@ void eeprom_ByteWrite(uint16_t address, uint8_t data)
 void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 {
 	uint8_t i;                      // Loop counter
+//DPRINT("eeprom_PageWrite(%u, %u)\r\n", address, numbytes);
 
-	ACK_Poll();                     // Begin ACK polling
+	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
 	byte_out(eeprom_control);       // Output control byte
 	byte_out((uint8_t)(address>>8));// Output address MSB
 	byte_out((uint8_t)address);     // Output address LSB
 	for (i = 0; i < numbytes; i++)  // Loop through data bytes
 	{
+//DPRINT("%02x ", data[i]);
 		byte_out(data[i]);          // Output next data byte
 	}
 	bstop();                        // Generate Stop condition
+//DPRINT("\r\n");
 }
 
 void eeprom_ByteRead(uint16_t address, uint8_t *data)
 {
-	ACK_Poll();                     // Begin ACK polling
+//DPRINT("eeprom_ByteRead(%u, %u)\r\n", address, data);
+	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
 	byte_out(eeprom_control);       // Output control byte
 	byte_out((uint8_t)(address>>8));// Output address MSB
@@ -242,8 +248,9 @@ void eeprom_ByteRead(uint16_t address, uint8_t *data)
 void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 {
 	uint16_t i;                     // Loop counter
+//DPRINT("eeprom_SequentialRead(%u, %u)\r\n", address, numbytes);
 
-	ACK_Poll();                     // Begin ACK polling
+	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
 	byte_out(eeprom_control);       // Output control byte
 	byte_out((uint8_t)(address>>8));// Output address MSB
@@ -260,6 +267,8 @@ void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 		{
 			data[i] = byte_in(NAKBIT); // If last byte, input byte & send NAK
 		}
+//DPRINT("%02x ", data[i]);
 	}
 	bstop();                        // Generate Stop condition
+//DPRINT("\r\n");
 }

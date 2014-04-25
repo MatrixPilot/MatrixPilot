@@ -57,17 +57,14 @@ write(int handle, void *buffer, unsigned int len)
 			break;
 
 		default: {
-/*
-			SIMIO simio;
-			register PSIMIO psimio asm("w0") = &simio;
-
-			simio.method = SIM_WRITE;
-			simio.u.write.handle = handle;
-			simio.u.write.buffer = buffer;
-			simio.u.write.len = len;
-			dowrite(psimio);
-			len = simio.u.write.len;
- */
+//			SIMIO simio;
+//			register PSIMIO psimio asm("w0") = &simio;
+//			simio.method = SIM_WRITE;
+//			simio.u.write.handle = handle;
+//			simio.u.write.buffer = buffer;
+//			simio.u.write.len = len;
+//			dowrite(psimio);
+//			len = simio.u.write.len;
 			break;
 		}
 	}

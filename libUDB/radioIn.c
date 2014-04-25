@@ -95,7 +95,7 @@ void udb_init_capture(void)
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
 	#endif
 	}
-	
+
 	TMR2 = 0;               // initialize timer
 #if (MIPS == 64)
 	T2CONbits.TCKPS = 2;    // prescaler = 64 option

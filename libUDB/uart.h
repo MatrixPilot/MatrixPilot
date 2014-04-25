@@ -23,10 +23,15 @@
 #define _UART_H_
 
 
+#ifdef USE_BLUETOOTH_UART
+#define BAUDRATEX       9600UL
+#define BRGHX           0
+#else
 #define BAUDRATEX       115200UL
 #define BRGHX           1
-//#define BAUDRATEX       9600UL
-//#define BRGHX           0
+#endif
+
+
 #if (BRGHX == 0)
 	#define BRG_DIVX    16
 #elif (BRGHX == 1)
