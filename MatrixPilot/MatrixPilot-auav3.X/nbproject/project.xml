@@ -9,10 +9,7 @@
             <cpp-extensions/>
             <header-extensions>h,hpp</header-extensions>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
-            <make-dep-projects>
-                <make-dep-project>../Microchip_Library_Apps.X</make-dep-project>
-                <make-dep-project>../VectorMatrix.X</make-dep-project>
-            </make-dep-projects>
+            <make-dep-projects/>
         </data>
     </configuration>
 </project>

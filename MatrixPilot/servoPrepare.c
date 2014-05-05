@@ -23,7 +23,6 @@
 #include "../libUDB/heartbeat.h"
 #include "mode_switch.h"
 #include "airspeedCntrl.h"
-#include "cbox.h"
 
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
@@ -97,10 +96,8 @@ void dcm_servo_callback_prepare_outputs(void)
 		// otherwise, there is not anything to do
 		manualPassthrough();	// Allow manual control while starting up
 	}
-
-        // if cbox_on is true, disable telemetry, since the control box is
-        // using the serial port
-	if (!cbox_on && dcm_flags._.calib_finished) // start telemetry after calibration
+	
+	if (dcm_flags._.calib_finished) // start telemetry after calibration
 	{
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
