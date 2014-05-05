@@ -66,28 +66,6 @@
 #endif
 
 
-extern void __delay32(unsigned long cycles);
-
-#define SF 5
-
-void osd_reset(void)
-{
-	osd_spi_write(0x00, 0x42) ;	// VM0: enable display of PAL OSD image, force software reset
-	__delay32(400000 * SF);
-//		osd_spi_write(0x00, 0x08) ;	// VM0: enable display of NTSC OSD image
-		osd_spi_write(0x00, 0x48) ;	// VM0: enable display of PAL OSD image
-
-//		osd_spi_write(0x03, 0x00) ;	// VOS set to +15 pixels (farthest up)
-//		osd_spi_write(0x03, 0x10) ;	// VOS set to +-0 pixels (no shift, default)
-		osd_spi_write(0x03, 0x1F) ;	// VOS set to -15 pixels (farthest down)
-//		osd_spi_write(0x03, 0x10) ;	// VOS set to -8 pixels
-
-//		osd_spi_write(0x04, 0x00) ;	// DMM set to 0
-		osd_spi_write(0x04, 0x04) ;	// DMM set to clear display memory
-
-		__delay32(20000 * SF);
-}
-
 void udb_init_osd( void )
 {
 	OSD_MISO_TRIS = 1 ;
