@@ -207,8 +207,8 @@
 // CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_HOME		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
-// REL_ANGLE_TO_HOME	- in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
-// REL_ANGLE_TO_GOAL	- in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
+// REL_ANGLE_TO_HOME	- in degrees. -180-179 (0=heading directly towards Home. Home to the right of the nose of the plane is positive)
+// REL_ANGLE_TO_GOAL	- in degrees. -180-179 (0=heading directly towards Goal. Goal to the right of the nose of the plane is positive)
 // GROUND_SPEED			- in cm/s
 // AIR_SPEED			- in cm/s
 // AIR_SPEED_Z			- in cm/s

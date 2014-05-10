@@ -548,6 +548,8 @@ static int16_t get_angle_to_point(int16_t x, int16_t y)
 	angle = (dir_to_goal * 180 + 64) >> 7;  // 0-359 (ccw, 0=East)
 	angle = -angle + 90;                            // 0-359 (clockwise, 0=North)
 	if (angle < 0) angle += 360;
+	angle += 180;
+	if (angle > 360) angle -= 360;
 	return angle;
 }
 
@@ -577,19 +579,19 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 		case ANGLE_TO_GOAL: // in degrees. 0-359 (clockwise, 0=North)
 			return get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1);
 
-		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
+		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards Home. Home to the right of the nose of the plane is positive)
 		{
 			int16_t angle = get_current_angle() - get_angle_to_point(0, 0);
 			if (angle < -180) angle += 360;
 			if (angle >= 180) angle -= 360;
-			return angle;
+			return -angle ;
 		}
-		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
+		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards Goal. Goal to the right of the nose of the plane is positive)
 		{
 			int16_t angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1);
 			if (angle < -180) angle += 360;
 			if (angle >= 180) angle -= 360;
-			return angle;
+			return -angle ;
 		}
 		case GROUND_SPEED: // in cm/s
 			return ground_velocity_magnitudeXY;
