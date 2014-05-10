@@ -584,14 +584,14 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 			int16_t angle = get_current_angle() - get_angle_to_point(0, 0);
 			if (angle < -180) angle += 360;
 			if (angle >= 180) angle -= 360;
-			return -angle ;
+			return -angle;
 		}
 		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards Goal. Goal to the right of the nose of the plane is positive)
 		{
 			int16_t angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1);
 			if (angle < -180) angle += 360;
 			if (angle >= 180) angle -= 360;
-			return -angle ;
+			return -angle;
 		}
 		case GROUND_SPEED: // in cm/s
 			return ground_velocity_magnitudeXY;
@@ -957,14 +957,16 @@ static boolean process_one_instruction(struct logoInstructionDef instr)
 			else if (instr.cmd == 18 && val >= instr.arg) condTrue = true;  // IF_GE
 			else if (instr.cmd == 19 && val <= instr.arg) condTrue = true;  // IF_LE
 
-			if (condTrue) {
+			if (condTrue)
+			{
 				if (logoStackIndex < LOGO_STACK_DEPTH-1)
 				{
 					logoStackIndex++;
 					logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_IF;
 				}
 			}
-			else {
+			else
+			{
 				// jump to the matching END or ELSE
 				instructionIndex = find_end_of_current_if_block();
 				if (currentInstructionSet[instructionIndex].subcmd == 3) // is entering an ELSE block
@@ -1003,7 +1005,8 @@ static void process_instructions(void)
 
 	waypointIndex = instructionIndex - 1;
 
-	if (logo_goal_has_moved()) {
+	if (logo_goal_has_moved())
+	{
 		update_goal_from(lastGoal);
 		compute_bearing_to_goal();
 	}
@@ -1021,7 +1024,8 @@ void flightplan_live_received_byte(uint8_t inbyte)
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
 
-	switch (logo_inject_pos) {
+	switch (logo_inject_pos)
+	{
 		case 0:
 			logo_inject_instr.cmd = inbyte;
 			break;

@@ -170,7 +170,7 @@ static void msg_start(uint8_t gpschar)
 	if (gpschar == '$')
 	{
 #ifdef DEBUG_NMEA
-//		udb_led_toggle(LED_BLUE ) ;
+//		udb_led_toggle(LED_BLUE);
 #endif
 		msg_parse = &gps_G;                 // Wait for the $
 		rmc_counter = 0;
@@ -236,9 +236,9 @@ static void gps_id3(uint8_t gpschar)
 		rmc_counter = 1;                    // Next rmc message after the comma
 		msg_parse = &gps_comma;             // A comma ',' is expected now
 #ifdef DEBUG_NMEA
-//	msg_parse = &msg_start;	
+//		msg_parse = &msg_start;
 		strcpy(debug_RMC, "$GPRMC");
-		udb_led_toggle ( LED_BLUE ) ;
+		udb_led_toggle(LED_BLUE);
 		RMCpos = 6;
 #endif
 	}
@@ -248,7 +248,7 @@ static void gps_id3(uint8_t gpschar)
 		msg_parse = &gps_comma;             // A comma ',' is expected now	
 #ifdef DEBUG_NMEA
 		GGApos = 6;
-//	msg_parse = &msg_start;
+//		msg_parse = &msg_start;
 		strcpy(debug_GGA, "$GPGGA");
 #endif
 	}
@@ -313,7 +313,6 @@ static void gps_comma(uint8_t gpschar)
 		{
 			msg_parse = &gps_checksum;
 		}
-	
 	}
 //	if (rmc_counter > 11)
 //	{
@@ -476,7 +475,7 @@ static void gps_rmc6(uint8_t gpschar)       // E or W int8_t
 	{
 		EW_ = ' ';
 		rmc_counter = 7;
-		msg_parse = &gps_rmc7;             // Parse the next message
+		msg_parse = &gps_rmc7;              // Parse the next message
 	}
 	else
 	{
@@ -615,8 +614,9 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 		if (XOR == checksum)
 		{
 			if (gga_counter > 0)            // We are checking gga
+			{
 				gga_chksm_ok = 1;           // And the checksum is good
-
+			}
 			if (rmc_counter > 0 && gga_chksm_ok == 1)
 			{
 #ifdef DEBUG_NMEA
@@ -628,16 +628,22 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 		else
 		{
 			if (gga_counter > 0)            // We are checking gga
+			{
 				gga_chksm_ok = 0;           // And the checksum is bad
+			}
 		}
 		checksum = 0;
 	}
 	else
 	{
 		if (gpschar <= '9')
+		{
 			checksum = (checksum << 4) + (gpschar - '0');
+		}
 		else
+		{
 			checksum = (checksum << 4) + (gpschar - 'A' + 0x0A);
+		}
 	}
 #ifdef DEBUG_NMEA
 LED_RED = LED_OFF;
