@@ -37,19 +37,19 @@ enum MCP24LC256_STATES
 	MCP24LC256_STATE_FAILED_TRX,
 };
 
-uint16_t MCP24LC256_write_address;
-uint16_t MCP24LC256_write_size;
-uint8_t commandData[4] = {0x00, 0x00}; 
-uint16_t MCP24LC256_state = MCP24LC256_STATE_STOPPED;
-uint8_t* MCP24LC256_pwrBuffer = NULL;
-uint16_t MCP24LC256_Timer = 0;
-NVMemory_callbackFunc pcallerCallback = NULL;
-uint16_t nv_memory_service_handle = INVALID_HANDLE;
+static uint16_t MCP24LC256_write_address;
+static uint16_t MCP24LC256_write_size;
+static uint8_t commandData[4] = {0x00, 0x00}; 
+static uint16_t MCP24LC256_state = MCP24LC256_STATE_STOPPED;
+static uint8_t* MCP24LC256_pwrBuffer = NULL;
+static uint16_t MCP24LC256_Timer = 0;
+static NVMemory_callbackFunc pcallerCallback = NULL;
+static uint16_t nv_memory_service_handle = INVALID_HANDLE;
 
-boolean MCP24LC256_write_chunk();
+static boolean MCP24LC256_write_chunk(void);
 //void (*callbackWriteDone)(void);
-void NVMemory_callback(void);
-void MCP24LC256_callback(boolean I2CtrxOK);
+static void NVMemory_callback(void);
+static void MCP24LC256_callback(boolean I2CtrxOK);
 
 
 void nv_memory_service(void)
@@ -57,10 +57,10 @@ void nv_memory_service(void)
 	switch (MCP24LC256_state)
 	{
 		case MCP24LC256_STATE_WAITING_WRITE:
-			I2C1_CheckACK(MCP24LC256_COMMAND, &MCP24LC256_callback);
+			I2C1_CheckAck(MCP24LC256_COMMAND, &MCP24LC256_callback);
 			break;
 		case MCP24LC256_STATE_FAILED_TRX:
-			I2C1_CheckACK(MCP24LC256_COMMAND, &MCP24LC256_callback);
+			I2C1_CheckAck(MCP24LC256_COMMAND, &MCP24LC256_callback);
 			break;
 	}
 }
@@ -111,7 +111,7 @@ boolean udb_nv_memory_write(uint8_t* wrBuffer, uint16_t address, uint16_t wrSize
 	return MCP24LC256_write_chunk();
 }
 
-boolean MCP24LC256_write_chunk()
+static boolean MCP24LC256_write_chunk(void)
 {
 	uint16_t writeSize = MCP24LC256_write_size;
 	// Truncate write at page boundary
@@ -150,11 +150,11 @@ boolean MCP24LC256_write_chunk()
 	return true;
 }
 
-void NVMemory_callback(void)
+static void NVMemory_callback(void)
 {
 }
 
-void MCP24LC256_callback(boolean I2CtrxOK)
+static void MCP24LC256_callback(boolean I2CtrxOK)
 {
 	if (I2CtrxOK == false)
 	{
