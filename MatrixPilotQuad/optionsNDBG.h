@@ -172,18 +172,23 @@
 // Tilt PID(DD) control gains
 #define TILT_KI 0.05
 #define TILT_KP 0.08
-#define TILT_KD 0.5
-#define TILT_KDD 0.8
+//#define TILT_KD 0.5
+#define TILT_KD 0.25
+//#define TILT_KDD 0.8
+#define TILT_KDD 0.0
 
 // Yaw PID control gains
 #define YAW_KI 0.5
 #define YAW_KP 0.3
-#define YAW_KD 3.0
+//#define YAW_KD 3.0
+#define YAW_KD 1.0
 
 
 // Vertical damping 
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
-#define ACCEL_K 1.0
+//#define ACCEL_K 1.0
+
+#define ACCEL_K 0.0
 
 #define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45       // maximum roll or pitch, degrees, not to exceed 45 degrees
