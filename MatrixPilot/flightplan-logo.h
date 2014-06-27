@@ -46,7 +46,7 @@
 // altitude, expressed in meters.
 
 #define USE_FIXED_ORIGIN        0
-#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
+#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,6 +161,8 @@
 //                        the DO() instruction.
 // EXEC(FUNC)           - Call FUNC as though it were the beginning of the logo program.  This will never return.
 //                        When/if FUNC finishes, logo will start back at the beginning of the program.
+// DO(LOGO_MAIN) or
+// EXEC(LOGO_MAIN)      - Restart at the top of the LOGO program
 // DO_ARG(FUNC, PARAM)  - Run subroutine FUNC, using an integer value as a parameter.
 // EXEC_ARG(FUNC, PARAM)- Exec subroutine FUNC, using an integer value as a parameter.
 // 
@@ -281,7 +283,6 @@ const struct logoInstructionDef instructions[] = {
 	REPEAT_FOREVER
 		DO_ARG(SQUARE, 100)
 	END
-
 
 	TO (SQUARE)
 		REPEAT(4)

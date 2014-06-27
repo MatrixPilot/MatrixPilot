@@ -231,6 +231,8 @@ enum {
                                 _SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
 #define HOME                    _HOME(1)
 
+#define LOGO_MAIN   0   // Allows for DO(LOGO_MAIN) or EXEC(LOGO_MAIN) to start at the top
+
 
 #include "flightplan-logo.h"
 
@@ -273,8 +275,6 @@ static int16_t logoStackIndex = 0;
 #define LOGO_FRAME_TYPE_IF          1
 #define LOGO_FRAME_TYPE_REPEAT      2
 #define LOGO_FRAME_TYPE_SUBROUTINE  3
-
-#define LOGO_MAIN   0   // Allows for DO(LOGO_MAIN) or EXEC(LOGO_MAIN) to start at the top
 
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
@@ -417,7 +417,8 @@ void run_flightplan(void)
 		}
 		else
 		{
-			if (logo_goal_has_moved()) {
+			if (logo_goal_has_moved())
+			{
 				update_goal_from(lastGoal);
 				compute_bearing_to_goal();
 			}
@@ -527,9 +528,9 @@ static int16_t get_current_angle(void)
 
 	curHeading.x = -rmat[1];
 	curHeading.y = rmat[4];
-	earth_yaw = rect_to_polar(&curHeading);  // (0=East,  ccw)
+	earth_yaw = rect_to_polar(&curHeading); // (0=East,  ccw)
 	angle = (earth_yaw * 180 + 64) >> 7;    // (ccw, 0=East)
-	angle = -angle + 90;                            // (clockwise, 0=North)
+	angle = -angle + 90;                    // (clockwise, 0=North)
 	if (angle < 0) angle += 360;
 	return angle;
 }
@@ -544,11 +545,10 @@ static int16_t get_angle_to_point(int16_t x, int16_t y)
 	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - y;
 	dir_to_goal = rect_to_polar (&vectorToGoal);
 
-	// dir_to_goal                                  // 0-255 (ccw, 0=East)
+	// dir_to_goal                          // 0-255 (ccw, 0=East)
 	angle = (dir_to_goal * 180 + 64) >> 7;  // 0-359 (ccw, 0=East)
-	angle = -angle + 90;                            // 0-359 (clockwise, 0=North)
+	angle = -angle + 90;                    // 0-359 (clockwise, 0=North)
 	if (angle < 0) angle += 360;
-	angle += 180;
 	if (angle > 360) angle -= 360;
 	return angle;
 }
@@ -557,7 +557,7 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 {
 	if (ident > 0 && ident <= NUM_INPUTS)
 	{
-		return udb_pwIn[(int16_t)ident];            // 2000 - 4000
+		return udb_pwIn[(int16_t)ident];    // 2000 - 4000
 	}
 
 	switch (ident) {
@@ -574,14 +574,21 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 			return get_current_angle();
 
 		case ANGLE_TO_HOME: // in degrees. 0-359 (clockwise, 0=North)
-			return get_angle_to_point(0, 0);
-
+		{
+			int16_t angle = get_angle_to_point(0,0);
+			angle += 180;
+			if (angle < 0) angle += 360;
+			if (angle > 360) angle -= 360;
+			return angle;
+		}
 		case ANGLE_TO_GOAL: // in degrees. 0-359 (clockwise, 0=North)
 			return get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1);
 
 		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards Home. Home to the right of the nose of the plane is positive)
 		{
-			int16_t angle = get_current_angle() - get_angle_to_point(0, 0);
+			int16_t angle = get_angle_to_point(0,0);
+			angle = get_current_angle() - angle;
+			angle += 180;
 			if (angle < -180) angle += 360;
 			if (angle >= 180) angle -= 360;
 			return -angle;
@@ -629,7 +636,7 @@ static boolean process_one_instruction(struct logoInstructionDef instr)
 	{
 		// Use the subroutine's parameter instead of the instruction's arg value
 		int16_t ind = get_current_stack_parameter_frame_index();
-		instr.arg *= logoStack[ind].arg;
+		instr.arg = logoStack[ind].arg;
 	}
 
 	switch (instr.cmd)
@@ -823,7 +830,7 @@ static boolean process_one_instruction(struct logoInstructionDef instr)
 
 					absoluteYLong._.W1 = absoluteHighWord;
 					absoluteYLong._.W0 = instr.arg;
-					
+
 					wp.x = absoluteXLong.WW;
 					wp.y = absoluteYLong.WW;
 					wp.z = 0;
@@ -903,8 +910,8 @@ static boolean process_one_instruction(struct logoInstructionDef instr)
 					}
 					break;
 				}
-				break;
 			}
+			break;
 
 		case 11: // Speed
 #if (SPEED_CONTROL == 1)
@@ -926,7 +933,6 @@ static boolean process_one_instruction(struct logoInstructionDef instr)
 				case 1: // Set
 					interruptIndex = find_start_of_subroutine(instr.arg);
 					break;
-					
 				case 0: // Clear
 					interruptIndex = 0;
 					break;
@@ -949,7 +955,7 @@ static boolean process_one_instruction(struct logoInstructionDef instr)
 		{
 			int16_t val = logo_value_for_identifier(instr.subcmd);
 			boolean condTrue = false;
-			
+
 			if (instr.cmd == 14 && val == instr.arg) condTrue = true;       // IF_EQ
 			else if (instr.cmd == 15 && val != instr.arg) condTrue = true;  // IF_NE
 			else if (instr.cmd == 16 && val > instr.arg) condTrue = true;   // IF_GT
@@ -991,14 +997,14 @@ static void process_instructions(void)
 	while (1)
 	{
 		boolean do_fly = process_one_instruction(currentInstructionSet[instructionIndex]);
-		
+
 		instructionsProcessed++;
 		instructionIndex++;
 		if (instructionIndex >= numInstructionsInCurrentSet) instructionIndex = 0;
-		
+
 		if (do_fly && penState == 0 && currentTurtle == PLANE)
 			break;
-		
+
 		if (instructionsProcessed >= MAX_INSTRUCTIONS_PER_CYCLE)
 			return;  // don't update goal if we didn't hit a FLY command
 	}
@@ -1061,7 +1067,7 @@ void flightplan_live_received_byte(uint8_t inbyte)
 
 void flightplan_live_commit(void)
 {
-	// The cmd=1 commads (REPEAT, END, TO) are not allowed
+	// The cmd=1 commands (REPEAT, END, TO) are not allowed
 	// to be injected.
 	if (logo_inject_pos == 5 && logo_inject_instr.cmd != 1)
 	{
