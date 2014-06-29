@@ -130,6 +130,12 @@ void updateBehavior(void)
 // This function is called every 25ms
 void updateTriggerAction(void)
 {
+	if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
+        {
+            triggerActionSetValue(desired_behavior.W & F_TRIGGER);
+            return;
+        }
+
 	if (cyclesUntilStopTriggerAction == 1)
 	{
 		triggerActionSetValue(TRIGGER_ACTION != TRIGGER_PULSE_HIGH);

@@ -301,6 +301,13 @@ uint16_t wind_gain_adjustment(void)
 #endif
 }
 
+void magClamp(int *in, int mag) {
+    if (*in < -mag)
+        *in = -mag;
+    else if (*in > mag)
+        *in = mag;
+}
+
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
 int16_t determine_navigation_deflection(char navType)
@@ -406,6 +413,10 @@ int16_t determine_navigation_deflection(char navType)
 	if (navType == 'h') deflectionAccum.WW = -deflectionAccum.WW;
 
 	// multiply by wind gain adjustment, and multiply by 2
-	deflectionAccum.WW = (__builtin_mulsu (deflectionAccum._.W1 , wind_gain)<<1); 
+	deflectionAccum.WW = (__builtin_mulsu (deflectionAccum._.W1 , wind_gain)<<1);
+
+        // clamp magnitude to reasonable value in DCM format (90 degrees = 16384)
+        magClamp(&(deflectionAccum._.W1), 12000);
+
 	return deflectionAccum._.W1;
 }

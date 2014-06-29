@@ -101,7 +101,7 @@ void normalRollCntrl(void)
 #endif
 	if (AILERON_NAVIGATION && flags._.GPS_steering)
 	{
-		rollAccum._.W1 = determine_navigation_deflection('a');
+		roll_setpoint = determine_navigation_deflection('a');
 	}
 
 #ifdef TestGains
@@ -111,7 +111,9 @@ void normalRollCntrl(void)
 	if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback)
 	{
 		gyroRollFeedback.WW = __builtin_mulus(rollkd , omegaAccum[1]);
-		rollAccum.WW += __builtin_mulsu(rmat6 , rollkp);
+                // To convert roll_setpoint to a DCM angle, we need to scale it
+                // to range from zero to +/- max. bank angle:
+		rollAccum.WW = __builtin_mulsu(rmat6 - roll_setpoint , rollkp);
 	}
 	else
 	{
@@ -127,7 +129,32 @@ void normalRollCntrl(void)
 		gyroYawFeedback.WW = 0;
 	}
 
-	roll_control = (int32_t)rollAccum._.W1 - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
+        // roll_control is the final PD loop (no I term) output for roll:
+        // roll_control = nav_term + roll_stab_term + yaw_stab_term
+
+        // For aileron navigation, the nav_term is proportional to heading error
+        // and has gain yaw_kp. The roll_stab term is proportional to roll angle
+        // and rate (absolute) with gains rollkp and rollkd, respectively.
+        // In order to prevent navigation inputs from affecting stability of the
+        // PID stabilization loop, it seems preferable to use the nav_term to alter
+        // the angle setpoint of the roll stabilization loop.
+
+        // To change the roll_control output to drive us to the nav setpoint:
+        // roll_control = (measured angle - angle setpoint) * Pgain + (measured rate - rate setpoint) * Dgain
+
+        // rollAccum._.W1 needs to become the roll angle setpoint and feed into line 114 instead of line 148 below
+
+        // the gyroRollFeedback would become:
+        // rollkp * (setpoint - rmat6) + rollkd * omegaAccum[1]
+        
+        // The roll setpoint might be +/-30 degrees, dependent
+        // only on whether a left or right turn is desired.
+
+        // For YAW_STABILIZATION_AILERON, the gyroYawFeedback term needs a
+        // setpoint specifying the desired yaw rate (this could be a constant e.g. all turns
+        // are standard rate turns), but YAW_STABILIZATION is not enabled in current testing.
+
+	roll_control = - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
 	// Servo reversing is handled in servoMix.c
 }
 

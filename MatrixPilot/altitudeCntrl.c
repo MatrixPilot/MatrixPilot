@@ -290,11 +290,7 @@ void normalAltitudeCntrl(void)
 #endif
 		}
 
-		if (!flags._.altitude_hold_throttle)
-		{
-			manualThrottle(throttleIn);
-		}
-		else if (flags._.GPS_steering && desired_behavior._.land)
+		if (flags._.GPS_steering && desired_behavior._.land)
 		{
 			// place a ceiling, in other words, go down, but not up.
 			if (pitchAltitudeAdjust > 0)
@@ -305,6 +301,10 @@ void normalAltitudeCntrl(void)
 			throttleFiltered.WW += (((int32_t)(udb_pwTrim[THROTTLE_INPUT_CHANNEL] - throttleFiltered._.W1))<<THROTTLEFILTSHIFT);
 			set_throttle_control(throttleFiltered._.W1 - throttleIn);
 			filterManual = true;
+		}
+                else if (!flags._.altitude_hold_throttle)
+		{
+			manualThrottle(throttleIn);
 		}
 		else
 		{

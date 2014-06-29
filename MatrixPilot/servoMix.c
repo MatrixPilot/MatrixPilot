@@ -56,27 +56,27 @@ void servoMix(void)
 	// Mix pitch_control into elevators
 	// Mix yaw control and waggle into rudder
 #if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
-		temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
-		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
-		
-		udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = 3000 +
-			REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, udb_pwOut[AILERON_OUTPUT_CHANNEL] - 3000);
+        temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
+        udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control);
-		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
+        udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = 3000 +
+                REVERSE_IF_NEEDED(AILERON_SECONDARY_CHANNEL_REVERSED, udb_pwOut[AILERON_OUTPUT_CHANNEL] - 3000);
 
-		temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle);
-		udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
+        temp = pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control);
+        udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-		if (pwManual[THROTTLE_INPUT_CHANNEL] == 0)
-		{
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0;
-		}
-		else
-		{
-			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control);
-			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
-		}
+        temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle);
+        udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
+
+        if (pwManual[THROTTLE_INPUT_CHANNEL] == 0)
+        {
+                udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = 0;
+        }
+        else
+        {
+                temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control);
+                udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
+        }
 #endif
 
 	// V-Tail airplane airframe

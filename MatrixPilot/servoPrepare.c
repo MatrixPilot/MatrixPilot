@@ -27,7 +27,12 @@
 //	routines to drive the PWM pins for the servos,
 //	assumes the use of the 16MHz crystal.
 
+// these are the desired pitch/roll/yaw angles (in DCM radians x.xx format)
+int16_t pitch_setpoint, roll_setpoint, yaw_setpoint;
+
+// these are the final PWM outputs to the servos/ESC (2 * usec)
 int16_t pitch_control, roll_control, yaw_control, throttle_control;
+
 uint16_t wind_gain;
 
 
