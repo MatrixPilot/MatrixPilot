@@ -68,28 +68,26 @@ fractional spin_axis[] = { 0, 0, RMAX };
 
 // rmat is the matrix of direction cosines relating the body and Earth coordinate systems.
 
-// The following 2 comment lines appear to be incorrect:
 // The columns of rmat are the axis vectors of the plane,
 // as measured in the earth reference frame.
 
-// Mark Whitehorn's understanding of UDB coordinate frames:
 // The UDB body frame has Y pointing forward, X to the left and Z downward; this
 // differs from the aviation convention which has X forward and Y to the right.
-// Assuming that rmat is in row-major order, the third row of rmat is elements
-// 6, 7 and 8 and it is either the body frame Z axis represented in the
-// Earth frame, or the Earth frame Z axis represented in the body frame.
+// Assuming that rmat is in row-major order, the third row of rmat (MATRIX elements
+// 6, 7 and 8) is the Earth frame Z axis represented in the body frame
 // Since the RPY roll angle (computed in MAVLink.c) uses the third row of rmat,
-// specifically elements 6(x) and 8(z), and roll is defined as rotation about the
-// forward (in this case Y) axis of the body frame Z vector, these assumptions
-// are confirmed as correct.
-// Therefore:
-// The rows of rmat are the unit vectors defining the body frame in the earth frame.
-// And: rmat describes the body frame B relative to the Earth frame E
-// In Craig's notation this is represented as (B->E)R (LateX format: presupsub{E}{B}R).
+// specifically elements 6(x) and 8(z), and positive roll is defined as CCW rotation
+// about the forward (Y) axis of the Earth frame Z vector, then roll to the right
+// (from straight and level) should rotate the Earth Z vector toward +X.
+
+// Therefore: The rows of rmat are the unit vectors representing the Earth frame
+// in the body frame.
+// And: rmat describes the Body frame B relative to the Earth frame E
+// In Craig's notation this is represented as (B->E)R (LateX format: presupsub{E}{B}R ).
 // E  B    E
 //  R  V =  V
 // B
-// To transform a point from body frame to Earth frame, multiply from the left
+// To transform a point from body frame to Earth frame , multiply from the left
 // with rmat.
 
 // rmat is initialized to the identity matrix in 2.14 fractional format
