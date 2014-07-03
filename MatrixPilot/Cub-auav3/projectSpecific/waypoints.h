@@ -49,7 +49,7 @@
 
 // This is a lefthand pattern for takeoff to the east
 
-#define USE_FIXED_ORIGIN		1
+#define USE_FIXED_ORIGIN		0
 
 // center of launch zone 40 4' 22.35"N 105 13' 48.88"W
 //#define FIXED_ORIGIN_LOCATION	{ -1052302444, 400728750, 1587.7 }

@@ -99,9 +99,10 @@ void normalRollCntrl(void)
 #ifdef TestGains
 	flags._.GPS_steering = 0; // turn off navigation
 #endif
+        roll_setpoint = -(udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) << 3;
 	if (AILERON_NAVIGATION && flags._.GPS_steering)
 	{
-		roll_setpoint = determine_navigation_deflection('a');
+		roll_setpoint += determine_navigation_deflection('a') << 3;
 	}
 
 #ifdef TestGains
@@ -117,6 +118,8 @@ void normalRollCntrl(void)
 	}
 	else
 	{
+                // no stabilization; pass manual setpoint through
+                rollAccum._.W1 = (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]);
 		gyroRollFeedback.WW = 0;
 	}
 

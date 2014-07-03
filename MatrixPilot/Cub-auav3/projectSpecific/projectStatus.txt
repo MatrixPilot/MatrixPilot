@@ -54,3 +54,8 @@
     porting S.bus input function from project MPQauav2_alpha1 in MatrixPilotMulti branch
     S.bus input working with OrangeRX 7 channel
     set up relative waypoints for 100x50m pattern at 30m altitude
+
+3 July: getting close to first test flight with fbw on roll axis
+    only aileron navigation is enabled, but yawkp_aileron is increased to 0.5
+    changed back to mavlink telemetry
+    changed waypoints.h to relative origin for walk test

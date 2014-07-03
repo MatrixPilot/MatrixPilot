@@ -309,6 +309,7 @@
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	2050
+
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -349,8 +350,9 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
 
 // use ring buffer and software flow control for onboard openlog
 // **** not compatible with mavlink binary uplink ****
@@ -466,7 +468,7 @@
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP				0.1 //0.22
 #define ROLLKD				0.025 //0.02
-#define YAWKP_AILERON		0.06 // 0.05
+#define YAWKP_AILERON		0.5 // 0.05
 #define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
 

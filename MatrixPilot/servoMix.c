@@ -56,7 +56,8 @@ void servoMix(void)
 	// Mix pitch_control into elevators
 	// Mix yaw control and waggle into rudder
 #if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
-        temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
+//        temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
+        temp = 3000  + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
         udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
         udb_pwOut[AILERON_SECONDARY_OUTPUT_CHANNEL] = 3000 +

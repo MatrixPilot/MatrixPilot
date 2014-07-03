@@ -481,8 +481,13 @@ boolean udb_serial_callback_get_binary_to_send(char *c)
 
 void serial_output_8hz(void)
 {
-	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
-								lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
+//	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
+//								lat_gps.WW, long_gps.WW, alt_sl_gps.WW,
+//								rmat[0], rmat[1], rmat[2],
+//								rmat[3], rmat[4], rmat[5],
+//								rmat[6], rmat[7], rmat[8]);
+	serial_output("roll_setpoint: %i, roll_control: %i, rmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
+								roll_setpoint, roll_control,
 								rmat[0], rmat[1], rmat[2],
 								rmat[3], rmat[4], rmat[5],
 								rmat[6], rmat[7], rmat[8]);
