@@ -23,6 +23,9 @@
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
+#ifdef USE_RING_BUFFER
+#include "ring_buffer.h"
+#endif
 #include "../libUDB/heartbeat.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB_internal.h" // Needed for access to RCON
@@ -32,6 +35,15 @@
 #include <string.h>
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
+
+#ifndef USE_RING_BUFFER
+#define SERIAL_BUFFER_SIZE 256
+uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
+#else
+int16_t sb_index = 0;
+int16_t end_index = 0;
+char serial_interrupt_stopped = 1;
+#endif
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -60,11 +72,6 @@ uint8_t fp_checksum;
 
 void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
 
-
-#define SERIAL_BUFFER_SIZE 256
-char serial_buffer[SERIAL_BUFFER_SIZE + 1];
-int16_t sb_index = 0;
-int16_t end_index = 0;
 
 void init_serial()
 {
@@ -380,6 +387,17 @@ void serial_output(char* format, ...)
 
 	va_start(arglist, format);
 
+#ifdef USE_RING_BUFFER
+        uint8_t buf[200];
+        int16_t len = vsnprintf((char*) buf, (size_t) ring_space(), format, arglist);
+	int status = queue_data((char*) buf, len);
+
+	if (status && (serial_interrupt_stopped == 1))
+	{
+		serial_interrupt_stopped  = 0;
+		udb_serial_start_sending_data();
+	}
+#else
 	int16_t start_index = end_index;
 	int16_t remaining = SERIAL_BUFFER_SIZE - start_index;
 
@@ -393,11 +411,13 @@ void serial_output(char* format, ...)
 	{
 		udb_serial_start_sending_data();
 	}
+#endif // USE_RING_BUFFER
 
 	va_end(arglist);
 }
 #endif // USE_TELELOG
 
+#ifndef USE_RING_BUFFER
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
 	uint8_t txchar = serial_buffer[ sb_index++ ];
@@ -413,6 +433,49 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	}
 	return -1;
 }
+#else
+#include "ring_buffer.h"
+
+// to be used with OpenLog for software flow control
+// Warning: imcompatible with mavlink binary uplink
+extern boolean pauseSerial;
+#define SOFTWARE_FLOW_CONTROL 0
+
+// compiler built_in mechanism to set and restore IPL
+static int current_cpu_ipl;
+
+static inline void setAndSaveIPL(int newIPL)
+{
+	SET_AND_SAVE_CPU_IPL(current_cpu_ipl, newIPL);
+}
+
+static inline void restoreIPL()
+{
+	RESTORE_CPU_IPL(current_cpu_ipl);
+}
+
+// Return one character at a time, as requested.
+// Requests will stop after we return false.
+// called by _U2TXInterrupt at IPL5
+
+boolean udb_serial_callback_get_binary_to_send(char *c)
+{
+	boolean status = false;
+
+#if (SOFTWARE_FLOW_CONTROL != 0)
+	if (!pauseSerial)
+#endif
+	{
+		status = ring_get(c);
+	}
+
+	if (!status)
+		serial_interrupt_stopped = 1;
+
+	return status;
+}
+#endif  // USE_RING_BUFFER
+
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
 

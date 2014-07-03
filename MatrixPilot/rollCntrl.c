@@ -154,7 +154,7 @@ void normalRollCntrl(void)
         // setpoint specifying the desired yaw rate (this could be a constant e.g. all turns
         // are standard rate turns), but YAW_STABILIZATION is not enabled in current testing.
 
-	roll_control = - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
+	roll_control = rollAccum._.W1 - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
 	// Servo reversing is handled in servoMix.c
 }
 

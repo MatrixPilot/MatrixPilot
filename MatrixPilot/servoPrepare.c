@@ -35,6 +35,10 @@ int16_t pitch_control, roll_control, yaw_control, throttle_control;
 
 uint16_t wind_gain;
 
+#if (USE_SBUS_INPUT == 1)
+void parseSbusData(void);
+extern boolean sbusDAV;
+#endif
 
 void manualPassthrough(void);
 
@@ -71,6 +75,10 @@ void init_servoPrepare(void) // initialize the PWM
 // Called at HEARTBEAT_HZ
 void dcm_servo_callback_prepare_outputs(void)
 {
+#if (USE_SBUS_INPUT == 1)
+        if (sbusDAV) parseSbusData();
+#endif
+
 	if (dcm_flags._.calib_finished)
 	{
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
