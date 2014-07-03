@@ -94,6 +94,11 @@ void udb_skip_imu_calibration(boolean b)
 //#endif
 //
 
+#if (USE_SBUS_INPUT == 1)
+void udb_init_Sbus(void);
+#endif
+
+
 void udb_init(void)
 {
 	udb_flags.B = 0;
@@ -123,6 +128,11 @@ void udb_init(void)
 	flexiFunctionServiceInit();
 #endif
 	udb_init_clock();
+#if (USE_SBUS_INPUT == 1)
+        udb_init_Sbus();
+#else
+        // TODO: modify udb_init_capture to work correctly with S.bus input
+#endif
 	udb_init_capture();
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
@@ -133,7 +143,7 @@ void udb_init(void)
 #if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif
-	udb_init_pwm();
+    udb_init_pwm();
 #if (USE_OSD == 1)
 	udb_init_osd();
 #endif

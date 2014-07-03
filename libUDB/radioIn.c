@@ -132,6 +132,7 @@ void udb_init_capture(void)
 }
 #define IC_INIT(x, y, z) _IC_INIT(x, y, z)
 
+#if (USE_SBUS_INPUT == 0)
 	if (NUM_INPUTS > 0) IC_INIT(1, REGTOK1, REGTOK2);
 #if (USE_PPM_INPUT == 0)
 	if (NUM_INPUTS > 1) IC_INIT(2, REGTOK1, REGTOK2);
@@ -142,7 +143,9 @@ void udb_init_capture(void)
 	if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
 	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
 #endif // USE_PPM_INPUT
+#endif // USE_SBUS_INPUT
 #endif // NORADIO
+
 }
 
 void set_udb_pwIn(uint16_t pwm, int index)
