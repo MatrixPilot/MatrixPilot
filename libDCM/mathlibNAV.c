@@ -399,3 +399,11 @@ int32_t long_scale(int32_t arg1, int16_t arg2)
 		return -product;
 	}
 }
+
+void magClamp(int16_t *in, int16_t mag) {
+    if (*in < -mag)
+        *in = -mag;
+    else if (*in > mag)
+        *in = mag;
+}
+

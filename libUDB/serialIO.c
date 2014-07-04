@@ -396,7 +396,11 @@ void parseSbusData() {
     } else {
         // failsafe flag is clear
         failSafePulses = 44;
-        udb_flags._.radio_on = 1;
+        if ((udb_pwIn[FAILSAFE_INPUT_CHANNEL] > FAILSAFE_INPUT_MIN) && (udb_pwIn[FAILSAFE_INPUT_CHANNEL] < FAILSAFE_INPUT_MAX))
+            udb_flags._.radio_on = 1;
+        else {
+            udb_flags._.radio_on = 0;
+        }
     }
 }
 

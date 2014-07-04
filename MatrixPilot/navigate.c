@@ -301,13 +301,6 @@ uint16_t wind_gain_adjustment(void)
 #endif
 }
 
-void magClamp(int *in, int mag) {
-    if (*in < -mag)
-        *in = -mag;
-    else if (*in > mag)
-        *in = mag;
-}
-
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
 int16_t determine_navigation_deflection(char navType)
@@ -415,8 +408,10 @@ int16_t determine_navigation_deflection(char navType)
 	// multiply by wind gain adjustment, and multiply by 2
 	deflectionAccum.WW = (__builtin_mulsu (deflectionAccum._.W1 , wind_gain)<<1);
 
+        // since the max magnitude of the crossproduct is 16384, a gain value of
+        // 1.0 should result in maximum roll angle of 90 degrees
         // clamp magnitude to reasonable value in DCM format (90 degrees = 16384)
-        magClamp(&(deflectionAccum._.W1), 12000);
+        magClamp(&(deflectionAccum._.W1), 16000);
 
 	return deflectionAccum._.W1;
 }

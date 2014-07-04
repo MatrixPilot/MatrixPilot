@@ -93,6 +93,9 @@ uint16_t vector2_normalize(int16_t result[], int16_t input[]);
 uint16_t vector3_normalize(int16_t result[], int16_t input[]);
 int32_t long_scale(int32_t arg1, int16_t arg2);
 
+// miscellaneous
+void magClamp(int16_t *in, int16_t mag);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Vars
 extern union dcm_fbts_word { struct dcm_flag_bits _; int16_t W; } dcm_flags;
