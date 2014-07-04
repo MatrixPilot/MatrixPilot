@@ -25,7 +25,7 @@
 #include "rmat.h"
 
 
-#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
+#if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL || GPS_TYPE == GPS_UBX)
 
 // Parse the GPS messages, using the binary interface.
 // The parser uses a state machine implemented via a pointer to a function.
@@ -65,34 +65,34 @@ static void msg_ACK_ID(uint8_t inchar);
 
 //void bin_out(char outchar);
 
-const char bin_mode_withnmea[] = "$PUBX,41,1,0003,0003,19200,0*21\r\n"; // turn on UBX + NMEA, 19200 baud
-const char bin_mode_nonmea[] = "$PUBX,41,1,0003,0001,19200,0*23\r\n";   // turn on UBX only, 19200 baud
+const char bin_mode_withnmea[] = "$PUBX,41,1,0003,0003,38400,0*24\r\n"; // turn on UBX + NMEA, 38400 baud
+const char bin_mode_nonmea[] = "$PUBX,41,1,0003,0001,38400,0*26\r\n";   // turn on UBX only, 38400 baud
 const char disable_GSV[] = "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n"; //Disable the $GPGSV NMEA message
 const char disable_VTG[] = "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n"; //Disable the $GPVTG NMEA message
 const char disable_GLL[] = "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n"; //Disable the $GPGLL NMEA message
 const char disable_GSA[] = "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n"; //Disable the $GPGSA NMEA message
 
-#if (GPS_TYPE == GPS_UBX_4HZ)
-const uint8_t set_rate[] = {
+const uint32_t gps_init_speed[] = {9600,19200,38400,57600,115200, 0};
+const uint32_t* current_init_speed = gps_init_speed;
+
+const uint8_t set_rate_5Hz[] = {
 	0xB5, 0x62, // Header
 	0x06, 0x08, // ID
 	0x06, 0x00, // Payload Length
-	0xFA, 0x00, // measRate
+	0xC8, 0x00, // measRate 5Hz
 	0x01, 0x00, // navRate
 	0x01, 0x00, // timeRef
-	0x10, 0x96  // Checksum
+	0xDE, 0x6A  // Checksum
 };
-#else
-const uint8_t set_rate[] = {
+const uint8_t set_rate_2Hz[] = {
 	0xB5, 0x62, // Header
 	0x06, 0x08, // ID
 	0x06, 0x00, // Payload Length
-	0xF4, 0x01, // measRate
+	0xF4, 0x01, // measRate 2Hz
 	0x01, 0x00, // navRate
 	0x01, 0x00, // timeRef
 	0x0B, 0x77  // Checksum
 };
-#endif
 
 const uint8_t enable_UBX_only[] = {
 	0xB5, 0x62, // Header
@@ -101,13 +101,13 @@ const uint8_t enable_UBX_only[] = {
 	0x01,       // Port ID
 	0x00,       // res0
 	0x00, 0x00, // res1
-	0xD0, 0x08, 0x00, 0x00, // mode
-	0x00, 0x4B, 0x00, 0x00, // baudrate
+	0xC0, 0x08, 0x00, 0x00, // mode
+	0x00, 0x96, 0x00, 0x00, // baudrate
 	0x03, 0x00, // inProtoMask
 	0x01, 0x00, // outProtoMask
 	0x00, 0x00, // Flags - reserved, set to 0
 	0x00, 0x00, // Pad - reserved, set to 0
-	0x42, 0x2B  // checksum
+	0x7D, 0x64  // checksum
 };
 
 const uint8_t enable_UBX_NMEA[] = {
@@ -117,13 +117,13 @@ const uint8_t enable_UBX_NMEA[] = {
 	0x01,       // Port ID
 	0x00,       // res0
 	0x00, 0x00, // res1
-	0xD0, 0x08, 0x00, 0x00, // mode
-	0x00, 0x4B, 0x00, 0x00, // baudrate
+	0xC0, 0x08, 0x00, 0x00, // mode
+	0x00, 0x96, 0x00, 0x00, // baudrate
 	0x03, 0x00, // inProtoMask
 	0x03, 0x00, // outProtoMask
 	0x00, 0x00, // Flags - reserved, set to 0
 	0x00, 0x00, // Pad - reserved, set to 0
-	0x44, 0x37  // checksum
+	0x7F, 0x70  // checksum
 };
 
 const uint8_t enable_NAV_SOL[] = {
@@ -171,8 +171,7 @@ const uint8_t enable_NAV_VELNED[] = {
 	0x23, 0x2E  // Checksum
 };
 
-#if (GPS_TYPE == GPS_UBX_4HZ)
-const uint8_t enable_NAV_DOP[] = {
+const uint8_t enable_NAV_DOP_4Hz[] = {
 	0xB5, 0x62, // Header
 	0x06, 0x01, // ID
 	0x08, 0x00, // Payload length
@@ -186,8 +185,8 @@ const uint8_t enable_NAV_DOP[] = {
 	0x00,       // Rate on ???
 	0x18, 0xDB  // Checksum
 };
-#else
-const uint8_t enable_NAV_DOP[] = {
+
+const uint8_t enable_NAV_DOP_2Hz[] = {
 	0xB5, 0x62, // Header
 	0x06, 0x01, // ID
 	0x08, 0x00, // Payload length
@@ -201,9 +200,9 @@ const uint8_t enable_NAV_DOP[] = {
 	0x00,       // Rate on ???
 	0x16, 0xD1  // Checksum
 };
-#endif
 
-const uint8_t enable_SBAS[] = {
+
+const uint8_t enable_WAAS_SBAS[] = {
 	0xB5, 0x62, // Header
 	0x06, 0x16, // ID
 	0x08, 0x00, // Payload length
@@ -218,32 +217,62 @@ const uint8_t enable_SBAS[] = {
 	0x29, 0xAD  // Checksum
 };
 
+const uint8_t enable_EGNOS_SBAS[] = {
+        0xB5, 0x62, // Header
+        0x06, 0x16, // ID
+        0x08, 0x00, // Payload length
+        0x03,       // Enable SBAS
+        0x07,
+        0x03,
+        0x00,
+        0x51,
+        0x08,
+        0x00,
+        0x00,
+        0x8A, 0x41  // Checksum
+};
+
+const uint8_t disable_SBAS[] = {
+        0xB5, 0x62, // Header
+        0x06, 0x16, // ID
+        0x08, 0x00, // Payload length
+        0x00,       // Disable SBAS
+        0x03,
+        0x03,
+        0x00,
+        0x51,
+        0x62,
+        0x06,
+        0x00,
+        0xE3, 0x27  // Checksum
+};
+
 const uint8_t config_NAV5[] = {
 	0xB5, 0x62, // Header
 	0x06, 0x24, // ID
 	0x24, 0x00, // Payload length
 	0xFF, 0xFF, //
-	0x04,       // Dynamic Model Number
+	0x08,       // Dynamic Model Number AIrborne < 4g
 	0x02,       //
 	0x00, 0x00, //
 	0x00, 0x00, //
 	0x10, 0x27, //
 	0x00, 0x00, //
 	0x05, 0x00, //
-	0xFA, 0x00, //
-	0xFA, 0x00, //
-	0x64, 0x00, //
-	0x2C, 0x01, //
+	0x32, 0x00, //
+	0x0A, 0x00, //
+	0x14, 0x00, //
+	0x05, 0x00, //
+	0x00, 0x3C, //
 	0x00, 0x00, //
 	0x00, 0x00, //
 	0x00, 0x00, //
 	0x00, 0x00, //
 	0x00, 0x00, //
 	0x00, 0x00, //
-	0x00, 0x00, //
-	0x13, 0x77  // Checksum
+	0x23, 0xFC  // Checksum
 };
-
+/*
 const uint16_t set_rate_length = 14;
 const uint16_t enable_NAV_SOL_length = 16;
 const uint16_t enable_NAV_POSLLH_length = 16;
@@ -252,6 +281,7 @@ const uint16_t enable_NAV_DOP_length = 16;
 const uint16_t enable_UBX_only_length = 28;
 const uint16_t enable_SBAS_length = 16;
 const uint16_t config_NAV5_length = 44;
+*/
 
 void (*msg_parse)(uint8_t inchar) = &msg_B3;
 
@@ -369,6 +399,9 @@ uint8_t* const msg_BODYRATES_parse[] = {
 };
 #endif // HILSIM
 
+/*
+ * called from dcm_run_init_step 40Hz
+ */
 void gps_startup_sequence(int16_t gpscount)
 {
 	if (gpscount == 980)
@@ -376,9 +409,19 @@ void gps_startup_sequence(int16_t gpscount)
 #if (HILSIM == 1)
 		udb_gps_set_rate(HILSIM_BAUD);
 #else
-		udb_gps_set_rate(9600);
+		current_init_speed = gps_init_speed;
 #endif
 	}
+#if (HILSIM != 1)
+        else if (gpscount >= 400 && gpscount <= 550 && gpscount % 20 == 0 && *current_init_speed)   // every 0.5 sec
+        {
+                udb_gps_set_rate(*current_init_speed);
+                current_init_speed++;
+                gpsoutline(bin_mode_nonmea);    // force 38400 speed
+        }
+	else if (gpscount == 350)
+		udb_gps_set_rate(38400);
+#endif
 	else if (dcm_flags._.nmea_passthrough && gpscount == 200)
 		gpsoutline(disable_GSV);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
@@ -393,29 +436,31 @@ void gps_startup_sequence(int16_t gpscount)
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		// set the UBX to use binary mode
 		gpsoutline(bin_mode_nonmea);
-#if (HILSIM != 1)
-	else if (gpscount == 150)
-		udb_gps_set_rate(19200);
-#endif
 	else if (gpscount == 140)
-		gpsoutbin(set_rate_length, set_rate);
+		GPSOUTBIN(set_rate_2Hz);
 	else if (gpscount == 130)
 		// command GPS to select which messages are sent, using UBX interface
-		gpsoutbin(enable_NAV_SOL_length, enable_NAV_SOL);
+		GPSOUTBIN(enable_NAV_SOL);
 	else if (gpscount == 120)
-		gpsoutbin(enable_NAV_POSLLH_length, enable_NAV_POSLLH);
+		GPSOUTBIN(enable_NAV_POSLLH);
 	else if (gpscount == 110)
-		gpsoutbin(enable_NAV_VELNED_length, enable_NAV_VELNED);
+		GPSOUTBIN(enable_NAV_VELNED);
 	else if (gpscount == 100)
-		gpsoutbin(enable_NAV_DOP_length, enable_NAV_DOP);
+		GPSOUTBIN(enable_NAV_DOP_2Hz);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 90)
-		gpsoutbin(enable_UBX_only_length, enable_UBX_NMEA);
+		GPSOUTBIN(enable_UBX_NMEA);
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 90)
-		gpsoutbin(enable_UBX_only_length, enable_UBX_only);
+		GPSOUTBIN(enable_UBX_only);
 	else if (gpscount == 80)
-		gpsoutbin(enable_SBAS_length, enable_SBAS);
+#if SBAS_TYPE == SBAS_EGNOS
+		GPSOUTBIN(enable_EGNOS_SBAS);
+#elif SBAS_TYPE == SBAS_WAAS
+		GPSOUTBIN(enable_WAAS_SBAS);
+#else
+		GPSOUTBIN(disable_SBAS);
+#endif
 	else if (gpscount == 70)
-		gpsoutbin(config_NAV5_length, config_NAV5);
+		GPSOUTBIN(config_NAV5);
 }
 
 boolean gps_nav_valid(void)
@@ -797,6 +842,12 @@ static void msg_CS1(uint8_t gpschar)
 		                                    // setting this ensures the nav routine does not try to use this data.
 	}
 	msg_parse = &msg_B3;
+}
+
+void gps_update_basic_data(void)
+{
+	week_no         = week_no_;
+	svs             = svs_;
 }
 
 void gps_commit_data(void)

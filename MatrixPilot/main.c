@@ -23,6 +23,8 @@
 #include "behaviour.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
+#include "flightplan-waypoints.h"
+#include <setjmp.h>
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -39,6 +41,8 @@
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
 void parameter_table_init(void);
 #endif
+
+static jmp_buf buf;
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -69,7 +73,7 @@ int main(void)
 	init_behavior();
 	init_serial();
 
-	if (setjmp())
+	if (setjmp(buf))
 	{
 		// a processor exception occurred and we're resuming execution here 
 		DPRINT("longjmp'd\r\n");

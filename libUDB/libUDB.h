@@ -212,18 +212,12 @@ extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro c
 extern struct ADchannel udb_vref;                          // reference voltage
 extern struct ADchannel udb_analogInputs[];
 
-#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;        // battery_current._.W1 is in tenths of Amps
 extern union longww battery_mAh_used;       // battery_mAh_used._.W1 is in mAh
-#endif
 
-#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_voltage;        // battery_voltage._.W1 is in tenths of Volts
-#endif
 
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as percent of full signal
-#endif
 
 
 // Calibrate the sensors

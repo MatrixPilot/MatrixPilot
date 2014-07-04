@@ -349,6 +349,11 @@ void gps_commit_data(void)
 	svs         = svs_;
 }
 
+gps_update_basic_data()
+{
+	svs          = svs_;
+}
+
 void init_gps_std(void)
 {
 }

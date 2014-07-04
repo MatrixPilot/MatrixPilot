@@ -62,12 +62,16 @@
 //    AIRFRAME_HELI             Not currently supported
 //    AIRFRAME_QUAD             Under development
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
-#define AIRFRAME_TYPE                       AIRFRAME_STANDARD
+#define AIRFRAME_TYPE                       AIRFRAME_VTAIL
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
-#define GPS_TYPE                            GPS_STD
+#define GPS_TYPE                            GPS_UBX_4HZ
+#define SBAS_WAAS   1 // US
+#define SBAS_EGNOS  2 // EU
+#define SBAS_OFF    3 // disabled
+#define SBAS_TYPE SBAS_EGNOS
 //#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
 
 
@@ -77,7 +81,7 @@
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
 #define ROLL_STABILIZATION_AILERONS         1
-#define ROLL_STABILIZATION_RUDDER           0
+#define ROLL_STABILIZATION_RUDDER           1
 #define PITCH_STABILIZATION                 1
 #define YAW_STABILIZATION_RUDDER            1
 #define YAW_STABILIZATION_AILERON           1
@@ -86,6 +90,7 @@
 // Set either of these to 0 to disable use of that control surface for navigation.
 #define AILERON_NAVIGATION                  1
 #define RUDDER_NAVIGATION                   1
+
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -102,7 +107,7 @@
 // This is an option for modulating the navigation gains in flight
 // to maintain a constant turn radius in heavy winds in waypoing mode.
 // Define WIND_GAIN_ADJUSTMENT as 1 to turn this feature on.
-#define WIND_GAIN_ADJUSTMENT                0
+#define WIND_GAIN_ADJUSTMENT                1
 
 // Altitude Hold
 // Use altitude hold in stabilized mode?  In waypoint mode?
@@ -114,20 +119,20 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED             AH_FULL
+#define ALTITUDEHOLD_STABILIZED             AH_NONE
 #define ALTITUDEHOLD_WAYPOINT               AH_FULL
 
 // Speed Control
 // If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
-#define SPEED_CONTROL                       0
+#define SPEED_CONTROL                       1
 #define DESIRED_SPEED                       10.0    // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
-#define INVERTED_FLIGHT_STABILIZED_MODE     0
-#define INVERTED_FLIGHT_WAYPOINT_MODE       0
+#define INVERTED_FLIGHT_STABILIZED_MODE     1
+#define INVERTED_FLIGHT_WAYPOINT_MODE       1
 
 // Hovering
 // Set these to 1 to enable stabilization of hovering in stabilized and/or waypoint modes.
@@ -191,8 +196,8 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT                       0
-#define PPM_NUMBER_OF_CHANNELS              8
+#define USE_PPM_INPUT                       1
+#define PPM_NUMBER_OF_CHANNELS              10
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
 
@@ -201,17 +206,17 @@
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
 // For UDB4 boards: Set to 1-8
-#define NUM_INPUTS                          5
+#define NUM_INPUTS                          8
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
 #define THROTTLE_INPUT_CHANNEL              CHANNEL_3
-#define AILERON_INPUT_CHANNEL               CHANNEL_1
+#define AILERON_INPUT_CHANNEL               CHANNEL_4
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
-#define RUDDER_INPUT_CHANNEL                CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_4
+#define RUDDER_INPUT_CHANNEL                CHANNEL_1
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -226,7 +231,7 @@
 // For UDB4/5 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
 // For AUAV3 boards:  Set to 3-8 (or up to 11 using pins RE1, RA6 and RA7.)
 //                               (this needs developing, so contact the list)
-#define NUM_OUTPUTS                         4
+#define NUM_OUTPUTS                         5
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -239,11 +244,11 @@
 // connect THROTTLE_OUTPUT_CHANNEL to one of the built-in Outputs (1, 2, or 3) to make
 // sure your board gets power.
 //
-#define THROTTLE_OUTPUT_CHANNEL             CHANNEL_3
-#define AILERON_OUTPUT_CHANNEL              CHANNEL_1
-#define ELEVATOR_OUTPUT_CHANNEL             CHANNEL_2
-#define RUDDER_OUTPUT_CHANNEL               CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
+#define THROTTLE_OUTPUT_CHANNEL             CHANNEL_1
+#define AILERON_OUTPUT_CHANNEL              CHANNEL_2
+#define ELEVATOR_OUTPUT_CHANNEL             CHANNEL_4
+#define RUDDER_OUTPUT_CHANNEL               CHANNEL_5
+#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_3
 #define CAMERA_PITCH_OUTPUT_CHANNEL         CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL           CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL              CHANNEL_UNUSED
@@ -274,8 +279,8 @@
 // Often the Flap channel will be controlled by a 3-position switch.
 // These are the thresholds for the cutoffs between low and middle, and between middle and high.
 // Normal signals should fall within about 2000 - 4000.
-#define MODE_SWITCH_THRESHOLD_LOW           2600
-#define MODE_SWITCH_THRESHOLD_HIGH          3400
+#define MODE_SWITCH_THRESHOLD_LOW           2500
+#define MODE_SWITCH_THRESHOLD_HIGH          3500
 
 // Setting MODE_SWITCH_TWO_POSITION to 1,  allows a two state mode switch on the transmitter to be used
 // to create three flight modes. When switch is "Down" the plane always reverts to Manual. When "Up",
@@ -302,7 +307,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN                  1500
+#define FAILSAFE_INPUT_MIN                  2000
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -343,12 +348,12 @@
 // SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
-//#define SERIAL_BAUDRATE                     19200
+#define SERIAL_BAUDRATE                     57600
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -389,19 +394,20 @@
 // to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
-#define ANALOG_CURRENT_INPUT_CHANNEL        CHANNEL_UNUSED
-#define ANALOG_VOLTAGE_INPUT_CHANNEL        CHANNEL_UNUSED
-#define ANALOG_RSSI_INPUT_CHANNEL           CHANNEL_UNUSED
+#define ANALOG_CURRENT_INPUT_CHANNEL        A_VOLT_BUFF
+#define ANALOG_VOLTAGE_INPUT_CHANNEL        A_AMPS_BUFF
+#define ANALOG_RSSI_INPUT_CHANNEL           A_RSSI_BUFF
 
-#define MAX_CURRENT                         900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
-#define CURRENT_SENSOR_OFFSET               10  // Add 1.0 Amp to whatever value we sense
+#define CURRENT_SENSOR_SCALE                69 // scale
+#define CURRENT_SENSOR_OFFSET               0  // in mA
 
-#define MAX_VOLTAGE                         543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define MAX_VOLTAGE                         554 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET               0   // Add 0.0 Volts to whatever value we sense
 
 // RSSI - RC Receiver signal strength
-#define RSSI_MIN_SIGNAL_VOLTAGE             0.5     // Voltage when RSSI should show 0%
-#define RSSI_MAX_SIGNAL_VOLTAGE             3.3     // Voltage when RSSI should show 100%
+#define RSSI_MIN_SIGNAL_VOLTAGE             1.5     // Voltage when RSSI should show 0%
+#define RSSI_MAX_SIGNAL_VOLTAGE             3.0     // Voltage when RSSI should show 100%
+#define RSSI_RAW_SIGNAL						1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -608,13 +614,13 @@
 // These settings are only used when Altitude Hold is enabled above.
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
-#define HEIGHT_TARGET_MIN                   25.0
-#define HEIGHT_TARGET_MAX                   100.0
+#define HEIGHT_TARGET_MIN                   75.0
+#define HEIGHT_TARGET_MAX                   110.0
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN                       10
+#define HEIGHT_MARGIN                       20
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
@@ -622,7 +628,7 @@
 // Use ALT_HOLD_THROTTLE_MIN when above HEIGHT_MARGIN of the target height.
 // Throttle values are from 0.0 - 1.0.
 #define ALT_HOLD_THROTTLE_MIN               0.35
-#define ALT_HOLD_THROTTLE_MAX               1.0
+#define ALT_HOLD_THROTTLE_MAX               0.8
 
 // Use ALT_HOLD_PITCH_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_PITCH_MAX and ALT_HOLD_PITCH_MIN when
@@ -640,7 +646,7 @@
 // it is used to increase speed (and wind penetration) during a return to launch.
 // set it to zero if you do not want to use this feature.
 // This only takes effect when entering RTL mode, which only happens when the plane loses the transmitter signal.
-#define RTL_PITCH_DOWN                      0.0
+#define RTL_PITCH_DOWN                      0.1
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -681,9 +687,9 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME               "Not Defined"
+#define ID_VEHICLE_MODEL_NAME               "Talon"
 #define ID_VEHICLE_REGISTRATION             "Not Defined"
-#define ID_LEAD_PILOT                       "Not Defined"
+#define ID_LEAD_PILOT                       "pma_"
 #define ID_DIY_DRONES_URL                   "http://www.diydrones.com"
 
 
@@ -776,7 +782,7 @@
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
 #define TLM_PORT                            3
-#define DBG_PORT                            1
+#define DBG_PORT                            0
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
 #define USE_TELELOG                         0

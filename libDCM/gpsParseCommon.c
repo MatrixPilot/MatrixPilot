@@ -119,7 +119,6 @@ void gps_parse_none(uint8_t gpschar) { }
 void (*msg_parse)(uint8_t) = &gps_parse_none;
 #endif // GPS_TYPE
 
-
 void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message to the GPS
 {
 	gps_out_buffer = 0; // clear the buffer pointer first, for safety, in case we're interrupted
@@ -322,6 +321,7 @@ static void udb_background_callback_triggered(void)
 		dirovergndHGPS[2] = 0;
 		dcm_flags._.yaw_req = 1;            // request yaw drift correction
 		dcm_flags._.gps_history_valid = 0;  // gps history has to be restarted
+		gps_update_basic_data();			// update svs
 	}
 }
 

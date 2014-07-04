@@ -928,10 +928,10 @@ void mavlink_output_40hz(void)
 		    0,              // Sensors enabled
 		    0,              // Sensor health
 		    udb_cpu_load() * 10,
-		    0,              // Battery voltage in mV
-		    0,              // Current
-		    0,              // Percentage battery remaining 100 percent is 1000
-		    r_mavlink_status.packet_rx_drop_count,
+		    battery_voltage.WW,            // Battery voltage in mV float
+		    battery_current.WW,              // Current //Battery current, in 10*milliamperes (1 = 10 milliampere)  uint16_t
+		    battery_mAh_used.WW,             // Percentage battery remaining 100 percent is 1000
+		    rc_signal_strength,
 		    0,              // errors_comm
 		    0,              // errors_count1
 		    0,              // errors_count2
@@ -963,11 +963,7 @@ void mavlink_output_40hz(void)
 		    (uint16_t)((udb_pwIn[6]) >> 1),
 		    (uint16_t)((udb_pwIn[7]) >> 1),
 		    (uint8_t)0,     // port number for more than 8 servos
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 		    (uint8_t)rc_signal_strength);
-#else
-		    (uint8_t)255);  // 255 denotes not in use
-#endif
 	}
 	// mavlink_msg_rc_channels_raw_send(mavlink_channel_t chan, uint32_t time_boot_ms, uint8_t port, uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw,
 	//    uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
