@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma message "Long Lake"
+#pragma message "West Field lefthand pattern"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ const struct waypointDef waypoints[] = {
 	{ { -96, 82, 35 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
 	{ { -104, 8, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
 	{ { -56, 4, 10 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-	{ { 51, 3, 10 } , F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { 51, 3, -10 } , F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 7
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ const struct waypointDef waypoints[] = {
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
 const struct waypointDef rtlWaypoints[] = {
-		{ { 30, 50,  30 } , F_LOITER, CAM_VIEW_LAUNCH } ,
+		{ { 0, 30,  30 } , F_LOITER, CAM_VIEW_LAUNCH } ,
 } ;
 
 

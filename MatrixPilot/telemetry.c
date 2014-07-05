@@ -478,6 +478,9 @@ boolean udb_serial_callback_get_binary_to_send(char *c)
 
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
+extern struct ADchannel udb_vcc;
+extern struct ADchannel udb_5v;
+extern struct ADchannel udb_rssi;
 
 void serial_output_8hz(void)
 {
@@ -486,8 +489,10 @@ void serial_output_8hz(void)
 //								rmat[0], rmat[1], rmat[2],
 //								rmat[3], rmat[4], rmat[5],
 //								rmat[6], rmat[7], rmat[8]);
-	serial_output("roll_setpoint: %i, roll_control: %i, rmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
-								roll_setpoint, roll_control,
+	serial_output("udb_5v: %i, batt V: %i, roll_setpoint: %i, roll_control: %i, rmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
+                                                                (uint16_t)(((double)udb_5v.value + 32768) / 65.536),
+								(uint16_t)(2 * 5499 * 3.3 * ((double)udb_vcc.value + 32768) / 65536),
+                                                                roll_setpoint, roll_control,
 								rmat[0], rmat[1], rmat[2],
 								rmat[3], rmat[4], rmat[5],
 								rmat[6], rmat[7], rmat[8]);

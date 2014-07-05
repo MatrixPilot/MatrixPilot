@@ -59,3 +59,14 @@
     only aileron navigation is enabled, but yawkp_aileron is increased to 0.5
     changed back to mavlink telemetry
     changed waypoints.h to relative origin for walk test
+    Flight test: roll axis stabilization works; rollkp is not too high
+    needed to scale up manual input to increase effectiveness in stabilize mode
+    Waypoint following did not work correctly; log indicates flight directly away
+    from WP1, and it looks like the sign of navigation deflection was flipped in
+    adding the roll setpoint logic.
+
+5 July: enabled magnetometer; auto-alignment is enabled
+    telemetry type set to mavlink
+    waypoints file is west field lefthand pattern with relative origin
+    RTL point is 30m north of init point at 30m altitude with flag F_LOITER;
+        throttle will come on when throttle hold (failsafe) is activated on DX7

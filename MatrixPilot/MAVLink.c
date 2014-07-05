@@ -1697,7 +1697,8 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(MAVLINK_RATE_SYSTEM_STATUS, mavlink_counter_40hz + spread_transmission_load))
 	{
 #if (BOARD_TYPE == AUAV3_BOARD)
-		voltage_milis.BB = (uint16_t)(2 * 5550 * 3.3 * ((double)udb_vcc.value + 32768) / 65536);
+            // note that this voltage is NOT VCC, it is the battery input voltage to ACSP1 divided by 3
+		voltage_milis.BB = (uint16_t)(2 * 5499 * 3.3 * ((double)udb_vcc.value + 32768) / 65536);
 #else
 		// TODO: assign this for udb4/5
 		voltage_milis.BB = 0;
