@@ -154,6 +154,7 @@
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT                       1
+#define MAG_YAW_ENABLE                      0
 
 
 // Racing Mode
@@ -350,9 +351,9 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
-#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
 
 // use ring buffer and software flow control for onboard openlog
 // **** not compatible with mavlink binary uplink ****
@@ -364,7 +365,7 @@
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       55
+#define MAVLINK_SYSID                       1
 
 
 ////////////////////////////////////////////////////////////////////////////////

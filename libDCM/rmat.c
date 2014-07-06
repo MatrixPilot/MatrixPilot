@@ -826,7 +826,7 @@ void dcm_run_imu_step(void)
 	rupdate();                  // local
 	normalize();                // local
 	roll_pitch_drift();         // local
-#if (MAG_YAW_DRIFT == 1)
+#if (MAG_YAW_DRIFT == 1 && MAG_YAW_ENABLE == 1)
 	if (magMessage == 7)
 	{
 		mag_drift();            // local
