@@ -50,6 +50,10 @@
 #include "mavlink_options.h"
 #include "../libUDB/events.h"
 
+#if (MAG_YAW_DRIFT == 1) // Magnetometer is connected
+		extern int16_t magFieldRaw[];
+#endif
+                
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with
 // as test suite.  The inserted code will self-test every message type to encode packets, de-code packets,
 // and it will then check that the results match. The code reports a pass rate and fail rate
@@ -1762,7 +1766,6 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
 #if (MAG_YAW_DRIFT == 1) // Magnetometer is connected
-		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
 			(int16_t)   udb_xaccel.value,	(int16_t)   udb_yaccel.value,	(int16_t) - udb_zaccel.value,
 			(int16_t) - udb_xrate.value,	(int16_t) - udb_yrate.value,	(int16_t) - udb_zrate.value,
