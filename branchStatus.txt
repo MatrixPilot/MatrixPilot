@@ -138,3 +138,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 7 July 2014:
 	ported ENABLE_MAGALIGNMENT option from MatrixPilotMulti
 	if undefined, magnetometer auto-alignment/offset code is bypassed
+	Increased GPS_SPEED_MIN from 1.5 to 3 m/sec; this should match
+	with max speed for using magnetometer if/when mag is enabled/disabled as a
+	function of ground speed.
