@@ -10,7 +10,7 @@ p3
 I0
 sS'telemetry_filename'
 p4
-S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02338.RAW'
+S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02346.RAW'
 p5
 sS'telemetry_type'
 p6
@@ -24,11 +24,11 @@ p9
 I0
 sS'GE_filename_kml'
 p10
-S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02338.kml'
+S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02346.kml'
 p11
 sS'CSV_filename'
 p12
-S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02338.csv'
+S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02346.csv'
 p13
 sS'waypoint_filename'
 p14
@@ -42,7 +42,7 @@ p17
 I0
 sS'GE_filename'
 p18
-S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02338.kmz'
+S'/media/ubuntu_32/home/markw/Desktop/flightLogs/Cub/LOG02346.kmz'
 p19
 sS'waypoint_selector'
 p20

@@ -49,7 +49,7 @@
 
 // This is a lefthand pattern for takeoff to the east
 
-#define USE_FIXED_ORIGIN		0
+#define USE_FIXED_ORIGIN		1
 
 // center of launch zone 40 4' 22.35"N 105 13' 48.88"W
 //#define FIXED_ORIGIN_LOCATION	{ -1052302444, 400728750, 1587.7 }
@@ -166,12 +166,12 @@
 
 const struct waypointDef waypoints[] = {
 	{ { 51, 3, 20 } , F_TAKEOFF , CAM_VIEW_LAUNCH } , //Waypoint 1
-	{ { 110, 0, 35 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-	{ { 104, 75, 35 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-	{ { -96, 82, 35 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-	{ { -104, 8, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-	{ { -56, 4, 10 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-	{ { 51, 3, -10 } , F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { 110, 0, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
+	{ { 104, 75, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { -96, 82, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
+	{ { -104, 8, 10 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
+	{ { -56, 4, 5 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
+//	{ { 51, 3, -10 } , F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 7
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ const struct waypointDef waypoints[] = {
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
 const struct waypointDef rtlWaypoints[] = {
-		{ { 0, 30,  30 } , F_LOITER, CAM_VIEW_LAUNCH } ,
+		{ { 0, 30,  20 } , F_LOITER, CAM_VIEW_LAUNCH } ,
 } ;
 
 
