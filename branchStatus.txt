@@ -134,3 +134,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
     Looking at analog inputs for AUAV3: ACSP1 input voltage is reported in a mavlink
     message, scaled to a max of 36.3V, current sense is mislabeled udb_5v, and does
     not appear to be functional on the Cub
+
+7 July 2014:
+	ported ENABLE_MAGALIGNMENT option from MatrixPilotMulti
+	if undefined, magnetometer auto-alignment/offset code is bypassed

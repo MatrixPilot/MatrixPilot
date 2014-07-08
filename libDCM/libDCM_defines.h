@@ -101,7 +101,7 @@ struct dcm_flag_bits {
 // saturation limit for the centrifugal adjustment to avoid numeric overflow
 
 #define WIND_NAV_AIR_SPEED_MIN  200   // Minimum airspeed in cm/sec for wind navigation to apply
-#define GPS_SPEED_MIN           150   // Minimum ground speed in cm/sec to use GPS for yaw drift compensation
+#define GPS_SPEED_MIN           300   // Minimum ground speed in cm/sec to use GPS for yaw drift compensation
 
 #endif // DCM_DEFINES_H
 

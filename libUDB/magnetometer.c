@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 int16_t udb_magFieldBody[3];                    // magnetic field in the body frame of reference 
-int16_t udb_magOffset[3] = { 0 , 0 , 0 };       // magnetic offset in the body frame of reference
+int16_t udb_magOffset[3] = { -233 , 297 , 4 };       // magnetic offset in the body frame of reference
 int16_t magGain[3] = { RMAX , RMAX , RMAX };    // magnetometer calibration gains
 int16_t rawMagCalib[3] = { 0 , 0 , 0 };
 int16_t magFieldRaw[3];

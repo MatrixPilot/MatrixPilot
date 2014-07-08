@@ -773,35 +773,37 @@ extern int16_t I2interrupts;
 /*
 void serial_output_8hz(void)
 {
-	serial_output("MagMessage: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\nMessages: %i\r\nInterrupts: %i\r\n\r\n",
-			magMessage,
-			I2CCONREG,  I2CSTATREG, I2ERROR,
-			I2messages, I2interrupts);
+        serial_output("MagMessage: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\nMessages: %i\r\nInterrupts: %i\r\n\r\n",
+                        magMessage,
+                        I2CCONREG,  I2CSTATREG, I2ERROR,
+                        I2messages, I2interrupts);
 }
  */
 
-void serial_output_8hz(void)
-{
-	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
-	{
-		serial_output("MagOffset: %i, %i, %i\r\n"
-									"MagBody: %i, %i, %i\r\n"
-									"MagEarth: %i, %i, %i\r\n"
-									"MagGain: %i, %i, %i\r\n"
-									"Calib: %i, %i, %i\r\n"
-									"MagMessage: %i\r\n"
-									"TotalMsg: %i\r\n"
-									"I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n"
-									"\r\n",
-									udb_magOffset[0] >> OFFSETSHIFT, udb_magOffset[1] >> OFFSETSHIFT, udb_magOffset[2] >> OFFSETSHIFT,
-									udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
-									magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
-									magGain[0], magGain[1], magGain[2],
-									rawMagCalib[0], rawMagCalib[1], rawMagCalib[2],
-									magMessage,
-									I2messages,
-									I2CCONREG, I2CSTATREG, I2ERROR);
-	}
+void serial_output_8hz(void) {
+//    if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
+//    {
+//        serial_output("MagOffset: %i, %i, %i\r\n"
+//                "MagBody: %i, %i, %i\r\n"
+//                "MagEarth: %i, %i, %i\r\n"
+//                "MagGain: %i, %i, %i\r\n"
+//                "Calib: %i, %i, %i\r\n"
+//                "MagMessage: %i\r\n"
+//                "TotalMsg: %i\r\n"
+//                "I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n"
+//                "\r\n",
+//                udb_magOffset[0] >> OFFSETSHIFT, udb_magOffset[1] >> OFFSETSHIFT, udb_magOffset[2] >> OFFSETSHIFT,
+//                udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
+//                magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
+//                magGain[0], magGain[1], magGain[2],
+//                rawMagCalib[0], rawMagCalib[1], rawMagCalib[2],
+//                magMessage,
+//                I2messages,
+//                I2CCONREG, I2CSTATREG, I2ERROR);
+        serial_output("%i, %i, %i, %i, %i, %i\r\n",
+                udb_magOffset[0] >> OFFSETSHIFT, udb_magOffset[1] >> OFFSETSHIFT, udb_magOffset[2] >> OFFSETSHIFT,
+                udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
+//    }
 }
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_CAM_TRACK)

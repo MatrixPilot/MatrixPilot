@@ -154,8 +154,8 @@
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT                       1
-#define MAG_YAW_ENABLE                      0
-
+#define MAG_YAW_ENABLE                      1
+#undef ENABLE_MAGALIGNMENT
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
@@ -354,6 +354,7 @@
 #define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAGNETOMETER
 
 // use ring buffer and software flow control for onboard openlog
 // **** not compatible with mavlink binary uplink ****
@@ -692,7 +693,7 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME   "Polaris Ultra"
+#define ID_VEHICLE_MODEL_NAME   "Parkzone Sport Cub"
 #define ID_VEHICLE_REGISTRATION "KD0AIJ"
 #define ID_LEAD_PILOT           "Mark Whitehorn"
 #define ID_DIY_DRONES_URL       "http://www.diydrones.com/profile/markw"

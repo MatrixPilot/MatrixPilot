@@ -70,3 +70,5 @@
     waypoints file is west field lefthand pattern with relative origin
     RTL point is 30m north of init point at 30m altitude with flag F_LOITER;
         throttle will come on when throttle hold (failsafe) is activated on DX7
+
+7 July: manually determined magnetometer offsets and disabled auto-alignment
