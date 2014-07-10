@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "heartbeat.h"
 
 int16_t current_orientation;
 union bfbts_word desired_behavior;
@@ -29,6 +30,8 @@ boolean currentTriggerActionValue = 0;
 
 void triggerActionSetValue(boolean newValue);
 
+#define Dcycles (HEARTBEAT_HZ * (int32_t)TRIGGER_PULSE_DURATION) / 1000
+#define Rcycles (HEARTBEAT_HZ * (int32_t)TRIGGER_REPEAT_PERIOD) / 1000
 
 void init_behavior(void)
 {
@@ -127,14 +130,14 @@ void updateBehavior(void)
 	
 }
 
-// This function is called every 25ms
+// Called at HEARTBEAT_HZ
 void updateTriggerAction(void)
 {
-	if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
-        {
-            triggerActionSetValue(desired_behavior.W & F_TRIGGER);
-            return;
-        }
+//	if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
+//        {
+//            triggerActionSetValue(desired_behavior.W & F_TRIGGER);
+//            return;
+//        }
 
 	if (cyclesUntilStopTriggerAction == 1)
 	{
@@ -151,7 +154,7 @@ void updateTriggerAction(void)
 		{
 			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
 
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
+			cyclesUntilStopTriggerAction = Dcycles;
 			cyclesUntilStartTriggerAction = 0;
 		}
 		else if (TRIGGER_ACTION == TRIGGER_TOGGLE)
@@ -165,8 +168,8 @@ void updateTriggerAction(void)
 		{
 			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
 
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
-			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)25;
+			cyclesUntilStopTriggerAction = Dcycles;
+			cyclesUntilStartTriggerAction = Rcycles;
 		}
 	}
 	else if (cyclesUntilStartTriggerAction > 0)

@@ -231,7 +231,7 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS							4
+#define NUM_OUTPUTS 5
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -251,7 +251,7 @@
 #define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL         CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL           CHANNEL_UNUSED
-#define TRIGGER_OUTPUT_CHANNEL              CHANNEL_UNUSED
+#define TRIGGER_OUTPUT_CHANNEL              CHANNEL_5
 #define PASSTHROUGH_A_OUTPUT_CHANNEL        CHANNEL_UNUSED
 #define PASSTHROUGH_B_OUTPUT_CHANNEL        CHANNEL_UNUSED
 #define PASSTHROUGH_C_OUTPUT_CHANNEL        CHANNEL_UNUSED
@@ -439,11 +439,12 @@
 
 // Note, durations in milliseconds are rounded down to the nearest 25ms.
 
-#define TRIGGER_TYPE                        TRIGGER_TYPE_NONE
-#define TRIGGER_ACTION                      TRIGGER_PULSE_HIGH
-#define TRIGGER_SERVO_LOW                   2000
-#define TRIGGER_SERVO_HIGH                  4000
-#define TRIGGER_PULSE_DURATION              250
+#define TRIGGER_TYPE                        TRIGGER_TYPE_SERVO
+#define TRIGGER_ACTION                      TRIGGER_PULSE_LOW
+#define TRIGGER_SERVO_LOW                   2500
+#define TRIGGER_SERVO_HIGH                  3800
+//#define TRIGGER_INIT_VALUE                  TRIGGER_SERVO_HIGH
+#define TRIGGER_PULSE_DURATION              1000
 #define TRIGGER_REPEAT_PERIOD               4000
 
 

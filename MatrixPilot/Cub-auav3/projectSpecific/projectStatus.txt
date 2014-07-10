@@ -72,3 +72,5 @@
         throttle will come on when throttle hold (failsafe) is activated on DX7
 
 7 July: manually determined magnetometer offsets and disabled auto-alignment
+
+9 July: configured waypoints.h to drop ball at runway center

@@ -141,3 +141,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	Increased GPS_SPEED_MIN from 1.5 to 3 m/sec; this should match
 	with max speed for using magnetometer if/when mag is enabled/disabled as a
 	function of ground speed.
+
+9 July 2014:
+	commented out first block of updateTriggerAction() since this seemed superfluous
+	Verified that trigger action works correctly for a low-going servo pulse

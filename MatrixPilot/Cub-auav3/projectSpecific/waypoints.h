@@ -165,13 +165,13 @@
 //};
 
 const struct waypointDef waypoints[] = {
-	{ { 51, 3, 20 } , F_TAKEOFF , CAM_VIEW_LAUNCH } , //Waypoint 1
+	{ { 51, 3, 20 } , F_TAKEOFF } , //Waypoint 1
 	{ { 110, 0, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
 	{ { 104, 75, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
 	{ { -96, 82, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-	{ { -104, 8, 10 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-	{ { -56, 4, 5 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-//	{ { 51, 3, -10 } , F_LAND , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { -104, 8, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
+	{ { -56, 4, 10 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
+	{ { 0, 0, 5 } , F_NORMAL + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 7
 };
 
 ////////////////////////////////////////////////////////////////////////////////
