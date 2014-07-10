@@ -124,10 +124,10 @@ fractional gplane[] = { 0, 0, GRAVITY };
 #endif
 
 // horizontal velocity over ground, as measured by GPS (Vz = 0)
-fractional dirovergndHGPS[] = { 0, RMAX, 0 };
+fractional dirOverGndHGPS[] = { 0, RMAX, 0 };
 
 // horizontal direction over ground, as indicated by Rmatrix
-fractional dirovergndHRmat[] = { 0, RMAX, 0 };
+fractional dirOverGndHrmat[] = { 0, RMAX, 0 };
 
 // rotation angle equal to omega times integration factor:
 //fractional theta[] = { 0, 0, 0 };
@@ -393,7 +393,7 @@ static void yaw_drift(void)
 		if (ground_velocity_magnitudeXY > GPS_SPEED_MIN)
 		{
 			// vector cross product to get the rotation error in ground frame
-			VectorCross(errorYawground, dirovergndHRmat, dirovergndHGPS);
+			VectorCross(errorYawground, dirOverGndHrmat, dirOverGndHGPS);
 			// convert to plane frame:
 			// *** Note: this accomplishes multiplication rmat transpose times errorYawground!!
 			MatrixMultiply(1, 3, 3, errorYawplane, errorYawground, rmat);

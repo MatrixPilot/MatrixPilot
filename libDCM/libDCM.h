@@ -61,7 +61,7 @@ void dcm_heartbeat_callback(void);
 struct relative3D dcm_absolute_to_relative(struct waypoint3D absolute);
 struct relative3D_32 dcm_absolute_to_relative_32(struct waypoint3D absolute);
 
-vect3D_32 dcm_rel2abs(vect3D_32 rel);
+vect3_32t dcm_rel2abs(vect3_32t rel);
 
 // FIXME: This should be handled internally, along with DCM calibration
 // Count down from 1000 at 40Hz

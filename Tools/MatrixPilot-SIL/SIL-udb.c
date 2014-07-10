@@ -338,7 +338,7 @@ void sleep_milliseconds(uint16_t ms)
 #endif
 }
 
-void sil_handle_seial_rc_input(uint8_t *buffer, int bytesRead)
+void sil_handle_serial_rc_input(uint8_t *buffer, int bytesRead)
 {
 	int i;
 
@@ -420,7 +420,7 @@ boolean handleUDBSockets(void)
 			serialSocket = NULL;
 		} else {
 			if (bytesRead>0) {
-				sil_handle_seial_rc_input(buffer, bytesRead);
+				sil_handle_serial_rc_input(buffer, bytesRead);
 				didRead = true;
 			}
 		}

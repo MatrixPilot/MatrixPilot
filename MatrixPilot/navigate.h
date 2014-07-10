@@ -49,6 +49,7 @@ void update_goal_alt(int16_t z);
 void compute_bearing_to_goal (void);
 void process_flightplan(void);
 int16_t determine_navigation_deflection(char navType);
+uint16_t wind_gain_adjustment(void);
 
 
 #endif // NAVIGATE_H

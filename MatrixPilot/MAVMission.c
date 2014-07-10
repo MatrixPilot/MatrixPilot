@@ -417,12 +417,12 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 	return true;
 }
 
-vect3D_32 getWaypoint3D(uint16_t wp);
+vect3_32t getWaypoint3D(uint16_t wp);
 
 void MAVMissionOutput_40hz(void)
 {
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS) // LOGO_WAYPOINTS cannot be uploaded / downloaded
-	vect3D_32 wp;
+	vect3_32t wp;
 
 	if (mavlink_flags.mavlink_send_waypoint_reached == 1)
 	{

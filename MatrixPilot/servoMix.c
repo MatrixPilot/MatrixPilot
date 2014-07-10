@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "servoPrepare.h"
 
 // Perform control based on the airframe type.
 // Use the radio to determine the baseline pulse widths if the radio is on.

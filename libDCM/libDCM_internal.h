@@ -27,8 +27,11 @@ void estYawDrift(void);
 void estimateWind(void);
 
 void gps_commit_data(void);
+void gps_update_basic_data(void);
 
 void gpsoutline(const char* message);
 void gpsoutbin(int16_t length, const uint8_t* msg);
+// safer version
+#define GPSOUTBIN(msg) gpsoutbin(sizeof(msg), msg)
 
 void dcm_run_imu_step(void);    // This needs to be run every 25ms

@@ -671,6 +671,11 @@ void gps_commit_data(void)
 	last_alt     = alt_sl_gps_;
 }
 
+void gps_update_basic_data(void)
+{
+	svs          = svs_;
+}
+
 void init_gps_nmea(void)
 {
 }

@@ -99,9 +99,9 @@ static struct relWaypointDef wp_to_relative(struct waypointDef wp)
 //struct relWaypointDef wp_to_absolute(struct waypointDef wp)
 
 //struct waypoint3D wp_to_absolute(struct waypointDef wp)
-static vect3D_32 wp_to_absolute_coords(struct waypointDef wp)
+static vect3_32t wp_to_absolute_coords(struct waypointDef wp)
 {
-	vect3D_32 v;
+	vect3_32t v;
 
 	if (wp.flags & F_ABSOLUTE)
 	{
@@ -234,12 +234,12 @@ void init_flightplan(int16_t flightplanNum)
 }
 
 //struct waypoint3D getWaypoint3D(uint16_t wp)
-vect3D_32 getWaypoint3D(uint16_t wp)
+vect3_32t getWaypoint3D(uint16_t wp)
 {
 //struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
 //	struct waypoint3D = currentWaypointSet[wp].loc;
 
-	vect3D_32 v;
+	vect3_32t v;
 	v = wp_to_absolute_coords(currentWaypointSet[wp]);
 	return v;
 
@@ -255,11 +255,11 @@ boolean use_fixed_origin(void)
 #endif
 }
 
-struct absolute3D get_fixed_origin(void)
+vect3_32t get_fixed_origin(void)
 {
 	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
 
-	struct absolute3D standardizedOrigin;
+	vect3_32t standardizedOrigin;
 	standardizedOrigin.x = origin.x;
 	standardizedOrigin.y = origin.y;
 	standardizedOrigin.z = (int32_t)(origin.z * 100);

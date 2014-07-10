@@ -87,7 +87,7 @@ const uint8_t set_rate[] = {
 	0xB5, 0x62, // Header
 	0x06, 0x08, // ID
 	0x06, 0x00, // Payload Length
-	0xF4, 0x01, // measRate
+	0xF4, 0x01, // measRate 2Hz
 	0x01, 0x00, // navRate
 	0x01, 0x00, // timeRef
 	0x0B, 0x77  // Checksum
@@ -797,6 +797,12 @@ static void msg_CS1(uint8_t gpschar)
 		                                    // setting this ensures the nav routine does not try to use this data.
 	}
 	msg_parse = &msg_B3;
+}
+
+void gps_update_basic_data(void)
+{
+	week_no         = week_no_;
+	svs             = svs_;
 }
 
 void gps_commit_data(void)

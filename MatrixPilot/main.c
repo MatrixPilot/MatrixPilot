@@ -21,8 +21,11 @@
 
 #include "defines.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
+#include "flightplan-waypoints.h"
+#include <setjmp.h>
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -39,6 +42,8 @@
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
 void parameter_table_init(void);
 #endif
+
+static jmp_buf buf;
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -63,13 +68,15 @@ int main(void)
 	udb_init();
 	dcm_init();
 	init_config();  // this will need to be moved up in order to support runtime hardware options
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 	init_waypoints();
+#endif
 	init_servoPrepare();
 	init_states();
 	init_behavior();
 	init_serial();
 
-	if (setjmp())
+	if (setjmp(buf))
 	{
 		// a processor exception occurred and we're resuming execution here 
 		DPRINT("longjmp'd\r\n");

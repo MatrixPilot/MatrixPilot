@@ -74,7 +74,7 @@ void udb_init_GPS(void)
 	_U1RXIP = INT_PRI_U1RX;     // Mid Range Interrupt Priority level, no urgent reason
 
 	_U1TXIF = 0;                // Clear the Transmit Interrupt Flag
-	_U1TXIE = 1;                // Disable Transmit Interrupts
+	_U1TXIE = 1;                // Enable Transmit Interrupts
 	_U1RXIF = 0;                // Clear the Receive Interrupt Flag
 	_U1RXIE = 1;                // Enable Receive Interrupts
 
