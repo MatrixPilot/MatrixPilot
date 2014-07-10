@@ -27,6 +27,7 @@
 extern volatile uint16_t trap_flags;
 extern volatile uint32_t trap_source;
 extern volatile uint16_t osc_fail_count;
+extern volatile uint16_t last_int;
 
 // Get flags telling the reason for the last reset (RCON)
 uint16_t get_reset_flags(void);

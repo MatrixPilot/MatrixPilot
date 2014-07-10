@@ -117,7 +117,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED             AH_PITCH_ONLY
+#define ALTITUDEHOLD_STABILIZED             AH_FULL
 #define ALTITUDEHOLD_WAYPOINT               AH_FULL
 
 // Speed Control
@@ -153,10 +153,10 @@
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE                  1
+#define BAROMETER_ALTITUDE                  0
 
 // Set your takeoff/launch/initialisation altitude in meters.
-#define LAUNCH_ALTITUDE                     5
+#define LAUNCH_ALTITUDE                     300
 
 
 // Racing Mode
@@ -189,9 +189,9 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-//#define USE_PPM_INPUT                       2
+#define USE_PPM_INPUT                       2
 //#define USE_PPM_INPUT                       1
-#define USE_PPM_INPUT                       0
+//#define USE_PPM_INPUT                       0
 #define PPM_NUMBER_OF_CHANNELS              8
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
@@ -214,21 +214,23 @@
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-//#define THROTTLE_INPUT_CHANNEL              CHANNEL_3
-//#define AILERON_INPUT_CHANNEL               CHANNEL_1
-//#define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
-//#define RUDDER_INPUT_CHANNEL                CHANNEL_4
-//#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
-#define THROTTLE_INPUT_CHANNEL              CHANNEL_1
-#define AILERON_INPUT_CHANNEL               CHANNEL_2
-#define ELEVATOR_INPUT_CHANNEL              CHANNEL_3
+#define THROTTLE_INPUT_CHANNEL              CHANNEL_3
+#define AILERON_INPUT_CHANNEL               CHANNEL_1
+#define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
 #define RUDDER_INPUT_CHANNEL                CHANNEL_4
-#define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_6
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
+
+//#define THROTTLE_INPUT_CHANNEL              CHANNEL_1
+//#define AILERON_INPUT_CHANNEL               CHANNEL_2
+//#define ELEVATOR_INPUT_CHANNEL              CHANNEL_3
+//#define RUDDER_INPUT_CHANNEL                CHANNEL_4
+//#define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_5
+//#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_6
+
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
-//#define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_UNUSED
+#define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL         CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL         CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL         CHANNEL_UNUSED
@@ -315,7 +317,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN                  2015
+#define FAILSAFE_INPUT_MIN                  2005
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -404,13 +406,13 @@
 // to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
-//#define ANALOG_CURRENT_INPUT_CHANNEL        CHANNEL_UNUSED
-//#define ANALOG_VOLTAGE_INPUT_CHANNEL        CHANNEL_UNUSED
-//#define ANALOG_RSSI_INPUT_CHANNEL           CHANNEL_UNUSED
+#define ANALOG_CURRENT_INPUT_CHANNEL        CHANNEL_UNUSED
+#define ANALOG_VOLTAGE_INPUT_CHANNEL        CHANNEL_UNUSED
+#define ANALOG_RSSI_INPUT_CHANNEL           CHANNEL_UNUSED
 
-#define ANALOG_CURRENT_INPUT_CHANNEL        A_AMPS_BUFF   // I,  pin label CS Curr
-#define ANALOG_VOLTAGE_INPUT_CHANNEL        A_VOLT_BUFF   // V,  pin label Bat Volt
-#define ANALOG_RSSI_INPUT_CHANNEL           A_RSSI_BUFF   // RS, pin label RSSI
+//#define ANALOG_CURRENT_INPUT_CHANNEL        A_AMPS_BUFF   // I,  pin label CS Curr
+//#define ANALOG_VOLTAGE_INPUT_CHANNEL        A_VOLT_BUFF   // V,  pin label Bat Volt
+//#define ANALOG_RSSI_INPUT_CHANNEL           A_RSSI_BUFF   // RS, pin label RSSI
 
 #define MAX_CURRENT                         900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
 #define CURRENT_SENSOR_OFFSET               10  // Add 1.0 Amp to whatever value we sense
@@ -731,7 +733,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable experimental extended range navigation support (merged from ballon launch branch)
-//#define USE_EXTENDED_NAV
+#define USE_EXTENDED_NAV
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -762,7 +764,7 @@
 // Set to 9 in order to use the USB for the console connection
 //#define CONSOLE_UART                        3
 #define CONSOLE_UART                        1
-//#define CONSOLE_USB                         0
+#define CONSOLE_USB                         0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
@@ -800,7 +802,7 @@
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
 
-#define USE_BLUETOOTH_UART
+//#define USE_BLUETOOTH_UART
 
 #ifdef USE_BLUETOOTH_UART
 // Use this with BlueTooth dongle
@@ -825,7 +827,13 @@
 #define USE_MSD                             1
  */
 #define USE_TELELOG                         0
+
+// Set this to 1 to enable loading options settings from a config file on AUAV3
 #define USE_CONFIGFILE                      0
+
+// Set this to 1 to enable the USB stack on AUAV3
 #define USE_USB                             0
+
+// Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
 #define USE_MSD                             0
 #define USE_YMODEM                          0

@@ -211,6 +211,14 @@ static void cmd_trap(char* arg)
 	gentrap();
 }
 
+static void cmd_uart(char* arg)
+{
+	printf("UART1 Registers:\r\n");
+	printf("\tU1MODE = %s\r\n", word_to_binary(U1MODE));
+	printf("\tU1STA  = %s\r\n", word_to_binary(U1STA));
+	printf("\tU1BRG  = %s\r\n", word_to_binary(U1BRG));
+}
+
 static void cmd_reg(char* arg)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
@@ -440,6 +448,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_dir,    "dir" },
 	{ 0, cmd_cat,    "cat" },
 	{ 0, cmd_nav,    "nav" },
+	{ 0, cmd_uart,   "uart" },
 };
 
 static void cmd_help(char* arg)

@@ -77,9 +77,14 @@ void udb_init_GPS(void)
 	_U1RXIP = INT_PRI_U1RX;     // Mid Range Interrupt Priority level, no urgent reason
 
 	_U1TXIF = 0;                // Clear the Transmit Interrupt Flag
-	_U1TXIE = 1;                // Disable Transmit Interrupts
+//	_U1TXIE = 1;                // Disable Transmit Interrupts
+	_U1TXIE = 0;                // Disable Transmit Interrupts
+
 	_U1RXIF = 0;                // Clear the Receive Interrupt Flag
 	_U1RXIE = 1;                // Enable Receive Interrupts
+
+//	_U1EIF = 0;                 // Clear the UART Error Interrupt
+//	_U1EIE = 1;                 // Enable UART Error Interrupts
 
 	U1MODEbits.UARTEN = 1;      // And turn the peripheral on
 	U1STAbits.UTXEN = 1;
@@ -102,6 +107,19 @@ void udb_gps_start_sending_data(void)
 	_U1TXIF = 1; // fire the tx interrupt
 }
 
+void __attribute__((__interrupt__,__no_auto_psv__)) _U1ErrInterrupt(void)
+{
+	_U1EIF = 0; // clear the interrupt
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+
+	U1STAbits.PERR = 0;
+	U1STAbits.FERR = 0;
+	U1STAbits.OERR = 0;
+	interrupt_restore_corcon;
+last_int = 14;
+}
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 {
 	_U1TXIF = 0; // clear the interrupt
@@ -118,6 +136,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 		U1TXREG = (uint8_t)txchar;
 	}
 	interrupt_restore_corcon;
+last_int = 15;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
@@ -135,6 +154,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	}
 	U1STAbits.OERR = 0;
 	interrupt_restore_corcon;
+last_int = 16;
 }
 
 
@@ -216,6 +236,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 		uart2_tx_count++;
 	}
 	interrupt_restore_corcon;
+last_int = 17;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
@@ -232,4 +253,5 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	}
 	U2STAbits.OERR = 0;
 	interrupt_restore_corcon;
+last_int = 18;
 }

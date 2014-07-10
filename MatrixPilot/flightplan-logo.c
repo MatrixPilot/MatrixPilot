@@ -90,7 +90,11 @@ static int16_t logoStackIndex = 0;
 
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
-static struct logoLocation { union longww x; union longww y; int16_t z; };
+struct logoLocation { 
+	union longww x;
+	union longww y;
+	int16_t z;
+};
 static struct logoLocation turtleLocations[2];
 static struct relative3D lastGoal = {0, 0, 0};
 
@@ -243,9 +247,12 @@ static void update_goal_from(struct relative3D old_goal)
 {
 	struct relative3D new_goal;
 
+	struct relative3D_32 og;
+	struct relative3D_32 ng;
+
 	lastGoal.x = new_goal.x = (turtleLocations[PLANE].x._.W1);
 	lastGoal.y = new_goal.y = (turtleLocations[PLANE].y._.W1);
-	lastGoal.z = new_goal.z = turtleLocations[PLANE].z;
+	lastGoal.z = new_goal.z =  turtleLocations[PLANE].z;
 	
 	if (old_goal.x == new_goal.x && old_goal.y == new_goal.y)
 	{
@@ -254,11 +261,20 @@ static void update_goal_from(struct relative3D old_goal)
 		old_goal.z = IMUlocationz._.W1;
 	}
 
-	navigate_set_goal(old_goal, new_goal);
+	og.x = old_goal.x;
+	og.y = old_goal.y;
+	og.z = old_goal.z;
+
+	ng.x = new_goal.x;
+	ng.y = new_goal.y;
+	ng.z = new_goal.z;
+
+	navigate_set_goal(og, ng);
+//	navigate_set_goal(old_goal, new_goal);
 
 	new_goal.x = (turtleLocations[CAMERA].x._.W1);
 	new_goal.y = (turtleLocations[CAMERA].y._.W1);
-	new_goal.z = turtleLocations[CAMERA].z;
+	new_goal.z =  turtleLocations[CAMERA].z;
 	set_camera_view(new_goal);
 }
 
@@ -385,9 +401,9 @@ static int16_t get_current_angle(void)
 
 	curHeading.x = -rmat[1];
 	curHeading.y = rmat[4];
-	earth_yaw = rect_to_polar(&curHeading);  // (0=East,  ccw)
+	earth_yaw = rect_to_polar(&curHeading); // (0=East,  ccw)
 	angle = (earth_yaw * 180 + 64) >> 7;    // (ccw, 0=East)
-	angle = -angle + 90;                            // (clockwise, 0=North)
+	angle = -angle + 90;                    // (clockwise, 0=North)
 	if (angle < 0) angle += 360;
 	return angle;
 }
@@ -402,9 +418,9 @@ static int16_t get_angle_to_point(int16_t x, int16_t y)
 	vectorToGoal.y = turtleLocations[currentTurtle].y._.W1 - y;
 	dir_to_goal = rect_to_polar (&vectorToGoal);
 
-	// dir_to_goal                                  // 0-255 (ccw, 0=East)
+	// dir_to_goal                          // 0-255 (ccw, 0=East)
 	angle = (dir_to_goal * 180 + 64) >> 7;  // 0-359 (ccw, 0=East)
-	angle = -angle + 90;                            // 0-359 (clockwise, 0=North)
+	angle = -angle + 90;                    // 0-359 (clockwise, 0=North)
 	if (angle < 0) angle += 360;
 	return angle;
 }
@@ -805,22 +821,24 @@ static boolean process_one_instruction(struct logoInstructionDef instr)
 		{
 			int16_t val = logo_value_for_identifier(instr.subcmd);
 			boolean condTrue = false;
-			
-			if (instr.cmd == 14 && val == instr.arg) condTrue = true;       // IF_EQ
+
+			if      (instr.cmd == 14 && val == instr.arg) condTrue = true;  // IF_EQ
 			else if (instr.cmd == 15 && val != instr.arg) condTrue = true;  // IF_NE
-			else if (instr.cmd == 16 && val > instr.arg) condTrue = true;   // IF_GT
-			else if (instr.cmd == 17 && val < instr.arg) condTrue = true;   // IF_LT
+			else if (instr.cmd == 16 && val >  instr.arg) condTrue = true;  // IF_GT
+			else if (instr.cmd == 17 && val <  instr.arg) condTrue = true;  // IF_LT
 			else if (instr.cmd == 18 && val >= instr.arg) condTrue = true;  // IF_GE
 			else if (instr.cmd == 19 && val <= instr.arg) condTrue = true;  // IF_LE
 
-			if (condTrue) {
+			if (condTrue)
+			{
 				if (logoStackIndex < LOGO_STACK_DEPTH-1)
 				{
 					logoStackIndex++;
 					logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_IF;
 				}
 			}
-			else {
+			else
+			{
 				// jump to the matching END or ELSE
 				instructionIndex = find_end_of_current_if_block();
 				if (currentInstructionSet[instructionIndex].subcmd == 3) // is entering an ELSE block
@@ -859,7 +877,8 @@ static void process_instructions(void)
 
 	waypointIndex = instructionIndex - 1;
 
-	if (logo_goal_has_moved()) {
+	if (logo_goal_has_moved())
+	{
 		update_goal_from(lastGoal);
 		compute_bearing_to_goal();
 	}
@@ -877,7 +896,8 @@ void flightplan_logo_live_received_byte(uint8_t inbyte)
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
 
-	switch (logo_inject_pos) {
+	switch (logo_inject_pos)
+	{
 		case 0:
 			logo_inject_instr.cmd = inbyte;
 			break;

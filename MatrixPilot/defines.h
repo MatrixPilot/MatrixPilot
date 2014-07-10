@@ -143,6 +143,7 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 #define FAILSAFE_RTL                1
 #define FAILSAFE_MAIN_FLIGHTPLAN    2
 
+#define FP_NONE                     0
 #define FP_WAYPOINTS                1
 #define FP_LOGO                     2
 

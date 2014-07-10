@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "libUDB_internal.h"
 #include "filters.h"
 
 inline int lp2(int input, union int32_w2 *state, unsigned int lpcb) {

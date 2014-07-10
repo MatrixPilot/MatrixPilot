@@ -22,7 +22,7 @@
 #define FILTERS_H
 
 #include <stdlib.h>
-//#include "libUDB_defines.h"
+#include "libUDB_defines.h"
 
 // IIR lowpass filter
 union int32_w2 { long  longword; struct {int low; int high;} word; } ;

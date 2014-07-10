@@ -204,7 +204,7 @@ int16_t calculate_week_num(int32_t date)
 	uint8_t m;
 	uint8_t y;
 	int16_t c;
-	
+
 //	DPRINT("date %li\r\n", date);
 
 	// Convert date from DDMMYY to week_num and day_of_week

@@ -64,6 +64,7 @@ inline void heartbeat(void) // called from ISR
 		start_pwm_outputs();
 	}
 #else
+?
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/ESC_HZ) == 0)
 	{
 		// set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
@@ -108,7 +109,7 @@ void TriggerIMU(void);
 //static void pulse(void)
 inline void pulse(void)
 {
-//	LED_BLUE = LED_OFF;     // indicates logfile activity
+//	led_off(LED_BLUE);     // indicates logfile activity
 
 #if (NORADIO != 1)
 	// 20Hz testing of radio link

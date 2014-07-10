@@ -6,7 +6,7 @@
 
 #include "parameter_table.h"
 #include "data_storage.h"
-#include "ADchannel.h"
+#include "../libUDB/ADchannel.h"
 
 
 extern struct ADchannel udb_xaccel;

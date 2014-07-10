@@ -136,6 +136,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA2Interrupt(void)
 	_DMA2IF = 0;
 
 	interrupt_restore_corcon;
+last_int = 9;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
@@ -150,6 +151,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 	IsBusy = 0;
 
 	interrupt_restore_corcon;
+last_int = 10;
 }
 /*
 unsigned char GetRxByte(uint16_t i)

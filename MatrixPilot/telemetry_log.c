@@ -327,7 +327,7 @@ static void log_write(char* str, int len)
 //	printf("log_write() %u bytes\r\n", len);
 	if (fsp)
 	{
-		LED_BLUE = LED_ON;
+		led_on(LED_BLUE);
 		if (FSfwrite(str, 1, len, fsp) != len)
 		{
 			DPRINT("ERROR: FSfwrite\r\n");

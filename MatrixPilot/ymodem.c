@@ -38,7 +38,7 @@
 //#include "printf.h"
 #include "ymodem.h"
 
-#define WITH_CRC32
+//#define WITH_CRC32
 #ifdef WITH_CRC32
 /* http://csbruce.com/~csbruce/software/crc32.c */
 unsigned long crc32(const unsigned char* buf, unsigned long count)
@@ -94,6 +94,8 @@ unsigned long crc32(const unsigned char* buf, unsigned long count)
 }
 #endif
 
+//#define WITH_CRC16
+#ifdef WITH_CRC16
 /* http://www.ccsinfo.com/forum/viewtopic.php?t=24977 */
 unsigned short crc16(const unsigned char* buf, unsigned long count)
 {
@@ -113,6 +115,7 @@ unsigned short crc16(const unsigned char* buf, unsigned long count)
 	}
 	return crc;
 }
+#endif
 
 static const char* u32_to_str(unsigned int val)
 {
@@ -441,7 +444,8 @@ unsigned long ymodem_send(unsigned char* buf, unsigned long size, char* filename
 
 	/* Flush the RX FIFO, after a cool off delay */
 	_sleep(1);
-	while (serial_read() >= 0);
+//	while (serial_read() >= 0);
+	while (_getchar(1) >= 0);
 
 	/* Not in the specs, just for balance */
 	do {

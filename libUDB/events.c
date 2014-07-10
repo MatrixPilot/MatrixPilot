@@ -130,6 +130,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTL_INTERUPT(void)
 		}
 	}
 	interrupt_restore_corcon;
+last_int = 6;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void)
@@ -157,5 +158,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void)
 		}
 	}
 	interrupt_restore_corcon;
+last_int = 7;
 }
 

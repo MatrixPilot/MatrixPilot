@@ -247,6 +247,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 	else \
 		set_udb_pwIn(time - rise, x); \
 	interrupt_restore_corcon; \
+last_int = 11; \
 }
 #define IC_HANDLER(x, y, z) _IC_HANDLER(x, y, z)
 
@@ -396,6 +397,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 #error Invalid USE_PPM_INPUT setting
 #endif // USE_PPM_INPUT
 	interrupt_restore_corcon;
+last_int = 13;
 }
 
 #endif // USE_PPM_INPUT

@@ -614,8 +614,9 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 		if (XOR == checksum)
 		{
 			if (gga_counter > 0)            // We are checking gga
+			{
 				gga_chksm_ok = 1;           // And the checksum is good
-
+			}
 			if (rmc_counter > 0 && gga_chksm_ok == 1)
 			{
 #ifdef DEBUG_NMEA
@@ -627,19 +628,25 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 		else
 		{
 			if (gga_counter > 0)            // We are checking gga
+			{
 				gga_chksm_ok = 0;           // And the checksum is bad
+			}
 		}
 		checksum = 0;
 	}
 	else
 	{
 		if (gpschar <= '9')
+		{
 			checksum = (checksum << 4) + (gpschar - '0');
+		}
 		else
+		{
 			checksum = (checksum << 4) + (gpschar - 'A' + 0x0A);
+		}
 	}
 #ifdef DEBUG_NMEA
-LED_RED = LED_OFF;
+led_off(LED_RED);
 #endif
 }
 

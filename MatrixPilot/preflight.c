@@ -80,10 +80,10 @@ void preflight(void)
 #endif
 	}
 
-	LED_RED = LED_OFF;
-	LED_BLUE = LED_OFF;
-	LED_GREEN = LED_OFF;
-	LED_ORANGE = LED_OFF;
+	led_off(LED_RED);
+	led_off(LED_BLUE);
+	led_off(LED_GREEN);
+	led_off(LED_ORANGE);
 
 	printf("Preflight complete\r\n");
 }

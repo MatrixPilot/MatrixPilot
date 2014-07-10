@@ -19,8 +19,9 @@
  *
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include "util.h"
-
 
 /************************************************************************
  *  Definitions for UART0
@@ -46,6 +47,7 @@
 /* Estimated number of calls to serial read we can issue in a second */
 #define SERIAL_CYCLE 48000
 
+#if 0
 
 /************************************************************************
  *  Static variables
@@ -175,9 +177,39 @@ void _memcpy(void *dst, void *src, UINT32 size)
 		REG8(((UINT32)dst) + i) = REG8(((UINT32)src) + i);
 }
 
+#endif
+
 void _sleep(int seconds)
 {
 	unsigned long i;
 	/* This seems to produce the approximative results on Xtreamer Pro */
 	for (i = 0; i < FOR_LOOP_CYCLE * seconds; i++);
+}
+
+int _getchar(int timeout)
+{
+	return -1;
+}
+
+void _putchar(int c)
+{
+	unsigned char b = c & 0xFF;
+//	serial_write(&b);
+}
+
+char* _strdup(const char* str)
+{
+	int n;
+	char* result = 0;
+
+	if (str)
+	{
+		n = strlen(str) + 1;
+		result = malloc(n);
+		if (result)
+		{
+			memcpy(result, str, n);
+		}
+	}
+	return result;
 }

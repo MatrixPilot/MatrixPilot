@@ -27,6 +27,7 @@
         <itemPath>../../libDCM/mathlibNAV.h</itemPath>
         <itemPath>../../libDCM/deadReckoning.h</itemPath>
         <itemPath>../../libDCM/estWind.h</itemPath>
+        <itemPath>../../libDCM/mathlib.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.h</itemPath>
@@ -63,6 +64,12 @@
         <itemPath>../../libUDB/udbTypes.h</itemPath>
         <itemPath>../../libUDB/ADchannel.h</itemPath>
         <itemPath>../../libUDB/filters.h</itemPath>
+        <itemPath>../../libUDB/LPS331.h</itemPath>
+        <itemPath>../../libUDB/RFM22B.h</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.h</itemPath>
+        <itemPath>../../libUDB/lrsIn.h</itemPath>
+        <itemPath>../../libUDB/radioIn.h</itemPath>
+        <itemPath>../../libUDB/selectIn.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -78,7 +85,6 @@
         <itemPath>../parameter_datatypes.h</itemPath>
         <itemPath>../parameter_table.h</itemPath>
         <itemPath>../mode_switch.h</itemPath>
-        <itemPath>../mavlink_options.h</itemPath>
         <itemPath>../euler_angles.h</itemPath>
         <itemPath>../config.h</itemPath>
         <itemPath>../preflight.h</itemPath>
@@ -86,13 +92,26 @@
         <itemPath>../fly_by_datalink.h</itemPath>
         <itemPath>../telemetry_log.h</itemPath>
         <itemPath>../console.h</itemPath>
-        <itemPath>../MAVFlexiFunctions.h</itemPath>
-        <itemPath>../MAVMission.h</itemPath>
-        <itemPath>../MAVParams.h</itemPath>
-        <itemPath>../MAVLink.h</itemPath>
-        <itemPath>../MAVUDBExtra.h</itemPath>
-        <itemPath>../flightplan-waypoints.h</itemPath>
         <itemPath>../navigate.h</itemPath>
+        <itemPath>../FreeRTOSConfig.h</itemPath>
+        <itemPath>../TaskLRS.h</itemPath>
+        <itemPath>../behaviour.h</itemPath>
+        <itemPath>../crc16.h</itemPath>
+        <itemPath>../flightplan.h</itemPath>
+        <itemPath>../flightplan_logo.h</itemPath>
+        <itemPath>../flightplan_waypoints.h</itemPath>
+        <itemPath>../logo.h</itemPath>
+        <itemPath>../logo_cpp.h</itemPath>
+        <itemPath>../logo_parser.h</itemPath>
+        <itemPath>../logocode.h</itemPath>
+        <itemPath>../osd_config.h</itemPath>
+        <itemPath>../osd_layout_remzibi.h</itemPath>
+        <itemPath>../quad.h</itemPath>
+        <itemPath>../ring_buffer.h</itemPath>
+        <itemPath>../servoMix.h</itemPath>
+        <itemPath>../stptok.h</itemPath>
+        <itemPath>../util.h</itemPath>
+        <itemPath>../ymodem.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="f1" displayName="common" projectFiles="true">
@@ -219,6 +238,12 @@
         <itemPath>../../MAVLink/include/mavlink_protobuf_manager.hpp</itemPath>
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
+        <itemPath>../../MAVLink/MAVFlexiFunctions.h</itemPath>
+        <itemPath>../../MAVLink/MAVLink.h</itemPath>
+        <itemPath>../../MAVLink/MAVMission.h</itemPath>
+        <itemPath>../../MAVLink/MAVParams.h</itemPath>
+        <itemPath>../../MAVLink/MAVUDBExtra.h</itemPath>
+        <itemPath>../../MAVLink/mavlink_options.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
@@ -269,6 +294,10 @@
         <itemPath>../../libDCM/estAirspeed.c</itemPath>
         <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
         <itemPath>../../libDCM/fbcl.s</itemPath>
+        <itemPath>../../libDCM/estLocation.c</itemPath>
+        <itemPath>../../libDCM/gpsData.c</itemPath>
+        <itemPath>../../libDCM/hilsim.c</itemPath>
+        <itemPath>../../libDCM/mathlib.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="libFlashFS" projectFiles="true">
         <itemPath>../../libFlashFS/AT45D.c</itemPath>
@@ -311,6 +340,13 @@
         <itemPath>../../libUDB/heartbeat.c</itemPath>
         <itemPath>../../libUDB/ADchannel.c</itemPath>
         <itemPath>../../libUDB/filters.c</itemPath>
+        <itemPath>../../libUDB/I2C.c</itemPath>
+        <itemPath>../../libUDB/LPS331.c</itemPath>
+        <itemPath>../../libUDB/flt2frct.c</itemPath>
+        <itemPath>../../libUDB/frct2flt.c</itemPath>
+        <itemPath>../../libUDB/lrsIn.c</itemPath>
+        <itemPath>../../libUDB/motorOut.c</itemPath>
+        <itemPath>../../libUDB/sonarIn.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
@@ -343,7 +379,6 @@
         <itemPath>../flightplan-waypoints.c</itemPath>
         <itemPath>../flightplan-logo.c</itemPath>
         <itemPath>../mp_osd.c</itemPath>
-        <itemPath>../MAVLink.c</itemPath>
         <itemPath>../mode_switch.c</itemPath>
         <itemPath>../data_services.c</itemPath>
         <itemPath>../data_storage.c</itemPath>
@@ -359,10 +394,29 @@
         <itemPath>../console.c</itemPath>
         <itemPath>../redef.c</itemPath>
         <itemPath>../flight_state.c</itemPath>
-        <itemPath>../MAVFlexiFunctions.c</itemPath>
-        <itemPath>../MAVMission.c</itemPath>
-        <itemPath>../MAVParams.c</itemPath>
-        <itemPath>../MAVUDBExtra.c</itemPath>
+        <itemPath>../TaskGPS.c</itemPath>
+        <itemPath>../TaskIMU.c</itemPath>
+        <itemPath>../TaskLRS.c</itemPath>
+        <itemPath>../crc16.c</itemPath>
+        <itemPath>../flightplan.c</itemPath>
+        <itemPath>../logo_parser.c</itemPath>
+        <itemPath>../minim_osd.c</itemPath>
+        <itemPath>../mp_tasks.c</itemPath>
+        <itemPath>../parameter_table_init.c</itemPath>
+        <itemPath>../quad.c</itemPath>
+        <itemPath>../remzibi_osd.c</itemPath>
+        <itemPath>../ring_buffer.c</itemPath>
+        <itemPath>../stptok.c</itemPath>
+        <itemPath>../tasks.c</itemPath>
+        <itemPath>../util.c</itemPath>
+        <itemPath>../ymodem.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5" displayName="MAVLink" projectFiles="true">
+        <itemPath>../../MAVLink/MAVFlexiFunctions.c</itemPath>
+        <itemPath>../../MAVLink/MAVLink.c</itemPath>
+        <itemPath>../../MAVLink/MAVMission.c</itemPath>
+        <itemPath>../../MAVLink/MAVParams.c</itemPath>
+        <itemPath>../../MAVLink/MAVUDBExtra.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
@@ -386,6 +440,7 @@
     <Elem>../../libCntrl</Elem>
     <Elem>../../Config</Elem>
     <Elem>../../Microchip/MDD File System</Elem>
+    <Elem>../../MAVLink</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

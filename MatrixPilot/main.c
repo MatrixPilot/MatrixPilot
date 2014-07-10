@@ -25,6 +25,8 @@
 #include "behaviour.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
+//#include "flightplan-waypoints.h"
+#include <setjmp.h>
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -44,9 +46,11 @@ void init_tasks(void);
 void parameter_table_init(void);
 #endif
 
+static jmp_buf buf;
+
 #if (SILSIM == 1)
 int mp_argc;
-char **mp_argv;
+char** mp_argv;
 int main(int argc, char** argv)
 {
 	// keep these values available for later
@@ -59,9 +63,11 @@ int main(void)
 #endif
 
 #if (USE_TELELOG == 1)
+?
 	log_init();
 #endif
 #if (USE_USB == 1)
+?
 	preflight();    // perhaps this would be better called usb_init()
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
@@ -71,6 +77,7 @@ int main(void)
 	flightplan_init();
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+#error here
 	quad_init();
 #else // AIRFRAME_TYPE
 	init_servoPrepare();
@@ -79,7 +86,7 @@ int main(void)
 	init_serial();
 #endif // AIRFRAME_TYPE
 
-	if (setjmp())
+	if (setjmp(buf))
 	{
 		// a processor exception occurred and we're resuming execution here 
 		DPRINT("longjmp'd\r\n");
@@ -97,6 +104,7 @@ int main(void)
 
 //#undef USE_FREERTOS
 #ifdef USE_FREERTOS
+#error here
 	DPRINT("Initialising RTOS\r\n");
 	init_tasks();   // initialise the RTOS
 	DPRINT("Starting Scheduler\r\n");
@@ -112,7 +120,7 @@ void idle_task(void)
 	while (1)
 	{
 #if (USE_TELELOG == 1)
-	telemetry_log_service();
+		telemetry_log_service();
 #endif
 #if (USE_USB == 1)
 		USBPollingService();
@@ -127,7 +135,7 @@ void idle_task(void)
 	}
 }
 
-void vApplicationMallocFailedHook( void )
+void vApplicationMallocFailedHook(void)
 {
 	/* vApplicationMallocFailedHook() will only be called if
 	configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook

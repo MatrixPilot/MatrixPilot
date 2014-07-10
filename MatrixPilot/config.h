@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-//	TODO: bad header file name, implies it has editable options, which it does not
+// TODO: bad header file name, implies it has editable options, which it does not
 
 ////////////////////////////////////////////////////////////////////////////////
 // config.h

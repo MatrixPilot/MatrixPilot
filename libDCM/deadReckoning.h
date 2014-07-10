@@ -32,6 +32,8 @@ extern union longww IMUvelocityx, IMUvelocityy, IMUvelocityz;
 extern union longww IMUintegralAccelerationx;
 extern union longww IMUintegralAccelerationy;
 
+extern int16_t forward_ground_speed ;
+
 #define IMUheight IMUlocationz._.W1
 
 //void dead_reckon(void);

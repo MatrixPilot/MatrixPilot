@@ -193,6 +193,7 @@ _INTERRUPT(MI2C)
 	I2C_IF = 0;                 // clear the interrupt
 	(*x.state)();               // execute the service routine
 	interrupt_restore_corcon;
+last_int = 19;
 }
 
 // Check if I2C port is available for use.

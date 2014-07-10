@@ -385,9 +385,9 @@ void motorCntrl(int flight_mode)
         if (flight_mode == COMPASS_MODE)
         {
             if (abs((int) earth_yaw) < 910)
-                TAIL_LIGHT = LED_ON;
+                led_on(TAIL_LIGHT);
             else
-                TAIL_LIGHT = LED_OFF;
+                led_off(TAIL_LIGHT);
         }
 
         // pulse throttle at heartRate/N if battery is low

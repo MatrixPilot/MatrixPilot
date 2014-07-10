@@ -259,4 +259,5 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 #endif
 
 	// interrupt_restore_corcon;
+last_int = 1;
 }

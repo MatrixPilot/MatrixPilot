@@ -142,9 +142,7 @@ void udb_init_clock(void)   // initialize timers
 	init_callback_2();
 }
 
-#ifdef USE_FREERTOS
-void T1Interrupt(void) {}
-#else
+#ifndef USE_FREERTOS
 // This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 {
@@ -153,6 +151,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	_T1IF = 0;              // clear the interrupt
 	heartbeat();
 	interrupt_restore_corcon;
+last_int = 2;
 }
 #endif // USE_FREERTOS
 
@@ -161,13 +160,16 @@ uint16_t rtos_ticks = 0;
 void vApplicationTickHook(void) // 1000 Hz
 {
 #ifdef USE_FREERTOS
-//	static int16_t i = 0;
+?
+	static int16_t i = 0;
 
 	rtos_ticks++;
-//	if (++i > 25) {
-//		i = 0;
-//		T1Interrupt();  // 40 Hz
-//	}
+
+	if (++i > (configTICK_RATE_HZ / HEARTBEAT_HZ)) // 40 Hz
+	{
+		i = 0;
+		heartbeat();
+	}
 #endif // USE_FREERTOS
 }
 
@@ -178,6 +180,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 	_cpu_timer++;           // increment the load counter
 	_T5IF = 0;              // clear the interrupt
 	interrupt_restore_corcon;
+last_int = 3;
 }
 
 static background_callback callback_fptr_1 = NULL;
@@ -192,6 +195,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	//pulse();
 	if (callback_fptr_1) callback_fptr_1();
 	interrupt_restore_corcon;
+last_int = 4;
 }
 
 // Trigger the low priority background processing interrupt.
@@ -215,6 +219,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void)
 	//udb_background_callback_triggered(); // replaced by function pointer callback below
 	if (callback_fptr_2) callback_fptr_2();
 	interrupt_restore_corcon;
+last_int = 5;
 }
 
 // Trigger the low priority background processing interrupt.

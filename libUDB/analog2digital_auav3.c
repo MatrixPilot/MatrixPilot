@@ -273,6 +273,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 		}
 	}
 	interrupt_restore_corcon;
+last_int = 8;
 }
 
 #endif // BOARD_TYPE

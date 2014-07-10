@@ -1,1 +1,2 @@
-UDB_OBJECTS = 
+UDB_OBJECTS = \
+../../libUDB/filters.o

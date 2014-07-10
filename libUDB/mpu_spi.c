@@ -209,6 +209,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	MPU_SS = 1;
 	(*mpu_call_back)();
 	interrupt_restore_corcon;
+last_int = 23;
 }
 
 #else // no SPI FIFO
@@ -277,6 +278,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	SPI_high = 0xFF & spibuf;
 #endif // 0
 	interrupt_restore_corcon;
+last_int = 22;
 }
 
 #endif // (__dsPIC33E__)

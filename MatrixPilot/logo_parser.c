@@ -31,10 +31,13 @@
 #include "logo.h"
 #include "logo_parser.h"
 
+//#ifndef WIN32
+//#define _strdup strdup
+//#endif
+
 #define MAX_LINE_LEN 80
 #define MAX_TOKEN_LEN 32
 #define MAX_CMD_LEN 21
-#define MAX_DEFINES 100
 
 typedef struct logoDef {
 	uint16_t compound_cmd :  1;

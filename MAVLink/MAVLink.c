@@ -911,8 +911,8 @@ enum MAV_STATE
 			mavlink_system_status = MAV_STATE_CALIBRATING;
 
 #if (AIRFRAME_TYPE != AIRFRAME_QUAD)
-//		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, mavlink_system_status);
-		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_SURFACE_BOAT, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, mavlink_system_status);
+		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, mavlink_system_status);
+//		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_ARDUPILOTMEGA, mavlink_base_mode, mavlink_custom_mode, mavlink_system_status);
 #else
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_QUADROTOR, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, mavlink_system_status);
 #endif

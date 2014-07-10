@@ -100,7 +100,7 @@ int quad_init(void)
     // minicom set at 230,400 baud works fine with OpenLog at 230,400
     udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
 
-    TAIL_LIGHT = LED_OFF; // taillight off
+    led_off(TAIL_LIGHT); // taillight off
 
 	printf("MPQmicro running.\r\n");
 	DPRINT("MPQmicro running...\r\n");
@@ -340,7 +340,7 @@ void quad_heartbeat_40hz_callback(void) // this was called udb_background_callba
             //            dcm_calibrate();
             didCalibrate = 1; // not in trunk
             // No longer calibrating: RED off
-            LED_RED = LED_OFF;
+            led_off(LED_RED);
         }
 //        else
 //        {
@@ -366,11 +366,11 @@ void quad_heartbeat_callback(void) // was called dcm_servo_callback_prepare_outp
     // Update the Green LED to show RC radio status
     if (udb_flags._.radio_on)
     {
-        LED_GREEN = LED_ON;
+        led_on(LED_GREEN);
     }
     else
     {
-        LED_GREEN = LED_OFF;
+        led_off(LED_GREEN);
     }
 
     // PID loop at x Hz
