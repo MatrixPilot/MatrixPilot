@@ -413,12 +413,12 @@ void gps_startup_sequence(int16_t gpscount)
 #endif
 	}
 #if (HILSIM != 1)
-        else if (gpscount >= 400 && gpscount <= 550 && gpscount % 20 == 0 && *current_init_speed)   // every 0.5 sec
-        {
-                udb_gps_set_rate(*current_init_speed);
-                current_init_speed++;
-                gpsoutline(bin_mode_nonmea);    // force 38400 speed
-        }
+	else if (gpscount >= 400 && gpscount <= 550 && gpscount % 20 == 0 && *current_init_speed)   // every 0.5 sec
+	{
+		udb_gps_set_rate(*current_init_speed);
+		current_init_speed++;
+		gpsoutline(bin_mode_nonmea);    // force 38400 speed
+	}
 	else if (gpscount == 350)
 		udb_gps_set_rate(38400);
 #endif

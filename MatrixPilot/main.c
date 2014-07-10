@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
 #include "flightplan-waypoints.h"
@@ -67,7 +68,9 @@ int main(void)
 	udb_init();
 	dcm_init();
 	init_config();  // this will need to be moved up in order to support runtime hardware options
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 	init_waypoints();
+#endif
 	init_servoPrepare();
 	init_states();
 	init_behavior();

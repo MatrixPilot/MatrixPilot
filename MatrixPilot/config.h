@@ -18,13 +18,16 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+// TODO: bad header file name, implies it has editable options, which it does not
 
 ////////////////////////////////////////////////////////////////////////////////
 // config.h
 // 
-// This file includes all of the user configurable runtime options. By default
-// they are set to default values as defined in options.h, however they can be 
-// overridden by fields in an optional config.ini file on the flash filesystem.
+// This file includes all of the structures which represent the user 
+// configurable runtime options. 
+// By default they are set to default values as defined in options.h, 
+// however they can be overridden by fields in an optional config.ini file on
+// one of the filesystems.
 // 
 
 struct network_module_bits {

@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"

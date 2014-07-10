@@ -42,9 +42,9 @@ void init_analogs(void)
 
 void calculate_analog_sensor_values(void)
 {
-    uint32_t v = 0;
-    if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
-    {
+	uint32_t v = 0;
+	if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+	{
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to current in tenths of Amps
 	v = udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value;
@@ -58,10 +58,10 @@ void calculate_analog_sensor_values(void)
 	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
 	// 90000/144000 == 900/1440
 	battery_mAh_used.WW += (battery_current.WW / 1440);
-    }
+	}
 
-    if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
-    {
+	if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+	{
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to voltage in tenths of Volts
 		battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE);
@@ -70,15 +70,14 @@ void calculate_analog_sensor_values(void)
 		battery_voltage.WW *= 10;
 
 		battery_voltage.WW += (VOLTAGE_SENSOR_OFFSET);
-    }
+	}
 
-    if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
-    {
+	if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+	{
 		uint32_t rssi_accum;
 		rssi_accum = udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value + 32768;
 		rssi_accum -= MIN_RSSI;
-
-	#if RSSI_RAW_SIGNAL
+#if RSSI_RAW_SIGNAL
 		rssi_accum /= RSSI_STEP;
 		if (rssi_accum > 255)
 		{
@@ -89,13 +88,13 @@ void calculate_analog_sensor_values(void)
 		rssi.WW = rc_signal_strength;
 		if (rssi._.W1 > 100)
 			rc_signal_strength = 100;
-	#else
+#else
 		rssi_accum = ((rssi_accum * 100) / (RSSI_RANGE));
 		if (rssi_accum > 100)
 		{
 			rssi_accum = 100;
 		}
 		rc_signal_strength = (uint8_t)rssi_accum;
-	#endif
+#endif
 	}
 }

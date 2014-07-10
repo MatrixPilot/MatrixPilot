@@ -349,7 +349,7 @@ void gps_commit_data(void)
 	svs         = svs_;
 }
 
-gps_update_basic_data()
+void gps_update_basic_data(void)
 {
 	svs          = svs_;
 }

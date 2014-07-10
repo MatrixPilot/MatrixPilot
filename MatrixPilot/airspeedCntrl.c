@@ -20,7 +20,10 @@
 
 
 #include "defines.h"
+#include "altitudeCntrl.h"
 #include "airspeedCntrl.h"
+#include "../libDCM/mathlibNAV.h"
+#include "../libDCM/deadReckoning.h"
 
 int16_t minimum_groundspeed;
 int16_t minimum_airspeed;
@@ -153,8 +156,9 @@ static int32_t calc_airspeed_int_error(int16_t aspdError, int32_t aspd_integral)
 	return airspeed_int.WW;
 }
 
+#if (GLIDE_AIRSPEED_CONTROL == 1)
 //Calculate and return pitch target adjustment for target airspeed
-static fractional gliding_airspeed_pitch_adjust(void)
+fractional gliding_airspeed_pitch_adjust(void)
 {
 	union longww accum;
 
@@ -211,6 +215,7 @@ static fractional gliding_airspeed_pitch_adjust(void)
 
 	return aspd_pitch_adj;
 }
+#endif // (GLIDE_AIRSPEED_CONTROL == 1)
 
 void airspeedCntrl(void)
 {

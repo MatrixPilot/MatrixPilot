@@ -23,6 +23,7 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "cameraCntrl.h"
+#include "altitudeCntrl.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
@@ -278,7 +279,11 @@ static int16_t logoStackIndex = 0;
 
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
-static struct logoLocation { union longww x; union longww y; int16_t z; };
+struct logoLocation { 
+	union longww x;
+	union longww y;
+	int16_t z;
+};
 static struct logoLocation turtleLocations[2];
 static struct relative3D lastGoal = {0, 0, 0};
 

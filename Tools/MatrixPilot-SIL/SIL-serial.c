@@ -38,8 +38,7 @@ boolean udb_gps_check_rate(int32_t rate)
 	return (rate == gpsRate);
 }
 
-
-// Call this function to initiate sending a data to the GPS
+// Call this function to initiate sending data to the GPS
 void udb_gps_start_sending_data(void)
 {
 	uint8_t buffer[BUFLEN];

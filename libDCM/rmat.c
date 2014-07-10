@@ -124,10 +124,10 @@ fractional gplane[] = { 0, 0, GRAVITY };
 #endif
 
 // horizontal velocity over ground, as measured by GPS (Vz = 0)
-fractional dirovergndHGPS[] = { 0, RMAX, 0 };
+fractional dirOverGndHGPS[] = { 0, RMAX, 0 };
 
 // horizontal direction over ground, as indicated by Rmatrix
-fractional dirovergndHRmat[] = { 0, RMAX, 0 };
+fractional dirOverGndHrmat[] = { 0, RMAX, 0 };
 
 // rotation angle equal to omega times integration factor:
 //fractional theta[] = { 0, 0, 0 };

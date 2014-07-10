@@ -23,6 +23,7 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "cameraCntrl.h"
+#include "servoPrepare.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
@@ -43,8 +44,8 @@
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
-uint16_t yawkpail;
-uint16_t yawkprud;
+uint16_t yawkpail; // only exported for parameter_table
+uint16_t yawkprud; // only exported for parameter_table
 
 struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };

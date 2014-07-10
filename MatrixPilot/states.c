@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "mode_switch.h"
+#include "altitudeCntrl.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"

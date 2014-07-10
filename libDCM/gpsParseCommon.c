@@ -191,9 +191,9 @@ static void udb_background_callback_triggered(void)
 	struct relative2D velocity_thru_air;
 	int16_t velocity_thru_airz;
 
-	dirovergndHRmat[0] = rmat[1];
-	dirovergndHRmat[1] = rmat[4];
-	dirovergndHRmat[2] = 0;
+	dirOverGndHrmat[0] = rmat[1];
+	dirOverGndHrmat[1] = rmat[4];
+	dirOverGndHrmat[2] = 0;
 
 	if (gps_nav_valid())
 	{
@@ -316,12 +316,12 @@ static void udb_background_callback_triggered(void)
 	else
 	{
 		gps_data_age = GPS_DATA_MAX_AGE+1;
-		dirovergndHGPS[0] = dirovergndHRmat[0];
-		dirovergndHGPS[1] = dirovergndHRmat[1];
-		dirovergndHGPS[2] = 0;
+		dirOverGndHGPS[0] = dirOverGndHrmat[0];
+		dirOverGndHGPS[1] = dirOverGndHrmat[1];
+		dirOverGndHGPS[2] = 0;
 		dcm_flags._.yaw_req = 1;            // request yaw drift correction
 		dcm_flags._.gps_history_valid = 0;  // gps history has to be restarted
-		gps_update_basic_data();			// update svs
+		gps_update_basic_data();            // update svs
 	}
 }
 

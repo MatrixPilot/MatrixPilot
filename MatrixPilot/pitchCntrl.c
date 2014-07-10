@@ -22,7 +22,9 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
 #include "airspeedCntrl.h"
+#include "altitudeCntrl.h"
 
 //  If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 

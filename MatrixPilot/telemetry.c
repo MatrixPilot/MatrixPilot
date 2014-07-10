@@ -521,9 +521,11 @@ void serial_output_8hz(void)
 
 void serial_output_8hz(void)
 {
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	int16_t i;
-//	static int16_t telemetry_counter = 8;
 	static int toggle = 0;
+#endif
+//	static int16_t telemetry_counter = 8;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
 	// F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
