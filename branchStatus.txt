@@ -143,5 +143,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	function of ground speed.
 
 9 July 2014:
+	fixed timing bug in updateTriggerAction; was hardwired for 40Hz heartbeat
 	commented out first block of updateTriggerAction() since this seemed superfluous
 	Verified that trigger action works correctly for a low-going servo pulse

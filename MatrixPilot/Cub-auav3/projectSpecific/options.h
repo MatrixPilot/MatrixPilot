@@ -105,7 +105,7 @@
 // holds the cross track error to smaller values.
 // 64 meters is probably the largest value you might use on a fast model jet (more than 50 meters/sec)
 // Use 32 meters for 20 to 50 meters/sec, and 16 meters for less than that.
-#define CROSS_TRACK_MARGIN                  32
+#define CROSS_TRACK_MARGIN                  16
 
 // Wind Gain Adjustment
 // This is an option for modulating the navigation gains in flight
@@ -161,8 +161,8 @@
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE							0
-#define RACING_MODE_WP_THROTTLE				1
+#define RACING_MODE			1
+#define RACING_MODE_WP_THROTTLE		.8
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
@@ -471,7 +471,7 @@
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP				0.1 //0.22
 #define ROLLKD				0.025 //0.02
-#define YAWKP_AILERON		0.25 // 0.05
+#define YAWKP_AILERON		0.5 // 0.05
 #define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
 
@@ -608,7 +608,7 @@
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
 // smoother, and is suggested for very fast planes.
-#define HEIGHT_MARGIN 20
+#define HEIGHT_MARGIN 5
 
 // Use ALT_HOLD_THROTTLE_MAX when below HEIGHT_MARGIN of the target height.
 // Interpolate between ALT_HOLD_THROTTLE_MAX and ALT_HOLD_THROTTLE_MIN
