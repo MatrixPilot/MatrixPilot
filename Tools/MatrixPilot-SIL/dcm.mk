@@ -1,4 +1,4 @@
-DCM_OBJECTS := \
+DCM_OBJECTS = \
 ../../libDCM/deadReckoning.o \
 ../../libDCM/estAltitude.o \
 ../../libDCM/estWind.o \

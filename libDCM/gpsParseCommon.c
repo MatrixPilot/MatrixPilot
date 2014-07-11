@@ -166,7 +166,7 @@ void udb_gps_callback_received_byte(uint8_t rxchar)
 }
 
 boolean gps_nav_capable_check_set(void)
-{
+{ // TODO: gps_data_age is not being set by NMEA or STD parsers?
 	if (gps_data_age < GPS_DATA_MAX_AGE) gps_data_age++;
 	dcm_flags._.nav_capable = (gps_data_age < GPS_DATA_MAX_AGE);
 //	return (gps_data_age < GPS_DATA_MAX_AGE);

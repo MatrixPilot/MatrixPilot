@@ -3,11 +3,7 @@ MP_OBJECTS = \
 ../../MatrixPilot/TaskIMU.o \
 ../../MatrixPilot/TaskGPS.o \
 \
-../../MatrixPilot/airspeedCntrl.o \
-../../MatrixPilot/altitudeCntrl.o \
-../../MatrixPilot/altitudeCntrlVariable.o \
 ../../MatrixPilot/behavior.o \
-../../MatrixPilot/cameraCntrl.o \
 ../../MatrixPilot/config.o \
 ../../MatrixPilot/config_tests.o \
 ../../MatrixPilot/data_services.o \
@@ -26,10 +22,7 @@ MP_OBJECTS = \
 ../../MatrixPilot/navigate.o \
 ../../MatrixPilot/nv_memory_table.o \
 ../../MatrixPilot/parameter_table.o \
-../../MatrixPilot/pitchCntrl.o \
-../../MatrixPilot/rollCntrl.o \
 ../../MatrixPilot/servoMix.o \
 ../../MatrixPilot/servoPrepare.o \
 ../../MatrixPilot/states.o \
-../../MatrixPilot/telemetry.o \
-../../MatrixPilot/yawCntrl.o
+../../MatrixPilot/telemetry.o

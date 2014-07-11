@@ -45,8 +45,8 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		0
-#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
+#define USE_FIXED_ORIGIN        0
+#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@
 // is targeting, instead of the location to aim the plane.
 // 
 // Each time you enter waypoint mode, the state is reset and your logo program starts from the top.  If
-// you enter RTL mode, the state is reset and your rtlInstructions[] logo program is run instead.
+// you enter RTL mode, the state is reset and your RTL logo program is run instead.
 // The following state is cleared when entering waypoint mode or RTL mode: (but not when your program
 // ends and starts over)
 //   - The plane turtle and camera turtle begin at the plane's current position and altitude.

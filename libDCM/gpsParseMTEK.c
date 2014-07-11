@@ -188,7 +188,6 @@ void gps_commit_data(void)
 		week_no.BB = calculate_week_num(date_gps_.WW);
 	}
 	tow.WW = calculate_time_of_week(time_gps_.WW);
-
 	lat_gps.WW   = lat_gps_.WW * 10;
 	lon_gps.WW   = lon_gps_.WW * 10;
 	alt_sl_gps   = alt_sl_gps_;
@@ -197,7 +196,6 @@ void gps_commit_data(void)
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
 	hdop         = (uint8_t)(hdop_.BB / 20);
 	svs          = svs_;
-
 	last_alt     = alt_sl_gps_;
 }
 

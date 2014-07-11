@@ -348,7 +348,7 @@ uint16_t vector2_normalize(int16_t result[], int16_t input[])
 	}
 	else
 	{
-		result[0]=result[1]=0;
+		result[0] = result[1] = 0;
 	}
 	return magnitude;
 }

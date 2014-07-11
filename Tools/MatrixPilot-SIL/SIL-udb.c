@@ -73,6 +73,7 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 #endif // WIN
 
 #include "libUDB.h"
+#include "ADchannel.h"
 #include "magnetometer.h"
 #include "magnetometerOptions.h"
 #include "events.h"
@@ -267,14 +268,14 @@ uint8_t udb_cpu_load(void)
 {
 	return 5; // sounds reasonable for a fake cpu%
 }
-
+/* commented out to make SILSIM gcc build work
 int16_t udb_servo_pulsesat(int32_t pw)
 {
 	if (pw > SERVOMAX) pw = SERVOMAX;
 	if (pw < SERVOMIN) pw = SERVOMIN;
 	return (int16_t)pw;
 }
-
+ */
 void udb_servo_record_trims(void)
 {
 	int16_t i;
@@ -407,7 +408,7 @@ boolean handleUDBSockets(void)
 {
 #define BUFLEN 32
 	uint8_t buffer[BUFLEN];
-	int32_t bytesRead;
+	int32_t bytesRead = 0;
 	int16_t i;
 	boolean didRead = false;
 
@@ -418,13 +419,15 @@ boolean handleUDBSockets(void)
 			printf("ERROR: failed to open %s\r\n", GPS_LOGFILE);
 		}
 	}
-	bytesRead = fread(buffer, 1, BUFLEN, fp);
-	if (!bytesRead) {
-		rewind(fp);
+	if (fp) {
 		bytesRead = fread(buffer, 1, BUFLEN, fp);
-	}
-	for (i = 0; i < bytesRead; i++) {
-		udb_gps_callback_received_byte(buffer[i]);
+		if (!bytesRead) {
+			rewind(fp);
+			bytesRead = fread(buffer, 1, BUFLEN, fp);
+		}
+		for (i = 0; i < bytesRead; i++) {
+			udb_gps_callback_received_byte(buffer[i]);
+		}
 	}
 	if (bytesRead > 0) didRead = true;
 	return didRead;

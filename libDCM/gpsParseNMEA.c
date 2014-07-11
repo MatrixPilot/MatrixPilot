@@ -651,17 +651,14 @@ void gps_commit_data(void)
 		week_no.BB = calculate_week_num(date_gps_.WW);
 	}
 	tow.WW = calculate_time_of_week(time_gps_.WW);
-
 	lat_gps      = lat_gps_;
 	lon_gps      = lon_gps_;
 	alt_sl_gps   = alt_sl_gps_;             // Altitude
 	sog_gps      = sog_gps_;                // Speed over ground
 	cog_gps      = cog_gps_;                // Course over ground
-
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
 	hdop         = hdop_._.B0;
 	svs          = svs_;
-
 	last_alt     = alt_sl_gps_;
 }
 

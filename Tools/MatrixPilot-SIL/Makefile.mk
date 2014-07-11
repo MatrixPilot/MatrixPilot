@@ -1,5 +1,5 @@
 CC = gcc
-INCPATH = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot -I../../FreeRTOS/include -I../../FreeRTOS/portable/MSVC-MingW
+INCPATH = -I. -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot -I../../FreeRTOS/include -I../../FreeRTOS/portable/MSVC-MingW
 
 RM_FILE = rm -f
 ifeq ($(OS),Windows_NT)
@@ -24,11 +24,13 @@ OBJECTS_DIR = ./
 MPSIL_TARGET = matrixpilot$(TARGET_EXTENSION)
 include udb.mk
 include dcm.mk
+include cntrl.mk
 include mp.mk
 include sil.mk
 MPSIL_OBJECTS = \
 	$(UDB_OBJECTS) \
 	$(DCM_OBJECTS) \
+	$(CNTRL_OBJECTS) \
 	$(MP_OBJECTS) \
 	$(SIL_OBJECTS) \
 	$(SOCK_OBJECTS)

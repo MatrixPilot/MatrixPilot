@@ -31,7 +31,7 @@
 const int16_t aileronbgain  = (int16_t)(8.0*AILERON_BOOST);
 const int16_t elevatorbgain = (int16_t)(8.0*ELEVATOR_BOOST);
 const int16_t rudderbgain   = (int16_t)(8.0*RUDDER_BOOST);
-
+///*
 // saturation logic to maintain pulse width within bounds
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
@@ -41,7 +41,7 @@ int16_t udb_servo_pulsesat(int32_t pw)
 	if (pw < SERVOMIN) pw = SERVOMIN;
 	return (int16_t)pw;
 }
-
+// */
 void servoMix(void)
 {
 	int32_t temp;

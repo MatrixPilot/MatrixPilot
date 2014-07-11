@@ -21,8 +21,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Software In the Loop Simulation
-// Only set this to 1 when building for simulation directly on your computer instead of
-// running on a UDB.
+//
 // See the MatrixPilot wiki for more info on using SILSIM.
 // Below are settings to configure the simulated UDB UARTs.
 // The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
