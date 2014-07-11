@@ -178,16 +178,28 @@ const struct waypointDef waypoints[] = {
 #define USE_FIXED_ORIGIN		1
 #define FIXED_ORIGIN_LOCATION	{ -1052124472, 398421750, 1812.0 }
 
+//const struct waypointDef waypoints[] = {
+//	{ { 30, -7, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 1
+//	{ { 100, -28, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 2
+//	{ { 101, 26, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 3
+//	{ { -100, 88, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 4
+//	{ { -102, 32, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 5
+//	{ { -71, 22, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 6
+//	{ { -27, 9, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
+//	{ { 0, 0, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
+//	{ { 5, 0, 5 } , F_CROSS_TRACK + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 7
+//};
+// right hand pattern
 const struct waypointDef waypoints[] = {
-	{ { 30, -7, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 1
-	{ { 100, -28, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 2
-	{ { 101, 26, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { -27, 9, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { -71, 22, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 6
+	{ { -102, 32, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 5
 	{ { -100, 88, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 4
-	{ { -102, 32, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 5
-	{ { -71, 22, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 6
-	{ { -27, 9, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
-	{ { 0, 0, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
-	{ { 5, 0, 5 } , F_CROSS_TRACK + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { 101, 26, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { 100, -28, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 2
+	{ { 30, -7, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 1
+	{ { 0, 0, 10 } , F_CROSS_TRACK + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { -5, 0, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
 };
 #endif
 
