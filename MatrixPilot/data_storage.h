@@ -100,24 +100,24 @@ typedef struct tagDATA_STORAGE_HEADER
 } DATA_STORAGE_HEADER;
 
 // Trigger storage service in low priority process.
-extern void storage_service_trigger(void);
+void storage_service_trigger(void);
 
 // Initialise the data storage
-extern void data_storage_init(void);
+void data_storage_init(void);
 
 // For access to a checksummed structure data area
-extern boolean storage_write(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback);
-extern boolean storage_read(uint16_t data_handle, uint8_t* prdData, uint16_t size, DS_callbackFunc callback);
+boolean storage_write(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback);
+boolean storage_read(uint16_t data_handle, uint8_t* prdData, uint16_t size, DS_callbackFunc callback);
 
 // Create a storage area
 // Size = size in bytes
 // type = data management type
 // callback = user callback for when process finished
-extern boolean storage_create_area(uint16_t data_handle, uint16_t size, uint16_t type, DS_callbackFunc callback);
+boolean storage_create_area(uint16_t data_handle, uint16_t size, uint16_t type, DS_callbackFunc callback);
 
 // Lookup the data storage table to see if an area exists
 // Does not require callback.  Always has immediate return
-extern boolean storage_check_area_exists(uint16_t data_handle, uint16_t size, uint16_t type);
+boolean storage_check_area_exists(uint16_t data_handle, uint16_t size, uint16_t type);
 
 // Status of sotage services
 boolean storage_services_started(void);
@@ -136,6 +136,6 @@ extern boolean storage_resize(uint16_t data_handle, uint16_t size, DS_callbackFu
 extern boolean storage_clear_all(DS_callbackFunc callback);
 
 // Clear specific data storage area by invalidating data
-extern boolean storage_clear_area(uint16_t data_handle, DS_callbackFunc callback);
+boolean storage_clear_area(uint16_t data_handle, DS_callbackFunc callback);
 
 #endif // DATA_STORAGE_H

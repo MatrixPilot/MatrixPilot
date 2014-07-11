@@ -51,7 +51,7 @@ static void TaskGPS(void* pvParameters)
 		xSemaphoreTake(xSemaphoreGPS, portMAX_DELAY);
 		udb_led_toggle(LED_RED);
 void udb_background_callback_triggered(void);
-		udb_background_callback_triggered();
+//		udb_background_callback_triggered();
 	}
 }
 

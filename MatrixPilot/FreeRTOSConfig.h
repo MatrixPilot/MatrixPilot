@@ -75,7 +75,7 @@
 #include "../libUDB/oscillator.h"
 
 
-#define configASSERT(x) if (!(x)) printf("ASSERT: %s %d\r\n", __FILE__, __LINE__);
+#define configASSERT(x) { if (!(x)) { printf("ASSERT: %s %d\r\n", __FILE__, __LINE__); for (;;) {} } }
 
 /*-----------------------------------------------------------
  * Application specific definitions.

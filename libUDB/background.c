@@ -23,6 +23,9 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#ifdef USE_FREERTOS
+#include "FreeRTOS.h"
+#endif // USE_FREERTOS
 
 //#define CPU_LOAD_PERCENT  1678  // = ((65536 * 100) / ((32000000 / 2) / (16 * 256)))
 //#define CPU_LOAD_PERCENT  839   // = ((65536 * 100) / ((64000000 / 2) / (16 * 256)))
@@ -160,7 +163,6 @@ uint16_t rtos_ticks = 0;
 void vApplicationTickHook(void) // 1000 Hz
 {
 #ifdef USE_FREERTOS
-?
 	static int16_t i = 0;
 
 	rtos_ticks++;

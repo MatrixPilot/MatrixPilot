@@ -8,7 +8,7 @@ dir_src=
 dir_bin=
 dir_tmp=build/auav3
 dir_sin=..\libVectorMatrix
-dir_inc=..\Config;..\libFlashFS;..\FreeRTOS\include;..\FreeRTOS\portable\MPLAB\PIC24_dsPIC;.;..\MAVLink\include;..\Microchip;..\Microchip\Include
+dir_inc=..\Config;..\FreeRTOS\include;..\FreeRTOS\portable\MPLAB\PIC24_dsPIC;..\libFlashFS;.;..\MAVLink\include;..\Microchip;..\Microchip\Include
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
 [CAT_FILTERS]
@@ -1604,7 +1604,7 @@ suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
 [TOOL_SETTINGS]
 TS{7D9C6ECE-785D-44CB-BA22-17BF2E119622}=--defsym=PSV_ERRATA=1 -g
-TS{25AC22BD-2378-4FDB-BFB6-7345A15512D3}=-g -Wall -DAUAV3 -mlarge-code -mlarge-data -funroll-loops -fomit-frame-pointer
+TS{25AC22BD-2378-4FDB-BFB6-7345A15512D3}=-g -Wall -DAUAV3 -DUSE_FREERTOS -DMPLAB_DSPIC_PORT -mlarge-code -mlarge-data -funroll-loops -fomit-frame-pointer
 TS{7DAC9A1D-4C45-45D6-B25A-D117C74E8F5A}=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -legacy-libc
 TS{509E5861-1E2A-483B-8B6B-CA8DB7F2DD78}=
 [INSTRUMENTED_TRACE]
@@ -1612,7 +1612,7 @@ enable=0
 transport=0
 format=0
 [CUSTOM_BUILD]
-Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)..\Config\options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
+Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)..\Config\options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)..\Config\options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
 Pre-BuildEnabled=1
 Post-Build=
 Post-BuildEnabled=1

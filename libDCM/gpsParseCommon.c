@@ -115,8 +115,12 @@ int16_t udb_gps_callback_get_byte_to_send(void)
 	return -1;
 }
 
-// Got a character from the GPS
+#if defined (USE_FREERTOS)
+void udb_gps_msg_parse(uint8_t rxchar)
+#else
 void udb_gps_callback_received_byte(uint8_t rxchar)
+#endif
+// Got a character from the GPS
 {
 	//bin_out(rxchar);      // binary out to the debugging USART
 	(*msg_parse)(rxchar);   // parse the input byte

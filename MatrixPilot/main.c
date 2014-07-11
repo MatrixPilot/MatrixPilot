@@ -104,7 +104,6 @@ int main(void)
 
 //#undef USE_FREERTOS
 #ifdef USE_FREERTOS
-#error here
 	DPRINT("Initialising RTOS\r\n");
 	init_tasks();   // initialise the RTOS
 	DPRINT("Starting Scheduler\r\n");

@@ -46,7 +46,7 @@
 // altitude, expressed in meters.
 
 //#define USE_FIXED_ORIGIN      0
-//#define FIXED_ORIGIN_LOCATION { -1219950467, 374124664, 2.00 }	// A point in Baylands Park in Sunnyvale, CA
+//#define FIXED_ORIGIN_LOCATION { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
