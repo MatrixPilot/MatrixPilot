@@ -74,3 +74,11 @@
 7 July: manually determined magnetometer offsets and disabled auto-alignment
 
 9 July: configured waypoints.h to drop ball at runway center
+
+11 July: good ball drop accuracy at west field with modest roll angles.
+
+12 July: single flight test with larger roll angles; Cub had trouble dealing with the
+	wind. Need to retest on calmer day. Earth magnetic vector displayed in GE
+	is much improved with new calibration; should improve further with r3240.
+
+13 July:

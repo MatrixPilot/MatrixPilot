@@ -638,11 +638,13 @@ static void mag_drift(void) {
 
         if (dcm_flags._.first_mag_reading == 0) {
 
-#ifdef ENABLE_MAGALIGNMENT
+#ifdef ENABLE_MAGOFFSET
             udb_magOffset[0] = udb_magOffset[0] + ((offsetEstimate[0] + 2) >> 2);
             udb_magOffset[1] = udb_magOffset[1] + ((offsetEstimate[1] + 2) >> 2);
             udb_magOffset[2] = udb_magOffset[2] + ((offsetEstimate[2] + 2) >> 2);
+#endif
 
+#ifdef ENABLE_MAGALIGNMENT
             quaternion_adjust(magAlignment, magAlignmentAdjustment);
 #endif
 

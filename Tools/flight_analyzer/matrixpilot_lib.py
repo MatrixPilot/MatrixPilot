@@ -48,7 +48,7 @@ class raw_mavlink_telemetry_file:
                 if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
                         self.last_F2_A_msg = self.msg
                         self.SUE_F2_A_needs_printing = True
-                        print self.msg.sue_magFieldEarth0, ",", self.msg.sue_magFieldEarth1, ",", self.msg.sue_magFieldEarth2
+                        # print self.msg.sue_magFieldEarth0, ",", self.msg.sue_magFieldEarth1, ",", self.msg.sue_magFieldEarth2
                         continue
                 elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
                         try:
@@ -71,8 +71,8 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
                             return self.msg                
-#                elif  self.msg.get_type() == 'RAW_IMU':
-#                            print self.msg.xmag,",",self.msg.ymag,",",self.msg.zmag
+                elif  self.msg.get_type() == 'RAW_IMU':
+                    print self.msg.xmag,",",self.msg.ymag,",",self.msg.zmag
                 else :
                         #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                         pass
@@ -593,7 +593,7 @@ class ascii_telemetry(base_telemetry):
                 try:
                     self.tm_actual = float (match.group(1))
                 except:
-                    print "Cortupt T: value (GPS Time) at line", line_no
+                    print "Corrupt T: value (GPS Time) at line", line_no
                     return "Error"
                 if ((self.tm_actual < max_tm_actual) and ( max_tm_actual > 604780000 )):
                     # 604800000 is no. of milliseconds in a week. This extra precaution required because

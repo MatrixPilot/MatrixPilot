@@ -8,8 +8,8 @@ import re
 
 # A program by Peter Hollands, July 2014 to help visualize magnetometer offsets
 # You will need to setup the full path to flight analyzer directory below:-
-MY_PATH_TO_FLIGHT_ANALYZER = "/Users/phollands/Desktop/development/MatrixPilot_mw4fbw/Tools/flight_analyzer"
-MY_FILE_NAME = "LOG02387.RAW"
+MY_PATH_TO_FLIGHT_ANALYZER = "/home/markw/markw_32/MPLABXprojects/newsvn/MatrixPilot_mw4fbw/Tools/flight_analyzer"
+MY_FILE_NAME = "/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/calDanceBody.RAW"
 
 try:
     sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))

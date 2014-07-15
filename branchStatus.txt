@@ -146,3 +146,11 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	fixed timing bug in updateTriggerAction; was hardwired for 40Hz heartbeat
 	commented out first block of updateTriggerAction() since this seemed superfluous
 	Verified that trigger action works correctly for a low-going servo pulse
+
+12 July 2014: r3240
+	Ellipsoid fit method demonstrated to generate reasonable values for udb_magOffset[]
+	and magnetometer.c changed to subtract offsets before gain adjustments and rotation
+	into body frame. Auto udb_magOffset correction should work properly when initialized
+	to fitted values. Need to retest with ENABLE_MAGOFFSET defined.
+	Outstanding question:
+		Is the auto mag. alignment of any value for onboard magnetometer?
