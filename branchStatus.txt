@@ -154,3 +154,10 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	to fitted values. Need to retest with ENABLE_MAGOFFSET defined.
 	Outstanding question:
 		Is the auto mag. alignment of any value for onboard magnetometer?
+
+15 July 2014:
+	remove a few more cascaded assignment statements
+
+16 July 2014:
+	add option #define PRE_CALIBRATED to allow preflight specification of accelerometer
+	and gyro offsets. Decrease calibration pause from 10 seconds to 1 second if precalibrated.

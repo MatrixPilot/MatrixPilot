@@ -81,4 +81,7 @@
 	wind. Need to retest on calmer day. Earth magnetic vector displayed in GE
 	is much improved with new calibration; should improve further with r3240.
 
-13 July:
+15 July: change options.h to define FIXED_TRIMPOINTS
+
+16 July: use mavlink raw sensor data log to calculate MPU6000 offsets
+	and define PRE_CALIBRATED in options.h

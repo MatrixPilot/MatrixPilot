@@ -65,6 +65,14 @@
 //        from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 #define BOARD_ORIENTATION                   ORIENTATION_FORWARDS
 
+// manual accel/gyro calibration values supplied
+#define PRE_CALIBRATED
+#define XACCEL_OFFSET -40
+#define YACCEL_OFFSET -100
+#define ZACCEL_OFFSET -1019
+#define XRATE_OFFSET  23
+#define YRATE_OFFSET  -192
+#define ZRATE_OFFSET  -118
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choose your airframe type:
@@ -207,6 +215,11 @@
 //   5 also enables E8 as the 5th input channel
 // For UDB4 boards: Set to 1-8
 #define NUM_INPUTS                          6
+
+// respect TX trim settings
+#define FIXED_TRIMPOINT     1
+#define THROTTLE_TRIMPOINT  2110
+#define CHANNEL_TRIMPOINT   3000
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.

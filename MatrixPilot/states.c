@@ -44,7 +44,11 @@ static int wagInterval = 0;
 //#define CALIB_PAUSE (5 * HEARTBEAT_HZ)    // wait for 5 seconds of runs through the state machine
 //#define STANDBY_PAUSE 8		// pause for 4 seconds
 
+#ifdef PRE_CALIBRATED
+#define CALIB_PAUSE (1 * HEARTBEAT_HZ)    // wait for 10 seconds of runs through the state machine
+#else
 #define CALIB_PAUSE (10 * HEARTBEAT_HZ)    // wait for 10 seconds of runs through the state machine
+#endif
 
 #define STANDBY_PAUSE 48		// pause for 24 seconds after first GPS fix
 #define NUM_WAGGLES   4     // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
@@ -153,8 +157,8 @@ static void ent_acquiringS(void)
 	{
 		udb_servo_record_trims();
 	}
-#else
-	udb_servo_record_trims();
+        #else
+                udb_servo_record_trims();
 #endif
 #endif
 	dcm_calibrate();

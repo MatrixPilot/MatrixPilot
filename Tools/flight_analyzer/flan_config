@@ -10,7 +10,7 @@ p3
 I0
 sS'telemetry_filename'
 p4
-S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/CalDanceBody.RAW'
+S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/levelCal2.RAW'
 p5
 sS'telemetry_type'
 p6
@@ -24,11 +24,11 @@ p9
 I0
 sS'GE_filename_kml'
 p10
-S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/CalDanceBody.kml'
+S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/levelCal2.kml'
 p11
 sS'CSV_filename'
 p12
-S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/CalDanceBody.csv'
+S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/levelCal2.csv'
 p13
 sS'waypoint_filename'
 p14
@@ -42,7 +42,7 @@ p17
 I0
 sS'GE_filename'
 p18
-S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/CalDanceBody.kmz'
+S'/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/levelCal2.kmz'
 p19
 sS'waypoint_selector'
 p20

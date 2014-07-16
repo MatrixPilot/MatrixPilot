@@ -1759,8 +1759,8 @@ void mavlink_output_40hz(void)
 	//	uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint8_t rssi)
 	// RAW SENSORS - ACCELOREMETERS and GYROS
 	// It is expected that these values are graphed to allow users to check basic sensor operation,
-	// and to graph noise on the signals. As this code if for testing and graphing basic hardware, it uses
-	// UDB conventions coordinate conventions for X,Y and Z axis rather than MAVLink conventions.
+	// and to graph noise on the signals. As this code is for testing and graphing basic hardware, it uses
+	// raw sensor data, not corrected for offsets or mounting orientation.
 	// See:- http://code.google.com/p/gentlenav/wiki/UDBCoordinateSystems and the "Aviation Convention" diagram.
 
 	spread_transmission_load = 30;
@@ -1768,10 +1768,10 @@ void mavlink_output_40hz(void)
 	{
 #if (MAG_YAW_DRIFT == 1) // Magnetometer is connected
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-			(int16_t)   udb_xaccel.value,	(int16_t)   udb_yaccel.value,	(int16_t) - udb_zaccel.value,
-			(int16_t) - udb_xrate.value,	(int16_t) - udb_yrate.value,	(int16_t) - udb_zrate.value,
-			(int16_t)   udb_magFieldBody[0],(int16_t)   udb_magFieldBody[1],(int16_t)   udb_magFieldBody[2]);
-//			(int16_t)   magFieldRaw[0],(int16_t)   magFieldRaw[1],(int16_t)   magFieldRaw[2]);
+			(int16_t)udb_xaccel.value, (int16_t)udb_yaccel.value, (int16_t)udb_zaccel.value,
+			(int16_t)udb_xrate.value, (int16_t)udb_yrate.value, (int16_t)udb_zrate.value,
+			(int16_t)magFieldRaw[0], (int16_t)magFieldRaw[1], (int16_t)magFieldRaw[2]);
+//			(int16_t)udb_magFieldBody[0], (int16_t)udb_magFieldBody[1], (int16_t)udb_magFieldBody[2]);
 #else // magnetometer is not connected
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
 			(int16_t)   udb_xaccel.value,	(int16_t)   udb_yaccel.value,	(int16_t) - udb_zaccel.value,

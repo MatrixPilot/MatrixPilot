@@ -107,6 +107,10 @@ void MPU6000_init16(void)
 //	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
+        //FIXME: these accel ranges are commented incorrectly; e.g. the signed 32bit value
+        // output by the MPU6000 has a sensitivity of 8192 LSB/g when set to the +/-4g range
+        // Not that the comments below in the "Legacy..." section are correct, and
+        // that the MatrixPilotMulti branch is also correct.
 #if (ACCEL_RANGE == 2)
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
 #elif (ACCEL_RANGE == 4)

@@ -221,6 +221,7 @@ void udb_a2d_record_offsets(void)
 #else  // horizontal initialization
 void udb_a2d_record_offsets(void)
 {
+#ifndef PRE_CALIBRATED
 #if (USE_NV_MEMORY == 1)
 	if(udb_skip_flags.skip_imu_cal == 1)
 		return;
@@ -235,6 +236,15 @@ void udb_a2d_record_offsets(void)
 	udb_zrate.offset = udb_zrate.value;
 #ifdef VREF
 	udb_vref.offset = udb_vref.value;
+#endif
+#else
+	UDB_XACCEL.offset = XACCEL_OFFSET;
+	UDB_YACCEL.offset = YACCEL_OFFSET;
+	UDB_ZACCEL.offset = ZACCEL_OFFSET;
+
+        udb_xrate.offset = XRATE_OFFSET;
+	udb_yrate.offset = YRATE_OFFSET;
+	udb_zrate.offset = ZRATE_OFFSET;
 #endif
 }
 #endif // INITIALIZE_VERTICAL

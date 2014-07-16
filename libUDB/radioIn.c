@@ -95,12 +95,16 @@ void udb_init_capture(void)
 	{	
 		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
-			if(i == THROTTLE_OUTPUT_CHANNEL)
-				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
-			else
-				udb_pwTrim[i] = udb_pwIn[i] = CHANNEL_TRIMPOINT;
+			if(i == THROTTLE_OUTPUT_CHANNEL) {
+				udb_pwTrim[i] = THROTTLE_TRIMPOINT;
+                                udb_pwIn[i] = THROTTLE_TRIMPOINT;
+                        } else {
+				udb_pwTrim[i] = CHANNEL_TRIMPOINT;
+                                udb_pwIn[i] = CHANNEL_TRIMPOINT;
+                        }
 	#else
-			udb_pwTrim[i] = udb_pwIn[i] = 0;
+			udb_pwTrim[i] = 0;
+                        udb_pwIn[i] = 0;
 	#endif
 	}
 	
