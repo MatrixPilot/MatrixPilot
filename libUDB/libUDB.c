@@ -252,10 +252,14 @@ void udb_a2d_record_offsets(void)
 void udb_servo_record_trims(void)
 {
 	int16_t i;
+#if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
 	for (i = 0; i <= NUM_INPUTS; i++)
 	{
 		udb_pwTrim[i] = udb_pwIn[i];
 	}
+#else
+		udb_pwTrim[THROTTLE_INPUT_CHANNEL] = THROTTLE_TRIMPOINT; 
+#endif
 }
 
 // saturation logic to maintain pulse width within bounds

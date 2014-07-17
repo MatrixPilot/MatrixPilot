@@ -54,14 +54,18 @@ void init_servoPrepare(void) // initialize the PWM
 
 	for (i=0; i <= NUM_INPUTS; i++)
 #if (FIXED_TRIMPOINT == 1)
-		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
+                // don't send a valid throttle pulse yet (prevents ESC from arming)
+		udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : CHANNEL_TRIMPOINT);
+                udb_pwTrim[i] = udb_pwIn[i];
 #else
-		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);	
+		udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);	
+                udb_pwTrim[i] = udb_pwIn[i];
 #endif
 
 #if (FIXED_TRIMPOINT == 1)
+        // don't send a valid throttle pulse yet (prevents ESC from arming)
 	for (i=0; i <= NUM_OUTPUTS; i++)
-		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
+		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : CHANNEL_TRIMPOINT);
 #else
 	for (i=0; i <= NUM_OUTPUTS; i++)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);

@@ -156,7 +156,8 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 		Is the auto mag. alignment of any value for onboard magnetometer?
 
 15 July 2014:
-	remove a few more cascaded assignment statements
+	remove a few more cascaded assignment statements and modify mavlink.c to output
+
 
 16 July 2014:
 	add option #define PRE_CALIBRATED to allow preflight specification of accelerometer
