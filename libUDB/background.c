@@ -170,7 +170,7 @@ void vApplicationTickHook(void) // 1000 Hz
 	if (++i > (configTICK_RATE_HZ / HEARTBEAT_HZ)) // 40 Hz
 	{
 		i = 0;
-		heartbeat();
+//		heartbeat();
 	}
 #endif // USE_FREERTOS
 }

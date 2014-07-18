@@ -80,13 +80,11 @@ void udb_init(void)
 //	I2C1_Init(); // moved into nv_memory_init()
 //#endif
 #if (USE_NV_MEMORY == 1)
-?
 	nv_memory_init();
 	data_storage_init();
 	data_services_init();
 #endif
 #if (USE_FLEXIFUNCTION_MIXING == 1)
-?
 	flexiFunctionServiceInit();
 #endif
 	udb_init_clock();
@@ -110,7 +108,6 @@ void udb_init(void)
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-?
 	udb_eeprom_init();
 #endif
 
