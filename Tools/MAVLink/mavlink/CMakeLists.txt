@@ -118,7 +118,7 @@ macro(generateMavlink version definitions)
         message(STATUS "processing: ${definitionAbsPath}")
         add_custom_command( 
             OUTPUT ${targetName}-stamp
-            COMMAND ${PYTHON_EXECUTABLE} ${mavgen} --lang=C --wire-protocol=${version}
+            COMMAND PYTHONPATH=$ENV{PYTHONPATH}:${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_EXECUTABLE} ${mavgen} --lang=C --wire-protocol=${version}
                 --output=include/v${version} ${definitionAbsPath}
             COMMAND touch ${targetName}-stamp
             DEPENDS ${definitionAbsPath} ${mavgen}
@@ -141,6 +141,7 @@ set(v0.9Definitions
 generateMavlink("0.9" "${v0.9Definitions}")
 set(v1.0Definitions
     ardupilotmega.xml
+    autoquad.xml
     common.xml
     matrixpilot.xml
     minimal.xml

@@ -24,7 +24,7 @@ class MAVTemplate(object):
         self.trim_leading_lf = trim_leading_lf
         self.checkmissing = checkmissing
 
-    def find_end(self, text, start_token, end_token):
+    def find_end(self, text, start_token, end_token, ignore_end_token=None):
         '''find the of a token.
         Returns the offset in the string immediately after the matching end_token'''
         if not text.startswith(start_token):
@@ -34,6 +34,12 @@ class MAVTemplate(object):
         while nesting > 0:
             idx1 = text[offset:].find(start_token)
             idx2 = text[offset:].find(end_token)
+            # Check for false positives due to another similar token
+            # For example, make sure idx2 points to the second '}' in ${{field: ${name}}}
+            if ignore_end_token:
+                combined_token = ignore_end_token + end_token
+                if text[offset+idx2:offset+idx2+len(combined_token)] == combined_token:
+                    idx2 += len(ignore_end_token)
             if idx1 == -1 and idx2 == -1:
                 raise MAVParseError("token nesting error")
             if idx1 == -1 or idx1 > idx2:
@@ -50,7 +56,7 @@ class MAVTemplate(object):
 
     def find_rep_end(self, text):
         '''find the of a repitition'''
-        return self.find_end(text, self.start_rep_token, self.end_rep_token)
+        return self.find_end(text, self.start_rep_token, self.end_rep_token, ignore_end_token=self.end_var_token)
 
     def substitute(self, text, subvars={},
                    trim_leading_lf=None, checkmissing=None):
@@ -75,7 +81,11 @@ class MAVTemplate(object):
             a = part2.split(':')
             field_name = a[0]
             rest = ':'.join(a[1:])
-            v = getattr(subvars, field_name, None)
+            v = None
+            if isinstance(subvars, dict):
+                v = subvars.get(field_name, None)
+            else:
+                v = getattr(subvars, field_name, None)
             if v is None:
                 raise MAVParseError('unable to find field %s' % field_name)
             t1 = part1
