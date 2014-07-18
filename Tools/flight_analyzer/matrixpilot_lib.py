@@ -72,7 +72,8 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
                             return self.msg                
                 elif  self.msg.get_type() == 'RAW_IMU':
-                    print self.msg.xmag,",",self.msg.ymag,",",self.msg.zmag
+                    print self.msg.xgyro,",",self.msg.ygyro,",",self.msg.zgyro, ",",\
+                          self.msg.xmag,",",self.msg.ymag,",",self.msg.zmag
                     #print self.msg.xacc,",",self.msg.yacc,",",self.msg.zacc, ",",\
                     #      self.msg.xgyro,",",self.msg.ygyro,",",self.msg.zgyro
                 else :

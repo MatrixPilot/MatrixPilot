@@ -163,10 +163,10 @@
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT                       1
 #define MAG_YAW_ENABLE                      1
-//#undef ENABLE_MAGOFFSET
-#define ENABLE_MAGOFFSET
-//#undef ENABLE_MAGALIGNMENT
-#define ENABLE_MAGALIGNMENT
+#undef ENABLE_MAGOFFSET
+//#define ENABLE_MAGOFFSET
+#undef ENABLE_MAGALIGNMENT
+//#define ENABLE_MAGALIGNMENT
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.

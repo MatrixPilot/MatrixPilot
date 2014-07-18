@@ -26,9 +26,13 @@
 #include "rmat.h"
 #include <stdio.h>
 
-int16_t udb_magFieldBody[3];                    // magnetic field in the body frame of reference 
-int16_t udb_magOffset[3] = { -193 , 383 , -510 };       // magnetic offset in the body frame of reference
-int16_t magGain[3] = { MAG_GAIN * RMAX * 1.0 , MAG_GAIN * RMAX * 1.0, MAG_GAIN * RMAX * 1.17 };    // magnetometer calibration gains
+// magnetic field in the body frame of reference
+int16_t udb_magFieldBody[3];
+// magnetic offset in the sensor frame of reference
+int16_t udb_magOffset[3] = { -193 , 383 , -510 };
+// body frame magnetometer calibration gains
+int16_t magGain[3] = { MAG_GAIN * RMAX * 1.0 , MAG_GAIN * RMAX * 1.0, MAG_GAIN * RMAX * 1.17 };
+//int16_t magGain[3] = { RMAX , RMAX , RMAX };    // magnetometer calibration gains
 int16_t rawMagCalib[3] = { 0 , 0 , 0 };
 int16_t magFieldRaw[3];
 int16_t magMessage = 0;                         // message type
@@ -180,7 +184,7 @@ static void I2C_callback(boolean I2CtrxOK)
 				magMessage = 0;         // invalid reading, reset the magnetometer
 			}
 		}
-                    // note that calibration is disabled above in rxMagnetometer
+                    // ignore gain calibration data
 //		else if (magMessage == 5)       // Calibration data
 //		{
 //			for (vectorIndex = 0; vectorIndex < 3; vectorIndex++)

@@ -50,9 +50,12 @@ static int wagInterval = 0;
 #define CALIB_PAUSE (10 * HEARTBEAT_HZ)    // wait for 10 seconds of runs through the state machine
 #endif
 
-#define STANDBY_PAUSE 48		// pause for 24 seconds after first GPS fix
-#define NUM_WAGGLES   4     // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE   300
+#define WAGGLE_FREQ   2
+// pause for 24 seconds after first GPS fix
+#define STANDBY_PAUSE 24 * WAGGLE_FREQ
+// waggle 3 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
+#define NUM_WAGGLES   4
 
 static int16_t calib_timer = CALIB_PAUSE;
 static int16_t standby_timer = STANDBY_PAUSE;
@@ -320,7 +323,7 @@ static void acquiringS(void)
 	ent_manualS();
 	return;
 #endif
-
+        // wait for GPS lock (and magnetometer data if mag enabled)
 	if (dcm_flags._.nav_capable && ((MAG_YAW_DRIFT == 0) || (magMessage == 7)))
 	{
 #if (NORADIO == 1)
@@ -329,7 +332,8 @@ static void acquiringS(void)
 		if (udb_flags._.radio_on)
 #endif
 		{
-			if (wagInterval >= (HEARTBEAT_HZ / 2))
+                        // 2Hz waggle frequency and standby countdown
+			if (wagInterval >= (HEARTBEAT_HZ / WAGGLE_FREQ))
 			{
 				wagInterval = 0;
 				standby_timer--;
