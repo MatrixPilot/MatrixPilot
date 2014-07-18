@@ -169,7 +169,8 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+//int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len) // RobD
 // Note: Channel Number, chan, is currently ignored.
 {
 	int16_t start_index;

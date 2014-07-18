@@ -43,7 +43,8 @@
 // The following macro enables MAVLink packets to be sent in one call to the serial driver
 // rather than character by character.
 #define MAVLINK_SEND_UART_BYTES mavlink_serial_send
-int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+//int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
+int16_t mavlink_serial_send(mavlink_channel_t chan, const uint8_t buf[], uint16_t len); // RobD
 #endif
 
 #include "../MAVLink/include/matrixpilot/mavlink.h"

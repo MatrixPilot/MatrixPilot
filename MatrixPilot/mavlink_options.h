@@ -51,3 +51,5 @@
 // Include code to remove rounding errors on PID values when using QGroundControl
 // 1 = Yes, 0 = No
 #define QGROUNDCTONROL_PID_COMPATIBILITY    1
+
+#define MAVLINK_EXTERNAL_RX_STATUS          1

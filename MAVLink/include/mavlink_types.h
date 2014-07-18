@@ -1,6 +1,12 @@
 #ifndef MAVLINK_TYPES_H_
 #define MAVLINK_TYPES_H_
 
+// Visual Studio versions before 2013 don't conform to C99.
+//#if (defined _MSC_VER) & (_MSC_VER < 1800)
+//#include <stdint.h>
+//#else
+//#include <inttypes.h>
+//#endif
 
 #ifndef MAVLINK_MAX_PAYLOAD_LEN
 // it is possible to override this, but be careful!
@@ -27,11 +33,15 @@
 
 #define MAVLINK_MAX_EXTENDED_PAYLOAD_LEN (MAVLINK_MAX_EXTENDED_PACKET_LEN - MAVLINK_EXTENDED_HEADER_LEN - MAVLINK_NUM_NON_PAYLOAD_BYTES)
 
+//#pragma pack(push, 1)
 typedef struct param_union {
 	union {
 		float param_float;
 		int32_t param_int32;
 		uint32_t param_uint32;
+		int16_t param_int16;
+		uint16_t param_uint16;
+		int8_t param_int8;
 		uint8_t param_uint8;
 		uint8_t bytes[4];
 	};
@@ -44,7 +54,7 @@ typedef struct __mavlink_system {
     uint8_t type;    ///< Unused, can be used by user to store the system's type
     uint8_t state;   ///< Unused, can be used by user to store the system's state
     uint8_t mode;    ///< Unused, can be used by user to store the system's mode
-    uint8_t nav_mode;    ///< Unused, can be used by user to store the system's navigation mode
+    uint32_t nav_mode;    ///< Unused, can be used by user to store the system's navigation mode
 } mavlink_system_t;
 
 typedef struct __mavlink_message {
@@ -58,13 +68,12 @@ typedef struct __mavlink_message {
 	uint64_t payload64[(MAVLINK_MAX_PAYLOAD_LEN+MAVLINK_NUM_CHECKSUM_BYTES+7)/8];
 } mavlink_message_t;
 
-
 typedef struct __mavlink_extended_message {
        mavlink_message_t base_msg;
        int32_t extended_payload_len;   ///< Length of extended payload if any
        uint8_t extended_payload[MAVLINK_MAX_EXTENDED_PAYLOAD_LEN];
 } mavlink_extended_message_t;
-
+//#pragma pack(pop)
 
 typedef enum {
 	MAVLINK_TYPE_CHAR     = 0,
@@ -86,9 +95,9 @@ typedef struct __mavlink_field_info {
         const char *name;                 // name of this field
         const char *print_format;         // printing format hint, or NULL
         mavlink_message_type_t type;      // type of this field
-        uint16_t array_length;        // if non-zero, field is an array
-        uint16_t wire_offset;         // offset of each field in the payload
-        uint16_t structure_offset;    // offset in a C structure
+        unsigned int array_length;        // if non-zero, field is an array
+        unsigned int wire_offset;         // offset of each field in the payload
+        unsigned int structure_offset;    // offset in a C structure
 } mavlink_field_info_t;
 
 // note that in this structure the order of fields is the order
