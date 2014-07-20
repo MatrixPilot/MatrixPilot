@@ -187,7 +187,7 @@ const struct waypointDef waypoints[] = {
 #else
 // AAM East Field runway center 39°50'31.83"N  105°12'44.81"W
 #define USE_FIXED_ORIGIN 1
-#define FIXED_ORIGIN_LOCATION	{ -1052124472, 398421750, 1812.0 }
+//#define FIXED_ORIGIN_LOCATION	{ -1052124472, 398421750, 1812.0 }
 #if 1
 #pragma message "low lefthand pattern waypoints"
 // This is a lefthand pattern for takeoff to the east
@@ -234,7 +234,7 @@ const struct waypointDef waypoints[] = {
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
 const struct waypointDef rtlWaypoints[] = {
-		{ { 0, 30,  20 } , F_LOITER, CAM_VIEW_LAUNCH } ,
+		{ { 0, 30,  20 } , F_LAND, F_LOITER, CAM_VIEW_LAUNCH } ,
 } ;
 
 

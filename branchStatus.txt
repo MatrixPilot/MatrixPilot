@@ -162,3 +162,6 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 16 July 2014:
 	add option #define PRE_CALIBRATED to allow preflight specification of accelerometer
 	and gyro offsets. Decrease calibration pause from 10 seconds to 1 second if precalibrated.
+	Now using MPLAB X v2.10; note that current SVN is still unsupported, so integrated
+	SVN stuff is still useless. Also note that v2.15 didn't work for me, and I've forgotten
+	what the problem was...

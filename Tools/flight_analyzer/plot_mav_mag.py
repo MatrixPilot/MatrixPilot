@@ -9,7 +9,7 @@ import re
 # A program by Peter Hollands, July 2014 to help visualize magnetometer offsets
 # You will need to setup the full path to flight analyzer directory below:-
 MY_PATH_TO_FLIGHT_ANALYZER = "/home/markw/markw_32/MPLABXprojects/newsvn/MatrixPilot_mw4fbw/Tools/flight_analyzer"
-MY_FILE_NAME = "/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/calDance_preCalBodyMag5.RAW"
+MY_FILE_NAME = "/home/markw/Copy/Cub-auav3-fbw-tests/magnetometer_testing/calDance_preCalRawBody5.RAW"
 
 try:
     sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
@@ -167,7 +167,10 @@ print ("hello, setting up MAVLink magnetometer points ...")
 
 for mav_nugget in mav_stream :
     #print (mav_nugget.xmag,",",mav_nugget.ymag,",",mav_nugget.zmag)
+    # body mag
     mag_point = (mav_nugget.xmag,mav_nugget.ymag,mav_nugget.zmag)
+    # raw mag
+    #mag_point = (mav_nugget.xgyro,mav_nugget.ygyro,mav_nugget.zgyro)
     mag_points.append(mag_point)
 
 points(pos=mag_points, size=5, color=color.green) 

@@ -85,3 +85,12 @@
 
 16 July: use mavlink raw sensor data log to calculate MPU6000 offsets
 	and define PRE_CALIBRATED in options.h
+
+19 July: magnetometer broken by enabling barometer: thought I had fixed this problem
+	a year ago...
+
+20 July: disabled barometer and verified that magnetometer is working using 900MHz Xbees
+	Noted some servo jitter dependent on location of onboard Xbee antenna.
+	Performed range check and RC signal seemed solid beyond 120 feet; no indication
+	of a range problem. Must change MAVLINK_BAUD to 57600 to use XBees. Changed back
+	to 115200 for next test flight with OpenLog instead of XBees.

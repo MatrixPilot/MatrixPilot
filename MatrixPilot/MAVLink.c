@@ -158,6 +158,8 @@ extern struct ADchannel udb_vcc;
 extern struct ADchannel udb_5v;
 extern struct ADchannel udb_rssi;
 
+extern long barometer_altitude;        // above sea level altitude - ASL (millimeters)
+
 union intbb voltage_milis = {0};
 uint8_t mavlink_counter_40hz = 0;
 uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
@@ -1691,7 +1693,7 @@ void mavlink_output_40hz(void)
 		if (THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000;
 		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, (float)(air_speed_3DIMU / 100.0), (float)(ground_velocity_magnitudeXY / 100.0), (int16_t) mavlink_heading,
 			(uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
-			((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
+			(float)barometer_altitude, //((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
 			(float) -IMUvelocityz._.W1);
 		//void mavlink_msg_vfr_hud_send(mavlink_channel_t chan, float airspeed, float groundspeed, int16_t heading, uint16_t throttle, float alt, float climb)
 	}

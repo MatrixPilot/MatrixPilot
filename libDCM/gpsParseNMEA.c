@@ -27,12 +27,12 @@
 
 //FIXME: code won't copile with DEBUG_NMEA undefined
 //#define DEBUG_NMEA
-
+#define DEBUG_NMEA
 #ifdef DEBUG_NMEA
 static uint16_t RMCpos = 0;
 static uint16_t GGApos = 0;
-char debug_RMC[80];
-char debug_GGA[80];
+int8_t debug_RMC[80];
+int8_t debug_GGA[80];
 #include <string.h>
 void debug_rmc(uint8_t ch)
 {
@@ -57,7 +57,7 @@ void debug_gga(uint8_t ch)
 }
 #else
 #define debug_rmc(a)
-#define debug_rmc_send(a)
+#define debug_rmc_send(int8_t ch)
 #define debug_gga(a)
 #endif
 
@@ -122,13 +122,14 @@ static uint8_t id1, id2, XOR;
 static int16_t digit;
 static int32_t degrees, minutes;
 
-union longbbbb lat_gps_, long_gps_, alt_sl_gps_;
-union intbb sog_gps_, cog_gps_;
-uint8_t svs_;
-uint8_t data_valid_, NS_, EW_;
-union intbb hdop_;
-//uint8_t day_of_week;
-union longbbbb last_alt;
+//static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
+static union intbb sog_gps_;
+static union uintbb cog_gps_;
+static uint8_t svs_;
+static uint8_t data_valid_, NS_, EW_;
+//static uint8_t hdop_;
+//static uint8_t day_of_week;
+static union longbbbb last_alt;
 
 //union longbbbb tow_;
 //union longbbbb date_gps_, time_gps_;
@@ -255,8 +256,8 @@ static void gps_id3(uint8_t gpschar)
 	{
 		gga_counter = 1;                    // Next gga message after the comma
 		msg_parse = &gps_comma;             // A comma ',' is expected now	
-#ifdef DEBUG_NMEA
 		GGApos = 6;
+#ifdef DEBUG_NMEA
 //	msg_parse = &msg_start;
 		strcpy(debug_GGA, "$GPGGA");
 #endif
@@ -469,7 +470,7 @@ static void gps_rmc5(uint8_t gpschar)       // Longitude
 			case 10:
 				minutes = 10 * minutes + (gpschar - '0');
 				rmc_counter = 6;
-				long_gps_.WW = (((long)10000000)*degrees+(50*minutes)/3); // Sure that minutes should be multiplied by 10?
+				lon_gps_.WW = (((long)10000000)*degrees+(50*minutes)/3); // Sure that minutes should be multiplied by 10?
 				msg_parse = &gps_comma;
 				break;
 			default:
@@ -493,7 +494,7 @@ static void gps_rmc6(uint8_t gpschar)       // E or W int8_t
 	else
 	{
 		EW_ = gpschar;
-		if (EW_ == 'W') long_gps_.WW = - long_gps_.WW;
+		if (EW_ == 'W') lon_gps_.WW = - lon_gps_.WW;
 		rmc_counter = 7;
 		msg_parse = &gps_comma;
 	}
@@ -634,7 +635,7 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 #ifdef DEBUG_NMEA
 				debug_rmc_send(gpschar);
 #endif
-				udb_background_trigger();   // parsing is complete, schedule navigation
+				gps_parse_common();         // parsing is complete, schedule navigation
 			}
 		}
 		else
@@ -665,10 +666,10 @@ void commit_gps_data(void)
 	tow.WW = calculate_time_of_week(time_gps_.WW);
 
 	lat_gps      = lat_gps_;
-	long_gps      = long_gps_;
+	lon_gps      = lon_gps_;
 	alt_sl_gps   = alt_sl_gps_;             // Altitude
 	sog_gps      = sog_gps_;                // Speed over ground
-	cog_gps.BB      = cog_gps_.BB;                // Course over ground
+	cog_gps      = cog_gps_;                // Course over ground
 
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
 	hdop         = hdop_._.B0;
