@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "FreeRTOS.h"
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
@@ -179,7 +180,8 @@ void vApplicationTickHook(void) // 1000 Hz
 
 	rtos_ticks++;
 
-	if (++i > 25) { // 40Hz
+	if (++i > (configTICK_RATE_HZ / HEARTBEAT_HZ)) // 40 Hz
+	{
 		i = 0;
 		// heartbeat() is now registered as a callback with the MPU6000 driver @ 200Hz
 	}

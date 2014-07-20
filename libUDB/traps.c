@@ -30,6 +30,9 @@
 #include <stdio.h>
 #include "interrupt.h"
 
+#include "defines.h"
+//#include "../libUDB/libUDB_internal.h"
+
 //#define USE_SETJMP
 
 #define TRAP_SRC_OSCFAIL    1
@@ -62,6 +65,11 @@ void restart(uint16_t flags, uint32_t addrs)
 	trap_flags = flags;
 	trap_source = addrs;
 
+	DPRINT("TRAP: %04x %04x%04x\r\n", 
+	    trap_flags, 
+	    (unsigned int)(trap_source >> 16), 
+	    (unsigned int)(trap_source & 0xffff));
+
 #ifdef USE_SETJMP
 	if (flags < TRAP_SRC_RESERVED)
 #else
@@ -85,7 +93,7 @@ void restart(uint16_t flags, uint32_t addrs)
 		asm("retfie");
 	}
 }
-
+/*
 void __attribute__((interrupt, no_auto_psv)) _OscillatorFail(void)
 {
 	INTCON1bits.OSCFAIL = 0;        // Clear the trap flag
@@ -136,3 +144,4 @@ void __attribute__((interrupt, no_auto_psv)) _DMACError(void)
 #endif // __dsPIC33E__
 	restart(TRAP_SRC_DMACERR, getErrLoc());
 }
+ */

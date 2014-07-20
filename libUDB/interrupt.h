@@ -27,9 +27,9 @@
 #define INT_PRI_T6      3   // background.c : trigger HEARTBEAT processing at a lower priority - NOTE: timer 6 is not actually being used
 #define INT_PRI_T7      2   // background.c : trigger navigation processing after new data is received from the GPS
 
-#define INT_PRI_MPUSPI  6   // mpu6000.c : SPI1 (UDB4 or AUAV3) or SPI2 (UDB4 or UDB5)
-#define INT_PRI_INT1    6   // mpu6000.c : mpu on SPI1 uses external interrupt 1
-#define INT_PRI_INT3    6   // mpu6000.c : mpu on SPI3 uses external interrupt 3
+#define INT_PRI_MPUSPI  4   // mpu6000.c : SPI1 (UDB4 or AUAV3) or SPI2 (UDB4 or UDB5)
+#define INT_PRI_INT1    4   // mpu6000.c : mpu on SPI1 uses external interrupt 1
+#define INT_PRI_INT3    4   // mpu6000.c : mpu on SPI3 uses external interrupt 3
 
 #define INT_PRI_IC      6   // radioIn.c : input capture interrupt
 
@@ -41,10 +41,10 @@
 #define INT_PRI_DMA1    5   // AT45D_DMA.c
 #define INT_PRI_DMA2    5   // AT45D_DMA.c
 
-#define INT_PRI_U1TX    3   // serialIO.c : mid range priority, no urgent reason
-#define INT_PRI_U1RX    3   // serialIO.c : mid range priority, no urgent reason
-#define INT_PRI_U2TX    3   // serialIO.c : mid range priority, no urgent reason
-#define INT_PRI_U2RX    3   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U1TX    4   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U1RX    4   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U2TX    4   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U2RX    4   // serialIO.c : mid range priority, no urgent reason
 
 #define INT_PRI_USB1    4   // USB available only on AUAV3
 

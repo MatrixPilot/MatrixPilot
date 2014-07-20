@@ -265,7 +265,7 @@ __attribute__(( weak )) void vApplicationSetupTickTimerInterrupt( void );
  * See header file for description.
  */
 
-#if 1
+#if 0
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
 	unsigned short  stack_save2, stack_save3;

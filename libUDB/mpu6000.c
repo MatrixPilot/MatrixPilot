@@ -214,6 +214,8 @@ void process_MPU_data(void)
 //	_T1IF = 1;              // trigger the heartbeat interrupt
 //	heartbeat();
 	if (callback) callback();
+#else
+#warning mpu6000: no callback mechanism defined
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 

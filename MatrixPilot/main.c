@@ -25,6 +25,9 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -64,12 +67,12 @@ int main(void)
 	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();
 	dcm_init();
-	init_config();  // this will need to be moved up in order to support runtime hardware options
-	init_waypoints();
-	init_servoPrepare();
-	init_states();
-	init_behavior();
-	init_serial();
+//	init_config();  // this will need to be moved up in order to support runtime hardware options
+//	init_waypoints();
+//	init_servoPrepare();
+//	init_states();
+//	init_behavior();
+//	init_serial();
 
 	if (setjmp())
 	{
@@ -96,6 +99,8 @@ int main(void)
 
 void vApplicationIdleHook(void)
 {
+//	static int i = 0;
+/*
 #if (USE_TELELOG == 1)
 	telemetry_log();
 #endif
@@ -108,4 +113,15 @@ void vApplicationIdleHook(void)
 //#ifndef (USE_FREERTOS)
 	udb_run();
 //#endif
+ */
+}
+
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+	DPRINT("Stack: %s\r\N", pcTaskName);
+}
+
+void vApplicationMallocFailedHook(void)
+{
+	DPRINT("Malloc Failed\r\n");
 }

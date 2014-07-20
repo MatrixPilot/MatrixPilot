@@ -37,6 +37,12 @@ SIL-events.o \
 ../../libDCM/mathlibNAV.o \
 ../../libDCM/rmat.o \
  \
+../../MAVLink/MAVFlexiFunctions.o \
+../../MAVLink/MAVLink.o \
+../../MAVLink/MAVMission.o \
+../../MAVLink/MAVParams.o \
+../../MAVLink/MAVUDBExtra.o \
+ \
 ../../MatrixPilot/airspeedCntrl.o \
 ../../MatrixPilot/altitudeCntrl.o \
 ../../MatrixPilot/altitudeCntrlVariable.o \

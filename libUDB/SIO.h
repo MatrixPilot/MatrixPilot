@@ -19,6 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+//#include "defines.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 
@@ -31,8 +33,7 @@
 typedef void (*sio_rx_callback)(uint8_t);
 typedef int16_t (*sio_tx_callback)(void);
 
-#ifndef SILSIM
-
+#if (SILSIM != 1)
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES
 // UXBRG = (Fcy/(16*BaudRate))-1
@@ -87,7 +88,7 @@ void w##_sio_init(sio_rx_callback rx_callback, int rx_pri, sio_tx_callback tx_ca
 	_U##x##TXIP = tx_pri;           /* Transmit Interrupt Priority level */ \
  	                                \
 	_U##x##TXIF = 0;                /* Clear the Transmit Interrupt Flag */ \
-	_U##x##TXIE = 1;                /* Disable Transmit Interrupts */ \
+	_U##x##TXIE = 1;                /* Enable Transmit Interrupts */ \
 	_U##x##RXIF = 0;                /* Clear the Receive Interrupt Flag */ \
 	_U##x##RXIE = 1;                /* Enable Receive Interrupts */ \
  	                                \
@@ -149,6 +150,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U##x##RXInterrupt(void) { \
 
 #else // SILSIM
 
+?
 
 #define SIO_INIT(w, x) \
 void w##_sio_init(sio_rx_callback rx_callback, int rx_pri, sio_tx_callback tx_callback, int tx_pri) { }

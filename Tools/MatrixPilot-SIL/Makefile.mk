@@ -25,12 +25,14 @@ MPSIL_TARGET = matrixpilot$(TARGET_EXTENSION)
 include udb.mk
 include dcm.mk
 include cntrl.mk
+include mavlink.mk
 include mp.mk
 include sil.mk
 MPSIL_OBJECTS = \
 	$(UDB_OBJECTS) \
 	$(DCM_OBJECTS) \
 	$(CNTRL_OBJECTS) \
+	$(MAVLINK_OBJECTS) \
 	$(MP_OBJECTS) \
 	$(SIL_OBJECTS) \
 	$(SOCK_OBJECTS)

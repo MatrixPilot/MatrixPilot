@@ -48,37 +48,36 @@ inline uint16_t heartbeat_cnt(void)
 	return udb_heartbeat_counter;
 }
 
-inline void heartbeat(void) // called from ISR
+inline void heartbeat(void) // called from ISR or TaskIMU
 {
 	// Start the sequential servo pulses at frequency SERVO_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
 	{
-		start_pwm_outputs();
+//		start_pwm_outputs();
 	}
 
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
 	{
-		cpu_load_calc();
+//		cpu_load_calc();
 		one_hertz_flag = 1;
 	}
 
+#if defined (USE_FREERTOS)
+	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
+#else
+/* FOO
 	// Call the periodic callback at 40 Hz
-//	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-//	{
-//		udb_heartbeat_40hz_callback(); // this was called udb_background_callback_periodic()
-//	}
-
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+	{
+		udb_heartbeat_40hz_callback(); // this was called udb_background_callback_periodic()
+	}
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 
-#if defined (USE_FREERTOS)
-void TriggerIMU(void);
-//	TriggerIMU();
-	udb_background_trigger_pulse(&TriggerIMU);
-#else
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 //	_T6IF = 1;
 	udb_background_trigger_pulse(&pulse);
+ */
 #endif
 }
 

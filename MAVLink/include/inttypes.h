@@ -45,7 +45,7 @@ typedef unsigned int __attribute__((__mode__(DI))) uint64_t;
 #define INT32_MAX  LONG_MAX
 #define INT32_MIN  LONG_MIN
 #define UINT64_MAX ULLONG_MAX
-#define INT64_MAX  LLONG_MAX
-#define INT64_MIN  LLONG_MIN
+//#define INT64_MAX  LLONG_MAX
+//#define INT64_MIN  LLONG_MIN
 
 #endif // #ifndef INTTYPES_H_INCL

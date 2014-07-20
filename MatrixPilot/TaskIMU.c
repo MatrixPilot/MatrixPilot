@@ -23,6 +23,7 @@
 //#include "../libDCM/libDCM.h"
 #include "../libUDB/libUDB_internal.h"
 #include "../libUDB/heartbeat.h"
+#include "mode_switch.h"
 
 #ifdef USE_FREERTOS
 
@@ -33,12 +34,16 @@
 
 static xSemaphoreHandle xSemaphoreIMU = NULL;
 
-uint16_t heartbeat_counter = 0;
+//uint16_t heartbeat_counter = 0;
 
 inline void pulse(void)
 {
 //	heartbeat_counter = (heartbeat_counter+1) % HEARTBEAT_MAX;
 
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/2) == 0)
+	{
+		udb_led_toggle(LED_ORANGE);
+	}
 /***** MOVED THIS FROM THE HEARTBEAT ISR ****/
 	// Call the periodic callback at 40 Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
@@ -50,7 +55,7 @@ inline void pulse(void)
 /***** WE STARTED OFF AT THE libUDB LAYER ****/
 
 //	LED_BLUE = LED_OFF;     // indicates logfile activity
-
+/* FOO
 #if (NORADIO != 1)
 	// 20Hz testing of radio link
 	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
@@ -64,7 +69,7 @@ inline void pulse(void)
 		radioIn_failsafe_reset();
 	}
 #endif // NORADIO
-
+ */
 	calculate_analog_sensor_values();
 	udb_callback_read_sensors();
 //void udb_callback_read_sensors(void)
@@ -76,13 +81,13 @@ inline void pulse(void)
 
 /***** THEN CALLED UP TO THE libDCM LAYER ****/
 //	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
-//void udb_heartbeat_callback(void)
 
+/* FOO
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
 		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
 	}
-
+ */
 /***** THEN CALLED UP TO THE MatrixPilot LAYER ****/
 //	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();
 //void dcm_heartbeat_callback(void)
@@ -92,7 +97,7 @@ inline void pulse(void)
 	{
 		dcm_run_imu_step();
 	}
-
+/* FOO
 	if (dcm_flags._.calib_finished)
 	{
 		// MOVED HERE FROM flight_controller()
@@ -121,9 +126,8 @@ inline void pulse(void)
 		// otherwise, there is not anything to do
 		manualPassthrough();                // Allow manual control while starting up
 	}
-	
 	osd_run_step();
-
+ */
 /***** FINISHED OFF BACK IN THE libDCM LAYER ****/
 	if (!dcm_flags._.init_finished)
 	{
@@ -139,6 +143,7 @@ inline void pulse(void)
 #endif
 
 /***** FINALLY FINISHING OFF WHERE WE STARTED IN THE libUDB LAYER ****/
+/* FOO
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
 #if (USE_I2C1_DRIVER == 1)
@@ -153,6 +158,7 @@ inline void pulse(void)
 		flexiFunctionServiceTrigger();
 #endif
 	}
+ */
 }
 
 
@@ -160,18 +166,55 @@ static void TaskIMU(void* pvParameters)
 {
 	(void)pvParameters;
 	DPRINT("TaskIMU\r\n");
+
+//	static int i = 0;
+// TODO: move MPU6000 initialisation to here
+
 	while (1)
 	{
-		xSemaphoreTake(xSemaphoreIMU, portMAX_DELAY);
-		pulse();
-//		IMU_update();  // this one at full speed
-//		FSM_update();  // this one at only 40Hz
+//		if (xSemaphoreTake(xSemaphoreIMU, portMAX_DELAY) == pdTRUE)
+		if (xSemaphoreTake(xSemaphoreIMU, 1000) == pdTRUE)
+		{
+///////////////////////////////////////////////////////////////////////////////
+			LED_RED = LED_ON;
+			heartbeat();
+			pulse();
+			LED_RED = LED_OFF;
+///////////////////////////////////////////////////////////////////////////////
+//			IMU_update();  // this one at full speed
+//			FSM_update();  // this one at only 40Hz
+
+//			if (i++ > 200) {
+//				udb_led_toggle(LED_BLUE);
+//				i = 0;
+//			}
+		}
+		else
+		{
+			DPRINT("TaskIMU timeout\r\n");
+		}
 	}
 }
 
-void TriggerIMU(void)
+// _memcpy_eds()
+
+void TaskIMU_Trigger(void)
 {
-	xSemaphoreGiveFromISR(xSemaphoreIMU, NULL);
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+//	static int i = 0;
+
+	if (xSemaphoreIMU != NULL)
+	{
+//		if (i++ > 200) {
+//			udb_led_toggle(LED_GREEN);
+//			i = 0;
+//		}
+		xSemaphoreGiveFromISR(xSemaphoreIMU, &xHigherPriorityTaskWoken);
+		if (xHigherPriorityTaskWoken != pdFALSE)
+		{
+			taskYIELD();
+		}
+	}
 }
 
 void TaskIMU_Init(void)

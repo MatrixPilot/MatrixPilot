@@ -56,7 +56,7 @@ static void TaskI2C(void* pvParameters)
 #if (BAROMETER_ALTITUDE == 1)
 		rxBarometer(NULL);
 #endif // BAROMETER_ALTITUDE
-		udb_led_toggle(LED_RED);
+//		udb_led_toggle(LED_RED);
 	}
 }
 

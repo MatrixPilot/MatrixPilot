@@ -63,7 +63,7 @@
 
 // Uncomment this definition if you're using directories
 // Writes must be enabled to use directories
-//#define ALLOW_DIRS
+#define ALLOW_DIRS
 
 // Allows the use of the FSfprintf function
 // Writes must be enabled to use the FSprintf function

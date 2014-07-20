@@ -51,6 +51,8 @@ void PutDec(unsigned char dec);
 void PutHex(int toPrint);
 void Puts(const char *str);
 
+void PutHexNibble(unsigned char nib);
+
 #if defined(__C30__) || defined(__PIC32MX__)
 void PutHexWord(unsigned int toPrint);
 void PutHexDWord(unsigned long int toPrint);

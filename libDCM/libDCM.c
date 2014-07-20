@@ -88,6 +88,8 @@ void gps_run_init_step(uint16_t count)
 {
 	if (count <= GPS_COUNT)
 	{
+//		printf("%u\r\n", GPS_COUNT - count);
+
 		gps_startup_sequence(GPS_COUNT - count); // Counts down from GPS_COUNT to 0
 		if (count == GPS_COUNT)
 		{

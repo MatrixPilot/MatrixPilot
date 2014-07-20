@@ -238,10 +238,13 @@ void udb_run(void)
 
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 
+#if (USE_FREERTOS)
+			void TaskIMU_Trigger(void);
+			TaskIMU_Trigger();
+#else
 //			udb_heartbeat_40hz_callback(); // Run at 40Hz
 //			udb_heartbeat_callback(); // Run at HEARTBEAT_HZ
-void TriggerIMU(void);
-	TriggerIMU();
+#endif
 
 			sil_ui_update();
 

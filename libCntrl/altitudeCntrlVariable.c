@@ -262,7 +262,7 @@ static void normalAltitudeCntrl(void)
 
 	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch)
 	{
-		if (THROTTLE_CHANNEL_REVERSED) throttleInOffset = - throttleInOffset;
+		if (THROTTLE_CHANNEL_REVERSED) throttleInOffset = -throttleInOffset;
 
 		if (state_flags._.GPS_steering)
 		{
@@ -296,7 +296,7 @@ static void normalAltitudeCntrl(void)
 		}
 		else
 		{
-			heightError._.W1 = - desiredHeight;
+			heightError._.W1 = -desiredHeight;
 			heightError.WW = (heightError.WW + IMUlocationz.WW + speed_height) >> 13;
 			if (heightError._.W0 < -height_marginx8)
 			{
@@ -312,7 +312,7 @@ static void normalAltitudeCntrl(void)
 				if (throttleAccum.WW > (int16_t)(max_throttle)) throttleAccum.WW = (int16_t)(max_throttle);
 			}
 
-			heightError._.W1 = - desiredHeight;
+			heightError._.W1 = -desiredHeight;
 			heightError.WW = (heightError.WW + IMUlocationz.WW - speed_height) >> 13;
 			if (heightError._.W0 < -height_marginx8)
 			{

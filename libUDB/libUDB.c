@@ -103,11 +103,12 @@ void udb_init(void)
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-//#if (USE_FREERTOS)
-//	MPU6000_init16(&TriggerIMU);
-//#else
+#if (USE_FREERTOS)
+	void TaskIMU_Trigger(void);
+	MPU6000_init16(&TaskIMU_Trigger);
+#else
 	MPU6000_init16(&heartbeat);
-//#endif
+#endif
 #endif
 
 	SRbits.IPL = 0; // turn on all interrupt priorities
@@ -116,7 +117,7 @@ void udb_init(void)
 void udb_run(void)
 {
 #if (USE_MCU_IDLE == 1)
-	Idle();
+//	Idle();
 #else
 	// pause cpu counting timer while not in an ISR
 	indicate_loading_main;

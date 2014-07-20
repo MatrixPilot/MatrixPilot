@@ -931,9 +931,9 @@ xQUEUE * const pxQueue = ( xQUEUE * ) xQueue;
 #endif /* configUSE_ALTERNATIVE_API */
 /*-----------------------------------------------------------*/
 
-int get_dsrpag(void);
-int get_dswpag(void);
-int get_tblpag(void);
+//int get_dsrpag(void);
+//int get_dswpag(void);
+//int get_tblpag(void);
 //static int i = 0;
 
 signed portBASE_TYPE xQueueGenericSendFromISR( xQueueHandle xQueue, const void * const pvItemToQueue, signed portBASE_TYPE *pxHigherPriorityTaskWoken, portBASE_TYPE xCopyPosition )

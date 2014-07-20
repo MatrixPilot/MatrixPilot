@@ -31,12 +31,6 @@
 // You can use one of those files by replacing this file with that one.
 
 
-// disable deadreckoning and windestimation while debugging north heading bug
-//#define DEADRECKONING           0
-//#define WIND_ESTIMATION         0
-
-#define USE_FLEXIFUNCTION_MIXING 0
-
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // Note:
@@ -748,8 +742,8 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-//#define CONSOLE_UART                        3
-#define CONSOLE_UART                        1
+#define CONSOLE_UART                        3
+//#define CONSOLE_UART                        1
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
@@ -786,8 +780,18 @@
 // Assign the console to an internal UART with CONSOLE_UART, map this console to
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
+
+//#define USE_BLUETOOTH_UART
+
+#ifdef USE_BLUETOOTH_UART
+// Use this with BlueTooth dongle
+#define TLM_PORT                            2
+#define DBG_PORT                            3
+#else
 #define TLM_PORT                            3
 #define DBG_PORT                            2
+#endif
+
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
 #define USE_TELELOG                         0

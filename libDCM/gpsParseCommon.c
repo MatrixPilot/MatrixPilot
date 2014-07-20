@@ -43,9 +43,6 @@ volatile union longbbbb lat_gps, lon_gps, alt_sl_gps;// latitude, longitude, alt
 volatile union intbb hilsim_airspeed;  // referenced in estWind and deadReckoning modules
 volatile uint8_t hdop;                              // horizontal dilution of precision
 volatile uint8_t svs;                               // number of satellites
-//union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
-//union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
-//uint8_t mode1, mode2;                             // gps mode1, mode2
 
 // these are only exported for telemetry output
 volatile union intbb week_no;
@@ -63,8 +60,6 @@ static int16_t gps_out_index = 0;
 union longbbbb lat_gps_, lon_gps_;
 union longbbbb alt_sl_gps_;
 union longbbbb tow_;
-//union intbb sog_gps_, cog_gps_, climb_gps_;
-//union intbb nav_valid_, nav_type_, week_no_;
 union intbb hdop_;
 
 int8_t actual_dir;
@@ -173,7 +168,10 @@ boolean gps_nav_capable_check_set(void)
 	return dcm_flags._.nav_capable;
 }
 
+#if defined (USE_FREERTOS)
+#else
 static void udb_background_callback_triggered(void);
+#endif
 
 // Received a full set of GPS messages
 void gps_parse_common(void)
@@ -206,6 +204,7 @@ static void udb_background_callback_triggered(void)
 	dirOverGndHrmat[1] = rmat[4];
 	dirOverGndHrmat[2] = 0;
 
+udb_led_toggle(LED_BLUE);
 	if (gps_nav_valid())
 	{
 		gps_commit_data();

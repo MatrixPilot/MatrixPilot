@@ -264,6 +264,12 @@ Output: None.
 const unsigned char CharacterArray[]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 //extern const unsigned char CharacterArray[];
 
+void PutHexNibble(unsigned char nib)
+{
+	nib = (nib>>4) & 0x0F;
+	PutChar(CharacterArray[nib]);
+}
+
 void PutHex(int toPrint)
 {
 	int printVar;
@@ -274,8 +280,6 @@ void PutHex(int toPrint)
 
 	toPrint = printVar & 0x0F;
 	PutChar(CharacterArray[toPrint]);
-
-	return;
 }
 
 /*******************************************************************************

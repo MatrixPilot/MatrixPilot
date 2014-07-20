@@ -12,11 +12,6 @@ MP_OBJECTS = \
 ../../MatrixPilot/flightplan-logo.o \
 ../../MatrixPilot/flightplan-waypoints.o \
 ../../MatrixPilot/main.o \
-../../MatrixPilot/MAVFlexiFunctions.o \
-../../MatrixPilot/MAVLink.o \
-../../MatrixPilot/MAVMission.o \
-../../MatrixPilot/MAVParams.o \
-../../MatrixPilot/MAVUDBExtra.o \
 ../../MatrixPilot/mode_switch.o \
 ../../MatrixPilot/mp_osd.o \
 ../../MatrixPilot/navigate.o \

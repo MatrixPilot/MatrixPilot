@@ -67,14 +67,17 @@
 #define FREERTOS_CONFIG_H
 
 #if (WIN == 1 || NIX == 1)
-#define INCLUDE_xTaskGetSchedulerState			1
+#define INCLUDE_xTaskGetSchedulerState  1
 #else
 #include "Compiler.h"
 #endif
 
+#include "../libUDB/oscillator.h"
 
 #include <stdio.h>
 #define configASSERT(x) { if (!(x)) { printf("ASSERT: %s %d\r\n", __FILE__, __LINE__); for (;;) {} } }
+
+//#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1 // causes build failure: FreeRTOS\tasks.c:2007: undefined reference to `portRECORD_READY_PRIORITY'#define configCHECK_FOR_STACK_OVERFLOW  2
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -88,12 +91,19 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-#define configUSE_PREEMPTION			1
-#define configUSE_IDLE_HOOK				1
-#define configUSE_TICK_HOOK				1
-//#define configTICK_RATE_HZ				( ( portTickType ) 1000 )
-#define configTICK_RATE_HZ				( ( portTickType ) 200 )
-#define configCPU_CLOCK_HZ				( ( unsigned long ) 32000000 )  /* Fosc / 2 */
+#define configUSE_PREEMPTION            1
+#define configUSE_IDLE_HOOK             1
+#define configUSE_TICK_HOOK             1
+
+#if 1
+#define configTICK_RATE_HZ				( ( portTickType ) 1000 )
+#define configCPU_CLOCK_HZ				( ( unsigned long ) FOSC / 2 )  /* Fosc / 2 */
+#else
+#define configTICK_RATE_HZ				( ( portTickType ) 500 )
+//#define configCPU_CLOCK_HZ				( ( unsigned long ) 32000000 )  /* Fosc / 2 */
+#define configCPU_CLOCK_HZ				( ( unsigned long ) FOSC )  /* Fosc / 2 */
+#endif
+
 #define configMAX_PRIORITIES			( ( unsigned portBASE_TYPE ) 4 )
 //#define configMINIMAL_STACK_SIZE		( 105 )
 #define configMINIMAL_STACK_SIZE		( 500 )
@@ -119,7 +129,8 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelayUntil			1
 #define INCLUDE_vTaskDelay				1
 
-//#define configKERNEL_INTERRUPT_PRIORITY	0x01
-#define configKERNEL_INTERRUPT_PRIORITY	0x03
+//#define configKERNEL_INTERRUPT_PRIORITY 1
+//#define configKERNEL_INTERRUPT_PRIORITY 3
+#define configKERNEL_INTERRUPT_PRIORITY   4
 
 #endif /* FREERTOS_CONFIG_H */

@@ -23,7 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 
-#if 0
+#ifdef USE_FREERTOS
 
 #include "sio.h"
 
@@ -56,7 +56,7 @@ SIO_DEFINE(tele, 2)
 
 void udb_init_USART(void)
 {
-	tele_sio_init(udb_serial_callback_received_byte, INT_PRI_U2RX, udb_serial_callback_get_byte_to_send, INT_PRI_U2RX);
+	tele_sio_init(udb_serial_callback_received_byte, INT_PRI_U2RX, udb_serial_callback_get_byte_to_send, INT_PRI_U2TX);
 }
 
 //boolean udb_gps_check_rate(int32_t rate);
@@ -172,7 +172,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	_U1RXIF = 0; // clear the interrupt
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
-	
+
 	while (U1STAbits.URXDA)
 	{
 		uint8_t rxchar = U1RXREG;
@@ -279,4 +279,4 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	interrupt_restore_corcon;
 }
 
-#endif // 0/1
+#endif // USE_FREERTOS
