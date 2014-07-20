@@ -88,9 +88,19 @@
 
 19 July: magnetometer broken by enabling barometer: thought I had fixed this problem
 	a year ago...
+	Auto flight was very erratic and I was unable to find the bomb; release point
+	was far to the north of the runway.
+	Analysis of the flight log shows release point GPS coordinates 270' north of the runway.
 
 20 July: disabled barometer and verified that magnetometer is working using 900MHz Xbees
 	Noted some servo jitter dependent on location of onboard Xbee antenna.
 	Performed range check and RC signal seemed solid beyond 120 feet; no indication
 	of a range problem. Must change MAVLINK_BAUD to 57600 to use XBees. Changed back
 	to 115200 for next test flight with OpenLog instead of XBees.
+	Found bomb using the GPS flightpath; bomb was directly on the recorded flightpath,
+	indicating that the LEA6 was doing a good job.
+	The Cub flew much better with the barometer disabled,
+	Analysis of log LEA6_mag0.RAW indicates the GPS path is more accurate than the
+	IMU path; impact point of bomb is within a meter laterally of the GPS path,
+	but about 6 meters away from the IMU path.
+	Definitely should give preference to the GPS heading when flying waypoints.

@@ -159,28 +159,54 @@
 #if 1
 #pragma message "West Field lefthand pattern"
 
+////////////////////////////////////////////////////////////////////////////////
+// This is a lefthand pattern for takeoff to the east
+
+#define USE_FIXED_ORIGIN		1
+
 const struct waypointDef waypoints[] = {
-	{ { 51, 3, 20 } , F_TAKEOFF } , //Waypoint 1
-	{ { 110, 0, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-	{ { 104, 75, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-	{ { -96, 82, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-	{ { -104, 8, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 5
-	{ { -56, 4, 10 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-	{ { 0, 0, 5 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 7
-	{ { 10, 0, 15 } , F_NORMAL + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 8
+	{ { 51, 3, 20 } , F_TAKEOFF , CAM_VIEW_LAUNCH } , //Waypoint 1
+	{ { 98, 2, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 2
+	{ { 109, 4, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { 111, 18, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 4
+	{ { 110, 57, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 5
+	{ { 104, 62, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 6
+	{ { 94, 63, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { -100, 68, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 8
+	{ { -109, 63, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 9
+	{ { -115, 50, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 10
+	{ { -114, 21, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 11
+	{ { -109, 11, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 12
+	{ { -99, 5, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 13
+	{ { -84, 5, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 14
+	{ { -67, 5, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 15
+	{ { -51, 4, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 16
+	{ { -28, 4, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 17
+	{ { -10, 5, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 18
+	{ { 9, 4, 10 } , F_CROSS_TRACK + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 19
 };
 #else
 #pragma message "West Field righthand pattern"
 
 const struct waypointDef waypoints[] = {
-	{ { -56, 4, 20 } , F_TAKEOFF , CAM_VIEW_LAUNCH } , //Waypoint 0
-	{ { -104, 8, 20 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 1
-	{ { -96, 82, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 2
-	{ { 104, 75, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 3
-	{ { 110, 0, 25 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 4
-	{ { 51, 3, 20 } , F_NORMAL } , //Waypoint 5
-	{ { 0, 0, 5 } , F_NORMAL , CAM_VIEW_LAUNCH } , //Waypoint 6
-	{ { -10, 0, 15 } , F_NORMAL + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { -54, 4, 20 } , F_TAKEOFF , CAM_VIEW_LAUNCH } , //Waypoint 1
+	{ { -91, 5, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 2
+	{ { -100, 13, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { -102, 32, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 4
+	{ { -103, 69, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 5
+	{ { -95, 80, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 6
+	{ { -84, 81, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { 79, 81, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 8
+	{ { 91, 76, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 9
+	{ { 97, 60, 35 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 10
+	{ { 98, 22, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 11
+	{ { 98, 5, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 12
+	{ { 89, 1, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 13
+	{ { 74, 1, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 14
+	{ { 58, 1, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 15
+	{ { 40, 2, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 16
+	{ { 14, 3, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 17
+	{ { -13, 3, 10 } , F_CROSS_TRACK + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 18
 };
 #endif
 
