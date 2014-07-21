@@ -165,3 +165,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	Now using MPLAB X v2.10; note that current SVN is still unsupported, so integrated
 	SVN stuff is still useless. Also note that v2.15 didn't work for me, and I've forgotten
 	what the problem was...
+
+21 July 2014:
+	ground tested gpsParseNMEA.c with Navspark GL GPS module. GPS coordinates and HUD
+	looked OK using Andropilot for display.

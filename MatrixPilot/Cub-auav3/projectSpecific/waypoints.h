@@ -260,7 +260,7 @@ const struct waypointDef waypoints[] = {
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
 const struct waypointDef rtlWaypoints[] = {
-		{ { 0, 30,  20 } , F_LAND, F_LOITER, CAM_VIEW_LAUNCH } ,
+		{ { 0, 30,  20 } , F_LAND, F_LOITER, CAM_VIEW_LAUNCH } 
 } ;
 
 

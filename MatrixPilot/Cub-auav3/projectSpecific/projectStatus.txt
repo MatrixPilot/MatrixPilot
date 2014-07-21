@@ -104,3 +104,5 @@
 	IMU path; impact point of bomb is within a meter laterally of the GPS path,
 	but about 6 meters away from the IMU path.
 	Definitely should give preference to the GPS heading when flying waypoints.
+
+21 July: modify options.h to test NavsparkGL module; looks flyable
