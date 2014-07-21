@@ -133,7 +133,14 @@ void udb_background_callback_triggered(void)
 		accum_nav.WW = long_scale((long_gps.WW - long_origin.WW)/90, cos_lat);
 		location[0] = accum_nav._.W0;
 
-		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
+#ifdef USE_PRESSURE_ALT
+#warning "using pressure altitude instead of GPS altitude"
+                // division by 100 implies alt_origin is in centimeters; not documented elsewhere
+                // longword result = (longword/10 - longword)/100 : range
+                accum_nav.WW = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
+#else
+                accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
+#endif // USE_PRESSURE_ALT
 		location[2] = accum_nav._.W0;
 
 		// convert GPS course of 360 degrees to a binary model with 256
@@ -203,12 +210,12 @@ void udb_background_callback_triggered(void)
 		// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
 		air_speed_magnitudeXY = velocity_thru_air.x; // in cm / sec
 
-#if (GPS_RATE == 4)
-		forward_acceleration = (air_speed_3DGPS - velocity_previous) << 2; // Ublox enters code 4 times per second
-#elif (GPS_RATE == 2)
-		forward_acceleration = (air_speed_3DGPS - velocity_previous) << 1; // Ublox enters code 2 times per second
+#if (GPS_RATE == 1)
+                // EM406 standard GPS reports once per second
+                forward_acceleration = (air_speed_3DGPS - velocity_previous);
 #else
-		forward_acceleration = (air_speed_3DGPS - velocity_previous);      // EM406 standard GPS enters code once per second
+                // multiply by GPS_RATE
+                forward_acceleration = (air_speed_3DGPS - velocity_previous) * GPS_RATE;
 #endif
 
 		velocity_previous = air_speed_3DGPS;

@@ -56,6 +56,7 @@ struct dcm_flag_bits {
 #define GPS_UBX_4HZ         4
 #define GPS_MTEK            5
 #define GPS_NMEA            6
+#define GPS_NAVSPARKGL        7
 
 //#define GPS_RATE          ((GPS_TYPE == GPS_MTEK) ? 4 : GPS_TYPE)
 
@@ -71,6 +72,8 @@ struct dcm_flag_bits {
    #define GPS_RATE 4
 #elif (GPS_TYPE == GPS_NMEA)
    #define GPS_RATE 1
+#elif (GPS_TYPE == GPS_NAVSPARKGL)
+   #define GPS_RATE 5
 #else
    #error("GPS_TYPE has no defined GPS_RATE")
 #endif

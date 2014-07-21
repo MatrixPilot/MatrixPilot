@@ -23,7 +23,7 @@
 #include "gpsParseCommon.h"
 #include "heartbeat.h"
 
-#if (GPS_TYPE == GPS_NMEA)
+#if ((GPS_TYPE == GPS_NMEA) || (GPS_TYPE == GPS_NAVSPARKGL))
 
 //#define DEBUG_NMEA
 

@@ -84,9 +84,10 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
-#define GPS_TYPE GPS_UBX_4HZ
-//#define DEFAULT_GPS_BAUD 115200
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_NMEA, or GPS_MTEK)
+//#define GPS_TYPE GPS_UBX_4HZ
+#define GPS_TYPE GPS_NAVSPARKGL
+#define DEFAULT_GPS_BAUD 115200
 
 #define BAROMETER_ALTITUDE 0
 
