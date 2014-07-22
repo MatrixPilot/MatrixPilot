@@ -37,8 +37,8 @@ MatrixPilot:
 cameraCntrl.c ?does Xplane accept camera pan/tilt commands?
 mp_osd.c ???
 
-SILSIM may be used to test changes only to files in the MatrixPilot folder,
-with the exception of those listed above.
+Source file changes which may be tested using SILSIM:
+Only files in the MatrixPilot folder.
 
 
 
