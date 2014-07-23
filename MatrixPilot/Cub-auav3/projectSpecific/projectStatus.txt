@@ -106,3 +106,6 @@
 	Definitely should give preference to the GPS heading when flying waypoints.
 
 21 July: modify options.h to test NavsparkGL module; looks flyable
+	flight test showed that both heading and COG are broken
+
+22 July: drive test indicates both heading and COG now working properly with NavsparkGL

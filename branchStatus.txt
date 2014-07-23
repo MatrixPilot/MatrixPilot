@@ -169,3 +169,10 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 21 July 2014:
 	ground tested gpsParseNMEA.c with Navspark GL GPS module. GPS coordinates and HUD
 	looked OK using Andropilot for display.
+
+23 July 2014:
+	to support NavsparkGL module:
+	Add digit counting to NMEA RMC record SOG and COG fields; correctly decode one or two
+	digits to right of decimal; fail if not exactly 3 digits to left
+	Add new serial output format for validating NMEA parser: safely print GGA time value
+	and SOG, COG values on each call to commit_gps_data()
