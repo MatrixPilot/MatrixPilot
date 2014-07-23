@@ -121,6 +121,9 @@ void dcm_servo_callback_prepare_outputs(void)
 		{
 			mavlink_output_40hz();
 		}
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_DBGPS)
+extern void serial_output_nmea();
+                serial_output_nmea();
 #else
 		// This is a simple check to send telemetry at 8hz
 //		if (udb_heartbeat_counter % 5 == 0)

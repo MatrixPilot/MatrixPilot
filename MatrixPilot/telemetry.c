@@ -476,6 +476,19 @@ boolean udb_serial_callback_get_binary_to_send(char *c)
 }
 #endif  // USE_RING_BUFFER
 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_NMEA)
+extern int rmc_flag, nmea_flag;
+extern int16_t get_sog_gps();
+extern uint16_t get_cog_gps();
+extern long get_time_gps();
+
+void serial_output_nmea() {
+                if (nmea_flag) {
+                    nmea_flag = 0;
+                    serial_output("time: %li, sog: %i, cog: %u\r\n", get_time_gps(), get_sog_gps(), get_cog_gps());
+                }
+}
+#endif
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
 extern struct ADchannel udb_vcc;

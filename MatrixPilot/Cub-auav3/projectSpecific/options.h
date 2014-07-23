@@ -372,7 +372,7 @@
 
 #define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
-//#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_NMEA
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAGNETOMETER
 
 // use ring buffer and software flow control for onboard openlog
