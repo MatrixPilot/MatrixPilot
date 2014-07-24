@@ -501,7 +501,7 @@
 // ROLL_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
 #define PITCHGAIN			0.1 // 0.150
-#define PITCHKD				0.04 //0.015 // 0.075
+#define PITCHKD				0.0 //0.015 // 0.075
 #define RUDDER_ELEV_MIX		0.2
 #define ROLL_ELEV_MIX		1.0
 #define ELEVATOR_BOOST		0.5

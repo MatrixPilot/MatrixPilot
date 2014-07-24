@@ -117,8 +117,8 @@ void normalRollCntrl(void) {
         // NOT THE SAME as pitch which is (rmat7 - pitch_setpoint)
         rollAccum.WW = __builtin_mulsu(rmat6 + roll_setpoint, rollkp);
     } else {
-        // no stabilization; pass manual setpoint through
-        rollAccum._.W1 = roll_manual;
+        // no stabilization; pass manual input through
+        rollAccum._.W1 = REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_manual);
         gyroRollFeedback.WW = 0;
     }
 
