@@ -109,3 +109,5 @@
 	flight test showed that both heading and COG are broken
 
 22 July: drive test indicates both heading and COG now working properly with NavsparkGL
+
+24 July: set up Cub-auav3 for NavsparkGL and pitch fbw tests

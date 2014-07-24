@@ -176,3 +176,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 	digits to right of decimal; fail if not exactly 3 digits to left
 	Add new serial output format for validating NMEA parser: safely print GGA time value
 	and SOG, COG values on each call to commit_gps_data()
+
+24 July 2014:
+	change pitchCntrl.c to use angle setpoint in stabilize mode; correct handling of
+	AILERON_CHANNEL_REVERSED in rollCntrl.c
