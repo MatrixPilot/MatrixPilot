@@ -57,6 +57,7 @@ void servoMix(void)
 	// Mix yaw control and waggle into rudder
 #if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
 //        temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
+        // manual roll control now handled in rollCntrl.c; no "boost" needed
         temp = 3000  + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
         udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
