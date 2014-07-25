@@ -116,23 +116,23 @@ void normalPitchCntrl(void) {
     // rmat ranges [-16384, 16383] for +/- 90 degrees
     pitch_setpoint = (pitch_manual << 4) + (pitch_manual << 3);
 
-    //    navElevMix = 0;
-    //    if (flags._.pitch_feedback) {
-    // rudder to elevator mixing proportional to rudder deflection * roll angle
-    //        if (RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED) {
-    //            // mix roll angle into elevator using rudderElevMixGain
-    //            pitchAccum.WW = __builtin_mulsu(rmat6, rudderElevMixGain) << 1;
-    //            // multiply result by manual rudder input * 8
-    //            pitchAccum.WW = __builtin_mulss(pitchAccum._.W1,
-    //                    REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwTrim[RUDDER_INPUT_CHANNEL] - udb_pwOut[RUDDER_OUTPUT_CHANNEL])) << 3;
-    //            navElevMix += pitchAccum._.W1;
-    //        }
-    //        // mix roll angle into elevator using rollElevMixGain: proportional to sin^2 of roll angle
-    //        pitchAccum.WW = __builtin_mulsu(rmat6, rollElevMixGain) << 1;
-    //        // multiply result by rmat[6]; note this is not sign-flipped when inverted
-    //        pitchAccum.WW = __builtin_mulss(pitchAccum._.W1, rmat[6]) >> 3;
-    //        navElevMix += pitchAccum._.W1;
-    //    }
+    navElevMix = 0;
+    if (flags._.pitch_feedback) {
+        //     rudder to elevator mixing proportional to rudder deflection * roll angle
+        if (RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED) {
+            // mix roll angle into elevator using rudderElevMixGain
+            pitchAccum.WW = __builtin_mulsu(rmat6, rudderElevMixGain) << 1;
+            // multiply result by manual rudder input * 8
+            pitchAccum.WW = __builtin_mulss(pitchAccum._.W1,
+                    REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwTrim[RUDDER_INPUT_CHANNEL] - udb_pwOut[RUDDER_OUTPUT_CHANNEL])) << 3;
+            navElevMix += pitchAccum._.W1;
+        }
+        // mix roll angle into elevator using rollElevMixGain: proportional to sin^2 of roll angle
+        pitchAccum.WW = __builtin_mulsu(rmat6, rollElevMixGain) << 1;
+        // multiply result by rmat[6]; note this is not sign-flipped when inverted
+        pitchAccum.WW = __builtin_mulss(pitchAccum._.W1, rmat[6]) >> 3;
+        navElevMix += pitchAccum._.W1;
+    }
 
     // pitch term (rmat7) of cross product (bottom row x omega)
     // pitchrate = rmat8 * omegaX - rmat6 * omegaZ
@@ -167,7 +167,7 @@ void normalPitchCntrl(void) {
         pitchAccum._.W1 = REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_manual);
     }
 
-    pitch_control = (int32_t) pitchAccum._.W1; // + navElevMix;
+    pitch_control = (int32_t) pitchAccum._.W1 + navElevMix;
 }
 
 void hoverPitchCntrl(void) {
