@@ -180,3 +180,7 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 24 July 2014:
 	change pitchCntrl.c to use angle setpoint in stabilize mode; correct handling of
 	AILERON_CHANNEL_REVERSED in rollCntrl.c
+
+25 July 2014:
+	clean up signs and servo reversal code in roll, pitch and yaw control, servomix files.
+	convert yaw to angle mode (PID loop operates on roll angle, instead of heading)

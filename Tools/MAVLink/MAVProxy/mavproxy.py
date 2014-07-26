@@ -1036,6 +1036,7 @@ def master_callback(m, master):
         handle_msec_timestamp(m, master)
 
     mtype = m.get_type()
+    # mpstate.console.writeln(m)
 
     # and log them
     if mtype != 'BAD_DATA' and mpstate.logqueue:
@@ -1160,6 +1161,7 @@ def master_callback(m, master):
             say("waypoint %u" % m.seq,priority='message')
 
     elif mtype == "SYS_STATUS":
+        mpstate.console.writeln(m.voltage_battery)
         battery_update(m)
         if master.flightmode != mpstate.status.flightmode:
             mpstate.status.flightmode = master.flightmode
@@ -1188,6 +1190,7 @@ def master_callback(m, master):
                 mpstate.status.last_gps_lock = time.time()
 
     elif mtype == "GPS_RAW_INT":
+        mpstate.console.writeln(m)
         if mpstate.status.have_gps_lock:
             if m.fix_type != 3 and not mpstate.status.lost_gps_lock and (time.time() - mpstate.status.last_gps_lock) > 3:
                 say("GPS fix lost")
@@ -1197,7 +1200,7 @@ def master_callback(m, master):
                 mpstate.status.lost_gps_lock = False
             if m.fix_type == 3:
                 mpstate.status.last_gps_lock = time.time()
-
+            
     elif mtype == "NAV_CONTROLLER_OUTPUT" and mpstate.status.flightmode == "AUTO" and mpstate.settings.distreadout:
         rounded_dist = int(m.wp_dist/mpstate.settings.distreadout)*mpstate.settings.distreadout
         if math.fabs(rounded_dist - mpstate.status.last_distance_announce) >= mpstate.settings.distreadout:

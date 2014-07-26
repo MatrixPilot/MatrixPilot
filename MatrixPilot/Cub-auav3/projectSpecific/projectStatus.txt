@@ -111,3 +111,17 @@
 22 July: drive test indicates both heading and COG now working properly with NavsparkGL
 
 24 July: set up Cub-auav3 for NavsparkGL and pitch fbw tests
+
+25 July: NavsparkGL altitude seems to be erratic and too low. Location accuracy looks
+	OK, but IMU path diverges from GPS more than with LEA6. flan.py indicates LEA6
+	data arriving at 4Hz, but shows Navspark data arriving at irregular 2Hz intervals.
+	Set up options.h to test new yaw control mode with increased gains for roll,yaw KP.
+	Also increased roll KD gain. Still need to find problem with NavsparkGL reporting
+	frequency.
+
+	TODO: implement a "panic" mode to mimic the E-flite AS3X feature. Try using just
+	accel vector and yaw rate using standard stall recovery procedure: force lateral accel
+	to zero with elevator and ailerons neutral, then use elevator and ailerons to force
+	accel vector (anti)parallel to body frame Z. See if this procedure is stable, or
+	can get trapped in a local minimum.
+
