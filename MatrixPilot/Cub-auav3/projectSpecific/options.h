@@ -85,9 +85,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_NMEA, or GPS_MTEK)
-//#define GPS_TYPE GPS_UBX_4HZ
-#define GPS_TYPE GPS_NAVSPARKGL
-#define DEFAULT_GPS_BAUD 115200
+#define GPS_TYPE GPS_UBX_4HZ
+//#define GPS_TYPE GPS_NAVSPARKGL
+//#define DEFAULT_GPS_BAUD 115200
 
 #define BAROMETER_ALTITUDE 0
 
@@ -99,13 +99,13 @@
 #define ROLL_STABILIZATION_AILERONS         1
 #define ROLL_STABILIZATION_RUDDER           0
 #define PITCH_STABILIZATION                 1
-#define YAW_STABILIZATION_RUDDER            0
+#define YAW_STABILIZATION_RUDDER            1
 #define YAW_STABILIZATION_AILERON           0
 
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
 #define AILERON_NAVIGATION                  1
-#define RUDDER_NAVIGATION                   0
+#define RUDDER_NAVIGATION                   1
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -284,7 +284,7 @@
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
 #define AILERON_CHANNEL_REVERSED            0
-#define ELEVATOR_CHANNEL_REVERSED           1
+#define ELEVATOR_CHANNEL_REVERSED           0
 #define RUDDER_CHANNEL_REVERSED             0
 #define AILERON_SECONDARY_CHANNEL_REVERSED  0
 #define THROTTLE_CHANNEL_REVERSED           0
@@ -489,7 +489,7 @@
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP				0.1 //0.22
-#define ROLLKD				0.025 //0.02
+#define ROLLKD				0.1 //0.02
 #define YAWKP_AILERON		0.375 // 0.05
 #define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
@@ -500,8 +500,8 @@
 // RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
 // ROLL_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN			0.1 // 0.150
-#define PITCHKD				0.0 //0.015 // 0.075
+#define PITCHGAIN			0.2 // 0.150
+#define PITCHKD				0.1 //0.015 // 0.075
 #define RUDDER_ELEV_MIX		0.2
 #define ROLL_ELEV_MIX		1.0
 #define ELEVATOR_BOOST		0.5
@@ -518,7 +518,7 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER				0.05 // 0.1
+#define YAWKP_RUDDER				0.5 // 0.1
 #define YAWKD_RUDDER				0 //0.03 // 0.1
 #define ROLLKP_RUDDER				0.04
 #define ROLLKD_RUDDER				0 //0.05

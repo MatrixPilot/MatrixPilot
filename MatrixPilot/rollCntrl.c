@@ -91,16 +91,18 @@ void normalRollCntrl(void) {
 #ifdef TestGains
     flags._.GPS_steering = 0; // turn off navigation
 #endif
-    // 16 * manual input in 2 * delta usec (range [-1000, 1000])
-    int16_t roll_manual = (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]);
+    // manual input is 2 * delta usec (range [-1000, 1000])
+    int16_t roll_manual =  REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED,
+            (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]));
 
     // To convert roll_setpoint to a DCM angle, we need to scale it
     // to range from zero to +/- max. bank angle:
-    // note that DX7 TX needs travel adjust +/-150% to achieve full
+    // note that DX7 TX needs travel adjust +/-150% to achieve full PWM range
     // rmat ranges [-16384, 16383] for +/- 90 degrees
     roll_setpoint = (roll_manual << 4) + (roll_manual << 3);
 
     if (AILERON_NAVIGATION && flags._.GPS_steering) {
+        // subtract from angle setpoint (sign is correct, rmat6 is special)
         roll_setpoint += determine_navigation_deflection('a') << 3;
     }
 
@@ -113,12 +115,12 @@ void normalRollCntrl(void) {
 
     if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback) {
         gyroRollFeedback.WW = __builtin_mulus(rollkd, omegaAccum[1]);
-        // Beware: -rmat6 is roll angle, so setpoint must be added here
-        // NOT THE SAME as pitch which is (rmat7 - pitch_setpoint)
-        rollAccum.WW = __builtin_mulsu(rmat6 + roll_setpoint, rollkp);
+        // Beware: -rmat6 is roll angle, so it must be added here
+        // NOT THE SAME as pitch which is (pitch_setpoint - rmat7)
+        rollAccum.WW = __builtin_mulsu(roll_setpoint + rmat6, rollkp);
     } else {
         // no stabilization; pass manual input through
-        rollAccum._.W1 = REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_manual);
+        rollAccum._.W1 = roll_manual;
         gyroRollFeedback.WW = 0;
     }
 

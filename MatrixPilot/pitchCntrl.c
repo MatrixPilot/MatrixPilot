@@ -109,30 +109,29 @@ void normalPitchCntrl(void) {
         pitchAltitudeAdjust = -pitchAltitudeAdjust - INVNPITCH;
     }
 
-    int16_t pitch_manual = (udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]);
+    // manual input is 2 * delta usec (range [-1000, 1000])
+    int16_t pitch_manual = REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED,
+        udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]);
+
     // To convert setpoint to a DCM angle, we need to scale it
-    // to range from zero to +/- max. bank angle:
-    // note that DX7 TX needs travel adjust +/-150% to achieve full
+    // to range from zero to +/- max. angle:
+    // note that DX7 TX needs travel adjust +/-150% to achieve full PWM range
     // rmat ranges [-16384, 16383] for +/- 90 degrees
     pitch_setpoint = (pitch_manual << 4) + (pitch_manual << 3);
 
     navElevMix = 0;
     if (flags._.pitch_feedback) {
-        //     rudder to elevator mixing proportional to rudder deflection * roll angle
-        if (RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED) {
-            // mix roll angle into elevator using rudderElevMixGain
-            pitchAccum.WW = __builtin_mulsu(rmat6, rudderElevMixGain) << 1;
-            // multiply result by manual rudder input * 8
-            pitchAccum.WW = __builtin_mulss(pitchAccum._.W1,
-                    REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, udb_pwTrim[RUDDER_INPUT_CHANNEL] - udb_pwOut[RUDDER_OUTPUT_CHANNEL])) << 3;
-            navElevMix += pitchAccum._.W1;
-        }
         // mix roll angle into elevator using rollElevMixGain: proportional to sin^2 of roll angle
-        pitchAccum.WW = __builtin_mulsu(rmat6, rollElevMixGain) << 1;
-        // multiply result by rmat[6]; note this is not sign-flipped when inverted
-        pitchAccum.WW = __builtin_mulss(pitchAccum._.W1, rmat[6]) >> 3;
+        pitchAccum.WW = __builtin_mulsu(-rmat6, rollElevMixGain) << 1;
+        // multiply result by rmat6
+        pitchAccum.WW = __builtin_mulss(pitchAccum._.W1, rmat6) << 2;
         navElevMix += pitchAccum._.W1;
     }
+    // subtract from angle setpoint
+    pitch_setpoint += navElevMix;
+
+    // limit combined manual and nav pitch setpoint to less than +/-45 degrees
+    magClamp(&pitch_setpoint, 11000);
 
     // pitch term (rmat7) of cross product (bottom row x omega)
     // pitchrate = rmat8 * omegaX - rmat6 * omegaZ
@@ -157,17 +156,17 @@ void normalPitchCntrl(void) {
                 + __builtin_mulus(pitchkd, pitchrate);
 #else
         // pitchrate is omegaX
-        pitchAccum.WW = __builtin_mulsu(rmat7 - pitch_setpoint, pitchgain)
+        pitchAccum.WW = __builtin_mulsu(pitch_setpoint - rmat7, pitchgain)
                 + __builtin_mulus(pitchkd, omegagyro[0]);
         //        pitchAccum.WW = __builtin_mulsu(rmat7 - rtlkick + pitchAltitudeAdjust, pitchgain)
         //                + __builtin_mulus(pitchkd, pitchrate);
 #endif
     } else {
         // no stabilization; pass manual input through
-        pitchAccum._.W1 = REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_manual);
+        pitchAccum._.W1 = pitch_manual;
     }
 
-    pitch_control = (int32_t) pitchAccum._.W1 + navElevMix;
+    pitch_control = (int32_t) pitchAccum._.W1;
 }
 
 void hoverPitchCntrl(void) {

@@ -67,7 +67,8 @@ void servoMix(void)
         temp = 3000 + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, pitch_control);
         udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-        temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle);
+//        temp = pwManual[RUDDER_INPUT_CHANNEL] + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle);
+        temp = 3000 + REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle);
         udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
         if (pwManual[THROTTLE_INPUT_CHANNEL] == 0)
