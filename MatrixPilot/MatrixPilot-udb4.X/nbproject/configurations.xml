@@ -164,6 +164,33 @@
           <itemPath>../../MAVLink/include/common/mavlink_msg_vision_speed_estimate.h</itemPath>
           <itemPath>../../MAVLink/include/common/testsuite.h</itemPath>
           <itemPath>../../MAVLink/include/common/version.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_attitude_setpoint_external.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_data_transmission_handshake.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_distance_sensor.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_encapsulated_data.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_global_position_setpoint_external_int.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_gps2_raw.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_gps2_rtk.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_gps_inject_data.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_gps_rtk.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_hil_gps.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_hil_optical_flow.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_hil_sensor.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_hil_state_quaternion.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_local_ned_position_setpoint_external.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_log_data.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_log_entry.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_log_erase.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_log_request_data.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_log_request_end.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_log_request_list.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_omnidirectional_flow.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_power_status.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_radio_status.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_rc_channels.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_scaled_imu2.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_serial_control.h</itemPath>
+          <itemPath>../../MAVLink/include/common/mavlink_msg_sim_state.h</itemPath>
         </logicalFolder>
         <logicalFolder name="f2" displayName="matrixpilot" projectFiles="true">
           <itemPath>../../MAVLink/include/matrixpilot/matrixpilot.h</itemPath>
@@ -193,12 +220,12 @@
           <itemPath>../../MAVLink/include/matrixpilot/version.h</itemPath>
         </logicalFolder>
         <itemPath>../../MAVLink/include/checksum.h</itemPath>
-        <itemPath>../../MAVLink/include/inttypes.h</itemPath>
         <itemPath>../../MAVLink/include/matrixpilot_mavlink_bridge_header.h</itemPath>
         <itemPath>../../MAVLink/include/mavlink_helpers.h</itemPath>
         <itemPath>../../MAVLink/include/mavlink_protobuf_manager.hpp</itemPath>
         <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
+        <itemPath>../../MAVLink/include/mavlink_conversions.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -319,6 +346,7 @@
     <Elem>../</Elem>
     <Elem>../../libDCM</Elem>
     <Elem>../../libUDB</Elem>
+    <Elem>../../MAVLink/include</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -338,8 +366,11 @@
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
+        <archiverTool>
+        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -391,6 +422,9 @@
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>
+      <C30-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C30-AR>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>

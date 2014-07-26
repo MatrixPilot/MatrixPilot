@@ -1,5 +1,4 @@
 CC       = gcc
-#CC      = /usr/local/i386-mingw32-4.3.0/bin/i386-mingw32-gcc   # used when cross-compiling from a unix system
 CFLAGS   = -pipe -Wall -W -O0 -DWIN=1
 INCPATH  = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot
 LFLAGS   = 
@@ -93,5 +92,4 @@ $(MPCAT_TARGET): $(MPCAT_OBJECTS)
 
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
-	-$(RM_FILE) *~ core *.core
-
+	-$(RM_FILE) $(MPSIL_TARGET) $(MPCAT_TARGET)
