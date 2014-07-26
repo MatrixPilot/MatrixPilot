@@ -47,16 +47,16 @@ BOOL ValidAppPresent(void)
 
 int main(void)
 {
-	mcu_init();
-
-	USBDeviceInit();    //usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
-#if defined(USB_INTERRUPT)
-	USBDeviceAttach();
-#endif
+	InitSwitch();
 
 	// Enter firmware upgrade mode if there is a trigger or if the application is not valid
 	if ((ReadSwitchStatus() == SWITCH_PRESSED) || !ValidAppPresent())
 	{
+		mcu_init();
+		USBDeviceInit();    //usb_device.c.  Initializes USB module SFRs and firmware variables to known states.
+#if defined(USB_INTERRUPT)
+		USBDeviceAttach();
+#endif
 		bootloader();
 	}
 

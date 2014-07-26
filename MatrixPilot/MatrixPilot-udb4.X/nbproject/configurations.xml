@@ -250,6 +250,7 @@
         <itemPath>../../libDCM/estAirspeed.c</itemPath>
         <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
         <itemPath>../../libDCM/fbcl.s</itemPath>
+        <itemPath>../../libDCM/estLocation.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/background.c</itemPath>

@@ -815,7 +815,7 @@ void gps_commit_data(void)
 	alt_sl_gps.WW   = alt_sl_gps_.WW / 10;          // SIRF provides altMSL in cm, UBX provides it in mm
 	sog_gps.BB      = sog_gps_._.W0;                // SIRF uses 2 byte SOG, UBX provides 4 bytes
 #if (HILSIM == 1)
-	as_sim.BB       = as_sim_._.W0;                 // provided by HILSIM, simulated airspeed
+	hilsim_airspeed.BB       = as_sim_._.W0;                 // provided by HILSIM, simulated airspeed
 #endif
 	cog_gps.BB      = (uint16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 

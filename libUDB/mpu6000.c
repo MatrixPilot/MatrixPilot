@@ -26,6 +26,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "ADchannel.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
 #include "../libDCM/libDCM_internal.h"
@@ -39,8 +40,8 @@
 uint16_t mpu_data[8], mpuCnt = 0;
 boolean mpuDAV = false;
 
-struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
-struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
+//struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
+//struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
 struct ADchannel mpu_temp;
 int16_t vref_adj;
 

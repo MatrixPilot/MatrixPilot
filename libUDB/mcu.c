@@ -109,6 +109,8 @@ _FPOR(ALTI2C1_ON & ALTI2C2_ON);
 #endif // __XC16__
 #endif // BOARD_TYPE
 
+#define INPUT_PIN  1
+#define OUTPUT_PIN 0
 
 int16_t defaultCorcon = 0;
 
@@ -204,9 +206,6 @@ void configurePPS(void)
 	__builtin_write_OSCCONL(OSCCON | (1 << 6));
 }
 
-#define INPUT_PIN  1
-#define OUTPUT_PIN 0
-
 // This method configures TRISx for the digital IOs
 void configureDigitalIO(void)   // AUAV3 board
 {
@@ -280,6 +279,7 @@ void configureDigitalIO(void)   // AUAV3 board
 #else
 void configureDigitalIO(void) // UDB4 and UDB5 boards
 {
+	// TODO: this needs to be updated to support PPM input on user defined input channel
 	_TRISD8 = 1;
 #if (USE_PPM_INPUT == 0)
 	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;

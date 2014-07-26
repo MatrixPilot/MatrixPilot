@@ -39,30 +39,29 @@ static void msg_CS1(uint8_t gpschar);
 
 void (*msg_parse)(uint8_t inchar) = &msg_start;
 
-const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
-const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
-const char gps_sbas_enable[]            = "$PMTK313,1*2E\r\n";          // Enable SBAS
-const char gps_waas_enable[]            = "$PMTK301,2*2E\r\n";          // Enable WAAS
-const char gps_navthreshold_disable[]   = "$PMTK397,0*23\r\n";          // Make sure we receive all position updates
-const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn on binary
+static const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
+static const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
+static const char gps_sbas_enable[]            = "$PMTK313,1*2E\r\n";          // Enable SBAS
+static const char gps_waas_enable[]            = "$PMTK301,2*2E\r\n";          // Enable WAAS
+static const char gps_navthreshold_disable[]   = "$PMTK397,0*23\r\n";          // Make sure we receive all position updates
+static const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn on binary
 
-uint8_t payloadlength;
-uint8_t un; // dummy char
+static uint8_t payloadlength;
+static uint8_t un; // dummy char
 //union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
-union longbbbb sog_gps_, cog_gps_;
+static union longbbbb sog_gps_, cog_gps_;
 //union longbbbb date_gps_, time_gps_;
-uint8_t svs_;
-uint8_t fix_type_;
+static uint8_t svs_;
+static uint8_t fix_type_;
 //union intbb hdop_;
-union intbb checksum;
+static union intbb checksum;
 uint8_t day_of_week;
 
-union longbbbb last_alt;
-uint8_t CK_A;
-uint8_t CK_B;
-int16_t store_index = 0;
+static uint8_t CK_A;
+static uint8_t CK_B;
+static int16_t store_index = 0;
 
-uint8_t* const msgDataParse[] = {
+static uint8_t* const msgDataParse[] = {
 	&lat_gps_.__.B0,    &lat_gps_.__.B1,    &lat_gps_.__.B2,    &lat_gps_.__.B3,
 	&lon_gps_.__.B0,    &lon_gps_.__.B1,    &lon_gps_.__.B2,    &lon_gps_.__.B3,
 	&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,
@@ -183,12 +182,12 @@ static void msg_CS1(uint8_t gpschar)
 
 void gps_commit_data(void)
 {
+	static union longbbbb last_alt = 0;
 	if (week_no.BB == 0)
 	{
 		week_no.BB = calculate_week_num(date_gps_.WW);
 	}
 	tow.WW = calculate_time_of_week(time_gps_.WW);
-
 	lat_gps.WW   = lat_gps_.WW * 10;
 	lon_gps.WW   = lon_gps_.WW * 10;
 	alt_sl_gps   = alt_sl_gps_;
@@ -197,7 +196,6 @@ void gps_commit_data(void)
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
 	hdop         = (uint8_t)(hdop_.BB / 20);
 	svs          = svs_;
-
 	last_alt     = alt_sl_gps_;
 }
 

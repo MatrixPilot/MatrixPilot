@@ -125,14 +125,6 @@ typedef uint8_t boolean;
 #define true                    1
 #define false                   0
 
-struct ADchannel {
-	int16_t input;  // raw input
-	int16_t value;  // average of the sum of inputs between report outs
-	int16_t offset; // baseline at power up 
-	int32_t sum;    // used as an integrator
-}; // variables for processing an AD channel
-
-
 struct udb_flag_bits {
 	uint16_t unused                 : 12;
 	uint16_t a2d_read               : 1;

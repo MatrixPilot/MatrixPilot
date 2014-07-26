@@ -26,6 +26,7 @@
 #include "../libUDB/magnetometer.h"
 #include "../libUDB/magnetometerOptions.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/ADchannel.h"
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane

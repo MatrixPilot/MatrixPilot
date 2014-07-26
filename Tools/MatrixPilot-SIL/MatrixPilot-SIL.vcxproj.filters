@@ -212,6 +212,15 @@
     <ClCompile Include="..\..\libFlashFS\minIni.c">
       <Filter>Source Files\libFlashFS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libDCM\estLocation.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\hilsim.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\mathlib.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

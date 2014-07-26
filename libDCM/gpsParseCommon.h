@@ -24,7 +24,7 @@ extern union intbb week_no;
 extern union intbb sog_gps;                 // speed over ground
 extern union uintbb cog_gps;                // course over ground, units: degrees * 100, range [0-35999]
 extern union intbb climb_gps;               // climb
-extern union intbb as_sim;
+extern union intbb hilsim_airspeed;
 //extern union longbbbb as_sim_;
 extern uint8_t hdop;                        // horizontal dilution of precision
 extern union longbbbb xpg, ypg, zpg;        // gps x, y, z position

@@ -207,10 +207,10 @@ extern UDB_SKIP_FLAGS udb_skip_flags;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Raw Accelerometer and Gyroscope(rate) Values
-extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
-extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
-extern struct ADchannel udb_vref;                          // reference voltage
-extern struct ADchannel udb_analogInputs[];
+//extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
+//extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
+//extern struct ADchannel udb_vref;                          // reference voltage
+//extern struct ADchannel udb_analogInputs[];
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;        // battery_current._.W1 is in tenths of Amps
@@ -229,7 +229,6 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 // Calibrate the sensors
 // Call this function once, soon after booting up, after a few seconds of
 // holding the UDB very still.
-void udb_a2d_record_offsets(void);
 void udb_callback_read_sensors(void);       // Callback
 
 
@@ -238,6 +237,8 @@ void udb_callback_read_sensors(void);       // Callback
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
 #define udb_led_toggle(x)                   ((x) = !(x))
+#define led_on(x)                       ((x) = 0)
+#define led_off(x)                      ((x) = 1)
 
 
 ////////////////////////////////////////////////////////////////////////////////

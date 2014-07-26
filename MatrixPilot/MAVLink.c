@@ -54,6 +54,7 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
 #include "euler_angles.h"
 #include "config.h"

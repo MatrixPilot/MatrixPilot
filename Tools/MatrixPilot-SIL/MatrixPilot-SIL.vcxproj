@@ -101,6 +101,7 @@
     <ClCompile Include="..\..\libDCM\deadReckoning.c" />
     <ClCompile Include="..\..\libDCM\estAirspeed.c" />
     <ClCompile Include="..\..\libDCM\estAltitude.c" />
+    <ClCompile Include="..\..\libDCM\estLocation.c" />
     <ClCompile Include="..\..\libDCM\estWind.c" />
     <ClCompile Include="..\..\libDCM\estYawDrift.c" />
     <ClCompile Include="..\..\libDCM\gpsParseCommon.c" />
@@ -108,7 +109,9 @@
     <ClCompile Include="..\..\libDCM\gpsParseNMEA.c" />
     <ClCompile Include="..\..\libDCM\gpsParseSTD.c" />
     <ClCompile Include="..\..\libDCM\gpsParseUBX.c" />
+    <ClCompile Include="..\..\libDCM\hilsim.c" />
     <ClCompile Include="..\..\libDCM\libDCM.c" />
+    <ClCompile Include="..\..\libDCM\mathlib.c" />
     <ClCompile Include="..\..\libDCM\mathlibNAV.c" />
     <ClCompile Include="..\..\libDCM\rmat.c" />
     <ClCompile Include="..\..\libFlashFS\minIni.c" />

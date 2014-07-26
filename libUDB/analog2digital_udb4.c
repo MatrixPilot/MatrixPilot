@@ -23,6 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "ADchannel.h"
 
 #if (BOARD_TYPE == UDB4_BOARD)
 
@@ -33,9 +34,9 @@
 // A first order digital lowpass filter with a time constant of about 32 milliseconds
 // is applied to improve signal to noise.
 
-struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;  // x, y, and z accelerometer channels
-struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;   // x, y, and z gyro channels
-struct ADchannel udb_vref;                            // reference voltage
+//struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;  // x, y, and z accelerometer channels
+//struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;   // x, y, and z gyro channels
+//struct ADchannel udb_vref;                            // reference voltage
 
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo pwIn/Out/Trim arrays
