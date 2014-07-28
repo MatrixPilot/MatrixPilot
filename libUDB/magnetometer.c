@@ -29,10 +29,9 @@
     // magnetic field in the body frame of reference
 int16_t udb_magFieldBody[3];
 // magnetic offset in the sensor frame of reference
-int16_t udb_magOffset[3] = { -193 , 383 , -510 };
-// body frame magnetometer calibration gains
-int16_t magGain[3] = {  RMAX * 1.0 , RMAX * 1.2, RMAX * 1.0 };
-//int16_t magGain[3] = { RMAX , RMAX , RMAX };    // magnetometer calibration gains
+int16_t udb_magOffset[3] = { 2 * MAG_XOFFSET, 2 * MAG_YOFFSET, 2 * MAG_ZOFFSET};
+// sensor frame magnetometer calibration gains
+int16_t magGain[3] = {  RMAX * MAG_XGAIN , RMAX * MAG_YGAIN, RMAX * MAG_ZGAIN };
 int16_t rawMagCalib[3] = { 0 , 0 , 0 };
 int16_t magFieldRaw[3];
 int16_t magMessage = 0;                         // message type
