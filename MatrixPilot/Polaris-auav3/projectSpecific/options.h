@@ -34,13 +34,6 @@
 #define OPTIONS_H
 //#pragma message "mw"
 
-// use ring buffer and software flow control for onboard openlog
-// **** not compatible with mavlink binary uplink ****
-// TODO: add option to use separate UART for mavlink uplink
-// TODO: port gimbal parameter setting code for use instead of mavlink uplink
-//       (could use "console" instead)
-#define USE_RING_BUFFER
-
 // define this to add debug text messages to mavlink stream
 #undef USE_MAVLINK_DBGIO
 
@@ -72,6 +65,14 @@
 //        from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 #define BOARD_ORIENTATION                   ORIENTATION_FORWARDS
 
+// manual accel/gyro calibration values supplied
+#define PRE_CALIBRATED
+#define XACCEL_OFFSET -209
+#define YACCEL_OFFSET 325
+#define ZACCEL_OFFSET -594
+#define XRATE_OFFSET  -26
+#define YRATE_OFFSET  116
+#define ZRATE_OFFSET  35
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choose your airframe type:
@@ -83,9 +84,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, or GPS_MTEK)
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_NMEA, or GPS_MTEK)
 #define GPS_TYPE GPS_STD
+//#define GPS_TYPE GPS_NAVSPARKGL
+//#define DEFAULT_GPS_BAUD 115200
 
+#define BAROMETER_ALTITUDE 0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enable/Disable core features of this firmware
@@ -95,13 +99,13 @@
 #define ROLL_STABILIZATION_AILERONS         1
 #define ROLL_STABILIZATION_RUDDER           0
 #define PITCH_STABILIZATION                 1
-#define YAW_STABILIZATION_RUDDER            0
+#define YAW_STABILIZATION_RUDDER            1
 #define YAW_STABILIZATION_AILERON           0
 
 // Aileron and Rudder Navigation
 // Set either of these to 0 to disable use of that control surface for navigation.
 #define AILERON_NAVIGATION                  1
-#define RUDDER_NAVIGATION                   0
+#define RUDDER_NAVIGATION                   1
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -138,7 +142,7 @@
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL                       0
-#define DESIRED_SPEED						16.0 // meters/second
+#define DESIRED_SPEED                       16.0 // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -160,15 +164,20 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT                       0
+#define MAG_YAW_DRIFT                       1
+#define MAG_YAW_ENABLE                      1
+#undef ENABLE_MAGOFFSET
+//#define ENABLE_MAGOFFSET
+#undef ENABLE_MAGALIGNMENT
+//#define ENABLE_MAGALIGNMENT
 
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE							0
-#define RACING_MODE_WP_THROTTLE				1
+#define RACING_MODE			0
+#define RACING_MODE_WP_THROTTLE		.8
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
@@ -210,6 +219,11 @@
 // For UDB4 boards: Set to 1-8
 #define NUM_INPUTS                          6
 
+// respect TX trim settings
+#define FIXED_TRIMPOINT     1
+#define THROTTLE_TRIMPOINT  2110
+#define CHANNEL_TRIMPOINT   3000
+
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
@@ -236,7 +250,7 @@
 //   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
-#define NUM_OUTPUTS							4
+#define NUM_OUTPUTS	4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -270,7 +284,7 @@
 // For any of these that evaluate to 1 (either hardcoded or by flipping a switch on the board,
 // as you define below), that servo will be sent reversed controls.
 #define AILERON_CHANNEL_REVERSED            1
-#define ELEVATOR_CHANNEL_REVERSED           1
+#define ELEVATOR_CHANNEL_REVERSED           0
 #define RUDDER_CHANNEL_REVERSED             1
 #define AILERON_SECONDARY_CHANNEL_REVERSED  0
 #define THROTTLE_CHANNEL_REVERSED           0
@@ -315,6 +329,7 @@
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
 #define FAILSAFE_INPUT_MIN	2050
+
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -357,6 +372,16 @@
 
 #define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_NMEA
+//#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAGNETOMETER
+
+// use ring buffer and software flow control for onboard openlog
+// **** not compatible with mavlink binary uplink ****
+// TODO: add option to use separate UART for mavlink uplink
+// TODO: port gimbal parameter setting code for use instead of mavlink uplink
+//       (could use "console" instead)
+#define USE_RING_BUFFER
+//#undef USE_RING_BUFFER
 
 // MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -433,11 +458,12 @@
 
 // Note, durations in milliseconds are rounded down to the nearest 25ms.
 
-#define TRIGGER_TYPE                        TRIGGER_TYPE_NONE
-#define TRIGGER_ACTION                      TRIGGER_PULSE_HIGH
-#define TRIGGER_SERVO_LOW                   2000
-#define TRIGGER_SERVO_HIGH                  4000
-#define TRIGGER_PULSE_DURATION              250
+#define TRIGGER_TYPE                        TRIGGER_TYPE_SERVO
+#define TRIGGER_ACTION                      TRIGGER_PULSE_LOW
+#define TRIGGER_SERVO_LOW                   2500
+#define TRIGGER_SERVO_HIGH                  3800
+//#define TRIGGER_INIT_VALUE                  TRIGGER_SERVO_HIGH
+#define TRIGGER_PULSE_DURATION              1000
 #define TRIGGER_REPEAT_PERIOD               4000
 
 
@@ -464,7 +490,7 @@
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP				0.1 //0.22
 #define ROLLKD				0.025 //0.02
-#define YAWKP_AILERON		0.06 // 0.05
+#define YAWKP_AILERON		0.3 // 0.05
 #define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
 
@@ -492,9 +518,9 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER				0.05 // 0.1
+#define YAWKP_RUDDER				0.1 // 0.1
 #define YAWKD_RUDDER				0 //0.03 // 0.1
-#define ROLLKP_RUDDER				0.04
+#define ROLLKP_RUDDER				0.05
 #define ROLLKD_RUDDER				0 //0.05
 #define MANUAL_AILERON_RUDDER_MIX	0.0
 #define RUDDER_BOOST				0.5
@@ -781,10 +807,10 @@
 
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG                         1
+#define USE_TELELOG                         0
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      1
+#define USE_CONFIGFILE                      0
 
 // Set this to 1 to enable the USB stack on AUAV3
 #define USE_USB                             0

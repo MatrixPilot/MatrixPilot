@@ -31,7 +31,7 @@
 // HMC5883L_SF is the SparkFun HMC5883L
 
 //#define HMC5843
-//#define HMC5883L
+#define HMC5883L
 //#define HMC5883L_SF
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
@@ -44,6 +44,14 @@
 // Set to 0 for fixed declination angle or 1 for variable declination angle
 #define DECLINATIONANGLE_VARIABLE           0
 
+// calibration constants
+#define MAG_XOFFSET (-15)
+#define MAG_YOFFSET (-54)
+#define MAG_ZOFFSET (496)
+
+#define MAG_XGAIN (500.0/638)
+#define MAG_YGAIN (1.0)
+#define MAG_ZGAIN (1.0)
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.

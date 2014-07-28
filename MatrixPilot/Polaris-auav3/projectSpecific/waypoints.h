@@ -47,15 +47,19 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN		0
+#define USE_FIXED_ORIGIN		1
 //#define FIXED_ORIGIN_LOCATION	{ -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
 
 // AAM East Field runway center 39°50'31.83"N  105°12'44.81"W
 //#define FIXED_ORIGIN_LOCATION	{ -1052124472, 398421750, 1808.0 }
 
-// AAM West Field runway center  39°50'31.97"N  105°13'10.17"W (105.2194917, 39.842213889)
+// AAM West Field runway center  39°50'31.97"N  105°13'10.17"W (-105.2194917, 39.842213889)
 // altitude estimated from LEA-6 GPS readings in Polaris Ultra log2228
-#define FIXED_ORIGIN_LOCATION	{ -1052194917, 398422138, 1820.0 }
+//#define FIXED_ORIGIN_LOCATION	{ -1052194917, 398422138, 1820.0 }
+
+// Long Lake launch point  39°48'47.74"N  105°12'49.57"W (-105.213769, 39.813261)
+// altitude estimated from LEA-6 GPS readings in Polaris Ultra log2228
+#define FIXED_ORIGIN_LOCATION	{ -105213769, 39813261, 1780.0 }
 
 // bench location
 //#define FIXED_ORIGIN_LOCATION	{ -1050979310,  397501990, 1695.0 }
