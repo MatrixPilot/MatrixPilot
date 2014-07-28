@@ -44,6 +44,14 @@
 // Set to 0 for fixed declination angle or 1 for variable declination angle
 #define DECLINATIONANGLE_VARIABLE           0
 
+// calibration constants
+#define MAG_XOFFSET (-193/2)
+#define MAG_YOFFSET (383/2)
+#define MAG_ZOFFSET (-510/2)
+
+#define MAG_XGAIN (1.0)
+#define MAG_YGAIN (1.2)
+#define MAG_ZGAIN (1.0)
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.

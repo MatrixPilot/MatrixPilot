@@ -151,12 +151,12 @@
 //    {{ -100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 3
 //};
 
-#if 1
+#if 0
 // AAM West Field runway center  39°50'31.97"N  105°13'10.17"W (105.2194917, 39.842213889)
 #define USE_FIXED_ORIGIN		1
 #define FIXED_ORIGIN_LOCATION	{ -1052194917, 398422138, 1817.0 }
 
-#if 1
+#if 0
 #pragma message "West Field lefthand pattern"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,26 +213,25 @@ const struct waypointDef waypoints[] = {
 #else
 // AAM East Field runway center 39°50'31.83"N  105°12'44.81"W
 #define USE_FIXED_ORIGIN 1
-//#define FIXED_ORIGIN_LOCATION	{ -1052124472, 398421750, 1812.0 }
-#if 1
+#define FIXED_ORIGIN_LOCATION	{ -1052124472, 398421750, 1812.0 }
+#if 0
 #pragma message "low lefthand pattern waypoints"
 // This is a lefthand pattern for takeoff to the east
 
-//const struct waypointDef waypoints[] = {
-//	{ { 30, -7, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 1
-//	{ { 100, -28, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 2
-//	{ { 101, 26, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 3
-//	{ { -100, 88, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 4
-//	{ { -102, 32, 10 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 5
-//	{ { -71, 22, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 6
-//	{ { -27, 9, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
-//	{ { 0, 0, 5 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
-//	{ { 5, 0, 5 } , F_CROSS_TRACK + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 7
-//};
+const struct waypointDef waypoints[] = {
+	{ { 30, -7, 15 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 1
+	{ { 100, -28, 15 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 2
+	{ { 101, 26, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 3
+	{ { -100, 88, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 4
+	{ { -102, 32, 15 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 5
+	{ { -71, 22, 15 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 6
+	{ { -27, 9, 15 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { 0, 0, 15 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
+	{ { 5, 0, 15 } , F_CROSS_TRACK + F_TRIGGER , CAM_VIEW_LAUNCH } , //Waypoint 7
+};
 #else
 #pragma message "righthand pattern waypoints"
 
-// This is a lefthand pattern for takeoff to the east
 // right hand pattern
 const struct waypointDef waypoints[] = {
 	{ { -27, 9, 20 } , F_CROSS_TRACK , CAM_VIEW_LAUNCH } , //Waypoint 7
