@@ -87,6 +87,7 @@ void dcm_heartbeat_callback(void)
 #endif // ALTITUDE_GAINS_VARIABLE
 		updateBehavior();
 		wind_gain = wind_gain_adjustment();
+		helicalTurnCntrl();
 		rollCntrl();
 		yawCntrl();
 		altitudeCntrl();

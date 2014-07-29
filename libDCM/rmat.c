@@ -167,24 +167,6 @@ void dcm_init_rmat(void)
 #endif
 }
 
-static void VectorCross(fractional * dest, fractional * src1, fractional * src2)
-{
-	// Implement the cross product. *dest = *src1X*src2;
-	union longww crossaccum;
-	crossaccum.WW = __builtin_mulss(src1[1], src2[2]);
-	crossaccum.WW -= __builtin_mulss(src1[2], src2[1]);
-	crossaccum.WW *= 4;
-	dest[0] = crossaccum._.W1;
-	crossaccum.WW = __builtin_mulss(src1[2], src2[0]);
-	crossaccum.WW -= __builtin_mulss(src1[0], src2[2]);
-	crossaccum.WW *= 4;
-	dest[1] = crossaccum._.W1;
-	crossaccum.WW = __builtin_mulss(src1[0], src2[1]);
-	crossaccum.WW -= __builtin_mulss(src1[1], src2[0]);
-	crossaccum.WW *= 4;
-	dest[2] = crossaccum._.W1;
-}
-
 static inline void read_gyros(void)
 {
 	// fetch the gyro signals and subtract the baseline offset, 

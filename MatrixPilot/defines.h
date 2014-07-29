@@ -60,7 +60,8 @@ extern union fbts_int flags;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Control code - rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c
+// Control code - helicalTurnCntrl.c,rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c
+void helicalTurnCntrl(void);
 void rollCntrl(void);
 void pitchCntrl(void);
 void yawCntrl(void);

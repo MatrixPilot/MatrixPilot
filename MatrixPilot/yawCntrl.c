@@ -109,15 +109,7 @@ void normalYawCntrl(void)
 	rollStabilization.WW = 0; // default case is no roll rudder stabilization
 	if (ROLL_STABILIZATION_RUDDER && flags._.pitch_feedback)
 	{
-		if (!desired_behavior._.inverted && !desired_behavior._.hover)  // normal
-		{
-			rollStabilization.WW = __builtin_mulsu(rmat[6], rollkprud);
-		}
-		else if (desired_behavior._.inverted) // inverted
-		{
-			rollStabilization.WW = - __builtin_mulsu(rmat[6], rollkprud);
-		}
-		rollStabilization.WW -= __builtin_mulus(rollkdrud, omegaAccum[1]);
+		rollStabilization.WW = - __builtin_mulsu(tiltError[1], rollkprud); // this works right side up or upside down
 	}
 
 	if (flags._.pitch_feedback)
