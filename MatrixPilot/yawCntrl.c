@@ -77,6 +77,7 @@ void normalYawCntrl(void)
 	int16_t yawNavDeflection;
 	union longww rollStabilization;
 	union longww gyroYawFeedback;
+	union longww yawStabilization ;
 	int16_t ail_rud_mix;
 
 #ifdef TestGains
@@ -99,11 +100,13 @@ void normalYawCntrl(void)
 
 	if (YAW_STABILIZATION_RUDDER && flags._.pitch_feedback)
 	{
-		gyroYawFeedback.WW = __builtin_mulus(yawkdrud, omegaAccum[2]);
+		gyroYawFeedback.WW = __builtin_mulus(yawkdrud, rotationRateError[2]);
+		yawStabilization.WW = - __builtin_mulsu(tiltError[2] , yawkprud ) ;  // yaw orientation error in body frame
 	}
 	else
 	{
 		gyroYawFeedback.WW = 0;
+		yawStabilization.WW = 0;
 	}
 
 	rollStabilization.WW = 0; // default case is no roll rudder stabilization
@@ -126,6 +129,7 @@ void normalYawCntrl(void)
 	yaw_control = (int32_t)yawNavDeflection 
 	            - (int32_t)gyroYawFeedback._.W1 
 	            + (int32_t)rollStabilization._.W1 
+	            + (int32_t)yawStabilization._.W1 
 	            + ail_rud_mix;
 	// Servo reversing is handled in servoMix.c
 }

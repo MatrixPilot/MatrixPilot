@@ -26,10 +26,12 @@
 #include "../libDCM/mathlibNAV.h"
 
 int16_t tiltError[3] ;
-int16_t desiredTilt[3] = { RMAX , 0 , RMAX } ;  // test case, desired tilt is 45 degrees to the left
+//int16_t desiredTilt[3] = { RMAX , 0 , RMAX } ;  // test case, desired tilt is 45 degrees to the left
+//int16_t desiredTilt[3] = { RMAX , 0 , 0 } ;  // test case, desired tilt is 90 degrees to the left
+int16_t desiredTilt[3] = { 0 , 0 , RMAX } ;  // test case, level
 int16_t desiredRotationRate[3] = { 0 , 0 , 0 } ;
-int16_t actualRotationRate[3] = { 0 , 0 , 0 } ;
-int16_t RotationRateError[3] = { 0 , 0 , 0 } ;
+//int16_t actualRotationRate[3] = { 0 , 0 , 0 } ;
+int16_t rotationRateError[3] = { 0 , 0 , 0 } ;
 
 // helicalTurnCntrl determines the values of the elements of the bottom row of rmat
 // as well as the required rotation rates in the body frame that are required to make a coordinated turn.
@@ -48,5 +50,7 @@ void helicalTurnCntrl( void )
 	{
 		vector3_normalize( tiltError , tiltError ) ; // for more than 90 degrees, make the tilt error vector parallel to desired axis, with magnitude RMAX
 	}
+
+	VectorSubtract( 3 , rotationRateError , omegaAccum , desiredRotationRate ) ;
 
 }
