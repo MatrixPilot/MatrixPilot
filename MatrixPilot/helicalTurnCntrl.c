@@ -26,12 +26,22 @@
 #include "../libDCM/mathlibNAV.h"
 
 int16_t tiltError[3] ;
-//int16_t desiredTilt[3] = { RMAX , 0 , RMAX } ;  // test case, desired tilt is 45 degrees to the left
-//int16_t desiredTilt[3] = { RMAX , 0 , 0 } ;  // test case, desired tilt is 90 degrees to the left
-int16_t desiredTilt[3] = { 0 , 0 , RMAX } ;  // test case, level
-int16_t desiredRotationRate[3] = { 0 , 0 , 0 } ;
+//int16_t desiredTiltVector[3] = { RMAX , 0 , RMAX } ;  // test case, desired tilt is 45 degrees to the left
+//int16_t desiredTiltVector[3] = { RMAX , 0 , 0 } ;  // test case, desired tilt is 90 degrees to the left
+static int16_t desiredTiltVector[3] = { 0 , 0 , RMAX } ;  // test case, level
+static int16_t desiredRotationRateVector[3] = { 0 , 0 , 0 } ;
 //int16_t actualRotationRate[3] = { 0 , 0 , 0 } ;
 int16_t rotationRateError[3] = { 0 , 0 , 0 } ;
+
+static uint16_t airSpeed = 1000 ;
+
+int16_t desiredTurnRateRadians = RMAX ;
+int16_t desiredTurnRateGyro ;
+
+static union longww desiredTilt ;
+
+#define GRAVITYCMSECSEC ( 981 )
+#define RADSTOGYRO ( ( uint16_t ) 96*SCALEGYRO ) // used in the conversion from radians per second to raw gyro units
 
 // helicalTurnCntrl determines the values of the elements of the bottom row of rmat
 // as well as the required rotation rates in the body frame that are required to make a coordinated turn.
@@ -44,13 +54,62 @@ int16_t rotationRateError[3] = { 0 , 0 , 0 } ;
 
 void helicalTurnCntrl( void )
 {
-	vector3_normalize( desiredTilt , desiredTilt ) ; // make sure tilt vector has magnitude RMAX
-	VectorCross( tiltError , &rmat[6] , desiredTilt ) ; // compute tilt orientation error
-	if ( VectorDotProduct( 3 , &rmat[6] , desiredTilt ) < 0 ) // more than 90 degree error
+	union longww accum ;
+
+	// compute the desired tilt
+
+	// desiredTilt is the ratio -rmat[6]/rmat[8] required for the turn
+	// desiredTilt = desiredTurnRate * airSpeed / gravity
+	// desiredTilt = RMAX*"desired tilt"
+	// desiredTurnRate = RMAX*"desired turn rate", desired turn rate in radians per second
+	// airSpeed is air speed centimeters per second
+	// gravity is 981 centimeters per second per second 
+
+	desiredTilt.WW = __builtin_mulsu( desiredTurnRateRadians , airSpeed ) ;
+	desiredTilt.WW /= GRAVITYCMSECSEC ;
+
+	// limit the lateral acceleration to +- 2 times gravity, total wing loading approximately 2.25 times gravity
+
+	if ( desiredTilt.WW > (int32_t) 2* (int32_t ) RMAX - 1)
+	{
+		desiredTilt.WW = (int32_t) 2* (int32_t ) RMAX - 1 ;
+		accum.WW = __builtin_mulsu( desiredTilt._.W0 , GRAVITYCMSECSEC ) ;
+		accum.WW /= airSpeed ;
+		desiredTurnRateRadians = accum._.W0 ;
+	}
+	else if ( desiredTilt.WW < - (int32_t) 2* (int32_t ) RMAX + 1 )
+	{
+		desiredTilt.WW = - (int32_t) 2* (int32_t ) RMAX + 1 ;
+		accum.WW = __builtin_mulsu( desiredTilt._.W0 , GRAVITYCMSECSEC ) ;
+		accum.WW /= airSpeed ;
+		desiredTurnRateRadians = accum._.W0 ;
+	}	
+
+	// convert desired turn rate from radians/second to gyro units
+
+	accum.WW = ( ( ( int32_t ) desiredTurnRateRadians ) << 4 );  // desired turn rate in radians times 16 to provide resolution for the divide to follow
+	accum.WW = accum.WW / RADSTOGYRO ; // at this point accum._.W0 has 2 times the required gyro signal for the turn.
+
+	VectorScale( 3, desiredRotationRateVector , &rmat[6] , accum._.W0 ) ;
+
+	// build the desired tilt vector and tilt error
+
+	desiredTiltVector[0] = -desiredTilt._.W0 ;
+	desiredTiltVector[1] =  0 ;
+	desiredTiltVector[2] = RMAX ;
+
+	vector3_normalize( desiredTiltVector , desiredTiltVector ) ; // make sure tilt vector has magnitude RMAX
+	VectorCross( tiltError , &rmat[6] , desiredTiltVector ) ; // compute tilt orientation error
+	if ( VectorDotProduct( 3 , &rmat[6] , desiredTiltVector ) < 0 ) // more than 90 degree error
 	{
 		vector3_normalize( tiltError , tiltError ) ; // for more than 90 degrees, make the tilt error vector parallel to desired axis, with magnitude RMAX
 	}
 
-	VectorSubtract( 3 , rotationRateError , omegaAccum , desiredRotationRate ) ;
+	// compute the rotation rate error vector
+
+//	VectorSubtract( 3 , rotationRateError , omegaAccum , desiredRotationRateVector ) ;
+	rotationRateError[0] = desiredRotationRateVector[0] ;
+	rotationRateError[1] = desiredRotationRateVector[1] ;
+	rotationRateError[2] = desiredRotationRateVector[2] ;
 
 }
