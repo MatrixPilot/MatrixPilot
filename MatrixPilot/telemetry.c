@@ -572,8 +572,8 @@ void serial_output_8hz(void)
 			    YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD, AILERON_BOOST);
 			break;
 		case 3:
-			serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n",
-			    PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST);
+			serial_output("F6:FD_FWD=%5.3f:P_GAIN=%5.3f:P_KD=%5.3f:E_BOOST=%3.1f:\r\n",
+			    FEED_FORWARD, PITCHGAIN, PITCHKD, ELEVATOR_BOOST);
 			break;
 		case 2:
 			serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",

@@ -25,18 +25,18 @@
 #include "servoPrepare.h"
 #include "../libDCM/mathlibNAV.h"
 
-int16_t tiltError[3] ;
-//int16_t desiredTiltVector[3] = { RMAX , 0 , RMAX } ;  // test case, desired tilt is 45 degrees to the left
-//int16_t desiredTiltVector[3] = { RMAX , 0 , 0 } ;  // test case, desired tilt is 90 degrees to the left
-static int16_t desiredTiltVector[3] = { 0 , 0 , RMAX } ;  // test case, level
-static int16_t desiredRotationRateVector[3] = { 0 , 0 , 0 } ;
-//int16_t actualRotationRate[3] = { 0 , 0 , 0 } ;
+int16_t tiltError[3] = { 0 , 0 , 0 } ;
+
+static int16_t desiredTiltVector[3] ;
+
+int16_t desiredRotationRateRadians[3] ;
+static int16_t desiredRotationRateGyro[3] ;
+
 int16_t rotationRateError[3] = { 0 , 0 , 0 } ;
 
 static uint16_t airSpeed = 1000 ;
 
 int16_t desiredTurnRateRadians = RMAX ;
-int16_t desiredTurnRateGyro ;
 
 static union longww desiredTilt ;
 
@@ -65,7 +65,7 @@ void helicalTurnCntrl( void )
 	// airSpeed is air speed centimeters per second
 	// gravity is 981 centimeters per second per second 
 
-	desiredTilt.WW = __builtin_mulsu( desiredTurnRateRadians , airSpeed ) ;
+	desiredTilt.WW = - __builtin_mulsu( desiredTurnRateRadians , airSpeed ) ;
 	desiredTilt.WW /= GRAVITYCMSECSEC ;
 
 	// limit the lateral acceleration to +- 2 times gravity, total wing loading approximately 2.25 times gravity
@@ -90,11 +90,18 @@ void helicalTurnCntrl( void )
 	accum.WW = ( ( ( int32_t ) desiredTurnRateRadians ) << 4 );  // desired turn rate in radians times 16 to provide resolution for the divide to follow
 	accum.WW = accum.WW / RADSTOGYRO ; // at this point accum._.W0 has 2 times the required gyro signal for the turn.
 
-	VectorScale( 3, desiredRotationRateVector , &rmat[6] , accum._.W0 ) ;
+	// compute desired rotation rate vector in body frame, scaling is same as gyro signal
+
+	VectorScale( 3, desiredRotationRateGyro , &rmat[6] , accum._.W0 ) ;
+
+	// compute desired rotation rate vector in body frame, scaling is in RMAX*radians/sec
+
+	VectorScale( 3, desiredRotationRateRadians , &rmat[6] , desiredTurnRateRadians ) ; // this produces half of what we want
+	VectorAdd( 3 , desiredRotationRateRadians , desiredRotationRateRadians , desiredRotationRateRadians ) ; // double
 
 	// build the desired tilt vector and tilt error
 
-	desiredTiltVector[0] = -desiredTilt._.W0 ;
+	desiredTiltVector[0] = desiredTilt._.W0 ;
 	desiredTiltVector[1] =  0 ;
 	desiredTiltVector[2] = RMAX ;
 
@@ -107,9 +114,6 @@ void helicalTurnCntrl( void )
 
 	// compute the rotation rate error vector
 
-//	VectorSubtract( 3 , rotationRateError , omegaAccum , desiredRotationRateVector ) ;
-	rotationRateError[0] = desiredRotationRateVector[0] ;
-	rotationRateError[1] = desiredRotationRateVector[1] ;
-	rotationRateError[2] = desiredRotationRateVector[2] ;
+	VectorSubtract( 3 , rotationRateError , omegaAccum , desiredRotationRateGyro ) ;
 
 }

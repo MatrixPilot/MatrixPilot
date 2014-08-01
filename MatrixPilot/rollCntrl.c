@@ -31,6 +31,7 @@
 
 uint16_t yawkdail;
 uint16_t rollkp;
+uint16_t rollkpfdfwd;
 uint16_t rollkd;
 uint16_t hoverrollkp;
 uint16_t hoverrollkd;
@@ -42,6 +43,7 @@ void init_rollCntrl(void)
 {
 	yawkdail    = (uint16_t)(YAWKD_AILERON*SCALEGYRO*RMAX);
 	rollkp      = (uint16_t)(ROLLKP*RMAX);
+	rollkpfdfwd = (uint16_t)(FEED_FORWARD*ROLLKP*RMAX);
 	rollkd      = (uint16_t)(ROLLKD*SCALEGYRO*RMAX);
 	hoverrollkp = (uint16_t)(HOVER_ROLLKP*SCALEGYRO*RMAX);
 	hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX);
@@ -75,17 +77,14 @@ void normalRollCntrl(void)
 	union longww rollAccum = { 0 };
 	union longww gyroRollFeedback;
 	union longww gyroYawFeedback;
-	fractional rmat6;
 	fractional omegaAccum2;
 
 	if (!canStabilizeInverted() || !desired_behavior._.inverted)
 	{
-		rmat6 = rmat[6];
 		omegaAccum2 = omegaAccum[2];
 	}
 	else
 	{
-		rmat6 = -rmat[6];
 		omegaAccum2 = -omegaAccum[2];
 	}
 #ifdef TestGains
@@ -100,10 +99,9 @@ void normalRollCntrl(void)
 #endif
 	if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback)
 	{
-//		gyroRollFeedback.WW = __builtin_mulus(rollkd , omegaAccum[1]);
-		gyroRollFeedback.WW = __builtin_mulus(rollkd , rotationRateError[1]);
-//		rollAccum.WW += __builtin_mulsu(rmat6 , rollkp);
-		rollAccum.WW -= __builtin_mulsu(tiltError[1] , rollkp);
+		gyroRollFeedback.WW = - __builtin_mulus(rollkd, rotationRateError[1]);
+		rollAccum.WW -= __builtin_mulsu(tiltError[1], rollkp);
+		rollAccum.WW += __builtin_mulsu(desiredRotationRateRadians[1], rollkpfdfwd);
 	}
 	else
 	{
@@ -111,13 +109,13 @@ void normalRollCntrl(void)
 	}
 	if (YAW_STABILIZATION_AILERON && flags._.pitch_feedback)
 	{
-		gyroYawFeedback.WW = __builtin_mulus(yawkdail, omegaAccum2);
+		gyroYawFeedback.WW = - __builtin_mulus(yawkdail, omegaAccum2);
 	}
 	else
 	{
 		gyroYawFeedback.WW = 0;
 	}
-	roll_control = (int32_t)rollAccum._.W1 - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
+	roll_control = (int32_t)rollAccum._.W1 + (int32_t)gyroRollFeedback._.W1 + (int32_t)gyroYawFeedback._.W1;
 	// Servo reversing is handled in servoMix.c
 }
 

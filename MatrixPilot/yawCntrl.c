@@ -32,6 +32,7 @@
 #endif // USE_CONFIGFILE
 
 uint16_t yawkdrud;
+uint16_t yawkpfdfwd;
 uint16_t rollkprud;
 uint16_t rollkdrud;
 uint16_t hoveryawkp;
@@ -43,16 +44,18 @@ void hoverYawCntrl(void);
 void init_yawCntrl(void)
 {
 	yawkdrud   = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
+	yawkpfdfwd = (uint16_t)(FEED_FORWARD*YAWKP_RUDDER*RMAX);
 	rollkprud  = (uint16_t)(ROLLKP_RUDDER*RMAX);
 	rollkdrud  = (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
 	hoveryawkp = (uint16_t)(HOVER_YAWKP*RMAX);
 	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
 
+// FIXME: KD, KP swapped, hover copied to roll kd rudder
 #if (USE_CONFIGFILE == 1)
 void save_yawCntrl(void)
 {
-	gains.YawKPRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
+	gains.YawKPRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX); 
 	gains.YawKDRudder  = (float)rollkprud  / (RMAX);
 	gains.RollKPRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
 	gains.RollKDRudder = (float)hoveryawkp / (RMAX);
@@ -100,8 +103,9 @@ void normalYawCntrl(void)
 
 	if (YAW_STABILIZATION_RUDDER && flags._.pitch_feedback)
 	{
-		gyroYawFeedback.WW = __builtin_mulus(yawkdrud, rotationRateError[2]);
-		yawStabilization.WW = - __builtin_mulsu(tiltError[2] , yawkprud ) ;  // yaw orientation error in body frame
+		gyroYawFeedback.WW =  - __builtin_mulsu(rotationRateError[2], yawkdrud);
+		yawStabilization.WW = - __builtin_mulsu(tiltError[2], yawkprud ) ;  // yaw orientation error in body frame
+		yawStabilization.WW += __builtin_mulsu(desiredRotationRateRadians[2], yawkpfdfwd ) ; // feed forward term
 	}
 	else
 	{
@@ -127,7 +131,7 @@ void normalYawCntrl(void)
 	}
 
 	yaw_control = (int32_t)yawNavDeflection 
-	            - (int32_t)gyroYawFeedback._.W1 
+	            + (int32_t)gyroYawFeedback._.W1 
 	            + (int32_t)rollStabilization._.W1 
 	            + (int32_t)yawStabilization._.W1 
 	            + ail_rud_mix;
