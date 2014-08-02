@@ -49,3 +49,9 @@
 
 8 August: increased nav. roll authority to about 45 degrees of bank and increased
 	roll_elev_mix to 1.0
+
+27 July 2014: test flight with branch _mw4fbw.
+	With current options settings, turn radius is too large. Maximum bank angle is
+	about 40 degrees. Increase ROLLKP from .1 to .2 and YAWKP_AILERON from .3 to .5
+	Test objective: show increased limit of bank angle to ~60 degrees and check for
+	oscillation due to ROLLKP increase.

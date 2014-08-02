@@ -45,8 +45,9 @@ if types is not None:
     types = types.split(',')
     
 if output:
-    output.write("xacc yacc zacc\n")    
+    output.write("time, xacc, yacc, zacc, roll, pitch, yaw\n")    
     
+accm = None
 while True:
     m = mlog.recv_match(condition=opts.condition, blocking=opts.follow)
     if m is None:
@@ -56,10 +57,13 @@ while True:
         continue
     last_timestamp = 0
     if output and m.get_type() != 'BAD_DATA':
-        print("msgId: %d" % m.get_msgId())
 #        print(m.__dict__)
         if m.get_msgId() == 27:
-            output.write("raw_imu: %f %d %d %d\n" % (m._timestamp, m.xacc, m.yacc, m.zacc))
-        if m.get_msgId() == 30:
-            output.write(",,,,,attitude: %f %f %f %f\n" % (m._timestamp, m.roll, m.pitch, m.yaw))
-        
+            accm = m
+            print("msgId: %d, time: %f" % (accm.get_msgId(), m._timestamp))
+            #output.write("raw_imu: %f %d %d %d\n" % (m._timestamp, m.xacc, m.yacc, m.zacc))
+        if (m.get_msgId() == 30) and (accm is not None):
+            print("msgId: %d, time: %f" % (m.get_msgId(), m._timestamp))
+            output.write("%f, %d, %d, %d, %f, %f, %f\n" % (accm._timestamp, accm.xacc, accm.yacc, accm.zacc, m.roll, m.pitch, m.yaw))
+            accm = None
+

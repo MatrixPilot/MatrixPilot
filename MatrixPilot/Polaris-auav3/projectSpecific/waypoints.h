@@ -59,7 +59,7 @@
 
 // Long Lake launch point  39°48'47.74"N  105°12'49.57"W (-105.213769, 39.813261)
 // altitude estimated from LEA-6 GPS readings in Polaris Ultra log2228
-#define FIXED_ORIGIN_LOCATION	{ -105213769, 39813261, 1780.0 }
+#define FIXED_ORIGIN_LOCATION	{ -1052137690, 398132610, 1780.0 }
 
 // bench location
 //#define FIXED_ORIGIN_LOCATION	{ -1050979310,  397501990, 1695.0 }

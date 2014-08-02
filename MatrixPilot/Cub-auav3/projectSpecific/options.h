@@ -37,6 +37,9 @@
 // define this to add debug text messages to mavlink stream
 #undef USE_MAVLINK_DBGIO
 
+// define this to test alternate stabilization techniques
+#define TEST_SIMPLE_STABILIZATION
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
 // See the MatrixPilot wiki for more details on different board types.
@@ -370,10 +373,14 @@
 // SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
+#ifdef TEST_SIMPLE_STABILIZATION
+#define SERIAL_OUTPUT_FORMAT 	SERIAL_DEBUG
+#else
 #define SERIAL_OUTPUT_FORMAT 	SERIAL_MAVLINK
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_UDB_EXTRA
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_NMEA
 //#define SERIAL_OUTPUT_FORMAT 	SERIAL_MAGNETOMETER
+#endif
 
 // use ring buffer and software flow control for onboard openlog
 // **** not compatible with mavlink binary uplink ****
@@ -485,7 +492,7 @@
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain
 // ROLLKD is the derivative (gyro) gain
-// YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
+// YAWKP_AILERON determines the maximum bank angle setpoint as a fraction of +/- 90 degrees
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP				0.1 //0.22

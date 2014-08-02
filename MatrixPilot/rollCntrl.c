@@ -21,6 +21,14 @@
 
 #include "defines.h"
 
+#ifdef TEST_SIMPLE_STABILIZATION
+#include "filters.h"
+union int32_w2 accx_filt, accy_filt, accz_filt;
+struct relative2D matrix_accum;
+extern fractional gplane[];
+int16_t roll_angle;
+#endif
+
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
@@ -102,7 +110,7 @@ void normalRollCntrl(void) {
     roll_setpoint = (roll_manual << 4) + (roll_manual << 3);
 
     if (AILERON_NAVIGATION && flags._.GPS_steering) {
-        // subtract from angle setpoint (sign is correct, rmat6 is special)
+        // add to manual angle setpoint
         roll_setpoint += determine_navigation_deflection('a') << 3;
     }
 
@@ -113,6 +121,42 @@ void normalRollCntrl(void) {
     flags._.pitch_feedback = 1;
 #endif
 
+#ifdef TEST_SIMPLE_STABILIZATION
+    // test some simple ideas for flight stabilization
+    // 1) force average accel vector parallel to body Z axis
+    // 2) and force yaw rate to zero
+    if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback) {
+        // compare roll setpoint to filtered body frame Z acceleration
+        // instead of DCM roll angle. The roll angle is approximately
+        // atan2(accx, accz)
+
+        // lowpass filter the x,y,z accelerometer samples
+        // The MPU6000 applies a 42Hz digital lowpass filter, but we probably
+        // want just a few Hz of bandwidth for the accelerometer readings.
+        // Note that this is executed at HEARTBEAT_HZ = 200, so the 3dB point
+        // for lp2 with LPCB_45_HZ will be 4.5Hz
+        lp2(gplane[1], &accy_filt, LPCB_45_HZ);
+        matrix_accum.y = -lp2(gplane[0], &accx_filt, LPCB_45_HZ);
+        matrix_accum.x = lp2(gplane[2], &accz_filt, LPCB_45_HZ);
+        
+        // binary angle (0 - 65536 = 360 degrees) or [-32K, 32K) -> [-180, 180) degrees
+        // therefore 90 degrees is 16K = DCM sin(90)
+        roll_angle = rect_to_polar16(&matrix_accum);
+
+        // looks like double the gain is needed here
+        rollAccum.WW = __builtin_mulsu((roll_setpoint - roll_angle) << 1, rollkp);
+
+        // normal roll damping
+        gyroRollFeedback.WW = __builtin_mulus(rollkd, omegaAccum[1]);
+        gyroYawFeedback.WW = 0;
+    } else {
+        // no stabilization; pass manual input through
+        rollAccum._.W1 = roll_manual;
+        gyroRollFeedback.WW = 0;
+        gyroYawFeedback.WW = 0;
+    }
+
+#else
     if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback) {
         gyroRollFeedback.WW = __builtin_mulus(rollkd, omegaAccum[1]);
         // Beware: -rmat6 is roll angle, so it must be added here
@@ -129,6 +173,7 @@ void normalRollCntrl(void) {
     } else {
         gyroYawFeedback.WW = 0;
     }
+#endif
 
     // roll_control is the final PD loop (no I term) output for roll:
     // roll_control = nav_term + roll_stab_term + yaw_stab_term

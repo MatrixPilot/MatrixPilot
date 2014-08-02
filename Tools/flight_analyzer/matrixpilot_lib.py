@@ -71,11 +71,11 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
                             return self.msg                
-                #elif  self.msg.get_type() == 'RAW_IMU':
-                    #print self.msg.xgyro,",",self.msg.ygyro,",",self.msg.zgyro, ",",\
-                    #      self.msg.xmag,",",self.msg.ymag,",",self.msg.zmag
-                    #print self.msg.xacc,",",self.msg.yacc,",",self.msg.zacc, ",",\
-                    #      self.msg.xgyro,",",self.msg.ygyro,",",self.msg.zgyro
+                elif  self.msg.get_type() == 'RAW_IMU':
+                    # hacked message is accel, magRaw, magBody instead of accel, gyro, mag
+                    print self.msg.xacc,",",self.msg.yacc,",",self.msg.zacc, ",", \
+                          self.msg.xgyro,",",self.msg.ygyro,",",self.msg.zgyro, ",", \
+                          self.msg.xmag,",",self.msg.ymag,",",self.msg.zmag
                 else :
                         #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                         pass
@@ -297,6 +297,7 @@ class mavlink_telemetry(base_telemetry):
                 self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
                 self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
                 self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
+                #print self.IMUlocationx_W1, ",", self.IMUlocationy_W1
                 self.sue_flags = int(telemetry_file.msg.sue_flags)
 
                 self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
@@ -372,6 +373,7 @@ class mavlink_telemetry(base_telemetry):
             self.origin_north = int(telemetry_file.msg.sue_lat_origin)
             self.origin_east = int(telemetry_file.msg.sue_lon_origin)
             self.origin_altitude = int(telemetry_file.msg.sue_alt_origin)
+            print "origin lat, lon, alt: ", self.origin_east, ",", self.origin_north, ",", self.origin_altitude
             
             return("F13")
 

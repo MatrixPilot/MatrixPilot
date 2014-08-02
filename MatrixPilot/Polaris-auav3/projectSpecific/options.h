@@ -488,9 +488,9 @@
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 // AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
-#define ROLLKP				0.1 //0.22
+#define ROLLKP				0.2 //0.22
 #define ROLLKD				0.025 //0.02
-#define YAWKP_AILERON		0.3 // 0.05
+#define YAWKP_AILERON		0.5 // 0.05
 #define YAWKD_AILERON		0.0 //0.11 //0.05
 #define AILERON_BOOST		0.5
 

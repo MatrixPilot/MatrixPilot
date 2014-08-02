@@ -125,3 +125,8 @@
 	accel vector (anti)parallel to body frame Z. See if this procedure is stable, or
 	can get trapped in a local minimum.
 
+1 August: Log 2445 is the first Cub log with full fbw logic. This felt very good in
+	stabilized mode, with YAW_STABILIZATION_RUDDER enabled, with yawCntrl.c using
+	rudder to maintain a roll angle setpoint with ROLLKP_RUDDER=0.1. (note that
+	YAW_STABILIZATION_RUDDER is	a misnomer with this logic, since rudder is stabilizing roll, not yaw)
+	

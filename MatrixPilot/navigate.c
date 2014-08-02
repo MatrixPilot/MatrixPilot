@@ -386,7 +386,7 @@ int16_t determine_navigation_deflection(char navType)
 	dotprod.WW = __builtin_mulss(actualX , desiredX) + __builtin_mulss(actualY , desiredY);
 	crossprod.WW = __builtin_mulss(actualX , desiredY) - __builtin_mulss(actualY , desiredX);
 	crossprod.WW = crossprod.WW<<2; // at this point, we have 1/4 of the cross product
-									// cannot go any higher than that, could get overflow
+					// cannot go any higher than that, could get overflow
 	if (dotprod._.W1 > 0)
 	{
 		deflectionAccum.WW = (__builtin_mulsu(crossprod._.W1 , yawkp)<< 1);
@@ -411,7 +411,7 @@ int16_t determine_navigation_deflection(char navType)
         // since the max magnitude of the crossproduct is 16384, a gain value of
         // 1.0 should result in maximum roll angle of 90 degrees
         // clamp magnitude to reasonable value in DCM format (90 degrees = 16384)
-        magClamp(&(deflectionAccum._.W1), 16000);
+//        magClamp(&(deflectionAccum._.W1), 16000);
 
 	return deflectionAccum._.W1;
 }

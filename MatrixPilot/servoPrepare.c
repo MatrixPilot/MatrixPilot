@@ -42,105 +42,103 @@ extern boolean sbusDAV;
 
 void manualPassthrough(void);
 
-
 void init_servoPrepare(void) // initialize the PWM
 {
-	int16_t i;
+    int16_t i;
 
 #if (USE_NV_MEMORY == 1)
-	if(udb_skip_flags.skip_radio_trim == 1)
-		return;
+    if (udb_skip_flags.skip_radio_trim == 1)
+        return;
 #endif
 
-	for (i=0; i <= NUM_INPUTS; i++)
-#if (FIXED_TRIMPOINT == 1)
-                // don't send a valid throttle pulse yet (prevents ESC from arming)
-		udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : CHANNEL_TRIMPOINT);
-                udb_pwTrim[i] = udb_pwIn[i];
-#else
-		udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);	
-                udb_pwTrim[i] = udb_pwIn[i];
-#endif
-
+    for (i = 0; i <= NUM_INPUTS; i++)
 #if (FIXED_TRIMPOINT == 1)
         // don't send a valid throttle pulse yet (prevents ESC from arming)
-	for (i=0; i <= NUM_OUTPUTS; i++)
-		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : CHANNEL_TRIMPOINT);
+        udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : CHANNEL_TRIMPOINT);
+    udb_pwTrim[i] = udb_pwIn[i];
 #else
-	for (i=0; i <= NUM_OUTPUTS; i++)
-		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
+        udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);
+    udb_pwTrim[i] = udb_pwIn[i];
 #endif
-	
+
+#if (FIXED_TRIMPOINT == 1)
+    // don't send a valid throttle pulse yet (prevents ESC from arming)
+    for (i = 0; i <= NUM_OUTPUTS; i++)
+        udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : CHANNEL_TRIMPOINT);
+#else
+    for (i = 0; i <= NUM_OUTPUTS; i++)
+        udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
+#endif
+
 #if (NORADIO == 1)
-	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000;
+    udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000;
 #endif
 }
 
 // Called at HEARTBEAT_HZ
-void dcm_servo_callback_prepare_outputs(void)
-{
+
+void dcm_servo_callback_prepare_outputs(void) {
 #if (USE_SBUS_INPUT == 1)
-        if (sbusDAV) parseSbusData();
+    if (sbusDAV) parseSbusData();
 #endif
 
-	if (dcm_flags._.calib_finished)
-	{
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			flight_mode_switch_2pos_poll();  // we always want this called at 40Hz
-		}
+    if (dcm_flags._.calib_finished) {
+        if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0) {
+            flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
+        }
 #if (DEADRECKONING == 1)
-		process_flightplan();
+        process_flightplan();
 #endif	
 #if (ALTITUDE_GAINS_VARIABLE == 1)
-		airspeedCntrl();
+        airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
-		updateBehavior();
-		wind_gain = wind_gain_adjustment ();
-		rollCntrl();
-		yawCntrl();
-		altitudeCntrl();
-		pitchCntrl();
-		servoMix();
+        updateBehavior();
+        wind_gain = wind_gain_adjustment();
+        rollCntrl();
+        yawCntrl();
+        altitudeCntrl();
+        pitchCntrl();
+        servoMix();
 #if (USE_CAMERA_STABILIZATION == 1)
-		cameraCntrl();
+        cameraCntrl();
 #endif
-		cameraServoMix();
-		updateTriggerAction();
-	}
-	else
-	{
-		// otherwise, there is not anything to do
-		manualPassthrough();	// Allow manual control while starting up
-	}
-	
-	if (dcm_flags._.calib_finished) // start telemetry after calibration
-	{
+        cameraServoMix();
+        updateTriggerAction();
+    } else {
+        // otherwise, there is not anything to do
+        manualPassthrough(); // Allow manual control while starting up
+    }
+
+    if (dcm_flags._.calib_finished) // start telemetry after calibration
+    {
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			mavlink_output_40hz();
-		}
-#elif (SERIAL_OUTPUT_FORMAT == SERIAL_DBGPS)
-extern void serial_output_nmea();
-                serial_output_nmea();
+        if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0) {
+            mavlink_output_40hz();
+        }
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
+        //extern void serial_output_nmea();
+        //                serial_output_nmea();
+        extern void serial_output_stest();
+        // call serial_output_stest at 40 Hz
+        if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0) {
+            serial_output_stest();
+        }
+
 #else
-		// This is a simple check to send telemetry at 8hz
-//		if (udb_heartbeat_counter % 5 == 0)
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
-		{
-			serial_output_8hz();
-		}
+        // This is a simple check to send telemetry at 8hz
+        //		if (udb_heartbeat_counter % 5 == 0)
+        if (udb_heartbeat_counter % (HEARTBEAT_HZ / 8) == 0) {
+            serial_output_8hz();
+        }
 #endif
-	}
-	
+    }
+
 #if (USE_OSD == 1)
-	osd_run_step();
+    osd_run_step();
 #endif
 }
 
-void manualPassthrough(void)
-{
-	roll_control = pitch_control = yaw_control = throttle_control = 0;
-	servoMix();
+void manualPassthrough(void) {
+    roll_control = pitch_control = yaw_control = throttle_control = 0;
+    servoMix();
 }
