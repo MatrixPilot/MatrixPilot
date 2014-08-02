@@ -151,12 +151,12 @@
 //    {{ -100,  0, 50}, F_NORMAL, CAM_VIEW_LAUNCH}, //Waypoint 3
 //};
 
-#if 0
+#if 1
 // AAM West Field runway center  39°50'31.97"N  105°13'10.17"W (105.2194917, 39.842213889)
 #define USE_FIXED_ORIGIN		1
 #define FIXED_ORIGIN_LOCATION	{ -1052194917, 398422138, 1817.0 }
 
-#if 0
+#if 1
 #pragma message "West Field lefthand pattern"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +259,7 @@ const struct waypointDef waypoints[] = {
 // and after flights, since turning off the transmitter will cause the throttle to come on.
 
 const struct waypointDef rtlWaypoints[] = {
-		{ { 0, 30,  20 } , F_LAND, F_LOITER, CAM_VIEW_LAUNCH } 
+		{ { 0, 30,  20 } , F_LAND + F_LOITER, CAM_VIEW_LAUNCH } 
 } ;
 
 
