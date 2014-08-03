@@ -184,3 +184,10 @@ Bug??? using COF linker output format, linking with static lib VectorMatrix.a do
 25 July 2014:
 	clean up signs and servo reversal code in roll, pitch and yaw control, servomix files.
 	convert yaw to angle mode (PID loop operates on roll angle, instead of heading)
+
+3 August 2014:
+	Renamed TEST_SIMPLE_STABILIZATION to TEST_ACCX_STABILIZATION in rollCntrl.c
+	Added macro definition DISABLE_CENTRIPETAL_COMP, and altered rmat.c:run_imu_step
+	to skip call to adj_accel if defined. This eliminates use of GPS data
+	in the complementary filter attitude estimation, but leaves in yaw drift correction
+	based either on magnetometer or GPS COG.

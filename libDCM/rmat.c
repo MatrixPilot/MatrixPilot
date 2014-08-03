@@ -787,7 +787,9 @@ void dcm_run_imu_step(void) {
     // update the matrix, renormalize it, adjust for roll and
     // pitch drift, and send it to the servos.
     dead_reckon(); // in libDCM:deadReconing.c
+#ifndef DISABLE_CENTRIPETAL_COMP
     adj_accel(); // local
+#endif
     rupdate(); // local
     normalize(); // local
     roll_pitch_drift(); // local

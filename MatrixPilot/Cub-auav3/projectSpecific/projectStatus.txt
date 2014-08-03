@@ -129,4 +129,9 @@
 	stabilized mode, with YAW_STABILIZATION_RUDDER enabled, with yawCntrl.c using
 	rudder to maintain a roll angle setpoint with ROLLKP_RUDDER=0.1. (note that
 	YAW_STABILIZATION_RUDDER is	a misnomer with this logic, since rudder is stabilizing roll, not yaw)
-	
+
+3 August: Set options.h to define DISABLE_CENTRIPETAL_COMP and undefine TEST_ACCX_STABILIZATION
+	to test theory that E-flite AS3X is just a 6DOF complementary filter
+	based AHRS. Switching from manual to stabilized mode should be similar to
+	entering "panic" mode on AS3X. Try entering stabilized mode when inverted and
+	in a coordinated turn to test.

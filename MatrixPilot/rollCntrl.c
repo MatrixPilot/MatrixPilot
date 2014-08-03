@@ -21,7 +21,7 @@
 
 #include "defines.h"
 
-#ifdef TEST_SIMPLE_STABILIZATION
+#ifdef DISABLE_CENTRIPETAL_COMP
 #include "filters.h"
 union int32_w2 accx_filt, accy_filt, accz_filt;
 struct relative2D matrix_accum;
@@ -121,7 +121,7 @@ void normalRollCntrl(void) {
     flags._.pitch_feedback = 1;
 #endif
 
-#ifdef TEST_SIMPLE_STABILIZATION
+#ifdef TEST_ACCX_STABILIZATION
     // test some simple ideas for flight stabilization
     // 1) force average accel vector parallel to body Z axis
     // 2) and force yaw rate to zero
