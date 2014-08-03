@@ -51,5 +51,6 @@ void process_flightplan(void);
 int16_t determine_navigation_deflection(char navType);
 uint16_t wind_gain_adjustment(void);
 
+extern uint16_t turngain ;
 
 #endif // NAVIGATE_H

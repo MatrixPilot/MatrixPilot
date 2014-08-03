@@ -469,6 +469,18 @@
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT                            1.0
 
+// FEED_FORWARD is a feed forward gain for deflecting control surfaces for turn rate.
+// The KP gains for each axis are multiplied by FEED_FORWARD to determine
+// the feed forward gain for that axis.
+// For each axis, a deflection term is added equal to the feed forward gain for that axis
+// times projection of the desired earth vertical rotation rate onto that axis
+#define FEED_FORWARD						1.0
+
+// TURN_GAIN sets the gain of the helical turn control for both fly by wire mode and waypoint mode
+// The default value of 1.0 will produce a maximum turn rate of about 60 degrees per second.
+// The largest possible value is 4.0, which will produce a 240 degree per second turn.
+#define TURN_GAIN							1.0
+
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
 // ROLLKD is the derivative (gyro) gain, approximately 0.125
@@ -484,13 +496,9 @@
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
 // PITCHKD feedback gain for pitch damping, around 0.0625
-// RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
-// AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
 #define PITCHGAIN                           0.10
 #define PITCHKD                             0.04
-#define RUDDER_ELEV_MIX                     0.20
-#define ROLL_ELEV_MIX                       0.05
 #define ELEVATOR_BOOST                      0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted

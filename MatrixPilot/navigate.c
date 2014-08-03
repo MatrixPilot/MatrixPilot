@@ -46,6 +46,7 @@
 
 uint16_t yawkpail; // only exported for parameter_table
 uint16_t yawkprud; // only exported for parameter_table
+uint16_t turngain;
 
 struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };
@@ -64,6 +65,7 @@ void init_navigation(void)
 {
 	yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
 	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
+	turngain = (uint16_t)(TURN_GAIN*RMAX);
 }
 
 #if (USE_CONFIGFILE == 1)
@@ -395,13 +397,9 @@ int16_t determine_navigation_deflection(char navType)
 		vector2_normalize(actualXY, actualXY);
 		actualX = actualXY[0];
 		actualY = actualXY[1];
-		if (navType == 'y')
+		if (navType == 't')
 		{
-			yawkp = yawkprud;
-		}
-		else if (navType == 'a')
-		{
-			yawkp = yawkpail;
+			yawkp = turngain;
 		}
 		else if (navType == 'h')
 		{
@@ -414,15 +412,9 @@ int16_t determine_navigation_deflection(char navType)
 	}
 	else
 	{
-		if (navType == 'y')
+		if (navType == 't')
 		{
-			yawkp = yawkprud ;
-			actualX = rmat[1];
-			actualY = rmat[4];
-		}
-		else if (navType == 'a')
-		{
-			yawkp = yawkpail;
+			yawkp = turngain;
 			actualX = rmat[1];
 			actualY = rmat[4];
 		}
@@ -467,7 +459,11 @@ int16_t determine_navigation_deflection(char navType)
 	{
 		deflectionAccum.WW = -deflectionAccum.WW;
 	}
-	// multiply by wind gain adjustment, and multiply by 2
-	deflectionAccum.WW = (__builtin_mulsu(deflectionAccum._.W1, wind_gain) << 1);
+
+#if (WIND_GAIN_ADJUSTMENT == 1)
+#error ( "wind gain adjustment is under construction and is not working at this time.")
+	deflectionAccum.WW = __builtin_mulsu(deflectionAccum._.W1, wind_gain);
+#endif // WIND_GAIN_ADJUSTMENT
+
 	return deflectionAccum._.W1;
 }

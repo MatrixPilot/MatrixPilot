@@ -26,11 +26,6 @@
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
 
-//  If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
-
-#define ANGLE_90DEG (RMAX/(2*57.3)) // FIXME: never used
-#define RTLKICK ((int32_t)(RTL_PITCH_DOWN*(RMAX/57.3)))
-#define INVNPITCH ((int32_t)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
 #define HOVERPOFFSET ((int32_t)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
 #define HOVERPTOWP ((int32_t)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
 
@@ -88,7 +83,6 @@ void pitchCntrl(void)
 static void normalPitchCntrl(void)
 {
 	union longww pitchAccum;
-	int16_t rtlkick;
 //	int16_t aspd_adj;
 //	fractional aspd_err, aspd_diff;
 
@@ -96,37 +90,12 @@ static void normalPitchCntrl(void)
 	flags._.GPS_steering = 0; // turn navigation off
 	flags._.pitch_feedback = 1; // turn stabilization on
 #endif
-	if (!canStabilizeInverted() || current_orientation != F_INVERTED)
-	{
-		// nothing needed here anymore
-	}
-	else
-	{
-		pitchAltitudeAdjust = -pitchAltitudeAdjust - INVNPITCH;
-	}
 
-	if (!udb_flags._.radio_on && flags._.GPS_steering)
-	{
-		rtlkick = RTLKICK;
-	}
-	else
-	{
-		rtlkick = 0;
-	}
-#if (GLIDE_AIRSPEED_CONTROL == 1)
-	fractional aspd_pitch_adj = gliding_airspeed_pitch_adjust();
-#endif
 	if (PITCH_STABILIZATION && flags._.pitch_feedback)
 	{
-#if (GLIDE_AIRSPEED_CONTROL == 1)
-		pitchAccum.WW = __builtin_mulsu(tiltError[0] - rtlkick + aspd_pitch_adj + pitchAltitudeAdjust, pitchgain) 
+		pitchAccum.WW = __builtin_mulsu(tiltError[0], pitchgain) 
 					  - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd)
-		              + __builtin_mulus(pitchkd, rotationRateError[0]);
-#else
-		pitchAccum.WW = __builtin_mulsu(tiltError[0] - rtlkick + pitchAltitudeAdjust, pitchgain) 
-					  - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd)
-		              + __builtin_mulus(pitchkd, rotationRateError[0]);
-#endif
+		              + __builtin_mulsu(rotationRateError[0], pitchkd );
 	}
 	else
 	{

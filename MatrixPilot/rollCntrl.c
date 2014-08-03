@@ -87,13 +87,7 @@ void normalRollCntrl(void)
 	{
 		omegaAccum2 = -omegaAccum[2];
 	}
-#ifdef TestGains
-	flags._.GPS_steering = 0; // turn off navigation
-#endif
-	if (AILERON_NAVIGATION && flags._.GPS_steering)
-	{
-		rollAccum._.W1 = determine_navigation_deflection('a');
-	}
+
 #ifdef TestGains
 	flags._.pitch_feedback = 1;
 #endif

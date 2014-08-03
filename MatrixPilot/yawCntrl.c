@@ -77,7 +77,6 @@ void yawCntrl(void)
 
 void normalYawCntrl(void)
 {
-	int16_t yawNavDeflection;
 	union longww rollStabilization;
 	union longww gyroYawFeedback;
 	union longww yawStabilization ;
@@ -87,19 +86,6 @@ void normalYawCntrl(void)
 	flags._.GPS_steering = 0; // turn off navigation
 	flags._.pitch_feedback = 1; // turn on stabilization
 #endif 
-	if (RUDDER_NAVIGATION && flags._.GPS_steering)
-	{
-		yawNavDeflection = determine_navigation_deflection('y');
-		
-		if (canStabilizeInverted() && current_orientation == F_INVERTED)
-		{
-			yawNavDeflection = -yawNavDeflection;
-		}
-	}
-	else
-	{
-		yawNavDeflection = 0;
-	}
 
 	if (YAW_STABILIZATION_RUDDER && flags._.pitch_feedback)
 	{
@@ -130,8 +116,7 @@ void normalYawCntrl(void)
 		ail_rud_mix = 0;
 	}
 
-	yaw_control = (int32_t)yawNavDeflection 
-	            + (int32_t)gyroYawFeedback._.W1 
+	yaw_control = (int32_t)gyroYawFeedback._.W1 
 	            + (int32_t)rollStabilization._.W1 
 	            + (int32_t)yawStabilization._.W1 
 	            + ail_rud_mix;
