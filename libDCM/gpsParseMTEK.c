@@ -56,12 +56,11 @@ static uint8_t fix_type_;
 //union intbb hdop_;
 static union intbb checksum;
 uint8_t day_of_week;
+uint8_t CK_A;
+uint8_t CK_B;
+int16_t store_index = 0;
 
-static uint8_t CK_A;
-static uint8_t CK_B;
-static int16_t store_index = 0;
-
-static uint8_t* const msgDataParse[] = {
+uint8_t* const msgDataParse[] = {
 	&lat_gps_.__.B0,    &lat_gps_.__.B1,    &lat_gps_.__.B2,    &lat_gps_.__.B3,
 	&lon_gps_.__.B0,    &lon_gps_.__.B1,    &lon_gps_.__.B2,    &lon_gps_.__.B3,
 	&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1, &alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,

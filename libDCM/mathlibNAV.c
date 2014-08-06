@@ -465,3 +465,21 @@ int16_t find_first_bit_int32(int32_t argument)
 		return binw1 - 1;
 	}
 }
+
+void VectorCross(int16_t * dest, int16_t * src1, int16_t * src2)
+{
+	// Implement the cross product. *dest = *src1X*src2;
+	union longww crossaccum;
+	crossaccum.WW = __builtin_mulss(src1[1], src2[2]);
+	crossaccum.WW -= __builtin_mulss(src1[2], src2[1]);
+	crossaccum.WW *= 4;
+	dest[0] = crossaccum._.W1;
+	crossaccum.WW = __builtin_mulss(src1[2], src2[0]);
+	crossaccum.WW -= __builtin_mulss(src1[0], src2[2]);
+	crossaccum.WW *= 4;
+	dest[1] = crossaccum._.W1;
+	crossaccum.WW = __builtin_mulss(src1[0], src2[1]);
+	crossaccum.WW -= __builtin_mulss(src1[1], src2[0]);
+	crossaccum.WW *= 4;
+	dest[2] = crossaccum._.W1;
+}

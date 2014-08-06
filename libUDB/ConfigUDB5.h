@@ -21,6 +21,9 @@
 
 // used for the UDB5
 
+// ACCEL_RANGE must be either 4 or 8
+// ACCEL_RANGE 2 will cause all sorts of trouble, do not use it
+
 #define ACCEL_RANGE         4       // 4 g range
 
 // note : it is possible to use other accelerometer ranges on the MPU6000
