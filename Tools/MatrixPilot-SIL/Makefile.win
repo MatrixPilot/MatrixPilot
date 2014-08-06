@@ -93,5 +93,5 @@ $(MPCAT_TARGET): $(MPCAT_OBJECTS)
 
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
-	-$(RM_FILE) *~ core *.core
+	-$(RM_FILE) $(MPSIL_TARGET) $(MPCAT_TARGET)
 

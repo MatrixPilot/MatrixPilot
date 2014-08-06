@@ -51,15 +51,14 @@ void init_yawCntrl(void)
 	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
 
-// FIXME: KD, KP swapped, hover copied to roll kd rudder
 #if (USE_CONFIGFILE == 1)
 void save_yawCntrl(void)
 {
-	gains.YawKPRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX); 
-	gains.YawKDRudder  = (float)rollkprud  / (RMAX);
-	gains.RollKPRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
-	gains.RollKDRudder = (float)hoveryawkp / (RMAX);
-	gains.RudderBoost  = (float)hoveryawkd / (SCALEGYRO*RMAX);
+	gains.YawKDRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
+	gains.RollKPRudder = (float)rollkprud  / (RMAX);
+	gains.RollKDRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
+	gains.HoverYawKP   = (float)hoveryawkp / (RMAX);
+	gains.HoverYawKD   = (float)hoveryawkd / (SCALEGYRO*RMAX);
 }
 #endif // USE_CONFIGFILE
 
