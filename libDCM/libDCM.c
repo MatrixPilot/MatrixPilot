@@ -24,6 +24,7 @@
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/magnetometer.h"
 #include "../libUDB/barometer.h"
+#include "../libUDB/ADchannel.h"
 #include "estAltitude.h"
 #include "mathlibNAV.h"
 #include "rmat.h"

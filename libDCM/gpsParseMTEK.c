@@ -39,22 +39,22 @@ static void msg_CS1(uint8_t gpschar);
 
 void (*msg_parse)(uint8_t inchar) = &msg_start;
 
-const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
-const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
-const char gps_sbas_enable[]            = "$PMTK313,1*2E\r\n";          // Enable SBAS
-const char gps_waas_enable[]            = "$PMTK301,2*2E\r\n";          // Enable WAAS
-const char gps_navthreshold_disable[]   = "$PMTK397,0*23\r\n";          // Make sure we receive all position updates
-const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn on binary
+static const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
+static const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
+static const char gps_sbas_enable[]            = "$PMTK313,1*2E\r\n";          // Enable SBAS
+static const char gps_waas_enable[]            = "$PMTK301,2*2E\r\n";          // Enable WAAS
+static const char gps_navthreshold_disable[]   = "$PMTK397,0*23\r\n";          // Make sure we receive all position updates
+static const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; // Turn on binary
 
-uint8_t payloadlength;
-uint8_t un; // dummy char
+static uint8_t payloadlength;
+static uint8_t un; // dummy char
 //union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
-union longbbbb sog_gps_, cog_gps_;
+static union longbbbb sog_gps_, cog_gps_;
 //union longbbbb date_gps_, time_gps_;
-uint8_t svs_;
-uint8_t fix_type_;
+static uint8_t svs_;
+static uint8_t fix_type_;
 //union intbb hdop_;
-union intbb checksum;
+static union intbb checksum;
 uint8_t day_of_week;
 
 uint8_t CK_A;
