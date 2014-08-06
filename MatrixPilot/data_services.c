@@ -44,10 +44,10 @@ int _SWR = 0;
 #endif
 
 // Data buffer used for services
-uint8_t data_services_buffer[DATA_SERVICE_BUFFER_SIZE];
+static uint8_t data_services_buffer[DATA_SERVICE_BUFFER_SIZE];
 
 // callback type for data services user
-DSRV_callbackFunc data_services_user_callback = NULL;
+static DSRV_callbackFunc data_services_user_callback = NULL;
 
 // All the states of the service
 typedef enum 
@@ -67,66 +67,66 @@ typedef enum
 } DATA_SERVICE_STATE;
 
 // Flag to show that the action is being done with all areas.
-boolean data_services_do_all_areas = false;
+static boolean data_services_do_all_areas = false;
 
 // service state variable
-uint16_t data_service_state = DATA_SERVICE_STATE_NOT_STARTED;
+static uint16_t data_service_state = DATA_SERVICE_STATE_NOT_STARTED;
 
 // Handle to event that will trigger the low priority service routine
-uint16_t data_service_event_handle = INVALID_HANDLE;
+static uint16_t data_service_event_handle = INVALID_HANDLE;
 
 // Low priority service routine
-void data_services(void);
+static void data_services(void);
 
 // Start init of all memory areas in the services table
-void data_services_init_all(void);
+static void data_services_init_all(void);
 
 // Service intialisation of memory areas starting at the tracking index
-void data_services_init_table_index(void);
+static void data_services_init_table_index(void);
 
 // Callback for completetion of memory area init
-void data_services_init_all_callback(boolean success);
+static void data_services_init_all_callback(boolean success);
 
 // Start of reading all areas in the table matching serialize flags
-void data_services_read_all(void);
+//static void data_services_read_all(void);
 
 // Start of writing all areas in the table matching serialize flags
-void data_services_write_all(void);
+//static void data_services_write_all(void);
 
 // Start of read a single area at index
-void data_services_read_index(void);
+static void data_services_read_index(void);
 
 // callback for reading areas in the table
-void data_services_read_callback(boolean success);
+static void data_services_read_callback(boolean success);
 
 // When finished reading an area, call to commit area to ram
-void data_services_read_done(void);
+static void data_services_read_done(void);
 
 // Serialise a list of data items/variables to the buffer
 // returns size of items serialised
-uint16_t serialise_items_to_buffer(uint16_t table_index);
+static uint16_t serialise_items_to_buffer(uint16_t table_index);
 
 // Serialise the buffer to a list of data items/variables
 // returns size of items serialised
-uint16_t serialise_buffer_to_items(uint16_t table_index);
+static uint16_t serialise_buffer_to_items(uint16_t table_index);
 
 // Start the write
-void data_services_write(void);
+static void data_services_write(void);
 
 // Write callback
-void data_services_write_callback(boolean success);
+static void data_services_write_callback(boolean success);
 
 // Get the index in the nv memory table for the storage handle.
-uint16_t data_services_get_table_index(uint16_t data_storage_handle);
+static uint16_t data_services_get_table_index(uint16_t data_storage_handle);
 
 // Calculate the size of the complete list of variable items in bytes
-uint16_t data_services_calc_item_size(uint16_t table_index);
+static uint16_t data_services_calc_item_size(uint16_t table_index);
 
 // Tracking index into table
-uint16_t data_services_table_index = 0;
+static uint16_t data_services_table_index = 0;
 
 // Flags that determine how and when to do serialisation
-uint16_t data_services_serialize_flags = 0;
+static uint16_t data_services_serialize_flags = 0;
 
 
 void data_services_init(void)
@@ -143,7 +143,7 @@ inline void data_services_trigger(void)
 	trigger_event(data_service_event_handle);
 }
 
-void data_services(void)
+static void data_services(void)
 {
 	switch (data_service_state)
 	{
@@ -171,14 +171,14 @@ void data_services(void)
 	}
 }
 
-void data_services_init_all(void)
+static void data_services_init_all(void)
 {
 	data_services_table_index = 0;
 	data_services_do_all_areas = true;
 	data_service_state = DATA_SERVICE_STATE_INIT_ALL;
 }
 
-void data_services_init_table_index(void)
+static void data_services_init_table_index(void)
 {
 	while (data_services_table_index < mavlink_parameter_block_count)
 	{
@@ -225,14 +225,14 @@ void data_services_init_table_index(void)
 	data_service_state = DATA_SERVICE_STATE_READ;
 }
 
-void data_services_init_all_callback(boolean success)
+static void data_services_init_all_callback(boolean success)
 {
 	if (success) data_services_table_index++;
 	data_service_state = DATA_SERVICE_STATE_INIT_ALL;
 }
 
 // Calculate the size of the complete list of variable items in bytes
-uint16_t data_services_calc_item_size(uint16_t table_index)
+static uint16_t data_services_calc_item_size(uint16_t table_index)
 {
 	uint16_t item_index;
 	uint16_t size = 0;
@@ -247,7 +247,7 @@ uint16_t data_services_calc_item_size(uint16_t table_index)
 }
 
 // Read data area at index
-void data_services_read_index(void)
+static void data_services_read_index(void)
 {
 	// If beyond end of table return to waiting.
 	if (data_services_table_index >= mavlink_parameter_block_count)
@@ -338,7 +338,7 @@ void data_services_load_all(uint16_t serialize_flags, DSRV_callbackFunc pcallbac
 }
 
 // Data is correct so serialise it from the buffer to the live data
-void data_services_read_done(void)
+static void data_services_read_done(void)
 {
 	serialise_buffer_to_items(data_services_table_index);
 
@@ -360,7 +360,7 @@ void data_services_read_done(void)
 }
 
 // Called when storage manager data read has finished
-void data_services_read_callback(boolean success)
+static void data_services_read_callback(boolean success)
 {
 	if (success)
 		data_service_state = DATA_SERVICE_STATE_READ_DONE;
@@ -380,7 +380,7 @@ void data_services_read_callback(boolean success)
 
 // Serialise a list of data items/variables to the buffer
 // returns total size of the items
-uint16_t serialise_items_to_buffer(uint16_t table_index)
+static uint16_t serialise_items_to_buffer(uint16_t table_index)
 {
 	if (table_index >= mavlink_parameter_block_count) return 0;
 
@@ -409,7 +409,7 @@ uint16_t serialise_items_to_buffer(uint16_t table_index)
 
 // Serialise the buffer to a list of data items/variables
 // returns total size of the items
-uint16_t  serialise_buffer_to_items(uint16_t table_index)
+static uint16_t serialise_buffer_to_items(uint16_t table_index)
 {
 	if (table_index >= mavlink_parameter_block_count) return 0;
 
@@ -436,7 +436,7 @@ uint16_t  serialise_buffer_to_items(uint16_t table_index)
 	return buffer_index;
 }
 
-uint16_t data_services_get_table_index(uint16_t data_storage_handle)
+static uint16_t data_services_get_table_index(uint16_t data_storage_handle)
 {
 	int16_t index;
 
@@ -466,7 +466,7 @@ boolean data_services_save_specific(uint16_t data_storage_handle, DSRV_callbackF
 }
 
 // Start the write of a checksummed structure
-void data_services_write(void)
+static void data_services_write(void)
 {
 	if (data_services_table_index >= mavlink_parameter_block_count)
 	{
@@ -517,7 +517,7 @@ void data_services_write(void)
 }
 
 // Write callback
-void data_services_write_callback(boolean success)
+static void data_services_write_callback(boolean success)
 {
 	if (success)
 	{

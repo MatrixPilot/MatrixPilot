@@ -55,7 +55,7 @@ void debug_gga(uint8_t ch)
 }
 #else
 //#define debug_rmc(a)
-//#define debug_rmc_send(int8_t ch)
+//#define debug_rmc_send(a)
 //#define debug_gga(a)
 #endif
 
@@ -125,7 +125,6 @@ static uint8_t svs_;
 static uint8_t data_valid_, NS_, EW_;
 //static uint8_t hdop_;
 //static uint8_t day_of_week;
-static union longbbbb last_alt;
 
 //union longbbbb tow_;
 //union longbbbb date_gps_, time_gps_;
@@ -652,22 +651,21 @@ LED_RED = LED_OFF;
 
 void gps_commit_data(void)
 {
+	static union longbbbb last_alt = 0;
+
 	if (week_no.BB == 0)
 	{
 		week_no.BB = calculate_week_num(date_gps_.WW);
 	}
 	tow.WW = calculate_time_of_week(time_gps_.WW);
-
 	lat_gps      = lat_gps_;
 	lon_gps      = lon_gps_;
 	alt_sl_gps   = alt_sl_gps_;             // Altitude
 	sog_gps      = sog_gps_;                // Speed over ground
 	cog_gps      = cog_gps_;                // Course over ground
-
 	climb_gps.BB = (alt_sl_gps_.WW - last_alt.WW) * GPS_RATE;
 	hdop         = hdop_._.B0;
 	svs          = svs_;
-
 	last_alt     = alt_sl_gps_;
 }
 

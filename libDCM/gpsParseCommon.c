@@ -42,7 +42,7 @@ union intbb week_no;
 union intbb sog_gps;                                // speed over ground
 union uintbb cog_gps;                               // course over ground
 union intbb climb_gps;                              // climb
-union intbb as_sim;
+union intbb hilsim_airspeed;
 union longbbbb tow;
 //union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
 //union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity

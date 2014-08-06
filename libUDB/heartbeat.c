@@ -109,6 +109,7 @@ static void pulse(void)
 	udb_callback_read_sensors();
 	udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
 
+	// process sensor data, run flight controller, generate outputs. implemented in libDCM.c
 	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
 
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)

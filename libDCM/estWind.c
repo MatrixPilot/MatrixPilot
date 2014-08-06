@@ -97,7 +97,7 @@ void estimateWind(void)
 		longaccum._.W1 = magVelocityDiff >> 2;
 		longaccum._.W0 = 0;
 #if (HILSIM == 1)
-		estimatedAirspeed = as_sim.BB; // use the simulation as a pitot tube
+		estimatedAirspeed = hilsim_airspeed.BB; // use the simulation as a pitot tube
 #else
 		estimatedAirspeed = __builtin_divud(longaccum.WW, magDirectionDiff);
 #endif

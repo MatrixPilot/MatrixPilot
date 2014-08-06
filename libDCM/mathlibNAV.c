@@ -163,7 +163,7 @@ void rotate_2D_vector_by_angle(int16_t vector[2], int8_t angle)
 	rotate_2D_vector_by_vector(vector, rotate);
 }
 
-void rotate(struct relative2D* xy, int8_t angle)
+void rotate_2D(struct relative2D* xy, int8_t angle)
 {
 	// rotates xy by angle, measured in a counter clockwise sense.
 	// A mathematical angle of plus or minus pi is represented digitally as plus or minus 128.
@@ -210,7 +210,7 @@ int8_t rect_to_polar(struct relative2D* xy)
 	{
 		theta_rot = delta_theta;
 		if (xy->y  > 0) theta_rot = -theta_rot;
-		rotate(xy, theta_rot);
+		rotate_2D(xy, theta_rot);
 		theta += theta_rot;
 		delta_theta = (delta_theta >> 1);
 		steps--;
@@ -252,7 +252,7 @@ int16_t rect_to_polar16(struct relative2D* xy)
 	{
 		theta_rot = delta_theta;
 		if (xy->y  > 0) theta_rot = -theta_rot;
-		rotate(xy, theta_rot);
+		rotate_2D(xy, theta_rot);
 		theta += theta_rot;
 		delta_theta = (delta_theta >> 1);
 		steps--;
