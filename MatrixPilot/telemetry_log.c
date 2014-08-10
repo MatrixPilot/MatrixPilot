@@ -125,24 +125,7 @@ static int fs_nextlog(char* filename)
 // called at startup to initialise the telemetry log system
 void log_init(void)
 {
-//	init_dataflash(); // this should now be getting device specific called from lower layers via FSInit()
-	if (!FSInit())
-	{
-#ifdef USE_AT45D_FLASH
-		AT45D_FormatFS();
-#elif (WIN == 1) || (NIX == 1)
-#else
-#warning No Mass Storage Device Format Function Defined
-#endif // USE_AT45D_FLASH
-		if (!FSInit())
-		{
-			printf("File system initialisation failed\r\n");
-			return;
-		}
-	}
-	printf("File system initalised\r\n");
 }
-
 void restart_telemetry(void);
 
 static void log_open(void)

@@ -20,7 +20,7 @@
 
 
 int16_t sine(int8_t angle);
-int8_t arcsine(int16_t angle);
+int8_t arcsine(int16_t y);  // arcsine takes the y coordinate of an x,y point and returns an angle
 int16_t cosine(int8_t angle);
 
 uint16_t sqrt_int(uint16_t sqr);

@@ -58,6 +58,13 @@
 #define LED_GREEN           _LATE2
 #define LED_RED             _LATE1
 
+// SPI SS pin definitions
+#define SPI1_SS             _LATB2
+#define SPI2_SS             _LATG9
+#define SPI1_TRIS           _TRISB2
+#define SPI2_TRIS           _TRISG9
+
+// Input Capture pin definitions
 #define IC_PIN1             _RD8
 #define IC_PIN2             _RD9
 #define IC_PIN3             _RD10
