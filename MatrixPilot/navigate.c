@@ -46,7 +46,8 @@
 
 uint16_t yawkpail; // only exported for parameter_table
 uint16_t yawkprud; // only exported for parameter_table
-uint16_t turngain;
+uint16_t turngainfbw; // fly by wire turn gain
+uint16_t turngainnav; // waypoints turn gain
 
 struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };
@@ -65,7 +66,8 @@ void init_navigation(void)
 {
 	yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
 	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
-	turngain = (uint16_t)(TURN_GAIN*RMAX);
+	turngainnav = (uint16_t)((TURN_RATE_NAV/57.3)*RMAX);
+	turngainfbw = (uint16_t)((TURN_RATE_FBW/57.3)*RMAX);
 }
 
 #if (USE_CONFIGFILE == 1)
@@ -399,7 +401,7 @@ int16_t determine_navigation_deflection(char navType)
 		actualY = actualXY[1];
 		if (navType == 't')
 		{
-			yawkp = turngain;
+			yawkp = turngainnav;
 		}
 		else if (navType == 'h')
 		{
@@ -414,7 +416,7 @@ int16_t determine_navigation_deflection(char navType)
 	{
 		if (navType == 't')
 		{
-			yawkp = turngain;
+			yawkp = turngainnav;
 			actualX = rmat[1];
 			actualY = rmat[4];
 		}

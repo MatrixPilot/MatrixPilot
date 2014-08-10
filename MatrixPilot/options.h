@@ -80,10 +80,10 @@
 #define ROLL_STABILIZATION_RUDDER           0
 #define PITCH_STABILIZATION                 1
 #define YAW_STABILIZATION_RUDDER            1
-#define YAW_STABILIZATION_AILERON           1
+#define YAW_STABILIZATION_AILERON           0
 
 // Aileron and Rudder Navigation
-// Set either of these to 0 to disable use of that control surface for navigation.
+// Set either of these to 1 to enable helical turn control for navigation.
 #define AILERON_NAVIGATION                  1
 #define RUDDER_NAVIGATION                   1
 
@@ -459,8 +459,9 @@
 // All gains should be positive real numbers.
 // Proportional gains should be less than 4.0.
 // Rate gains should be less than 0.8.
-// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN,
-// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
+// With the new helical turn control, rate gains are not even needed, try setting them all to zero.
+// Proportional gains include ROLLKP, YAWKP_AILERON, PITCHGAIN,
+// ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
 // MANUAL_AILERON_RUDDER_MIX, RUDDER_BOOST, HOVER_ROLLKP, HOVER_PITCHGAIN, HOVER_YAWKP
 // Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER,
 // HOVER_ROLLKD, HOVER_PITCHKD, HOVER_YAWKD
@@ -476,22 +477,23 @@
 // times projection of the desired earth vertical rotation rate onto that axis
 #define FEED_FORWARD						1.0
 
-// TURN_GAIN sets the gain of the helical turn control for both fly by wire mode and waypoint mode
-// The default value of 1.0 will produce a maximum turn rate of about 60 degrees per second.
-// The largest possible value is 4.0, which will produce a 240 degree per second turn.
-#define TURN_GAIN							1.0
+// TURN_RATE_NAV and TURN_RATE_FBW set the gains of the helical turn control for
+// waypoint navigation mode and fly by wire mode respectively.
+// They are specified in terms of the maximum desired turning rate in degrees per second in each mode.
+// The largest possible value is 240 degrees per second, anything larger will be clipped to 240.
+#define TURN_RATE_NAV							30.0
+#define TURN_RATE_FBW							60.0
 
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
 // ROLLKD is the derivative (gyro) gain, approximately 0.125
 // YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
-// AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
 #define ROLLKP                              0.20
 #define ROLLKD                              0.05
 #define YAWKP_AILERON                       0.10
 #define YAWKD_AILERON                       0.05
-#define AILERON_BOOST                       1.00
+#define AILERON_BOOST						0.5
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125

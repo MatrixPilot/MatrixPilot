@@ -306,6 +306,7 @@
         <itemPath>../MAVMission.c</itemPath>
         <itemPath>../MAVParams.c</itemPath>
         <itemPath>../MAVUDBExtra.c</itemPath>
+        <itemPath>../helicalTurnCntrl.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

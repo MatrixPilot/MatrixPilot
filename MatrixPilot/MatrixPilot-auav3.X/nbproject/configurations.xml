@@ -353,6 +353,7 @@
         <itemPath>../MAVMission.c</itemPath>
         <itemPath>../MAVParams.c</itemPath>
         <itemPath>../MAVUDBExtra.c</itemPath>
+        <itemPath>../helicalTurnCntrl.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>

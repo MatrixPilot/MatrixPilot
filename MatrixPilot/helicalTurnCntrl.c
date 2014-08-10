@@ -33,15 +33,14 @@
 #define GRAVITYCMSECSEC ( 981 )
 #define RADSTOGYRO ( ( uint16_t ) 48*SCALEGYRO ) // used in the conversion from radians per second to raw gyro units
 
-int16_t tiltError[3] = { 0 , 0 , 0 } ;
-static int16_t desiredTiltVector[3] ;
+#define MAX_INPUT ( 1000 ) // maximum input in pwm units
+
+#define MINIMUM_AIRSPEED ( 500 ) // minimum value of airspeed in cm/sec to be used in tilt computation,
+								 // mainly used for ground testing of turning tilt, which would go to zero at zero airspeed
+
+int16_t tiltError[3] ;
 int16_t desiredRotationRateRadians[3] ;
-static int16_t desiredRotationRateGyro[3] ;
-int16_t rotationRateError[3] = { 0 , 0 , 0 } ;
-static uint16_t airSpeed = 981 ;
-int16_t desiredTurnRateRadians = RMAX/2 ;
-//int16_t desiredTurnRateRadians = 0 ;
-static union longww desiredTilt ;
+int16_t rotationRateError[3] ;
 
 // helicalTurnCntrl determines the values of the elements of the bottom row of rmat
 // as well as the required rotation rates in the body frame that are required to make a coordinated turn.
@@ -55,16 +54,21 @@ static union longww desiredTilt ;
 void helicalTurnCntrl( void )
 {
 	union longww accum ;
-	int16_t rtlkick;
-	int16_t desiredPitch;
+	int16_t rtlkick ;
+	int16_t desiredPitch ;
 	int16_t steeringInput ;
-	
+	int16_t desiredTurnRateRadians ;
+	int16_t desiredTiltVector[3] ;
+	int16_t desiredRotationRateGyro[3] ;
+	uint16_t airSpeed ;
+	union longww desiredTilt ;	
 #ifdef TestGains
 	flags._.GPS_steering = 0; // turn off navigation
 	flags._.pitch_feedback = 1; // turn on stabilization
 	airSpeed = 981 ; // for testing purposes, an airspeed is needed
 #else
 	airSpeed = air_speed_3DIMU ;
+	if ( airSpeed < MINIMUM_AIRSPEED ) airSpeed = MINIMUM_AIRSPEED ;
 #endif
 
 	// determine the desired turn rate as the sum of navigation and fly by wire.
@@ -92,10 +96,10 @@ void helicalTurnCntrl( void )
 		steeringInput = 0 ;
 	}
 
-	if ( steeringInput > 1000 ) steeringInput = 1000 ;
-	if ( steeringInput < -1000 ) steeringInput = 1000 ;
+	if ( steeringInput > MAX_INPUT ) steeringInput = MAX_INPUT ;
+	if ( steeringInput < - MAX_INPUT ) steeringInput = - MAX_INPUT ;
 
-	accum.WW = __builtin_mulsu( steeringInput , turngain ) / 2000 ;
+	accum.WW = __builtin_mulsu( steeringInput , turngainfbw ) / ( 2*MAX_INPUT) ;
 
 	if ((AILERON_NAVIGATION||RUDDER_NAVIGATION) && flags._.GPS_steering)
 	{
