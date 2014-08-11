@@ -28,7 +28,6 @@
 //
 // Mix computed roll and pitch controls into the output channels for the compiled airframe type.
 
-const int16_t aileronbgain  = (int16_t)(8.0*AILERON_BOOST);
 const int16_t elevatorbgain = (int16_t)(8.0*ELEVATOR_BOOST);
 const int16_t rudderbgain   = (int16_t)(8.0*RUDDER_BOOST);
 
@@ -49,7 +48,7 @@ void servoMix(void)
 	// Apply boosts if in a stabilized mode
 	if (udb_flags._.radio_on && flags._.pitch_feedback)
 	{
-		pwManual[AILERON_INPUT_CHANNEL] += ((pwManual[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]) * aileronbgain) >> 3;
+		pwManual[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] ; // in fly by wire or navigate mode, manual input is calculated as part of turn control
 		pwManual[ELEVATOR_INPUT_CHANNEL] += ((pwManual[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) * elevatorbgain) >> 3;
 		pwManual[RUDDER_INPUT_CHANNEL] += ((pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) * rudderbgain) >> 3;
 	}

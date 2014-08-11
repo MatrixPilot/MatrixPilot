@@ -491,16 +491,15 @@
 // YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
 #define ROLLKP                              0.20
 #define ROLLKD                              0.05
-#define YAWKP_AILERON                       0.10
-#define YAWKD_AILERON                       0.05
-#define AILERON_BOOST						0.5
+#define YAWKP_AILERON                       0.00
+#define YAWKD_AILERON                       0.00
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
 // PITCHKD feedback gain for pitch damping, around 0.0625
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN                           0.10
-#define PITCHKD                             0.04
+#define PITCHGAIN                           0.30
+#define PITCHKD                             0.00
 #define ELEVATOR_BOOST                      0.50
 
 // Neutral pitch angle of the plane (in degrees) when flying inverted
@@ -515,12 +514,12 @@
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER                        0.05
-#define YAWKD_RUDDER                        0.05
-#define ROLLKP_RUDDER                       0.06
-#define ROLLKD_RUDDER                       0.05
+#define YAWKP_RUDDER                        0.30
+#define YAWKD_RUDDER                        0.00
+#define ROLLKP_RUDDER                       0.00
+#define ROLLKD_RUDDER                       0.00
 #define MANUAL_AILERON_RUDDER_MIX           0.00
-#define RUDDER_BOOST                        1.00
+#define RUDDER_BOOST                        0.50
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)
