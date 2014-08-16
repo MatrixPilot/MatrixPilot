@@ -34,7 +34,7 @@ int one_hertz_flag = 0;
 uint16_t udb_heartbeat_counter = 0;
 #define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
-static void pulse(void);    // forward declaration
+static void heartbeat_pulse(void);    // forward declaration
 
 //#define HEARTBEAT_FREQ(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
 //#define HEARTBEAT_CHK(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
@@ -74,14 +74,14 @@ inline void heartbeat(void) // called from ISR
 
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 //	_T6IF = 1;
-	udb_background_trigger_pulse(&pulse);
+	udb_background_trigger_pulse(&heartbeat_pulse);
 
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 }
 
 // Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 // This is a good place to eventually compute pulse widths for servos.
-static void pulse(void)
+static void heartbeat_pulse(void)
 {
 	LED_BLUE = LED_OFF;     // indicates logfile activity
 

@@ -174,7 +174,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	_T6IF = 0;              // clear the interrupt
-//	pulse();
+//	heartbeat_pulse();
 	if (callback_fptr_1) callback_fptr_1();
 	interrupt_restore_corcon;
 }
