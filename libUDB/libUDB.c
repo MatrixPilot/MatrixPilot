@@ -142,6 +142,15 @@ void udb_a2d_record_offsets(void)
 		return;
 #endif
 
+#ifdef CUSTOM_OFFSETS
+	// offsets have been measured manually and entered into the options.h file
+	udb_xaccel.offset = XACCEL_OFFSET ;
+	udb_yaccel.offset = YACCEL_OFFSET ;
+	udb_zaccel.offset = ZACCEL_OFFSET ;
+	udb_xrate.offset = XRATE_OFFSET ;
+	udb_yrate.offset = YRATE_OFFSET ;
+	udb_zrate.offset = ZRATE_OFFSET ;
+#else
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value;
 	udb_xrate.offset  = udb_xrate.value;
@@ -149,6 +158,7 @@ void udb_a2d_record_offsets(void)
 	udb_yrate.offset  = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
 	udb_zrate.offset  = udb_zrate.value;
+#endif	// CUSTOM_OFFSETS
 #ifdef VREF
 	udb_vref.offset   = udb_vref.value;
 #endif

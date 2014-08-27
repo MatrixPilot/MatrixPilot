@@ -32,6 +32,8 @@ char debug_buffer[128];
 int db_index = 0;
 void send_debug_line(void);
 
+#define RECORD_OFFSETS	( 1 ) // set to 1 in order to record accelerometer and gyro offsets in telemetry
+
 int main(void)
 {
 	mcu_init();
@@ -122,11 +124,20 @@ void dcm_heartbeat_callback(void) // was called dcm_servo_callback_prepare_outpu
 void send_debug_line(void)
 {
 	db_index = 0;
-	sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
-		lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, 
-		rmat[0], rmat[1], rmat[2], 
-		rmat[3], rmat[4], rmat[5], 
-		rmat[6], rmat[7], rmat[8]);
+	if( RECORD_OFFSETS == 1 )
+	{
+		int16_t gravity2x = (int16_t) 2*GRAVITY ;
+		sprintf( debug_buffer , "%i, %i, %i, %i, %i, %i, %i\r\n" , 
+			gravity2x, udb_xaccel.value , udb_yaccel.value , udb_zaccel.value , udb_xrate.value , udb_yrate.value , udb_zrate.value ) ; 
+	}
+	else
+	{
+		sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
+			lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, 
+			rmat[0], rmat[1], rmat[2], 
+			rmat[3], rmat[4], rmat[5], 
+			rmat[6], rmat[7], rmat[8]);
+	}
 	udb_serial_start_sending_data();
 }
 
