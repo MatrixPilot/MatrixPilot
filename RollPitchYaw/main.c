@@ -23,6 +23,7 @@
 
 
 #include "../libDCM/libDCM.h"
+#include "../libDCM/gpsData.h"
 #include "../libUDB/heartbeat.h"
 
 // Used for serial debug output

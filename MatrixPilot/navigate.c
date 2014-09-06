@@ -25,6 +25,7 @@
 #include "cameraCntrl.h"
 #include "servoPrepare.h"
 #include "flightplan-waypoints.h"
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"

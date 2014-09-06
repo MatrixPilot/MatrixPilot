@@ -20,40 +20,13 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
 #include "estAltitude.h"
 #include "mathlibNAV.h"
 #include "rmat.h"
 #include "../libUDB/interrupt.h"
 #include <string.h>
-
-
-// GPS modules global variables
-#ifdef USE_EXTENDED_NAV
-struct relative3D_32 GPSlocation = { 0, 0, 0 };
-#else
-struct relative3D GPSlocation = { 0, 0, 0 };
-#endif // USE_EXTENDED_NAV
-struct relative3D GPSvelocity = { 0, 0, 0 };
-
-union longbbbb lat_origin, lon_origin, alt_origin;
-union longbbbb lat_gps, lon_gps, alt_sl_gps;        // latitude, longitude, altitude
-union intbb week_no;
-union intbb sog_gps;                                // speed over ground
-union uintbb cog_gps;                               // course over ground
-union intbb climb_gps;                              // climb
-union intbb hilsim_airspeed;
-union longbbbb tow;
-//union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
-//union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
-//uint8_t mode1, mode2;                             // gps mode1, mode2
-uint8_t hdop;                                       // horizontal dilution of precision
-uint8_t svs;                                        // number of satellites
-int16_t cos_lat = 0;
-int16_t gps_data_age;
-const uint8_t* gps_out_buffer = 0;
-int16_t gps_out_buffer_length = 0;
-int16_t gps_out_index = 0;
 
 // GPS parser modules variables
 union longbbbb lat_gps_, lon_gps_;
@@ -62,23 +35,13 @@ union longbbbb tow_;
 //union intbb sog_gps_, cog_gps_, climb_gps_;
 //union intbb nav_valid_, nav_type_, week_no_;
 union intbb hdop_;
-
-int8_t actual_dir;
-uint16_t ground_velocity_magnitudeXY = 0;
-int16_t forward_acceleration = 0;
-uint16_t air_speed_magnitudeXY = 0;
-uint16_t air_speed_3DGPS = 0;
-int8_t calculated_heading;           // takes into account wind velocity
-
-static int8_t cog_previous = 64;
-static int16_t sog_previous = 0;
-static int16_t climb_rate_previous = 0;
-static int16_t location_previous[] = { 0, 0, 0 };
-static uint16_t velocity_previous = 0;
+union longbbbb date_gps_, time_gps_;
 
 extern void (*msg_parse)(uint8_t gpschar);
 
-union longbbbb date_gps_, time_gps_;
+static const uint8_t* gps_out_buffer = 0;
+static int16_t gps_out_buffer_length = 0;
+static int16_t gps_out_index = 0;
 
 int32_t get_gps_date(void)
 {

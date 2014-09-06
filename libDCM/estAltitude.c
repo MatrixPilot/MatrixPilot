@@ -20,6 +20,7 @@
 
 
 #include "libDCM.h"
+#include "gpsData.h"
 #include "../libUDB/barometer.h"
 #include "estAltitude.h"
 #include <math.h>

@@ -93,14 +93,5 @@ extern struct relative3D GPSvelocity;
 extern struct relative2D velocity_thru_air; // derived horizontal velocity relative to air in cm/sec
 extern int16_t estimatedWind[3];            // wind velocity vectors in cm / sec
 
-//extern uint16_t air_speed_3DIMU;
-//extern int16_t total_energy;
-
-//extern union longww IMUlocationx, IMUlocationy, IMUlocationz;
-//extern union longww IMUvelocityx, IMUvelocityy, IMUvelocityz;
-//#define IMUheight IMUlocationz._.W1
-
-extern union longbbbb lat_gps,    lon_gps,    alt_sl_gps;
-extern union longbbbb lat_origin, lon_origin, alt_origin;
 
 #endif // LIB_DCM_H
