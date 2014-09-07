@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
 #include "../libUDB/magnetometer.h"
 #include "rmat.h"

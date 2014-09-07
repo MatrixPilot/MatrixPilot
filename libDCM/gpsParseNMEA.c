@@ -20,6 +20,7 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
 
 #if (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)

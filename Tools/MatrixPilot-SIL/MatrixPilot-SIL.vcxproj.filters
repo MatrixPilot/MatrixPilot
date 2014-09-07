@@ -221,6 +221,12 @@
     <ClCompile Include="..\..\libDCM\mathlib.c">
       <Filter>Source Files\libDCM</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsData.c">
+      <Filter>Source Files\libDCM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libFlashFS\filesys.c">
+      <Filter>Source Files\libFlashFS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -465,6 +471,15 @@
     </ClInclude>
     <ClInclude Include="..\..\MatrixPilot\airspeed_options.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\estWind.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\gpsData.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\filesys.h">
+      <Filter>Header Files\libFlashFS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

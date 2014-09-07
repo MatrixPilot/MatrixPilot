@@ -104,6 +104,7 @@
     <ClCompile Include="..\..\libDCM\estLocation.c" />
     <ClCompile Include="..\..\libDCM\estWind.c" />
     <ClCompile Include="..\..\libDCM\estYawDrift.c" />
+    <ClCompile Include="..\..\libDCM\gpsData.c" />
     <ClCompile Include="..\..\libDCM\gpsParseCommon.c" />
     <ClCompile Include="..\..\libDCM\gpsParseMTEK.c" />
     <ClCompile Include="..\..\libDCM\gpsParseNMEA.c" />
@@ -114,6 +115,7 @@
     <ClCompile Include="..\..\libDCM\mathlib.c" />
     <ClCompile Include="..\..\libDCM\mathlibNAV.c" />
     <ClCompile Include="..\..\libDCM\rmat.c" />
+    <ClCompile Include="..\..\libFlashFS\filesys.c" />
     <ClCompile Include="..\..\libFlashFS\minIni.c" />
     <ClCompile Include="..\..\MatrixPilot\airspeedCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\altitudeCntrl.c" />
@@ -164,6 +166,8 @@
     <ClInclude Include="..\..\libDCM\dcmTypes.h" />
     <ClInclude Include="..\..\libDCM\deadReckoning.h" />
     <ClInclude Include="..\..\libDCM\estAltitude.h" />
+    <ClInclude Include="..\..\libDCM\estWind.h" />
+    <ClInclude Include="..\..\libDCM\gpsData.h" />
     <ClInclude Include="..\..\libDCM\gpsParseCommon.h" />
     <ClInclude Include="..\..\libDCM\libDCM.h" />
     <ClInclude Include="..\..\libDCM\libDCM_defines.h" />
@@ -171,6 +175,7 @@
     <ClInclude Include="..\..\libDCM\mathlibNAV.h" />
     <ClInclude Include="..\..\libDCM\rmat.h" />
     <ClInclude Include="..\..\libFlashFS\AT45D.h" />
+    <ClInclude Include="..\..\libFlashFS\filesys.h" />
     <ClInclude Include="..\..\libFlashFS\FSconfig.h" />
     <ClInclude Include="..\..\libFlashFS\MDD_AT45D.h" />
     <ClInclude Include="..\..\libFlashFS\minGlue-mdd.h" />

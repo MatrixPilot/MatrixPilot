@@ -137,7 +137,7 @@
 // 
 // By default the only waypoint is defined to be 75 meters above the starting point.
 
-#if (SILSIM == 1)
+#if (HILSIM == 1)
 
 // Innsbruck inverted/reversed T3 course
 const struct waypointDef waypoints[] = {
