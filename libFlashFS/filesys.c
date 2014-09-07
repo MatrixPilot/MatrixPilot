@@ -20,37 +20,97 @@
 
 
 #include "defines.h"
-#include "MDD File System/FSIO.h"
-#include "AT45D.h"
 #include "filesys.h"
+#ifndef WIN32
+#include "MDD-File-System/FSIO.h"
+#include "AT45D.h"
+#include "EEPROM.h"
 
 
 void filesys_chkdsk(void)
 {
-	printf("chkdsk\r\n");
+	printf("filesys_chkdsk() - TODO\r\n");
+}
+
+/*
+// Summary: A structure used for searching for files on a device.
+// Description: The SearchRec structure is used when searching for file on a device.  It contains parameters that will be loaded with
+//              file information when a file is found.  It also contains the parameters that the user searched for, allowing further
+//              searches to be perfomed in the same directory for additional files that meet the specified criteria.
+typedef struct
+{
+	char            filename[FILE_NAME_SIZE_8P3 + 2];   // The name of the file that has been found
+	unsigned char   attributes;                     // The attributes of the file that has been found
+	unsigned long   filesize;                       // The size of the file that has been found
+	unsigned long   timestamp;                      // The last modified time of the file that has been found (create time for directories)
+	#ifdef SUPPORT_LFN
+		BOOL               AsciiEncodingType;       // Ascii file name or Non-Ascii file name indicator
+		unsigned short int *utf16LFNfound;          // Pointer to long file name found in UTF16 format
+		unsigned short int utf16LFNfoundLength;     // LFN Found length in terms of words including the NULL word at the last.
+	#endif
+	unsigned int    entry;                          // The directory entry of the last file found that matches the specified attributes. (Internal use only)
+	char            searchname[FILE_NAME_SIZE_8P3 + 2]; // The 8.3 format name specified when the user began the search. (Internal use only)
+	unsigned char   searchattr;                     // The attributes specified when the user began the search. (Internal use only)
+	unsigned long   cwdclus;                        // The directory that this search was performed in. (Internal use only)
+	unsigned char   initialized;                    // Check to determine if the structure was initialized by FindFirst (Internal use only)
+} SearchRec;
+ */
+void filesys_dir(char* arg)
+{
+	SearchRec rec;
+
+	if (arg == NULL) {
+		arg = "*.*";
+	}
+	DPRINT("filesys_dir %s\r\n", arg);
+	if (FindFirst(arg, ATTR_MASK, &rec) != -1) {
+		do {
+			printf("%s\t%lu\r\n", rec.filename, rec.filesize);
+		} while (FindNext(&rec) != -1);
+	}
+}
+
+void filesys_cat(char* arg)
+{
+	char buf[2];
+	FSFILE* fp;
+
+	DPRINT("filesys_cat(%s)\r\n", arg);
+
+	fp = FSfopen(arg, "r");
+	if (fp != NULL) {
+		while (FSfread(buf, 1, sizeof(char), fp) == 1) {
+			printf("%c", buf[0]);
+}
+		FSfclose(fp);
+	} else {
+		DPRINT("failed to open %s\r\n", arg);
+	}
 }
 
 void filesys_format(void)
 {
+	printf("filesys_format\r\n");
 #ifdef USE_AT45D_FLASH
-	printf("formatting dataflash\r\n");
 	AT45D_FormatFS();
+#elif defined USE_EEPROM_FLASH
+	EEPROM_FormatFS();
 #elif (WIN == 1) || (NIX == 1)
 #else
 #warning No Mass Storage Device Format Function Defined
 #endif // USE_AT45D_FLASH
 }
 
-void filesys_init(void)
+int filesys_init(void)
 {
-	printf("filesys_init()\r\n");
+	DPRINT("filesys_init()\r\n");
 //	init_dataflash(); // this should now be getting device specific called from lower layers via FSInit()
 
     MDD_InitIO();
 	if (!MDD_MediaDetect())
 	{
 		printf("no media detected\r\n");
-//		return;
+		return 0;
 	}
 
 	if (!FSInit())
@@ -60,9 +120,43 @@ void filesys_init(void)
 		if (!FSInit())
 		{
 			printf("File system initialisation failed\r\n");
-			return;
+			return 0;
 		}
 	}
 	printf("File system initalised\r\n");
+	return 1;
 }
+
+#else // WIN32
+
+void filesys_chkdsk(void)
+{
+	printf("filesys_chkdsk() - WIN32 TODO\r\n");
+}
+
+void filesys_dir(char* arg)
+{
+	if (arg == NULL) {
+		arg = "*.*";
+	}
+	DPRINT("filesys_dir %s - WIN32 TODO\r\n", arg);
+}
+
+//size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
+void filesys_cat(char* arg)
+{
+	DPRINT("filesys_cat(%s) - WIN32 TODO\r\n", arg);
+}
+
+void filesys_format(void)
+{
+}
+
+int filesys_init(void)
+{
+	DPRINT("filesys_init() - nothing to do on WIN32\r\n");
+	return 1;
+}
+
+#endif // WIN32
 

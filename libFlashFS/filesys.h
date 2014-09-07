@@ -23,8 +23,11 @@
 #define FILESYS_H
 
 
-void filesys_init(void);
-void chkdsk(void);
+int filesys_init(void);
+void filesys_chkdsk(void);
+void filesys_format(void);
+void filesys_dir(char* arg);
+void filesys_cat(char* arg);
 
 
 #endif // FILESYS_H

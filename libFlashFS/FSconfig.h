@@ -23,12 +23,16 @@
 #define _FSCONFIG_H_
 
 //#define USE_AT45D_FLASH
+//#define USE_EEPROM_FLASH
 //#define USE_SD_INTERFACE_WITH_SPI
 #include "HardwareProfile.h"
 
 #ifdef USE_AT45D_FLASH
 //#warning USE_AT45D_FLASH
 #include "MDD_AT45D.h"
+#elif defined USE_EEPROM_FLASH
+//#warning USE_EEPROM_FLASH
+#include "MDD_EEPROM.h"
 #elif defined(USE_SD_INTERFACE_WITH_SPI)
 //#warning USE_SD_INTERFACE_WITH_SPI
 #include "MDD File System/SD-SPI.h"
@@ -52,7 +56,7 @@
 
 
 // Uncomment this to use the FindFirst, FindNext, and FindPrev
-//#define ALLOW_FILESEARCH
+#define ALLOW_FILESEARCH
 
 // Comment this line out if you don't intend to write data to the card
 #define ALLOW_WRITES
@@ -211,6 +215,21 @@
 #define MDD_AT45D_FLASH_MAX_NUM_FILES_IN_ROOT 64
 
 //#define AT45D_FLASH_WRITE_PROTECT
+
+#elif defined USE_EEPROM_FLASH
+
+#define MDD_MediaInitialize     MDD_EEPROM_MediaInitialize
+#define MDD_MediaDetect         MDD_EEPROM_MediaDetect
+#define MDD_SectorRead          MDD_EEPROM_SectorRead
+#define MDD_SectorWrite         MDD_EEPROM_SectorWrite
+#define MDD_InitIO              MDD_EEPROM_InitIO
+#define MDD_ShutdownMedia       MDD_EEPROM_ShutdownMedia
+#define MDD_WriteProtectState   MDD_EEPROM_WriteProtectState
+#define MDD_ReadSectorSize      MDD_EEPROM_ReadSectorSize
+#define MDD_ReadCapacity        MDD_EEPROM_ReadCapacity
+
+//#define MDD_EEPROM_FLASH_DRIVE_CAPACITY 14
+#define MDD_EEPROM_FLASH_MAX_NUM_FILES_IN_ROOT 16
 
 #else
 

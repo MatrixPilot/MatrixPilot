@@ -239,15 +239,18 @@
 //   an SD-card-based physical layer
 #ifdef USE_SD_INTERFACE_WITH_SPI
 
+#define MEDIA_SOFT_DETECT
+
 #if defined(__dsPIC33E__)   // AUAV3 Board
 
-#define MEDIA_SOFT_DETECT
             #define SD_WE               0
 
 //            #define SD_CS               LATBbits.LATB9
 //            #define SD_CS_TRIS          TRISBbits.TRISB9
             #define SD_CS               LATDbits.LATD2
             #define SD_CS_TRIS          TRISDbits.TRISD2
+//            #define SD_CS_ANSEL         ANSELDbits.ANSD2 // no such bit on device
+
 //            #define SD_CD               PORTAbits.RA12
 //            #define SD_CD_TRIS          TRISAbits.TRISA12
 //            #define SD_WE               PORTGbits.RG1
@@ -267,27 +270,31 @@
             #define SPIIN               TRISGbits.TRISG7
             #define SPIOUT              TRISGbits.TRISG8
 
+            // Description: SD-SPI Analog/Digital Select ANSEL bit
+            #define SD_SCK_ANSEL	ANSELGbits.ANSG6
+            #define SD_SDI_ANSEL	ANSELGbits.ANSG7
+            #define SD_SDO_ANSEL	ANSELGbits.ANSG8
+
 #elif defined(__dsPIC33F__) // UDB4 or UDB5 board
 
             // Description: SD-SPI Chip Select Output bit
-//            #define SD_CS               LATBbits.LATB9
             #define SD_CS               LATBbits.LATB2
             // Description: SD-SPI Chip Select TRIS bit
-//            #define SD_CS_TRIS          TRISBbits.TRISB9
             #define SD_CS_TRIS          TRISBbits.TRISB2
 
 		    // Description: SD-SPI Analog/Digital Select ANSEL bit
-//            #define SD_CS_ANSEL			ANSELBbits.ANSB9
+            #define SD_CS_ANSEL         ANSELBbits.ANSB2
             
             // Description: SD-SPI Card Detect Input bit
-            #define SD_CD               PORTAbits.RA12
+            #define SD_CD               PORTGbits.RG0
             // Description: SD-SPI Card Detect TRIS bit
-            #define SD_CD_TRIS          TRISAbits.TRISA12
+            #define SD_CD_TRIS          TRISGbits.TRISG0
 
             // Description: SD-SPI Write Protect Check Input bit
-            #define SD_WE               PORTGbits.RG1
+            #define SD_WE               0
+//            #define SD_WE               PORTGbits.RG1
             // Description: SD-SPI Write Protect Check TRIS bit
-            #define SD_WE_TRIS          TRISGbits.TRISG1
+//            #define SD_WE_TRIS          TRISGbits.TRISG1
 
 		    // Description: SD-SPI Analog/Digital Select ANSEL bit
 //            #define SD_SCK_ANSEL	ANSELGbits.ANSG6

@@ -40,7 +40,7 @@
 
 #include "GenericTypeDefs.h"
 #include "FSconfig.h"
-#include "MDD File System/FSDefs.h" 
+#include "MDD-File-System/FSDefs.h" 
 #include "stddef.h"
 
 #ifdef USE_SD_INTERFACE_WITH_SPI

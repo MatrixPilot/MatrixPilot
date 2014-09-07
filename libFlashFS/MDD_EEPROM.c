@@ -19,16 +19,20 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "FSconfig.h"
-
-#ifdef USE_AT45D_FLASH
-
-#include <stdint.h>
-#include <stdio.h>
+#include "defines.h"
 #include "MDD-File-System/FSIO.h"
 #include "MDD-File-System/FSDefs.h"
-#include "MDD_AT45D.h"
-#include "AT45D.h"
+#include "FSconfig.h"
+
+#ifdef USE_EEPROM_FLASH
+
+#include "MDD_EEPROM.h"
+#include "EEPROM.h"
+#include "I2C.h"
+//#include <stdint.h>
+#include <stdio.h>
+
+#include "../libUDB/eeprom_udb4.h"
 
 extern void Delayms(BYTE milliseconds);
 
@@ -43,7 +47,7 @@ static MEDIA_INFORMATION mediaInformation;
  * Output:          TRUE   - Card detected
  *                  FALSE   - No card detected
  *****************************************************************************/
-BYTE MDD_AT45D_MediaDetect(void)
+BYTE MDD_EEPROM_MediaDetect(void)
 {
 	return TRUE;
 }
@@ -55,7 +59,7 @@ BYTE MDD_AT45D_MediaDetect(void)
  *
  * Output:          WORD - size of the sectors for this physical media.
  *****************************************************************************/
-WORD MDD_AT45D_ReadSectorSize(void)
+WORD MDD_EEPROM_ReadSectorSize(void)
 {
 	return MEDIA_SECTOR_SIZE;
 }
@@ -69,7 +73,7 @@ WORD MDD_AT45D_ReadSectorSize(void)
  *                  Ex: In other words, this function returns the last valid 
  *                  LBA address that may be read/written to.
  *****************************************************************************/
-DWORD MDD_AT45D_ReadCapacity(void)
+DWORD MDD_EEPROM_ReadCapacity(void)
 {
 	//The SCSI READ_CAPACITY command wants to know the last valid LBA address 
 	//that the host is allowed to read or write to.  Since LBA addresses start
@@ -77,8 +81,8 @@ DWORD MDD_AT45D_ReadCapacity(void)
 	//host is allowed to read and write the LBA == 0x00000000, which would be 
 	//1 sector worth of capacity.
 	//Therefore, the last valid LBA that the host may access is 
-	//MDD_AT45D_FLASH_TOTAL_DISK_SIZE - 1.
-	return (MDD_AT45D_FLASH_TOTAL_DISK_SIZE - 1); 
+	//MDD_EEPROM_FLASH_TOTAL_DISK_SIZE - 1.
+	return (MDD_EEPROM_FLASH_TOTAL_DISK_SIZE - 1); 
 }
 
 /******************************************************************************
@@ -87,9 +91,10 @@ DWORD MDD_AT45D_ReadCapacity(void)
  * Output:          TRUE  - Card initialized
  *                  FALSE - Card not initialized
  *****************************************************************************/
-BYTE MDD_AT45D_InitIO(void)
+BYTE MDD_EEPROM_InitIO(void)
 {
-	init_dataflash();
+	I2C1_Init();
+//	udb_eeprom_init();
 	return TRUE;
 }
 
@@ -100,7 +105,7 @@ BYTE MDD_AT45D_InitIO(void)
  *
  * Overview:    MediaInitialize initializes the media card and supporting variables.
  *****************************************************************************/
-MEDIA_INFORMATION * MDD_AT45D_MediaInitialize(void)
+MEDIA_INFORMATION * MDD_EEPROM_MediaInitialize(void)
 {
 	mediaInformation.validityFlags.bits.sectorSize = TRUE;
 //	mediaInformation.validityFlags.bits.maxLUN = TRUE;
@@ -127,11 +132,11 @@ MEDIA_INFORMATION * MDD_AT45D_MediaInitialize(void)
  *              be converted to byte address. This is accomplished by
  *              shifting the address left 9 times.
  *****************************************************************************/
-BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer)
+BYTE MDD_EEPROM_SectorRead(DWORD sector_addr, BYTE* buffer)
 {
-//	printf("MDD_AT45D_SectorRead %u\r\n", (unsigned int)sector_addr);
+//	printf("MDD_EEPROM_SectorRead %u\r\n", (unsigned int)sector_addr);
 
-	if (sector_addr >= MDD_AT45D_FLASH_TOTAL_DISK_SIZE)
+	if (sector_addr >= MDD_EEPROM_FLASH_TOTAL_DISK_SIZE)
 	{
 		return FALSE;
 	}
@@ -157,11 +162,11 @@ BYTE MDD_AT45D_SectorRead(DWORD sector_addr, BYTE* buffer)
  *              be converted to byte address. This is accomplished by
  *              shifting the address left 9 times.
  *****************************************************************************/
-BYTE MDD_AT45D_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero)
+BYTE MDD_EEPROM_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero)
 {
-//	printf("MDD_AT45D_SectorWrite %u\r\n", (unsigned int)sector_addr);
+//	printf("MDD_EEPROM_SectorWrite %u\r\n", (unsigned int)sector_addr);
 
-	if (sector_addr >= MDD_AT45D_FLASH_TOTAL_DISK_SIZE)
+	if (sector_addr >= MDD_EEPROM_FLASH_TOTAL_DISK_SIZE)
 	{
 		return FALSE;
 	}
@@ -176,9 +181,9 @@ BYTE MDD_AT45D_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZer
  *
  * Overview:    Determines if the card is write-protected
  *****************************************************************************/
-BYTE MDD_AT45D_WriteProtectState(void)
+BYTE MDD_EEPROM_WriteProtectState(void)
 {
 	return FALSE;
 }
 
-#endif // USE_AT45D_FLASH
+#endif // USE_EEPROM_FLASH

@@ -26,8 +26,8 @@
 #include <stdio.h>
 #include "SIL-filesystem.h"
 #else
-#include "MDD File System/FSIO.h"
-#include "AT45D.h"
+#include "MDD-File-System/FSIO.h"
+//#include "../libFlashFS/AT45D.h"
 #endif
 #include <string.h>
 #include <stdarg.h>
@@ -59,7 +59,7 @@ static char logfile_name[13];
 static FSFILE* fsp = NULL;
 
 
-static int16_t log_append(char* logbuf, int index, char* data, int len)
+static int16_t log_append(char* logbuf, int index, const char* data, int len)
 {
 	int16_t end_index = 0;
 	int16_t remaining = LOGBUF_BUFFER_SIZE - index;
@@ -79,7 +79,7 @@ static int16_t log_append(char* logbuf, int index, char* data, int len)
 }
 
 // called from telemetry module at interrupt level to buffer new log data
-void log_telemetry(char* data, int len)
+void log_telemetry(const char* data, int len)
 {
 	if (lb_in_use == 1)
 	{
@@ -191,7 +191,7 @@ static void log_check(void)
 	}
 }
 
-static void log_write(char* str, int len)
+static void log_write(const char* str, int len)
 {
 	if (fsp)
 	{

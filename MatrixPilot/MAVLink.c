@@ -56,6 +56,7 @@
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
+#include "telemetry_log.h"
 #include "euler_angles.h"
 #include "config.h"
 #include <string.h>

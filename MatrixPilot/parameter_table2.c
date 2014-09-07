@@ -2,7 +2,7 @@
 
 #include "defines.h" 
 
-#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
 
 #include "parameter_table.h"
 #include "data_storage.h"
@@ -151,5 +151,4 @@ const mavlink_parameter mavlink_parameters_list[] = {
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif 
-
+#endif // (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 

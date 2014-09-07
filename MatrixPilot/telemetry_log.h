@@ -21,7 +21,7 @@
 
 void log_close(void);
 void log_swapbuf(void);
-void log_telemetry(char* data, int len);
+void log_telemetry(const char* data, int len);
 
 // called from mainloop to write telemetry log data to flash
 void telemetry_log(void);

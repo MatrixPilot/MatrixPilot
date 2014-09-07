@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+
+#if (USE_USB == 1)
+
 #include "../libUDB/oscillator.h"
 #if (CONSOLE_UART != 0)
 #include "console.h"
@@ -70,10 +73,12 @@ void preflight(void)
 		if ((USBDeviceState < CONFIGURED_STATE)||(USBSuspendControl==1)) {
 			// do nothing
 		} else {
-#if (USE_MSD != 0)
+#if (USE_MSD == 1)
 			MSDTasks();
 #endif
+#if (USE_CDC == 1)
 			CDCTasks();
+#endif
 		}
 #if (CONSOLE_UART != 0)
 		console();
@@ -133,12 +138,15 @@ void USBPollingService(void)
 		}
 		else
 		{
-#if (USE_MSD != 0)
+#if (USE_MSD == 1)
 			MSDTasks();
 #endif
+#if (USE_CDC == 1)
 			CDCTasks();
+#endif
 		}
 	}
 }
 
 #endif // (BOARD_TYPE == AUAV3_BOARD)
+#endif // (USE_USB == 1)

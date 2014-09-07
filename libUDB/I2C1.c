@@ -162,14 +162,14 @@ boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSiz
 }
 
 // Only send command byte to check for ACK.
-boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback)
+boolean I2C1_CheckAck(uint8_t addr, I2C_callbackFunc pCallback)
 {
 	if (!I2C1_CheckAvailable()) return false;
 
 	pI2C_callback = pCallback;
 
 	I2C1_command_data_size = 0;
-	I2C1_AddressByte = address;
+	I2C1_AddressByte = addr;
 	pI2C1Buffer = NULL;
 
 	I2C1_tx_data_size = 0;              // tx data size
