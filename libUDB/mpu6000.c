@@ -170,7 +170,7 @@ void MPU6000_init16(void)
 #endif
 }
 
-void process_MPU_data(void)
+static void process_MPU_data(void)
 {
 	mpuDAV = true;
 
@@ -212,7 +212,7 @@ void process_MPU_data(void)
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 
-void MPU6000_read(void)
+static void MPU6000_read(void)
 {
 	// burst read guarantees that all registers represent the same sample interval
 	mpuCnt++;

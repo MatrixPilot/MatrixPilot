@@ -1,3 +1,5 @@
+#if 0
+
 #include <mavlink.h>
 #include <stdio.h>
 
@@ -37,3 +39,5 @@ int main(int argc, char* argv[])
 	put_bitfield_n_by_index(encoded, bits, packet_index, bit_index, &bit_index, packet);
 	
 }
+
+#endif // 0
