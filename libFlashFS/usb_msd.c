@@ -19,12 +19,20 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "../libUDB/libUDB.h"
+
+#if (USE_USB == 1)
+
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include "FSconfig.h"
 
+#if (USE_MSD == 1)
+
 #ifdef USE_AT45D_FLASH
 #include "MDD_AT45D.h"
+#elif defined USE_EEPROM_FLASH
+#include "MDD_EEPROM.h"
 #elif defined USE_SD_INTERFACE_WITH_SPI
 #include "MDD File System/SD-SPI.h"
 #else
@@ -67,6 +75,19 @@ LUN_FUNCTIONS LUN[MAX_LUN + 1] =
 		&MDD_SDSPI_SectorWrite
 	}
 };
+#elif defined USE_EEPROM_FLASH
+LUN_FUNCTIONS LUN[MAX_LUN + 1] = 
+{
+	{
+		&MDD_EEPROM_MediaInitialize,
+		&MDD_EEPROM_ReadCapacity,
+		&MDD_EEPROM_ReadSectorSize,
+		&MDD_EEPROM_MediaDetect,
+		&MDD_EEPROM_SectorRead,
+		&MDD_EEPROM_WriteProtectState,
+		&MDD_EEPROM_SectorWrite
+	}
+};
 #else
 #error here
 #endif // USE_AT45D_FLASH
@@ -91,3 +112,5 @@ const ROM InquiryResponse inq_resp = {
 	}
 };
 
+#endif // (USE_MSD == 1)
+#endif // (USE_USB == 1)

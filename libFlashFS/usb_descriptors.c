@@ -121,6 +121,10 @@ state according to the definition in the USB specification.
 #ifndef __USB_DESCRIPTORS_C
 #define __USB_DESCRIPTORS_C
 
+#include "../libUDB/libUDB.h"
+
+#if (USE_USB == 1)
+
 /** INCLUDES *******************************************************/
 #include "./USB/usb.h"
 #include "./USB/usb_function_msd.h"
@@ -325,5 +329,7 @@ ROM BYTE *ROM USB_SD_Ptr[]=
 };
 
 
-#endif
+#endif // (USE_USB == 1)
+
+#endif // __USB_DESCRIPTORS_C
 /** EOF usb_descriptors.c ***************************************************/

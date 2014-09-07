@@ -88,6 +88,10 @@ Description:
 #ifndef USB_HAL_DSPIC33E_C
 #define USB_HAL_DSPIC33E_C
 
+#include "../libUDB/libUDB.h"
+
+#if (USE_USB == 1)
+
 #include "USB/usb.h"
 
 
@@ -168,4 +172,6 @@ BOOL USBSleepOnSuspend(void)
 }
 
 #endif //USB_HAL_DSPIC33E_C
+
+#endif // (USE_USB == 1)
 

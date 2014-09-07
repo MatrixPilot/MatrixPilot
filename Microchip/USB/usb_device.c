@@ -250,6 +250,10 @@ allow for much more relaxed timing requirements, and therefore greater applicati
 firmware design flexibility.
 //----------------------------------------------------------------------------------*/
 
+#include "../libUDB/libUDB.h"
+
+#if (USE_USB == 1)
+
 /** INCLUDES *******************************************************/
 #include "./USB/usb.h"
 #include "HardwareProfile.h"
@@ -3130,5 +3134,7 @@ static void USBStdFeatureReqHandler(void)
     }//end if (lots of checks for set/clear endpoint halt)
 }//end USBStdFeatureReqHandler
 
+
+#endif // (USE_USB == 1)
 
 /** EOF USBDevice.c *****************************************************/
