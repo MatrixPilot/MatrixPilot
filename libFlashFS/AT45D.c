@@ -21,10 +21,12 @@
 
 //#include "defines.h"
 #include <stdint.h>
+#include "FSconfig.h"
 #include "AT45D.h"
 #include <spi.h>
 #include <stdio.h>
 
+#ifdef USE_AT45D_FLASH
 
 void init_AT45D_DMA(void);
 
@@ -287,3 +289,4 @@ void WriteSector(uint16_t sector, uint8_t* buffer)
 }
 
 #endif // !USE_AT45D_DMA
+#endif // USE_AT45D_FLASH
