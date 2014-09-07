@@ -458,11 +458,11 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 				{
 					case 0: // Read
 						DPRINT("Read (ROM)\r\n");
-						init_config();
+						config_load();
 						break;
 					case 1: // Write
 						DPRINT("Write (ROM)\r\n");
-						save_config();
+						config_save();
 						break;
 					default:
 						DPRINT("245 packet.param1 %f packet.param2 %f\r\n", (double)packet.param1, (double)packet.param2);

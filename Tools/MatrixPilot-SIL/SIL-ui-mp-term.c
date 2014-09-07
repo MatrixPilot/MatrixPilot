@@ -220,7 +220,7 @@ void sil_handle_key_input(char c)
 					
 				case '9':
 					printf("Saving Params to ini file\r\n");
-					save_config();
+					config_save();
 					break;
 					
 				default:
