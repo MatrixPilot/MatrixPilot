@@ -778,6 +778,9 @@
 #define TLM_PORT                            3
 #define DBG_PORT                            1
 
+// Set this to 1 to enable filesystem support
+#define USE_FILESYS                         1
+
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
 #define USE_TELELOG                         0
 

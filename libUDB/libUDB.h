@@ -64,6 +64,7 @@
 #endif
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
+#include "options_auav3.h"
 #endif
 
 #ifndef BOARD_TYPE

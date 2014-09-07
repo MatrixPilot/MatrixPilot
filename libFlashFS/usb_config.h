@@ -5,6 +5,7 @@
 #ifndef USBCFG_H
 #define USBCFG_H
 
+
 /** DEFINITIONS ****************************************************/
 #define USB_EP0_BUFF_SIZE       8   // Valid Options: 8, 16, 32, or 64 bytes.
                                     // Using larger options take more SRAM, but
@@ -25,7 +26,7 @@
 //Configuration descriptors - if these two definitions do not exist then
 //  a ROM BYTE *ROM variable named exactly USB_CD_Ptr[] must exist.
 #define USB_USER_CONFIG_DESCRIPTOR USB_CD_Ptr
-#define USB_USER_CONFIG_DESCRIPTOR_INCLUDE extern ROM BYTE *ROM USB_CD_Ptr[]
+#define USB_USER_CONFIG_DESCRIPTOR_INCLUDE extern const BYTE *ROM USB_CD_Ptr[]
 
 //Make sure only one of the below "#define USB_PING_PONG_MODE"
 //is uncommented.

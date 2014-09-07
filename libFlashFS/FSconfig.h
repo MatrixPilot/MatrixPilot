@@ -22,9 +22,6 @@
 #ifndef _FSCONFIG_H_
 #define _FSCONFIG_H_
 
-//#define USE_AT45D_FLASH
-//#define USE_EEPROM_FLASH
-//#define USE_SD_INTERFACE_WITH_SPI
 #include "HardwareProfile.h"
 
 #ifdef USE_AT45D_FLASH

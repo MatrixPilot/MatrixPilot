@@ -19,16 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
 #include "libUDB.h"
-#include "mpu_spi.h"
-#include "interrupt.h"
-#include "oscillator.h"
-#include "delay.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
+#include "oscillator.h"
+#include "interrupt.h"
+#include "mpu_spi.h"
 #include <stdbool.h>
+#include <delay.h>
 #include <spi.h>
 
 #if (MPU_SPI == 1)

@@ -74,7 +74,7 @@
 #include "MDD-File-System/FSDefs.h"
 #include "MDD-File-System/SD-SPI.h"
 #include "string.h"
-#include "FSconfig.h"
+//#include "FSconfig.h"
 
 /******************************************************************************
  * Global Variables

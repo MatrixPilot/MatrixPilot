@@ -60,9 +60,6 @@ int main(void)
 {
 	mcu_init();
 #endif
-#if (USE_TELELOG == 1)
-	log_init();
-#endif
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
