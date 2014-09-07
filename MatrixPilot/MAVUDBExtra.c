@@ -27,6 +27,7 @@
 #include "MAVUDBExtra.h"
 #include "navigate.h"
 #include "flightplan-waypoints.h"
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/rmat.h"
