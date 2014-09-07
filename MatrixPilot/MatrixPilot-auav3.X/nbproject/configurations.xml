@@ -5,231 +5,296 @@
                    displayName="Header Files"
                    projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/libDCM.h</itemPath>
-        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
-        <itemPath>../../libDCM/libDCM_internal.h</itemPath>
-        <itemPath>../../libDCM/estAltitude.h</itemPath>
-        <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
-        <itemPath>../../libDCM/rmat.h</itemPath>
-        <itemPath>../../libDCM/dcmTypes.h</itemPath>
-        <itemPath>../../libDCM/mathlibNAV.h</itemPath>
-        <itemPath>../../libDCM/deadReckoning.h</itemPath>
+        <itemPath>..\..\libDCM\dcmTypes.h</itemPath>
+        <itemPath>..\..\libDCM\deadReckoning.h</itemPath>
+        <itemPath>..\..\libDCM\estAltitude.h</itemPath>
+        <itemPath>..\..\libDCM\estWind.h</itemPath>
+        <itemPath>..\..\libDCM\gpsData.h</itemPath>
+        <itemPath>..\..\libDCM\gpsParseCommon.h</itemPath>
+        <itemPath>..\..\libDCM\libDCM.h</itemPath>
+        <itemPath>..\..\libDCM\libDCM_defines.h</itemPath>
+        <itemPath>..\..\libDCM\libDCM_internal.h</itemPath>
+        <itemPath>..\..\libDCM\mathlibNAV.h</itemPath>
+        <itemPath>..\..\libDCM\rmat.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="f3" displayName="libFlashFS" projectFiles="true">
-        <itemPath>../../libFlashFS/AT45D.h</itemPath>
-        <itemPath>../../libFlashFS/FSconfig.h</itemPath>
-        <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
-        <itemPath>../../libFlashFS/minGlue-mdd.h</itemPath>
-        <itemPath>../../libFlashFS/minGlue.h</itemPath>
-        <itemPath>../../libFlashFS/minIni.h</itemPath>
-        <itemPath>../../libFlashFS/usb_config.h</itemPath>
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>..\..\libFlashFS\AT45D.h</itemPath>
+        <itemPath>..\..\libFlashFS\EEPROM.h</itemPath>
+        <itemPath>..\..\libFlashFS\filesys.h</itemPath>
+        <itemPath>..\..\libFlashFS\FSconfig.h</itemPath>
+        <itemPath>..\..\libFlashFS\MDD_AT45D.h</itemPath>
+        <itemPath>..\..\libFlashFS\MDD_EEPROM.h</itemPath>
+        <itemPath>..\..\libFlashFS\minGlue-mdd.h</itemPath>
+        <itemPath>..\..\libFlashFS\minGlue.h</itemPath>
+        <itemPath>..\..\libFlashFS\minIni.h</itemPath>
+        <itemPath>..\..\libFlashFS\usb_cdc.h</itemPath>
+        <itemPath>..\..\libFlashFS\usb_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/magnetometerOptions.h</itemPath>
-        <itemPath>../../libUDB/libUDB.h</itemPath>
-        <itemPath>../../libUDB/libUDB_internal.h</itemPath>
-        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
-        <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
-        <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
-        <itemPath>../../libUDB/ConfigHILSIM.h</itemPath>
-        <itemPath>../../libUDB/events.h</itemPath>
-        <itemPath>../../libUDB/I2C.h</itemPath>
-        <itemPath>../../libUDB/NV_memory.h</itemPath>
-        <itemPath>../../libUDB/nv_memory_options.h</itemPath>
-        <itemPath>../../libUDB/mpu6000.h</itemPath>
-        <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
-        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
-        <itemPath>../../libUDB/oscillator.h</itemPath>
-        <itemPath>../../libUDB/interrupt.h</itemPath>
-        <itemPath>../../libUDB/barometer.h</itemPath>
-        <itemPath>../../libUDB/uart.h</itemPath>
-        <itemPath>../../libUDB/heartbeat.h</itemPath>
-        <itemPath>../../libUDB/magnetometer.h</itemPath>
-        <itemPath>../../libUDB/analogs.h</itemPath>
-        <itemPath>../../libUDB/osd.h</itemPath>
-        <itemPath>../../libUDB/fixDeps.h</itemPath>
-        <itemPath>../../libUDB/mpu_spi.h</itemPath>
-        <itemPath>../../libUDB/udbTypes.h</itemPath>
-        <itemPath>../../libUDB/ADchannel.h</itemPath>
+        <itemPath>..\..\libUDB\ADchannel.h</itemPath>
+        <itemPath>..\..\libUDB\analogs.h</itemPath>
+        <itemPath>..\..\libUDB\barometer.h</itemPath>
+        <itemPath>..\..\libUDB\boardRotation_defines.h</itemPath>
+        <itemPath>..\..\libUDB\ConfigAUAV3.h</itemPath>
+        <itemPath>..\..\libUDB\ConfigHILSIM.h</itemPath>
+        <itemPath>..\..\libUDB\ConfigUDB4.h</itemPath>
+        <itemPath>..\..\libUDB\ConfigUDB5.h</itemPath>
+        <itemPath>..\..\libUDB\eeprom_udb4.h</itemPath>
+        <itemPath>..\..\libUDB\events.h</itemPath>
+        <itemPath>..\..\libUDB\fixDeps.h</itemPath>
+        <itemPath>..\..\libUDB\heartbeat.h</itemPath>
+        <itemPath>..\..\libUDB\I2C.h</itemPath>
+        <itemPath>..\..\libUDB\interrupt.h</itemPath>
+        <itemPath>..\..\libUDB\libUDB.h</itemPath>
+        <itemPath>..\..\libUDB\libUDB_defines.h</itemPath>
+        <itemPath>..\..\libUDB\libUDB_internal.h</itemPath>
+        <itemPath>..\..\libUDB\magnetometer.h</itemPath>
+        <itemPath>..\..\libUDB\magnetometerOptions.h</itemPath>
+        <itemPath>..\..\libUDB\mpu6000.h</itemPath>
+        <itemPath>..\..\libUDB\mpu_spi.h</itemPath>
+        <itemPath>..\..\libUDB\NV_memory.h</itemPath>
+        <itemPath>..\..\libUDB\nv_memory_options.h</itemPath>
+        <itemPath>..\..\libUDB\oscillator.h</itemPath>
+        <itemPath>..\..\libUDB\osd.h</itemPath>
+        <itemPath>..\..\libUDB\uart.h</itemPath>
+        <itemPath>..\..\libUDB\udbTypes.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
-        <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
+      <logicalFolder name="libVectorMatrix"
+                     displayName="libVectorMatrix"
+                     projectFiles="true">
+        <itemPath>..\..\libVectorMatrix\dspcommon.inc</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
-        <itemPath>../defines.h</itemPath>
-        <itemPath>../flightplan-logo.h</itemPath>
-        <itemPath>../waypoints.h</itemPath>
-        <itemPath>../gain_variables.h</itemPath>
-        <itemPath>../osd_layout.h</itemPath>
-        <itemPath>../data_services.h</itemPath>
-        <itemPath>../data_storage.h</itemPath>
-        <itemPath>../parameter_datatypes.h</itemPath>
-        <itemPath>../parameter_table.h</itemPath>
-        <itemPath>../mode_switch.h</itemPath>
-        <itemPath>../airspeed_options.h</itemPath>
-        <itemPath>../airspeedCntrl.h</itemPath>
-        <itemPath>../mavlink_options.h</itemPath>
-        <itemPath>../euler_angles.h</itemPath>
-        <itemPath>../options.h</itemPath>
-        <itemPath>../config.h</itemPath>
-        <itemPath>../preflight.h</itemPath>
-        <itemPath>../redef.h</itemPath>
-        <itemPath>../fly_by_datalink.h</itemPath>
-        <itemPath>../telemetry_log.h</itemPath>
-        <itemPath>../console.h</itemPath>
-        <itemPath>../MAVFlexiFunctions.h</itemPath>
-        <itemPath>../MAVMission.h</itemPath>
-        <itemPath>../MAVParams.h</itemPath>
-        <itemPath>../MAVLink.h</itemPath>
-        <itemPath>../MAVUDBExtra.h</itemPath>
-        <itemPath>../flightplan-waypoints.h</itemPath>
-        <itemPath>../navigate.h</itemPath>
-        <itemPath>../behaviour.h</itemPath>
-        <itemPath>../cameraCntrl.h</itemPath>
-        <itemPath>../osd_layout_remzibi.h</itemPath>
-        <itemPath>../ring_buffer.h</itemPath>
+        <logicalFolder name="example-options-files"
+                       displayName="example-options-files"
+                       projectFiles="true">
+          <itemPath>..\..\MatrixPilot\example-options-files\options.AcroMaster-ben.h</itemPath>
+          <itemPath>..\..\MatrixPilot\example-options-files\options.Delta-Phil.h</itemPath>
+          <itemPath>..\..\MatrixPilot\example-options-files\options.EasyStar-Bill.h</itemPath>
+          <itemPath>..\..\MatrixPilot\example-options-files\options.GentleLady-Bill.h</itemPath>
+          <itemPath>..\..\MatrixPilot\example-options-files\options.HILSIM-B747-Bill.h</itemPath>
+          <itemPath>..\..\MatrixPilot\example-options-files\options.HILSIM-Cessna-ben.h</itemPath>
+          <itemPath>..\..\MatrixPilot\example-options-files\options.MiniMag-ben.h</itemPath>
+        </logicalFolder>
+        <itemPath>..\..\MatrixPilot\airspeedCntrl.h</itemPath>
+        <itemPath>..\..\MatrixPilot\airspeed_options.h</itemPath>
+        <itemPath>..\..\MatrixPilot\altitudeCntrl.h</itemPath>
+        <itemPath>..\..\MatrixPilot\behaviour.h</itemPath>
+        <itemPath>..\..\MatrixPilot\cameraCntrl.h</itemPath>
+        <itemPath>..\..\MatrixPilot\config.h</itemPath>
+        <itemPath>..\..\MatrixPilot\console.h</itemPath>
+        <itemPath>..\..\MatrixPilot\data_services.h</itemPath>
+        <itemPath>..\..\MatrixPilot\data_storage.h</itemPath>
+        <itemPath>..\..\MatrixPilot\defines.h</itemPath>
+        <itemPath>..\..\MatrixPilot\euler_angles.h</itemPath>
+        <itemPath>..\..\MatrixPilot\flightplan-logo.h</itemPath>
+        <itemPath>..\..\MatrixPilot\flightplan-waypoints.h</itemPath>
+        <itemPath>..\..\MatrixPilot\fly_by_datalink.h</itemPath>
+        <itemPath>..\..\MatrixPilot\gain_variables.h</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVFlexiFunctions.h</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVLink.h</itemPath>
+        <itemPath>..\..\MatrixPilot\mavlink_options.h</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVMission.h</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVParams.h</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVUDBExtra.h</itemPath>
+        <itemPath>..\..\MatrixPilot\mode_switch.h</itemPath>
+        <itemPath>..\..\MatrixPilot\navigate.h</itemPath>
+        <itemPath>..\..\MatrixPilot\options.h</itemPath>
+        <itemPath>..\..\MatrixPilot\osd_config.h</itemPath>
+        <itemPath>..\..\MatrixPilot\osd_layout.h</itemPath>
+        <itemPath>..\..\MatrixPilot\osd_layout_remzibi.h</itemPath>
+        <itemPath>..\..\MatrixPilot\parameter_datatypes.h</itemPath>
+        <itemPath>..\..\MatrixPilot\parameter_table.h</itemPath>
+        <itemPath>..\..\MatrixPilot\preflight.h</itemPath>
+        <itemPath>..\..\MatrixPilot\redef.h</itemPath>
+        <itemPath>..\..\MatrixPilot\ring_buffer.h</itemPath>
+        <itemPath>..\..\MatrixPilot\servoPrepare.h</itemPath>
+        <itemPath>..\..\MatrixPilot\telemetry_log.h</itemPath>
+        <itemPath>..\..\MatrixPilot\waypoints.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
-        <logicalFolder name="f1" displayName="common" projectFiles="true">
-          <itemPath>../../MAVLink/include/common/common.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_attitude.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_attitude_quaternion.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_auth_key.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_battery_status.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_change_operator_control.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_change_operator_control_ack.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_command_ack.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_command_long.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_data_stream.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_debug.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_debug_vect.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_file_transfer_dir_list.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_file_transfer_res.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_file_transfer_start.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_global_position_int.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_global_position_setpoint_int.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_global_vision_position_estimate.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_gps_global_origin.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_gps_raw_int.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_gps_status.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_heartbeat.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_highres_imu.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_hil_controls.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_hil_rc_inputs_raw.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_hil_state.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_local_position_ned.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_local_position_ned_system_global_offset.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_local_position_setpoint.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_manual_control.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_manual_setpoint.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_memory_vect.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_ack.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_clear_all.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_count.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_current.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_item.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_item_reached.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_request.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_request_list.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_request_partial_list.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_set_current.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_mission_write_partial_list.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_named_value_float.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_named_value_int.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_nav_controller_output.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_optical_flow.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_param_request_list.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_param_request_read.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_param_set.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_param_value.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_ping.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_raw_imu.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_raw_pressure.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_rc_channels_override.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_rc_channels_raw.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_rc_channels_scaled.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_request_data_stream.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_rates_thrust_setpoint.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_speed_thrust_setpoint.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_roll_pitch_yaw_thrust_setpoint.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_safety_allowed_area.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_safety_set_allowed_area.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_scaled_imu.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_scaled_pressure.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_servo_output_raw.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_global_position_setpoint_int.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_gps_global_origin.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_local_position_setpoint.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_mode.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_quad_motors_setpoint.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_quad_swarm_led_roll_pitch_yaw_thrust.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_quad_swarm_roll_pitch_yaw_thrust.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_roll_pitch_yaw_speed_thrust.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_set_roll_pitch_yaw_thrust.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_setpoint_6dof.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_setpoint_8dof.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_state_correction.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_statustext.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_sys_status.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_system_time.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_vfr_hud.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_vicon_position_estimate.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_vision_position_estimate.h</itemPath>
-          <itemPath>../../MAVLink/include/common/mavlink_msg_vision_speed_estimate.h</itemPath>
-          <itemPath>../../MAVLink/include/common/testsuite.h</itemPath>
-          <itemPath>../../MAVLink/include/common/version.h</itemPath>
+        <logicalFolder name="include" displayName="include" projectFiles="true">
+          <logicalFolder name="common" displayName="common" projectFiles="true">
+            <itemPath>..\..\MAVLink\include\common\common.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_attitude.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_attitude_quaternion.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_attitude_setpoint_external.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_auth_key.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_battery_status.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_change_operator_control.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_change_operator_control_ack.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_command_ack.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_command_long.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_data_stream.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_data_transmission_handshake.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_debug.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_debug_vect.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_distance_sensor.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_encapsulated_data.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_file_transfer_dir_list.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_file_transfer_res.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_file_transfer_start.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_global_position_int.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_global_position_setpoint_external_int.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_global_position_setpoint_int.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_global_vision_position_estimate.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_gps2_raw.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_gps2_rtk.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_gps_global_origin.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_gps_inject_data.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_gps_raw_int.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_gps_rtk.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_gps_status.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_heartbeat.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_highres_imu.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_hil_controls.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_hil_gps.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_hil_optical_flow.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_hil_rc_inputs_raw.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_hil_sensor.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_hil_state.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_hil_state_quaternion.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_local_ned_position_setpoint_external.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_local_position_ned.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_local_position_ned_system_global_offset.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_local_position_setpoint.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_log_data.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_log_entry.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_log_erase.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_log_request_data.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_log_request_end.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_log_request_list.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_manual_control.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_manual_setpoint.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_memory_vect.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_ack.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_clear_all.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_count.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_current.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_item.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_item_reached.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_request.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_request_list.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_request_partial_list.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_set_current.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_mission_write_partial_list.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_named_value_float.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_named_value_int.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_nav_controller_output.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_omnidirectional_flow.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_optical_flow.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_param_request_list.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_param_request_read.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_param_set.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_param_value.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_ping.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_power_status.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_radio_status.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_raw_imu.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_raw_pressure.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_rc_channels.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_rc_channels_override.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_rc_channels_raw.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_rc_channels_scaled.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_request_data_stream.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_roll_pitch_yaw_rates_thrust_setpoint.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_roll_pitch_yaw_speed_thrust_setpoint.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_roll_pitch_yaw_thrust_setpoint.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_safety_allowed_area.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_safety_set_allowed_area.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_scaled_imu.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_scaled_imu2.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_scaled_pressure.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_serial_control.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_servo_output_raw.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_setpoint_6dof.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_setpoint_8dof.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_global_position_setpoint_int.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_gps_global_origin.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_local_position_setpoint.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_mode.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_quad_motors_setpoint.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_quad_swarm_led_roll_pitch_yaw_thrust.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_quad_swarm_roll_pitch_yaw_thrust.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_roll_pitch_yaw_speed_thrust.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_set_roll_pitch_yaw_thrust.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_sim_state.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_state_correction.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_statustext.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_system_time.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_sys_status.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_vfr_hud.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_vicon_position_estimate.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_vision_position_estimate.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\mavlink_msg_vision_speed_estimate.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\testsuite.h</itemPath>
+            <itemPath>..\..\MAVLink\include\common\version.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="matrixpilot" displayName="matrixpilot" projectFiles="true">
+            <itemPath>..\..\MAVLink\include\matrixpilot\matrixpilot.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_airspeeds.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_altitudes.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_buffer_function.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_buffer_function_ack.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_command.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_command_ack.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_directory.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_directory_ack.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_read_req.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_set.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f13.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f14.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f15.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f16.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f2_a.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f2_b.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f4.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f5.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f6.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f7.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f8.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\testsuite.h</itemPath>
+            <itemPath>..\..\MAVLink\include\matrixpilot\version.h</itemPath>
+          </logicalFolder>
+          <itemPath>..\..\MAVLink\include\checksum.h</itemPath>
+          <itemPath>..\..\MAVLink\include\inttypes.h</itemPath>
+          <itemPath>..\..\MAVLink\include\matrixpilot_mavlink_bridge_header.h</itemPath>
+          <itemPath>..\..\MAVLink\include\mavlink_conversions.h</itemPath>
+          <itemPath>..\..\MAVLink\include\mavlink_helpers.h</itemPath>
+          <itemPath>..\..\MAVLink\include\mavlink_types.h</itemPath>
+          <itemPath>..\..\MAVLink\include\protocol.h</itemPath>
         </logicalFolder>
-        <logicalFolder name="f2" displayName="matrixpilot" projectFiles="true">
-          <itemPath>../../MAVLink/include/matrixpilot/matrixpilot.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_airspeeds.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_altitudes.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_buffer_function.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_buffer_function_ack.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_command.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_command_ack.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_directory.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_directory_ack.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_read_req.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_set.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f13.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f14.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f15.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f16.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_a.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_b.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f4.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f5.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f6.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f7.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f8.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/testsuite.h</itemPath>
-          <itemPath>../../MAVLink/include/matrixpilot/version.h</itemPath>
-        </logicalFolder>
-        <itemPath>../../MAVLink/include/checksum.h</itemPath>
-        <itemPath>../../MAVLink/include/matrixpilot_mavlink_bridge_header.h</itemPath>
-        <itemPath>../../MAVLink/include/mavlink_helpers.h</itemPath>
-        <itemPath>../../MAVLink/include/mavlink_protobuf_manager.hpp</itemPath>
-        <itemPath>../../MAVLink/include/mavlink_types.h</itemPath>
-        <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="f2" displayName="Microchip" projectFiles="true">
-        <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
-        <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
-        <itemPath>../../Microchip/Include/Compiler.h</itemPath>
-        <itemPath>../../Microchip/Include/GenericTypeDefs.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_function_cdc.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
-        <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
-        <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
-        <itemPath>../../Microchip/HardwareProfile.h</itemPath>
-        <itemPath>../../Microchip/NetConfig.h</itemPath>
+      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
+        <logicalFolder name="Include" displayName="Include" projectFiles="true">
+          <logicalFolder name="MDD-File-System"
+                         displayName="MDD-File-System"
+                         projectFiles="true">
+            <itemPath>..\..\Microchip\Include\MDD-File-System\FSDefs.h</itemPath>
+            <itemPath>..\..\Microchip\Include\MDD-File-System\FSIO.h</itemPath>
+            <itemPath>..\..\Microchip\Include\MDD-File-System\SD-SPI.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="USB" displayName="USB" projectFiles="true">
+            <itemPath>..\..\Microchip\Include\USB\usb.h</itemPath>
+            <itemPath>..\..\Microchip\Include\USB\usb_ch9.h</itemPath>
+            <itemPath>..\..\Microchip\Include\USB\usb_common.h</itemPath>
+            <itemPath>..\..\Microchip\Include\USB\usb_device.h</itemPath>
+            <itemPath>..\..\Microchip\Include\USB\usb_function_cdc.h</itemPath>
+            <itemPath>..\..\Microchip\Include\USB\usb_function_msd.h</itemPath>
+            <itemPath>..\..\Microchip\Include\USB\usb_hal.h</itemPath>
+            <itemPath>..\..\Microchip\Include\USB\usb_hal_dspic33E.h</itemPath>
+          </logicalFolder>
+          <itemPath>..\..\Microchip\Include\Compiler.h</itemPath>
+          <itemPath>..\..\Microchip\Include\GenericTypeDefs.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="USB" displayName="USB" projectFiles="true">
+          <itemPath>..\..\Microchip\USB\usb_device_local.h</itemPath>
+        </logicalFolder>
+        <itemPath>..\..\Microchip\HardwareProfile.h</itemPath>
+        <itemPath>..\..\Microchip\NetConfig.h</itemPath>
+        <itemPath>..\..\Microchip\Sockets.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -240,129 +305,164 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/estWind.c</itemPath>
-        <itemPath>../../libDCM/estYawDrift.c</itemPath>
-        <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
-        <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
-        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
-        <itemPath>../../libDCM/mathlibNAV.c</itemPath>
-        <itemPath>../../libDCM/rmat.c</itemPath>
-        <itemPath>../../libDCM/libDCM.c</itemPath>
-        <itemPath>../../libDCM/deadReckoning.c</itemPath>
-        <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
-        <itemPath>../../libDCM/estAltitude.c</itemPath>
-        <itemPath>../../libDCM/estAirspeed.c</itemPath>
-        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
-        <itemPath>../../libDCM/fbcl.s</itemPath>
-        <itemPath>../../libDCM/estLocation.c</itemPath>
-        <itemPath>../../libDCM/hilsim.c</itemPath>
+        <itemPath>..\..\libDCM\deadReckoning.c</itemPath>
+        <itemPath>..\..\libDCM\estAirspeed.c</itemPath>
+        <itemPath>..\..\libDCM\estAltitude.c</itemPath>
+        <itemPath>..\..\libDCM\estLocation.c</itemPath>
+        <itemPath>..\..\libDCM\estWind.c</itemPath>
+        <itemPath>..\..\libDCM\estYawDrift.c</itemPath>
+        <itemPath>..\..\libDCM\fbcl.s</itemPath>
+        <itemPath>..\..\libDCM\gpsData.c</itemPath>
+        <itemPath>..\..\libDCM\gpsParseCommon.c</itemPath>
+        <itemPath>..\..\libDCM\gpsParseMTEK.c</itemPath>
+        <itemPath>..\..\libDCM\gpsParseNMEA.c</itemPath>
+        <itemPath>..\..\libDCM\gpsParseSTD.c</itemPath>
+        <itemPath>..\..\libDCM\gpsParseUBX.c</itemPath>
+        <itemPath>..\..\libDCM\hilsim.c</itemPath>
+        <itemPath>..\..\libDCM\libDCM.c</itemPath>
+        <itemPath>..\..\libDCM\mathlibNAV.c</itemPath>
+        <itemPath>..\..\libDCM\rmat.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="f2" displayName="libFlashFS" projectFiles="true">
-        <itemPath>../../libFlashFS/AT45D.c</itemPath>
-        <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
-        <itemPath>../../libFlashFS/usb.c</itemPath>
-        <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
-        <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
-        <itemPath>../../libFlashFS/minIni.c</itemPath>
-        <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
-        <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
-        <itemPath>../../libFlashFS/usb_msd.c</itemPath>
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>..\..\libFlashFS\AT45D.c</itemPath>
+        <itemPath>..\..\libFlashFS\AT45D_DMA.c</itemPath>
+        <itemPath>..\..\libFlashFS\AT45D_FS.c</itemPath>
+        <itemPath>..\..\libFlashFS\EEPROM.c</itemPath>
+        <itemPath>..\..\libFlashFS\EEPROM_FS.c</itemPath>
+        <itemPath>..\..\libFlashFS\filesys.c</itemPath>
+        <itemPath>..\..\libFlashFS\MDD_AT45D.c</itemPath>
+        <itemPath>..\..\libFlashFS\MDD_EEPROM.c</itemPath>
+        <itemPath>..\..\libFlashFS\minIni.c</itemPath>
+        <itemPath>..\..\libFlashFS\usb.c</itemPath>
+        <itemPath>..\..\libFlashFS\usb_cdc.c</itemPath>
+        <itemPath>..\..\libFlashFS\usb_descriptors.c</itemPath>
+        <itemPath>..\..\libFlashFS\usb_msd.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/background.c</itemPath>
-        <itemPath>../../libUDB/libUDB.c</itemPath>
-        <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
-        <itemPath>../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../libUDB/osd.c</itemPath>
-        <itemPath>../../libUDB/24LC256.c</itemPath>
-        <itemPath>../../libUDB/events.c</itemPath>
-        <itemPath>../../libUDB/mpu6000.c</itemPath>
-        <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
-        <itemPath>../../libUDB/traps_asm.s</itemPath>
-        <itemPath>../../libUDB/mcu.c</itemPath>
-        <itemPath>../../libUDB/traps.c</itemPath>
-        <itemPath>../../libUDB/barometer.c</itemPath>
-        <itemPath>../../libUDB/I2C1.c</itemPath>
-        <itemPath>../../libUDB/I2C2.c</itemPath>
-        <itemPath>../../libUDB/magnetometer.c</itemPath>
-        <itemPath>../../libUDB/radioIn.c</itemPath>
-        <itemPath>../../libUDB/serialIO.c</itemPath>
-        <itemPath>../../libUDB/write.c</itemPath>
-        <itemPath>../../libUDB/uart.c</itemPath>
-        <itemPath>../../libUDB/read.c</itemPath>
-        <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
-        <itemPath>../../libUDB/analogs.c</itemPath>
-        <itemPath>../../libUDB/osd_bit.c</itemPath>
-        <itemPath>../../libUDB/osd_spi.c</itemPath>
-        <itemPath>../../libUDB/mpu_spi.c</itemPath>
-        <itemPath>../../libUDB/heartbeat.c</itemPath>
-        <itemPath>../../libUDB/ADchannel.c</itemPath>
+        <itemPath>..\..\libUDB\24LC256.c</itemPath>
+        <itemPath>..\..\libUDB\ADchannel.c</itemPath>
+        <itemPath>..\..\libUDB\analog2digital_auav3.c</itemPath>
+        <itemPath>..\..\libUDB\analog2digital_udb4.c</itemPath>
+        <itemPath>..\..\libUDB\analog2digital_udb5.c</itemPath>
+        <itemPath>..\..\libUDB\analogs.c</itemPath>
+        <itemPath>..\..\libUDB\background.c</itemPath>
+        <itemPath>..\..\libUDB\barometer.c</itemPath>
+        <itemPath>..\..\libUDB\eeprom_udb4.c</itemPath>
+        <itemPath>..\..\libUDB\events.c</itemPath>
+        <itemPath>..\..\libUDB\heartbeat.c</itemPath>
+        <itemPath>..\..\libUDB\I2C1.c</itemPath>
+        <itemPath>..\..\libUDB\I2C2.c</itemPath>
+        <itemPath>..\..\libUDB\libUDB.c</itemPath>
+        <itemPath>..\..\libUDB\magnetometer.c</itemPath>
+        <itemPath>..\..\libUDB\mcu.c</itemPath>
+        <itemPath>..\..\libUDB\mpu6000.c</itemPath>
+        <itemPath>..\..\libUDB\mpu_spi.c</itemPath>
+        <itemPath>..\..\libUDB\osd.c</itemPath>
+        <itemPath>..\..\libUDB\osd_bit.c</itemPath>
+        <itemPath>..\..\libUDB\osd_spi.c</itemPath>
+        <itemPath>..\..\libUDB\radioIn.c</itemPath>
+        <itemPath>..\..\libUDB\read.c</itemPath>
+        <itemPath>..\..\libUDB\serialIO.c</itemPath>
+        <itemPath>..\..\libUDB\servoOut.c</itemPath>
+        <itemPath>..\..\libUDB\sonarIn.c</itemPath>
+        <itemPath>..\..\libUDB\traps.c</itemPath>
+        <itemPath>..\..\libUDB\traps_asm.s</itemPath>
+        <itemPath>..\..\libUDB\uart.c</itemPath>
+        <itemPath>..\..\libUDB\write.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="f1" displayName="libVectorMatrix" projectFiles="true">
-        <itemPath>../../libVectorMatrix/madd.s</itemPath>
-        <itemPath>../../libVectorMatrix/mmul.s</itemPath>
-        <itemPath>../../libVectorMatrix/mscl.s</itemPath>
-        <itemPath>../../libVectorMatrix/msub.s</itemPath>
-        <itemPath>../../libVectorMatrix/mtrp.s</itemPath>
-        <itemPath>../../libVectorMatrix/vadd.s</itemPath>
-        <itemPath>../../libVectorMatrix/vcon.s</itemPath>
-        <itemPath>../../libVectorMatrix/vcopy.s</itemPath>
-        <itemPath>../../libVectorMatrix/vcor.s</itemPath>
-        <itemPath>../../libVectorMatrix/vdot.s</itemPath>
-        <itemPath>../../libVectorMatrix/vmax.s</itemPath>
-        <itemPath>../../libVectorMatrix/vmin.s</itemPath>
-        <itemPath>../../libVectorMatrix/vmul.s</itemPath>
-        <itemPath>../../libVectorMatrix/vneg.s</itemPath>
-        <itemPath>../../libVectorMatrix/vpow.s</itemPath>
-        <itemPath>../../libVectorMatrix/vscl.s</itemPath>
-        <itemPath>../../libVectorMatrix/vsub.s</itemPath>
-        <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
+      <logicalFolder name="libVectorMatrix"
+                     displayName="libVectorMatrix"
+                     projectFiles="true">
+        <itemPath>..\..\libVectorMatrix\madd.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\mmul.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\mscl.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\msub.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\mtrp.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vadd.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vcon.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vcopy.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vcor.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vdot.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vmax.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vmin.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vmul.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vneg.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vpow.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vscl.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vsub.s</itemPath>
+        <itemPath>..\..\libVectorMatrix\vzpad.s</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
-        <itemPath>../config_tests.c</itemPath>
-        <itemPath>../behavior.c</itemPath>
-        <itemPath>../cameraCntrl.c</itemPath>
-        <itemPath>../navigate.c</itemPath>
-        <itemPath>../pitchCntrl.c</itemPath>
-        <itemPath>../rollCntrl.c</itemPath>
-        <itemPath>../servoMix.c</itemPath>
-        <itemPath>../states.c</itemPath>
-        <itemPath>../yawCntrl.c</itemPath>
-        <itemPath>../telemetry.c</itemPath>
-        <itemPath>../servoPrepare.c</itemPath>
-        <itemPath>../flightplan-waypoints.c</itemPath>
-        <itemPath>../flightplan-logo.c</itemPath>
-        <itemPath>../mp_osd.c</itemPath>
-        <itemPath>../altitudeCntrl.c</itemPath>
-        <itemPath>../MAVLink.c</itemPath>
-        <itemPath>../mode_switch.c</itemPath>
-        <itemPath>../data_services.c</itemPath>
-        <itemPath>../data_storage.c</itemPath>
-        <itemPath>../nv_memory_table.c</itemPath>
-        <itemPath>../parameter_table.c</itemPath>
-        <itemPath>../airspeedCntrl.c</itemPath>
-        <itemPath>../altitudeCntrlVariable.c</itemPath>
-        <itemPath>../euler_angles.c</itemPath>
-        <itemPath>../main.c</itemPath>
-        <itemPath>../preflight.c</itemPath>
-        <itemPath>../stack.S</itemPath>
-        <itemPath>../config.c</itemPath>
-        <itemPath>../fly_by_datalink.c</itemPath>
-        <itemPath>../telemetry_log.c</itemPath>
-        <itemPath>../console.c</itemPath>
-        <itemPath>../redef.c</itemPath>
-        <itemPath>../flight_state.c</itemPath>
-        <itemPath>../MAVFlexiFunctions.c</itemPath>
-        <itemPath>../MAVMission.c</itemPath>
-        <itemPath>../MAVParams.c</itemPath>
-        <itemPath>../MAVUDBExtra.c</itemPath>
+        <itemPath>..\..\MatrixPilot\airspeedCntrl.c</itemPath>
+        <itemPath>..\..\MatrixPilot\altitudeCntrl.c</itemPath>
+        <itemPath>..\..\MatrixPilot\altitudeCntrlVariable.c</itemPath>
+        <itemPath>..\..\MatrixPilot\behavior.c</itemPath>
+        <itemPath>..\..\MatrixPilot\cameraCntrl.c</itemPath>
+        <itemPath>..\..\MatrixPilot\config.c</itemPath>
+        <itemPath>..\..\MatrixPilot\config_tests.c</itemPath>
+        <itemPath>..\..\MatrixPilot\console.c</itemPath>
+        <itemPath>..\..\MatrixPilot\data_services.c</itemPath>
+        <itemPath>..\..\MatrixPilot\data_storage.c</itemPath>
+        <itemPath>..\..\MatrixPilot\euler_angles.c</itemPath>
+        <itemPath>..\..\MatrixPilot\flightplan-logo.c</itemPath>
+        <itemPath>..\..\MatrixPilot\flightplan-waypoints.c</itemPath>
+        <itemPath>..\..\MatrixPilot\flight_state.c</itemPath>
+        <itemPath>..\..\MatrixPilot\fly_by_datalink.c</itemPath>
+        <itemPath>..\..\MatrixPilot\main.c</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVFlexiFunctions.c</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVLink.c</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVMission.c</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVParams.c</itemPath>
+        <itemPath>..\..\MatrixPilot\MAVUDBExtra.c</itemPath>
+        <itemPath>..\..\MatrixPilot\minim_osd.c</itemPath>
+        <itemPath>..\..\MatrixPilot\mode_switch.c</itemPath>
+        <itemPath>..\..\MatrixPilot\mp_osd.c</itemPath>
+        <itemPath>..\..\MatrixPilot\navigate.c</itemPath>
+        <itemPath>..\..\MatrixPilot\nv_memory_table.c</itemPath>
+        <itemPath>..\..\MatrixPilot\parameter_table.c</itemPath>
+        <itemPath>..\..\MatrixPilot\parameter_table2.c</itemPath>
+        <itemPath>..\..\MatrixPilot\parameter_table_init.c</itemPath>
+        <itemPath>..\..\MatrixPilot\pitchCntrl.c</itemPath>
+        <itemPath>..\..\MatrixPilot\preflight.c</itemPath>
+        <itemPath>..\..\MatrixPilot\redef.c</itemPath>
+        <itemPath>..\..\MatrixPilot\remzibi_osd.c</itemPath>
+        <itemPath>..\..\MatrixPilot\ring_buffer.c</itemPath>
+        <itemPath>..\..\MatrixPilot\rollCntrl.c</itemPath>
+        <itemPath>..\..\MatrixPilot\servoMix.c</itemPath>
+        <itemPath>..\..\MatrixPilot\servoPrepare.c</itemPath>
+        <itemPath>..\..\MatrixPilot\sonarCntrl.c</itemPath>
+        <itemPath>..\..\MatrixPilot\stack.S</itemPath>
+        <itemPath>..\..\MatrixPilot\states.c</itemPath>
+        <itemPath>..\..\MatrixPilot\telemetry.c</itemPath>
+        <itemPath>..\..\MatrixPilot\telemetry_log.c</itemPath>
+        <itemPath>..\..\MatrixPilot\yawCntrl.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
-        <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
-        <itemPath>../../Microchip/USB/usb_device.c</itemPath>
-        <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
-        <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
-        <itemPath>../../Microchip/USB/CDC Device Driver/usb_function_cdc.c</itemPath>
+      <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
+        <logicalFolder name="include" displayName="include" projectFiles="true">
+          <itemPath>..\..\MAVLink\include\bittest.c</itemPath>
+        </logicalFolder>
+      </logicalFolder>
+      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
+        <logicalFolder name="MDD-File-System"
+                       displayName="MDD-File-System"
+                       projectFiles="true">
+          <itemPath>..\..\Microchip\MDD-File-System\FSIO.c</itemPath>
+          <itemPath>..\..\Microchip\MDD-File-System\SD-SPI.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="USB" displayName="USB" projectFiles="true">
+          <logicalFolder name="CDC-Device-Driver"
+                         displayName="CDC-Device-Driver"
+                         projectFiles="true">
+            <itemPath>..\..\Microchip\USB\CDC-Device-Driver\usb_function_cdc.c</itemPath>
+          </logicalFolder>
+          <logicalFolder name="MSD-Device-Driver"
+                         displayName="MSD-Device-Driver"
+                         projectFiles="true">
+            <itemPath>..\..\Microchip\USB\MSD-Device-Driver\usb_function_msd.c</itemPath>
+          </logicalFolder>
+          <itemPath>..\..\Microchip\USB\usb_device.c</itemPath>
+          <itemPath>..\..\Microchip\USB\usb_hal_dspic33e.c</itemPath>
+        </logicalFolder>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -372,11 +472,11 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>..</Elem>
-    <Elem>../../libUDB</Elem>
     <Elem>../../libDCM</Elem>
-    <Elem>../../Microchip</Elem>
-    <Elem>../../MAVLink/include/matrixpilot</Elem>
+    <Elem>../../libUDB</Elem>
+    <Elem>../../libVectorMatrix</Elem>
+    <Elem>../../MatrixPilot</Elem>
+    <Elem>../../MAVLink</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -428,7 +528,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="..;../../libFlashFS;../../MAVLink/include;../../Microchip;../../Microchip/Include"/>
+                  value="..;../../MatrixPilot;../../libFlashFS;../../MAVLink/include;../../Microchip;../../Microchip/include"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -442,7 +542,7 @@
         <property key="oXC16gcc-name-text-sec" value=""/>
         <property key="oXC16gcc-near-chars" value="false"/>
         <property key="oXC16gcc-no-isr-warn" value="false"/>
-        <property key="oXC16gcc-sfr-warn" value="true"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
         <property key="oXC16gcc-smar-io-lvl" value="1"/>
         <property key="oXC16gcc-smart-io-fmt" value=""/>
         <property key="optimization-level" value="0"/>
@@ -451,10 +551,8 @@
         <property key="preprocessor-macros" value="AUAV3"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
-        <property key="use-iar" value="false"/>
       </C30>
       <C30-AR>
-        <property key="additional-options-chop-files" value="false"/>
       </C30-AR>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
@@ -496,7 +594,7 @@
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
-                  value="&quot;${DISTDIR}/MatrixPilot-auav3.X.${IMAGE_TYPE}.map&quot;"/>
+                  value="&quot;${DISTDIR}/MatrixPilot-AUAV3.X.${IMAGE_TYPE}.map&quot;"/>
         <property key="oXC16ld-extra-opts" value=""/>
         <property key="oXC16ld-fill-upper" value="0"/>
         <property key="oXC16ld-force-link" value="false"/>
@@ -521,98 +619,8 @@
         <property key="legacy-libc" value="true"/>
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
-        <property key="save-temps" value="false"/>
       </C30Global>
       <PICkit3PlatformTool>
-        <property key="ADC 1" value="true"/>
-        <property key="ADC 2" value="true"/>
-        <property key="AutoSelectMemRanges" value="auto"/>
-        <property key="COMPARATOR" value="true"/>
-        <property key="CRC" value="true"/>
-        <property key="DCI" value="true"/>
-        <property key="Freeze All Other Peripherals" value="true"/>
-        <property key="I2C1" value="true"/>
-        <property key="I2C2" value="true"/>
-        <property key="INPUT CAPTURE 1" value="true"/>
-        <property key="INPUT CAPTURE 10" value="true"/>
-        <property key="INPUT CAPTURE 11" value="true"/>
-        <property key="INPUT CAPTURE 12" value="true"/>
-        <property key="INPUT CAPTURE 13" value="true"/>
-        <property key="INPUT CAPTURE 14" value="true"/>
-        <property key="INPUT CAPTURE 15" value="true"/>
-        <property key="INPUT CAPTURE 16" value="true"/>
-        <property key="INPUT CAPTURE 2" value="true"/>
-        <property key="INPUT CAPTURE 3" value="true"/>
-        <property key="INPUT CAPTURE 4" value="true"/>
-        <property key="INPUT CAPTURE 5" value="true"/>
-        <property key="INPUT CAPTURE 6" value="true"/>
-        <property key="INPUT CAPTURE 7" value="true"/>
-        <property key="INPUT CAPTURE 8" value="true"/>
-        <property key="INPUT CAPTURE 9" value="true"/>
-        <property key="OUTPUT COMPARE 1" value="true"/>
-        <property key="OUTPUT COMPARE 10" value="true"/>
-        <property key="OUTPUT COMPARE 11" value="true"/>
-        <property key="OUTPUT COMPARE 12" value="true"/>
-        <property key="OUTPUT COMPARE 13" value="true"/>
-        <property key="OUTPUT COMPARE 14" value="true"/>
-        <property key="OUTPUT COMPARE 15" value="true"/>
-        <property key="OUTPUT COMPARE 16" value="true"/>
-        <property key="OUTPUT COMPARE 2" value="true"/>
-        <property key="OUTPUT COMPARE 3" value="true"/>
-        <property key="OUTPUT COMPARE 4" value="true"/>
-        <property key="OUTPUT COMPARE 5" value="true"/>
-        <property key="OUTPUT COMPARE 6" value="true"/>
-        <property key="OUTPUT COMPARE 7" value="true"/>
-        <property key="OUTPUT COMPARE 8" value="true"/>
-        <property key="OUTPUT COMPARE 9" value="true"/>
-        <property key="PARALLEL MASTER/SLAVE PORT" value="true"/>
-        <property key="PWM" value="true"/>
-        <property key="REAL TIME CLOCK AND CALENDAR" value="true"/>
-        <property key="SPI 1" value="true"/>
-        <property key="SPI 2" value="true"/>
-        <property key="SPI 3" value="true"/>
-        <property key="SPI 4" value="true"/>
-        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
-        <property key="TIMER1" value="true"/>
-        <property key="TIMER2" value="true"/>
-        <property key="TIMER3" value="true"/>
-        <property key="TIMER4" value="true"/>
-        <property key="TIMER5" value="true"/>
-        <property key="TIMER6" value="true"/>
-        <property key="TIMER7" value="true"/>
-        <property key="TIMER8" value="true"/>
-        <property key="TIMER9" value="true"/>
-        <property key="ToolFirmwareFilePath"
-                  value="Press to browse for a specific firmware version"/>
-        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
-        <property key="UART 1" value="true"/>
-        <property key="UART 2" value="true"/>
-        <property key="UART 3" value="true"/>
-        <property key="UART 4" value="true"/>
-        <property key="USB" value="true"/>
-        <property key="hwtoolclock.frcindebug" value="false"/>
-        <property key="memories.aux" value="false"/>
-        <property key="memories.bootflash" value="false"/>
-        <property key="memories.configurationmemory" value="false"/>
-        <property key="memories.eeprom" value="false"/>
-        <property key="memories.flashdata" value="true"/>
-        <property key="memories.id" value="false"/>
-        <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.end" value="0x557ff"/>
-        <property key="memories.programmemory.start" value="0x0"/>
-        <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmertogo.imagename" value=""/>
-        <property key="programoptions.eraseb4program" value="true"/>
-        <property key="programoptions.pgmspeed" value="2"/>
-        <property key="programoptions.preserveeeprom" value="false"/>
-        <property key="programoptions.preserveprogramrange" value="false"/>
-        <property key="programoptions.preserveprogramrange.end" value="0x557ff"/>
-        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
-        <property key="programoptions.preserveuserid" value="false"/>
-        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
-        <property key="programoptions.usehighvoltageonmclr" value="false"/>
-        <property key="programoptions.uselvpprogramming" value="false"/>
-        <property key="voltagevalue" value="3.25"/>
       </PICkit3PlatformTool>
     </conf>
   </confs>
