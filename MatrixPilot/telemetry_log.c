@@ -32,6 +32,9 @@
 #include <string.h>
 #include <stdarg.h>
 
+extern void restart_telemetry(void);
+extern boolean inflight_state(void);
+
 
 #if (WIN == 1 || NIX == 1)
 #define LOGFILE_ENABLE_PIN 0
@@ -122,12 +125,6 @@ static int fs_nextlog(char* filename)
 	return 0;
 }
 
-// called at startup to initialise the telemetry log system
-void log_init(void)
-{
-}
-void restart_telemetry(void);
-
 static void log_open(void)
 {
 	static uint8_t log_error = 0;
@@ -166,9 +163,6 @@ void log_close(void)
 		printf("%s closed\r\n", logfile_name);
 	}
 }
-
-void restart_telemetry(void);
-boolean inflight_state(void);
 
 static void log_check(void)
 {

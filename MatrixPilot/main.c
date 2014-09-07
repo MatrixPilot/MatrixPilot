@@ -27,6 +27,8 @@
 #include "flightplan-waypoints.h"
 #include <setjmp.h>
 
+#include "../libFlashFS/filesys.h"
+
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -66,8 +68,13 @@ int main(void)
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();
+#if (USE_FILESYS == 1)
+	if (filesys_init())
+	{
+		config_load();
+	}
+#endif // USE_FILESYS
 	dcm_init();
-	init_config();  // this will need to be moved up in order to support runtime hardware options
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 	init_waypoints();
 #endif

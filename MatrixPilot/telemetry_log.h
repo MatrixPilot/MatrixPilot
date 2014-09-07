@@ -19,7 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-void log_init(void);
 void log_close(void);
 void log_swapbuf(void);
 void log_telemetry(char* data, int len);
