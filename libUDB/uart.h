@@ -46,7 +46,7 @@ char GetBaudError(void);
 char GetChar(void);
 void PutChar(char ch);
 char IsPressed(void);
-void PrintString(char* str);
+void PrintString(const char* str);
 void PutDec(unsigned char dec);
 void PutHex(int toPrint);
 

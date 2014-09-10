@@ -189,7 +189,7 @@ Input: Pointer to a null terminated character string.
 Output: None.
 
 *******************************************************************************/
-void PrintString(char *str)
+void PrintString(const char *str)
 {
 	unsigned char c;
 
