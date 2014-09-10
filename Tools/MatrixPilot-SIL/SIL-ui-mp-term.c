@@ -33,7 +33,7 @@ void print_help(void)
 	printf("j/l     = aileron left/right\n");
 	printf("\n");
 	printf("z       = zero the sticks\n");
-	printf("L       = toggle LEDs\n");
+	printf(";       = toggle LEDs\n");
 	printf("0       = toggle RC Radio connection on/off\n");
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	printf("xN      = execute LOGO subroutine N(0-9)\n");
@@ -115,10 +115,10 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 {
 	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
 	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
-		printf("\n%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
+		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
 	}
 	else {
-		printf("\n%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
+		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
 	}
 }
 
@@ -198,7 +198,7 @@ void sil_handle_key_input(char c)
 					printf("\nRadio %s\n", (sil_radio_on) ? "On" : "Off");
 					break;
 
-				case 'L':
+				case ';':
 					showLEDs = !showLEDs;
 					if (showLEDs) {
 						printf("\n");

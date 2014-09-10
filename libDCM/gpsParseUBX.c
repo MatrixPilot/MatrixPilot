@@ -58,6 +58,7 @@ static void msg_CS1(uint8_t inchar);
 
 #if (HILSIM == 1)
 	static void msg_BODYRATES(uint8_t inchar);
+	static void msg_KEYSTROKE(uint8_t gpschar);
 #endif
 
 static void msg_MSGU(uint8_t inchar);
@@ -280,7 +281,9 @@ static union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
 static union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
 static union intbb p_sim_,     q_sim_,     r_sim_;
 static union intbb p_sim,      q_sim,      r_sim;
+static uint8_t x_ckey_, x_vkey_;
 void commit_bodyrate_data(void);
+void commit_keystroke_data(void);
 #endif
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
@@ -367,6 +370,9 @@ uint8_t* const msg_BODYRATES_parse[] = {
 	&g_a_x_sim_._.B0, &g_a_x_sim_._.B1, // x accel reading (grav - accel, body frame)
 	&g_a_y_sim_._.B0, &g_a_y_sim_._.B1, // y accel reading (grav - accel, body frame)
 	&g_a_z_sim_._.B0, &g_a_z_sim_._.B1, // z accel reading (grav - accel, body frame)
+};
+uint8_t* const msg_KEYSTROKE_parse[] = {
+	&x_ckey_, &x_vkey_, // control code, virtual keystroke code
 };
 #endif // HILSIM
 
@@ -608,6 +614,19 @@ static void msg_PL1(uint8_t gpschar)
 					}
 					break;
 				}
+				case 0xAC : { // NAV-KEYSTROKE message - THIS IS NOT AN OFFICIAL UBX MESSAGE
+					// WE ARE FAKING THIS FOR HIL SIMULATION
+					if (payloadlength.BB ==  NUM_POINTERS_IN(msg_KEYSTROKE_parse))
+					{
+						msg_parse = &msg_KEYSTROKE;
+					}
+					else
+					{
+						printf("NAV-KEYSTROKE, bad payloadlength %u != %u\r\n", payloadlength.BB, NUM_POINTERS_IN(msg_KEYSTROKE_parse));
+						msg_parse = &msg_B3;    // error condition
+					}
+					break;
+				}
 #endif
 				default : {     // some other NAV class message
 					msg_parse = &msg_MSGU;
@@ -736,6 +755,25 @@ static void msg_BODYRATES(uint8_t gpschar)
 		msg_parse = &msg_CS1;
 	}
 }
+
+static void msg_KEYSTROKE(uint8_t gpschar)
+{
+	if (payloadlength.BB > 0)
+	{
+		*msg_KEYSTROKE_parse[store_index++] = gpschar;
+		CK_A += gpschar;
+		CK_B += CK_A;
+		payloadlength.BB--;
+	}
+	else
+	{
+		// If the payload length is zero, we have received the entire payload, or the payload length
+		// was zero to start with. either way, the byte we just received is the first checksum byte.
+		checksum._.B1 = gpschar;
+		msg_parse = &msg_CS1;
+	}
+}
+
 #endif // HILSIM
 
 static void msg_ACK_CLASS(uint8_t gpschar)
@@ -789,6 +827,11 @@ static void msg_CS1(uint8_t gpschar)
 		{
 			// If we got the correct checksum for bodyrates, commit that data immediately
 			commit_bodyrate_data();
+		}
+		else if (msg_id == 0xAC)
+		{
+			// If we got the correct checksum for keystroke, commit that data immediately
+			commit_keystroke_data();
 		}
 #endif
 	}
@@ -849,6 +892,86 @@ void commit_bodyrate_data(void)
 	p_sim = p_sim_;
 	q_sim = q_sim_;
 	r_sim = r_sim_;
+}
+
+void hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
+{
+	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
+	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
+		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
+	}
+	else {
+		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
+	}
+}
+
+#define KEYPRESS_INPUT_DELTA 50
+
+void hilsim_handle_key_input(char c)
+{
+	switch (c) {
+		case 107: // Numpad +
+			hil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA*2);
+			break;
+		case 109: // Numpad -
+			hil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA*2);
+			break;
+		case 97:  // Numpad 1
+			hil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			break;
+		case 99:  // Numpad 3
+			hil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			break;
+		case 104: // Numpad 8
+			hil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			break;
+		case 98:  // Numpad 2
+			hil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			break;
+		case 100: // Numpad 4
+			hil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+			break;
+		case 102: // Numpad 6
+			hil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+			break;
+		case 101: // Numpad 5
+			printf("\naileron, elevator, rudder = 0%%\n");
+			udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
+			udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
+			udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
+			printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
+			break;
+		case 35: // '1' Numpad End
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
+			break;
+		case 111: // '2' Numpad /
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
+			break;
+		case 106: // '3' Numpad *
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
+			break;
+		case 36: // '4' Numpad Home
+			udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
+			break;
+		default:
+			break;
+	}
+}
+
+void commit_keystroke_data(void)
+{
+	if ((x_vkey_ != 0) && ((x_ckey_ & 0x08) || (x_ckey_ & 0x00))) // key down or key repeat
+	{
+/*
+xplm_ShiftFlag      1   The shift key is down
+xplm_OptionAltFlag  2   The option or alt key is down
+xplm_ControlFlag    4   The control key is down*
+xplm_DownFlag       8   The key is being pressed down
+xplm_UpFlag         16  The key is being released
+ */
+//		printf("HILSIM keystroke %u %02x\r\n", x_vkey_, x_ckey_);
+		hilsim_handle_key_input(x_vkey_);
+	}
 }
 
 void HILSIM_set_gplane(void)

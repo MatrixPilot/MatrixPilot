@@ -36,6 +36,24 @@
     <Filter Include="Source Files\libUDB">
       <UniqueIdentifier>{3824688d-0ed8-4283-ae32-33dd7fab24d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MAVLink">
+      <UniqueIdentifier>{0c5acc6c-3ac1-4891-8ddd-317213abf2d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink\include">
+      <UniqueIdentifier>{04e86fd9-4f76-4052-9e71-275523ec0771}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink\message_definitions">
+      <UniqueIdentifier>{64baa320-c528-444d-959d-c537e4768dbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink\include\matrixpilot">
+      <UniqueIdentifier>{ee865dab-31b4-4579-bf0a-9f3966091843}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink\include\common">
+      <UniqueIdentifier>{5824a3da-1dc2-49dd-a541-b3176a2baa85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MAVLink">
+      <UniqueIdentifier>{96c0bc0a-a087-497d-b0b7-9fb8288a8e54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\MatrixPilot\airspeedCntrl.c">
@@ -221,11 +239,41 @@
     <ClCompile Include="..\..\libDCM\mathlib.c">
       <Filter>Source Files\libDCM</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libDCM\gpsData.c">
-      <Filter>Source Files\libDCM</Filter>
+    <ClCompile Include="..\..\MAVLink\MAVFTP.c">
+      <Filter>Source Files\MAVLink</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libFlashFS\filesys.c">
       <Filter>Source Files\libFlashFS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\console.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\flight_state.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\fly_by_datalink.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\minim_osd.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\preflight.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\redef.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\remzibi_osd.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\ring_buffer.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\sonarCntrl.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libDCM\gpsData.c">
+      <Filter>Source Files\libDCM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -472,18 +520,504 @@
     <ClInclude Include="..\..\MatrixPilot\airspeed_options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libDCM\estWind.h">
-      <Filter>Header Files\libDCM</Filter>
+    <ClInclude Include="..\..\MAVLink\MAVFTP.h">
+      <Filter>Header Files\MAVLink</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libDCM\gpsData.h">
-      <Filter>Header Files\libDCM</Filter>
+    <ClInclude Include="..\..\MAVLink\include\mavlink_helpers.h">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\checksum.h">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\mavlink_types.h">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\inttypes.h">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot_mavlink_bridge_header.h">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\mavlink_conversions.h">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\mavlink_protobuf_manager.hpp">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\protocol.h">
+      <Filter>Header Files\MAVLink\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\common.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_attitude.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_attitude_quaternion.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_attitude_setpoint_external.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_auth_key.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_battery_status.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_change_operator_control.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_change_operator_control_ack.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_command_ack.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_command_long.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_data_stream.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_data_transmission_handshake.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_debug.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_debug_vect.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_distance_sensor.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_encapsulated_data.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_file_transfer_dir_list.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_file_transfer_res.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_file_transfer_start.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_global_position_int.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_global_position_setpoint_external_int.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_global_position_setpoint_int.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_global_vision_position_estimate.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_gps_global_origin.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_gps_inject_data.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_gps_raw_int.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_gps_rtk.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_gps_status.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_gps2_raw.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_gps2_rtk.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_heartbeat.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_highres_imu.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_hil_controls.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_hil_gps.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_hil_optical_flow.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_hil_rc_inputs_raw.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_hil_sensor.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_hil_state.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_hil_state_quaternion.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_local_ned_position_setpoint_external.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_local_position_ned.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_local_position_ned_system_global_offset.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_local_position_setpoint.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_log_data.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_log_entry.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_log_erase.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_log_request_data.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_log_request_end.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_log_request_list.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_manual_control.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_manual_setpoint.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_memory_vect.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_ack.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_clear_all.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_count.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_current.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_item.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_item_reached.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_request.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_request_list.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_request_partial_list.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_set_current.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_mission_write_partial_list.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_named_value_float.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_named_value_int.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_nav_controller_output.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_omnidirectional_flow.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_optical_flow.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_param_request_list.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_param_request_read.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_param_set.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_param_value.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_ping.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_power_status.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_radio_status.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_raw_imu.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_raw_pressure.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_rc_channels.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_rc_channels_override.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_rc_channels_raw.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_rc_channels_scaled.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_request_data_stream.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_roll_pitch_yaw_rates_thrust_setpoint.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_roll_pitch_yaw_speed_thrust_setpoint.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_roll_pitch_yaw_thrust_setpoint.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_safety_allowed_area.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_safety_set_allowed_area.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_scaled_imu.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_scaled_imu2.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_scaled_pressure.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_serial_control.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_servo_output_raw.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_global_position_setpoint_int.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_gps_global_origin.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_local_position_setpoint.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_mode.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_quad_motors_setpoint.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_quad_swarm_led_roll_pitch_yaw_thrust.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_quad_swarm_roll_pitch_yaw_thrust.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_roll_pitch_yaw_speed_thrust.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_set_roll_pitch_yaw_thrust.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_setpoint_6dof.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_setpoint_8dof.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_sim_state.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_state_correction.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_statustext.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_sys_status.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_system_time.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_vfr_hud.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_vicon_position_estimate.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_vision_position_estimate.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\mavlink_msg_vision_speed_estimate.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\testsuite.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\common\version.h">
+      <Filter>Header Files\MAVLink\include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\matrixpilot.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_airspeeds.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_altitudes.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_buffer_function.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_buffer_function_ack.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_command.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_command_ack.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_directory.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_directory_ack.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_read_req.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_flexifunction_set.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f2_a.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f2_b.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f4.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f5.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f6.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f7.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f8.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f13.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f14.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f15.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f16.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\testsuite.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MAVLink\include\matrixpilot\version.h">
+      <Filter>Header Files\MAVLink\include\matrixpilot</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libFlashFS\filesys.h">
       <Filter>Header Files\libFlashFS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libDCM\estWind.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\altitudeCntrl.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\servoPrepare.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\mathlib.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\MatrixPilot\MatrixPilot-auav3.hex">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\ardupilotmega.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\common.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\matrixpilot.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\minimal.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\pixhawk.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\sensesoar.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\slugs.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\test.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MAVLink\message_definitions\ualberta.xml">
+      <Filter>Header Files\MAVLink\message_definitions</Filter>
+    </None>
+    <None Include="..\..\MatrixPilot\MatrixPilot-udb4.hex">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </None>
+    <None Include="..\..\MatrixPilot\MatrixPilot-udb5.hex">
       <Filter>Header Files\MatrixPilot</Filter>
     </None>
   </ItemGroup>
