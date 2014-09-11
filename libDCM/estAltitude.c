@@ -37,10 +37,10 @@ int barometer_temperature_gnd = 0;
 long barometer_altitude;        // above sea level altitude - ASL (millimeters)
 long barometer_agl_altitude;    // above ground level altitude - AGL
 long barometer_pressure;
-int barometer_temperature;
+int16_t barometer_temperature;
 float sea_level_pressure;
 
-inline int get_barometer_temperature(void)   { return barometer_temperature; }
+inline int16_t get_barometer_temperature(void)   { return barometer_temperature; }
 inline long get_barometer_pressure(void)     { return barometer_pressure; }
 inline long get_barometer_altitude(void)     { return barometer_altitude; }
 inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }

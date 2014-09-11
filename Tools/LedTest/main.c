@@ -51,6 +51,7 @@ int main(void)
 #if (BOARD_TYPE != AUAV3_BOARD)
 	udb_eeprom_init();  // using legacy eeprom driver
 #endif
+	DPRINT("MatrixPilot LedTest\r\n");
 	while (1)
 	{
 		udb_run();
@@ -189,6 +190,7 @@ void udb_heartbeat_callback(void)
 		udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] = 3000;
 	} else if (eepromSuccess == 0 && eepromFailureFlashCount) {
 		// eeprom failure!
+		DPRINT("eeprom failure!\r\n");
 		if (udb_heartbeat_counter % 6 == 0) {
 			udb_led_toggle(LED_RED);
 			udb_led_toggle(LED_GREEN);
