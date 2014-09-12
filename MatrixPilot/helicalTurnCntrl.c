@@ -54,6 +54,7 @@ int16_t rotationRateError[3] ;
 void helicalTurnCntrl( void )
 {
 	union longww accum ;
+	int16_t rollErrorVector[3] ;
 	int16_t rtlkick ;
 	int16_t desiredPitch ;
 	int16_t steeringInput ;
@@ -61,7 +62,14 @@ void helicalTurnCntrl( void )
 	int16_t desiredTiltVector[3] ;
 	int16_t desiredRotationRateGyro[3] ;
 	uint16_t airSpeed ;
-	union longww desiredTilt ;	
+	union longww desiredTilt ;
+	int16_t desiredPitchVector[2] ;
+	int16_t desiredPerpendicularPitchVector[2] ;
+	int16_t actualPitchVector[2] ;
+	int16_t pitchDot ;
+	int16_t pitchCross ;
+	int16_t pitchError ;
+	int16_t pitchErrorBody[2] ;	
 #ifdef TestGains
 	flags._.GPS_steering = 0; // turn off navigation
 	flags._.pitch_feedback = 1; // turn on stabilization
@@ -194,21 +202,82 @@ void helicalTurnCntrl( void )
 	}
 	else
 	{
+		desiredPitch += INVNPITCH ;
 		// inverted flight, flip the desired tilt vector
 		desiredTiltVector[0] = - desiredTiltVector[0] ;
-		desiredTiltVector[1] =  desiredPitch + INVNPITCH ;
+		desiredTiltVector[1] = - desiredPitch  ;
 		desiredTiltVector[2] = - desiredTiltVector[2] ;
 	}
 
 	vector3_normalize( desiredTiltVector , desiredTiltVector ) ; // make sure tilt vector has magnitude RMAX
 
-	// compute tilt error vector
+	// compute roll error
 
-	VectorCross( tiltError , &rmat[6] , desiredTiltVector ) ; // compute tilt orientation error
+	VectorCross( rollErrorVector , &rmat[6] , desiredTiltVector ) ; // compute tilt orientation error
 	if ( VectorDotProduct( 3 , &rmat[6] , desiredTiltVector ) < 0 ) // more than 90 degree error
 	{
-		vector3_normalize( tiltError , tiltError ) ; // for more than 90 degrees, make the tilt error vector parallel to desired axis, with magnitude RMAX
+		vector3_normalize( rollErrorVector , rollErrorVector ) ; // for more than 90 degrees, make the tilt error vector parallel to desired axis, with magnitude RMAX
 	}
+	
+	tiltError[1] = rollErrorVector[1] ;
+
+	// compute pitch error
+
+	// start by computing the projection of earth frame pitch error to body frame
+
+	pitchErrorBody[0] = rmat[6] ;
+	pitchErrorBody[1] = rmat[8] ;
+
+	// normalize the projection vector and compute the cosine of the actual pitch as a side effect 
+
+	actualPitchVector[1] = ( int16_t ) vector2_normalize( pitchErrorBody , pitchErrorBody ) ;
+
+	// complete the actual pitch vector
+
+	actualPitchVector[0] = rmat[7] ;
+
+	// compute the desired pitch vector
+
+	desiredPitchVector[0] = - desiredPitch ;
+	desiredPitchVector[1] = RMAX ;
+	vector2_normalize ( desiredPitchVector , desiredPitchVector ) ;
+
+	// rotate desired pitch vector by 90 degrees to be able to compute cross product using VectorDot
+
+	desiredPerpendicularPitchVector[0] = desiredPitchVector[1] ;
+	desiredPerpendicularPitchVector[1] = - desiredPitchVector[0] ;
+
+	// compute pitchDot, the dot product of actual and desired pitch vector
+	// (the 2* that appears in several of the following expressions is a result of the Q2.14 format)
+
+	pitchDot = 2*VectorDotProduct( 2 , actualPitchVector , desiredPitchVector ) ;
+
+	// compute pitchCross, the cross product of the actual and desired pitch vector
+
+	pitchCross = 2*VectorDotProduct( 2 , actualPitchVector , desiredPerpendicularPitchVector ) ;
+
+	if( pitchDot > 0 )
+	{
+		pitchError = pitchCross ;
+	}
+	else
+	{
+		if ( pitchCross > 0 )
+		{
+			pitchError = RMAX ;
+		}
+		else
+		{
+			pitchError = - RMAX ;
+		}
+	}
+
+	// multiply the normalized rmat[6] , rmat[8] vector by the pitch error
+
+	VectorScale( 2 , pitchErrorBody , pitchErrorBody , pitchError ) ;
+
+	tiltError[0] = 2*pitchErrorBody[1] ;
+	tiltError[2] = - 2*pitchErrorBody[0] ;
 
 	// compute the rotation rate error vector
 
