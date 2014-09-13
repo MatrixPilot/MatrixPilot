@@ -359,11 +359,6 @@
 #define MAVLINK_SYSID                       1
 
 
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-//#define USE_OSD                             0   // moved to osd.h
-
 // NUM_ANALOG_INPUTS:
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
 //#define NUM_ANALOG_INPUTS                   0 // moved to board specific config files
