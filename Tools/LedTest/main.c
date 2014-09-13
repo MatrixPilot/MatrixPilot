@@ -20,7 +20,7 @@
 
 
 #include "../../libUDB/libUDB.h"
-#include "../../libUDB/libUDB_internal.h"
+#include "../../libUDB/ADchannel.h"
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/mpu6000.h"
 #include <libpic30.h>
