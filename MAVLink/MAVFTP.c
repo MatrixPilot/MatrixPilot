@@ -19,11 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
-#include "MAVLink.h"
+#include "../MatrixPilot/MAVLink.h"
 #include "MAVFTP.h"
 #include <stdio.h>
 
