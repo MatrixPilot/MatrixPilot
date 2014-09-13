@@ -9,8 +9,8 @@
 #if (WIN == 1 || NIX == 1)
 
 #include <stdio.h>
-#include "libUDB.h"
-#include "string.h"
+#include "../../libUDB/libUDB.h"
+#include <string.h>
 
 #define EEPROMFilePath "EEPROM.bin"
 #define EE_PAGE_SIZE   32

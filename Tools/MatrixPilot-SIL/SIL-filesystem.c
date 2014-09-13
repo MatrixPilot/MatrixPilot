@@ -9,8 +9,8 @@
 #if (WIN == 1 || NIX == 1)
 
 
-#include "../libUDB/libUDB.h"
-#include "../libUDB/heartbeat.h"
+#include "../../libUDB/libUDB.h"
+#include "../../libUDB/heartbeat.h"
 #include "SIL-filesystem.h"
 
 

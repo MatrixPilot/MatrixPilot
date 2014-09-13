@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libUDB.h"
+#include "../../libUDB/libUDB.h"
 #include "../../libUDB/magnetometer.h"
 #include "../../libUDB/heartbeat.h"
 #include "SIL-config.h"

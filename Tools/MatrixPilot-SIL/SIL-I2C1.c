@@ -20,11 +20,11 @@
 
 #if (WIN == 1 || NIX == 1)
 
-#include "libUDB_internal.h"
-#include "interrupt.h"
-#include "I2C.h"
-#include "NV_memory.h"
-#include "events.h"
+#include "../../libUDB/libUDB_internal.h"
+#include "../../libUDB/interrupt.h"
+#include "../../libUDB/I2C.h"
+#include "../../libUDB/NV_memory.h"
+#include "../../libUDB/events.h"
 
 #if (USE_I2C1_DRIVER == 1)
 
