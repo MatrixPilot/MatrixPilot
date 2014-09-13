@@ -20,17 +20,18 @@
 
 
 #include "defines.h"
+#include "osd_config.h"
+
+#if ((USE_OSD == OSD_NATIVE) && (SILSIM != 1))
+
 #include "navigate.h"
+#include "../libUDB/osd.h"
 #include "../libUDB/heartbeat.h"
-#include "../libDCM/libDCM_internal.h"
-#include "../libDCM/gpsParseCommon.h"
+#include "../libUDB/ADchannel.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../libUDB/osd.h"
-#include "osd_config.h"
-#include <stdlib.h>
+#include "../libDCM/gpsData.h"
 
-#if (USE_OSD == OSD_NATIVE)
 
 #define OSD_LOC_DISABLED    -1
 #include "osd_layout.h"

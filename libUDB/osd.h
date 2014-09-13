@@ -28,13 +28,6 @@
 #define OSD_NTSC            0
 #define OSD_PAL             1
 
-// define the OSD types
-#define OSD_NONE            0   // OSD disabled
-#define OSD_NATIVE          1   // native OSD
-#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
-#define OSD_MINIM           3   // Output data formatted for minim OSD
-
-
 #define MAX7456_VM0     0x00    // Video Mode 0
 #define MAX7456_VM1     0x01    // Video Mode 1
 #define MAX7456_HOS     0x02    // Horizontal Offset

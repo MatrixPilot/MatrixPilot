@@ -21,7 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "oscillator.h"
-#include "defines.h"
+#include "libUDB.h"
 #include "osd_config.h"
 #include "osd.h"
 

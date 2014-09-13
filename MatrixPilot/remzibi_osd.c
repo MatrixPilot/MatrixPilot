@@ -21,12 +21,12 @@
 
 #include "defines.h"
 #include "flightplan-waypoints.h"
-#include "../libDCM/libDCM_internal.h"
-#include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/gpsData.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libDCM/deadReckoning.h"
 #include "../libUDB/osd.h"
 #include "osd_config.h"
-#include <stdlib.h>
+#include "navigate.h"
 
 #if (USE_OSD == OSD_REMZIBI)
 
