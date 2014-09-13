@@ -250,7 +250,7 @@ allow for much more relaxed timing requirements, and therefore greater applicati
 firmware design flexibility.
 //----------------------------------------------------------------------------------*/
 
-#include "../libUDB/libUDB.h"
+#include "../../libUDB/libUDB.h"
 
 #if (USE_USB == 1)
 
