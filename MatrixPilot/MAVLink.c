@@ -229,7 +229,7 @@ void mav_printf(const char* format, ...)
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 // add printf library when running tests to output ascii messages of test results
-void serial_output(char* format, ...)
+static void serial_output(char* format, ...)
 {
 	int16_t remaining = 0;
 	int16_t wrote = 0;
