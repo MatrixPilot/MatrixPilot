@@ -28,15 +28,17 @@
 
 // note : it is possible to use other accelerometer ranges on the MPU6000
 #define SCALEGYRO           3.0016  // 500 degree/second range
-#define SCALEACCEL          1.29    // 4 g range
+//#define SCALEACCEL          1.29    // 4 g range
+#define SCALEACCEL          1.27    // 4 g range measured by WJP on a few UDB5s
 
 #define NUM_ANALOG_INPUTS   4
 
-// A/D channels:
+// External A/D channels:
 #define analogInput1BUFF    3
 #define analogInput2BUFF    4
 #define analogInput3BUFF    5
 #define analogInput4BUFF    6
+
 #define A_VOLT_BUFF         7       // V, pin label Bat Volt
 #define A_AMPS_BUFF         8       // I, pin label CS Curr
 #define A_RSSI_BUFF         9       // RS, pin label RSSI
@@ -69,10 +71,10 @@
 #define MAX_OUTPUTS         8
 
 // LED pins
-#define LED_BLUE            LATEbits.LATE4
-#define LED_ORANGE          LATEbits.LATE3
-#define LED_GREEN           LATEbits.LATE2
-#define LED_RED             LATEbits.LATE1
+#define LED_BLUE            _LATE4
+#define LED_ORANGE          _LATE3
+#define LED_GREEN           _LATE2
+#define LED_RED             _LATE1
 
 // SPI SS pin definitions
 #define SPI1_SS             _LATB2
@@ -80,7 +82,7 @@
 #define SPI1_TRIS           _TRISB2
 #define SPI2_TRIS           _TRISG9
 
-// Input Capture pin difinitions
+// Input Capture pin definitions
 #define IC_PIN1             _RD8
 #define IC_PIN2             _RD9
 #define IC_PIN3             _RD10

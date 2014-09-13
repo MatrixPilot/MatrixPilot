@@ -32,6 +32,8 @@
 #define xaccelBUFF          5
 #define yaccelBUFF          6
 #define zaccelBUFF          4
+
+// External A/D channels:
 #define analogInput1BUFF    7
 #define analogInput2BUFF    8
 #define analogInput3BUFF    9
