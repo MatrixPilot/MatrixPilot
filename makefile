@@ -5,10 +5,8 @@
 #
 
 SOURCE_DIR ?= ..
-$(warning source_dir = $(SOURCE_DIR))
 
 DEVICE ?= SILSIM
-$(warning device = $(DEVICE))
 
 TARGET_NAME ?= MatrixPilot
 
@@ -27,7 +25,7 @@ TARGET_TYPE := hex
 CPU := 33EP512MU810
 endif
 
-ifeq ($(DEVICE),UDB5) 
+ifneq (,$(filter $(DEVICE), UDB4 UDB5))
 TOOLCHAIN := C30
 TARGET_TYPE := hex
 CPU := 33FJ256GP710A
@@ -37,7 +35,6 @@ endif
 TARGET := $(TARGET_NAME).$(TARGET_TYPE)
 TARGET_MAP := $(TARGET_NAME).map
 
-$(warning target = $(TARGET))
 
 ifeq ($(TOOLCHAIN),GCC) 
 LIBS := -lws2_32
@@ -124,8 +121,6 @@ modules := $(subst /module.mk,,$(shell $(FIND) $(SOURCE_DIR) -name module.mk))
 include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/libUDB $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/include $(SOURCE_DIR)/libVectorMatrix
 endif
 
-$(warning modules = $(modules))
-$(warning includes = $(include_dirs))
 
 
 defines += $(DEVICE)=1
@@ -147,7 +142,6 @@ all:
 include $(addsuffix /module.mk,$(modules))
 
 create-output-directories := \
-	$(warning creating output directories $(subst $(SOURCE_DIR)/,,$(modules))) \
 	$(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(modules)))); do [ -d %%f ] || $(MKDIR) %%f)
 
 .PHONY: all
