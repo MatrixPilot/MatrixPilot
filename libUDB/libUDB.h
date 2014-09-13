@@ -45,7 +45,7 @@
 #define USE_MSD                             0
 #undef  FAILSAFE_INPUT_MIN
 #define FAILSAFE_INPUT_MIN                  1500
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #else
 #define SILSIM                              0
 #include <dsp.h>

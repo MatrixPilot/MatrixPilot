@@ -24,7 +24,7 @@
 #include "telemetry_log.h"
 #if (WIN == 1 || NIX == 1)
 #include <stdio.h>
-#include "SIL-filesystem.h"
+#include "../Tools/MatrixPilot-SIL/SIL-filesystem.h"
 #else
 #include "MDD-File-System/FSIO.h"
 #endif

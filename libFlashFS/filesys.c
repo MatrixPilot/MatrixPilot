@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../libUDB/libUDB.h" // for DPRINT
 #include "filesys.h"
 #ifndef WIN32
 #include "MDD-File-System/FSIO.h"
@@ -139,13 +139,13 @@ void filesys_dir(char* arg)
 	if (arg == NULL) {
 		arg = "*.*";
 	}
-	DPRINT("filesys_dir %s - WIN32 TODO\r\n", arg);
+	printf("filesys_dir %s - WIN32 TODO\r\n", arg);
 }
 
 //size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
 void filesys_cat(char* arg)
 {
-	DPRINT("filesys_cat(%s) - WIN32 TODO\r\n", arg);
+	printf("filesys_cat(%s) - WIN32 TODO\r\n", arg);
 }
 
 void filesys_format(void)
@@ -154,7 +154,7 @@ void filesys_format(void)
 
 int filesys_init(void)
 {
-	DPRINT("filesys_init() - nothing to do on WIN32\r\n");
+	printf("filesys_init() - nothing to do on WIN32\r\n");
 	return 1;
 }
 

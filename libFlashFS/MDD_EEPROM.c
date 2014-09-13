@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../libUDB/libUDB.h"
 #include "MDD-File-System/FSIO.h"
 #include "MDD-File-System/FSDefs.h"
 #include "FSconfig.h"
@@ -29,9 +29,6 @@
 #include "MDD_EEPROM.h"
 #include "EEPROM.h"
 #include "I2C.h"
-//#include <stdint.h>
-#include <stdio.h>
-
 #include "../libUDB/eeprom_udb4.h"
 
 extern void Delayms(BYTE milliseconds);

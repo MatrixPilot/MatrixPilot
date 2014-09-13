@@ -23,7 +23,7 @@
 #include "mathlibNAV.h"
 #include "mathlib.h"
 #if (WIN == 1 || NIX == 1)
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #endif // (WIN == 1 || NIX == 1)
 
 #ifndef NULL

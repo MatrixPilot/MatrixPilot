@@ -9,8 +9,8 @@
 #if (WIN == 1 || NIX == 1)
 
 #include "SIL-udb.h"
-#include "defines.h"
-#include "flightplan-waypoints.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/flightplan-waypoints.h"
 #include <stdio.h>
 
 #define BUFLEN 512

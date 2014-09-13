@@ -23,7 +23,7 @@
 
 #ifdef USE_AT45D_FLASH
 
-#include "defines.h"
+#include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "AT45D.h"
 #include <stdio.h>
