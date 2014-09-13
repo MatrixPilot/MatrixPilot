@@ -339,11 +339,6 @@
 #define MAVLINK_SYSID                       55
 
 
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD                             0
-
 // NUM_ANALOG_INPUTS:
 // For classic boards: Set to 0, 1, or 2
 //   1 enables Radio In 1 as an analog Input

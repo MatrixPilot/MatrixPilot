@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2012 MatrixPilot Team
+// Copyright 2009-2014 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -161,18 +161,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
-// For classic UDB boards:
-// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
-// This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
-// If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
-// following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
-// With it set to 1, the RC outputs will be in this alternate configuration:
-// Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-//
-// For UDB4 boards:
-// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
-// The 8 standard output channels remain unaffected.  2 additional output channels are available
-// on pins RA4 and RA1.
+// For setups with an external Rx device:
+//   Use a single PPM input connection from the RC receiver to the UDB on RC input channel PPM_IC.
+//   The 8 standard output channels remain unaffected.
+//   For UDB4 and UDB5 boards:
+//     2 additional output channels are available on pins RA4 and RA1.
+//   For AUAV3 boards:
+//     support for additional output channels may be developed upon request
 //
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
@@ -184,11 +179,17 @@
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
 
+// Select which Input Capture pin the PPM device is connected to
+// changing this can be useful when using PPM and fitting a UDB into
+// very tight airframes, as it allows alternative input pins to be
+// assigned for connection to the receiver.
+// If not using PPM, then this must be left set to '1'
+#define PPM_IC                              1
+
 // NUM_INPUTS:
-// For classic boards: Set to 1-5 (or 1-8 when using PPM input)
-//   1-4 enables only the first 1-4 of the 4 standard input channels
-//   5 also enables E8 as the 5th input channel
-// For UDB4 boards: Set to 1-8
+// If using PWM inputs (parallel Rx connections), set to the number of cables connected, 1-8
+// If using PPM inputs (serial Rx connection), set to the number of Rx channels, up to PPM_NUMBER_OF_CHANNELS
+// If using LRS library (integrated SPI tranceiver), set to the number of Rx channels, up to 16
 #define NUM_INPUTS                          4
 
 // Channel numbers for each input.
@@ -210,13 +211,10 @@
 #define PASSTHROUGH_D_INPUT_CHANNEL         CHANNEL_UNUSED
 
 // NUM_OUTPUTS:
-// For classic boards: Set to 3, 4, 5, or 6
-//   3 enables only the standard 3 output channels
-//   4 also enables E0 as the 4th output channel
-//   5 also enables E2 as the 5th output channel
-//   6 also enables E4 as the 6th output channel
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
-// For UDB4 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
+// For UDB4/5 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
+// For AUAV3 boards:  Set to 3-8 (or up to 11 using pins RE1, RA6 and RA7.)
+//                               (this needs developing, so contact the list)
 #define NUM_OUTPUTS                         3
 
 // Channel numbers for each output
@@ -323,7 +321,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, or SERIAL_OSD_REMZIBI)
+// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
 // This determines the format of the output sent out the spare serial port.
 // Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
@@ -331,28 +329,27 @@
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
-// SERIAL_MAVLINK is only supported on the UDB4 to ensure that sufficient RAM is available.
+// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
 #define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
 
-// MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
-// Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       55
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for either standard telemetry streams or MAVLink
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+//#define SERIAL_BAUDRATE                     19200
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD                             0
+
+// MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
+// Each aircraft in the sky will need a unique I.D. in the range from 0-255
+#define MAVLINK_SYSID                       1
+
 
 // NUM_ANALOG_INPUTS:
-// For classic boards: Set to 0, 1, or 2
-//   1 enables Radio In 1 as an analog Input
-//   2 also enables Radio In 2 as another analog Input
-//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS                   0
+//#define NUM_ANALOG_INPUTS                   0 // moved to board specific config files
 
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
@@ -380,9 +377,31 @@
 #define ANALOG_VOLTAGE_INPUT_CHANNEL        CHANNEL_UNUSED
 #define ANALOG_RSSI_INPUT_CHANNEL           CHANNEL_UNUSED
 
+#define MAX_CURRENT                         900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
+#define CURRENT_SENSOR_OFFSET               10  // Add 1.0 Amp to whatever value we sense
+
+#define MAX_VOLTAGE                         543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
+#define VOLTAGE_SENSOR_OFFSET               0   // Add 0.0 Volts to whatever value we sense
+
 // RSSI - RC Receiver signal strength
 #define RSSI_MIN_SIGNAL_VOLTAGE             0.5     // Voltage when RSSI should show 0%
 #define RSSI_MAX_SIGNAL_VOLTAGE             3.3     // Voltage when RSSI should show 100%
+
+
+////////////////////////////////////////////////////////////////////////////////
+// MAXBOTIX SONAR LANDING FLARE
+// Designed for use with the following device:-
+// http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
+// Can be used on INPUT 8 of the UDB4/5 if that is not used for a channel input.
+// Will return distance to ground in meters and compensate for roll subject to 
+// receiving a returned sonar signal.
+// This option is designed to be used with Logo Flight Planning.
+// Logo allows the user to Interrupt a Landing and flare, or Go Around,
+// based on sonar distance to ground.
+
+// Set USE_SONAR_INPUT to the input capture channel which the sensor
+// is connected to. Must be greater than the last used servo channel.
+#define USE_SONAR_INPUT                     0
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -739,6 +758,9 @@
 #define TLM_PORT                            3
 #define DBG_PORT                            1
 
+
+// Set this to 1 to enable filesystem support
+#define USE_FILESYS                         1
 
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
 #define USE_TELELOG                         0
