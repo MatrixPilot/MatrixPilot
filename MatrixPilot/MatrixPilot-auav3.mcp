@@ -18,8 +18,8 @@ filter_obj=*.o
 filter_lib=*.a
 filter_lkr=*.gld
 [CAT_SUBFOLDERS]
-subfolder_src=
-subfolder_inc=
+subfolder_src=MAVLink;MatrixPilot;Microchip;libDCM;libFlashFS;libUDB;libVectorMatrix
+subfolder_inc=MAVLink;MatrixPilot;Microchip;libDCM;libFlashFS;libUDB
 subfolder_obj=
 subfolder_lib=
 subfolder_lkr=
@@ -413,7 +413,6 @@ file_385=Microchip
 file_386=Microchip
 file_387=Microchip
 file_388=Microchip
-
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -804,7 +803,6 @@ file_385=no
 file_386=no
 file_387=no
 file_388=no
-
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -1195,7 +1193,6 @@ file_385=no
 file_386=no
 file_387=no
 file_388=no
-
 [FILE_INFO]
 file_000=..\MatrixPilot\airspeedCntrl.c
 file_001=..\MatrixPilot\altitudeCntrl.c
@@ -1586,7 +1583,6 @@ file_385=..\Microchip\Include\USB\usb_function_msd.h
 file_386=..\Microchip\Include\USB\usb_hal.h
 file_387=..\Microchip\Include\USB\usb_hal_dspic33E.h
 file_388=..\Microchip\USB\usb_device_local.h
-
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

@@ -984,9 +984,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\MatrixPilot\MatrixPilot-auav3.hex">
-      <Filter>Header Files\MatrixPilot</Filter>
-    </None>
     <None Include="..\..\MAVLink\message_definitions\ardupilotmega.xml">
       <Filter>Header Files\MAVLink\message_definitions</Filter>
     </None>
@@ -1013,12 +1010,6 @@
     </None>
     <None Include="..\..\MAVLink\message_definitions\ualberta.xml">
       <Filter>Header Files\MAVLink\message_definitions</Filter>
-    </None>
-    <None Include="..\..\MatrixPilot\MatrixPilot-udb4.hex">
-      <Filter>Header Files\MatrixPilot</Filter>
-    </None>
-    <None Include="..\..\MatrixPilot\MatrixPilot-udb5.hex">
-      <Filter>Header Files\MatrixPilot</Filter>
     </None>
   </ItemGroup>
 </Project>

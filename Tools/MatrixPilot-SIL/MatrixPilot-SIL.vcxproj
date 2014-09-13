@@ -50,7 +50,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;..\..\libUDB;..\..\MatrixPilot;..\..\libFlashFS;..\..\Microchip;..\..\Microchip\include;..\HILSIM_XPlane;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Config;../../libUDB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN;WIN32;_DEBUG;_WINDOWS;_USRDLL;XPNETDATA_EXPORTS;IBM=1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -178,6 +178,7 @@
     <ClInclude Include="..\..\libDCM\deadReckoning.h" />
     <ClInclude Include="..\..\libDCM\estAltitude.h" />
     <ClInclude Include="..\..\libDCM\estWind.h" />
+    <ClInclude Include="..\..\libDCM\gpsData.h" />
     <ClInclude Include="..\..\libDCM\gpsParseCommon.h" />
     <ClInclude Include="..\..\libDCM\libDCM.h" />
     <ClInclude Include="..\..\libDCM\libDCM_defines.h" />
@@ -411,9 +412,6 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\MatrixPilot\MatrixPilot-auav3.hex" />
-    <None Include="..\..\MatrixPilot\MatrixPilot-udb4.hex" />
-    <None Include="..\..\MatrixPilot\MatrixPilot-udb5.hex" />
     <None Include="..\..\MAVLink\message_definitions\ardupilotmega.xml" />
     <None Include="..\..\MAVLink\message_definitions\common.xml" />
     <None Include="..\..\MAVLink\message_definitions\matrixpilot.xml" />
