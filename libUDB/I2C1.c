@@ -25,7 +25,7 @@
 #include "NV_memory.h"
 #include "events.h"
 
-#if (USE_I2C1_DRIVER == 1)
+//#if (USE_I2C1_DRIVER == 1)
 
 #define I2C1_SDA        _RG3
 #define I2C1_SCL        _RG2
@@ -337,4 +337,4 @@ static void I2C1_Failed(void)
 		pI2C_callback(false);
 }
 
-#endif // USE_I2C1_DRIVER
+//#endif // USE_I2C1_DRIVER

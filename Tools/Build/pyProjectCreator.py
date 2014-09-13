@@ -45,7 +45,7 @@ def find_files(masks, dir):
 		else:
 			for mask in masks:
 				if fnmatch.fnmatch(entry, mask):
-					str = str + "        <itemPath>" + os.path.join(dir, entry) + "</itemPath>\n"
+					str = str + "        <itemPath>" + dir.replace("\\", "/") + "/" + entry + "</itemPath>\n"
 	return str
 
 def find(masks, startdir=os.curdir):
