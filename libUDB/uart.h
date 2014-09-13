@@ -60,9 +60,11 @@ char Hex2Char(char hex);
 void ClrError(void);
 int DataReceived(void);
 
+#if (SILSIM != 1)
 #define kbhit IsPressed
 #define getch GetChar
 #define putch PutChar
+#endif
 
 
 #endif // _UART_H_

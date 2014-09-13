@@ -78,14 +78,18 @@ static void cmd_stop(void)
 
 static void cmd_on(void)
 {
+#if (SILSIM != 1)
 	printf("on.\r\n");
 	SRbits.IPL = 0; // turn on all interrupt priorities
+#endif
 }
 
 static void cmd_off(void)
 {
+#if (SILSIM != 1)
 	printf("off.\r\n");
 	SRbits.IPL = 7; // turn off all interrupt priorities
+#endif
 }
 
 static void cmd_cpuload(void)
@@ -95,12 +99,14 @@ static void cmd_cpuload(void)
 
 static void cmd_crash(void)
 {
+#if (SILSIM != 1)
 	static int i;
 	char buffer[32];
 
 	sprintf(buffer, "overflowing stack %u.\r\n", i++);
 	printf(buffer);
 	cmd_crash();
+#endif
 }
 
 static void cmd_adc(void)
@@ -110,12 +116,14 @@ static void cmd_adc(void)
 
 static void cmd_barom(void)
 {
+#if (SILSIM != 1)
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
 	       get_barometer_temperature(),
 	       (uint16_t)get_barometer_pressure(),
 	       (uint16_t)get_barometer_altitude(),
 	       (uint16_t)get_barometer_agl_altitude()
 	      );
+#endif
 }
 
 static void cmd_magno(void)
@@ -204,7 +212,9 @@ void gentrap(void);
 
 static void cmd_trap(void)
 {
+#if (SILSIM != 1)
 	gentrap();
+#endif
 }
 
 static void cmd_reg(void)
@@ -261,7 +271,9 @@ static void cmd_stack(void)
 
 static void cmd_reset(void)
 {
+#if (SILSIM != 1)
 	asm("reset");
+#endif
 }
 
 static void cmd_help(void);

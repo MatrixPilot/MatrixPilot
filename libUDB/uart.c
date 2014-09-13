@@ -19,7 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+//#include "../MatrixPilot/defines.h"
+#include "../libUDB/libUDB.h"
 #include "oscillator.h"
 #include "uart.h"
 
