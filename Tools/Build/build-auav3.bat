@@ -1,1 +1,1 @@
-make -f ../makefile_auav3 %1 %2
+make -f ../../makefile SOURCE_DIR=../.. DEVICE=AUAV3

@@ -1,1 +1,1 @@
-make -f ../makefile_silsim %1 %2
+make -f ../../makefile SOURCE_DIR=../.. DEVICE=SILSIM

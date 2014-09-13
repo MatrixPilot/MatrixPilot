@@ -71,10 +71,11 @@ def mplab8_scan_dirs(masks, directories):
 			file_info = file_info + "file_" + str.format('{:0>3}', file_cnt) + "=" + filename + '\n'
 			file_cnt = file_cnt + 1
 
-def mplab8_project(mcu_type, target_board, project_output_file):
+def mplab8_project(mcu_type, target_board, config_dir, project_output_file):
 	with open ("mplab8-template.txt", "r") as file:
 		data = file.read()
 		data = data.replace("%%DEVICE%%", mcu_type)
+		data = data.replace("%%CONFIG%%", config_dir)
 		data = data.replace("%%TARGET_BOARD%%", target_board)
 		data = data.replace("%%FILE_SUBFOLDERS%%", file_subfolders)
 		data = data.replace("%%GENERATED_FILES%%", other_files)
@@ -93,7 +94,7 @@ def mplabX_scan_dirs(masks, directories):
 		str = str + "      </logicalFolder>\n"
 	return str
 
-def mplabX_project(mcu_type, target_board, header_files, source_files, project_path):
+def mplabX_project(mcu_type, name, target_board, config_dir, header_files, source_files, project_path):
 	mkdirnotex(os.path.join(project_path, "Makefile"))
 	with open ("Makefile", "r") as file:
 		data = file.read()
@@ -103,7 +104,9 @@ def mplabX_project(mcu_type, target_board, header_files, source_files, project_p
 	mkdirnotex(os.path.join(project_path, "nbproject"))
 	with open ("configurations.xml", "r") as file:
 		data = file.read()
+		data = data.replace("%%NAME%%", name)
 		data = data.replace("%%DEVICE%%", mcu_type)
+		data = data.replace("%%CONFIG%%", config_dir)
 		data = data.replace("%%TARGET_BOARD%%", target_board)
 		data = data.replace("%%HEADER_FILES%%", header_files)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
@@ -111,6 +114,7 @@ def mplabX_project(mcu_type, target_board, header_files, source_files, project_p
 		file.write(data)
 	with open ("project.xml", "r") as file:
 		data = file.read()
+		data = data.replace("%%NAME%%", name)
 		data = data.replace("%%TARGET_BOARD%%", target_board)
 	with open (os.path.join(project_path, "project.xml"), "w") as file:
 		file.write(data)
@@ -122,6 +126,8 @@ if __name__ == '__main__':
 	parser.add_option("-n", "--name", dest="name", help="specify the project name", type="string", default="MatrixPilot", metavar="MatrixPilot")
 	parser.add_option("-t", "--target", dest="target", help="specify the target board", type="string", default="UDB5", metavar="UDB5")
 	parser.add_option("-d", "--dir", dest="directories", help="search directory for source files", action='append')
+	parser.add_option("-i", "--inc", dest="includes", help="additional include files directory", default="")
+	parser.add_option("-c", "--cfg", dest="config", help="specify configuration files directory", default="../Config")
 	parser.add_option("-o", "--out", dest="out", help="project files output path", default="output")
 #	parser.add_option("--defines", dest="defines", help="specify optional defines", action='append')
 	(opts, args) = parser.parse_args()
@@ -140,10 +146,10 @@ if __name__ == '__main__':
 	mplab8_scan_dirs("*.h", opts.directories)
 	project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".mcp")
 	print "writing: " + project_path
-	mplab8_project(arch, opts.target, project_path)
+	mplab8_project(arch, opts.target, opts.config, project_path)
 
 	headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.directories)
 	sources = mplabX_scan_dirs(["*.c", "*.s"], opts.directories)
 	project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".X")
 	print "writing: " + project_path
-	mplabX_project(arch, opts.target, headers, sources, project_path)
+	mplabX_project(arch, opts.name, opts.target, opts.config, headers, sources, project_path)
