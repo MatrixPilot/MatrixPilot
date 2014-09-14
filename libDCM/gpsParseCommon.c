@@ -285,7 +285,7 @@ static void udb_background_callback_triggered(void)
 		velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
 
 #if (HILSIM == 1)
-		air_speed_3DGPS = as_sim.BB; // use Xplane as a pitot
+		air_speed_3DGPS = hilsim_airspeed.BB; // use Xplane as a pitot
 #else
 		air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
 #endif
