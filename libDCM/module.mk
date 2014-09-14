@@ -1,7 +1,7 @@
 
 local_src := $(wildcard $(SOURCE_DIR)/$(subdirectory)/*.c)
 
-ifeq ($(TOOLCHAIN),C30) 
+ifneq (,$(filter $(TOOLCHAIN), C30 XC16))
 local_src += $(wildcard $(SOURCE_DIR)/$(subdirectory)/*.s)
 else
 endif

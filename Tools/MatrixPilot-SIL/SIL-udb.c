@@ -72,13 +72,10 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 
 #endif // WIN
 
-#include "libUDB.h"
-#include "ADchannel.h"
-#include "magnetometer.h"
-#include "magnetometerOptions.h"
-#include "events.h"
+#include "../../libUDB/ADchannel.h"
+#include "../../libUDB/magnetometerOptions.h"
+#include "../../libUDB/events.h"
 #include "SIL-udb.h"
-//#include "UDBSocket.h"
 #include "SIL-ui.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
