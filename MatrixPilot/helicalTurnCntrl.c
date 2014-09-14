@@ -194,9 +194,9 @@ void helicalTurnCntrl( void )
 	}
 	else
 	{
-		// inverted flight, flip the desired tilt vector
+		// inverted flight, flip the desired roll vector and add pitch adjustment
 		desiredTiltVector[0] = - desiredTiltVector[0] ;
-		desiredTiltVector[1] =  desiredPitch + INVNPITCH ;
+		desiredTiltVector[1] = - desiredPitch - INVNPITCH ;
 		desiredTiltVector[2] = - desiredTiltVector[2] ;
 	}
 
