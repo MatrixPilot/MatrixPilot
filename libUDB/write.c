@@ -40,22 +40,24 @@ write(int handle, void *buffer, unsigned int len)
 				brg = &U4BRG;
 			}
 #endif // __dsPIC33E__
-			if ((umode->UARTEN) == 0)
-			{
-				*brg = 0;
-				umode->UARTEN = 1;
-			}
-			if ((ustatus->UTXEN) == 0)
-			{
-				ustatus->UTXEN = 1;
-			}
-			for (i = len; i; --i)
-			{
-				while ((ustatus->TRMT) ==0);
-				*txreg = *(char*)buffer++;
-			}
 			break;
 
+		case 3:
+#if defined (__dsPIC33E__)
+			umode = (UxMODEBITS*)&U3MODEbits;
+			ustatus = (UxSTABITS*)&U3STAbits;
+			txreg = &U3TXREG;
+			brg = &U3BRG;
+#endif // __dsPIC33E__
+			break;
+		case 4:
+#if defined (__dsPIC33E__)
+			umode = (UxMODEBITS*)&U4MODEbits;
+			ustatus = (UxSTABITS*)&U4STAbits;
+			txreg = &U4TXREG;
+			brg = &U4BRG;
+#endif // __dsPIC33E__
+			break;
 		default: {
 //			SIMIO simio;
 //			register PSIMIO psimio asm("w0") = &simio;
@@ -65,8 +67,22 @@ write(int handle, void *buffer, unsigned int len)
 //			simio.u.write.len = len;
 //			dowrite(psimio);
 //			len = simio.u.write.len;
-			break;
+			return 0;
 		}
+	}
+	if ((umode->UARTEN) == 0)
+	{
+		*brg = 0;
+		umode->UARTEN = 1;
+	}
+	if ((ustatus->UTXEN) == 0)
+	{
+		ustatus->UTXEN = 1;
+	}
+	for (i = len; i; --i)
+	{
+		while ((ustatus->TRMT) ==0);
+		*txreg = *(char*)buffer++;
 	}
 	return len;
 }

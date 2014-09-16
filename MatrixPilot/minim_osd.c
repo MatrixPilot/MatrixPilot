@@ -20,13 +20,14 @@
 
 
 #include "defines.h"
+#include "navigate.h"
 #include "osd_config.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/gpsData.h"
 #include "../libUDB/osd.h"
-#include "navigate.h"
+#include <stdlib.h> // for abs(...)
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 

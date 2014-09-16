@@ -3,6 +3,7 @@
 #::= simply expanded variables (posix standard)
 # ?= conditional variable assignment operator, only has an effect if the variable is not yet defined
 #
+Q := $(if $(V),,@)
 
 SOURCE_DIR ?= ..
 
@@ -10,30 +11,29 @@ DEVICE ?= SILSIM
 
 TARGET_NAME ?= MatrixPilot
 
-TARGET_NAME := $(TARGET_NAME)-$(DEVICE)
-
 ifeq ($(DEVICE),SILSIM) 
 TOOLCHAIN := GCC
 TARGET_TYPE := exe
 CPU :=
 endif
 
-
 ifeq ($(DEVICE),AUAV3) 
-TOOLCHAIN := C30
+#TOOLCHAIN ?= C30
+TOOLCHAIN ?= XC16
 TARGET_TYPE := hex
 CPU := 33EP512MU810
 endif
 
 ifneq (,$(filter $(DEVICE), UDB4 UDB5))
-TOOLCHAIN := C30
+TOOLCHAIN ?= C30
 TARGET_TYPE := hex
 CPU := 33FJ256GP710A
 endif
 
 
-TARGET := $(TARGET_NAME).$(TARGET_TYPE)
+TARGET_NAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
 TARGET_MAP := $(TARGET_NAME).map
+TARGET := $(TARGET_NAME).$(TARGET_TYPE)
 
 
 ifeq ($(TOOLCHAIN),GCC) 
@@ -43,9 +43,10 @@ CFLAGS += -DWIN=1
 endif
 
 ifeq ($(TOOLCHAIN),C30) 
-CC       := "C:\Program Files (x86)\Microchip\mplabc30\v3.31\bin\pic30-gcc.exe"
-AR       := "C:\Program Files (x86)\Microchip\mplabc30\v3.31\bin\pic30-ar.exe"
-BIN2HEX  := "C:\Program Files (x86)\Microchip\mplabc30\v3.31\bin\pic30-bin2hex.exe"
+#CC       := "C:\Program Files (x86)\Microchip\mplabc30\v3.31\bin\pic30-gcc.exe"
+CC       := pic30-gcc.exe
+AR       := pic30-ar.exe
+BIN2HEX  := pic30-bin2hex.exe
 LIBS     := -legacy-libc 
 TARGET_ARCH := -mcpu=$(CPU)
 AFLAGS += -Wa,-g,--defsym=PSV_ERRATA=1
@@ -113,12 +114,12 @@ defines :=
 
 ifeq ($(DEVICE),SILSIM)
 modules := $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/Tools/MatrixPilot-SIL
-include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/libUDB
+include_dirs := $(SOURCE_DIR)/Config
 endif
 
 ifneq (,$(filter $(DEVICE), UDB4 UDB5 AUAV3))
 modules := $(subst /module.mk,,$(shell $(FIND) $(SOURCE_DIR) -name module.mk))
-include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/libUDB $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/include $(SOURCE_DIR)/libVectorMatrix
+include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/include $(SOURCE_DIR)/libVectorMatrix
 endif
 
 
@@ -142,7 +143,7 @@ all:
 include $(addsuffix /module.mk,$(modules))
 
 create-output-directories := \
-	$(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(modules)))); do [ -d %%f ] || $(MKDIR) %%f)
+	$(Q) $(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(modules)))); do [ -d %%f ] || $(MKDIR) %%f)
 
 .PHONY: all
 all: $(TARGET)
@@ -159,20 +160,20 @@ ifneq "$(MAKECMDGOALS)" "clean"
 endif
 
 %.d: %.c
-	$(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
-	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
-	$(MV) $@.tmp $@
+	$(Q) $(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(Q) $(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
+	$(Q) $(MV) $@.tmp $@
 
 %.o: %.c
-	$(CC) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+	$(Q) $(CC) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
 %.d: %.s
-	$(CC) $(TARGET_ARCH) $(AFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
-	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
-	$(MV) $@.tmp $@
+	$(Q) $(CC) $(TARGET_ARCH) $(AFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(Q) $(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
+	$(Q) $(MV) $@.tmp $@
 
 %.o: %.s
-	$(CC) $(TARGET_ARCH) -c -o $@ $< $(AFLAGS),$(subst $(space),$(comma),$(INCLUDES))
+	$(Q) $(CC) $(TARGET_ARCH) -c -o $@ $< $(AFLAGS),$(subst $(space),$(comma),$(INCLUDES))
 
 %.exe: $(objects)
 	$(CC) -o $@ $(LFLAGS) $(objects) $(LIBS)
