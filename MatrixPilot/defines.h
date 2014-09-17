@@ -151,7 +151,7 @@ void mavlink_output_40hz(void);
 
 ////////////////////////////////////////////////////////////////////////////////
 // mp_osd.c
-void osd_run_step(void);
+void mp_osd_run_step(void);
 
 
 #include "gain_variables.h"

@@ -119,7 +119,7 @@ void dcm_heartbeat_callback(void)
 #endif // SERIAL_OUTPUT_FORMAT
 	}
 
-	osd_run_step();
+	mp_osd_run_step();
 }
 
 void manualPassthrough(void)
