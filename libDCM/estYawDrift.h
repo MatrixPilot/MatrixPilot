@@ -19,21 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef MODE_SWITCH_H
-#define MODE_SWITCH_H
+// Allows disabling yaw drift estimation.
+// Starts off enabled.  Call this to disable and to then re-enable.
+void dcm_enable_yaw_drift_correction(boolean enabled);
 
-
-//inline int16_t flight_mode_switch_manual(void);
-//inline int16_t flight_mode_switch_stabilize(void);
-//inline int16_t flight_mode_switch_waypoints(void);
-
-// removed 'inline' to keep VC++ happy
-int16_t flight_mode_switch_manual(void);
-int16_t flight_mode_switch_stabilize(void);
-int16_t flight_mode_switch_waypoints(void);
-
-void flight_mode_switch_2pos_poll(void); // this is called at 40 hertz and scans the two postion switch option.
-void flight_mode_switch_check_set(void); // this is called at 2 hertz and changes the flight mode if req.
-
-
-#endif // MODE_SWITCH_H
+void estYawDrift(void);
