@@ -41,7 +41,7 @@ void AT45D_FormatFS(void);
 
 typedef struct tagCmds {
 	int index;
-	void (*fptr)(void);
+	void (*fptr)(char*);
 	const char const * cmdstr;
 } cmds_t;
 
@@ -51,12 +51,12 @@ char cmdstr[32];
 int show_cpu_load = 0;
 
 
-static void cmd_ver(void)
+static void cmd_ver(char* arg)
 {
 	printf("MatrixPilot v0.1, " __TIME__ " " __DATE__ "\r\n");
 }
 
-static void cmd_format(void)
+static void cmd_format(char* arg)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	printf("formatting dataflash\r\n");
@@ -70,13 +70,13 @@ static void cmd_start(void)
 	show_cpu_load = 1;
 }
 
-static void cmd_stop(void)
+static void cmd_stop(char* arg)
 {
 	printf("stopped.\r\n");
 	show_cpu_load = 0;
 }
 
-static void cmd_on(void)
+static void cmd_on(char* arg)
 {
 #if (SILSIM != 1)
 	printf("on.\r\n");
@@ -84,7 +84,7 @@ static void cmd_on(void)
 #endif
 }
 
-static void cmd_off(void)
+static void cmd_off(char* arg)
 {
 #if (SILSIM != 1)
 	printf("off.\r\n");
@@ -92,12 +92,12 @@ static void cmd_off(void)
 #endif
 }
 
-static void cmd_cpuload(void)
+static void cmd_cpuload(char* arg)
 {
 	printf("CPU Load %u%%\r\n", udb_cpu_load());
 }
 
-static void cmd_crash(void)
+static void cmd_crash(char* arg)
 {
 #if (SILSIM != 1)
 	static int i;
@@ -105,16 +105,16 @@ static void cmd_crash(void)
 
 	sprintf(buffer, "overflowing stack %u.\r\n", i++);
 	printf(buffer);
-	cmd_crash();
+	cmd_crash(arg);
 #endif
 }
 
-static void cmd_adc(void)
+static void cmd_adc(char* arg)
 {
 //	printf("ADC vcc %u, 5v %u, rssi %u\r\n", udb_vcc.value, udb_5v.value, udb_rssi.value);
 }
 
-static void cmd_barom(void)
+static void cmd_barom(char* arg)
 {
 #if (SILSIM != 1)
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
@@ -126,11 +126,11 @@ static void cmd_barom(void)
 #endif
 }
 
-static void cmd_magno(void)
+static void cmd_magno(char* arg)
 {
 }
 
-static void cmd_options(void)
+static void cmd_options(char* arg)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", ROLL_STABILIZATION_AILERONS);
@@ -146,7 +146,7 @@ static void cmd_options(void)
 #endif
 }
 
-static void cmd_gains(void)
+static void cmd_gains(char* arg)
 {
 #if (USE_CONFIGFILE == 1)
 	printf("YAWKP_AILERON: %f\r\n", (double)gains.YawKPAileron);
@@ -210,14 +210,14 @@ const char* word_to_binary(int x)
 
 void gentrap(void);
 
-static void cmd_trap(void)
+static void cmd_trap(char* arg)
 {
 #if (SILSIM != 1)
 	gentrap();
 #endif
 }
 
-static void cmd_reg(void)
+static void cmd_reg(char* arg)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	printf("USB Registers:\r\n");
@@ -256,7 +256,7 @@ UxCNFG2: USB CONFIGURATION REGISTER 2
 extern uint16_t maxstack;
 #endif
 
-static void cmd_stack(void)
+static void cmd_stack(char* arg)
 {
 #if (RECORD_FREE_STACK_SPACE == 1)
 	printf("maxstack %x\r\n", maxstack);
@@ -269,18 +269,18 @@ static void cmd_stack(void)
 #endif
 }
 
-static void cmd_reset(void)
+static void cmd_reset(char* arg)
 {
 #if (SILSIM != 1)
 	asm("reset");
 #endif
 }
 
-static void cmd_help(void);
+static void cmd_help(char* arg);
 
 void log_close(void);
 
-static void cmd_close(void)
+static void cmd_close(char* arg)
 {
 #if (USE_TELELOG == 1)
 	log_close();
@@ -309,7 +309,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_close,  "close" },
 };
 
-static void cmd_help(void)
+static void cmd_help(char* arg)
 {
 	int i;
 
@@ -319,38 +319,53 @@ static void cmd_help(void)
 	}
 }
 
-static void command(char* cmdstr)
+static void command(char* cmdstr, int cmdlen)
 {
 	int i;
+	char* argstr = NULL;
 
+	for (i = 0; i < cmdlen; i++) {
+		if (cmdstr[i] == ' ') {
+			cmdstr[i] = '\0';
+			argstr = cmdstr + i + 1;
+		}
+	}
 	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++) {
 		if (strcmp(cmdslist[i].cmdstr, cmdstr) == 0) {
-			cmdslist[i].fptr();
+			cmdslist[i].fptr(argstr);
 		}
+	}
+}
+
+void console_inbyte(char ch)
+{
+	if (cmdlen < sizeof(cmdstr)) {
+		cmdstr[cmdlen] = ch;
+		if ((ch == '\r') || (ch == '\n')) {
+			cmdstr[cmdlen] = '\0';
+//		cmdlen = 0;
+			if (strlen(cmdstr) > 0) {
+				putch('\r');
+			command(cmdstr, cmdlen);
+			}
+		cmdlen = 0;
+		} else {
+			putch(ch);
+			cmdlen++;
+		}
+	} else {
+		cmdlen = 0;
 	}
 }
 
 void console(void)
 {
+#if (CONSOLE_UART != 9)
 	if (kbhit()) {
 		char ch = getch();
-		if (cmdlen < sizeof(cmdstr)) {
-			cmdstr[cmdlen] = ch;
-			if ((ch == '\r') || (ch == '\n')) {
-				cmdstr[cmdlen] = '\0';
-				cmdlen = 0;
-				if (strlen(cmdstr) > 0) {
-					putch('\r');
-					command(cmdstr);
-				}
-			} else {
-				putch(ch);
-				cmdlen++;
-			}
-		} else {
-			cmdlen = 0;
-		}
+		console_inbyte(ch);
 	}
+#endif
 }
 
 #endif // CONSOLE_UART
