@@ -125,6 +125,7 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 #define FAILSAFE_RTL                1
 #define FAILSAFE_MAIN_FLIGHTPLAN    2
 
+#define FP_NONE                     0
 #define FP_WAYPOINTS                1
 #define FP_LOGO                     2
 
@@ -133,7 +134,8 @@ int32_t cam_yawServoLimit(int32_t pwm_pulse);
 // serialIO.c
 void init_serial(void);
 void serial_output(char* format, ...);
-void serial_output_8hz(void);
+
+void telemetry_output_8hz(void);
 void mavlink_output_40hz(void);
 
 // Serial Output Format
@@ -157,7 +159,7 @@ void mp_osd_run_step(void);
 #include "gain_variables.h"
 
 // GNU compiler specific macros for specifically marking variables as unused
-// If not using GNU, then macro makes no alteration to the code
+// If not using GNU, then these macros make no alteration to the code
 #ifdef __GNUC__
 #  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
 #else

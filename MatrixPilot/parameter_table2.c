@@ -6,6 +6,7 @@
 
 #include "parameter_table.h"
 #include "data_storage.h"
+#include "../libDCM/altitudeCntrl.h"
 #include "../libUDB/ADchannel.h"
 
 
@@ -24,10 +25,6 @@ extern int16_t alt_hold_pitch_min;
 extern int16_t alt_hold_pitch_max;
 extern int16_t alt_hold_pitch_high;
 extern int16_t rtl_pitch_down;
-extern int16_t minimum_groundspeed;
-extern int16_t maximum_airspeed;
-extern int16_t minimum_airspeed;
-extern int16_t desiredSpeed;
 extern int16_t minimum_groundspeed;
 extern int16_t maximum_airspeed;
 extern int16_t minimum_airspeed;

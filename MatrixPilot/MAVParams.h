@@ -23,7 +23,7 @@
 #define MAVPARAMS_H
 
 
-boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i);
+//boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i);
 
 boolean MAVParamsHandleMessage(mavlink_message_t* handle_msg);
 void MAVParamsOutput_40hz(void);

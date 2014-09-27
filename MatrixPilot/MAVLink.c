@@ -36,7 +36,8 @@
 //    MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
 //    MAV_DATA_STREAM_EXTRA3 not assigned yet
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
@@ -47,14 +48,17 @@
 #include "MAVUDBExtra.h"
 
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h" // Needed for access to internal DCM value
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
 #include "telemetry_log.h"
@@ -154,7 +158,7 @@ void init_serial(void)
 	init_mavlink();
 }
 
-void restart_telemetry(void)
+void telemetry_restart(void)
 {
 }
 
@@ -455,7 +459,7 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 				}
 				break;
 #endif // (USE_NV_MEMORY == 1)
-			case 245:
+			case 245: // MAV_CMD_PREFLIGHT_STORAGE:
 				switch ((uint16_t)packet.param1)
 				{
 					case 0: // Read
@@ -915,7 +919,10 @@ void mavlink_output_40hz(void)
 		int16_t pwOut_max = 4000;
 		mavlink_heading = get_geo_heading_angle();
 		if (THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000;
-		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, (float)(air_speed_3DIMU / 100.0), (float)(ground_velocity_magnitudeXY / 100.0), (int16_t)mavlink_heading,
+		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0,
+		    (float)(air_speed_3DIMU / 100.0),
+		    (float)(ground_velocity_magnitudeXY / 100.0),
+		    (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
 		    ((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
 		    (float) -IMUvelocityz._.W1);

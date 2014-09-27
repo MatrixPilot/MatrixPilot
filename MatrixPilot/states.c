@@ -404,7 +404,7 @@ boolean launch_enabled(void)
 }
 
 //  State: catapult launch armed
-//  entered only from manualS iff (radio_on and gear_up and nav_capable and switch_home)
+//  entered only from manualS if (radio_on and gear_up and nav_capable and switch_home)
 static void cat_armedS(void)
 {
 	// transition to manual if flight_mode_switch no longer in waypoint mode

@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
@@ -36,7 +36,7 @@
 union intbb dcm_declination_angle = { 0 };
 #endif
 
-#include "parameter_table.h"
+#include "../MatrixPilot/parameter_table.h"
 
 
 /****************************************************************************/
@@ -84,7 +84,7 @@ void mavlink_set_maxstack(float setting, int16_t i)
 #endif // RECORD_FREE_STACK_SPACE
 
 
-boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i)
+static boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i)
 {
 	switch (mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].mavlink_type)
 	{
@@ -376,7 +376,7 @@ typedef struct param_union {
 	uint8_t type;
 } mavlink_param_union_t;
  */
-void MAVParamsSet(const mavlink_message_t* handle_msg)
+static void MAVParamsSet(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_set_t packet;
 	int16_t i;
@@ -453,7 +453,7 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 	}
 }
 
-void MAVParamsRequestList(const mavlink_message_t* handle_msg)
+static void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_request_list_t packet;
 
@@ -468,7 +468,7 @@ void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 	}
 }
 
-void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
+static void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_request_read_t packet;
 //	int16_t index;

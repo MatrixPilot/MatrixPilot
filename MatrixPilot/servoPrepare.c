@@ -22,12 +22,15 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
-#include "cameraCntrl.h"
-#include "../libUDB/heartbeat.h"
-#include "../libUDB/osd.h"
 #include "mode_switch.h"
-#include "airspeedCntrl.h"
+#include "servoPrepare.h"
 #include "flightplan-waypoints.h"
+#include "../libUDB/heartbeat.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/osd.h"
+#include "airspeedCntrl.h"
+#include "cameraCntrl.h"
+#include "osd_config.h"
 
 int16_t pitch_control;
 int16_t roll_control;
@@ -114,7 +117,16 @@ void dcm_heartbeat_callback(void)
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
 // RobD			flight_state_8hz();
-			serial_output_8hz();
+			telemetry_output_8hz();
+
+#if (USE_OSD == OSD_REMZIBI)
+void remzibi_osd_8hz(void);
+			remzibi_osd_8hz();
+#elif (USE_OSD == OSD_MINIM)
+void minim_osd_8hz(void);
+			minim_osd_8hz();
+#endif // USE_OSD
+
 		}
 #endif // SERIAL_OUTPUT_FORMAT
 	}

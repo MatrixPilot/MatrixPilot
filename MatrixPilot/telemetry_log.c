@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
+#include "telemetry.h"
 #include "telemetry_log.h"
 #if (WIN == 1 || NIX == 1)
 #include <stdio.h>
@@ -140,7 +141,7 @@ static void log_open(void)
 	{
 		lb1_end_index = 0;  // empty the logfile ping-pong buffers
 		lb2_end_index = 0;
-		restart_telemetry();// signal telemetry to send startup data again
+		telemetry_restart();// signal telemetry to send startup data again
 		printf("%s opened\r\n", logfile_name);
 	}
 	else

@@ -27,12 +27,15 @@
 #include "telemetry_log.h"
 #endif
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/osd.h"
-#include "../libUDB/magnetometerOptions.h"
+#include "magnetometerOptions.h"
 #include "osd_config.h"
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
+#include "../libUDB/mcu.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
@@ -427,14 +430,14 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 
 static int16_t telemetry_counter = 8;
 
-void restart_telemetry(void)
+void telemetry_restart(void)
 {
 	telemetry_counter = 8;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
 	    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW,
@@ -447,7 +450,7 @@ void serial_output_8hz(void)
 
 extern int16_t desiredHeight;
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	uint16_t mode;
 	struct relative2D matrix_accum;
@@ -520,7 +523,7 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	int16_t i;
@@ -697,7 +700,7 @@ extern int16_t udb_magOffset[3];
 
 #warning SERIAL_OSD_REMZIBI undergoing merge to trunk
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	// TODO: Output interesting information for OSD.
 	// But first we'll have to implement a buffer for passthrough characters to avoid
@@ -727,7 +730,7 @@ extern int16_t I2interrupts;
 #define I2CSTATREG I2CSTAT
 #endif
 /*
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	serial_output("MagMessage: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\nMessages: %i\r\nInterrupts: %i\r\n\r\n",
 	    magMessage,
@@ -736,7 +739,7 @@ void serial_output_8hz(void)
 }
  */
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
@@ -762,7 +765,7 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_CAM_TRACK)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	uint8_t checksum = 0;
 	checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1;
@@ -785,7 +788,7 @@ void serial_output_8hz(void)
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
 #if (USE_OSD != OSD_MINIM) && (USE_OSD != OSD_REMZIBI)
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 }
 #endif // USE_OSD
