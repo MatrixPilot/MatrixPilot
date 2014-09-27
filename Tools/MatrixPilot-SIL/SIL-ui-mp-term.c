@@ -10,6 +10,7 @@
 
 #include "SIL-udb.h"
 #include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
 #include "../MatrixPilot/flightplan-waypoints.h"
 #include <stdio.h>
 
