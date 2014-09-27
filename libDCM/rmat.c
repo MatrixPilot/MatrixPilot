@@ -19,14 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "mathlibNAV.h"
 #include "deadReckoning.h"
 #include "gpsParseCommon.h"
-#include "../libUDB/magnetometer.h"
-#include "../libUDB/magnetometerOptions.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/ADchannel.h"
+#include "../libUDB/magnetometer.h"
+#include "magnetometerOptions.h"
+#include "rmat.h"
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane

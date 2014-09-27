@@ -23,9 +23,7 @@
 
 void dcm_init_rmat(void);
 
-void estLocation(void);
 void estYawDrift(void);
-void estimateWind(void);
 
 void gps_commit_data(void);
 void gps_update_basic_data(void);

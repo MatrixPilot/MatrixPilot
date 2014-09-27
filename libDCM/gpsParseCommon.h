@@ -64,9 +64,13 @@ extern uint16_t air_speed_3DGPS;
 //extern void (*gps_startup_sequence)(int16_t gpscount);
 //extern boolean (*gps_nav_valid)(void);
 //extern void (*gps_commit_data)(void);
+void gps_commit_data(void);
+void gpsoutline(const char* message);
+void gpsoutbin(int16_t length, const uint8_t* msg);
 
 void gps_init(void);
 void gps_parse_common(void);
+void gps_update_basic_data(void);
 boolean gps_nav_capable_check_set(void);
 void HILSIM_set_gplane(void);
 void HILSIM_set_omegagyro(void);
@@ -76,3 +80,16 @@ int32_t get_gps_time(void);
 
 int16_t calculate_week_num(int32_t date);
 int32_t calculate_time_of_week(int32_t time);
+
+
+// FIXME: This should be handled internally, along with DCM calibration
+// Count down from 1000 at 40Hz
+void gps_startup_sequence(int16_t gpscount);
+
+// Is our gps data good enough for navigation?
+boolean gps_nav_valid(void);
+
+// Called once each time the GPS reports a new location.
+// After dead reckoning is complete, this callback may go away.
+void dcm_callback_gps_location_updated(void);   // Callback
+

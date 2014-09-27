@@ -19,9 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
+
 
 #if (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)
 
@@ -125,7 +127,6 @@ static union uintbb cog_gps_;
 static uint8_t svs_;
 static uint8_t data_valid_, NS_, EW_;
 //static uint8_t hdop_;
-//static uint8_t day_of_week;
 
 //union longbbbb tow_;
 //union longbbbb date_gps_, time_gps_;

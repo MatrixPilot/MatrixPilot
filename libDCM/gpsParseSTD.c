@@ -19,9 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 
 
 #if (GPS_TYPE == GPS_STD || GPS_TYPE == GPS_ALL)

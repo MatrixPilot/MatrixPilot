@@ -22,8 +22,9 @@
 #include "libDCM_internal.h"
 #include "gpsData.h"
 #include "gpsParseCommon.h"
-//#include "estLocation.h"
+#include "estLocation.h"
 #include "mathlibNAV.h"
+#include "estWind.h"
 
 
 #ifdef USE_EXTENDED_NAV

@@ -19,9 +19,13 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsParseCommon.h"
 #include "mathlibNAV.h"
+#include "gpsData.h"
+#include "estWind.h"
+#include "rmat.h"
+
 
 int16_t estimatedWind[3] = { 0, 0, 0 };
 
@@ -32,7 +36,7 @@ static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
 #define MINROTATION ((int16_t)(0.2 * RMAX))
 
-void estimateWind(void)
+void estWind(void)
 {
 	int16_t index;
 	int16_t groundVelocity[3];
@@ -127,7 +131,7 @@ void estimateWind(void)
 
 #else
 
-void estimateWind(void)
+void estWind(void)
 {
 }
 

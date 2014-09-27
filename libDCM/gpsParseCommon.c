@@ -22,10 +22,14 @@
 #include "libDCM_internal.h"
 #include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "estLocation.h"
 #include "estAltitude.h"
+#include "estYawDrift.h"
+#include "estWind.h"
 #include "mathlibNAV.h"
 #include "rmat.h"
 #include "../libUDB/interrupt.h"
+#include "../libUDB/serialIO.h"
 #include <string.h>
 
 // GPS parser modules variables
@@ -149,7 +153,7 @@ static void udb_background_callback_triggered(void)
 		dcm_callback_gps_location_updated();
 
 		estLocation();
-		estimateWind();
+		estWind();
 		estAltitude();
 		estYawDrift();
 

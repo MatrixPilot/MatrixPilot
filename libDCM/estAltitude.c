@@ -61,8 +61,8 @@ void altimeter_calibrate(void)
 #if (BAROMETER_ALTITUDE == 1)
 void udb_barometer_callback(long pressure, int temperature, char status)
 {
-	barometer_temperature = temperature;
-	barometer_pressure = pressure;
+	barometer_temperature = temperature; // units of 0.1 deg C
+	barometer_pressure = pressure; // units are Pascals so this could be reduced to an uint16_t
 }
 #endif
 

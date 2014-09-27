@@ -23,7 +23,6 @@
 #include "gpsData.h"
 
 // GPS MatrixPilot global variables (these are the GPS system outputs)
-//vect3_16t estimatedWind = { 0, 0, 0 };
 #ifdef USE_EXTENDED_NAV
 struct relative3D_32 GPSlocation = { 0, 0, 0 };
 #else

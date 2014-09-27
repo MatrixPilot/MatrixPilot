@@ -19,8 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/servoOut.h"
 
 
 #if (HILSIM == 1)
