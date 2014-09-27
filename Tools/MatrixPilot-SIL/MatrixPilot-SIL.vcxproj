@@ -133,6 +133,7 @@
     <ClCompile Include="..\..\MatrixPilot\flightplan-waypoints.c" />
     <ClCompile Include="..\..\MatrixPilot\flight_state.c" />
     <ClCompile Include="..\..\MatrixPilot\fly_by_datalink.c" />
+    <ClCompile Include="..\..\MatrixPilot\helicalTurnCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\main.c" />
     <ClCompile Include="..\..\MatrixPilot\MAVFlexiFunctions.c" />
     <ClCompile Include="..\..\MatrixPilot\MAVLink.c" />
@@ -144,6 +145,7 @@
     <ClCompile Include="..\..\MatrixPilot\mp_osd.c" />
     <ClCompile Include="..\..\MatrixPilot\navigate.c" />
     <ClCompile Include="..\..\MatrixPilot\nv_memory_table.c" />
+    <ClCompile Include="..\..\MatrixPilot\parameter_table.c" />
     <ClCompile Include="..\..\MatrixPilot\parameter_table2.c" />
     <ClCompile Include="..\..\MatrixPilot\parameter_table_init.c" />
     <ClCompile Include="..\..\MatrixPilot\pitchCntrl.c" />
@@ -174,11 +176,19 @@
     <ClCompile Include="SIL-ui-mp-term.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Config\airspeed_options.h" />
+    <ClInclude Include="..\..\Config\FSconfig.h" />
+    <ClInclude Include="..\..\Config\magnetometerOptions.h" />
+    <ClInclude Include="..\..\Config\nv_memory_options.h" />
+    <ClInclude Include="..\..\Config\options.h" />
+    <ClInclude Include="..\..\Config\options_auav3.h" />
+    <ClInclude Include="..\..\Config\osd_config.h" />
     <ClInclude Include="..\..\libDCM\dcmTypes.h" />
     <ClInclude Include="..\..\libDCM\deadReckoning.h" />
     <ClInclude Include="..\..\libDCM\estAltitude.h" />
+    <ClInclude Include="..\..\libDCM\estLocation.h" />
     <ClInclude Include="..\..\libDCM\estWind.h" />
-    <ClInclude Include="..\..\libDCM\gpsData.h" />
+    <ClInclude Include="..\..\libDCM\estYawDrift.h" />
     <ClInclude Include="..\..\libDCM\gpsParseCommon.h" />
     <ClInclude Include="..\..\libDCM\libDCM.h" />
     <ClInclude Include="..\..\libDCM\libDCM_defines.h" />
@@ -187,14 +197,17 @@
     <ClInclude Include="..\..\libDCM\mathlibNAV.h" />
     <ClInclude Include="..\..\libDCM\rmat.h" />
     <ClInclude Include="..\..\libFlashFS\AT45D.h" />
+    <ClInclude Include="..\..\libFlashFS\EEPROM.h" />
     <ClInclude Include="..\..\libFlashFS\filesys.h" />
     <ClInclude Include="..\..\libFlashFS\FSconfig.h" />
     <ClInclude Include="..\..\libFlashFS\MDD_AT45D.h" />
+    <ClInclude Include="..\..\libFlashFS\MDD_EEPROM.h" />
     <ClInclude Include="..\..\libFlashFS\minGlue-mdd.h" />
     <ClInclude Include="..\..\libFlashFS\minGlue.h" />
     <ClInclude Include="..\..\libFlashFS\minIni.h" />
     <ClInclude Include="..\..\libFlashFS\usb_cdc.h" />
     <ClInclude Include="..\..\libFlashFS\usb_config.h" />
+    <ClInclude Include="..\..\libUDB\ADchannel.h" />
     <ClInclude Include="..\..\libUDB\analogs.h" />
     <ClInclude Include="..\..\libUDB\barometer.h" />
     <ClInclude Include="..\..\libUDB\boardRotation_defines.h" />
@@ -202,7 +215,9 @@
     <ClInclude Include="..\..\libUDB\ConfigHILSIM.h" />
     <ClInclude Include="..\..\libUDB\ConfigUDB4.h" />
     <ClInclude Include="..\..\libUDB\ConfigUDB5.h" />
+    <ClInclude Include="..\..\libUDB\eeprom_udb4.h" />
     <ClInclude Include="..\..\libUDB\events.h" />
+    <ClInclude Include="..\..\libUDB\fixDeps.h" />
     <ClInclude Include="..\..\libUDB\heartbeat.h" />
     <ClInclude Include="..\..\libUDB\I2C.h" />
     <ClInclude Include="..\..\libUDB\interrupt.h" />
@@ -211,16 +226,20 @@
     <ClInclude Include="..\..\libUDB\libUDB_internal.h" />
     <ClInclude Include="..\..\libUDB\magnetometer.h" />
     <ClInclude Include="..\..\libUDB\magnetometerOptions.h" />
+    <ClInclude Include="..\..\libUDB\mcu.h" />
     <ClInclude Include="..\..\libUDB\mpu6000.h" />
     <ClInclude Include="..\..\libUDB\mpu_spi.h" />
     <ClInclude Include="..\..\libUDB\NV_memory.h" />
     <ClInclude Include="..\..\libUDB\nv_memory_options.h" />
     <ClInclude Include="..\..\libUDB\oscillator.h" />
     <ClInclude Include="..\..\libUDB\osd.h" />
+    <ClInclude Include="..\..\libUDB\radioIn.h" />
+    <ClInclude Include="..\..\libUDB\serialIO.h" />
+    <ClInclude Include="..\..\libUDB\servoOut.h" />
+    <ClInclude Include="..\..\libUDB\sonarIn.h" />
     <ClInclude Include="..\..\libUDB\uart.h" />
     <ClInclude Include="..\..\libUDB\udbTypes.h" />
     <ClInclude Include="..\..\MatrixPilot\airspeedCntrl.h" />
-    <ClInclude Include="..\..\MatrixPilot\airspeed_options.h" />
     <ClInclude Include="..\..\MatrixPilot\altitudeCntrl.h" />
     <ClInclude Include="..\..\MatrixPilot\behaviour.h" />
     <ClInclude Include="..\..\MatrixPilot\cameraCntrl.h" />
@@ -232,9 +251,11 @@
     <ClInclude Include="..\..\MatrixPilot\euler_angles.h" />
     <ClInclude Include="..\..\MatrixPilot\flightplan-logo.h" />
     <ClInclude Include="..\..\MatrixPilot\flightplan-waypoints.h" />
+    <ClInclude Include="..\..\MatrixPilot\flightplan.h" />
     <ClInclude Include="..\..\MatrixPilot\fly_by_datalink.h" />
     <ClInclude Include="..\..\MatrixPilot\FreeRTOSConfig.h" />
     <ClInclude Include="..\..\MatrixPilot\gain_variables.h" />
+    <ClInclude Include="..\..\MatrixPilot\libCntrl.h" />
     <ClInclude Include="..\..\MatrixPilot\MAVFlexiFunctions.h" />
     <ClInclude Include="..\..\MatrixPilot\MAVLink.h" />
     <ClInclude Include="..\..\MatrixPilot\mavlink_options.h" />
@@ -244,9 +265,6 @@
     <ClInclude Include="..\..\MatrixPilot\mode_switch.h" />
     <ClInclude Include="..\..\MatrixPilot\motorCntrl.h" />
     <ClInclude Include="..\..\MatrixPilot\navigate.h" />
-    <ClInclude Include="..\..\MatrixPilot\options.h" />
-    <ClInclude Include="..\..\MatrixPilot\options_quad.h" />
-    <ClInclude Include="..\..\MatrixPilot\osd_config.h" />
     <ClInclude Include="..\..\MatrixPilot\osd_layout.h" />
     <ClInclude Include="..\..\MatrixPilot\osd_layout_remzibi.h" />
     <ClInclude Include="..\..\MatrixPilot\parameter_datatypes.h" />
@@ -255,7 +273,11 @@
     <ClInclude Include="..\..\MatrixPilot\quad.h" />
     <ClInclude Include="..\..\MatrixPilot\redef.h" />
     <ClInclude Include="..\..\MatrixPilot\ring_buffer.h" />
+    <ClInclude Include="..\..\MatrixPilot\servoMix.h" />
     <ClInclude Include="..\..\MatrixPilot\servoPrepare.h" />
+    <ClInclude Include="..\..\MatrixPilot\sonarCntrl.h" />
+    <ClInclude Include="..\..\MatrixPilot\states.h" />
+    <ClInclude Include="..\..\MatrixPilot\telemetry.h" />
     <ClInclude Include="..\..\MatrixPilot\telemetry_log.h" />
     <ClInclude Include="..\..\MatrixPilot\util.h" />
     <ClInclude Include="..\..\MatrixPilot\waypoints.h" />
@@ -409,7 +431,6 @@
     <ClInclude Include="..\..\MAVLink\include\mavlink_types.h" />
     <ClInclude Include="..\..\MAVLink\include\protocol.h" />
     <ClInclude Include="..\..\MAVLink\MAVFTP.h" />
-    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\MAVLink\message_definitions\ardupilotmega.xml" />

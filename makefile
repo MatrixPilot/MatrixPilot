@@ -34,6 +34,9 @@ endif
 TARGET_NAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
 TARGET_MAP := $(TARGET_NAME).map
 TARGET := $(TARGET_NAME).$(TARGET_TYPE)
+$(warning *******************************************************************************)
+$(warning Building $(TARGET))
+$(warning *******************************************************************************)
 
 
 ifeq ($(TOOLCHAIN),GCC) 
@@ -54,6 +57,17 @@ CFLAGS += -x c -g -Wall -mlarge-code -mlarge-data -legacy-libc
 LFLAGS += -Wl,-Tp$(CPU).gld,-Map="$(TARGET_MAP)",--report-mem
 endif
 
+ifeq ($(TOOLCHAIN),XC16) 
+CC       := xc16-gcc.exe
+AR       := xc16-ar.exe
+BIN2HEX  := xc16-bin2hex.exe
+LIBS     := -legacy-libc 
+TARGET_ARCH := -mcpu=$(CPU)
+AFLAGS += -Wa,-g,--defsym=PSV_ERRATA=1
+CFLAGS += -g -omf=elf -legacy-libc -msmart-io=1 -Wall -msfr-warn=off -mlarge-code -mlarge-data
+LFLAGS += -omf=elf -Wl,-script=p$(CPU).gld,--heap=256,--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="$(TARGET_MAP)"
+endif
+
 # $(call mkoutdir, dir-list)
 mkoutdir = $(shell for %%f in ($(subst /,\,$(subst ../,,$(1)))); do [ -d %%f ] || $(MKDIR) %%f)
 
@@ -70,7 +84,6 @@ subdirectory = $(patsubst $(SOURCE_DIR)/%/module.mk,%, \
 define make-library
   libraries += $1
   sources += $2
-
   $1: $(call source-to-object,$2)
 endef
 
@@ -80,6 +93,7 @@ RM = del /Q /F
 #MV ?= move /Y
 MV ?= mv -f
 CP = copy /Y
+FIND := C:\MinGW\msys\1.0\bin\find.exe
 ifdef ComSpec
 SHELL := $(ComSpec)
 endif
@@ -91,11 +105,11 @@ QT = '
 RM = rm -rf
 MV ?= mv -f
 CP = cp -f
+FIND := find
 endif
 SED := sed
 MKDIR := mkdir
 #TEST := [
-FIND := C:\MinGW\msys\1.0\bin\find.exe
 space = $(empty) $(empty)
 comma := ,
 
@@ -113,7 +127,7 @@ sources :=
 defines :=
 
 ifeq ($(DEVICE),SILSIM)
-modules := $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/Tools/MatrixPilot-SIL
+modules := $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/MAVLink $(SOURCE_DIR)/Tools/MatrixPilot-SIL
 include_dirs := $(SOURCE_DIR)/Config
 endif
 

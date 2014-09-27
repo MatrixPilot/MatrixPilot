@@ -54,6 +54,9 @@
     <Filter Include="Source Files\MAVLink">
       <UniqueIdentifier>{96c0bc0a-a087-497d-b0b7-9fb8288a8e54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Config">
+      <UniqueIdentifier>{ad626add-5a4f-44a1-97c6-275318204ba4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\MatrixPilot\airspeedCntrl.c">
@@ -275,11 +278,14 @@
     <ClCompile Include="..\..\libDCM\gpsData.c">
       <Filter>Source Files\libDCM</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\helicalTurnCntrl.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\parameter_table.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\MatrixPilot\airspeedCntrl.h">
       <Filter>Header Files\MatrixPilot</Filter>
     </ClInclude>
@@ -412,12 +418,6 @@
     <ClInclude Include="..\..\libDCM\rmat.h">
       <Filter>Header Files\libDCM</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\MatrixPilot\options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\MatrixPilot\options_quad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libUDB\analogs.h">
       <Filter>Header Files\libUDB</Filter>
     </ClInclude>
@@ -513,12 +513,6 @@
     </ClInclude>
     <ClInclude Include="..\..\libFlashFS\usb_config.h">
       <Filter>Header Files\libFlashFS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\MatrixPilot\osd_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\MatrixPilot\airspeed_options.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\MAVLink\MAVFTP.h">
       <Filter>Header Files\MAVLink</Filter>
@@ -981,6 +975,81 @@
     </ClInclude>
     <ClInclude Include="..\..\libDCM\mathlib.h">
       <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\estLocation.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libDCM\estYawDrift.h">
+      <Filter>Header Files\libDCM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\ADchannel.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\eeprom_udb4.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\fixDeps.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\mcu.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\radioIn.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\serialIO.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\servoOut.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libUDB\sonarIn.h">
+      <Filter>Header Files\libUDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\flightplan.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\libCntrl.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\servoMix.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\sonarCntrl.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\states.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MatrixPilot\telemetry.h">
+      <Filter>Header Files\MatrixPilot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\airspeed_options.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\FSconfig.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\magnetometerOptions.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\nv_memory_options.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\options.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\options_auav3.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Config\osd_config.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\EEPROM.h">
+      <Filter>Header Files\libFlashFS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libFlashFS\MDD_EEPROM.h">
+      <Filter>Header Files\libFlashFS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

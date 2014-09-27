@@ -5,6 +5,7 @@ DCM_OBJECTS := \
 ../../libDCM/estLocation.o \
 ../../libDCM/estWind.o \
 ../../libDCM/estYawDrift.o \
+../../libDCM/gpsData.o \
 ../../libDCM/gpsParseCommon.o \
 ../../libDCM/gpsParseMTEK.o \
 ../../libDCM/gpsParseNMEA.o \

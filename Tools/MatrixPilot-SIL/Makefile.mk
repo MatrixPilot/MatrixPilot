@@ -1,5 +1,5 @@
 CC = gcc
-INCPATH = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot
+INCPATH = -I. -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
 RM_FILE = rm -f
 ifeq ($(OS),Windows_NT)
 	TARGET_EXTENSION = .exe
