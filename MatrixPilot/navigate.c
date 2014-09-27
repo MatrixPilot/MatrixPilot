@@ -24,13 +24,14 @@
 #include "behaviour.h"
 #include "cameraCntrl.h"
 #include "servoPrepare.h"
+#include "states.h"
 #include "flightplan-waypoints.h"
+#include "../libUDB/libUDB.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../libUDB/libUDB.h"
 #include <stdlib.h>
 
 // Compute actual and desired courses.
@@ -58,8 +59,6 @@ int8_t extended_range = 0;
 int8_t desired_bearing_over_ground;
 int16_t desired_bearing_over_ground_vector[2];
 
-extern union longww IMUintegralAccelerationx;
-extern union longww IMUintegralAccelerationy;
 
 void init_navigation(void)
 {

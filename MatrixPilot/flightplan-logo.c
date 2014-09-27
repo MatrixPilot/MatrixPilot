@@ -24,6 +24,7 @@
 #include "behaviour.h"
 #include "cameraCntrl.h"
 #include "altitudeCntrl.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"

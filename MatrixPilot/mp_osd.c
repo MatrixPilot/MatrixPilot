@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "osd_config.h"
+#include "states.h"
 
 #if ((USE_OSD == OSD_NATIVE) && (SILSIM != 1))
 
@@ -31,6 +32,7 @@
 #include "../libUDB/ADchannel.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/gpsData.h"
 
 #define OSD_LOC_DISABLED    -1
@@ -75,7 +77,7 @@ static boolean osd_was_on = 0;
 
 static char msgbuf_0[21];
 static char msgbuf_1[21];
-static osd_console_blanking_time = 0;
+static uint8_t osd_console_blanking_time = 0;
 
 void osd_write_message(char* msg)
 {

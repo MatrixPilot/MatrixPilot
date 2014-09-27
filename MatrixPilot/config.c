@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "navigate.h"
+#include "libCntrl.h"
 #include "airspeedCntrl.h"
 
 #if (USE_CONFIGFILE == 1)

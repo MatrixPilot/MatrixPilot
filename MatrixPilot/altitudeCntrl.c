@@ -24,6 +24,7 @@
 #include "behaviour.h"
 #include "servoPrepare.h"
 #include "altitudeCntrl.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/deadReckoning.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"

@@ -24,6 +24,7 @@
 #include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
+#include "states.h"
 #include "flightplan-waypoints.h"
 #include <setjmp.h>
 

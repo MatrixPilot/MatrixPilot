@@ -64,7 +64,7 @@ static void cmd_format(char* arg)
 #endif // BOARD_TYPE
 }
 
-static void cmd_start(void)
+static void cmd_start(char* arg)
 {
 	printf("starting.\r\n");
 	show_cpu_load = 1;
