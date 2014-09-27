@@ -24,6 +24,7 @@
 #include "../libDCM/libDCM.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "servoOut.h"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
@@ -75,7 +76,8 @@ int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 static volatile int16_t outputNum;
 
 
-void udb_init_pwm(void) // initialize the PWM
+// initialize the PWM
+void servoOut_init(void) // was called udb_init_pwm()
 {
 	int16_t i;
 	for (i = 0; i <= NUM_OUTPUTS; i++)

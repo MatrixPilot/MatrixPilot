@@ -22,6 +22,8 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "radioIn.h"
+#include "../MatrixPilot/states.h"
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -77,7 +79,7 @@ void udb_servo_record_trims(void)
 	}
 }
 
-void udb_init_capture(void)
+void radioIn_init(void) // was called udb_init_capture(void)
 {
 	int16_t i;
 
@@ -142,6 +144,7 @@ void udb_init_capture(void)
 #endif // NORADIO
 }
 
+// called from heartbeat pulse at 20Hz
 void radioIn_failsafe_check(void)
 {
 	// check to see if at least one valid pulse has been received,

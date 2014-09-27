@@ -22,6 +22,7 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "serialIO.h"
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES

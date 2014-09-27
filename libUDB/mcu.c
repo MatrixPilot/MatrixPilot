@@ -23,6 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "uart.h"
+#include "mcu.h"
 #include <stdio.h>
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)

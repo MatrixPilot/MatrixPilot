@@ -22,6 +22,8 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "servoOut.h"
+#include "radioIn.h"
 #include "analogs.h"
 #include "events.h"
 #include "osd.h"
@@ -80,7 +82,7 @@ void udb_init(void)
 	flexiFunctionServiceInit();
 #endif
 	udb_init_clock();
-	udb_init_capture();
+	radioIn_init(); // was udb_init_capture();
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
@@ -90,7 +92,7 @@ void udb_init(void)
 #if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif
-	udb_init_pwm();
+	servoOut_init(); // was udb_init_pwm()
 	osd_init();
 
 //FIXME: add AUAV3 support

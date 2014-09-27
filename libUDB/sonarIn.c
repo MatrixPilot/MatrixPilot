@@ -21,6 +21,7 @@
 
 #include "libUDB_internal.h"
 #include "interrupt.h"
+#include "sonarIn.h"
 
 #if (USE_SONAR_INPUT != 0)
 

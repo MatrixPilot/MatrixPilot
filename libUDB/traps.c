@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "interrupt.h"
+#include "mcu.h"
 
 //#define USE_SETJMP
 
@@ -40,9 +41,6 @@
 #define TRAP_SRC_DEFAULTINT 32
 #define TRAP_SRC_DMACERR    64
 
-extern volatile uint16_t trap_flags;
-extern volatile uint32_t trap_source;
-extern volatile uint16_t osc_fail_count;
 extern volatile uint16_t stack_ptr;
 
 uint32_t getErrLoc(void);   // Get Address Error Loc
