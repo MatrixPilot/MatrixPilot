@@ -152,4 +152,4 @@ if __name__ == '__main__':
 	sources = mplabX_scan_dirs(["*.c", "*.s"], opts.directories)
 	project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".X")
 	print "writing: " + project_path
-	mplabX_project(arch, opts.name, opts.target, opts.config, headers, sources, project_path)
+	mplabX_project(arch, opts.name, opts.target, "../" + opts.config, headers, sources, project_path)
