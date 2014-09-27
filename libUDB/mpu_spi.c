@@ -26,7 +26,6 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "mpu_spi.h"
-#include <stdbool.h>
 #include <delay.h>
 #include <spi.h>
 
