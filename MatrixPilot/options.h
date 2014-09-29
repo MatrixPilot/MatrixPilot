@@ -487,8 +487,10 @@
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
 // ROLLKD is the derivative (gyro) gain, approximately 0.125
-// YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
-// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
+// YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error.
+// use it only if there is no rudder.
+// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation.
+// use it only if there is no rudder.
 #define ROLLKP                              0.20
 #define ROLLKD                              0.05
 #define YAWKP_AILERON                       0.00
@@ -507,12 +509,15 @@
 #define INVERTED_NEUTRAL_PITCH              8.0
 
 // Rudder/Yaw Control Gains
-// YAWKP_RUDDER is the proportional feedback gain for rudder navigation
-// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
-// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle
-// ROLLKD_RUDDER is the feedback gain for the rudder in response to the rate of change roll angle
+// YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.
+// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation.
+// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle,
+// use it only if there are no ailerons.
+// ROLLKD_RUDDER is the feedback gain for the rudder in response to the rate of change roll angle,
+// use it only if there are no ailerons.
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
+// MANUAL_AILERON_RUDDER_MIX is no longer needed with the new controls, it should be set to zero.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
 #define YAWKP_RUDDER                        0.30
 #define YAWKD_RUDDER                        0.00
@@ -522,6 +527,7 @@
 #define RUDDER_BOOST                        0.50
 
 // Gains for Hovering
+// These are still here from the previous version of the controls, because the new controls have not yet been set up for hovering.
 // Gains are named based on plane's frame of reference (roll means ailerons)
 // HOVER_ROLLKP is the roll-proportional feedback gain applied to the ailerons while navigating a hover
 // HOVER_ROLLKD is the roll gyro feedback gain applied to ailerons while stabilizing a hover
