@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\MatrixPilot">
+      <UniqueIdentifier>{ee0f694e-cbd5-49be-bc4a-b6c0158b951d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MatrixPilot">
+      <UniqueIdentifier>{c4576743-41c9-4e97-998f-73c679cc4160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MatrixPilot\example-options-files">
+      <UniqueIdentifier>{c4576743-41c9-4e97-998f-73c679cc4161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{999516ab-101d-4b37-a0a1-954b70f2fe8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\MatrixPilot-SIL">
+      <UniqueIdentifier>{999516ab-101d-4b37-a0a1-954b70f2fe8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libDCM">
+      <UniqueIdentifier>{7bd2d843-aba7-4bd5-adf3-cf556bbdb9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libDCM">
+      <UniqueIdentifier>{d1bbf368-20b3-49dc-990c-9d65e84b8c0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libUDB">
+      <UniqueIdentifier>{5101f421-f26a-4d8d-a4d2-8d74b9a9bf8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libFlashFS">
+      <UniqueIdentifier>{44f3753e-ceb9-4a92-abb6-8960cc7b0dac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libFlashFS">
+      <UniqueIdentifier>{ea19c55d-a288-4357-b923-30294bc47078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libUDB">
+      <UniqueIdentifier>{3824688d-0ed8-4283-ae32-33dd7fab24d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{7c64d08f-1f2d-483d-baa0-70178d13d8db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools\MatrixPilot-SIL">
+      <UniqueIdentifier>{7c64d08f-1f2d-483d-baa0-70178d13d8da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MAVLink">
+      <UniqueIdentifier>{18deb80c-5377-455f-b235-c2faafec23a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink">
+      <UniqueIdentifier>{7ea2c885-cfeb-4e6f-982a-ed83347c56b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Config">
+      <UniqueIdentifier>{3ee74130-e2d6-40e0-abc0-ec3af57955ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink\include">
+      <UniqueIdentifier>{b1611d7d-c787-4911-bdcf-efb11414c2c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink\include\common">
+      <UniqueIdentifier>{8c2ca144-2370-4d87-ab3a-ea7c1d58c6cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MAVLink\include\matrixpilot">
+      <UniqueIdentifier>{25195372-8d4c-49fc-ae53-61f263258ca3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+%%SOURCE_FILES%%
+  </ItemGroup>
+  <ItemGroup>
+%%HEADER_FILES%%
+  </ItemGroup>
+</Project>

@@ -14,10 +14,6 @@ other_files = ""
 file_info = ""
 file_cnt = 0
 
-# MPLABX project builder variables
-#header = ""
-#source = ""
-
 def mkdirnotex(filename):  
 	folder = os.path.dirname(filename)  
 	if not os.path.exists(folder):  
@@ -85,6 +81,56 @@ def mplab8_project(mcu_type, target_board, config_dir, project_output_file):
 	with open (project_output_file, "w") as file:
 		file.write(data)
 
+def vs2010_scan_dirs(masks, sources, directories):
+	str = ""
+	for dir in directories:
+		path = os.path.join(rootdir, dir)
+		for mask in masks:
+			files = find(mask, path)
+			for filename in files:
+				if sources == 1:
+					str = str + "    <ClCompile Include=\"" + filename.replace("/", "\\") + "\" />\n"
+				else:
+					str = str + "    <ClInclude Include=\"" + filename.replace("/", "\\") + "\" />\n"
+	return str
+
+def vs2010_scan_filter_dirs(masks, sources, prefix, directories):
+	str = ""
+	for dir in directories:
+		path = os.path.join(rootdir, dir)
+		for mask in masks:
+			files = find(mask, path)
+			for filename in files:
+				fname = filename.replace("/", "\\")
+				if sources == 1:
+					str = str + "    <ClCompile Include=\"" + fname + "\">\n"
+					str = str + "      <Filter>" + prefix + os.path.dirname(fname.replace("..\\", "")) + "</Filter>\n"
+					str = str + "    </ClCompile>\n"
+				else:
+					str = str + "    <ClInclude Include=\"" + fname + "\">\n"
+					str = str + "      <Filter>" + prefix + os.path.dirname(fname.replace("..\\", "")) + "</Filter>\n"
+					str = str + "    </ClInclude>\n"
+	return str
+
+def vs2010_project(mcu_type, target_board, config_dir, header_files, source_files, project_output_file):
+	with open ("template.vcxproj", "r") as file:
+		data = file.read()
+		data = data.replace("%%CONFIG%%", config_dir)
+		data = data.replace("%%SOURCE_FILES%%", source_files)
+		data = data.replace("%%HEADER_FILES%%", header_files)
+	mkdirnotex(project_output_file)
+	with open (project_output_file, "w") as file:
+		file.write(data)
+
+def vs2010_project_filters(mcu_type, target_board, config_dir, header_files, source_files, project_output_file):
+	with open ("template.vcxproj.filters", "r") as file:
+		data = file.read()
+		data = data.replace("%%SOURCE_FILES%%", source_files)
+		data = data.replace("%%HEADER_FILES%%", header_files)
+	mkdirnotex(project_output_file)
+	with open (project_output_file, "w") as file:
+		file.write(data)
+
 def mplabX_scan_dirs(masks, directories):
 	str = ""
 	for dir in directories:
@@ -140,16 +186,29 @@ if __name__ == '__main__':
 		arch = "dsPIC33FJ256GP710A"
 	elif opts.target == "AUAV3":
 		arch = "dsPIC33EP512MU810"
+	else:
+		arch = ""
 
-	mplab8_scan_dirs("*.c", opts.directories)
-	mplab8_scan_dirs("*.s", opts.directories)
-	mplab8_scan_dirs("*.h", opts.directories)
-	project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".mcp")
-	print "writing: " + project_path
-	mplab8_project(arch, opts.target, opts.config, project_path)
+	if opts.target == "SIL":
+		sources = vs2010_scan_dirs(["*.c"], 1, opts.directories)
+		headers = vs2010_scan_dirs(["*.h"], 0, opts.directories)
+		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".vcxproj")
+		print "writing: " + project_path
+		vs2010_project(arch, opts.target, opts.config, headers, sources, project_path)
+		source_filter = vs2010_scan_filter_dirs(["*.c"], 1, "Source Files\\", opts.directories)
+		header_filter = vs2010_scan_filter_dirs(["*.h"], 0, "Header Files\\", opts.directories)
+		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".vcxproj.filters")
+		vs2010_project_filters(arch, opts.target, opts.config, header_filter, source_filter, project_path)
+	else:
+		mplab8_scan_dirs("*.c", opts.directories)
+		mplab8_scan_dirs("*.s", opts.directories)
+		mplab8_scan_dirs("*.h", opts.directories)
+		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".mcp")
+		print "writing: " + project_path
+		mplab8_project(arch, opts.target, opts.config, project_path)
 
-	headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.directories)
-	sources = mplabX_scan_dirs(["*.c", "*.s"], opts.directories)
-	project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".X")
-	print "writing: " + project_path
-	mplabX_project(arch, opts.name, opts.target, "../" + opts.config, headers, sources, project_path)
+		headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.directories)
+		sources = mplabX_scan_dirs(["*.c", "*.s"], opts.directories)
+		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".X")
+		print "writing: " + project_path
+		mplabX_project(arch, opts.name, opts.target, "../" + opts.config, headers, sources, project_path)
