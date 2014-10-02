@@ -15,6 +15,8 @@
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/magnetometer.h"
 #include "../../libUDB/heartbeat.h"
+#include "../../libUDB/serialIO.h"
+#include "../../libDCM/rmat.h"
 #include "SIL-config.h"
 
 #ifdef WIN
@@ -23,11 +25,13 @@
 #include <Windows.h>
 #include <Time.h>
 
+#ifndef TEST
 struct timezone
 {
 	int tz_minuteswest; // of Greenwich
 	int tz_dsttime;     // type of dst correction to apply
 };
+#endif
 
 #if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
@@ -478,10 +482,12 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 
 #endif // MAG_YAW_DRIFT
 
+#ifndef TEST
 int setjmp(void)
 {
 	return 0;
 }
+#endif
 
 int16_t FindFirstBitFromLeft(int16_t val)
 {
