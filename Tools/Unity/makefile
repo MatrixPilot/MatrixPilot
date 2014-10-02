@@ -9,6 +9,8 @@
 
 Q := $(if $(V),,@)
 
+SOURCE_DIR ?= .
+
 CC := gcc
 RUBY_GEN := ruby auto/generate_test_runner.rb
 
@@ -16,6 +18,7 @@ TARGET_UDB := TestUDB
 TARGET_DCM := TestDCM
 TARGET_MPX := TestMPX
 
+MKDIR := mkdir
 ifeq ($(OS),Windows_NT)
 	TARGET_EXTENSION := .exe
 	FLAGS := -DWIN=1
@@ -127,6 +130,11 @@ else ifeq ($(OS),Windows_NT)
 else
 	CLEANUP = rm -f build/*.o ; rm -f $(TEST_UDB)  ; rm -f $(TEST_DCM)  ; rm -f $(TEST_MPX) ; mkdir -p build
 endif
+
+subdirs := build
+
+create-output-directories := \
+	$(Q) $(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(subdirs)))); do [ -d %%f ] || $(MKDIR) %%f)
 
 all: clean default
 
