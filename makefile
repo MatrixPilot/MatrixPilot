@@ -68,9 +68,9 @@ LFLAGS += -Wl,-Tp$(CPU).gld,-Map="$(TARGET_MAP)",--report-mem
 endif
 
 ifeq ($(TOOLCHAIN),XC16) 
-CC       := xc16-gcc.exe
-AR       := xc16-ar.exe
-BIN2HEX  := xc16-bin2hex.exe
+CC       := xc16-gcc
+AR       := xc16-ar
+BIN2HEX  := xc16-bin2hex
 LIBS     := -legacy-libc 
 TARGET_ARCH := -mcpu=$(CPU)
 AFLAGS += -Wa,-g,--defsym=PSV_ERRATA=1
@@ -79,7 +79,11 @@ LFLAGS += -omf=elf -Wl,-script=p$(CPU).gld,--heap=256,--stack=16,--check-section
 endif
 
 # $(call mkoutdir, dir-list)
+ifeq ($(OS),Windows_NT) 
 mkoutdir = $(shell for %%f in ($(subst /,\,$(subst ../,,$(1)))); do [ -d %%f ] || $(MKDIR) %%f)
+else
+mkoutdir = $(shell for f in $(subst ../,,$(1)); do [ -d $$f ] || $(MKDIR) $$f; done)
+endif
 
 # $(call source-to-object, source-file-list)
 source-to-object = $(subst $(SOURCE_DIR)/,,$(subst .c,.o,$(filter %.c,$1))) \
@@ -144,7 +148,7 @@ endif
 
 ifneq (,$(filter $(DEVICE), UDB4 UDB5 AUAV3))
 modules := $(subst /module.mk,,$(shell $(FIND) $(SOURCE_DIR) -name module.mk))
-include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/include $(SOURCE_DIR)/libVectorMatrix
+include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/Include $(SOURCE_DIR)/libVectorMatrix
 endif
 
 
