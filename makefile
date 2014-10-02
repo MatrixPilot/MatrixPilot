@@ -13,7 +13,11 @@ TARGET_NAME ?= MatrixPilot
 
 ifeq ($(DEVICE),SILSIM) 
 TOOLCHAIN := GCC
+ifeq ($(OS),Windows_NT)
 TARGET_TYPE := exe
+else
+TARGET_TYPE := out
+endif
 CPU :=
 endif
 
@@ -40,9 +44,15 @@ $(warning **********************************************************************
 
 
 ifeq ($(TOOLCHAIN),GCC) 
+ifeq ($(OS),Windows_NT) 
 LIBS := -lws2_32
 TARGET_ARCH :=
 CFLAGS += -DWIN=1
+else
+LIBS := -lm
+TARGET_ARCH :=
+CFLAGS += -DNIX=1
+endif
 endif
 
 ifeq ($(TOOLCHAIN),C30) 
@@ -100,15 +110,16 @@ endif
 ifdef COMSPEC
 SHELL := $(COMSPEC)
 endif
+MKDIR := mkdir
 else
 QT = '
 RM = rm -rf
 MV ?= mv -f
 CP = cp -f
 FIND := find
+MKDIR := mkdir -p
 endif
 SED := sed
-MKDIR := mkdir
 #TEST := [
 space = $(empty) $(empty)
 comma := ,
@@ -156,8 +167,13 @@ all:
 #include $(patsubst %,$(SOURCE_DIR)/%/module.mk,$(modules))
 include $(addsuffix /module.mk,$(modules))
 
+ifeq ($(OS),Windows_NT) 
 create-output-directories := \
 	$(Q) $(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(modules)))); do [ -d %%f ] || $(MKDIR) %%f)
+else
+create-output-directories := \
+	$(shell for f in $(subst $(SOURCE_DIR)/,,$(modules)); do [ -d $$f ] || $(MKDIR) $$f; done)
+endif
 
 .PHONY: all
 all: $(TARGET)
@@ -191,6 +207,9 @@ endif
 
 %.exe: $(objects)
 	$(CC) -o $@ $(LFLAGS) $(objects) $(LIBS)
+
+%.out: %.exe
+	mv $< $@
 
 %.cof: $(objects)
 	$(CC) $(TARGET_ARCH) -o $@ $(objects) $(LFLAGS) $(LIBS)
