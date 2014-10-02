@@ -26,7 +26,7 @@ ifeq ($(OS),Windows_NT)
 else
 	TARGET_EXTENSION := .out
 	FLAGS := -DNIX
-	LIBS :=
+	LIBS := -lm
 endif
 TEST_UDB := $(TARGET_UDB)$(TARGET_EXTENSION)
 TEST_DCM := $(TARGET_DCM)$(TARGET_EXTENSION)
@@ -47,6 +47,7 @@ SRC_UDB_FILES = \
 ../MatrixPilot-SIL/SIL-eeprom.c \
 ../MatrixPilot-SIL/SIL-events.c \
 ../HILSIM_XPlane/UDBSocketWin.c \
+../HILSIM_XPlane/UDBSocketUnix.c \
 $(SRC_TST_FILES)
 
 SRC_DCM_FILES = \
