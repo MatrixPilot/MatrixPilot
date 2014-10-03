@@ -114,9 +114,9 @@ void dcm_callback_gps_location_updated(void)
 }
 
 #ifdef USE_EXTENDED_NAV
-void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
+void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
 #else
-void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
+void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 #endif // USE_EXTENDED_NAV
 {
 	struct relative2D courseLeg;
@@ -185,7 +185,7 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 
 //struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
 //extern struct waypointparameters goal;
-//	DPRINT("set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
+//	DPRINT("navigate_set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
 
 //  New method for computing cosine and sine of course direction
 	vector2_normalize(&courseDirection[0], &courseDirection[0]);
@@ -193,22 +193,22 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 	goal.sinphi = courseDirection[1];
 }
 
-void update_goal_alt(int16_t z)
+void navigate_set_goal_height(int16_t z)
 {
 	goal.height = z;
 }
 
-void process_flightplan(void)
+void navigate_process_flightplan(void)
 {
 	if (gps_nav_valid() && flags._.GPS_steering)
 	{
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 		run_flightplan();
 		compute_camera_view();
 	}
 }
 
-void compute_bearing_to_goal(void)
+void navigate_compute_bearing_to_goal(void)
 {
 	union longww temporary;
 
@@ -374,7 +374,7 @@ uint16_t wind_gain_adjustment(void)
 
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
-int16_t determine_navigation_deflection(char navType)
+int16_t navigate_determine_deflection(char navType)
 {
 	union longww deflectionAccum;
 	union longww dotprod;

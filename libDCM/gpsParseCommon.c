@@ -161,7 +161,7 @@ static void udb_background_callback_triggered(void)
 		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
-		process_flightplan();
+		navigate_process_flightplan();
 #endif
 	}
 	else

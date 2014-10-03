@@ -86,7 +86,7 @@ void dcm_heartbeat_callback(void)
 			flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
 		}
 #if (DEADRECKONING == 1)
-		process_flightplan();
+		navigate_process_flightplan();
 #endif
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 		airspeedCntrl();

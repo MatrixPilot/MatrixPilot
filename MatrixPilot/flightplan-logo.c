@@ -403,7 +403,7 @@ static void update_goal_from(struct relative3D old_goal)
 		old_goal.z = IMUlocationz._.W1;
 	}
 
-	set_goal(old_goal, new_goal);
+	navigate_set_goal(old_goal, new_goal);
 
 	new_goal.x = (turtleLocations[CAMERA].x._.W1);
 	new_goal.y = (turtleLocations[CAMERA].y._.W1);
@@ -427,7 +427,7 @@ void run_flightplan(void)
 			if (logo_goal_has_moved())
 			{
 				update_goal_from(lastGoal);
-				compute_bearing_to_goal();
+				navigate_compute_bearing_to_goal();
 			}
 		}
 		logo_inject_pos = 0;
@@ -446,7 +446,7 @@ void run_flightplan(void)
 			instructionIndex = interruptIndex+1;
 			interruptStackBase = logoStackIndex;
 			process_instructions();
-			update_goal_alt(turtleLocations[PLANE].z);
+			navigate_set_goal_height(turtleLocations[PLANE].z);
 			lastGoal.z = turtleLocations[PLANE].z;
 		}
 	}
@@ -1021,7 +1021,7 @@ static void process_instructions(void)
 	if (logo_goal_has_moved())
 	{
 		update_goal_from(lastGoal);
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 	}
 }
 

@@ -87,7 +87,7 @@ void normalYawCntrl(void)
 #endif 
 	if (RUDDER_NAVIGATION && flags._.GPS_steering)
 	{
-		yawNavDeflection = determine_navigation_deflection('y');
+		yawNavDeflection = navigate_determine_deflection('y');
 		
 		if (canStabilizeInverted() && current_orientation == F_INVERTED)
 		{

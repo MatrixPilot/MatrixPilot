@@ -41,14 +41,14 @@ extern int8_t desired_dir;
 
 void init_navigation(void);
 #ifdef USE_EXTENDED_NAV
-void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
+void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
 #else
-void set_goal(struct relative3D fromPoint , struct relative3D toPoint);
+void navigate_set_goal(struct relative3D fromPoint , struct relative3D toPoint);
 #endif // USE_EXTENDED_NAV
-void update_goal_alt(int16_t z);
-void compute_bearing_to_goal (void);
-void process_flightplan(void);
-int16_t determine_navigation_deflection(char navType);
+void navigate_set_goal_height(int16_t z);
+void navigate_compute_bearing_to_goal(void);
+void navigate_process_flightplan(void);
+int16_t navigate_determine_deflection(char navType);
 uint16_t wind_gain_adjustment(void);
 
 
