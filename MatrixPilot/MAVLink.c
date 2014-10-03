@@ -46,6 +46,7 @@
 #include "MAVMission.h"
 #include "MAVFlexiFunctions.h"
 #include "MAVUDBExtra.h"
+#include "../MAVLink/MAVFTP.h"
 
 #if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
@@ -625,6 +626,7 @@ static void handleMessage(void)
 	handling_of_message_completed |= MAVParamsHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVFlexiFunctionsHandleMessage(handle_msg);
+	handling_of_message_completed |= MAVFTPHandleMessage(handle_msg);
 
 	if (handling_of_message_completed == true)
 	{
@@ -1032,6 +1034,7 @@ void mavlink_output_40hz(void)
 	MAVParamsOutput_40hz();
 	MAVMissionOutput_40hz();
 	MAVFlexiFunctionsOutput_40hz();
+	MAVFTPOutput_40hz();
 
 	// Acknowledge a command if flaged to do so.
 	if (mavlink_send_command_ack == true)

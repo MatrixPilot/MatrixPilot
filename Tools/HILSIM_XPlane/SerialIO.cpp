@@ -5,9 +5,9 @@ extern "C" {
 #include "UDBSocket.h" // MS Visual C++, XCode, linux builds
 }
 
-UDBSocket serialSock = NULL;
-UDBSocket udpSock = NULL;
-UDBSocket activeSock = NULL; // points to one of the other two, only 1 of which remains active
+static UDBSocket serialSock = NULL;
+static UDBSocket udpSock = NULL;
+static UDBSocket activeSock = NULL; // points to one of the other two, only 1 of which remains active
 
 extern LogFile LoggingFile;
 extern string CommPortString;

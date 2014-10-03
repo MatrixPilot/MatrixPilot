@@ -61,7 +61,7 @@ static uint16_t I2C1_tx_data_size = 0;      // tx data size
 static uint16_t I2C1_rx_data_size = 0;      // rx data size
 static uint16_t I2C1_command_data_size = 0; // command data size
 static uint8_t* pI2C1Buffer = NULL;         // pointer to buffer
-static uint8_t* pI2C1commandBuffer = NULL;  // pointer to receive buffer
+static const uint8_t* pI2C1commandBuffer = NULL;  // pointer to receive buffer
 static uint16_t I2C1_service_handle = INVALID_HANDLE;
 static void (*I2C1_state)(void) = &I2C1_idle;
 static I2C_callbackFunc pI2C_callback = NULL;
@@ -120,18 +120,18 @@ static inline boolean I2C1_CheckAvailable(void)
 	return true;
 }
 
-boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback)
+boolean I2C1_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback)
 {
 	if (!I2C1_CheckAvailable()) return false;
 
-	pI2C_callback = pCallback;
+	pI2C_callback = callback;
 
-	I2C1_command_data_size = commandDataSize;
-	pI2C1commandBuffer = pcommandData;
-	I2C1_AddressByte = address;
-	pI2C1Buffer = ptxData;
+	I2C1_command_data_size = cmd_len;
+	pI2C1commandBuffer = cmd;
+	I2C1_AddressByte = addr;
+	pI2C1Buffer = data;
 
-	I2C1_tx_data_size = txSize;         // tx data size
+	I2C1_tx_data_size = data_len;       // tx data size
 	I2C1_rx_data_size = 0;              // rx data size
 
 	// Set ISR callback and trigger the ISR
@@ -140,19 +140,19 @@ boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSi
 	return true;
 }
 
-boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode)
+boolean I2C1_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode)
 {
 	if (!I2C1_CheckAvailable()) return false;
 
-	pI2C_callback = pCallback;
+	pI2C_callback = callback;
 
-	I2C1_command_data_size = commandDataSize;
-	pI2C1commandBuffer = pcommandData;
-	I2C1_AddressByte = address;
-	pI2C1Buffer = prxData;
+	I2C1_command_data_size = cmd_len;
+	pI2C1commandBuffer = cmd;
+	I2C1_AddressByte = addr;
+	pI2C1Buffer = data;
 
 	I2C1_tx_data_size = 0;              // tx data size
-	I2C1_rx_data_size = rxSize;         // rx data size
+	I2C1_rx_data_size = data_len;       // rx data size
 
 	// Set ISR callback and trigger the ISR
 	I2C1_state = &I2C1_startWrite;
@@ -161,11 +161,11 @@ boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSiz
 }
 
 // Only send command byte to check for ACK.
-boolean I2C1_CheckAck(uint8_t addr, I2C_callbackFunc pCallback)
+boolean I2C1_CheckAck(uint8_t addr, I2C_callbackFunc callback)
 {
 	if (!I2C1_CheckAvailable()) return false;
 
-	pI2C_callback = pCallback;
+	pI2C_callback = callback;
 
 	I2C1_command_data_size = 0;
 	I2C1_AddressByte = addr;
@@ -259,7 +259,7 @@ static void I2C1_doneWrite(void)
 		pI2C_callback(true);
 }
 
-// Start a read after a write by settign the start bit again
+// Start a read after a write by setting the start bit again
 static void I2C1_readStart(void)
 {
 	I2C1_Index = 0;                     // Reset index into buffer

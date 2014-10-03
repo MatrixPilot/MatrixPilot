@@ -25,7 +25,7 @@ boolean showLEDs = 0;
 uint8_t inputState = 0;
 int hasShownInitStates = 0;
 
-void sil_handle_key_input(char c);
+int sil_handle_key_input(char c);
 void sil_checkForLedUpdates(void);
 
 void print_help(void)
@@ -128,7 +128,7 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 
 #define KEYPRESS_INPUT_DELTA 50
 
-void sil_handle_key_input(char c)
+int sil_handle_key_input(char c)
 {
 	switch (inputState) {
 		case 0:
@@ -226,7 +226,7 @@ void sil_handle_key_input(char c)
 					break;
 					
 				default:
-					break;
+					return 0;
 			}
 			break;
 		}
@@ -254,8 +254,10 @@ void sil_handle_key_input(char c)
 				sil_reset();
 			}
 			inputState = 0;
+			break;
 		}
 	}
+	return 1;
 }
 
 #endif // (WIN == 1 || NIX == 1)

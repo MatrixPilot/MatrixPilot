@@ -19,11 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
+#include "serialIO.h"
 #include "servoOut.h"
 #include "radioIn.h"
+#include "ADchannel.h"
+#include "mpu6000.h"
 #include "analogs.h"
 #include "events.h"
 #include "osd.h"
@@ -101,7 +105,7 @@ void udb_init(void)
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	MPU6000_init16();
+	MPU6000_init16(&heartbeat);
 #endif
 
 	SRbits.IPL = 0; // turn on all interrupt priorities
@@ -115,12 +119,4 @@ void udb_run(void)
 	// pause cpu counting timer while not in an ISR
 	indicate_loading_main;
 #endif
-}
-
-// saturation logic to maintain pulse width within bounds
-int16_t udb_servo_pulsesat(int32_t pw)
-{
-	if (pw > SERVOMAX) pw = SERVOMAX;
-	if (pw < SERVOMIN) pw = SERVOMIN;
-	return (int16_t)pw;
 }

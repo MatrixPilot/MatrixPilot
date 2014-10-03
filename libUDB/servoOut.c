@@ -129,6 +129,16 @@ void servoOut_init(void) // was called udb_init_pwm()
 #endif
 }
 
+// saturation logic to maintain pulse width within bounds
+// This takes a servo out value, and clips it to be within
+// 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
+int16_t udb_servo_pulsesat(int32_t pw)
+{
+	if (pw > SERVOMAX) pw = SERVOMAX;
+	if (pw < SERVOMIN) pw = SERVOMIN;
+	return (int16_t)pw;
+}
+
 void udb_set_action_state(boolean newValue)
 {
 	ACTION_OUT_PIN = newValue;

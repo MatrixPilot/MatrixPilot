@@ -22,7 +22,7 @@
 // X axis pointing to right, Y axis pointing forward and Z axis pointing up
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
@@ -46,8 +46,12 @@ int16_t vref_adj;
 
 // MPU6000 Initialization and configuration
 
+static callback_fptr_t callback = NULL;
+
 void MPU6000_init16(callback_fptr_t fptr)
 {
+	callback = fptr;
+
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz

@@ -19,6 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#ifndef FLIGHTPLAN_LOGO_H
+#define FLIGHTPLAN_LOGO_H
+
 ////////////////////////////////////////////////////////////////////////////////
 // UDB LOGO Waypoint handling
 
@@ -532,3 +535,4 @@ TO (INT_HANDLER_LEFT)
 END
 };
 */
+#endif // FLIGHTPLAN_LOGO_H

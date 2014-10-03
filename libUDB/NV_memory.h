@@ -25,7 +25,7 @@
 #ifndef NV_MEMORY_H
 #define NV_MEMORY_H
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 
 typedef void (*NVMemory_callbackFunc)(boolean);
 
@@ -40,4 +40,3 @@ boolean udb_nv_memory_read(uint8_t* rdBuffer, uint16_t address, uint16_t rdSize,
 boolean udb_nv_memory_write(uint8_t* wrBuffer, uint16_t address, uint16_t wrSize, NVMemory_callbackFunc pCallback);
 
 #endif // NV_MEMORY_H
-

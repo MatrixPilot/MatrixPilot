@@ -32,6 +32,10 @@
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
 #define PID_HZ 40
 
+// PWM rate for ESCs (Quadcopter support)
+//#define ESC_HZ 400
+#define ESC_HZ 200
+
 // Read-only value increments with each heartbeat
 extern uint16_t udb_heartbeat_counter;
 
