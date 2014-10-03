@@ -19,10 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
-extern int16_t get_sonar_value(void);   // Get the raw pwm units from the sonar device driver
-
-
 //int16_t sonar_distance;         // distance to target in centimeters
 //int16_t sonar_height_to_ground; // calculated distance to ground in Earth's Z Plane allowing for tilt
 

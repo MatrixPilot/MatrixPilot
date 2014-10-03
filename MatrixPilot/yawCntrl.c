@@ -23,6 +23,8 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "states.h"
+#include "../libDCM/rmat.h"
 
 #define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
 

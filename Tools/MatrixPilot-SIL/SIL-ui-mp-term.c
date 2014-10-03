@@ -9,14 +9,17 @@
 #if (WIN == 1 || NIX == 1)
 
 #include "SIL-udb.h"
+#include "UDBSocket.h"
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
+#include "../MatrixPilot/config.h"
 #include "../MatrixPilot/flightplan-waypoints.h"
+#include "../libUDB/servoOut.h"
 #include <stdio.h>
 
 #define BUFLEN 512
 
-UDBSocket stdioSocket;
+UDBSocket stdioSocket = NULL;
 uint8_t lastLedBits = 0;
 boolean showLEDs = 0;
 uint8_t inputState = 0;
@@ -122,8 +125,6 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
 	}
 }
-
-void save_config(void);
 
 #define KEYPRESS_INPUT_DELTA 50
 

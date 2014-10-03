@@ -24,6 +24,7 @@
 #include "states.h"
 #include "../libDCM/estYawDrift.h"
 #include "../libUDB/servoOut.h"
+#include "../libDCM/rmat.h"
 
 int16_t current_orientation;
 union bfbts_word desired_behavior;

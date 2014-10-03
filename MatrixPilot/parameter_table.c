@@ -6,7 +6,7 @@
 
 #include "parameter_table.h"
 #include "data_storage.h"
-#include "../libDCM/altitudeCntrl.h"
+#include "altitudeCntrl.h"
 #include "../libUDB/ADchannel.h"
 
 

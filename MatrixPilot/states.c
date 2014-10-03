@@ -21,15 +21,16 @@
 
 #include "defines.h"
 #include "mode_switch.h"
-#include "altitudeCntrl.h"
 #include "flightplan-waypoints.h"
+#include "states.h"
+#include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
 #include <stdio.h>
 
 union fbts_int flags;
 int16_t waggle = 0;
-uint8_t counter = 0;
+static uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
 #if (SILSIM == 1)

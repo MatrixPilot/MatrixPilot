@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "servoPrepare.h"
 #include "altitudeCntrl.h"
 #include "airspeedCntrl.h"
 #include "../libDCM/estWind.h"

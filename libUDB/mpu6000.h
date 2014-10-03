@@ -145,6 +145,10 @@
 
 void MPU6000_print(void);
 
+typedef void (*callback_fptr_t)(void);
+
+void MPU6000_init16(callback_fptr_t fptr);
+
 extern struct ADchannel mpu_temp;
 
 #endif // __MPU6000_H__

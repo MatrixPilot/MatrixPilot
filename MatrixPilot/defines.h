@@ -84,17 +84,15 @@ void save_altitudeCntrlVariable(void);
 void calculate_sonar_height_above_ground(void);
 
 
-// AltitudeHold type
+// Negate VALUE if NEEDS_REVERSING is true
+#define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE) ((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
+
+
+// ALTITUDEHOLD_STABILIZED and ALTITUDEHOLD_WAYPOINT options
 #define AH_NONE             0
 #define AH_PITCH_ONLY       1
 #define AH_FULL             3
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// servoMix.c
-void servoMix(void);
-void cameraServoMix(void);
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
 // See options.h for a description of each type
@@ -104,6 +102,7 @@ void cameraServoMix(void);
 //#define AIRFRAME_HELI       3    // Untested
 //#define AIRFRAME_QUAD       4    // Under development
 
+// AIRFRAME_TYPE options
 #define AIRFRAME_NONE       0
 #define AIRFRAME_STANDARD   1
 #define AIRFRAME_VTAIL      2
@@ -111,34 +110,16 @@ void cameraServoMix(void);
 #define AIRFRAME_HELI       4    // Untested
 #define AIRFRAME_QUAD       5    // Under development
 
-// Negate VALUE if NEEDS_REVERSING is true
-#define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE) ((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
-
-extern int16_t cam_pitch_servo_pwm_delta;  
-extern int16_t cam_yaw_servo_pwm_delta;
-int32_t cam_pitchServoLimit(int32_t pwm_pulse);
-int32_t cam_yawServoLimit(int32_t pwm_pulse);
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Failsafe Type
+// FAILSAFE_TYPE options
 #define FAILSAFE_RTL                1
 #define FAILSAFE_MAIN_FLIGHTPLAN    2
 
+// FLIGHT_PLAN_TYPE options
 #define FP_NONE                     0
 #define FP_WAYPOINTS                1
 #define FP_LOGO                     2
 
-
-////////////////////////////////////////////////////////////////////////////////
-// serialIO.c
-void init_serial(void);
-void serial_output(char* format, ...);
-
-void telemetry_output_8hz(void);
-void mavlink_output_40hz(void);
-
-// Serial Output Format
+// SERIAL_OUTPUT_FORMAT options
 #define SERIAL_NONE         0    // No serial data is sent
 #define SERIAL_DEBUG        1    // UAV Dev Board debug info
 #define SERIAL_ARDUSTATION  2    // Compatible with ArduStation
@@ -149,11 +130,6 @@ void mavlink_output_40hz(void);
 #define SERIAL_UDB_EXTRA    7    // Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
 #define SERIAL_CAM_TRACK    8    // Output Location in a format usable by a 2nd UDB to target its camera at this plane
 #define SERIAL_MAVLINK      9    // The Micro Air Vehicle Link protocol from the PixHawk Project
-
-
-////////////////////////////////////////////////////////////////////////////////
-// mp_osd.c
-void mp_osd_run_step(void);
 
 
 #include "gain_variables.h"

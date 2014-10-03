@@ -24,9 +24,13 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
+#include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
+#include "sonarCntrl.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libUDB/servoOut.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"

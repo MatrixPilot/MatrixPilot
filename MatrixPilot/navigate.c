@@ -27,11 +27,13 @@
 #include "states.h"
 #include "flightplan-waypoints.h"
 #include "../libUDB/libUDB.h"
-#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libDCM/mathlib.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 #include <stdlib.h>
 
 // Compute actual and desired courses.

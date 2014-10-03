@@ -23,6 +23,8 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "states.h"
+#include "../libDCM/rmat.h"
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"

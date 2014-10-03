@@ -19,10 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "servoOut.h"
+#include "motorOut.h"
+#include "analogs.h"
+#include "radioIn.h"
+#include "../libDCM/rmat.h"
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif

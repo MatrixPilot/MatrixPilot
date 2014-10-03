@@ -25,6 +25,7 @@
 #include "cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/gpsData.h"
 #include <stdlib.h>
 
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)

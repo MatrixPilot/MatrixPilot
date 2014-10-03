@@ -284,8 +284,8 @@ static union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
 static union intbb p_sim_,     q_sim_,     r_sim_;
 static union intbb p_sim,      q_sim,      r_sim;
 static uint8_t x_ckey_, x_vkey_;
-void commit_bodyrate_data(void);
-void commit_keystroke_data(void);
+static void commit_bodyrate_data(void);
+static void commit_keystroke_data(void);
 #endif
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
@@ -861,7 +861,7 @@ void gps_commit_data(void)
 	alt_sl_gps.WW   = alt_sl_gps_.WW / 10;          // SIRF provides altMSL in cm, UBX provides it in mm
 	sog_gps.BB      = sog_gps_._.W0;                // SIRF uses 2 byte SOG, UBX provides 4 bytes
 #if (HILSIM == 1)
-	hilsim_airspeed.BB       = as_sim_._.W0;                 // provided by HILSIM, simulated airspeed
+	hilsim_airspeed.BB = as_sim_._.W0;              // provided by HILSIM, simulated airspeed
 #endif
 	cog_gps.BB      = (uint16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
 
@@ -886,7 +886,7 @@ void gps_commit_data(void)
 }
 
 #if (HILSIM == 1)
-void commit_bodyrate_data(void)
+static void commit_bodyrate_data(void)
 {
 	g_a_x_sim = g_a_x_sim_;
 	g_a_y_sim = g_a_y_sim_;

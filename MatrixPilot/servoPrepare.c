@@ -23,13 +23,16 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "mode_switch.h"
+#include "servoMix.h"
 #include "servoPrepare.h"
+#include "MAVLink.h"
 #include "flightplan-waypoints.h"
+#include "libCntrl.h"
+#include "airspeedCntrl.h"
+#include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
-#include "airspeedCntrl.h"
-#include "cameraCntrl.h"
 #include "osd_config.h"
 
 int16_t pitch_control;

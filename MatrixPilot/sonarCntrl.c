@@ -20,14 +20,15 @@
 
 
 #include "defines.h"
-//#include "../libUDB/sonarIn.h"
-extern int16_t get_sonar_value(void);   // Get the raw pwm units from the sonar device driver
+#include "sonarCntrl.h"
+#include "../libUDB/sonarIn.h"
+#include "../libDCM/rmat.h"
 
 #if (USE_SONAR_INPUT != 0)
 
-int16_t sonar_distance;         // distance to target in centimeters
-int16_t sonar_height_to_ground; // calculated distance to ground in Earth's Z Plane allowing for tilt
-static fractional cos_pitch_roll;      // tilt of the plane in UDB fractional units * 2.
+int16_t sonar_distance;             // distance to target in centimeters
+int16_t sonar_height_to_ground;     // calculated distance to ground in Earth's Z Plane allowing for tilt
+static fractional cos_pitch_roll;   // tilt of the plane in UDB fractional units * 2.
 
 
 // USEABLE_SONAR_DISTANCE may well vary with type of ground cover (e.g. long grass may be less).
@@ -85,11 +86,11 @@ void calculate_sonar_height_above_ground(void)
 	{
 		if (no_readings_count < 7)  // This assumes runnig at 40HZ UDB frame rate
 		{
-		 	no_readings_count++;
+			no_readings_count++;
 		}
 		else
 		{
-	    	sonar_height_to_ground = NO_READING_RECEIVED_DISTANCE;
+			sonar_height_to_ground = NO_READING_RECEIVED_DISTANCE;
 		}
 	}
 }

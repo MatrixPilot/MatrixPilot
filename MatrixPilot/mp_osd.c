@@ -21,11 +21,12 @@
 
 #include "defines.h"
 #include "osd_config.h"
-#include "states.h"
 
 #if ((USE_OSD == OSD_NATIVE) && (SILSIM != 1))
 
 #include <ctype.h>
+#include <string.h>
+#include "states.h"
 #include "navigate.h"
 #include "../libUDB/osd.h"
 #include "../libUDB/heartbeat.h"
@@ -34,6 +35,7 @@
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/estWind.h"
 #include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 
 #define OSD_LOC_DISABLED    -1
 #include "osd_layout.h"

@@ -23,8 +23,11 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
+#include "../libUDB/servoOut.h"
+#include "../libDCM/rmat.h"
 
 //  If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 
