@@ -40,7 +40,6 @@
 // Read will send the address as a write followed by the read
 //
 
-#include "libUDB_internal.h"
 
 // callback type for I2C user
 typedef void (*I2C_callbackFunc)(boolean);
