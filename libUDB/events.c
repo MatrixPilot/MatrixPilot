@@ -21,8 +21,8 @@
 
 // Manages software triggered events to run registered callbacks
 
+#include "libUDB.h"
 #include "events.h"
-#include "libUDB_internal.h"
 #include "interrupt.h"
 
 #define _EVENTL_TRIGGERIP _C2IP

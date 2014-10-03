@@ -46,7 +46,7 @@ int16_t vref_adj;
 
 // MPU6000 Initialization and configuration
 
-void MPU6000_init16(void)
+void MPU6000_init16(callback_fptr_t fptr)
 {
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers

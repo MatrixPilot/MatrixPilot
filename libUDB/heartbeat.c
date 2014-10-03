@@ -24,7 +24,6 @@
 #include "interrupt.h"
 #include "heartbeat.h"
 #include "servoOut.h"
-#include "motorOut.h"
 #include "analogs.h"
 #include "radioIn.h"
 #include "../libDCM/rmat.h"
