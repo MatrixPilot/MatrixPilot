@@ -29,7 +29,7 @@ CPU := 33EP512MU810
 endif
 
 ifneq (,$(filter $(DEVICE), UDB4 UDB5))
-TOOLCHAIN ?= C30
+TOOLCHAIN ?= XC16
 TARGET_TYPE := hex
 CPU := 33FJ256GP710A
 endif
@@ -44,6 +44,7 @@ $(warning **********************************************************************
 
 
 ifeq ($(TOOLCHAIN),GCC) 
+CC := gcc
 ifeq ($(OS),Windows_NT) 
 LIBS := -lws2_32
 TARGET_ARCH :=
@@ -150,7 +151,6 @@ ifneq (,$(filter $(DEVICE), UDB4 UDB5 AUAV3))
 modules := $(subst /module.mk,,$(shell $(FIND) $(SOURCE_DIR) -name module.mk))
 include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/Include $(SOURCE_DIR)/libVectorMatrix
 endif
-
 
 
 defines += $(DEVICE)=1

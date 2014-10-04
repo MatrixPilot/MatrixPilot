@@ -24,7 +24,10 @@
 
 #include "../libDCM/libDCM.h"
 #include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/serialIO.h"
+#include "../libUDB/servoOut.h"
 
 // Used for serial debug output
 #include <stdio.h>

@@ -172,9 +172,9 @@ void radioIn_failsafe_reset(void)
 	noisePulses = 0;
 }
 
+#if (NORADIO != 1)
 static void set_udb_pwIn(int pwm, int index)
 {
-#if (NORADIO != 1)
 	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
 
 	if (FAILSAFE_INPUT_CHANNEL == index)
@@ -223,10 +223,8 @@ static void set_udb_pwIn(int pwm, int index)
 	}
 	udb_pwIn[index] = pwm;
 #endif // FLY_BY_DATALINK_ENABLED
-#endif // NOARADIO !=1
 }
 
-#if (NORADIO != 1)
 #if (USE_PPM_INPUT == 0)
 
 #define _IC_HANDLER(x, y, z) \
