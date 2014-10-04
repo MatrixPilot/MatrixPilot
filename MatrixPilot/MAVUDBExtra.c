@@ -40,6 +40,8 @@
 #include "../libUDB/mcu.h"
 #include "../libUDB/servoOut.h"
 
+extern uint16_t maxstack;
+
 static union intbb voltage_milis = {0};
 int16_t mavlink_sue_telemetry_counter = 8; // Countdown counter, for use with SERIAL_UDB_EXTRA compatibility
 boolean mavlink_sue_telemetry_f2_a = true;

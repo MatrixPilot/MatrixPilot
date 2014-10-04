@@ -52,6 +52,7 @@ int16_t send_variables_counter = 0;
 int16_t send_by_index = 0;
 
 extern uint16_t maxstack;
+static boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i);
 
 // ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 // All paramaters are sent as type (mavlink_param_union_t) between Ground Control Station and MatrixPilot.

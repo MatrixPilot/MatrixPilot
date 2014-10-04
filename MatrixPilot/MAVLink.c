@@ -153,7 +153,8 @@ void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
-#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
+//#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
+#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink" // xc16 uses this syntax
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();

@@ -403,7 +403,19 @@ static void update_goal_from(struct relative3D old_goal)
 		old_goal.z = IMUlocationz._.W1;
 	}
 
+#ifdef USE_EXTENDED_NAV
+	// TODO: RobD - review this change implemented to restore build, but not runtime tested
+	struct relative3D_32 old_goal_32, new_goal_32;
+	old_goal_32.x = old_goal.x;
+	old_goal_32.y = old_goal.y;
+	old_goal_32.z = old_goal.z;
+	new_goal_32.x = new_goal.x;
+	new_goal_32.y = new_goal.y;
+	new_goal_32.z = new_goal.z;
+	navigate_set_goal(old_goal_32, new_goal_32);
+#else
 	navigate_set_goal(old_goal, new_goal);
+#endif // USE_EXTENDED_NAV
 
 	new_goal.x = (turtleLocations[CAMERA].x._.W1);
 	new_goal.y = (turtleLocations[CAMERA].y._.W1);
