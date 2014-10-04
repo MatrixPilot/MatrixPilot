@@ -19,7 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//#include "defines.h"
+#include "FSconfig.h"
+
+#ifdef USE_AT45D_FLASH
+
 #include <stdint.h>
 #include "AT45D.h"
 #include <spi.h>
@@ -287,3 +290,4 @@ void WriteSector(uint16_t sector, uint8_t* buffer)
 }
 
 #endif // !USE_AT45D_DMA
+#endif // USE_AT45D_FLASH

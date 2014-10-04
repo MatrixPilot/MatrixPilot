@@ -19,16 +19,16 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "../libDCM/gpsParseCommon.h"
-#include "../libDCM/mathlibNAV.h"
-#include "../libUDB/libUDB.h"
+#include "../../MatrixPilot/defines.h"
+#include "../../libDCM/gpsParseCommon.h"
+#include "../../libDCM/mathlibNAV.h"
+#include "../../libUDB/libUDB.h"
 
-#include "../libDCM/libDCM_internal.h"
-//#include "gpsParseCommon.h"
-//#include "../libUDB/heartbeat.h"b
-//#include "../libUDB/magnetometer.h"
-//#include "../libUDB/barometer.h"
+#include "../../libDCM/libDCM_internal.h"
+//#include "../../libDCM/gpsParseCommon.h"
+//#include "../../libUDB/heartbeat.h"b
+//#include "../../libUDB/magnetometer.h"
+//#include "../../libUDB/barometer.h"
 
 
 union dcm_fbts_word dcm_flags;

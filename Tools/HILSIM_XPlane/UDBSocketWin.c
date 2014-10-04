@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#if (WIN == 1)
+#if (WIN == 1 || WIN32 == 1) // WIN defined in GGC builds, WIN32 defined in VC++
 
 #include "UDBSocket.h"
 

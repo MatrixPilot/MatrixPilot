@@ -243,8 +243,6 @@
     <ClCompile Include="..\..\MatrixPilot\config.c" />
     <ClCompile Include="..\..\MatrixPilot\config_tests.c" />
     <ClCompile Include="..\..\MatrixPilot\crc16.c" />
-    <ClCompile Include="..\..\MatrixPilot\data_services.c" />
-    <ClCompile Include="..\..\MatrixPilot\data_storage.c" />
     <ClCompile Include="..\..\MatrixPilot\euler_angles.c" />
     <ClCompile Include="..\..\MatrixPilot\flightplan-logo.c" />
     <ClCompile Include="..\..\MatrixPilot\flightplan-waypoints.c" />
@@ -254,7 +252,6 @@
     <ClCompile Include="..\..\MatrixPilot\mode_switch.c" />
     <ClCompile Include="..\..\MatrixPilot\mp_osd.c" />
     <ClCompile Include="..\..\MatrixPilot\navigate.c" />
-    <ClCompile Include="..\..\MatrixPilot\nv_memory_table.c" />
     <ClCompile Include="..\..\MatrixPilot\parameter_table2.c" />
     <ClCompile Include="..\..\MatrixPilot\parameter_table_init.c" />
     <ClCompile Include="..\..\MatrixPilot\servoMix.c" />

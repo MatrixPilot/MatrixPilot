@@ -258,3 +258,4 @@ this
 example
 token
 */
+#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)

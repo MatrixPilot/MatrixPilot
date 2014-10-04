@@ -19,18 +19,23 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "navigate.h"
-#include "behaviour.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/navigate.h"
+#include "../MatrixPilot/behaviour.h"
+#include "../MatrixPilot/servoPrepare.h"
+#include "../MatrixPilot/states.h"
+#include "altitudeCntrl.h"
+#include "sonarCntrl.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/gpsParseCommon.h"
+#include "../libUDB/servoOut.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
 #endif // USE_CONFIGFILE
 
 #if (ALTITUDE_GAINS_VARIABLE != 1)
-
-extern vect3_16t estimatedWind;             // wind velocity vectors in cm / sec
 
 union longww throttleFiltered = { 0 };
 

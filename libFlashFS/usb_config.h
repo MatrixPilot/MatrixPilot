@@ -25,7 +25,7 @@
 //Configuration descriptors - if these two definitions do not exist then
 //  a ROM BYTE *ROM variable named exactly USB_CD_Ptr[] must exist.
 #define USB_USER_CONFIG_DESCRIPTOR USB_CD_Ptr
-#define USB_USER_CONFIG_DESCRIPTOR_INCLUDE extern ROM BYTE *ROM USB_CD_Ptr[]
+#define USB_USER_CONFIG_DESCRIPTOR_INCLUDE extern const BYTE *ROM USB_CD_Ptr[]
 
 //Make sure only one of the below "#define USB_PING_PONG_MODE"
 //is uncommented.
@@ -110,8 +110,17 @@
 //#define USB_ENABLE_TRANSFER_COMPLETE_HANDLER
 
 /** DEVICE CLASS USAGE *********************************************/
+#if (USE_USB == 1)
+
+#if (USE_MSD == 1)
 #define USB_USE_MSD
+#endif // (USE_MSD == 1)
+
+#if (USE_CDC == 1)
 #define USB_USE_CDC
+#endif // (USE_CDC == 1)
+
+#endif // (USE_USB == 1)
 
 /** ENDPOINTS ALLOCATION *******************************************/
 

@@ -58,7 +58,9 @@ void udb_background_callback_triggered(void);
 void TaskGPS_Init(void)
 {
 	xTaskHandle xHandle = NULL;
+
 	vSemaphoreCreateBinary(xSemaphoreGPS);
+	configASSERT(xSemaphoreGPS);
 	xTaskCreate(TaskGPS, (signed portCHAR*)"GPS", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+2, &xHandle);
 	configASSERT(xHandle);
 }

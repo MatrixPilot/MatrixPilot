@@ -19,10 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//#include "libUDB_internal.h"
+//#include "libUDB.h"
 #include "I2C.h"
 #include "interrupt.h"
-#include "NV_memory.h"
+//#include "NV_memory.h"
 #include "events.h"
 /*
 #ifndef I2C_SOURCE_INCLUDED
@@ -68,7 +68,7 @@
 #define I2C_NORMAL (((I2C_CON  & 0b0000000000011111) == 0) && \
                     ((I2C_STAT & 0b0100010011000001) == 0))
 
-static void I2C_Init(void);
+void I2C_Init(void);
 static void serviceI2C(void);
 
 static void isr_failed(void);
@@ -140,7 +140,7 @@ void I2C_Reset(void)
 	I2C_Init();             // enable the bus again
 }
 
-static void I2C_Init(void)
+void I2C_Init(void)
 {
 	I2C2BRG  = I2CBRGVAL;
 	I2C_EN   = 1;           // enable I2C peripheral
@@ -193,7 +193,6 @@ _INTERRUPT(MI2C)
 	I2C_IF = 0;                 // clear the interrupt
 	(*x.state)();               // execute the service routine
 	interrupt_restore_corcon;
-last_int = 19;
 }
 
 // Check if I2C port is available for use.

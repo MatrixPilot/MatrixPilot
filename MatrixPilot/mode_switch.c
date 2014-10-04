@@ -224,29 +224,36 @@ void mode_switch_2pos_poll(void) // this is called at 40 hertz
 #endif // MODE_SWITCH_TWO_POSITION
 }
 
-void mode_switch_check_set(boolean radio_on)
+uint8_t mode_switch_check_set(boolean radio_on)
 {
+//	static uint8_t mode_switch_old = 0;
+	uint8_t mode_switch_req;
+
 	if (radio_on)
 	{
 #if (MODE_SWITCH_TWO_POSITION == 1)
 		switch  (mode_switch_request_mode)
 		{
 			case FLIGHT_MODE_SWITCH_AUTONOMOUS:
+				mode_switch_req = MODE_AUTOPILOT;
 				mode_switch_flags._.man_req = 0;
 				mode_switch_flags._.auto_req = 0;
 				mode_switch_flags._.home_req = 1;
 				break;
 			case FLIGHT_MODE_SWITCH_STABILIZED:
+				mode_switch_req = MODE_STABILISE;
 				mode_switch_flags._.man_req = 0;
 				mode_switch_flags._.auto_req = 1;
 				mode_switch_flags._.home_req = 0;
 				break;
 			case FLIGHT_MODE_SWITCH_MANUAL:
+				mode_switch_req = MODE_MANUAL;
 				mode_switch_flags._.man_req = 1;
 				mode_switch_flags._.auto_req = 0;
 				mode_switch_flags._.home_req = 0;
 				break;
 			default: // Put autopilot in Manual Mode
+				mode_switch_req = MODE_MANUAL;
 				mode_switch_flags._.man_req = 1;
 				mode_switch_flags._.auto_req = 0;
 				mode_switch_flags._.home_req = 0;
@@ -256,12 +263,14 @@ void mode_switch_check_set(boolean radio_on)
 		// Select manual, automatic, or come home, based on pulse width of the switch input channel as defined in options.h.
 		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_HIGH)
 		{
+			mode_switch_req = MODE_AUTOPILOT;
 			mode_switch_flags._.man_req = 0;
 			mode_switch_flags._.auto_req = 0;
 			mode_switch_flags._.home_req = 1;
 		}
 		else if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW)
 		{
+			mode_switch_req = MODE_STABILISE;
 			mode_switch_flags._.man_req = 0;
 			mode_switch_flags._.auto_req = 1;
 			mode_switch_flags._.home_req = 0;
@@ -270,11 +279,13 @@ void mode_switch_check_set(boolean radio_on)
 		{
 			#if (FLY_BY_DATALINK_ENABLED == 1)
 			// when using fbdl, we are *always* in stabilized mode
+			mode_switch_req = MODE_STABILISE;
 			mode_switch_flags._.man_req = 0;
 			mode_switch_flags._.auto_req = 1;
 			mode_switch_flags._.home_req = 0;
 			
 			#else
+			mode_switch_req = MODE_MANUAL;
 			mode_switch_flags._.man_req = 1;
 			mode_switch_flags._.auto_req = 0;
 			mode_switch_flags._.home_req = 0;
@@ -306,8 +317,10 @@ void mode_switch_check_set(boolean radio_on)
 	}
 	else
 	{
+		mode_switch_req = MODE_AUTOPILOT;
 		mode_switch_flags._.man_req = 0;
 		mode_switch_flags._.auto_req = 0;
 		mode_switch_flags._.home_req = 1;
 	}
+	return mode_switch_req;
 }

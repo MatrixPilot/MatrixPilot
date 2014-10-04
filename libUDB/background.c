@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
@@ -154,7 +154,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	_T1IF = 0;              // clear the interrupt
 	heartbeat();
 	interrupt_restore_corcon;
-last_int = 2;
 }
 #endif // USE_FREERTOS
 
@@ -182,7 +181,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 	_cpu_timer++;           // increment the load counter
 	_T5IF = 0;              // clear the interrupt
 	interrupt_restore_corcon;
-last_int = 3;
 }
 
 static background_callback callback_fptr_1 = NULL;
@@ -197,7 +195,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	//pulse();
 	if (callback_fptr_1) callback_fptr_1();
 	interrupt_restore_corcon;
-last_int = 4;
 }
 
 // Trigger the low priority background processing interrupt.
@@ -221,7 +218,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void)
 	//udb_background_callback_triggered(); // replaced by function pointer callback below
 	if (callback_fptr_2) callback_fptr_2();
 	interrupt_restore_corcon;
-last_int = 5;
 }
 
 // Trigger the low priority background processing interrupt.

@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
@@ -36,14 +36,14 @@
 union intbb dcm_declination_angle = { 0 };
 #endif
 
-#include "parameter_table.h"
+#include "../MatrixPilot/parameter_table.h"
 
 
 /****************************************************************************/
 // Variables to support compilation
 
 #if (USE_NV_MEMORY == 1)
-#include "data_services.h"
+//#include "data_services.h"
 #endif
 
 /****************************************************************************/
@@ -60,8 +60,8 @@ extern uint16_t maxstack;
 // http://www.qgroundcontrol.org/parameter_interface
 
 #if (RECORD_FREE_STACK_SPACE ==  1)
-void mavlink_send_param_maxstack(int16_t);
-void mavlink_set_maxstack(float setting, int16_t i);
+static void mavlink_send_param_maxstack(int16_t);
+static void mavlink_set_maxstack(float setting, int16_t i);
 
 static boolean mavlink_check_target(uint8_t target_system, uint8_t target_component)
 //boolean mavlink_check_target(uint8_t target_system, uint8_t target_component)
@@ -69,14 +69,14 @@ static boolean mavlink_check_target(uint8_t target_system, uint8_t target_compon
 	return false;
 }
 
-void mavlink_send_param_maxstack(int16_t i)
+static void mavlink_send_param_maxstack(int16_t i)
 {
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
 	    (4096 - maxstack), MAVLINK_TYPE_FLOAT,  count_of_parameters_list, i);
 	//mavlink_msg_param_value_send(mavlink_channel_t chan, const char *param_id, float param_value, uint8_t param_type, uint16_t param_count, uint16_t param_index)
 }
 
-void mavlink_set_maxstack(float setting, int16_t i)
+static void mavlink_set_maxstack(float setting, int16_t i)
 {
 	mavlink_param_union_t param;
 	param.type = MAVLINK_TYPE_FLOAT;
@@ -89,8 +89,7 @@ void mavlink_set_maxstack(float setting, int16_t i)
 }
 #endif // RECORD_FREE_STACK_SPACE
 
-
-boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i)
+static boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i)
 {
 	switch (mavlink_parameter_parsers[mavlink_parameters_list[i].udb_param_type].mavlink_type)
 	{
@@ -382,7 +381,7 @@ typedef struct param_union {
 	uint8_t type;
 } mavlink_param_union_t;
  */
-void MAVParamsSet(const mavlink_message_t* handle_msg)
+static void MAVParamsSet(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_set_t packet;
 	int16_t i;
@@ -459,7 +458,7 @@ void MAVParamsSet(const mavlink_message_t* handle_msg)
 	}
 }
 
-void MAVParamsRequestList(const mavlink_message_t* handle_msg)
+static void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_request_list_t packet;
 
@@ -474,7 +473,7 @@ void MAVParamsRequestList(const mavlink_message_t* handle_msg)
 	}
 }
 
-void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
+static void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
 {
 	mavlink_param_request_read_t packet;
 //	int16_t index;

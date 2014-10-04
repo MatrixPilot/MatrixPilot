@@ -19,22 +19,27 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
 #include "MAVLink.h"
 #include "MAVUDBExtra.h"
-#include "navigate.h"
-#include "flightplan.h"
+#include "../MatrixPilot/navigate.h"
+#include "../MatrixPilot/flightplan.h"
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/rmat.h"
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
+#include "../libUDB/mcu.h"
+#include "../libUDB/servoOut.h"
 
-union intbb voltage_milis = {0};
+static union intbb voltage_milis = {0};
 int16_t mavlink_sue_telemetry_counter = 8; // Countdown counter, for use with SERIAL_UDB_EXTRA compatibility
 boolean mavlink_sue_telemetry_f2_a = true;
 

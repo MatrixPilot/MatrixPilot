@@ -29,3 +29,5 @@ void udb_servo_record_trims(void);
 void radioIn_failsafe_check(void);
 // called from heartbeat pulse at 1Hz
 void radioIn_failsafe_reset(void);
+
+void udb_callback_radio_did_turn_off(void); // callback

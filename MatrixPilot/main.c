@@ -20,13 +20,15 @@
 
 
 #include "defines.h"
-//#include "options.h"
-#include "../libUDB/libUDB.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
-//#include "flightplan-waypoints.h"
+#include "states.h"
+#include "flightplan_waypoints.h"
 #include <setjmp.h>
+
+#include "../libFlashFS/filesys.h"
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -63,11 +65,9 @@ int main(void)
 #endif
 
 #if (USE_TELELOG == 1)
-?
 	log_init();
 #endif
 #if (USE_USB == 1)
-?
 	preflight();    // perhaps this would be better called usb_init()
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
@@ -76,14 +76,16 @@ int main(void)
 	init_config();  // this will need to be moved up in order to support runtime hardware options
 	flightplan_init();
 
+	for (;;) {}
+
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
-#error here
+//#error here
 	quad_init();
 #else // AIRFRAME_TYPE
 	init_servoPrepare();
 	init_states();
 	init_behavior();
-	init_serial();
+	telemetry_init();
 #endif // AIRFRAME_TYPE
 
 	if (setjmp(buf))
@@ -99,7 +101,6 @@ int main(void)
 #endif // _MSC_VER
 
 //	MatrixPilot();
-
 //	dcm_fract_test(472580108);
 
 //#undef USE_FREERTOS
@@ -119,7 +120,7 @@ void idle_task(void)
 	while (1)
 	{
 #if (USE_TELELOG == 1)
-		telemetry_log_service();
+		telemetry_log();
 #endif
 #if (USE_USB == 1)
 		USBPollingService();

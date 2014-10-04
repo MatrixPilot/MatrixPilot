@@ -106,9 +106,9 @@
 #define NEUTRAL_TRIM    3010
 #define THROTTLE_IDLE   2250
 
-#define ROLL_INPUT_CHANNEL	CHANNEL_1
-#define PITCH_INPUT_CHANNEL	CHANNEL_2
-#define YAW_INPUT_CHANNEL	CHANNEL_4
+#define ROLL_INPUT_CHANNEL  CHANNEL_1
+#define PITCH_INPUT_CHANNEL CHANNEL_2
+#define YAW_INPUT_CHANNEL   CHANNEL_4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -122,10 +122,10 @@
 //OPTIONS: check output channel mappings in options.h
 //#error("output channel mappings not set")
 
-#define MOTOR_A_OUTPUT_CHANNEL	CHANNEL_3		// + front or X left front, CCW
-#define MOTOR_B_OUTPUT_CHANNEL	CHANNEL_4		// + right or X right front, CW
-#define MOTOR_C_OUTPUT_CHANNEL	CHANNEL_1		// + rear or X right rear, CCW
-#define MOTOR_D_OUTPUT_CHANNEL	CHANNEL_2		// + left or X left rear,	CW
+#define MOTOR_A_OUTPUT_CHANNEL CHANNEL_3    // + front or X left front, CCW
+#define MOTOR_B_OUTPUT_CHANNEL CHANNEL_4    // + right or X right front, CW
+#define MOTOR_C_OUTPUT_CHANNEL CHANNEL_1    // + rear or X right rear, CCW
+#define MOTOR_D_OUTPUT_CHANNEL CHANNEL_2    // + left or X left rear,	CW
 
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.

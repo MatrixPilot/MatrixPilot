@@ -2,9 +2,9 @@
 module for loading/saving waypoints
 '''
 
-import mavutil, time, copy
+import time, copy
 import logging
-import mavutil
+from . import mavutil
 try:
     from google.protobuf import text_format
     import mission_pb2
@@ -38,11 +38,18 @@ class MAVWPLoader(object):
 
     def add(self, w, comment=''):
         '''add a waypoint'''
-	w = copy.copy(w)
-	if comment:
-		w.comment = comment
+        w = copy.copy(w)
+        if comment:
+            w.comment = comment
         w.seq = self.count()
         self.wpoints.append(w)
+        self.last_change = time.time()
+
+    def reindex(self):
+        '''reindex waypoints'''
+        for i in range(self.count()):
+            w = self.wpoints[i]
+            w.seq = i
         self.last_change = time.time()
 
     def add_latlonalt(self, lat, lon, altitude):
@@ -70,6 +77,7 @@ class MAVWPLoader(object):
         '''remove a waypoint'''
         self.wpoints.remove(w)
         self.last_change = time.time()
+        self.reindex()
 
     def clear(self):
         '''clear waypoint list'''
@@ -262,17 +270,17 @@ class MAVWPLoader(object):
         f = open(filename, mode='w')
         f.write("QGC WPL 110\n")
         for w in self.wpoints:
-	    if getattr(w, 'comment', None):
-	        f.write("# %s\n" % w.comment)
+            if getattr(w, 'comment', None):
+                f.write("# %s\n" % w.comment)
             f.write("%u\t%u\t%u\t%u\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%u\n" % (
                 w.seq, w.current, w.frame, w.command,
                 w.param1, w.param2, w.param3, w.param4,
                 w.x, w.y, w.z, w.autocontinue))
         f.close()
 
-    def polygon(self, done=None):
-        '''return a polygon for the waypoints'''
-        points = []
+    def view_indexes(self, done=None):
+        '''return a list waypoint indexes in view order'''
+        ret = []
         if done is None:
             done = set()
         idx = 0
@@ -287,23 +295,33 @@ class MAVWPLoader(object):
             w = self.wp(idx)
             if idx in done:
                 if w.x != 0 or w.y != 0:
-                    points.append((w.x, w.y))
+                    ret.append(idx)
                 break
             done.add(idx)
             if w.command == mavutil.mavlink.MAV_CMD_DO_JUMP:
                 idx = int(w.param1)
                 w = self.wp(idx)
                 if w.x != 0 or w.y != 0:
-                    points.append((w.x, w.y))
+                    ret.append(idx)
                 continue
-            idx += 1
             if (w.x != 0 or w.y != 0) and w.command in [mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
                                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM,
                                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_TURNS,
                                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_TIME,
                                                         mavutil.mavlink.MAV_CMD_NAV_LAND,
-                                                        mavutil.mavlink.MAV_CMD_NAV_TAKEOFF]:
-                points.append((w.x, w.y))
+                                                        mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+                                                        mavutil.mavlink.MAV_CMD_NAV_SPLINE_WAYPOINT]:
+                ret.append(idx)
+            idx += 1
+        return ret
+
+    def polygon(self, done=None):
+        '''return a polygon for the waypoints'''
+        indexes = self.view_indexes(done)
+        points = []
+        for idx in indexes:
+            w = self.wp(idx)
+            points.append((w.x, w.y))
         return points
 
     def polygon_list(self):
@@ -312,6 +330,16 @@ class MAVWPLoader(object):
         ret = []
         while len(done) != self.count():
             p = self.polygon(done)
+            if len(p) > 0:
+                ret.append(p)
+        return ret
+
+    def view_list(self):
+        '''return a list of polygon indexes lists for the waypoints'''
+        done = set()
+        ret = []
+        while len(done) != self.count():
+            p = self.view_indexes(done)
             if len(p) > 0:
                 ret.append(p)
         return ret
@@ -326,7 +354,6 @@ class MAVRallyLoader(object):
     '''MAVLink Rally points and Rally Land ponts loader'''
     def __init__(self, target_system=0, target_component=0):
         self.rally_points = []
-        self.rally_land_points = []
         self.target_system = target_system
         self.target_component = target_component
         self.last_change = time.time()
@@ -338,29 +365,60 @@ class MAVRallyLoader(object):
     def rally_point(self, i):
         '''return rally point i'''
         return self.rally_points[i]
-   
+
+    def reindex(self):
+        '''reset counters and indexes'''
+        for i in range(self.rally_count()):
+            self.rally_points[i].count = self.rally_count()
+            self.rally_points[i].idx = i
+        self.last_change = time.time()
+            
     def append_rally_point(self, p):
         '''add rallypoint to end of list'''
         if (self.rally_count() > 9):
-           print "Can't have more than 10 rally points, not adding."
+           print("Can't have more than 10 rally points, not adding.")
            return
 
         self.rally_points.append(p)
-        self.last_change = time.time()
-        self.last_change = time.time()
-        for i in range(self.rally_count()):
-            self.rally_points[i].count = self.rally_count()
+        self.reindex()
 
     def create_and_append_rally_point(self, lat, lon, alt, break_alt, land_dir, flags):
         '''add a point via latitude/longitude'''
-        p = mavutil.mavlink.MAVLink_rally_point_message(self.target_system, self.target_component, self.rally_count(), 0, lat, lon, alt, break_alt, land_dir, flags)
+        p = mavutil.mavlink.MAVLink_rally_point_message(self.target_system, self.target_component,
+                                                        self.rally_count(), 0, lat, lon, alt, break_alt, land_dir, flags)
         self.append_rally_point(p)
 
     def clear(self):
         '''clear all point lists (rally and rally_land)'''
         self.rally_points = []
-        self.rally_land_points = []
         self.last_change = time.time()
+
+    def remove(self, i):
+        '''remove a rally point'''
+        if i < 1 or i > self.rally_count():
+            print("Invalid rally point number %u" % i)
+        self.rally_points.pop(i-1)
+        self.reindex()
+
+    def move(self, i, lat, lng, change_time=True):
+        '''move a rally point'''
+        if i < 1 or i > self.rally_count():
+            print("Invalid rally point number %u" % i)
+        self.rally_points[i-1].lat = int(lat*1e7)
+        self.rally_points[i-1].lng = int(lng*1e7)
+        if change_time:
+            self.last_change = time.time()
+
+    def set_alt(self, i, alt, break_alt=None, change_time=True):
+        '''set rally point altitude(s)'''
+        if i < 1 or i > self.rally_count():
+            print("Inavlid rally point number %u" % i)
+            return
+        self.rally_points[i-1].alt = int(alt)
+        if (break_alt != None):
+            self.rally_points[i-1].break_alt = break_alt
+        if change_time:
+            self.last_change = time.time()
 
     def load(self, filename):
         '''load rally and rally_land points from a file.
@@ -380,10 +438,6 @@ class MAVRallyLoader(object):
             if (a[0].lower() == "rally"):
                 self.create_and_append_rally_point(float(a[1]) * 1e7, float(a[2]) * 1e7,
                                                    float(a[3]), float(a[4]), float(a[5]) * 100.0, int(a[6]))
-# Coming Soon:
-#            elif (a[0].lower().equals("rally_land"):
-#                self.add_rally_land_from_file(float(a[1]), float(a[2]), float(a[3]))
-
         f.close()
         return len(self.rally_points)
 
@@ -393,9 +447,6 @@ class MAVRallyLoader(object):
         for p in self.rally_points:
             f.write("RALLY %f\t%f\t%f\t%f\t%f\t%d\n" % (p.lat * 1e-7, p.lng * 1e-7, p.alt,
                                                         p.break_alt, p.land_dir, p.flags))
-        #Coming soon
-        #for p in self.rally_land_points:
-        #    f.write("RALLY_LAND %f\t%f\t%f\n" & (p.lat, p.lng, p.atl)
         f.close()
 
 class MAVFenceError(Exception):
@@ -423,9 +474,17 @@ class MAVFenceLoader(object):
     def add(self, p):
         '''add a point'''
         self.points.append(p)
-        self.last_change = time.time()
+        self.reindex()
+
+    def reindex(self):
+        '''reindex waypoints'''
         for i in range(self.count()):
-            self.points[i].count = self.count()
+            w = self.points[i]
+            w.idx = i
+            w.count = self.count()
+            w.target_system = self.target_system
+            w.target_component = self.target_component
+        self.last_change = time.time()
 
     def add_latlon(self, lat, lon):
         '''add a point via latitude/longitude'''
@@ -462,6 +521,37 @@ class MAVFenceLoader(object):
         for p in self.points:
             f.write("%f\t%f\n" % (p.lat, p.lng))
         f.close()
+
+    def move(self, i, lat, lng, change_time=True):
+        '''move a fence point'''
+        if i < 0 or i >= self.count():
+            print("Invalid fence point number %u" % i)
+        self.points[i].lat = lat
+        self.points[i].lng = lng
+        # ensure we close the polygon
+        if i == 1:
+                self.points[self.count()-1].lat = lat
+                self.points[self.count()-1].lng = lng
+        if i == self.count() - 1:
+                self.points[1].lat = lat
+                self.points[1].lng = lng
+        if change_time:
+            self.last_change = time.time()
+
+    def remove(self, i, change_time=True):
+        '''remove a fence point'''
+        if i < 0 or i >= self.count():
+            print("Invalid fence point number %u" % i)
+        self.points.pop(i)
+         # ensure we close the polygon
+        if i == 1:
+                self.points[self.count()-1].lat = self.points[1].lat
+                self.points[self.count()-1].lng = self.points[1].lng
+        if i == self.count():
+                self.points[1].lat = self.points[self.count()-1].lat
+                self.points[1].lng = self.points[self.count()-1].lng
+        if change_time:
+            self.last_change = time.time()
 
     def polygon(self):
             '''return a polygon for the fence'''

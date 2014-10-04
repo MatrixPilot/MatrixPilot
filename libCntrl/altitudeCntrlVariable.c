@@ -21,9 +21,16 @@
 // To use this library, you must set ALTITUDE_GAINS_VARIABLE == 1 in options.h
 
 
-#include "defines.h"
-#include "behaviour.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/navigate.h"
+#include "../MatrixPilot/behaviour.h"
+#include "../MatrixPilot/servoPrepare.h"
+#include "../MatrixPilot/states.h"
 #include "airspeedCntrl.h"
+#include "altitudeCntrl.h"
+#include "sonarCntrl.h"
+#include "../libDCM/deadReckoning.h"
+#include "../libUDB/servoOut.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"

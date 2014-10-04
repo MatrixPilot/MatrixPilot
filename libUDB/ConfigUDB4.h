@@ -34,6 +34,8 @@
 #define xaccelBUFF          5
 #define yaccelBUFF          6
 #define zaccelBUFF          4
+
+// External A/D channels:
 #define analogInput1BUFF    7
 #define analogInput2BUFF    8
 #define analogInput3BUFF    9
@@ -59,6 +61,7 @@
 #define LED_ORANGE          _LATE3
 #define LED_GREEN           _LATE2
 #define LED_RED             _LATE1
+#define LED_TAIL_LIGHT      _LATE1
 
 // SPI SS pin definitions
 #define SPI1_SS             _LATB2

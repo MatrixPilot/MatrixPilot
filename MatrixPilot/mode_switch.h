@@ -23,6 +23,12 @@
 #define MODE_SWITCH_H
 
 
+#define MODE_NONE      0
+#define MODE_MANUAL    1
+#define MODE_STABILISE 2
+#define MODE_AUTOPILOT 3
+#define MODE_FAILSAFE  4
+
 boolean mode_switch_manual_chk(void);
 boolean mode_switch_stabilize_chk(void);
 boolean mode_switch_waypoints_chk(void);
@@ -30,7 +36,7 @@ boolean mode_switch_rtl_hold_chk(void);
 void mode_switch_rtl_hold_set(void);
 
 void mode_switch_2pos_poll(void); // this is called at 40 hertz and scans the two postion switch option.
-void mode_switch_check_set(boolean radio_on); // this is called at 2 hertz and changes the flight mode if req.
+uint8_t mode_switch_check_set(boolean radio_on); // this is called at 2 hertz and changes the flight mode if req.
 
 
 #endif // MODE_SWITCH_H

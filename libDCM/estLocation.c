@@ -21,34 +21,22 @@
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
 //#include "../MatrixPilot/navigate.h" // TODO: resolve this upwards include for  navigate_process_flightplan() declaration
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
-//#include "estAltitude.h"
+#include "estLocation.h"
 #include "mathlibNAV.h"
-//#include "rmat.h"
-//#include "../libUDB/interrupt.h"
-//#include <string.h>
 
 
-//#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
-//#else
-#include "../libUDB/filters.h"
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+#include "../libDCM/filters.h"
 
 // multiplier for GPS x,y units (1/90 originally => 1 LSB / meter)
 #define LATLON2CM (10/9)
 
 struct relative3D GPSloc_cm = {0, 0, 0};
-// boxcar integrator buffer
-const int boxCarN = 3;
-const int boxCarLen = 10;
-struct boxCarState filterState;
-int boxCarBuff[30];
-long boxCarSum[3];
-
-extern boolean sendGPS;
-extern int tailFlash;
-
-//#endif // AIRFRAME_TYPE
+static struct boxCarState boxCarState; // boxcar integrator state buffer
+#endif // AIRFRAME_TYPE
 
 
 
@@ -64,22 +52,23 @@ static void location_plane(vect3_16t* gpsloc)
 {
 	union longbbbb accum_nav;
 
-		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
-		gpsloc->y = accum_nav._.W0;
-		accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
-		gpsloc->x = accum_nav._.W0;
+	accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
+	gpsloc->y = accum_nav._.W0;
+	accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
+	gpsloc->x = accum_nav._.W0;
 #ifdef USE_PRESSURE_ALT
 #warning "using pressure altitude instead of GPS altitude"
-		// division by 100 implies alt_origin is in centimeters; not documented elsewhere
-		// longword result = (longword/10 - longword)/100 : range
-		accum_nav.WW = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
+	// division by 100 implies alt_origin is in centimeters; not documented elsewhere
+	// longword result = (longword/10 - longword)/100 : range
+	accum_nav.WW = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
 #else
-		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
+	accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
 #endif // USE_PRESSURE_ALT
-		gpsloc->z = accum_nav._.W0;
+	gpsloc->z = accum_nav._.W0;
 }
 #endif // USE_EXTENDED_NAV
 
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 #ifdef USE_EXTENDED_NAV
 static void location_quad(vect3_32t* gpsloc)
 #else // !USE_EXTENDED_NAV
@@ -118,12 +107,13 @@ static void location_quad(vect3_16t* gpsloc)
 		gpsloc->z = accum_nav._.W0;
 
 		// run boxcar filter on new position
-		boxcar(&loc_cm, &filterState, &loc_cm_avg);
+		boxcar((int*)&loc_cm, &boxCarState, &loc_cm_avg);
 		// copy results back to GPSloc_cm
 		GPSloc_cm.x = loc_cm_avg.x;
 		GPSloc_cm.y = loc_cm_avg.y;
 		GPSloc_cm.z = loc_cm_avg.z;
 }
+#endif // AIRFRAME_TYPE
 
 void estLocation(void)
 {
@@ -239,5 +229,17 @@ void estLocation(void)
 #endif
 
 		velocity_previous = air_speed_3DGPS;
+}
+
+void estLocation_init(void)
+{
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+#define BOXCARN   3
+#define BOXCARLEN 10
+	static int boxCarBuff[BOXCARLEN * BOXCARN];
+	static long boxCarSum[BOXCARN];
+
+	init_boxCarState(BOXCARLEN, BOXCARN, boxCarBuff, boxCarSum, &boxCarState);
+#endif // AIRFRAME_TYPE
 }
 

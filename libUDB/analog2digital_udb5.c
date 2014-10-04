@@ -19,18 +19,13 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
 #include "ADchannel.h"
 
 #if (BOARD_TYPE == UDB5_BOARD)
-
-#if (NUM_ANALOG_INPUTS <= 0)
-#undef NUM_ANALOG_INPUTS
-#define NUM_ANALOG_INPUTS 4
-#endif
 
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo pwIn/Out/Trim arrays

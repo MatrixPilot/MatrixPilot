@@ -19,7 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
+#include "sonarIn.h"
 
 #if (USE_SONAR_INPUT != 0)
 
@@ -86,7 +87,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
 		udb_flags._.sonar_updated = 1;
 	}
 	interrupt_restore_corcon;
-last_int = 20;
 }
 
 #endif // USE_SONAR_INPUT

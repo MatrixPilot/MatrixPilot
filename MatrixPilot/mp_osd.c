@@ -20,17 +20,20 @@
 
 
 #include "defines.h"
+#include "osd_config.h"
+
+#if ((USE_OSD == OSD_NATIVE) && (SILSIM != 1))
+
+#include <ctype.h>
+#include "states.h"
 #include "navigate.h"
+#include "../libUDB/osd.h"
 #include "../libUDB/heartbeat.h"
-#include "../libDCM/libDCM_internal.h"
-#include "../libDCM/gpsParseCommon.h"
+#include "../libUDB/ADchannel.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../libUDB/osd.h"
-#include "osd_config.h"
-#include <stdlib.h>
-
-#if (USE_OSD == OSD_NATIVE)
+#include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 
 #define OSD_LOC_DISABLED    -1
 #include "osd_layout.h"
@@ -70,6 +73,58 @@ static const uint8_t callsign[] = OSD_CALL_SIGN;
 static uint8_t osd_reset_cnt = 0;
 static uint8_t osd_phase = 0;
 static boolean osd_was_on = 0;
+
+#if (OSD_SHOW_CONSOLE == 1)
+
+static char msgbuf_0[21];
+static char msgbuf_1[21];
+static uint8_t osd_console_blanking_time = 0;
+
+void osd_write_message(char* msg)
+{
+	strncpy(msgbuf_0, msgbuf_1, 20);
+	strncpy(msgbuf_1, msg, 20);
+	osd_console_blanking_time = 80;
+}
+
+static void osd_console_write_line(char* msg)
+{
+	uint8_t i;
+
+	osd_spi_write(MAX7456_DMM, 1);      // DMM: Enable auto-increment mode
+	for (i = 0; i < 20; i++)
+	{
+		char ch = tolower(msg[i]);
+		if (!ch) break;
+
+		if (ch == ' ') {
+			ch = 138;
+		} else {
+//			ch = ch - 60;
+			ch = ch + 42;
+		}
+		osd_spi_write_byte(ch);
+	}
+	osd_spi_write_byte(0xFF);           // Disable auto-increment mode 
+}
+
+static void osd_update_console(void)
+{
+	if (osd_console_blanking_time)
+	{
+		if (!--osd_console_blanking_time)
+		{
+			memset(msgbuf_0, ' ', 20);
+			memset(msgbuf_1, ' ', 20);
+		}
+		osd_spi_write_location(OSD_LOC_CONSOLE_0);
+		osd_console_write_line(msgbuf_0);
+		osd_spi_write_location(OSD_LOC_CONSOLE_1);
+		osd_console_write_line(msgbuf_1);
+	}
+}
+
+#endif
 
 #if (OSD_SHOW_HORIZON == 1)
 
@@ -228,11 +283,7 @@ static void osd_setup_screen(void)
 #endif
 }
 
-static void osd_update_values(void)
-{
-	switch (osd_phase)
-	{
-		case 0:
+static void osd_update_values_phase_0(void)
 		{
 #if (OSD_LOC_ALTITUDE != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_ALTITUDE+1);
@@ -276,10 +327,10 @@ static void osd_update_values(void)
 			else
 				osd_spi_write(0x7, 0x9C);                   // R : RTL Mode, lost signal
 #endif
-			break;
-		}
-		case 1:
-		{
+}
+
+static void osd_update_values_phase_1(void)
+{
 			int8_t earth_yaw;
 			int8_t dir_to_goal;
 			int16_t dist_to_goal;
@@ -388,17 +439,20 @@ static void osd_update_values(void)
 #endif
 
 #endif
-			break;
-		}
-		case 2:
-		{
+}
+
+static void osd_update_values_phase_2(void)
+{
 #if (OSD_SHOW_HORIZON == 1)
 			osd_update_horizon();
 #endif
-			break;
-		}
-		case 3:
-		{
+#if (OSD_SHOW_CONSOLE == 1)
+	osd_update_console();
+#endif
+}
+
+static void osd_update_values_phase_3(void)
+{
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S);
 			osd_spi_write_number(air_speed_3DIMU/100, 3, 0, 0, 0, 0);   // speed in m/s
@@ -443,7 +497,7 @@ static void osd_update_values(void)
 
 #if (OSD_LOC_VERTICAL_WIND_SPEED != OSD_LOC_DISABLED)
 			osd_spi_write_location(OSD_LOC_VERTICAL_WIND_SPEED);
-			osd_spi_write_number(estimatedWind.z/10, 4, 1, NUM_FLAG_SIGNED, 0, 0); // vertical wind speed in m/s
+	osd_spi_write_number(estimatedWind[2]/10, 4, 1, NUM_FLAG_SIGNED, 0, 0); // vertical wind speed in m/s
 #endif
 
 #if (OSD_LOC_TOTAL_ENERGY != OSD_LOC_DISABLED)
@@ -492,13 +546,11 @@ static void osd_update_values(void)
 				osd_spi_erase_chars(10);
 			}
 #endif
-			break;
-		}
 	}
-}
 
-void osd_run_step(void)
+void mp_osd_run_step(void)
 {
+	static uint8_t osd_phase = 0;
 	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] >= 3000 || !udb_flags._.radio_on);
 	int16_t countdown = 0;
 
@@ -564,7 +616,22 @@ void osd_run_step(void)
 				osd_spi_write(MAX7456_VOS, OSD_VERTICAL_OFFSET);
 				osd_spi_write(MAX7456_HOS, OSD_HORIZONTAL_OFFSET);
 
-				osd_update_values();
+//				osd_update_values();
+				switch (osd_phase)
+				{
+					case 0:
+						osd_update_values_phase_0();
+						break;
+					case 1:
+						osd_update_values_phase_1();
+						break;
+					case 2:
+						osd_update_values_phase_2();
+						break;
+					case 3:
+						osd_update_values_phase_3();
+						break;
+				}
 				osd_phase = (osd_phase+1) % 4;
 			}
 		}
@@ -573,6 +640,6 @@ void osd_run_step(void)
 
 #else
 
-void osd_run_step(void) {}
+void mp_osd_run_step(void) {}
 
 #endif // USE_OSD

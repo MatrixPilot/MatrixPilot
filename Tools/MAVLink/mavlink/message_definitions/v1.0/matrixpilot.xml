@@ -141,7 +141,7 @@
       <field type="int16_t" name="sue_magFieldEarth0">Serial UDB Extra Magnetic Field Earth 0 </field>
       <field type="int16_t" name="sue_magFieldEarth1">Serial UDB Extra Magnetic Field Earth 1 </field>
       <field type="int16_t" name="sue_magFieldEarth2">Serial UDB Extra Magnetic Field Earth 2 </field>
-      <field type="int16_t" name="sue_svs">Serial UDB Extra Number of Satellites in View</field>
+      <field type="int16_t" name="sue_svs">Serial UDB Extra Number of Sattelites in View</field>
       <field type="int16_t" name="sue_hdop">Serial UDB Extra GPS Horizontal Dilution of Precision</field>
     </message>
     <message id="171" name="SERIAL_UDB_EXTRA_F2_B">
@@ -189,13 +189,13 @@
       <field type="uint8_t" name="sue_YAW_STABILIZATION_AILERON">Serial UDB Extra Yaw Stabilization using Ailerons Enabled</field>
       <field type="uint8_t" name="sue_AILERON_NAVIGATION">Serial UDB Extra Navigation with Ailerons Enabled</field>
       <field type="uint8_t" name="sue_RUDDER_NAVIGATION">Serial UDB Extra Navigation with Rudder Enabled</field>
-      <field type="uint8_t" name="sue_ALTITUDEHOLD_STABILIZED">Serial UDB Extra Type of Altitude Hold when in Stabilized Mode</field>
-      <field type="uint8_t" name="sue_ALTITUDEHOLD_WAYPOINT">Serial UDB Extra Type of Altitude Hold when in Waypoint Mode</field>
+      <field type="uint8_t" name="sue_ALTITUDEHOLD_STABILIZED">Serial UDB Extra Type of Alitude Hold when in Stabilized Mode</field>
+      <field type="uint8_t" name="sue_ALTITUDEHOLD_WAYPOINT">Serial UDB Extra Type of Alitude Hold when in Waypoint Mode</field>
       <field type="uint8_t" name="sue_RACING_MODE">Serial UDB Extra Firmware racing mode enabled</field>
     </message>
     <message id="173" name="SERIAL_UDB_EXTRA_F5">
       <description>Backwards compatible version of SERIAL_UDB_EXTRA F5: format</description>
-      <field type="float" name="sue_YAWKP_AILERON">Serial UDB YAWKP_AILERON Gain for Proportional control of navigation</field>
+      <field type="float" name="sue_YAWKP_AILERON">Serial UDB YAWKP_AILERON Gain for Proporional control of navigation</field>
       <field type="float" name="sue_YAWKD_AILERON">Serial UDB YAWKD_AILERON Gain for Rate control of navigation</field>
       <field type="float" name="sue_ROLLKP">Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization</field>
       <field type="float" name="sue_ROLLKD">Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization</field>
@@ -212,7 +212,7 @@
     </message>
     <message id="175" name="SERIAL_UDB_EXTRA_F7">
       <description>Backwards compatible version of SERIAL_UDB_EXTRA F7: format</description>
-      <field type="float" name="sue_YAWKP_RUDDER">Serial UDB YAWKP_RUDDER Gain for Proportional control of navigation</field>
+      <field type="float" name="sue_YAWKP_RUDDER">Serial UDB YAWKP_RUDDER Gain for Proporional control of navigation</field>
       <field type="float" name="sue_YAWKD_RUDDER">Serial UDB YAWKD_RUDDER Gain for Rate control of navigation</field>
       <field type="float" name="sue_ROLLKP_RUDDER">Serial UDB Extra ROLLKP_RUDDER Gain for Proportional control of roll stabilization</field>
       <field type="float" name="sue_ROLLKD_RUDDER">Serial UDB Extra ROLLKD_RUDDER Gain for Rate control of roll stabilization</field>
@@ -243,22 +243,42 @@
       <field type="uint8_t" name="sue_DR">Serial UDB Extra Dead Reckoning Enabled</field>
       <field type="uint8_t" name="sue_BOARD_TYPE">Serial UDB Extra Type of UDB Hardware</field>
       <field type="uint8_t" name="sue_AIRFRAME">Serial UDB Extra Type of Airframe</field>
-      <field type="int16_t" name="sue_RCON">Serial UDB Extra Reboot Register of DSPIC</field>
-      <field type="int16_t" name="sue_TRAP_FLAGS">Serial UDB Extra Last dsPIC Trap Flags</field>
+      <field type="int16_t" name="sue_RCON">Serial UDB Extra Reboot Regitster of DSPIC</field>
+      <field type="int16_t" name="sue_TRAP_FLAGS">Serial UDB Extra  Last dspic Trap Flags</field>
       <field type="uint32_t" name="sue_TRAP_SOURCE">Serial UDB Extra Type Program Address of Last Trap</field>
-      <field type="int16_t" name="sue_osc_fail_count">Serial UDB Extra Number of Oscillator Failures</field>
+      <field type="int16_t" name="sue_osc_fail_count">Serial UDB Extra Number of Ocillator Failures</field>
       <field type="uint8_t" name="sue_CLOCK_CONFIG">Serial UDB Extra UDB Internal Clock Configuration</field>
       <field type="uint8_t" name="sue_FLIGHT_PLAN_TYPE">Serial UDB Extra Type of Flight Plan</field>
     </message>
     <message id="179" name="SERIAL_UDB_EXTRA_F15">
       <description>Backwards compatible version of SERIAL_UDB_EXTRA F15 and F16: format</description>
       <field type="uint8_t[40]" name="sue_ID_VEHICLE_MODEL_NAME">Serial UDB Extra Model Name Of Vehicle</field>
-      <field type="uint8_t[20]" name="sue_ID_VEHICLE_REGISTRATION">Serial UDB Extra Registration Number of Vehicle</field>
+      <field type="uint8_t[20]" name="sue_ID_VEHICLE_REGISTRATION">Serial UDB Extra Registraton Number of Vehicle</field>
     </message>
     <message id="180" name="SERIAL_UDB_EXTRA_F16">
       <field type="uint8_t[40]" name="sue_ID_LEAD_PILOT">Serial UDB Extra Name of Expected Lead Pilot</field>
       <field type="uint8_t[70]" name="sue_ID_DIY_DRONES_URL">Serial UDB Extra URL of Lead Pilot or Team</field>	
     </message>
+    <message id="181" name="ALTITUDES">
+               <description>The altitude measured by sensors and IMU</description>
+               <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
+               <field type="int32_t" name="alt_gps">GPS altitude in meters, expressed as * 1000 (millimeters), above MSL</field>
+               <field type="int32_t" name="alt_imu">IMU altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_barometric">barometeric altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_optical_flow">Optical flow altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_range_finder">Rangefinder Altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+               <field type="int32_t" name="alt_extra">Extra altitude above ground in meters, expressed as * 1000 (millimeters)</field>
+     </message>
+     <message id="182" name="AIRSPEEDS">
+               <description>The airspeed measured by sensors and IMU</description>
+               <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
+               <field type="int16_t" name="airspeed_imu">Airspeed estimate from IMU, cm/s</field>
+               <field type="int16_t" name="airspeed_pitot">Pitot measured forward airpseed, cm/s</field>
+               <field type="int16_t" name="airspeed_hot_wire">Hot wire anenometer measured airspeed, cm/s</field>
+               <field type="int16_t" name="airspeed_ultrasonic">Ultrasonic measured airspeed, cm/s</field>
+               <field type="int16_t" name="aoa">Angle of attack sensor, degrees * 10</field>
+               <field type="int16_t" name="aoy">Yaw angle sensor, degrees * 10</field>
+     </message>
     
    </messages>
 </mavlink>

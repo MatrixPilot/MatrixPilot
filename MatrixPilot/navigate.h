@@ -34,13 +34,15 @@ void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPo
 void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint);
 #endif // USE_EXTENDED_NAV
 void navigate_set_goal_height(int16_t z);
-void compute_bearing_to_goal(void);
+void navigate_compute_bearing_to_goal(void);
 void navigate_process_flightplan(void);
 int16_t navigate_determine_deflection(char navType);
 int16_t navigate_desired_height(void);
 
 // NEW STUFF:
 int16_t navigate_get_goal(vect3_16t* goal);
+
+uint16_t wind_gain_adjustment(void);
 
 
 #endif // NAVIGATE_H

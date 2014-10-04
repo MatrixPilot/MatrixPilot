@@ -19,10 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "uart.h"
+#include "mcu.h"
 #include <stdio.h>
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
@@ -117,7 +118,6 @@ int16_t defaultCorcon = 0;
 volatile uint16_t trap_flags __attribute__ ((persistent, near));
 volatile uint32_t trap_source __attribute__ ((persistent, near));
 volatile uint16_t osc_fail_count __attribute__ ((persistent, near));
-volatile uint16_t last_int __attribute__ ((persistent, near));
 
 uint16_t get_reset_flags(void)
 {
@@ -401,7 +401,6 @@ void mcu_init(void)
 		    (unsigned int)(trap_source >> 16), 
 		    (unsigned int)(trap_source & 0xffff), 
 		    osc_fail_count);
-		DPRINT("S/W Reset: last_int %u\r\n", last_int);
 	}
 #endif // CONSOLE_UART
 }

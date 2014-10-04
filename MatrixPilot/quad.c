@@ -20,8 +20,8 @@
 
 
 #include "defines.h"
-#include "options.h"
-#include "options_quad.h"
+//#include "options.h"
+//#include "options_quad.h"
 #include "quad.h"
 #include "../libCntrl/motorCntrl.h"
 #include "../libDCM/libDCM.h"
@@ -33,7 +33,6 @@
 
 unsigned long uptime;
 boolean sendGains;
-boolean sendGPS;
 
 static int flight_mode = 0;     // decoded flight mode switch
 static int gainadj_mode = 0;    // decoded gain mode switch
@@ -44,9 +43,6 @@ static boolean writeGains = false;
 static boolean throttleUp = false;
 
 unsigned int tailFlash = 0;
-
-extern union longww primary_voltage;
-extern unsigned int lowVoltageWarning;
 
 static void storeGains(void)
 {
@@ -100,7 +96,7 @@ int quad_init(void)
     // minicom set at 230,400 baud works fine with OpenLog at 230,400
     udb_serial_set_rate(TELEMETRY_BAUD); // this works with OpenLog set at 230,400 baud
 
-    led_off(TAIL_LIGHT); // taillight off
+    led_off(LED_TAIL_LIGHT); // taillight off
 
 	printf("MPQmicro running.\r\n");
 	DPRINT("MPQmicro running...\r\n");
@@ -404,7 +400,6 @@ void quad_heartbeat_callback(void) // was called dcm_servo_callback_prepare_outp
     }
 }
 
-unsigned int lowVoltageWarning;union longww primary_voltage;
 //void udb_callback_radio_did_turn_off(void)
 //{
 //}

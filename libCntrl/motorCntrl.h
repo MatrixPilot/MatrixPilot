@@ -47,7 +47,7 @@
 #define YAW_SIGN 1
 
 // PWM rate for ESCs
-#define ESC_HZ 400
+//#define ESC_HZ 400
 
 // amount of throttle before fly-by-wire controls engage
 #define THROTTLE_DEADBAND 100
@@ -59,14 +59,14 @@
 #define ROLLPITCH_CLAMP 300
 #define YAW_CLAMP 300
 
-extern unsigned int pid_gains[];
+extern uint16_t pid_gains[];
 extern boolean didCalibrate;
 
 extern union longww primary_voltage;
-extern unsigned int lowVoltageWarning;
+extern uint16_t lowVoltageWarning;
 
 void udb_set_dc(void);
-void motorCntrl(int flight_mode);
+void motorCntrl(int16_t flight_mode);
 
 
 #endif // MOTOR_CNTRL_H

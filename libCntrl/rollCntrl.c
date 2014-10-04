@@ -19,9 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "navigate.h"
-#include "behaviour.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/navigate.h"
+#include "../MatrixPilot/behaviour.h"
+#include "../MatrixPilot/servoPrepare.h"
+#include "../MatrixPilot/states.h"
+#include "../libDCM/rmat.h"
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"

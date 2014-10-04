@@ -36,7 +36,8 @@
 //    MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
 //    MAV_DATA_STREAM_EXTRA3 not assigned yet
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
@@ -47,21 +48,25 @@
 #include "MAVUDBExtra.h"
 
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h" // Needed for access to internal DCM value
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
-#include "parameter_table.h"
-#include "telemetry_log.h"
-#include "euler_angles.h"
-#include "navigate.h"
-#include "config.h"
+//#include "../MatrixPilot/parameter_table.h"
+#include "../MatrixPilot/telemetry_log.h"
+#include "../MatrixPilot/telemetry.h"
+#include "../MatrixPilot/euler_angles.h"
+#include "../MatrixPilot/navigate.h"
+#include "../MatrixPilot/config.h"
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
@@ -145,14 +150,14 @@ void init_mavlink(void)
 	streamRates[MAV_DATA_STREAM_RC_CHANNELS]    = MAVLINK_RATE_RC_CHAN;
 	streamRates[MAV_DATA_STREAM_RAW_SENSORS]    = MAVLINK_RATE_RAW_SENSORS;
 	streamRates[MAV_DATA_STREAM_POSITION]       = MAVLINK_RATE_POSITION;
-	streamRates[MAV_DATA_STREAM_NAV_CONTROLLER] = MAVLINK_RATE_NAV_CONTROLLER;
-	streamRates[MAV_DATA_STREAM_AIRSPEEDS]      = MAVLINK_RATE_AIRSPEEDS;
-	streamRates[MAV_DATA_STREAM_ALTITUDES]      = MAVLINK_RATE_ALTITUDES;
+//	streamRates[MAV_DATA_STREAM_NAV_CONTROLLER] = MAVLINK_RATE_NAV_CONTROLLER;
+//	streamRates[MAV_DATA_STREAM_AIRSPEEDS]      = MAVLINK_RATE_AIRSPEEDS;
+//	streamRates[MAV_DATA_STREAM_ALTITUDES]      = MAVLINK_RATE_ALTITUDES;
 	streamRates[MAV_DATA_STREAM_EXTRA1]         = MAVLINK_RATE_SUE;
 	streamRates[MAV_DATA_STREAM_EXTRA2]         = MAVLINK_RATE_POSITION_SENSORS;
 }
 
-void init_serial(void)
+void telemetry_init(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
@@ -162,7 +167,7 @@ void init_serial(void)
 	init_mavlink();
 }
 
-void restart_telemetry(void)
+void telemetry_restart(void)
 {
 }
 
@@ -236,7 +241,7 @@ void mav_printf(const char* format, ...)
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 // add printf library when running tests to output ascii messages of test results
-void serial_output(char* format, ...)
+static void serial_output(char* format, ...)
 {
 	int16_t remaining = 0;
 	int16_t wrote = 0;
@@ -506,11 +511,11 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 				{
 					case 0: // Read
 						DPRINT("Read (ROM)\r\n");
-						init_config();
+						config_load();
 						break;
 					case 1: // Write
 						DPRINT("Write (ROM)\r\n");
-						save_config();
+						config_save();
 						break;
 					default:
 						DPRINT("245 packet.param1 %f packet.param2 %f\r\n", (double)packet.param1, (double)packet.param2);
@@ -1109,8 +1114,8 @@ enum MAV_STATE
 	}
 
 	// POSITION SENSOR DATA - Using STREAM_EXTRA2
-
 	spread_transmission_load = 36;
+/*
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_ALTITUDES], mavlink_counter_40hz + spread_transmission_load))
 	{
 #if (BAROMETER_ALTITUDE == 1)
@@ -1123,14 +1128,15 @@ int32_t range_finder_alt = 34;
 		//mavlink_msg_altitudes_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t alt_gps, int32_t alt_imu, int32_t alt_barometric, int32_t alt_optical_flow, int32_t alt_range_finder, int32_t alt_extra)
 #endif
 	}
-
+ */
+/*
 	spread_transmission_load = 40;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_AIRSPEEDS], mavlink_counter_40hz + spread_transmission_load))
 	{
 //		mavlink_msg_airspeeds_send(MAVLINK_COMM_0, msec, 0, 0, 0, 0, 0, 0);
 		//mavlink_msg_airspeeds_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t airspeed_imu, int16_t airspeed_pitot, int16_t airspeed_hot_wire, int16_t airspeed_ultrasonic, int16_t aoa, int16_t aoy)
 	}
-
+ */
 	spread_transmission_load = 42;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
@@ -1142,14 +1148,11 @@ int32_t range_finder_alt = 34;
 #endif
 	}
 
-//uint16_t uart2_tx_count = 0;
-//uint16_t uart2_rx_count = 0;
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 //	NAV_CONTROLLER_OUTPUT
+/*
 	spread_transmission_load = 46;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_NAV_CONTROLLER], mavlink_counter_40hz + spread_transmission_load))
 	{
@@ -1162,18 +1165,18 @@ uint16_t wp_dist = tofinish_line;
 float alt_error = 0.0;
 float aspd_error = 0.0;
 float xtrack_error = 0.0;
-/*
-static int i = 0;
-if (i++ > 40)
-{
-	i = 0;
-	DPRINT("desired_dir %i, get_geo_heading_angle() %u, tofinish_line %u\r\n", (int16_t)desired_dir, get_geo_heading_angle(), tofinish_line);
-}
- */
-		mavlink_msg_nav_controller_output_send(MAVLINK_COMM_0, nav_roll, nav_pitch, nav_bearing, target_bearing, wp_dist, alt_error, aspd_error, xtrack_error);
+
+//
+//static int i = 0;
+//if (i++ > 40)
+//{
+//	i = 0;
+//	DPRINT("desired_dir %i, get_geo_heading_angle() %u, tofinish_line %u\r\n", (int16_t)desired_dir, get_geo_heading_angle(), tofinish_line);
+//}
+//		mavlink_msg_nav_controller_output_send(MAVLINK_COMM_0, nav_roll, nav_pitch, nav_bearing, target_bearing, wp_dist, alt_error, aspd_error, xtrack_error);
 		//mavlink_msg_nav_controller_output_send(mavlink_channel_t chan, float nav_roll, float nav_pitch, int16_t nav_bearing, int16_t target_bearing, uint16_t wp_dist, float alt_error, float aspd_error, float xtrack_error)
 	}
-
+ */
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -19,16 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsParseCommon.h"
-//#include "../libUDB/heartbeat.h"
-//#include "../libUDB/magnetometer.h"
-//#include "../libUDB/barometer.h"
-//#include "../libUDB/ADchannel.h"
-//#include "estAltitude.h"
-//#include "mathlibNAV.h"
-//#include "rmat.h"
-//#include <math.h>
+#include "../libUDB/servoOut.h"
 
 
 #if (HILSIM == 1)

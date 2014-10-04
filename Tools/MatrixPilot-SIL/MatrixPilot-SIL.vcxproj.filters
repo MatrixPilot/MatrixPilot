@@ -62,12 +62,6 @@
     <ClCompile Include="..\..\MatrixPilot\config_tests.c">
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\MatrixPilot\data_services.c">
-      <Filter>Source Files\MatrixPilot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\MatrixPilot\data_storage.c">
-      <Filter>Source Files\MatrixPilot</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\MatrixPilot\euler_angles.c">
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
@@ -87,9 +81,6 @@
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
     <ClCompile Include="..\..\MatrixPilot\navigate.c">
-      <Filter>Source Files\MatrixPilot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\MatrixPilot\nv_memory_table.c">
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
     <ClCompile Include="..\..\MatrixPilot\servoMix.c">

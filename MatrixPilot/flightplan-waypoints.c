@@ -25,6 +25,9 @@
 #include "../libCntrl/cameraCntrl.h"
 #include "flightplan_waypoints.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/gpsData.h"
+#include "../MAVLink/MAVLink.h"
+#include "../MAVLink/MAVMission.h"
 #include <stdlib.h>
 
 
@@ -274,11 +277,6 @@ vect3_32t getWaypoint3D(uint16_t wp)
 //	return currentWaypointSet[wp].loc;
 }
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-void mavlink_waypoint_reached(int16_t waypoint);
-void mavlink_waypoint_changed(int16_t waypoint);
-#endif
-
 void set_waypoint(int16_t index)
 {
 	DPRINT("set_waypoint(%u)\r\n", index);
@@ -314,7 +312,7 @@ void set_waypoint(int16_t index)
 			setBehavior(current_waypoint.flags);
 		}
 #if (DEADRECKONING == 0)
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 #endif
 	}
 }
@@ -366,7 +364,7 @@ static void next_waypoint(void)
 	{
 		navigate_set_goal(GPSlocation, current_waypoint.loc);
 #if (DEADRECKONING == 0)
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 #endif
 	}
 }
@@ -380,7 +378,7 @@ void flightplan_waypoints_update(void)
 		navigate_set_goal(GPSlocation, current_waypoint.loc);
 		set_camera_view(current_waypoint.viewpoint);
 		setBehavior(current_waypoint.flags);
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 		wp_inject_pos = 0;
 		return;
 	}

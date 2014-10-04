@@ -24,8 +24,8 @@
 
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-//#define MIPS                    64
-#define MIPS                    16
+#define MIPS                    64
+//#define MIPS                    16
 #else
 #define MIPS                    16
 #endif

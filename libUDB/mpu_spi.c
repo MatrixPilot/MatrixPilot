@@ -19,16 +19,14 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
 #include "libUDB.h"
-#include "mpu_spi.h"
-#include "interrupt.h"
-#include "oscillator.h"
-#include "delay.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
-#include <stdbool.h>
+#include "oscillator.h"
+#include "interrupt.h"
+#include "mpu_spi.h"
+#include <delay.h>
 #include <spi.h>
 
 #if (MPU_SPI == 1)
@@ -209,7 +207,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	MPU_SS = 1;
 	(*mpu_call_back)();
 	interrupt_restore_corcon;
-last_int = 23;
 }
 
 #else // no SPI FIFO
@@ -278,7 +275,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	SPI_high = 0xFF & spibuf;
 #endif // 0
 	interrupt_restore_corcon;
-last_int = 22;
 }
 
 #endif // (__dsPIC33E__)

@@ -20,7 +20,7 @@
 
 
 //#include "defines.h"
-#include "libUDB_internal.h"
+#include "libUDB.h"
 
 #include "oscillator.h"
 #include "uart.h"
@@ -38,6 +38,7 @@
 extern int __C30_UART;
 
 #if (CONSOLE_UART != 0) && (CONSOLE_UART != 9)
+
 #ifdef USE_BLUETOOTH_UART
 #define BAUDRATEX       9600UL
 #define BRGHX           0

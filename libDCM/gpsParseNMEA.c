@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 
 
 #if (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)
@@ -125,7 +127,6 @@ static union uintbb cog_gps_;
 static uint8_t svs_;
 static uint8_t data_valid_, NS_, EW_;
 //static uint8_t hdop_;
-//static uint8_t day_of_week;
 
 //union longbbbb tow_;
 //union longbbbb date_gps_, time_gps_;
@@ -646,7 +647,7 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 		}
 	}
 #ifdef DEBUG_NMEA
-led_off(LED_RED);
+	led_off(LED_RED);
 #endif
 }
 
@@ -670,22 +671,19 @@ void gps_commit_data(void)
 	last_alt     = alt_sl_gps_;
 }
 
+void gps_update_basic_data(void)
+{
+	svs          = svs_;
+}
+
 void init_gps_nmea(void)
 {
 }
 
 #if (HILSIM == 1)
-void commit_bodyrate_data(void)
-{
-}
-
-void HILSIM_set_gplane(void)
-{
-}
-
-void HILSIM_set_omegagyro(void)
-{
-}
+void commit_bodyrate_data(void) {}
+void HILSIM_set_gplane(void) {}
+void HILSIM_set_omegagyro(void) {}
 #endif // HILSIM
 
 #endif // (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)

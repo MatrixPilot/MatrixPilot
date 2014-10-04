@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/magnetometer.h"
 #include "rmat.h"
 
@@ -279,7 +281,7 @@ static union intbb g_a_x_sim_, g_a_y_sim_, g_a_z_sim_;
 static union intbb g_a_x_sim,  g_a_y_sim,  g_a_z_sim;
 static union intbb p_sim_,     q_sim_,     r_sim_;
 static union intbb p_sim,      q_sim,      r_sim;
-void commit_bodyrate_data(void);
+static void commit_bodyrate_data(void);
 #endif
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
@@ -799,6 +801,12 @@ static void msg_CS1(uint8_t gpschar)
 	msg_parse = &msg_B3;
 }
 
+void gps_update_basic_data(void)
+{
+	week_no         = week_no_;
+	svs             = svs_;
+}
+
 void gps_commit_data(void)
 {
 	//bin_out(0xFF);
@@ -834,7 +842,7 @@ void gps_commit_data(void)
 }
 
 #if (HILSIM == 1)
-void commit_bodyrate_data(void)
+static void commit_bodyrate_data(void)
 {
 	g_a_x_sim = g_a_x_sim_;
 	g_a_y_sim = g_a_y_sim_;

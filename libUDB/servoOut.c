@@ -21,11 +21,12 @@
 //	routines to drive the PWM pins for the servos,
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
-#include "options.h"
-#include "libUDB_internal.h"
+//#include "options.h"
+#include "libUDB.h"
 #include "../libDCM/libDCM.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "servoOut.h"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
@@ -78,8 +79,7 @@ static volatile int16_t outputNum;
 
 
 // initialize the PWM
-//void udb_init_pwm(void)
-void init_servoOut(void) // was called udb_init_pwm()
+void servoOut_init(void) // was called udb_init_pwm()
 {
 	int16_t i;
 	for (i = 0; i <= NUM_OUTPUTS; i++)
@@ -259,5 +259,4 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 #endif
 
 	// interrupt_restore_corcon;
-last_int = 1;
 }

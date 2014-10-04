@@ -21,13 +21,22 @@
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
 #include "../MatrixPilot/navigate.h" // TODO: resolve this upwards include for  navigate_process_flightplan() declaration
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "estLocation.h"
 #include "estAltitude.h"
+#include "estYawDrift.h"
+#include "estWind.h"
 #include "mathlibNAV.h"
 #include "rmat.h"
 #include "../libUDB/interrupt.h"
+#include "../libUDB/serialIO.h"
+#include "filters.h"
 #include <string.h>
+
+
+vect3_16t estimatedWind = { 0, 0, 0 };
 
 // GPS parser modules variables
 union longbbbb lat_gps_, lon_gps_;
@@ -37,6 +46,8 @@ union longbbbb tow_;
 //union intbb nav_valid_, nav_type_, week_no_;
 union intbb hdop_;
 union longbbbb date_gps_, time_gps_;
+
+boolean sendGPS;
 
 extern void (*msg_parse)(uint8_t gpschar);
 
@@ -152,7 +163,7 @@ static void gps_parse_common_callback(void)
 			dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW);
 			dcm_flags._.dead_reckon_enable = 1;
 			// initialize boxCar filter state
-			init_boxCarState(boxCarLen, boxCarN, boxCarBuff, boxCarSum, &filterState);
+			estLocation_init();
 		}
 #endif // AIRFRAME_TYPE
 		gps_data_age = 0;

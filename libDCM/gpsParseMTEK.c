@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 
 
 #if (GPS_TYPE == GPS_MTEK || GPS_TYPE == GPS_ALL)
@@ -55,7 +57,6 @@ static uint8_t svs_;
 static uint8_t fix_type_;
 //union intbb hdop_;
 static union intbb checksum;
-//uint8_t day_of_week;
 
 static uint8_t CK_A;
 static uint8_t CK_B;
@@ -182,8 +183,7 @@ static void msg_CS1(uint8_t gpschar)
 
 void gps_commit_data(void)
 {
-//	static union longbbbb last_alt = 0;
-	static union longbbbb last_alt;
+	static union longbbbb last_alt = 0;
 
 	if (week_no.BB == 0)
 	{
@@ -201,22 +201,19 @@ void gps_commit_data(void)
 	last_alt     = alt_sl_gps_;
 }
 
+void gps_update_basic_data(void)
+{
+	svs          = svs_;
+}
+
 void init_gps_mtek(void)
 {
 }
 
 #if (HILSIM == 1)
-void commit_bodyrate_data(void)
-{
-}
-
-void HILSIM_set_gplane(void)
-{
-}
-
-void HILSIM_set_omegagyro(void)
-{
-}
+void commit_bodyrate_data(void) {}
+void HILSIM_set_gplane(void) {}
+void HILSIM_set_omegagyro(void) {}
 #endif // HILSIM
 
 #endif // (GPS_TYPE == GPS_MTEK || GPS_TYPE == GPS_ALL)

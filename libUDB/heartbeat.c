@@ -20,10 +20,15 @@
 
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for AIRFRAME_TYPE
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "servoOut.h"
+#include "motorOut.h"
+#include "analogs.h"
+#include "radioIn.h"
+#include "../libDCM/rmat.h"
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif
@@ -64,7 +69,6 @@ inline void heartbeat(void) // called from ISR
 		start_pwm_outputs();
 	}
 #else
-?
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/ESC_HZ) == 0)
 	{
 		// set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
@@ -145,9 +149,9 @@ inline void pulse(void)
 #endif
 
 #if (USE_NV_MEMORY == 1)
-		nv_memory_service_trigger();
-		storage_service_trigger();
-		data_services_trigger();
+//		nv_memory_service_trigger();
+//		storage_service_trigger();
+//		data_services_trigger();
 #endif
 
 #if (USE_FLEXIFUNCTION_MIXING == 1)

@@ -19,10 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "navigate.h"
-#include "behaviour.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/navigate.h"
+#include "../MatrixPilot/behaviour.h"
+#include "../MatrixPilot/servoPrepare.h"
+#include "../MatrixPilot/states.h"
+#include "../libUDB/servoOut.h"
+#include "../libDCM/rmat.h"
 #include "airspeedCntrl.h"
+#include "altitudeCntrl.h"
 
 //  If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 

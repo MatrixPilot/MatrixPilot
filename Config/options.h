@@ -30,7 +30,9 @@
 // specific planes located in the MatrixPilot/example-options-files directory.
 // You can use one of those files by replacing this file with that one.
 
+
 #define USE_FLEXIFUNCTION_MIXING 0
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
@@ -53,7 +55,7 @@
 //        from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 //        so that the GPS connector points toward the tail of the plane
 #define BOARD_ORIENTATION                   ORIENTATION_FORWARDS
-//#define BOARD_ORIENTATION                   ORIENTATION_BACKWARDS
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Choose your airframe type:
@@ -69,7 +71,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
-//#define GPS_TYPE                            GPS_NONE
 #define GPS_TYPE                            GPS_MTEK
 //#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
 
@@ -190,8 +191,6 @@
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
 #define USE_PPM_INPUT                       2
-//#define USE_PPM_INPUT                       1
-//#define USE_PPM_INPUT                       0
 #define PPM_NUMBER_OF_CHANNELS              8
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
@@ -202,7 +201,6 @@
 // assigned for connection to the receiver.
 // If not using PPM, then this must be left set to '1'
 #define PPM_IC                              1
-
 
 // NUM_INPUTS:
 // If using PWM inputs (parallel Rx connections), set to the number of cables connected, 1-8
@@ -219,14 +217,6 @@
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
 #define RUDDER_INPUT_CHANNEL                CHANNEL_4
 #define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
-
-//#define THROTTLE_INPUT_CHANNEL              CHANNEL_1
-//#define AILERON_INPUT_CHANNEL               CHANNEL_2
-//#define ELEVATOR_INPUT_CHANNEL              CHANNEL_3
-//#define RUDDER_INPUT_CHANNEL                CHANNEL_4
-//#define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_5
-//#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_6
-
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -359,7 +349,6 @@
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
 #define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
-//#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
@@ -370,15 +359,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
+// MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       55
+#define MAVLINK_SYSID                       1
 
-
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-//#define USE_OSD                             0   // moved to osd.h
 
 // NUM_ANALOG_INPUTS:
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
@@ -409,10 +393,6 @@
 #define ANALOG_CURRENT_INPUT_CHANNEL        CHANNEL_UNUSED
 #define ANALOG_VOLTAGE_INPUT_CHANNEL        CHANNEL_UNUSED
 #define ANALOG_RSSI_INPUT_CHANNEL           CHANNEL_UNUSED
-
-//#define ANALOG_CURRENT_INPUT_CHANNEL        A_AMPS_BUFF   // I,  pin label CS Curr
-//#define ANALOG_VOLTAGE_INPUT_CHANNEL        A_VOLT_BUFF   // V,  pin label Bat Volt
-//#define ANALOG_RSSI_INPUT_CHANNEL           A_RSSI_BUFF   // RS, pin label RSSI
 
 #define MAX_CURRENT                         900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
 #define CURRENT_SENSOR_OFFSET               10  // Add 1.0 Amp to whatever value we sense
@@ -671,7 +651,7 @@
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
-#define HILSIM                              0
+#define HILSIM                              1
 #define HILSIM_USB                          0           // AUAV3 only (under development)
 #define HILSIM_BAUD                         38400
 
@@ -802,30 +782,21 @@
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
 
-//#define USE_BLUETOOTH_UART
+#define USE_BLUETOOTH_UART
 
 #ifdef USE_BLUETOOTH_UART
 // Use this with BlueTooth dongle
 #define TLM_PORT                            2
 #define DBG_PORT                            3
 #else
-#define TLM_PORT                            2
-#define DBG_PORT                            3
+#define TLM_PORT                            3
+#define DBG_PORT                            2
 #endif
 
-/*
+// Set this to 1 to enable filesystem support
+#define USE_FILESYS                         1
+
 // Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG                         1
-
-// Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      1
-
-// Set this to 1 to enable the USB stack on AUAV3
-#define USE_USB                             1
-
-// Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
-#define USE_MSD                             1
- */
 #define USE_TELELOG                         0
 
 // Set this to 1 to enable loading options settings from a config file on AUAV3

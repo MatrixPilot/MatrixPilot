@@ -19,21 +19,31 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <libq.h>
-#include "defines.h"
-#include "options.h"
-#include "options_quad.h"
-#include "quad.h"
+#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for AIRFRAME_TYPE
+#include "../libUDB/libUDB.h"
+//#include "options.h"
+//#include "options_quad.h"
+#include "../MatrixPilot/quad.h"
 #include "motorCntrl.h"
-#include "../libDCM/libDCM.h"
+#include "../libUDB/servoOut.h"
 #include "../libUDB/heartbeat.h"
 //#include "../libUDB/oscillator.h"
+#include "../libDCM/libDCM.h"
+#include "../libDCM/rmat.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../MatrixPilot/servoPrepare.h"
+#include <math.h>
+
+#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
+#include <libq.h>
+#endif
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 
-extern union longww primary_voltage;
-extern unsigned int lowVoltageWarning;
+long _Q16atan(long a) { return 0; }
+
+union longww primary_voltage;
+uint16_t lowVoltageWarning;
 
 boolean didCalibrate = false;
 
@@ -57,8 +67,8 @@ boolean didCalibrate = false;
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 50 // prevent Tx pulse variation from causing yaw drift
 
-static int current_flight_mode = 0;
-static int motorsArmed = 0;
+static int16_t current_flight_mode = 0;
+static int16_t motorsArmed = 0;
 
 extern union longww IMUcmx, IMUvx;
 extern union longww IMUcmy, IMUvy;
@@ -66,24 +76,24 @@ extern union longww IMUcmz, IMUvz;
 
 // these are the current KP, KD and KDD loop gains in 2.14 fractional format
 // valid range [0,3.99]
-unsigned int pid_gains[PID_GAINS_N];
+uint16_t pid_gains[PID_GAINS_N];
 
-static int rolladvanced, pitchadvanced;
-static signed char lagBC, precessBC;
+static int16_t rolladvanced, pitchadvanced;
+static int8_t lagBC, precessBC;
 static struct relative2D matrix_accum;
-static unsigned int earth_yaw; // yaw with respect to earth frame
-static unsigned int desired_heading = 0;
-static int accel_feedback;
-static int rate_error_prev[2] = {0, 0};
-static int rate_error_dot[2] = {0, 0};
+static uint16_t earth_yaw; // yaw with respect to earth frame
+static uint16_t desired_heading = 0;
+static int16_t accel_feedback;
+static int16_t rate_error_prev[2] = {0, 0};
+static int16_t rate_error_dot[2] = {0, 0};
 
-static int pwManual[5]; // channels 1-4 are control inputs from RX
-static int commanded_roll;
-static int commanded_pitch;
-static int commanded_yaw;
+static int16_t pwManual[5]; // channels 1-4 are control inputs from RX
+static int16_t commanded_roll;
+static int16_t commanded_pitch;
+static int16_t commanded_yaw;
 
-static int roll_error, pitch_error, yaw_error;
-static int rate_error[3];
+static int16_t roll_error, pitch_error, yaw_error;
+static int16_t rate_error[3];
 
 static union longww roll_error_integral = {0};
 static union longww pitch_error_integral = {0};
@@ -91,29 +101,28 @@ static union longww rrate_error_integral = {0};
 static union longww prate_error_integral = {0};
 static union longww yaw_error_integral = {0};
 
-static int poscmd_north, poscmd_east;
-static int pos_error[3], pos_setpoint[3];
+static int16_t poscmd_north, poscmd_east;
+static int16_t pos_error[3], pos_setpoint[3];
 static union longww pos_prev[3], pos_delta[3];
-static int pos_perr[3], pos_derr[3];
+static int16_t pos_perr[3], pos_derr[3];
 
-static int reduceThrottle = 0;
-static int thrModCount = 0;
-static int thrReduction = 0;
+static int16_t reduceThrottle = 0;
+static int16_t thrModCount = 0;
+static int16_t thrReduction = 0;
 
-static unsigned int throttle_limit = (unsigned int)(65536 * THROTTLE_LIMIT);
+static uint16_t throttle_limit = (uint16_t)(65536 * THROTTLE_LIMIT);
 
-static void rotate2D(int* x, int* y, signed char angle)
+static void rotate2D(int16_t* x, int16_t* y, int8_t angle)
 {
     struct relative2D xy;
     xy.x = *x;
     xy.y = *y;
-    rotate(&xy, angle);
+    rotate_2D(&xy, angle);
     *x = xy.x;
     *y = xy.y;
-
 }
 
-static void deadBand(int* input, int band)
+static void deadBand(int16_t* input, int16_t band)
 {
 	if (*input >= band)
 		*input -= band;
@@ -123,7 +132,7 @@ static void deadBand(int* input, int band)
         *input = 0;
 }
 
-static void magClamp(int* in, int mag)
+static void magClamp(int16_t* in, int16_t mag)
 {
     if (*in < -mag)
         *in = -mag;
@@ -131,7 +140,7 @@ static void magClamp(int* in, int mag)
         *in = mag;
 }
 
-static void magClamp32(long* in, long mag)
+static void magClamp32(int32_t* in, int32_t mag)
 {
     if (*in < -mag)
         *in = -mag;
@@ -139,31 +148,31 @@ static void magClamp32(long* in, long mag)
         *in = mag;
 }
 
-void motorCntrl(int flight_mode)
+void motorCntrl(int16_t flight_mode)
 {
-    int temp;
-    int motor_A;
-    int motor_B;
-    int motor_C;
-    int motor_D;
-    int commanded_roll_body_frame;
-    int commanded_pitch_body_frame;
+    int16_t temp;
+    int16_t motor_A;
+    int16_t motor_B;
+    int16_t motor_C;
+    int16_t motor_D;
+    int16_t commanded_roll_body_frame;
+    int16_t commanded_pitch_body_frame;
     //    int commanded_tilt[3];
     union longww long_accum;
     //	union longww accum ; // debugging temporary
     //    int posKP =0;
-    int posKD = 0;
+    int16_t posKD = 0;
 
 //	freq_mc++;
-/*
-    // limit throttle to 70% if battery is low
-    if (primary_voltage._.W1 < lowVoltageWarning) {
-        throttle_limit = (unsigned int)(0.7 * 65536);
-    } else if (primary_voltage._.W1 > (lowVoltageWarning + 500)) {
-        // hysteresis of 500mV
-        throttle_limit = (unsigned int)(THROTTLE_LIMIT * 65536);
-    }
- */
+
+//    // limit throttle to 70% if battery is low
+//    if (primary_voltage._.W1 < lowVoltageWarning) {
+//        throttle_limit = (unsigned int)(0.7 * 65536);
+//    } else if (primary_voltage._.W1 > (lowVoltageWarning + 500)) {
+//        // hysteresis of 500mV
+//        throttle_limit = (unsigned int)(THROTTLE_LIMIT * 65536);
+//    }
+
     for (temp = 0; temp <= 4; temp++)
     {
         if (udb_flags._.radio_on)
@@ -385,9 +394,9 @@ void motorCntrl(int flight_mode)
         if (flight_mode == COMPASS_MODE)
         {
             if (abs((int) earth_yaw) < 910)
-                led_on(TAIL_LIGHT);
+                led_on(LED_TAIL_LIGHT);
             else
-                led_off(TAIL_LIGHT);
+                led_off(LED_TAIL_LIGHT);
         }
 
         // pulse throttle at heartRate/N if battery is low

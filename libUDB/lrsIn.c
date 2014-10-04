@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "lrsIn.h"
@@ -28,6 +28,8 @@
 #else
 #endif
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 static boolean isFailSafe = true;
 static int16_t lrsIn[NUM_INPUTS+1];     // pulse widths of radio inputs

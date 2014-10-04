@@ -7,7 +7,7 @@
 #include <setjmp.h>
 #include "unity.h"
 
-#include "udbTypes.h"
+#include "../../libUDB/udbTypes.h"
 
 
 static int SetToOneToFailInTearDown;

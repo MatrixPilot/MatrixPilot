@@ -21,19 +21,22 @@
 
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
+#include "telemetry.h"
 #include "telemetry_log.h"
 #if (WIN == 1 || NIX == 1)
 #include <stdio.h>
-#include "SIL-filesystem.h"
+#include "../Tools/MatrixPilot-SIL/SIL-filesystem.h"
 #else
-#include "MDD File System/FSIO.h"
-#include "AT45D.h"
+#if (BOARD_TYPE != PX4_BOARD)
+#include "MDD-File-System/FSIO.h"
+#include "../libFlashFS/AT45D.h"
+#endif
 #endif
 #include <string.h>
 #include <stdarg.h>
 
 
-#if (WIN == 1 || NIX == 1)
+#if (WIN == 1 || NIX == 1 || BOARD_TYPE == PX4_BOARD)
 #define LOGFILE_ENABLE_PIN 0
 #else
 #if defined( __dsPIC33E__ )
@@ -47,6 +50,21 @@
 #error unknown processor family
 #endif
 
+#endif
+
+/*
+#define FILE FSFILE
+#define fopen FSfopen     // (logfile_name, "a");
+#define fclose FSfclose
+#define fwrite FSfwrite   // (str, 1, len, fsp) != len)
+ */
+#if (BOARD_TYPE == PX4_BOARD)
+#undef LOGFILE_ENABLE_PIN
+#define LOGFILE_ENABLE_PIN 0
+#define FSFILE    FILE
+#define FSfopen   fopen
+#define FSfclose  fclose
+#define FSfwrite  fwrite
 #endif
 
 boolean log_enabled(void)
@@ -115,7 +133,7 @@ static int16_t log_append(char* logbuf, int index, const uint8_t* data, int len,
 #endif
 // called from telemetry module at interrupt level to buffer new log data
 /*
-void log_telemetry(char* data, int len)
+void log_telemetry(const char* data, int len)
 {
 	int16_t remaining;
 
@@ -251,8 +269,6 @@ void log_init(void)
 	printf("File system initalised\r\n");
 }
 
-void restart_telemetry(void);
-
 static void log_open(void)
 {
 	static uint8_t log_error = 0;
@@ -269,7 +285,7 @@ static void log_open(void)
 	{
 		lb1_end_index = 0;  // purge the logfile ping-pong buffers
 		lb2_end_index = 0;
-		restart_telemetry();// signal telemetry to send startup data again
+		telemetry_restart();// signal telemetry to send startup data again
 		printf("%s opened\r\n", logfile_name);
 	}
 	else
@@ -292,7 +308,6 @@ void log_close(void)
 	}
 }
 
-void restart_telemetry(void);
 boolean inflight_state(void);
 
 static void log_check(void)
@@ -322,7 +337,7 @@ static void log_check(void)
 	}
 }
 
-static void log_write(char* str, int len)
+static void log_write(const char* str, int len)
 {
 //	printf("log_write() %u bytes\r\n", len);
 	if (fsp)

@@ -22,13 +22,16 @@
 #include "defines.h"
 #include "mode_switch.h"
 #include "flightplan.h"
+#include "states.h"
+#include "../libCntrl/altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
 #include <stdio.h>
 
 union state_flags_int state_flags;
 int16_t waggle = 0;
-uint8_t counter = 0;
+
+static uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
 #if (SILSIM == 1)
@@ -405,7 +408,7 @@ static void acquiringS(void)
 }
 
 #ifdef CATAPULT_LAUNCH_ENABLE
-boolean launch_enabled(void)
+static boolean launch_enabled(void)
 {
 	return (udb_pwIn[LAUNCH_ARM_INPUT_CHANNEL] > 3000);
 }

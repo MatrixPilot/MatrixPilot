@@ -23,6 +23,8 @@
 #include <string.h>
 #include "util.h"
 
+#if 0
+
 /************************************************************************
  *  Definitions for UART0
  ************************************************************************/
@@ -177,7 +179,7 @@ void _memcpy(void *dst, void *src, UINT32 size)
 		REG8(((UINT32)dst) + i) = REG8(((UINT32)src) + i);
 }
 
-#endif
+#endif // 0
 
 void _sleep(int seconds)
 {
@@ -196,6 +198,8 @@ void _putchar(int c)
 	unsigned char b = c & 0xFF;
 //	serial_write(&b);
 }
+
+#endif // 0
 
 char* _strdup(const char* str)
 {

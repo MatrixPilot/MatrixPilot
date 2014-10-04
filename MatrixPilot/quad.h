@@ -26,7 +26,6 @@
 extern unsigned int tailFlash;
 extern unsigned long uptime;
 extern boolean sendGains;
-extern boolean sendGPS;
 
 int  quad_init(void);
 void quad_background_task(void);

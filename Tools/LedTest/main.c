@@ -20,7 +20,6 @@
 
 
 #include "../../libUDB/libUDB.h"
-#include "../../libUDB/libUDB_internal.h"
 #include "../../libUDB/eeprom_udb4.h"
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/ADchannel.h"

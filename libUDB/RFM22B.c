@@ -18,7 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "libUDB_internal.h"
+//#include "libUDB.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "RFM22B.h"
@@ -42,7 +43,7 @@
 #define _TRISRFMINT _TRISA12
 
 #elif (BOARD_TYPE == UDB5_BOARD)
-#define SPI_PORT 2
+#define SPI_PORT 1
 #define _TRISRFMINT _TRISA13
 
 #elif (BOARD_TYPE == AUAV2_BOARD)
@@ -50,7 +51,7 @@
 #define _TRISRFMINT _TRISE8
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
-#define SPI_PORT 1
+#define SPI_PORT 2
 #define _TRISRFMINT _TRISG12
 
 #elif (BOARD_TYPE == AUAV4_BOARD)
@@ -131,6 +132,7 @@ static int16_t SPI_n;
 #endif // ENABLE_SPI_PORT_INT
 
 
+void RFM22B_Int(void) {}
 
 boolean init_RFM22B(void)
 {
@@ -403,10 +405,10 @@ void rfmReceive(uint8_t* data, uint8_t size)
 
 	while (size--)
 	{
-		SPIBUF = 0xff;                 // send dummy data
-//		while (!_SRMPT);            // wait for transfer to complete
-		while (!_SPIIF);            // wait for transfer to complete
-		_SPIIF = 0;                 // clear interrupt flag
+		SPIBUF = 0xff;          // send dummy data
+//		while (!_SRMPT);        // wait for transfer to complete
+		while (!_SPIIF);        // wait for transfer to complete
+		_SPIIF = 0;             // clear interrupt flag
 		*(data++) = SPIBUF;
 	}
 	_SS = 1;

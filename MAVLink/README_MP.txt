@@ -80,7 +80,7 @@ The Mavlink directory can also be created using the following recipe:
   }
 
 * Added all the *.h files in MAVLink include directory and MAVLink/include/common
-  directory to MPLAB project list for MatrixPilot (relative file addressing). 
+  directory to the MPLAB project list for MatrixPilot (relative file addressing). 
   (we are currently only using the "common" message types.
 
 Pete Hollands

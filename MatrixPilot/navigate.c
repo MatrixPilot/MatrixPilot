@@ -23,13 +23,17 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "flightplan.h"
+#include "servoPrepare.h"
+#include "states.h"
+#include "../libUDB/libUDB.h"
 #include "../libCntrl/cameraCntrl.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/mathlib.h"
-#include "../libUDB/libUDB.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 #include <stdlib.h>
 
 // Compute actual and desired courses.
@@ -290,11 +294,13 @@ void navigate_process_flightplan(void)
 {
 	if (gps_nav_valid() && state_flags._.GPS_steering)
 	{
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 		flightplan_update();
 		compute_camera_view();
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 static int16_t compute_progress_to_goal(int16_t totalDist, int16_t remainingDist)
 {
@@ -413,7 +419,9 @@ static void cross_track(vect2_16t* result)
 	}
 }
 
-void compute_bearing_to_goal(void)
+///////////////////////////////////////////////////////////////////////////////
+
+void navigate_compute_bearing_to_goal(void)
 {
 	struct relative2D togoal;
 	union longww temporary;

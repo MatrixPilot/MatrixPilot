@@ -24,7 +24,7 @@
 
 
 // number of heartbeats per second
-#define HEARTBEAT_HZ 40
+#define HEARTBEAT_HZ 200
 
 // number of servo updates per second
 #define SERVO_HZ 40
@@ -32,8 +32,9 @@
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
 #define PID_HZ 40
 
-// PWM rate for ESCs
-#define ESC_HZ 400
+// PWM rate for ESCs (Quadcopter support)
+//#define ESC_HZ 400
+#define ESC_HZ 200
 
 // Read-only value increments with each heartbeat
 extern uint16_t udb_heartbeat_counter;
@@ -43,6 +44,8 @@ inline void heartbeat(void);
 inline uint16_t heartbeat_cnt(void);
 inline boolean heartbeat_chk(uint16_t hertz);
 inline void pulse(void);
+
+void udb_heartbeat_40hz_callback(void); // callback
 
 
 #endif // HEARTBEAT_H

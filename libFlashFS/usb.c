@@ -19,6 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include "../libUDB/libUDB.h"
+
+#if (USE_USB == 1)
+
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include "USB/usb_function_cdc.h"
@@ -254,8 +258,12 @@ void USBCBErrorHandler(void)
  *******************************************************************/
 void USBCBCheckOtherReq(void)
 {
+#if (USB_MSD == 1)
 	USBCheckMSDRequest();
+#endif
+#if (USB_CDC == 1)
 	USBCheckCDCRequest();
+#endif
 }
 
 /*******************************************************************
@@ -311,8 +319,12 @@ void USBCBInitEP(void)
 		USBEnableEndpoint(MSD_DATA_OUT_EP,USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
 	#endif
 
+#if (USB_MSD == 1)
 	USBMSDInit();
+#endif
+#if (USB_CDC == 1)
 	CDCInitEP();
+#endif
 }
 
 /********************************************************************
@@ -521,6 +533,7 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 			// then we are required to have a persistent STALL, where it cannot 
 			// be cleared (until MSD reset recovery takes place).  See MSD BOT 
 			// specs v1.0, section 6.6.1.
+#if (USB_MSD == 1)
 			if (MSDWasLastCBWValid() == FALSE)
 			{
 				// Need to re-stall the endpoints, for persistent STALL behavior.
@@ -536,9 +549,13 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 					USBMSDOutHandle = USBRxOnePacket(MSD_DATA_OUT_EP, (BYTE*)&msd_cbw, MSD_OUT_EP_SIZE);
 				}
 			}
+#endif
 			break;
 		default:
 			break;
 	}
 	return TRUE;
 }
+
+#endif // (USE_USB == 1)
+

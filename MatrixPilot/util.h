@@ -22,6 +22,8 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
+#if 0
+
 #define NULL        ((void*)0)
 #define REG8(addr)  (*(volatile UINT8*) (addr))
 #define REG16(addr) (*(volatile UINT16*)(addr))
@@ -51,5 +53,7 @@ void _putchar(int c);
 int  _getchar(int timeout);
 void _memset(void* dst, UINT8 value, UINT32 size);
 void _memcpy(void* dst, void* src, UINT32 size);
+
+#endif // 0
 
 #endif // __UTIL_H__

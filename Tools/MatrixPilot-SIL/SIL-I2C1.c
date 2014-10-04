@@ -20,11 +20,11 @@
 
 #if (WIN == 1 || NIX == 1)
 
-#include "libUDB_internal.h"
-#include "interrupt.h"
-#include "I2C.h"
-#include "NV_memory.h"
-#include "events.h"
+#include "../../libUDB/libUDB.h"
+#include "../../libUDB/interrupt.h"
+#include "../../libUDB/I2C.h"
+//#include "../../libUDB/NV_memory.h"
+#include "../../libUDB/events.h"
 
 #if (USE_I2C1_DRIVER == 1)
 
@@ -37,17 +37,17 @@ void I2C1_Trigger(void)
 {
 }
 
-boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback)
+boolean I2C1_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback)
 {
 	return true;
 }
 
-boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode)
+boolean I2C1_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode)
 {
 	return true;
 }
 // Only send command byte to check for ACK.
-boolean I2C1_CheckACK(uint16_t address, I2C_callbackFunc pCallback)
+boolean I2C1_CheckACK(uint8_t addr, I2C_callbackFunc pCallback)
 {
 	return true;
 }

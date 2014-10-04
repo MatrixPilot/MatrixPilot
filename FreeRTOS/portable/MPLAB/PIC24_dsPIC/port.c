@@ -467,7 +467,5 @@ void __attribute__((__interrupt__, auto_psv)) configTICK_INTERRUPT_HANDLER( void
 	{
 		portYIELD();
 	}
-//last_int = 21;
 }
 #endif // USE_FREERTOS
-

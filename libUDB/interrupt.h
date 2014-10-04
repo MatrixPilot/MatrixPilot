@@ -29,9 +29,9 @@
 
 #define INT_PRI_RFMSPI  6   // RFM22B.c : SPI1 (UDB4 or AUAV3) or SPI2 (UDB4 or UDB5)
 
-#define INT_PRI_MPUSPI  6   // mpu6000.c : SPI1 (UDB4 or AUAV3) or SPI2 (UDB4 or UDB5)
-#define INT_PRI_INT1    6   // mpu6000.c : mpu on SPI1 uses external interrupt 1
-#define INT_PRI_INT3    6   // mpu6000.c : mpu on SPI3 uses external interrupt 3
+#define INT_PRI_MPUSPI  4   // mpu6000.c : SPI1 (UDB4 or AUAV3) or SPI2 (UDB4 or UDB5)
+#define INT_PRI_INT1    4   // mpu6000.c : mpu on SPI1 uses external interrupt 1
+#define INT_PRI_INT3    4   // mpu6000.c : mpu on SPI3 uses external interrupt 3
 
 #define INT_PRI_IC      6   // radioIn.c : input capture interrupt
 
@@ -52,6 +52,15 @@
 
 #define INT_PRI_EVENTM  2   // events.c : trigger M uses the C1 interrupt
 #define INT_PRI_EVENTL  1   // events.c : trigger L uses the C2 interrupt
+
+// Proposed new names for interrupt priorities:
+#define INT_PRI_MPU     3
+#define INT_PRI_RTOS    2   // interrupts with higher priority cannot call RTOS functions
+#define INT_PRI_GPS     1
+#define INT_PRI_TELE    1
+#define INT_PRI_MSD     1
+#define INT_PRI_PULSE   1
+#define INT_PRI_IMU     1
 
 
 #define ATTRIB_INT __attribute__((__interrupt__,__no_auto_psv__)) 

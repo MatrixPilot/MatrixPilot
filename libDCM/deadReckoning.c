@@ -20,10 +20,12 @@
 
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsParseCommon.h"
 #include "deadReckoning.h"
 #include "mathlibNAV.h"
+#include "estWind.h"
+#include "gpsData.h"
 #include "rmat.h"
 #include "../libUDB/heartbeat.h"
 
@@ -190,8 +192,9 @@ void dead_reckon(struct relative3D gps_velocity)
 	total_energy = energy._.W1;
 }
 
-#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
-#else
+//#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
+//#else
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 #warning("Including integrate_loc_cm function")
 
 // estimate position in cm, using only GPSloc_cm, gps_velocity and accelEarth

@@ -18,7 +18,11 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "options.h"
+#include "../libUDB/libUDB.h"
+#include "../libUDB/serialIO.h"
+
+#if (USE_USB == 1 && USE_CDC == 1)
+
 #include "USB/usb.h"
 #include "USB/usb_function_cdc.h"
 #include "usb_cdc.h"
@@ -256,3 +260,5 @@ void mySetLineCodingHandler(void)
 	}
 }
 #endif // USB_CDC_SET_LINE_CODING_HANDLER
+
+#endif // (USE_USB == 1 && USE_CDC == 1)

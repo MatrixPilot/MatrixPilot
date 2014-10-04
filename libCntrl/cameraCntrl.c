@@ -18,9 +18,11 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "defines.h"
-#include "cameraCntrl.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/rmat.h"
+#include "cameraCntrl.h"
 
 // servo_ratios are used to convert degrees of rotation into servo pulse code lengths
 // This code is configured for the full throw of the servo to be achieved by a range of

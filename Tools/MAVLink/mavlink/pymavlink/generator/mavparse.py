@@ -20,11 +20,12 @@ class MAVParseError(Exception):
         return self.message
 
 class MAVField(object):
-    def __init__(self, name, type, print_format, xml, description=''):
+    def __init__(self, name, type, print_format, xml, description='', enum=''):
         self.name = name
         self.name_upper = name.upper()
         self.description = description
         self.array_length = 0
+        self.enum = enum
         self.omit_arg = False
         self.const_value = None
         self.print_format = print_format
@@ -187,8 +188,12 @@ class MAVXML(object):
                     print_format = attrs['print_format']
                 else:
                     print_format = None
+                if 'enum' in attrs:
+                    enum = attrs['enum']
+                else:
+                    enum = ''
                 self.message[-1].fields.append(MAVField(attrs['name'], attrs['type'],
-                                                        print_format, self))
+                                                        print_format, self, enum=enum))
             elif in_element == "mavlink.enums.enum":
                 check_attrs(attrs, ['name'], 'enum')
                 self.enum.append(MAVEnum(attrs['name'], p.CurrentLineNumber))
@@ -246,6 +251,7 @@ class MAVXML(object):
         for m in self.message:
             m.wire_length = 0
             m.fieldnames = []
+            m.fieldlengths = []
             m.ordered_fieldnames = []
             if self.sort_fields:
                 m.ordered_fields = sorted(m.fields,
@@ -255,6 +261,13 @@ class MAVXML(object):
                 m.ordered_fields = m.fields
             for f in m.fields:
                 m.fieldnames.append(f.name)
+                L = f.array_length
+                if L == 0:
+                    m.fieldlengths.append(1)
+                elif L > 1 and f.type == 'char':
+                    m.fieldlengths.append(1)
+                else:
+                    m.fieldlengths.append(L)
             for f in m.ordered_fields:
                 f.wire_offset = m.wire_length
                 m.wire_length += f.wire_length
@@ -277,7 +290,7 @@ class MAVXML(object):
     def __str__(self):
         return "MAVXML for %s from %s (%u message, %u enums)" % (
             self.basename, self.filename, len(self.message), len(self.enum))
-    
+
 
 def message_checksum(msg):
     '''calculate a 8-bit checksum of the key fields of a message, so we
@@ -347,7 +360,7 @@ def check_duplicates(xml):
                     return True
                 enummap[s1] = "%s:%u" % (x.filename, enum.linenumber)
                 enummap[s2] = "%s:%u" % (x.filename, enum.linenumber)
-                    
+
     return False
 
 

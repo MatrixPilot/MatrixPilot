@@ -24,7 +24,7 @@
 #include "MAX21000_map.h"
 //#include "platform/platformInterface.h"
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"

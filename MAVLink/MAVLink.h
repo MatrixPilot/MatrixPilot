@@ -22,7 +22,7 @@
 #ifndef _MAVLINK_H_
 #define _MAVLINK_H_
 
-#define MAVLINK_EXTERNAL_RX_STATUS
+#define MAVLINK_EXTERNAL_RX_STATUS 1
 
 #include "mavlink_options.h"
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
@@ -60,6 +60,9 @@ typedef struct mavlink_flag_bits {
 	uint16_t mavlink_request_specific_waypoint : 1;
 	uint16_t mavlink_send_waypoint_reached  : 1;
 	uint16_t mavlink_send_waypoint_changed  : 1;
+	uint16_t mavlink_ftp                    : 1;
+	uint16_t mavlink_ftp_sending            : 1;
+	uint16_t mavlink_ftp_receiving          : 1;
 } mavlink_flags_t;
 
 extern mavlink_flags_t mavlink_flags;

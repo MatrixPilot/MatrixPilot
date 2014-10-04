@@ -19,7 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "FSconfig.h"
+
+#ifdef USE_AT45D_FLASH
+
+#include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "AT45D.h"
 #include <stdio.h>
@@ -136,7 +140,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA2Interrupt(void)
 	_DMA2IF = 0;
 
 	interrupt_restore_corcon;
-last_int = 9;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
@@ -151,7 +154,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 	IsBusy = 0;
 
 	interrupt_restore_corcon;
-last_int = 10;
 }
 /*
 unsigned char GetRxByte(uint16_t i)
@@ -325,3 +327,5 @@ void WriteSector(uint16_t sector, uint8_t* buffer)
 }
 
 #endif // USE_AT45D_DMA
+
+#endif // USE_AT45D_FLASH

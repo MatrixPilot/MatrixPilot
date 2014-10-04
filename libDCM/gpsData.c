@@ -20,17 +20,9 @@
 
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
-//#include "../MatrixPilot/navigate.h" // TODO: resolve this upwards include for  navigate_process_flightplan() declaration
-//#include "libDCM_internal.h"
-#include "gpsParseCommon.h"
-//#include "estAltitude.h"
-//#include "mathlibNAV.h"
-//#include "rmat.h"
-//#include "../libUDB/interrupt.h"
-//#include <string.h>
+#include "gpsData.h"
 
 // GPS MatrixPilot global variables (these are the GPS system outputs)
-vect3_16t estimatedWind = { 0, 0, 0 };
 #ifdef USE_EXTENDED_NAV
 struct relative3D_32 GPSlocation = { 0, 0, 0 };
 #else

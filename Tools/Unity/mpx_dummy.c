@@ -19,56 +19,29 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "../libDCM/gpsParseCommon.h"
-#include "../libDCM/estAltitude.h"
-#include "../libDCM/mathlibNAV.h"
-#include "../libUDB/libUDB.h"
+#include "../../MatrixPilot/defines.h"
+#include "../../libDCM/gpsParseCommon.h"
+#include "../../libDCM/estAltitude.h"
+#include "../../libDCM/mathlibNAV.h"
+#include "../../libUDB/libUDB.h"
 #include <stdlib.h>
 
-int16_t waggle = 0;
+//int16_t waggle = 0;
 
 
+void config_save(void) {}
 void udb_heartbeat_40hz_callback(void) {}
 void dcm_heartbeat_callback(void) {}
-void navigate_process_flightplan(void) {}
+void dcm_callback_gps_location_updated(void) {}
+void udb_serial_callback_received_byte(uint8_t rxchar) {}
+int16_t udb_serial_callback_get_byte_to_send(void) {}
 
-void save_config(void)
-{
-}
+//void navigate_process_flightplan(void) {}
+//void dcm_servo_callback_prepare_outputs(void) {}
+//void process_flightplan(void) {}
+//void udb_background_callback_periodic(void) {}
 
-void dcm_callback_gps_location_updated(void)
-{
-}
+//void flightplan_live_begin(void) {}
+//void flightplan_live_received_byte(uint8_t inbyte) {}
+//void flightplan_live_commit(void) {}
 
-void dcm_servo_callback_prepare_outputs(void)
-{
-}
-
-void process_flightplan(void)
-{
-}
-
-void udb_background_callback_periodic(void)
-{
-}
-
-void udb_serial_callback_received_byte(uint8_t rxchar)
-{
-}
-
-int16_t udb_serial_callback_get_byte_to_send(void)
-{
-}
-
-void flightplan_live_begin(void)
-{
-}
-
-void flightplan_live_received_byte(uint8_t inbyte)
-{
-}
-
-void flightplan_live_commit(void)
-{
-}

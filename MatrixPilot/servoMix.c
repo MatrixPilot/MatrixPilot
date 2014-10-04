@@ -21,6 +21,10 @@
 
 #include "defines.h"
 #include "servoMix.h"
+#include "servoPrepare.h"
+#include "states.h"
+#include "../libCntrl/cameraCntrl.h"
+#include "../libUDB/servoOut.h"
 
 // Perform control based on the airframe type.
 // Use the radio to determine the baseline pulse widths if the radio is on.

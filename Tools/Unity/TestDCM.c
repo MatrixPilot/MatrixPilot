@@ -7,11 +7,11 @@
 #include <setjmp.h>
 #include "unity.h"
 
-#include "udbTypes.h"
-#include "dcmTypes.h"
+#include "../../libUDB/udbTypes.h"
+#include "../../libDCM/dcmTypes.h"
 
-#include "libDCM_internal.h"
-#include "mathlibNAV.h"
+#include "../../libDCM/libDCM_internal.h"
+#include "../../libDCM/mathlibNAV.h"
 
 
 static int SetToOneToFailInTearDown;
@@ -34,8 +34,47 @@ void tearDown(void)
   }
 }
 
+
+//#define _SCALEACCEL 1.29    // 4 g range
+#define _SCALEACCEL 1.27    // 4 g range measured by WJP on a few UDB5s
+#define _SCALEGYRO  3.0016  // 500 degree/second range
+#define _GRAVITY    ((int32_t)(5280.0/_SCALEACCEL))  // gravity in AtoD/2 units
+#define _RADPERSEC  ((int64_t)5632.0/_SCALEGYRO) // one radian per second, in AtoD/2 units
+#define _GRAVITYM   ((int64_t)980.0)             // 100 times gravity, meters/sec/sec
+
+//#define _CENTRISCALE ((int32_t)(((int64_t)519168.0)*_GRAVITY)/((int64_t)_RADPERSEC*_GRAVITYM))                         // old
+#define _CENTRISCALE ((uint64_t)((((uint64_t)519168.0)*(uint64_t)_GRAVITY)/((uint64_t)_RADPERSEC*(uint64_t)_GRAVITYM)))  // new
+
 void test_DCM(void)
 {
+	int64_t a;
+	uint64_t b;
+	int32_t gravity;
+	float scaleaccel;
+
+	printf("SCALEACCEL  %f\r\n", _SCALEACCEL);
+	printf("GRAVITY     %ld\r\n", _GRAVITY);
+	printf("GRAVITYM    %lld\r\n", _GRAVITYM);
+	printf("RADPERSEC   %lld\r\n", _RADPERSEC);
+	printf("CENTRISCALE %lld\r\n", _CENTRISCALE);
+
+//	a = (uint64_t)_CENTRISCALE / (uint64_t)519168.0;
+	a = _CENTRISCALE;
+	b = ((uint64_t)_RADPERSEC*(uint64_t)_GRAVITYM);
+	printf("a %lld\r\n", (int64_t)a);
+	printf("b %llu\r\n", (uint64_t)b);
+//	gravity = (int32_t)(a * b);
+	
+	gravity = ((uint64_t)_CENTRISCALE * (uint64_t)_RADPERSEC*(uint64_t)_GRAVITYM) / (uint64_t)519168.0;
+	
+	printf("gravity  %d\r\n", gravity);
+	scaleaccel = 5280.0 / (float)gravity;
+	printf("scaleaccel  %f\r\n", scaleaccel);
+
+	printf("delta  %f\r\n", scaleaccel - _SCALEACCEL);
+
+//	TEST_ASSERT_FLOAT_WITHIN(delta, expected, actual)
+	TEST_ASSERT_FLOAT_WITHIN(0.0015, _SCALEACCEL, scaleaccel);
 }
 /*
 int16_t sine(int8_t angle);
@@ -332,9 +371,6 @@ void test_vect2_polar_16(void)
 	TEST_ASSERT_EQUAL_INT16(-27140, polar.p);
 }
 
-
-
-
 void test_MatrixAdd(void)
 {
 	fractional dstM[]  = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 42 };
@@ -355,10 +391,6 @@ void test_MatrixMultiply(void)
 {
 //fractional* MatrixMultiply(int16_t numRows1, int16_t numCols1Rows2, int16_t numCols2, fractional* dstM, fractional* srcM1, fractional* srcM2);
 }
-
-#if 0
-#endif
-
 
 void test_VectorCopy(void)
 {

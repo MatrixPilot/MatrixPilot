@@ -19,9 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-//#include "../libUDB/sonarIn.h"
-extern int16_t get_sonar_value(void);   // Get the raw pwm units from the sonar device driver
+#include "../MatrixPilot/defines.h"
+#include "sonarCntrl.h"
+#include "../libUDB/sonarIn.h"
+#include "../libDCM/rmat.h"
 
 #if (USE_SONAR_INPUT != 0)
 

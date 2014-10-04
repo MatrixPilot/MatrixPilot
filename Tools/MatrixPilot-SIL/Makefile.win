@@ -1,9 +1,9 @@
 CC       = gcc
 INCPATH = -I. -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot -I../../FreeRTOS/include -I../../FreeRTOS/portable/MSVC-MingW
 
-	FLAGS = -DWIN=1
-	LFLAGS   = 
-	LIBS     = -lws2_32
+FLAGS = -DWIN=1
+LFLAGS   = 
+LIBS     = -lws2_32
 CFLAGS = -pipe -Wall -W -O0 $(FLAGS)
 RM_FILE  = rm -f
 
@@ -111,5 +111,4 @@ $(MPCAT_TARGET): $(MPCAT_OBJECTS)
 
 clean:
 	-$(RM_FILE) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
-	-$(RM_FILE) *~ core *.core
-
+	-$(RM_FILE) $(MPSIL_TARGET) $(MPCAT_TARGET)

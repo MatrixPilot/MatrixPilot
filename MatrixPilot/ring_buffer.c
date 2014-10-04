@@ -24,7 +24,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "options.h"
+#include "../libUDB/libUDB.h"
+#include "../libUDB/serialIO.h"
 #ifdef USE_RING_BUFFER
 void udb_serial_start_sending_data(void);
 
@@ -53,7 +54,7 @@ __attribute__((far)) char ring_buffer[RINGSIZE];
 // called by udb_serial_callback_get_byte_to_send at IPL5
 // modifies ring_tail
 
-bool ring_get(char* b)
+boolean ring_get(char* b)
 {
 	int16_t t = ring_tail;
 	if (ring_head == t)

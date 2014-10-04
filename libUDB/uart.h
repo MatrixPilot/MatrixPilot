@@ -34,6 +34,8 @@ void PutDec(unsigned char dec);
 void PutHex(int toPrint);
 void Puts(const char* str);
 
+void PutHexNibble(unsigned char nib);
+
 #if defined(__C30__) || defined(__PIC32MX__)
 void PutHexWord(unsigned int toPrint);
 void PutHexDWord(unsigned long int toPrint);
@@ -44,9 +46,11 @@ char Hex2Char(char hex);
 void ClrError(void);
 int DataReceived(void);
 
+#if (SILSIM != 1)
 #define kbhit IsPressed
 #define getch GetChar
 #define putch PutChar
+#endif
 
 
 #endif // _UART_H_

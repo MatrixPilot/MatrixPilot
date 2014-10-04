@@ -21,6 +21,8 @@
 
 // used for the AUAV3 with dsPIC33EP512MU810
 
+// ACCEL_RANGE must be either 4 or 8
+// ACCEL_RANGE 2 will cause all sorts of trouble, do not use it
 
 #define ACCEL_RANGE         4       //    4 g range
 
@@ -30,7 +32,12 @@
 
 #define NUM_ANALOG_INPUTS   7
 
-// A/D channels:
+// External A/D channels:
+#define analogInput1BUFF    3
+#define analogInput2BUFF    4
+#define analogInput3BUFF    1
+#define analogInput4BUFF    2
+
 #define A_VOLT_BUFF         5       // V, pin label Bat Volt
 #define A_AMPS_BUFF         6       // I, pin label CS Curr
 #define A_RSSI_BUFF         7       // RS, pin label RSSI
@@ -39,10 +46,6 @@
 #define A_5V_BUFF           6       // I, pin label CS Curr
 #define A_RSSI_BUFF         7       // RS, pin label RSSI
 
-#define analogInput1BUFF    3
-#define analogInput2BUFF    4
-#define analogInput3BUFF    1
-#define analogInput4BUFF    2
 
 // MPU6000 configuration
 #define xrate_MPU_channel   5
@@ -69,6 +72,7 @@
 #define LED_RED             LATBbits.LATB3
 #define LED_GREEN           LATBbits.LATB4
 #define LED_ORANGE          LATBbits.LATB5
+#define LED_TAIL_LIGHT      LATAbits.LATA6
 #define DIG2                LATAbits.LATA6
 #define DIG1                LATAbits.LATA7
 #define DIG0                LATEbits.LATE1

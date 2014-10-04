@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#define PI 3.1415926535897931159979634685441851615905761718750 /* double */
+
 typedef int16_t fractional;
 
 fractional* MatrixAdd (          /* Matrix addition */

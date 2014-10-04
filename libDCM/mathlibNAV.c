@@ -22,8 +22,11 @@
 #include "dcmTypes.h"
 #include "mathlibNAV.h"
 #if (WIN == 1 || NIX == 1)
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #endif // (WIN == 1 || NIX == 1)
+#if (PX4 == 1)
+#include "../libUDB/builtins.h"
+#endif // (PX4 == 1)
 
 //  math libraray
 
@@ -73,7 +76,7 @@ int16_t sine(int8_t angle)
 	}
 }
 
-int8_t arcsine(int16_t y)
+int8_t arcsine(int16_t y)  // arcsine takes the y coordinate of an x,y point and returns an angle
 {
 	// returns the inverse sine of y
 	// y is in Q2.14 format, 16384 is maximum value
@@ -464,4 +467,22 @@ int16_t find_first_bit_int32(int32_t argument)
 	{
 		return binw1 - 1;
 	}
+}
+
+void VectorCross(int16_t * dest, int16_t * src1, int16_t * src2)
+{
+	// Implement the cross product. *dest = *src1X*src2;
+	union longww crossaccum;
+	crossaccum.WW = __builtin_mulss(src1[1], src2[2]);
+	crossaccum.WW -= __builtin_mulss(src1[2], src2[1]);
+	crossaccum.WW *= 4;
+	dest[0] = crossaccum._.W1;
+	crossaccum.WW = __builtin_mulss(src1[2], src2[0]);
+	crossaccum.WW -= __builtin_mulss(src1[0], src2[2]);
+	crossaccum.WW *= 4;
+	dest[1] = crossaccum._.W1;
+	crossaccum.WW = __builtin_mulss(src1[0], src2[1]);
+	crossaccum.WW -= __builtin_mulss(src1[1], src2[0]);
+	crossaccum.WW *= 4;
+	dest[2] = crossaccum._.W1;
 }

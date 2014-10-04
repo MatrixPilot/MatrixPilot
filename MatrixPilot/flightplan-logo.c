@@ -25,7 +25,9 @@
 #include "logo.h"
 #include "logo_parser.h"
 #include "flightplan_logo.h"
+#include "../libCntrl/altitudeCntrl.h"
 #include "../libCntrl/cameraCntrl.h"
+#include "../libDCM/rmat.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
@@ -293,7 +295,7 @@ void flightplan_logo_update(void)
 		{
 			if (logo_goal_has_moved()) {
 				update_goal_from(lastGoal);
-				compute_bearing_to_goal();
+				navigate_compute_bearing_to_goal();
 			}
 		}
 		logo_inject_pos = 0;
@@ -880,7 +882,7 @@ static void process_instructions(void)
 	if (logo_goal_has_moved())
 	{
 		update_goal_from(lastGoal);
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 	}
 }
 
@@ -933,7 +935,7 @@ void flightplan_logo_live_received_byte(uint8_t inbyte)
 
 void flightplan_logo_live_commit(void)
 {
-	// The cmd=1 commads (REPEAT, END, TO) are not allowed
+	// The cmd=1 commands (REPEAT, END, TO) are not allowed
 	// to be injected.
 	if (logo_inject_pos == 5 && logo_inject_instr.cmd != 1)
 	{

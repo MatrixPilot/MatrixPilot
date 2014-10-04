@@ -1,38 +1,50 @@
 # ==========================================
+#   MatrixPilot Unit Test Framework makefile
+#   created by Robert Dickenson, Feb 2014
+#
 #   Unity Project - A Test Framework for C
 #   Copyright (c) 2007 Mike Karlesky, Mark VanderVoord, Greg Williams
 #   [Released under MIT License. Please refer to license.txt for details]
 # ========================================== 
 
-C_COMPILER = gcc
-TARGET_UDB = TestUDB
-TARGET_DCM = TestDCM
-TARGET_MPX = TestMPX
+Q := $(if $(V),,@)
+
+CC := gcc
+RUBY_GEN := ruby auto/generate_test_runner.rb
+
+TARGET_UDB := TestUDB
+TARGET_DCM := TestDCM
+TARGET_MPX := TestMPX
+TARGET_UDB4 := TestUDB4
+TARGET_UDB5 := TestUDB5
 
 ifeq ($(OS),Windows_NT)
-	TARGET_EXTENSION = .exe
-	FLAGS = -DWIN
-	LIBS = -lws2_32
+	TARGET_EXTENSION := .exe
+	FLAGS := -DWIN=1
+	LIBS := -lws2_32
 else
-	TARGET_EXTENSION = .out
-	FLAGS = -DNIX
-	LIBS =
+	TARGET_EXTENSION := .out
+	FLAGS := -DNIX
+	LIBS :=
 endif
-TEST_UDB = $(TARGET_UDB)$(TARGET_EXTENSION)
-TEST_DCM = $(TARGET_DCM)$(TARGET_EXTENSION)
-TEST_MPX = $(TARGET_MPX)$(TARGET_EXTENSION)
-SYMBOLS = -DTEST -DUNITY_SUPPORT_64 $(FLAGS)
+TEST_UDB := $(TARGET_UDB)$(TARGET_EXTENSION)
+TEST_DCM := $(TARGET_DCM)$(TARGET_EXTENSION)
+TEST_MPX := $(TARGET_MPX)$(TARGET_EXTENSION)
+TEST_UDB4 := $(TARGET_UDB4)$(TARGET_EXTENSION)
+TEST_UDB5 := $(TARGET_UDB5)$(TARGET_EXTENSION)
+SYMBOLS := -DTEST -DUNITY_SUPPORT_64 $(FLAGS)
 
 MP_HEADERS = \
-../../MatrixPilot/options.h \
+../../Config/options.h \
 ../../MatrixPilot/waypoints.h \
 ../../MatrixPilot/flightplan-logo.h
 
 SRC_TST_FILES = externals.c
 
+#../MatrixPilot-SIL/SIL-ui-mp-term.c \
+
 SRC_UDB_FILES = \
 ../MatrixPilot-SIL/SIL-udb.c \
-../MatrixPilot-SIL/SIL-ui-mp-term.c \
 ../MatrixPilot-SIL/SIL-serial.c \
 ../MatrixPilot-SIL/SIL-dsp.c \
 ../MatrixPilot-SIL/SIL-eeprom.c \
@@ -42,6 +54,7 @@ $(SRC_TST_FILES)
 
 SRC_DCM_FILES = \
 ../../libDCM/deadReckoning.c \
+../../libDCM/estLocation.c \
 ../../libDCM/estAltitude.c \
 ../../libDCM/estWind.c \
 ../../libDCM/estYawDrift.c \
@@ -49,42 +62,47 @@ SRC_DCM_FILES = \
 ../../libDCM/gpsParseMTEK.c \
 ../../libDCM/gpsParseSTD.c \
 ../../libDCM/gpsParseUBX.c \
+../../libDCM/gpsData.c \
 ../../libDCM/libDCM.c \
+../../libDCM/hilsim.c \
 ../../libDCM/mathlibNAV.c \
 ../../libDCM/mathlib.c \
 ../../libDCM/rmat.c \
 $(SRC_UDB_FILES)
 
 SRC_MPX_FILES = \
-../../MatrixPilot/airspeedCntrl.c \
-../../MatrixPilot/altitudeCntrl.c \
-../../MatrixPilot/altitudeCntrlVariable.c \
+../../libCntrl/airspeedCntrl.c \
+../../libCntrl/altitudeCntrl.c \
+../../libCntrl/altitudeCntrlVariable.c \
 ../../MatrixPilot/behavior.c \
-../../MatrixPilot/cameraCntrl.c \
+../../libCntrl/cameraCntrl.c \
+../../MatrixPilot/crc16.c \
+../../MatrixPilot/crc32.c \
 ../../MatrixPilot/config.c \
 ../../MatrixPilot/config_tests.c \
-../../MatrixPilot/data_services.c \
-../../MatrixPilot/data_storage.c \
 ../../MatrixPilot/euler_angles.c \
+../../MatrixPilot/flightplan.c \
 ../../MatrixPilot/flightplan-logo.c \
 ../../MatrixPilot/flightplan-waypoints.c \
-../../MatrixPilot/MAVLink.c \
-../../MatrixPilot/MAVFlexiFunctions.c \
-../../MatrixPilot/MAVMission.c \
-../../MatrixPilot/MAVParams.c \
-../../MatrixPilot/MAVUDBExtra.c \
+../../MatrixPilot/logo_parser.c \
+../../MAVLink/MAVLink.c \
+../../MAVLink/MAVFlexiFunctions.c \
+../../MAVLink/MAVMission.c \
+../../MAVLink/MAVParams.c \
+../../MAVLink/MAVUDBExtra.c \
 ../../MatrixPilot/mode_switch.c \
 ../../MatrixPilot/mp_osd.c \
 ../../MatrixPilot/navigate.c \
-../../MatrixPilot/nv_memory_table.c \
 ../../MatrixPilot/parameter_table.c \
-../../MatrixPilot/pitchCntrl.c \
-../../MatrixPilot/rollCntrl.c \
+../../MatrixPilot/parameter_table2.c \
+../../libCntrl/pitchCntrl.c \
+../../libCntrl/rollCntrl.c \
 ../../MatrixPilot/servoMix.c \
 ../../MatrixPilot/servoPrepare.c \
 ../../MatrixPilot/states.c \
+../../MatrixPilot/stptok.c \
 ../../MatrixPilot/telemetry.c \
-../../MatrixPilot/yawCntrl.c \
+../../libCntrl/yawCntrl.c \
 $(SRC_DCM_FILES)
 
 TEST_MPX_FILES = \
@@ -102,13 +120,14 @@ TEST_DCM_FILES = \
 	build/TestDCM_Runner.c \
 	src/unity.c
 
+TEST_UDB4_FILES = \
+	TestUDB4.c \
+	build/TestUDB4_Runner.c \
+	src/unity.c
+
 INC_DIRS = \
 	-Isrc \
 	-I../../Config \
-	-I../../libUDB \
-	-I../../libDCM \
-	-I../../MatrixPilot \
-	-I../HILSIM_XPlane \
 	-I../MatrixPilot-SIL
 
 ifeq ($(OSTYPE),cygwin)
@@ -122,34 +141,31 @@ endif
 #%.o: %.c $(MP_HEADERS)
 #	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
+TESTS := udb dcm mpx udb4 udb5 auav3 hilsim
+
 all: clean default
 
-ubd:
-	ruby auto/generate_test_runner.rb TestUDB.c build/TestUDB_Runner.c
-	$(C_COMPILER) $(INC_DIRS) $(SYMBOLS) $(TEST_UDB_FILES) $(SRC_UDB_FILES) mpx_dummy.c dcm_dummy.c $(LIBS) -o $(TEST_UDB)
+udb:
+	$(Q) $(RUBY_GEN) TestUDB.c build/TestUDB_Runner.c
+	$(Q) $(CC) $(INC_DIRS) $(SYMBOLS) $(TEST_UDB_FILES) $(SRC_UDB_FILES) mpx_dummy.c dcm_dummy.c $(LIBS) -o $(TEST_UDB)
 	./$(TEST_UDB)
 
 dcm:
-	ruby auto/generate_test_runner.rb TestDCM.c build/TestDCM_Runner.c
-	$(C_COMPILER) $(INC_DIRS) $(SYMBOLS) $(TEST_DCM_FILES) $(SRC_DCM_FILES) mpx_dummy.c $(LIBS) -o $(TEST_DCM)
+	$(Q) $(RUBY_GEN) TestDCM.c build/TestDCM_Runner.c
+	$(Q) $(CC) $(INC_DIRS) $(SYMBOLS) $(TEST_DCM_FILES) $(SRC_DCM_FILES) mpx_dummy.c $(LIBS) -o $(TEST_DCM)
 	./$(TEST_DCM)
 
 mpx:
-	ruby auto/generate_test_runner.rb TestMPX.c build/TestMPX_Runner.c
-	$(C_COMPILER) $(INC_DIRS) $(SYMBOLS) $(TEST_MPX_FILES) $(SRC_MPX_FILES) $(LIBS) -o $(TEST_MPX)
+	$(Q) $(RUBY_GEN) TestMPX.c build/TestMPX_Runner.c
+	$(Q) $(CC) $(INC_DIRS) $(SYMBOLS) $(TEST_MPX_FILES) $(SRC_MPX_FILES) $(LIBS) -o $(TEST_MPX)
 	./$(TEST_MPX)
 
-default:
-	ruby auto/generate_test_runner.rb TestUDB.c build/TestUDB_Runner.c
-	ruby auto/generate_test_runner.rb TestDCM.c build/TestDCM_Runner.c
-	ruby auto/generate_test_runner.rb TestMPX.c build/TestMPX_Runner.c
-	$(C_COMPILER) $(INC_DIRS) $(SYMBOLS) $(TEST_UDB_FILES) $(SRC_UDB_FILES) mpx_dummy.c dcm_dummy.c $(LIBS) -o $(TEST_UDB)
-	$(C_COMPILER) $(INC_DIRS) $(SYMBOLS) $(TEST_DCM_FILES) $(SRC_DCM_FILES) mpx_dummy.c $(LIBS) -o $(TEST_DCM)
-	$(C_COMPILER) $(INC_DIRS) $(SYMBOLS) $(TEST_MPX_FILES) $(SRC_MPX_FILES) $(LIBS) -o $(TEST_MPX)
-	./$(TEST_UDB)
-	./$(TEST_DCM)
-	./$(TEST_MPX)
+udb4:
+	$(Q) $(RUBY_GEN) TestUDB4.c build/TestUDB4_Runner.c
+	$(Q) $(CC) $(INC_DIRS) $(SYMBOLS) $(TEST_DCM_FILES) $(SRC_DCM_FILES) mpx_dummy.c $(LIBS) -o $(TEST_UDB4)
+	./$(TEST_UDB4)
+
+default: udb dcm mpx
 
 clean:
-	$(CLEANUP)
-
+	$(Q) $(CLEANUP)

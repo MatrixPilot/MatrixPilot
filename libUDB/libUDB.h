@@ -29,8 +29,9 @@
 //#define NDEBUG
 #include <assert.h>
 
-//#include "defines.h"
+//#include "../MatrixPilot/defines.h"
 #include "options.h"
+#include "options_quad.h"
 
 #if (WIN == 1 || NIX == 1)
 #define inline __inline
@@ -49,12 +50,17 @@
 #define USE_MSD                             0
 #undef  FAILSAFE_INPUT_MIN
 #define FAILSAFE_INPUT_MIN                  1500
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #undef BAROMETER_ALTITUDE
 #else
 #define SILSIM                              0
 #include <dsp.h>
 #endif // (WIN == 1 || NIX == 1)
+
+#ifdef PX4
+#include "../libUDB/builtins.h"
+#include "../libSTM/dsp.h"
+#endif // PX4
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -69,6 +75,11 @@
 #endif
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
+#include "options_auav3.h"
+#endif
+#ifdef PX4
+#define BOARD_TYPE                          PX4_BOARD
+#include "libSTM.h"
 #endif
 
 #ifndef BOARD_TYPE
@@ -144,15 +155,14 @@ void udb_heartbeat_40hz_callback(void);
 void udb_heartbeat_callback(void);
 
 typedef void (*background_callback)(void);
-typedef void (*callback_fptr_t)(void);
+//typedef void (*callback_fptr_t)(void);
 /*
-static callback_fptr_t callback = NULL;
-
-void some_function(callback_fptr_t fptr)
-{
-	callback = fptr;
-	if (callback) callback();
-}
+//static callback_fptr_t callback = NULL;
+//void some_function(callback_fptr_t fptr)
+//{
+//	callback = fptr;
+//	if (callback) callback();
+//}
  */
 
 // Trigger the background_callback() functions from a low priority ISR.
@@ -183,7 +193,7 @@ extern int16_t udb_pwTrim[];                // initial pulse widths for trimming
 // These are the servo channel values that will be sent out to the servos.
 // Set these values in your implementation of the udb_heartbeat_callback()
 // Each channel should be set to a value between 2000 and 4000.
-extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
+//extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
 
 // This read-only value holds flags that tell you, among other things,
 // whether the receiver is currently receiving values from the transmitter.
@@ -191,7 +201,7 @@ extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
 
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int16_t udb_servo_pulsesat(int32_t pw);
+//int16_t udb_servo_pulsesat(int32_t pw);
 
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
@@ -245,34 +255,40 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 // Calibrate the sensors
 // Call this function once, soon after booting up, after a few seconds of
 // holding the UDB very still.
-void udb_callback_read_sensors(void);       // Callback
+//void udb_callback_read_sensors(void);       // Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
-#define udb_led_toggle(x)                   ((x) = !(x))
+#ifdef PX4
+void udb_led_toggle(uint8_t x);
+void led_on(uint8_t x);
+void led_off(uint8_t x);
+#else
+#define udb_led_toggle(x)               ((x) = !(x))
 #define led_on(x)                       ((x) = 0)
 #define led_off(x)                      ((x) = 1)
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // GPS IO
 
 // Set the GPS serial data rate.
-void udb_gps_set_rate(int32_t rate);
-boolean udb_gps_check_rate(int32_t rate);  // returns true if the rate arg is the current rate
+//void udb_gps_set_rate(int32_t rate);
+//boolean udb_gps_check_rate(int32_t rate);  // returns true if the rate arg is the current rate
 
 // Call this function to initiate sending a data to the GPS
-void udb_gps_start_sending_data(void);
+//void udb_gps_start_sending_data(void);
 
 // Implement this callback to tell the UDB what byte is next to send on the GPS.
 // Return -1 to stop sending data.
-int16_t udb_gps_callback_get_byte_to_send(void);        // Callback
+//int16_t udb_gps_callback_get_byte_to_send(void);        // Callback
 
 // Implement this callback to handle receiving a byte from the GPS
-void udb_gps_callback_received_byte(uint8_t rxchar);    // Callback
+//void udb_gps_callback_received_byte(uint8_t rxchar);    // Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,18 +296,18 @@ void udb_gps_callback_received_byte(uint8_t rxchar);    // Callback
 
 // Set the serial port data rate.  Use the UDB_BAUD_* constants defined in the Config*.h
 // files.
-void udb_serial_set_rate(int32_t rate);
-boolean udb_serial_check_rate(int32_t rate);// returns true if the rate arg is the current rate
+//void udb_serial_set_rate(int32_t rate);
+//boolean udb_serial_check_rate(int32_t rate);// returns true if the rate arg is the current rate
 
 // Call this function to initiate sending a data to the serial port
-void udb_serial_start_sending_data(void);
+//void udb_serial_start_sending_data(void);
 
 // Implement this callback to tell the UDB what byte is next to send on the serial port.
 // Return -1 to stop sending data.
-int16_t udb_serial_callback_get_byte_to_send(void);     // Callback
+//int16_t udb_serial_callback_get_byte_to_send(void);     // Callback
 
 // Implement this callback to handle receiving a byte from the serial port
-void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
+//void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
 
 
 #endif // LIB_UDB_H

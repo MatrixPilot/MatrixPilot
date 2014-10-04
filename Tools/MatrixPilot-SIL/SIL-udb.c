@@ -12,9 +12,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libUDB.h"
+#include "../../libUDB/libUDB.h"
 #include "../../libUDB/magnetometer.h"
-#include "../../libUDB/barometer.h"
 #include "../../libUDB/heartbeat.h"
 #include "SIL-config.h"
 
@@ -24,11 +23,13 @@
 #include <Windows.h>
 #include <Time.h>
 
+#ifndef TEST
 struct timezone
 {
 	int tz_minuteswest; // of Greenwich
 	int tz_dsttime;     // type of dst correction to apply
 };
+#endif
 
 #if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
@@ -73,13 +74,10 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 
 #endif // WIN
 
-#include "libUDB.h"
-#include "ADchannel.h"
-#include "magnetometer.h"
+#include "../../libUDB/ADchannel.h"
 #include "magnetometerOptions.h"
-#include "events.h"
+#include "../../libUDB/events.h"
 #include "SIL-udb.h"
-//#include "UDBSocket.h"
 #include "SIL-ui.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
@@ -120,7 +118,7 @@ uint16_t mp_rcon = 3;                           // default RCON state at normal 
 extern int mp_argc;
 extern char **mp_argv;
 
-uint8_t leds[4] = {0, 0, 0, 0};
+uint8_t leds[5] = {0, 0, 0, 0, 0};
 UDBSocket serialSocket;
 uint8_t sil_radio_on;
 
@@ -150,7 +148,7 @@ void udb_init(void)
 {
 	int16_t i;
 
-	// If we were reest:
+	// If we were reset:
 	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
 	{
 		mp_rcon = 128; // enable just the external/MCLR reset bit
@@ -537,10 +535,12 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 
 #endif // MAG_YAW_DRIFT
 
+#ifndef TEST
 int setjmp(void)
 {
 	return 0;
 }
+#endif
 
 int16_t FindFirstBitFromLeft(int16_t val)
 {
@@ -557,8 +557,10 @@ int16_t FindFirstBitFromLeft(int16_t val)
 	return i;
 }
 
+//long _Q16atan(int32_t a) { return 0; }
+
 void vApplicationTickHook(void) {}
-void vApplicationIdleHook(void) {}
+//void vApplicationIdleHook(void) {}
 
 //void *pvPortMalloc( size_t xWantedSize )
 //{

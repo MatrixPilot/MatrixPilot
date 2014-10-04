@@ -19,9 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "radioIn.h"
+#include "../MatrixPilot/states.h"
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -49,7 +51,8 @@
 #error Invalid MIPS Configuration
 #endif // MIPS
 
-#define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR) // 3.5ms
+//#define MIN_SYNC_PULSE_WIDTH (14000/TMR_FACTOR) // 3.5ms
+#define MIN_SYNC_PULSE_WIDTH (10000/TMR_FACTOR) // 2.5ms
 //#define DEBUG_FAILSAFE_MIN_MAX
 
 
@@ -67,6 +70,23 @@ int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 static int16_t failSafePulses = 0;
 static int16_t noisePulses = 0;
 
+static boolean isFailSafe = true;
+
+boolean radioIn_isFailSafe(void)
+{
+	return isFailSafe;
+}
+
+uint8_t radioIn_getInput(int16_t* ppm, uint8_t channels)
+{
+	uint8_t c;
+
+	for (c = 0; c < channels; c++)
+	{
+		ppm[c+1] = udb_pwIn[c+1];
+	}
+	return MODE_SWITCH_INPUT_CHANNEL; // make this define specific to each ppm input device
+}
 
 void udb_servo_record_trims(void)
 {
@@ -77,7 +97,7 @@ void udb_servo_record_trims(void)
 	}
 }
 
-void udb_init_capture(void)
+void radioIn_init(void) // was called udb_init_capture(void)
 {
 	int16_t i;
 
@@ -247,7 +267,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 	else \
 		set_udb_pwIn(time - rise, x); \
 	interrupt_restore_corcon; \
-last_int = 11; \
 }
 #define IC_HANDLER(x, y, z) _IC_HANDLER(x, y, z)
 
@@ -397,7 +416,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) IC_INTERRUPT(PPM_IC)
 #error Invalid USE_PPM_INPUT setting
 #endif // USE_PPM_INPUT
 	interrupt_restore_corcon;
-last_int = 13;
 }
 
 #endif // USE_PPM_INPUT

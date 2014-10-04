@@ -127,8 +127,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelayUntil         1
 #define INCLUDE_vTaskDelay              1
 
-//#define configKERNEL_INTERRUPT_PRIORITY 0x01
-#define configKERNEL_INTERRUPT_PRIORITY 0x03
+#define configKERNEL_INTERRUPT_PRIORITY   4
 
 #define configUSE_MALLOC_FAILED_HOOK    1
 

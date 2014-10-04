@@ -20,11 +20,16 @@
 
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for AIRFRAME_TYPE
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "eeprom_udb4.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "serialIO.h"
+#include "servoOut.h"
+#include "radioIn.h"
+#include "ADchannel.h"
+#include "mpu6000.h"
 #include "analogs.h"
 #include "events.h"
 #include "osd.h"
@@ -35,15 +40,19 @@
 
 // Include the NV memory services if required
 #if (USE_NV_MEMORY == 1)
-#include "NV_memory.h"
-#include "data_storage.h"
-#include "data_services.h"
+//#include "NV_memory.h"
+//#include "data_storage.h"
+//#include "data_services.h"
 #endif
 
 // Include flexifunction mixers if required
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 #include "../libflexifunctions/flexifunctionservices.h"
 #endif
+
+extern void udb_init_ADC(void);
+extern void udb_init_clock(void);
+extern void init_motorOut(void);
 
 
 union udb_fbts_byte udb_flags;
@@ -88,7 +97,7 @@ void udb_init(void)
 	flexiFunctionServiceInit();
 #endif
 	udb_init_clock();
-	udb_init_capture();
+	radioIn_init(); // was udb_init_capture();
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
@@ -99,9 +108,9 @@ void udb_init(void)
 	udb_init_USART();
 #endif
 #if (AIRFRAME_TYPE != AIRFRAME_QUAD)
-	init_servoOut(); // was called udb_init_pwm()
+	servoOut_init(); // was udb_init_pwm()
 #else
-#error here 1
+//#error here 1
 	init_motorOut();
 #endif // AIRFRAME_TYPE
 	osd_init();
@@ -112,11 +121,12 @@ void udb_init(void)
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-//#if (USE_FREERTOS)
-//	MPU6000_init16(&TriggerIMU);
-//#else
+#if (USE_FREERTOS)
+	void TaskIMU_Trigger(void);
+	MPU6000_init16(&TaskIMU_Trigger);
+#else
 	MPU6000_init16(&heartbeat);
-//#endif
+#endif
 #endif
 
 	SRbits.IPL = 0; // turn on all interrupt priorities

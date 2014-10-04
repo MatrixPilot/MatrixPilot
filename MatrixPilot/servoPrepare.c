@@ -24,11 +24,19 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "telemetry.h"
+#include "mode_switch.h"
+#include "servoMix.h"
+#include "servoPrepare.h"
+#include "../MAVLink/MAVLink.h"
+#include "../libCntrl/libCntrl.h"
+#include "../libCntrl/airspeedCntrl.h"
 #include "../libCntrl/cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
-#include "mode_switch.h"
-#include "../libCntrl/airspeedCntrl.h"
+
+void mp_osd_run_step(void);
 
 int16_t pitch_control;
 int16_t roll_control;
@@ -113,7 +121,7 @@ void dcm_heartbeat_callback(void)   // was called dcm_servo_callback_prepare_out
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
 // RobD			flight_state_8hz();
-			serial_output_8hz();
+			telemetry_output_8hz();
 		}
 #endif // SERIAL_OUTPUT_FORMAT
 	}
@@ -128,6 +136,6 @@ void dcm_heartbeat_callback(void)   // was called dcm_servo_callback_prepare_out
 		mavlink_output_40hz();
 	}
 #endif // SERIAL_OUTPUT_FORMAT
-	osd_run_step();
+	mp_osd_run_step();
 #endif // AIRFRAME_TYPE
 }

@@ -8,11 +8,10 @@
 
 #if (WIN == 1 || NIX == 1)
 
-#include "defines.h"
-#include "../libUDB/heartbeat.h"
+
+#include "../../libUDB/libUDB.h"
+#include "../../libUDB/heartbeat.h"
 #include "SIL-filesystem.h"
-//#include "libUDB.h"
-//#include <stdio.h>
 
 
 int FSInit(void)

@@ -24,7 +24,7 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 
 #define MAX_EVENTS 16
 #define INVALID_HANDLE 0xFFFF

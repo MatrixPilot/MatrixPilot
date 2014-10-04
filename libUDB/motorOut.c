@@ -19,9 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/oscillator.h"
+#include "../libUDB/servoOut.h"
 
 
 //int16_t udb_pwOut[NUM_OUTPUTS+1]; // pulse widths for servo outputs

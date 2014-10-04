@@ -2,10 +2,11 @@
 
 #include "defines.h" 
 
-#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
 
 #include "parameter_table.h"
 #include "data_storage.h"
+#include "../libCntrl/altitudeCntrl.h"
 #include "../libUDB/ADchannel.h"
 
 
@@ -24,10 +25,6 @@ extern int16_t alt_hold_pitch_min;
 extern int16_t alt_hold_pitch_max;
 extern int16_t alt_hold_pitch_high;
 extern int16_t rtl_pitch_down;
-extern int16_t minimum_groundspeed;
-extern int16_t maximum_airspeed;
-extern int16_t minimum_airspeed;
-extern int16_t desiredSpeed;
 extern int16_t minimum_groundspeed;
 extern int16_t maximum_airspeed;
 extern int16_t minimum_airspeed;
@@ -151,5 +148,4 @@ const mavlink_parameter mavlink_parameters_list[] = {
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif 
-
+#endif // (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 

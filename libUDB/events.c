@@ -22,7 +22,7 @@
 // Manages software triggered events to run registered callbacks
 
 #include "events.h"
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "interrupt.h"
 
 #define _EVENTL_TRIGGERIP _C2IP
@@ -130,7 +130,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTL_INTERUPT(void)
 		}
 	}
 	interrupt_restore_corcon;
-last_int = 6;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void)
@@ -158,6 +157,5 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void)
 		}
 	}
 	interrupt_restore_corcon;
-last_int = 7;
 }
 

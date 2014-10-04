@@ -7,12 +7,12 @@
 #include <setjmp.h>
 #include "unity.h"
 
-#include "udbTypes.h"
-#include "dcmTypes.h"
+#include "../../libUDB/udbTypes.h"
+#include "../../libDCM/dcmTypes.h"
 
-#include "defines.h"
-#include "events.h"
-#include "mode_switch.h"
+#include "../../MatrixPilot/defines.h"
+#include "../../libUDB/events.h"
+#include "../../MatrixPilot/mode_switch.h"
 
 // Dividing by these constants produces +/- infinity.
 // The rationale is given in UnityAssertFloatIsInf's body.

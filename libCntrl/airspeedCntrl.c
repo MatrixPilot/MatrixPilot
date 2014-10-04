@@ -19,7 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/servoPrepare.h"
+#include "altitudeCntrl.h"
 #include "airspeedCntrl.h"
 
 int16_t minimum_groundspeed;
@@ -153,8 +155,9 @@ static int32_t calc_airspeed_int_error(int16_t aspdError, int32_t aspd_integral)
 	return airspeed_int.WW;
 }
 
+#if (GLIDE_AIRSPEED_CONTROL == 1)
 //Calculate and return pitch target adjustment for target airspeed
-static fractional gliding_airspeed_pitch_adjust(void)
+fractional gliding_airspeed_pitch_adjust(void)
 {
 	union longww accum;
 
@@ -211,6 +214,7 @@ static fractional gliding_airspeed_pitch_adjust(void)
 
 	return aspd_pitch_adj;
 }
+#endif // (GLIDE_AIRSPEED_CONTROL == 1)
 
 void airspeedCntrl(void)
 {

@@ -20,19 +20,21 @@
 
 
 int16_t sine(int8_t angle);
-int8_t arcsine(int16_t angle);
+int8_t arcsine(int16_t y);  // arcsine takes the y coordinate of an x,y point and returns an angle
 int16_t cosine(int8_t angle);
 
 uint16_t sqrt_int(uint16_t sqr);
 uint16_t sqrt_long(uint32_t sqr);
 int32_t long_scale(int32_t arg1, int16_t arg2);
+void VectorCross(int16_t * dest, int16_t * src1, int16_t * src2);
 
 void rotate_2D_vector_by_vector(int16_t vector[2], int16_t rotate[2]);      //-> void vect2_16x16_rotate(vect2_16t* vector, const vect2_16t* rotate);
 void rotate_2D_long_vector_by_vector(int32_t vector[2], int16_t rotate[2]); //-> void vect2_32x16_rotate(vect2_32t* vector, const vect2_16t* rotate);
 void rotate_2D_vector_by_angle(int16_t vector[2], int8_t angle);            //-> void vect2_16phi_rotate(vect2_16t* vector, int8_t angle);
 void rotate_2D(struct relative2D *xy, int8_t angle);     //-> void vect2_16phi_rotate(vect2_16t* vector, int8_t angle);
-int8_t rect_to_polar(struct relative2D *xy);          //-> uint8_t vect2_polar(polar_16t* polar, const vect2_16t* vector);
-int16_t rect_to_polar16(struct relative2D *xy);       //-> uint16_t vect2_polar_16(polar_16t* polar, const vect2_16t* vector);
+int8_t rect_to_polar(struct relative2D *xy);             //-> uint8_t vect2_polar(polar_16t* polar, const vect2_16t* vector);
+int16_t rect_to_polar16(struct relative2D *xy);          //-> uint16_t vect2_polar_16(polar_16t* polar, const vect2_16t* vector);
+
 uint16_t vector2_mag(int16_t x, int16_t y);                    //-> uint16_t vect2_16_mag(const vect2_16t* vector);
 uint16_t vector3_mag(int16_t x, int16_t y, int16_t z);         //-> uint16_t vect3_16_mag(const vect3_16t* vector);
 uint16_t vector2_normalize(int16_t result[], int16_t input[]); //-> uint16_t vect2_16_norm(vect2_16t* result, const vect2_16t* vector);

@@ -25,6 +25,7 @@
 #include "defines.h"
 #include "euler_angles.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libDCM/rmat.h"
 
 /**
  * Returns the aircraft heading angle (a.k.a., yaw angle) in degrees relative

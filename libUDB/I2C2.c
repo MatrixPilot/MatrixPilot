@@ -20,7 +20,7 @@
 
 #include "I2C.h"
 /*
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "interrupt.h"
 //#include "NV_memory.h"
 #include "events.h"
@@ -64,6 +64,7 @@
 #define I2C_Read        I2C2_Read
 #define I2C_CheckAck    I2C2_CheckAck
 #define I2C_Trigger     I2C2_Trigger
+#define I2C_Init        I2C2_Init
 
 #define I2C_SOURCE_INCLUDED
 #include "I2C.c"

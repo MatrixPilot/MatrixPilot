@@ -20,10 +20,6 @@
 
 
 #include "defines.h"
-#include "MDD File System/FSIO.h"
-#include "MDD File System/FSDefs.h"
-
-#include "ymodem.h"
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
@@ -68,6 +64,68 @@ static void cmd_format(char* arg)
 #endif // BOARD_TYPE
 }
 
+/*
+// Summary: A structure used for searching for files on a device.
+// Description: The SearchRec structure is used when searching for file on a device.  It contains parameters that will be loaded with
+//              file information when a file is found.  It also contains the parameters that the user searched for, allowing further
+//              searches to be perfomed in the same directory for additional files that meet the specified criteria.
+typedef struct
+{
+    char            filename[FILE_NAME_SIZE_8P3 + 2];   // The name of the file that has been found
+    unsigned char   attributes;                     // The attributes of the file that has been found
+    unsigned long   filesize;                       // The size of the file that has been found
+    unsigned long   timestamp;                      // The last modified time of the file that has been found (create time for directories)
+	#ifdef SUPPORT_LFN
+		BOOL			AsciiEncodingType;          // Ascii file name or Non-Ascii file name indicator
+		unsigned short int *utf16LFNfound;		    // Pointer to long file name found in UTF16 format
+		unsigned short int utf16LFNfoundLength;     // LFN Found length in terms of words including the NULL word at the last.
+	#endif
+    unsigned int    entry;                          // The directory entry of the last file found that matches the specified attributes. (Internal use only)
+    char            searchname[FILE_NAME_SIZE_8P3 + 2]; // The 8.3 format name specified when the user began the search. (Internal use only)
+    unsigned char   searchattr;                     // The attributes specified when the user began the search. (Internal use only)
+    unsigned long   cwdclus;                        // The directory that this search was performed in. (Internal use only)
+    unsigned char   initialized;                    // Check to determine if the structure was initialized by FindFirst (Internal use only)
+} SearchRec;
+ */
+static void cmd_dir(char* arg)
+{
+#if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
+	SearchRec rec;
+	char* fileName = "*.*";
+
+//int FindFirst(const char* fileName, unsigned int attr, SearchRec* rec);
+//int FindNext(SearchRec* rec); 
+
+	if (arg != NULL) {
+		fileName = arg;
+	}
+	if (FindFirst(fileName, ATTR_MASK, &rec) != -1) {
+		do {
+			printf("%s\r\n", rec.filename);
+		} while (FindNext(&rec) != -1);
+	}
+#endif
+}
+
+//size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
+static void cmd_cat(char* arg)
+{
+#if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
+	char buf[2];
+	FSFILE* fp;
+
+	printf("cmd_cat(%s)\r\n", arg);
+
+	fp = FSfopen(arg, "r");
+	if (fp != NULL) {
+		while (FSfread(buf, 1, sizeof(char), fp) == 1) {
+			printf("%c", buf[0]);
+		}
+		FSfclose(fp);
+	}
+#endif
+}
+
 static void cmd_start(char* arg)
 {
 	printf("starting.\r\n");
@@ -82,14 +140,18 @@ static void cmd_stop(char* arg)
 
 static void cmd_on(char* arg)
 {
+#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
 	printf("on.\r\n");
 	SRbits.IPL = 0; // turn on all interrupt priorities
+#endif
 }
 
 static void cmd_off(char* arg)
 {
+#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
 	printf("off.\r\n");
 	SRbits.IPL = 7; // turn off all interrupt priorities
+#endif
 }
 
 static void cmd_cpuload(char* arg)
@@ -99,12 +161,14 @@ static void cmd_cpuload(char* arg)
 
 static void cmd_crash(char* arg)
 {
+#if (SILSIM != 1)
 	static int i;
 	char buffer[32];
 
 	sprintf(buffer, "overflowing stack %u.\r\n", i++);
 	printf(buffer);
 	cmd_crash(arg);
+#endif
 }
 
 static void cmd_adc(char* arg)
@@ -114,12 +178,14 @@ static void cmd_adc(char* arg)
 
 static void cmd_barom(char* arg)
 {
+#if (SILSIM != 1)
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
 	       get_barometer_temperature(),
 	       (uint16_t)get_barometer_pressure(),
 	       (uint16_t)get_barometer_altitude(),
 	       (uint16_t)get_barometer_agl_altitude()
 	      );
+#endif
 }
 
 static void cmd_magno(char* arg)
@@ -208,15 +274,19 @@ void gentrap(void);
 
 static void cmd_trap(char* arg)
 {
+#if (SILSIM != 1)
 	gentrap();
+#endif
 }
 
 static void cmd_uart(char* arg)
 {
+#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
 	printf("UART1 Registers:\r\n");
 	printf("\tU1MODE = %s\r\n", word_to_binary(U1MODE));
 	printf("\tU1STA  = %s\r\n", word_to_binary(U1STA));
 	printf("\tU1BRG  = %s\r\n", word_to_binary(U1BRG));
+#endif
 }
 
 static void cmd_reg(char* arg)
@@ -273,7 +343,9 @@ static void cmd_stack(char* arg)
 
 static void cmd_reset(char* arg)
 {
+#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
 	asm("reset");
+#endif
 }
 
 static void cmd_help(char* arg);
@@ -310,67 +382,6 @@ static void cmd_receive(char* arg)
 	unsigned long result;
 
 	result = ymodem_send(buf, size, filename);
-#endif
-}
-/*
-// Summary: A structure used for searching for files on a device.
-// Description: The SearchRec structure is used when searching for file on a device.  It contains parameters that will be loaded with
-//              file information when a file is found.  It also contains the parameters that the user searched for, allowing further
-//              searches to be perfomed in the same directory for additional files that meet the specified criteria.
-typedef struct
-{
-    char            filename[FILE_NAME_SIZE_8P3 + 2];   // The name of the file that has been found
-    unsigned char   attributes;                     // The attributes of the file that has been found
-    unsigned long   filesize;                       // The size of the file that has been found
-    unsigned long   timestamp;                      // The last modified time of the file that has been found (create time for directories)
-	#ifdef SUPPORT_LFN
-		BOOL			AsciiEncodingType;          // Ascii file name or Non-Ascii file name indicator
-		unsigned short int *utf16LFNfound;		    // Pointer to long file name found in UTF16 format
-		unsigned short int utf16LFNfoundLength;     // LFN Found length in terms of words including the NULL word at the last.
-	#endif
-    unsigned int    entry;                          // The directory entry of the last file found that matches the specified attributes. (Internal use only)
-    char            searchname[FILE_NAME_SIZE_8P3 + 2]; // The 8.3 format name specified when the user began the search. (Internal use only)
-    unsigned char   searchattr;                     // The attributes specified when the user began the search. (Internal use only)
-    unsigned long   cwdclus;                        // The directory that this search was performed in. (Internal use only)
-    unsigned char   initialized;                    // Check to determine if the structure was initialized by FindFirst (Internal use only)
-} SearchRec;
- */
-static void cmd_dir(char* arg)
-{
-#if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
-	SearchRec rec;
-	char* fileName = "*.*";
-
-//int FindFirst(const char* fileName, unsigned int attr, SearchRec* rec);
-//int FindNext(SearchRec* rec); 
-
-	if (arg != NULL) {
-		fileName = arg;
-	}
-	if (FindFirst(fileName, ATTR_MASK, &rec) != -1) {
-		do {
-			printf("%s\r\n", rec.filename);
-		} while (FindNext(&rec) != -1);
-	}
-#endif
-}
-
-//size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
-static void cmd_cat(char* arg)
-{
-#if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
-	char buf[2];
-	FSFILE* fp;
-
-	printf("cmd_cat(%s)\r\n", arg);
-
-	fp = FSfopen(arg, "r");
-	if (fp != NULL) {
-		while (FSfread(buf, 1, sizeof(char), fp) == 1) {
-			printf("%c", buf[0]);
-		}
-		FSfclose(fp);
-	}
 #endif
 }
 
@@ -426,6 +437,8 @@ gcdist = 4709.484375 Nm
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
 	{ 0, cmd_ver,    "ver" },
+	{ 0, cmd_dir,    "dir" },
+	{ 0, cmd_cat,    "cat" },
 	{ 0, cmd_format, "format" },
 	{ 0, cmd_start,  "start" },
 	{ 0, cmd_stop,   "stop" },
@@ -445,8 +458,6 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_close,  "close" },
 	{ 0, cmd_send,   "send" },
 	{ 0, cmd_receive,"receive" },
-	{ 0, cmd_dir,    "dir" },
-	{ 0, cmd_cat,    "cat" },
 	{ 0, cmd_nav,    "nav" },
 	{ 0, cmd_uart,   "uart" },
 };
