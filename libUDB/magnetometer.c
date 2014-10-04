@@ -29,16 +29,16 @@
 int16_t udb_magFieldBody[3];                    // magnetic field in the body frame of reference 
 int16_t udb_magOffset[3] = { 0 , 0 , 0 };       // magnetic offset in the body frame of reference
 // To use static offsets, Change the variable name udb_magOffset to udb_staticMagOffset on lines 169, 170, 171
-int16_t udb_staticMagOffset[3] = { 0 , 0 , 0 };       // Enter the static magnetic offset in the body frame of reference here.
+int16_t udb_staticMagOffset[3] = { 0 , 0 , 0 }; // Enter the static magnetic offset in the body frame of reference here.
 int16_t magGain[3] = { RMAX , RMAX , RMAX };    // magnetometer calibration gains
 int16_t rawMagCalib[3] = { 0 , 0 , 0 };
 int16_t magFieldRaw[3];
 int16_t magMessage = 0;                         // message type
 
-static magnetometer_callback_funcptr magnetometer_callback = NULL;
-
 #if (MAG_YAW_DRIFT == 1)
 //#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+
+static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 #define HMC5883_COMMAND 0x3C
 

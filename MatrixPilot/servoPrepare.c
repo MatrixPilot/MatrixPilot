@@ -26,6 +26,7 @@
 #include "servoMix.h"
 #include "servoPrepare.h"
 #include "MAVLink.h"
+#include "telemetry.h"
 #include "flightplan-waypoints.h"
 #include "libCntrl.h"
 #include "airspeedCntrl.h"
@@ -34,6 +35,7 @@
 #include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
 #include "osd_config.h"
+#include "mp_osd.h"
 
 int16_t pitch_control;
 int16_t roll_control;
