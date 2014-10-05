@@ -651,8 +651,7 @@ LED_RED = LED_OFF;
 
 void gps_commit_data(void)
 {
-	static union longbbbb last_alt = 0;
-
+	static union longbbbb last_alt = { 0 } ;
 	if (week_no.BB == 0)
 	{
 		week_no.BB = calculate_week_num(date_gps_.WW);
