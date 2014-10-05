@@ -7,9 +7,9 @@
       <logicalFolder name="LedTest" displayName="LedTest" projectFiles="true">
         <itemPath>../options.h</itemPath>
         <itemPath>../nv_memory_options.h</itemPath>
+        <itemPath>../magnetometerOptions.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../../libUDB/magnetometerOptions.h</itemPath>
         <itemPath>../../../libUDB/libUDB.h</itemPath>
         <itemPath>../../../libUDB/libUDB_internal.h</itemPath>
         <itemPath>../../../libUDB/libUDB_defines.h</itemPath>
@@ -22,6 +22,12 @@
         <itemPath>../../../libUDB/magnetometer.h</itemPath>
         <itemPath>../../../libUDB/analogs.h</itemPath>
         <itemPath>../../../libUDB/mpu_spi.h</itemPath>
+        <itemPath>../../../libUDB/eeprom_udb4.h</itemPath>
+        <itemPath>../../../libUDB/ADchannel.h</itemPath>
+        <itemPath>../../../libUDB/servoOut.h</itemPath>
+        <itemPath>../../../libUDB/serialIO.h</itemPath>
+        <itemPath>../../../libUDB/radioIn.h</itemPath>
+        <itemPath>../../../libUDB/mcu.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -51,6 +57,7 @@
         <itemPath>../../../libUDB/traps.c</itemPath>
         <itemPath>../../../libUDB/heartbeat.c</itemPath>
         <itemPath>../../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../../libUDB/ADchannel.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -85,8 +92,11 @@
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
+        <archiverTool>
+        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -137,6 +147,9 @@
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>
+      <C30-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C30-AR>
       <C30-AS>
         <property key="assembler-symbols" value=""/>
         <property key="expand-macros" value="false"/>

@@ -26,6 +26,7 @@
 #include "serialIO.h"
 #include "servoOut.h"
 #include "radioIn.h"
+#include "eeprom_udb4.h"
 #include "ADchannel.h"
 #include "mpu6000.h"
 #include "analogs.h"
