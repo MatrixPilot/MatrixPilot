@@ -22,12 +22,17 @@
 #include "defines.h"
 #include "navigate.h"
 #include "osd_config.h"
+#include "states.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/rmat.h"
+#include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
 #include <stdlib.h> // for abs(...)
+
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -36,12 +41,13 @@
 #include <string.h>
 #include "osd_layout_remzibi.h"
 
+static FILE* fp = NULL;
 static int16_t telemetry_counter = 0;
 
-//void init_serial(void)
-//{
-//	udb_serial_set_rate(57600);
-//}
+void minim_osd_init(FILE* _fp)
+{
+	fp = _fp;
+}
 
 static void update_coords(void)
 {
@@ -79,7 +85,7 @@ static void update_coords(void)
 	//
 	//   $A,lat,lng,numSV,alt,speed,course,fix,<CRLF>
 	//
-	serial_output("$A,%li,%li,%i,%i,%i,%i,%i,%i,\r\n",
+	fprintf(fp, "$A,%li,%li,%i,%i,%i,%i,%i,%i,\r\n",
 		lat_gps.WW,
 		lon_gps.WW,
 		(int16_t)svs,
@@ -122,7 +128,7 @@ static void update_mp_mode(void)
 	else
 		mp_mode = 10;                       // Unknown
 
-	serial_output("$P,%i,\r\n", mp_mode);
+	fprintf(fp, "$P,%i,\r\n", mp_mode);
 }
 
 static void update_wp(void)
@@ -134,7 +140,8 @@ static void update_wp(void)
 	int16_t dir_to_goal = desired_dir - earth_yaw;
 
 	// wp_target_bearing, wp_dist, wp_number
-	serial_output("$M,%li,%li,%i,\r\n", dir_to_goal, abs(tofinish_line), waypointIndex); 
+//	fprintf(fp, "$M,%li,%li,%i,\r\n", dir_to_goal, abs(tofinish_line), waypointIndex); 
+	fprintf(fp, "$M,%i,%i,%i,\r\n", dir_to_goal, abs(tofinish_line), waypointIndex); 
 }
 
 static void serial_show_AH(void)
@@ -174,7 +181,7 @@ static void serial_show_AH(void)
 	//  ex .  $I,23,-112,CRLF          CRLF -are two bytes termination of line (dec 13 10) (hex 0D 0A) 
 	//  Support graphical artificial horizon and pitch presentation, roll and pitch as integer type as degrees (-180,180)
 	//
-	serial_output("$I,%li,%li,\r\n", earth_roll, earth_pitch);
+	fprintf(fp, "$I,%li,%li,\r\n", earth_roll, earth_pitch);
 }
 
 static void update_climb_rate(void)
@@ -183,7 +190,7 @@ static void update_climb_rate(void)
 	// called every 1 sec so difference in height is climg rate
 	static int16_t alt = 0;
 
-	serial_output("$Z,%i,\r\n", IMUlocationz._.W1 - alt);
+	fprintf(fp, "$Z,%i,\r\n", IMUlocationz._.W1 - alt);
 	alt = IMUlocationz._.W1;
 }
 
@@ -192,9 +199,9 @@ static void update_battery(void)
 	// $U,volts,CRLF
 
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
-	serial_output("$U,%li,\r\n", battery_voltage._.W1 * 10);
+	fprintf(fp, "$U,%li,\r\n", battery_voltage._.W1 * 10);
 #else
-	serial_output("$U,1200,\r\n");
+	fprintf(fp, "$U,1200,\r\n");
 #endif
 }
 
@@ -207,39 +214,42 @@ static void update_channels(void)
 	rssi = (rc_signal_strength * 255) / 100;
 #endif
 	// $C,ch1,.....,ch8,rssi,CRLF
-	serial_output("$C,%i,", (unsigned)(udb_pwOut[THROTTLE_OUTPUT_CHANNEL]>>1));
+	fprintf(fp, "$C,%i,", (unsigned)(udb_pwOut[THROTTLE_OUTPUT_CHANNEL]>>1));
 	for (i = 5; i <= MIN(NUM_INPUTS, 8); i++)
 	{
-		serial_output("%i,", (unsigned)(udb_pwIn[i]>>1));
+		fprintf(fp, "%i,", (unsigned)(udb_pwIn[i]>>1));
 	}
 	// if NUM_INPUTS < 8 fill remaining channels
 	for (i = NUM_INPUTS+1; i <= 8; i++)
 	{
-		serial_output("1500,");
+		fprintf(fp, "1500,");
 	}
-	serial_output("%i,\r\n", rssi);
+	fprintf(fp, "%i,\r\n", rssi);
 }
 
-void serial_output_8hz(void)
+void minim_osd_8hz(void)
 {
-	serial_show_AH();
+	if (fp != NULL)
+	{
+		serial_show_AH();
 
-	if (telemetry_counter & 1)
-	{
-		update_coords();
+		if (telemetry_counter & 1)
+		{
+			update_coords();
+		}
+		if (telemetry_counter % 4 == 1)
+		{
+			update_mp_mode();
+			update_wp();
+			update_channels();
+		}
+		if (telemetry_counter % 8 == 0)
+		{
+			update_battery();
+			update_climb_rate();
+		}
+		++telemetry_counter;
 	}
-	if (telemetry_counter % 4 == 1)
-	{
-		update_mp_mode();
-		update_wp();
-		update_channels();
-	}
-	if (telemetry_counter % 8 == 0)
-	{
-		update_battery();
-		update_climb_rate();
-	}
-	++telemetry_counter;
 }
 
 #endif // (USE_OSD == OSD_MINIM)

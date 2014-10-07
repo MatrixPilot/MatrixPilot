@@ -176,7 +176,7 @@ static void ent_calibrateS(void)
 	waggle = 0;
 	stateS = &calibrateS;
 	calib_timer = CALIB_PAUSE;
-	LED_RED = LED_ON; // turn on mode led
+	led_on(LED_RED); // turn on mode led
 }
 
 // Acquire state is used to wait for the GPS to achieve lock.
@@ -206,7 +206,7 @@ static void ent_acquiringS(void)
 	throttleFiltered._.W1 = 0;
 	stateS = &acquiringS;
 	standby_timer = STANDBY_PAUSE;
-	LED_RED = LED_OFF;
+	led_off(LED_RED);
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
@@ -220,7 +220,7 @@ static void ent_manualS(void)
 	flags._.altitude_hold_pitch = 0;
 	flags._.disable_throttle = 0;
 	waggle = 0;
-	LED_RED = LED_OFF;
+	led_off(LED_RED);
 	stateS = &manualS;
 }
 
@@ -240,7 +240,7 @@ static void ent_stabilizedS(void)
 	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL);
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY);
 	waggle = 0;
-	LED_RED = LED_ON;
+	led_on(LED_RED);
 	stateS = &stabilizedS;
 }
 
@@ -258,7 +258,7 @@ static void ent_cat_armedS(void)
 	// must suppress throttle in cat_armed state
 	flags._.disable_throttle = 1;
 
-	LED_ORANGE = LED_ON;
+	led_on(LED_ORANGE);
 
 	stateS = &cat_armedS;
 }
@@ -293,7 +293,7 @@ static void ent_waypointS(void)
 	}
 
 	waggle = 0;
-	LED_RED = LED_ON;
+	led_on(LED_RED);
 	stateS = &waypointS;
 }
 
@@ -319,7 +319,7 @@ static void ent_returnS(void)
 #endif
 
 	waggle = 0;
-	LED_RED = LED_ON;
+	led_on(LED_RED);
 	stateS = &returnS;
 }
 
@@ -411,13 +411,13 @@ static void cat_armedS(void)
 	// transition to manual if flight_mode_switch no longer in waypoint mode
 	// or link lost or gps lost
 	if (flight_mode_switch_manual() | !udb_flags._.radio_on | !dcm_flags._.nav_capable) {
-		LED_ORANGE = LED_OFF;
+		led_off(LED_ORANGE);
 		ent_manualS();
 	}
 
 	// transition to waypointS iff launch detected
 	else if (dcm_flags._.launch_detected) {
-		LED_ORANGE = LED_OFF;
+		led_off(LED_ORANGE);
 		ent_cat_delayS();
 	}
 }
@@ -430,7 +430,7 @@ static void cat_delayS(void)
 	// or link lost or gps lost
 	if (flight_mode_switch_manual() | !udb_flags._.radio_on | !dcm_flags._.nav_capable)
 	{
-		LED_ORANGE = LED_OFF;
+		led_off(LED_ORANGE);
 		ent_manualS();
 	}
 	else if (--launch_timer == 0)

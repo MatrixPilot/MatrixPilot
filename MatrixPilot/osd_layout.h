@@ -31,6 +31,7 @@
 
 #define OSD_SHOW_CENTER_DOT             0
 
+#define OSD_SHOW_CONSOLE                1
 #define OSD_SHOW_HORIZON                1
 #define OSD_HORIZON_WIDTH               10
 #define OSD_HORIZON_ROLL_REVERSED       0
@@ -41,6 +42,9 @@
 
 // OSD Element Locations
 // Set each one to OSD_LOC_DISABLED or OSD_LOC(row, col) from (0, 0) to (12, 29) for NTSC or up to (15, 29) for PAL.
+
+#define OSD_LOC_CONSOLE_0               OSD_LOC(11, 3)      // 20 characters wide
+#define OSD_LOC_CONSOLE_1               OSD_LOC(12, 3)      // 20 characters wide
 
 #define OSD_LOC_DIST_TO_GOAL            OSD_LOC(1, 13)      // 5 characters wide
 #define OSD_LOC_ARROW_TO_GOAL           OSD_LOC(2, 14)      // 2 characters wide

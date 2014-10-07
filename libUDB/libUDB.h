@@ -58,9 +58,17 @@
 // See the MatrixPilot wiki for more details on different board types.
 #ifdef UDB4
 #define BOARD_TYPE                          UDB4_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef UDB5
 #define BOARD_TYPE                          UDB5_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
