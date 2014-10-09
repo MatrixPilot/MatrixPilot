@@ -87,17 +87,17 @@ static void setup_origin(void)
 	{
 		dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW);
 	}
-	flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
+	state_flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
 }
 
 void dcm_callback_gps_location_updated(void)
 {
-	if (flags._.save_origin)
+	if (state_flags._.save_origin)
 	{
 		// capture origin information during power up. much of this is not
 		// actually used for anything, but is saved in case you decide to
 		// extend this code.
-		flags._.save_origin = 0;
+		state_flags._.save_origin = 0;
 		setup_origin();
 #if (BAROMETER_ALTITUDE == 1)
 		altimeter_calibrate();
@@ -200,7 +200,7 @@ void navigate_set_goal_height(int16_t z)
 
 void navigate_process_flightplan(void)
 {
-	if (gps_nav_valid() && flags._.GPS_steering)
+	if (gps_nav_valid() && state_flags._.GPS_steering)
 	{
 		navigate_compute_bearing_to_goal();
 		run_flightplan();
@@ -300,7 +300,7 @@ void navigate_compute_bearing_to_goal(void)
 			desired_bearing_over_ground_vector[1] = togoal.y;
 			vector2_normalize(desired_bearing_over_ground_vector, desired_bearing_over_ground_vector);
 	}
-	if (flags._.GPS_steering)   // return to home or waypoints state
+	if (state_flags._.GPS_steering)   // return to home or waypoints state
 	{
 		desired_dir = goal.phi;
 		if (goal.legDist > 0)

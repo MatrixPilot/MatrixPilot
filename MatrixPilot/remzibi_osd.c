@@ -207,7 +207,7 @@ static void update_coords(void)
 	int16_t dist_to_home = toGoal.x;
 	int16_t dist_to_goal;
 
-	if (flags._.GPS_steering)
+	if (state_flags._.GPS_steering)
 	{
 		//dir_to_goal = desired_dir - earth_yaw;
 		dist_to_goal = abs(tofinish_line);
@@ -306,13 +306,13 @@ static void get_mp_mode(void)
 {
 	if (!home_saved)
 		mp_mode =  MODE_UNDEFINED;
-	else if (!flags._.pitch_feedback)
+	else if (!state_flags._.pitch_feedback)
 		mp_mode =  MODE_MANUAL;
-	else if (!flags._.GPS_steering)
+	else if (!state_flags._.GPS_steering)
 		mp_mode =  MODE_STABLE;
-	else if (udb_flags._.radio_on && !flags._.rtl_hold)
+	else if (udb_flags._.radio_on && !state_flags._.rtl_hold)
 		mp_mode =  MODE_WAYPOINT;
-	else if (flags._.rtl_hold && udb_flags._.radio_on)
+	else if (state_flags._.rtl_hold && udb_flags._.radio_on)
 		mp_mode =  MODE_RTH_HOLD;   // H : RTL Hold, has signal
 	else if (!udb_flags._.radio_on)
 		mp_mode =  MODE_RTH;

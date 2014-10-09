@@ -91,16 +91,16 @@ void normalRollCntrl(void)
 		omegaAccum2 = -omegaAccum[2];
 	}
 #ifdef TestGains
-	flags._.GPS_steering = 0; // turn off navigation
+	state_flags._.GPS_steering = 0; // turn off navigation
 #endif
-	if (AILERON_NAVIGATION && flags._.GPS_steering)
+	if (AILERON_NAVIGATION && state_flags._.GPS_steering)
 	{
 		rollAccum._.W1 = navigate_determine_deflection('a');
 	}
 #ifdef TestGains
-	flags._.pitch_feedback = 1;
+	state_flags._.pitch_feedback = 1;
 #endif
-	if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback)
+	if (ROLL_STABILIZATION_AILERONS && state_flags._.pitch_feedback)
 	{
 		gyroRollFeedback.WW = __builtin_mulus(rollkd , omegaAccum[1]);
 		rollAccum.WW += __builtin_mulsu(rmat6 , rollkp);
@@ -109,7 +109,7 @@ void normalRollCntrl(void)
 	{
 		gyroRollFeedback.WW = 0;
 	}
-	if (YAW_STABILIZATION_AILERON && flags._.pitch_feedback)
+	if (YAW_STABILIZATION_AILERON && state_flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW = __builtin_mulus(yawkdail, omegaAccum2);
 	}
@@ -126,9 +126,9 @@ void hoverRollCntrl(void)
 	int16_t rollNavDeflection;
 	union longww gyroRollFeedback;
 
-	if (flags._.pitch_feedback)
+	if (state_flags._.pitch_feedback)
 	{
-		if (AILERON_NAVIGATION && flags._.GPS_steering)
+		if (AILERON_NAVIGATION && state_flags._.GPS_steering)
 		{
 			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? navigate_determine_deflection('h') : 0;
 		}

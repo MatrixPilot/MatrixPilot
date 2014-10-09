@@ -115,7 +115,7 @@ void cameraCntrl(void)
 
 	// In Manual Mode
 #if (CAMERA_MODE_INPUT_CHANNEL == CHANNEL_UNUSED)
-	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+	if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 0)
 #else
 	if (udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] < CAMERA_MODE_THRESHOLD_LOW)
 #endif
@@ -128,7 +128,7 @@ void cameraCntrl(void)
 	{
 		// Stabilised Mode
 #if (CAMERA_MODE_INPUT_CHANNEL ==	CHANNEL_UNUSED)
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+		if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 1)
 #else
 		if ((udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] > CAMERA_MODE_THRESHOLD_LOW) &&
 		    (udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_HIGH))

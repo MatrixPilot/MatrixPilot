@@ -318,13 +318,13 @@ static void osd_update_values_phase_0(void)
 
 #if (OSD_LOC_AP_MODE != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_AP_MODE);
-	if (!flags._.pitch_feedback)
+	if (!state_flags._.pitch_feedback)
 		osd_spi_write(0x7, 0x97);                   // M : Manual Mode
-	else if (!flags._.GPS_steering)
+	else if (!state_flags._.GPS_steering)
 		osd_spi_write(0x7, 0x9D);                   // S : Stabilized Mode
-	else if (udb_flags._.radio_on && !flags._.rtl_hold)
+	else if (udb_flags._.radio_on && !state_flags._.rtl_hold)
 		osd_spi_write(0x7, 0xA1);                   // W : Waypoint Mode
-	else if (flags._.rtl_hold && udb_flags._.radio_on)
+	else if (state_flags._.rtl_hold && udb_flags._.radio_on)
 		osd_spi_write(0x7, 0x92);                   // H : RTL Hold, has signal
 	else
 		osd_spi_write(0x7, 0x9C);                   // R : RTL Mode, lost signal
@@ -342,7 +342,7 @@ static void osd_update_values_phase_1(void)
 	curHeading.y = rmat[4];
 	earth_yaw = rect_to_polar(&curHeading);  // 0-255 (0=East,  ccw)
 
-	if (flags._.GPS_steering)
+	if (state_flags._.GPS_steering)
 	{
 		dir_to_goal = desired_dir - earth_yaw;
 		dist_to_goal = abs(tofinish_line);

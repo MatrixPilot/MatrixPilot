@@ -184,7 +184,7 @@ static void set_throttle_control(int16_t throttle)
 	int16_t throttleIn;
 	int16_t temp;
 
-	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch || filterManual)
+	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch || filterManual)
 	{
 		if (udb_flags._.radio_on == 1)
 		{
@@ -238,13 +238,13 @@ static void normalAltitudeCntrl(void)
 		throttleIn = udb_pwTrim[THROTTLE_INPUT_CHANNEL];
 		throttleInOffset = 0;
 	}
-	if (flags._.altitude_hold_throttle || flags._.altitude_hold_pitch)
+	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch)
 	{
 		if (THROTTLE_CHANNEL_REVERSED)
 		{
 			throttleInOffset = -throttleInOffset;
 		}
-		if (flags._.GPS_steering)
+		if (state_flags._.GPS_steering)
 		{
 			if (desired_behavior._.takeoff || desired_behavior._.altitude)
 			{
@@ -310,18 +310,18 @@ if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) {
 			}
 //#if (RACING_MODE == 1)
 if (RACING_MODE == 1) {
-			if (flags._.GPS_steering)
+			if (state_flags._.GPS_steering)
 			{
 				throttleAccum.WW = (int32_t)(FIXED_WP_THROTTLE);
 			}
 }
 //#endif
 		}
-		if (!flags._.altitude_hold_throttle)
+		if (!state_flags._.altitude_hold_throttle)
 		{
 			manualThrottle(throttleIn);
 		}
-		else if (flags._.GPS_steering && desired_behavior._.land)
+		else if (state_flags._.GPS_steering && desired_behavior._.land)
 		{
 			// place a ceiling, in other words, go down, but not up.
 			if (pitchAltitudeAdjust > 0)
@@ -341,7 +341,7 @@ if (RACING_MODE == 1) {
 			set_throttle_control(throttleFiltered._.W1 - throttleIn);
 			filterManual = true;
 		}
-		if (!flags._.altitude_hold_pitch)
+		if (!state_flags._.altitude_hold_pitch)
 		{
 			pitchAltitudeAdjust = 0;
 		}

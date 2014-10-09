@@ -793,22 +793,22 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 1;
 	if (mavlink_frequency_send(MAVLINK_RATE_HEARTBEAT, mavlink_counter_40hz + spread_transmission_load))
 	{
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+		if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 0)
 		{
 			mavlink_base_mode = MAV_MODE_MANUAL_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL;
 		}
-		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+		else if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 1)
 		{
 			mavlink_base_mode = MAV_MODE_GUIDED_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_STABILIZE;
 		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
+		else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		{
 			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_AUTONOMOUS;
 		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
+		else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		{
 			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED; // Return to Landing (lost contact with transmitter)
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_RTL;

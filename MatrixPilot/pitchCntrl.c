@@ -101,8 +101,8 @@ static void normalPitchCntrl(void)
 	fractional rmat8;
 
 #ifdef TestGains
-	flags._.GPS_steering = 0; // turn navigation off
-	flags._.pitch_feedback = 1; // turn stabilization on
+	state_flags._.GPS_steering = 0; // turn navigation off
+	state_flags._.pitch_feedback = 1; // turn stabilization on
 #endif
 	if (!canStabilizeInverted() || current_orientation != F_INVERTED)
 	{
@@ -118,7 +118,7 @@ static void normalPitchCntrl(void)
 		pitchAltitudeAdjust = -pitchAltitudeAdjust - INVNPITCH;
 	}
 	navElevMix = 0;
-	if (flags._.pitch_feedback)
+	if (state_flags._.pitch_feedback)
 	{
 		if (RUDDER_OUTPUT_CHANNEL != CHANNEL_UNUSED && RUDDER_INPUT_CHANNEL != CHANNEL_UNUSED) {
 			pitchAccum.WW = __builtin_mulsu(rmat6, rudderElevMixGain) << 1;
@@ -133,7 +133,7 @@ static void normalPitchCntrl(void)
 	pitchAccum.WW = (__builtin_mulss(rmat8, omegagyro[0])
 	               - __builtin_mulss(rmat6, omegagyro[2])) << 1;
 	pitchrate = pitchAccum._.W1;
-	if (!udb_flags._.radio_on && flags._.GPS_steering)
+	if (!udb_flags._.radio_on && state_flags._.GPS_steering)
 	{
 		rtlkick = RTLKICK;
 	}
@@ -144,7 +144,7 @@ static void normalPitchCntrl(void)
 #if (GLIDE_AIRSPEED_CONTROL == 1)
 	fractional aspd_pitch_adj = gliding_airspeed_pitch_adjust();
 #endif
-	if (PITCH_STABILIZATION && flags._.pitch_feedback)
+	if (PITCH_STABILIZATION && state_flags._.pitch_feedback)
 	{
 #if (GLIDE_AIRSPEED_CONTROL == 1)
 		pitchAccum.WW = __builtin_mulsu(rmat7 - rtlkick + aspd_pitch_adj + pitchAltitudeAdjust, pitchgain) 
@@ -168,7 +168,7 @@ static void hoverPitchCntrl(void)
 	int16_t manualPitchOffset;
 	int32_t pitchToWP;
 
-	if (flags._.pitch_feedback)
+	if (state_flags._.pitch_feedback)
 	{
 		pitchAccum.WW = (__builtin_mulss(-rmat[7], omegagyro[0])
 		               - __builtin_mulss(rmat[6], omegagyro[1])) << 1;
@@ -176,7 +176,7 @@ static void hoverPitchCntrl(void)
 		elevInput = (udb_flags._.radio_on == 1) ?
 		    REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0;
 		manualPitchOffset = elevInput * (int16_t)(RMAX/600);
-		if (flags._.GPS_steering)
+		if (state_flags._.GPS_steering)
 		{
 			pitchToWP = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS) ?
 			    HOVERPTOWP : (HOVERPTOWP / HOVER_NAV_MAX_PITCH_RADIUS * tofinish_line);

@@ -68,14 +68,14 @@ void setBehavior(int16_t newBehavior)
 
 boolean canStabilizeInverted(void)
 {
-	return ((INVERTED_FLIGHT_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-	        (INVERTED_FLIGHT_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
+	return ((INVERTED_FLIGHT_STABILIZED_MODE && (state_flags._.pitch_feedback && !state_flags._.GPS_steering)) ||
+	        (INVERTED_FLIGHT_WAYPOINT_MODE && (state_flags._.pitch_feedback && state_flags._.GPS_steering)));
 }
 
 boolean canStabilizeHover(void)
 {
-	return ((HOVERING_STABILIZED_MODE && (flags._.pitch_feedback && !flags._.GPS_steering)) ||
-	        (HOVERING_WAYPOINT_MODE && (flags._.pitch_feedback && flags._.GPS_steering)));
+	return ((HOVERING_STABILIZED_MODE && (state_flags._.pitch_feedback && !state_flags._.GPS_steering)) ||
+	        (HOVERING_WAYPOINT_MODE && (state_flags._.pitch_feedback && state_flags._.GPS_steering)));
 }
 
 void updateBehavior(void)
@@ -125,7 +125,7 @@ void updateBehavior(void)
 			current_orientation = F_NORMAL;
 		}
 	}
-	if (flags._.pitch_feedback && !flags._.GPS_steering)
+	if (state_flags._.pitch_feedback && !state_flags._.GPS_steering)
 	{
 		desired_behavior.W = current_orientation;
 	}

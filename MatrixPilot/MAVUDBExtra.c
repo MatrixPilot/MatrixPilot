@@ -113,15 +113,15 @@ void MAVUDBExtraOutput_40hz(void)
 					// It is not changed for now, to preserve close compatibility with origin SERIAL_UDB_EXTRA code.
 					if (tow.WW > 0) tow.WW += 250;
 
-					if (flags._.f13_print_req == 1)
+					if (state_flags._.f13_print_req == 1)
 					{
 						// The F13 line of telemetry is printed just once  when origin has been captured after GPS lock
 						mavlink_msg_serial_udb_extra_f13_send(MAVLINK_COMM_0, week_no.BB, lat_origin.WW, lon_origin.WW, alt_origin.WW);
-						flags._.f13_print_req = 0;
+						state_flags._.f13_print_req = 0;
 					}
 #if (MAG_YAW_DRIFT == 1)
 					mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW,
-					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + state_flags._.GPS_steering),
 					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 					    rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 					    (uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
@@ -130,7 +130,7 @@ void MAVUDBExtraOutput_40hz(void)
 					    svs, hdop);
 #else
 					mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW,
-					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + state_flags._.GPS_steering),
 					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 					    rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 					    (uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
@@ -157,7 +157,7 @@ void MAVUDBExtraOutput_40hz(void)
 						    pwIn_save[6], pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10],
 						    pwOut_save[1], pwOut_save[2], pwOut_save[3], pwOut_save[4], pwOut_save[5],
 						    pwOut_save[6], pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10],
-						    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1, flags.WW,
+						    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1, state_flags.WW,
 #if (SILSIM != 1)
 						    osc_fail_count,
 #else

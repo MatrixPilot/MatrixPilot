@@ -115,13 +115,13 @@ static void update_mp_mode(void)
 	int16_t mp_mode = 0;
 
 	// $P,mode,CRLF
-	if (!flags._.pitch_feedback)
+	if (!state_flags._.pitch_feedback)
 		mp_mode = 0;
-	else if (!flags._.GPS_steering)
+	else if (!state_flags._.GPS_steering)
 		mp_mode = 2;
-	else if (udb_flags._.radio_on && !flags._.rtl_hold)
+	else if (udb_flags._.radio_on && !state_flags._.rtl_hold)
 		mp_mode = 5;
-	else if (flags._.rtl_hold && udb_flags._.radio_on)
+	else if (state_flags._.rtl_hold && udb_flags._.radio_on)
 		mp_mode = 15;                       // H : RTL Hold, has signal
 	else if (!udb_flags._.radio_on)
 		mp_mode = 11;
