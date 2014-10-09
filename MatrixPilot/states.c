@@ -56,6 +56,9 @@ static void ent_returnS(void);
 
 void (*stateS)(void) = &startS;
 
+extern void init_cut_down(void) ;
+extern void cut_down_logic(void ) ;
+
 void init_states(void)
 {
 	DPRINT("init_states()\r\n");
@@ -65,6 +68,7 @@ void init_states(void)
 	dcm_flags._.dead_reckon_enable = 0;
 	flags._.update_autopilot_state_asap = 0;
 	stateS = &startS;
+	init_cut_down() ;
 }
 
 void udb_callback_radio_did_turn_off(void)
@@ -299,6 +303,7 @@ static void acquiringS(void)
 
 static void manualS(void)
 {
+	cut_down_logic() ;
 	if (udb_flags._.radio_on)
 	{
 		if (flight_mode_switch_waypoints() & dcm_flags._.nav_capable)
@@ -317,6 +322,7 @@ static void manualS(void)
 
 static void stabilizedS(void) 
 {
+	cut_down_logic() ;
 	if (udb_flags._.radio_on)
 	{
 		if (flight_mode_switch_waypoints() & dcm_flags._.nav_capable)
@@ -333,6 +339,7 @@ static void stabilizedS(void)
 
 static void waypointS(void)
 {
+	cut_down_logic() ;
 	udb_led_toggle(LED_RED);
 
 	if (udb_flags._.radio_on)
@@ -350,6 +357,7 @@ static void waypointS(void)
 
 static void returnS(void)
 {
+	cut_down_logic() ;
 	if (udb_flags._.radio_on)
 	{
 		if (flight_mode_switch_manual())
