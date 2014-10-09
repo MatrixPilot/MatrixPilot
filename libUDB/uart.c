@@ -19,7 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//#include "../MatrixPilot/defines.h"
 #include "libUDB.h"
 #include "oscillator.h"
 #include "uart.h"
@@ -37,6 +36,22 @@
 extern int __C30_UART;
 
 #if (CONSOLE_UART != 0) && (CONSOLE_UART != 9)
+
+#ifdef USE_BLUETOOTH_UART
+#define BAUDRATEX       9600UL
+#define BRGHX           0
+#else
+#define BAUDRATEX       115200UL
+#define BRGHX           1
+#endif
+
+#if (BRGHX == 0)
+	#define BRG_DIVX    16
+#elif (BRGHX == 1)
+	#define BRG_DIVX    4
+#else
+	#error Must select a valid BRGHX value
+#endif
 
 //******************************************************************************
 // Constants
