@@ -20,7 +20,10 @@ static void (* cut_down_state) (void) = &ascent ;
 
 void init_cut_down(void)
 {
-
+	cut_down_timer = CONFIRM_TIME ;
+	cut_down_state = &ascent ;
+	_LATA1 = 0 ; // initialize to be off
+	_TRISA1 = 0 ; // cut down output is on pin RA1
 }
 
 static void ascent(void)
@@ -55,6 +58,7 @@ static void confirm(void)
 static void start_cut_down(void)
 {
 	LED_BLUE = LED_ON ;
+	_LATA1 = 1 ;
 	if ( cut_down_timer-- == 0 )
 	{
 		cut_down_state = &end_cut_down ;
@@ -64,6 +68,7 @@ static void start_cut_down(void)
 static void end_cut_down(void)
 {
 	LED_BLUE = LED_OFF ;
+	_LATA1 = 0 ;
 	if ( cut_down_trigger == 0 )
 	{
 		cut_down_timer = CONFIRM_TIME ;
