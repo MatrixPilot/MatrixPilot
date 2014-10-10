@@ -42,6 +42,7 @@ static void confirm(void)
 {
 	if ( cut_down_trigger == 1)
 	{
+		LED_ORANGE = LED_ON ;
 		if ( cut_down_timer-- == 0 )
 		{
 			cut_down_timer = CUT_DOWN_PULSE_WIDTH ;
@@ -50,6 +51,7 @@ static void confirm(void)
 	}
 	else
 	{
+		LED_ORANGE = LED_OFF ;
 		cut_down_timer = CONFIRM_TIME ;
 		cut_down_state = &ascent ;
 	}
@@ -57,6 +59,7 @@ static void confirm(void)
 
 static void start_cut_down(void)
 {
+	LED_ORANGE = LED_OFF ;
 	LED_BLUE = LED_ON ;
 	_LATA1 = 1 ;
 	if ( cut_down_timer-- == 0 )
@@ -114,12 +117,10 @@ void cut_down_logic(void)
 	}
 	if ( cut_down_manual_input || ( udb_flags._.radio_on != 1 ))
 	{
-		LED_ORANGE = LED_ON ;
 		cut_down_trigger = 1 ;
 	}
 	else
 	{
-		LED_ORANGE = LED_OFF ;
 		cut_down_trigger = 0 ;
 	}
 	(* cut_down_state) () ; // execute state machine
