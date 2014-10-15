@@ -40,8 +40,7 @@
 
 int16_t tiltError[3] ;
 int16_t desiredRotationRateRadians[3] ;
-int16_t rotationRateError[3] ;
-
+int16_t rotationRateError[3] ;
 // helicalTurnCntrl determines the values of the elements of the bottom row of rmat
 // as well as the required rotation rates in the body frame that are required to make a coordinated turn.
 // The required values for the bottom row of rmat are placed in the vector desiredTilt.
@@ -195,7 +194,7 @@ void helicalTurnCntrl( void )
 #endif
 
 	//	Adjustment for inverted flight
-	if (!canStabilizeInverted() || current_orientation != F_INVERTED)
+	if (!canStabilizeInverted() || !desired_behavior._.inverted )
 	{
 		// normal flight
 		desiredTiltVector[1] =  - desiredPitch ;
