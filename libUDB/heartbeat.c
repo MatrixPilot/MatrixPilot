@@ -87,7 +87,7 @@ inline void heartbeat(void) // called from ISR
 // This is a good place to eventually compute pulse widths for servos.
 static void heartbeat_pulse(void)
 {
-	LED_BLUE = LED_OFF;     // indicates logfile activity
+	led_off(LED_BLUE);  // indicates logfile activity
 
 #if (NORADIO != 1)
 	// 20Hz testing of radio link

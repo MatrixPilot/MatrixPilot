@@ -84,7 +84,7 @@ void save_altitudeCntrlVariable(void);
 #define FP_WAYPOINTS                1
 #define FP_LOGO                     2
 
-// SERIAL_OUTPUT_FORMAT options
+// TELEMETRY_OUTPUT_FORMAT options
 #define SERIAL_NONE         0    // No serial data is sent
 #define SERIAL_DEBUG        1    // UAV Dev Board debug info
 #define SERIAL_ARDUSTATION  2    // Compatible with ArduStation
