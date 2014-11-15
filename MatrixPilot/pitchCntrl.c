@@ -63,7 +63,7 @@ void save_pitchCntrl(void)
 	gains.PitchKD        = (float)pitchkd           / (SCALEGYRO*RMAX);
 	gains.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
 	gains.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
-	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
+//	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
 	gains.RollElevMix    = (float)rollElevMixGain   / (RMAX);
 }
 #endif // USE_CONFIGFILE

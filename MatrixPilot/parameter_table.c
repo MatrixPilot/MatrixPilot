@@ -60,7 +60,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"PID_YAWKDAIL" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdail, sizeof(yawkdail) },
     {"PID_PITCHGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &pitchgain, sizeof(pitchgain) },
     {"PID_PITCHKD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &pitchkd, sizeof(pitchkd) },
-    {"PID_RUDELEVGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
+//    {"PID_RUDELEVGAIN" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
     {"PID_ROLLKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
     {"PID_YAWKPRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
     {"PID_YAWKDRUD" , {.param_float=0.0} , {.param_float=0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdrud, sizeof(yawkdrud) },

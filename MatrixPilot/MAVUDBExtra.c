@@ -73,11 +73,13 @@ void MAVUDBExtraOutput_40hz(void)
 				break;
 			case 4:
 				mavlink_msg_serial_udb_extra_f5_send(MAVLINK_COMM_0, YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD,
-				    YAW_STABILIZATION_AILERON, AILERON_BOOST);
+//				    YAW_STABILIZATION_AILERON, AILERON_BOOST);
+				    YAW_STABILIZATION_AILERON, 0);
 				mavlink_sue_telemetry_counter--;
 				break;
 			case 3:
-				mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_0, PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST);
+//				mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_0, PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST);
+				mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_0, PITCHGAIN, PITCHKD, 0, 0, ELEVATOR_BOOST);
 				mavlink_sue_telemetry_counter--;
 				break;
 			case 2:
