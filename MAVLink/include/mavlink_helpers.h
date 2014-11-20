@@ -10,6 +10,11 @@
 #define MAVLINK_HELPER
 #endif
 
+#ifdef USE_RING_BUFFER
+ 	static inline void setAndSaveIPL(int newIPL);
+ 	static inline void restoreIPL();
+#endif
+
 /*
  * Internal function to give access to the channel status for each channel
  */
@@ -19,6 +24,7 @@ MAVLINK_HELPER mavlink_status_t* mavlink_get_channel_status(uint8_t chan)
 #ifdef MAVLINK_EXTERNAL_RX_STATUS
 	// No m_mavlink_status array defined in function,
 	// has to be defined externally
+        extern mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 #else
 	static mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 #endif
