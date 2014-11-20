@@ -51,16 +51,16 @@ void init_yawCntrl(void)
 	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_yawCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKDRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
 	gains.RollKPRudder = (float)rollkprud  / (RMAX);
 	gains.RollKDRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
 	gains.HoverYawKP   = (float)hoveryawkp / (RMAX);
 	gains.HoverYawKD   = (float)hoveryawkd / (SCALEGYRO*RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 void yawCntrl(void)
 {

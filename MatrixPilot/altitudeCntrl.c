@@ -90,9 +90,9 @@ void init_altitudeCntrl(void)
 	desiredSpeed          = DESIRED_SPEED * 10; // Stored in 10ths of meters per second
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_altitudeCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 //	gains.YawKDAileron = yawkdail / (SCALEGYRO*RMAX);
 	gains.HeightTargetMax = height_target_max;
 	gains.HeightTargetMin = height_target_min;
@@ -102,8 +102,8 @@ void save_altitudeCntrl(void)
 	gains.AltHoldPitchMax = alt_hold_pitch_max;
 	gains.AltHoldPitchHigh = alt_hold_pitch_high;
 //	desiredSpeed / 10;
-}
 #endif // USE_CONFIGFILE
+}
 
 #if (SPEED_CONTROL == 1)  // speed control loop
 

@@ -66,17 +66,17 @@ void init_pitchCntrl(void)
 	rollElevMixGain = (uint16_t)(ROLL_ELEV_MIX*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_pitchCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.Pitchgain      = (float)pitchgain         / (RMAX);
 	gains.PitchKD        = (float)pitchkd           / (SCALEGYRO*RMAX);
 	gains.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
 	gains.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
 	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
 	gains.RollElevMix    = (float)rollElevMixGain   / (RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 void pitchCntrl(void)
 {
