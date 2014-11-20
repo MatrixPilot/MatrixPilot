@@ -818,8 +818,10 @@ MAV_AUTOPILOT_ARMAZILA = 15 # Armazila -- http://armazila.com
 enums['MAV_AUTOPILOT'][15] = EnumEntry('MAV_AUTOPILOT_ARMAZILA', '''Armazila -- http://armazila.com''')
 MAV_AUTOPILOT_AEROB = 16 # Aerob -- http://aerob.ru
 enums['MAV_AUTOPILOT'][16] = EnumEntry('MAV_AUTOPILOT_AEROB', '''Aerob -- http://aerob.ru''')
-MAV_AUTOPILOT_ENUM_END = 17 # 
-enums['MAV_AUTOPILOT'][17] = EnumEntry('MAV_AUTOPILOT_ENUM_END', '''''')
+MAV_AUTOPILOT_ASLUAV = 17 # ASLUAV autopilot -- http://www.asl.ethz.ch
+enums['MAV_AUTOPILOT'][17] = EnumEntry('MAV_AUTOPILOT_ASLUAV', '''ASLUAV autopilot -- http://www.asl.ethz.ch''')
+MAV_AUTOPILOT_ENUM_END = 18 # 
+enums['MAV_AUTOPILOT'][18] = EnumEntry('MAV_AUTOPILOT_ENUM_END', '''''')
 
 # MAV_TYPE
 enums['MAV_TYPE'] = {}
@@ -1615,11 +1617,12 @@ MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE = 102
 MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE = 103
 MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE = 104
 MAVLINK_MSG_ID_HIGHRES_IMU = 105
-MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW = 106
+MAVLINK_MSG_ID_OPTICAL_FLOW_RAD = 106
 MAVLINK_MSG_ID_HIL_SENSOR = 107
 MAVLINK_MSG_ID_SIM_STATE = 108
 MAVLINK_MSG_ID_RADIO_STATUS = 109
 MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL = 110
+MAVLINK_MSG_ID_TIMESYNC = 111
 MAVLINK_MSG_ID_HIL_GPS = 113
 MAVLINK_MSG_ID_HIL_OPTICAL_FLOW = 114
 MAVLINK_MSG_ID_HIL_STATE_QUATERNION = 115
@@ -3668,23 +3671,29 @@ class MAVLink_highres_imu_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 93, struct.pack('<QfffffffffffffH', self.time_usec, self.xacc, self.yacc, self.zacc, self.xgyro, self.ygyro, self.zgyro, self.xmag, self.ymag, self.zmag, self.abs_pressure, self.diff_pressure, self.pressure_alt, self.temperature, self.fields_updated))
 
-class MAVLink_omnidirectional_flow_message(MAVLink_message):
+class MAVLink_optical_flow_rad_message(MAVLink_message):
         '''
-        Optical flow from an omnidirectional flow sensor (e.g. PX4FLOW
-        with wide angle lens)
+        Optical flow from an angular rate flow sensor (e.g. PX4FLOW or
+        mouse sensor)
         '''
-        def __init__(self, time_usec, sensor_id, left, right, quality, front_distance_m):
-                MAVLink_message.__init__(self, MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW, 'OMNIDIRECTIONAL_FLOW')
-                self._fieldnames = ['time_usec', 'sensor_id', 'left', 'right', 'quality', 'front_distance_m']
+        def __init__(self, time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_OPTICAL_FLOW_RAD, 'OPTICAL_FLOW_RAD')
+                self._fieldnames = ['time_usec', 'sensor_id', 'integration_time_us', 'integrated_x', 'integrated_y', 'integrated_xgyro', 'integrated_ygyro', 'integrated_zgyro', 'temperature', 'quality', 'time_delta_distance_us', 'distance']
                 self.time_usec = time_usec
                 self.sensor_id = sensor_id
-                self.left = left
-                self.right = right
+                self.integration_time_us = integration_time_us
+                self.integrated_x = integrated_x
+                self.integrated_y = integrated_y
+                self.integrated_xgyro = integrated_xgyro
+                self.integrated_ygyro = integrated_ygyro
+                self.integrated_zgyro = integrated_zgyro
+                self.temperature = temperature
                 self.quality = quality
-                self.front_distance_m = front_distance_m
+                self.time_delta_distance_us = time_delta_distance_us
+                self.distance = distance
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 211, struct.pack('<Qf10h10hBB', self.time_usec, self.front_distance_m, self.left[0], self.left[1], self.left[2], self.left[3], self.left[4], self.left[5], self.left[6], self.left[7], self.left[8], self.left[9], self.right[0], self.right[1], self.right[2], self.right[3], self.right[4], self.right[5], self.right[6], self.right[7], self.right[8], self.right[9], self.sensor_id, self.quality))
+                return MAVLink_message.pack(self, mav, 138, struct.pack('<QIfffffIfhBB', self.time_usec, self.integration_time_us, self.integrated_x, self.integrated_y, self.integrated_xgyro, self.integrated_ygyro, self.integrated_zgyro, self.time_delta_distance_us, self.distance, self.temperature, self.sensor_id, self.quality))
 
 class MAVLink_hil_sensor_message(MAVLink_message):
         '''
@@ -3777,6 +3786,19 @@ class MAVLink_file_transfer_protocol_message(MAVLink_message):
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 84, struct.pack('<BBB251B', self.target_network, self.target_system, self.target_component, self.payload[0], self.payload[1], self.payload[2], self.payload[3], self.payload[4], self.payload[5], self.payload[6], self.payload[7], self.payload[8], self.payload[9], self.payload[10], self.payload[11], self.payload[12], self.payload[13], self.payload[14], self.payload[15], self.payload[16], self.payload[17], self.payload[18], self.payload[19], self.payload[20], self.payload[21], self.payload[22], self.payload[23], self.payload[24], self.payload[25], self.payload[26], self.payload[27], self.payload[28], self.payload[29], self.payload[30], self.payload[31], self.payload[32], self.payload[33], self.payload[34], self.payload[35], self.payload[36], self.payload[37], self.payload[38], self.payload[39], self.payload[40], self.payload[41], self.payload[42], self.payload[43], self.payload[44], self.payload[45], self.payload[46], self.payload[47], self.payload[48], self.payload[49], self.payload[50], self.payload[51], self.payload[52], self.payload[53], self.payload[54], self.payload[55], self.payload[56], self.payload[57], self.payload[58], self.payload[59], self.payload[60], self.payload[61], self.payload[62], self.payload[63], self.payload[64], self.payload[65], self.payload[66], self.payload[67], self.payload[68], self.payload[69], self.payload[70], self.payload[71], self.payload[72], self.payload[73], self.payload[74], self.payload[75], self.payload[76], self.payload[77], self.payload[78], self.payload[79], self.payload[80], self.payload[81], self.payload[82], self.payload[83], self.payload[84], self.payload[85], self.payload[86], self.payload[87], self.payload[88], self.payload[89], self.payload[90], self.payload[91], self.payload[92], self.payload[93], self.payload[94], self.payload[95], self.payload[96], self.payload[97], self.payload[98], self.payload[99], self.payload[100], self.payload[101], self.payload[102], self.payload[103], self.payload[104], self.payload[105], self.payload[106], self.payload[107], self.payload[108], self.payload[109], self.payload[110], self.payload[111], self.payload[112], self.payload[113], self.payload[114], self.payload[115], self.payload[116], self.payload[117], self.payload[118], self.payload[119], self.payload[120], self.payload[121], self.payload[122], self.payload[123], self.payload[124], self.payload[125], self.payload[126], self.payload[127], self.payload[128], self.payload[129], self.payload[130], self.payload[131], self.payload[132], self.payload[133], self.payload[134], self.payload[135], self.payload[136], self.payload[137], self.payload[138], self.payload[139], self.payload[140], self.payload[141], self.payload[142], self.payload[143], self.payload[144], self.payload[145], self.payload[146], self.payload[147], self.payload[148], self.payload[149], self.payload[150], self.payload[151], self.payload[152], self.payload[153], self.payload[154], self.payload[155], self.payload[156], self.payload[157], self.payload[158], self.payload[159], self.payload[160], self.payload[161], self.payload[162], self.payload[163], self.payload[164], self.payload[165], self.payload[166], self.payload[167], self.payload[168], self.payload[169], self.payload[170], self.payload[171], self.payload[172], self.payload[173], self.payload[174], self.payload[175], self.payload[176], self.payload[177], self.payload[178], self.payload[179], self.payload[180], self.payload[181], self.payload[182], self.payload[183], self.payload[184], self.payload[185], self.payload[186], self.payload[187], self.payload[188], self.payload[189], self.payload[190], self.payload[191], self.payload[192], self.payload[193], self.payload[194], self.payload[195], self.payload[196], self.payload[197], self.payload[198], self.payload[199], self.payload[200], self.payload[201], self.payload[202], self.payload[203], self.payload[204], self.payload[205], self.payload[206], self.payload[207], self.payload[208], self.payload[209], self.payload[210], self.payload[211], self.payload[212], self.payload[213], self.payload[214], self.payload[215], self.payload[216], self.payload[217], self.payload[218], self.payload[219], self.payload[220], self.payload[221], self.payload[222], self.payload[223], self.payload[224], self.payload[225], self.payload[226], self.payload[227], self.payload[228], self.payload[229], self.payload[230], self.payload[231], self.payload[232], self.payload[233], self.payload[234], self.payload[235], self.payload[236], self.payload[237], self.payload[238], self.payload[239], self.payload[240], self.payload[241], self.payload[242], self.payload[243], self.payload[244], self.payload[245], self.payload[246], self.payload[247], self.payload[248], self.payload[249], self.payload[250]))
 
+class MAVLink_timesync_message(MAVLink_message):
+        '''
+        Time synchronization message.
+        '''
+        def __init__(self, tc1, ts1):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_TIMESYNC, 'TIMESYNC')
+                self._fieldnames = ['tc1', 'ts1']
+                self.tc1 = tc1
+                self.ts1 = ts1
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 34, struct.pack('<qq', self.tc1, self.ts1))
+
 class MAVLink_hil_gps_message(MAVLink_message):
         '''
         The global position, as returned by the Global Positioning
@@ -3807,23 +3829,27 @@ class MAVLink_hil_gps_message(MAVLink_message):
 
 class MAVLink_hil_optical_flow_message(MAVLink_message):
         '''
-        Simulated optical flow from a flow sensor (e.g. optical mouse
-        sensor)
+        Simulated optical flow from a flow sensor (e.g. PX4FLOW or
+        optical mouse sensor)
         '''
-        def __init__(self, time_usec, sensor_id, flow_x, flow_y, flow_comp_m_x, flow_comp_m_y, quality, ground_distance):
+        def __init__(self, time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance):
                 MAVLink_message.__init__(self, MAVLINK_MSG_ID_HIL_OPTICAL_FLOW, 'HIL_OPTICAL_FLOW')
-                self._fieldnames = ['time_usec', 'sensor_id', 'flow_x', 'flow_y', 'flow_comp_m_x', 'flow_comp_m_y', 'quality', 'ground_distance']
+                self._fieldnames = ['time_usec', 'sensor_id', 'integration_time_us', 'integrated_x', 'integrated_y', 'integrated_xgyro', 'integrated_ygyro', 'integrated_zgyro', 'temperature', 'quality', 'time_delta_distance_us', 'distance']
                 self.time_usec = time_usec
                 self.sensor_id = sensor_id
-                self.flow_x = flow_x
-                self.flow_y = flow_y
-                self.flow_comp_m_x = flow_comp_m_x
-                self.flow_comp_m_y = flow_comp_m_y
+                self.integration_time_us = integration_time_us
+                self.integrated_x = integrated_x
+                self.integrated_y = integrated_y
+                self.integrated_xgyro = integrated_xgyro
+                self.integrated_ygyro = integrated_ygyro
+                self.integrated_zgyro = integrated_zgyro
+                self.temperature = temperature
                 self.quality = quality
-                self.ground_distance = ground_distance
+                self.time_delta_distance_us = time_delta_distance_us
+                self.distance = distance
 
         def pack(self, mav):
-                return MAVLink_message.pack(self, mav, 119, struct.pack('<QfffhhBB', self.time_usec, self.flow_comp_m_x, self.flow_comp_m_y, self.ground_distance, self.flow_x, self.flow_y, self.sensor_id, self.quality))
+                return MAVLink_message.pack(self, mav, 237, struct.pack('<QIfffffIfhBB', self.time_usec, self.integration_time_us, self.integrated_x, self.integrated_y, self.integrated_xgyro, self.integrated_ygyro, self.integrated_zgyro, self.time_delta_distance_us, self.distance, self.temperature, self.sensor_id, self.quality))
 
 class MAVLink_hil_state_quaternion_message(MAVLink_message):
         '''
@@ -4460,13 +4486,14 @@ mavlink_map = {
         MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE : ( '<Qfff', MAVLink_vision_speed_estimate_message, [0, 1, 2, 3], [1, 1, 1, 1], 208 ),
         MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE : ( '<Qffffff', MAVLink_vicon_position_estimate_message, [0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 1, 1, 1, 1], 56 ),
         MAVLINK_MSG_ID_HIGHRES_IMU : ( '<QfffffffffffffH', MAVLink_highres_imu_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 93 ),
-        MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW : ( '<Qf10h10hBB', MAVLink_omnidirectional_flow_message, [0, 4, 2, 3, 5, 1], [1, 1, 10, 10, 1, 1], 211 ),
+        MAVLINK_MSG_ID_OPTICAL_FLOW_RAD : ( '<QIfffffIfhBB', MAVLink_optical_flow_rad_message, [0, 10, 1, 2, 3, 4, 5, 6, 9, 11, 7, 8], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 138 ),
         MAVLINK_MSG_ID_HIL_SENSOR : ( '<QfffffffffffffI', MAVLink_hil_sensor_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 108 ),
         MAVLINK_MSG_ID_SIM_STATE : ( '<fffffffffffffffffffff', MAVLink_sim_state_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 32 ),
         MAVLINK_MSG_ID_RADIO_STATUS : ( '<HHBBBBB', MAVLink_radio_status_message, [2, 3, 4, 5, 6, 0, 1], [1, 1, 1, 1, 1, 1, 1], 185 ),
         MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL : ( '<BBB251B', MAVLink_file_transfer_protocol_message, [0, 1, 2, 3], [1, 1, 1, 251], 84 ),
+        MAVLINK_MSG_ID_TIMESYNC : ( '<qq', MAVLink_timesync_message, [0, 1], [1, 1], 34 ),
         MAVLINK_MSG_ID_HIL_GPS : ( '<QiiiHHHhhhHBB', MAVLink_hil_gps_message, [0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 124 ),
-        MAVLINK_MSG_ID_HIL_OPTICAL_FLOW : ( '<QfffhhBB', MAVLink_hil_optical_flow_message, [0, 6, 4, 5, 1, 2, 7, 3], [1, 1, 1, 1, 1, 1, 1, 1], 119 ),
+        MAVLINK_MSG_ID_HIL_OPTICAL_FLOW : ( '<QIfffffIfhBB', MAVLink_hil_optical_flow_message, [0, 10, 1, 2, 3, 4, 5, 6, 9, 11, 7, 8], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 237 ),
         MAVLINK_MSG_ID_HIL_STATE_QUATERNION : ( '<Q4ffffiiihhhHHhhh', MAVLink_hil_state_quaternion_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 4 ),
         MAVLINK_MSG_ID_SCALED_IMU2 : ( '<Ihhhhhhhhh', MAVLink_scaled_imu2_message, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 76 ),
         MAVLINK_MSG_ID_LOG_REQUEST_LIST : ( '<HHBB', MAVLink_log_request_list_message, [2, 3, 0, 1], [1, 1, 1, 1], 128 ),
@@ -5816,7 +5843,7 @@ class MAVLink(object):
                 to measure the system latencies, including serial
                 port, radio modem and UDP connections.
 
-                time_usec                 : Unix timestamp in microseconds (uint64_t)
+                time_usec                 : Unix timestamp in microseconds or since system boot if smaller than MAVLink epoch (1.1.2009) (uint64_t)
                 seq                       : PING sequence (uint32_t)
                 target_system             : 0: request ping from all receiving systems, if greater than 0: message is a ping response and number is the system id of the requesting system (uint8_t)
                 target_component          : 0: request ping from all receiving components, if greater than 0: message is a ping response and number is the system id of the requesting system (uint8_t)
@@ -5832,7 +5859,7 @@ class MAVLink(object):
                 to measure the system latencies, including serial
                 port, radio modem and UDP connections.
 
-                time_usec                 : Unix timestamp in microseconds (uint64_t)
+                time_usec                 : Unix timestamp in microseconds or since system boot if smaller than MAVLink epoch (1.1.2009) (uint64_t)
                 seq                       : PING sequence (uint32_t)
                 target_system             : 0: request ping from all receiving systems, if greater than 0: message is a ping response and number is the system id of the requesting system (uint8_t)
                 target_component          : 0: request ping from all receiving components, if greater than 0: message is a ping response and number is the system id of the requesting system (uint8_t)
@@ -8358,37 +8385,49 @@ class MAVLink(object):
                 '''
                 return self.send(self.highres_imu_encode(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, abs_pressure, diff_pressure, pressure_alt, temperature, fields_updated))
 
-        def omnidirectional_flow_encode(self, time_usec, sensor_id, left, right, quality, front_distance_m):
+        def optical_flow_rad_encode(self, time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance):
                 '''
-                Optical flow from an omnidirectional flow sensor (e.g. PX4FLOW with
-                wide angle lens)
+                Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse
+                sensor)
 
                 time_usec                 : Timestamp (microseconds, synced to UNIX time or since system boot) (uint64_t)
                 sensor_id                 : Sensor ID (uint8_t)
-                left                      : Flow in deci pixels (1 = 0.1 pixel) on left hemisphere (int16_t)
-                right                     : Flow in deci pixels (1 = 0.1 pixel) on right hemisphere (int16_t)
-                quality                   : Optical flow quality / confidence. 0: bad, 255: maximum quality (uint8_t)
-                front_distance_m          : Front distance in meters. Positive value (including zero): distance known. Negative value: Unknown distance (float)
+                integration_time_us        : Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the. (uint32_t)
+                integrated_x              : Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.) (float)
+                integrated_y              : Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.) (float)
+                integrated_xgyro          : RH rotation around X axis (rad) (float)
+                integrated_ygyro          : RH rotation around Y axis (rad) (float)
+                integrated_zgyro          : RH rotation around Z axis (rad) (float)
+                temperature               : Temperature * 100 in centi-degrees Celsius (int16_t)
+                quality                   : Optical flow quality / confidence. 0: no valid flow, 255: maximum quality (uint8_t)
+                time_delta_distance_us        : Time in microseconds since the distance was sampled. (uint32_t)
+                distance                  : Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance. (float)
 
                 '''
-                msg = MAVLink_omnidirectional_flow_message(time_usec, sensor_id, left, right, quality, front_distance_m)
+                msg = MAVLink_optical_flow_rad_message(time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance)
                 msg.pack(self)
                 return msg
 
-        def omnidirectional_flow_send(self, time_usec, sensor_id, left, right, quality, front_distance_m):
+        def optical_flow_rad_send(self, time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance):
                 '''
-                Optical flow from an omnidirectional flow sensor (e.g. PX4FLOW with
-                wide angle lens)
+                Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse
+                sensor)
 
                 time_usec                 : Timestamp (microseconds, synced to UNIX time or since system boot) (uint64_t)
                 sensor_id                 : Sensor ID (uint8_t)
-                left                      : Flow in deci pixels (1 = 0.1 pixel) on left hemisphere (int16_t)
-                right                     : Flow in deci pixels (1 = 0.1 pixel) on right hemisphere (int16_t)
-                quality                   : Optical flow quality / confidence. 0: bad, 255: maximum quality (uint8_t)
-                front_distance_m          : Front distance in meters. Positive value (including zero): distance known. Negative value: Unknown distance (float)
+                integration_time_us        : Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the. (uint32_t)
+                integrated_x              : Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.) (float)
+                integrated_y              : Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.) (float)
+                integrated_xgyro          : RH rotation around X axis (rad) (float)
+                integrated_ygyro          : RH rotation around Y axis (rad) (float)
+                integrated_zgyro          : RH rotation around Z axis (rad) (float)
+                temperature               : Temperature * 100 in centi-degrees Celsius (int16_t)
+                quality                   : Optical flow quality / confidence. 0: no valid flow, 255: maximum quality (uint8_t)
+                time_delta_distance_us        : Time in microseconds since the distance was sampled. (uint32_t)
+                distance                  : Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance. (float)
 
                 '''
-                return self.send(self.omnidirectional_flow_encode(time_usec, sensor_id, left, right, quality, front_distance_m))
+                return self.send(self.optical_flow_rad_encode(time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance))
 
         def hil_sensor_encode(self, time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, abs_pressure, diff_pressure, pressure_alt, temperature, fields_updated):
                 '''
@@ -8556,6 +8595,28 @@ class MAVLink(object):
                 '''
                 return self.send(self.file_transfer_protocol_encode(target_network, target_system, target_component, payload))
 
+        def timesync_encode(self, tc1, ts1):
+                '''
+                Time synchronization message.
+
+                tc1                       : Time sync timestamp 1 (int64_t)
+                ts1                       : Time sync timestamp 2 (int64_t)
+
+                '''
+                msg = MAVLink_timesync_message(tc1, ts1)
+                msg.pack(self)
+                return msg
+
+        def timesync_send(self, tc1, ts1):
+                '''
+                Time synchronization message.
+
+                tc1                       : Time sync timestamp 1 (int64_t)
+                ts1                       : Time sync timestamp 2 (int64_t)
+
+                '''
+                return self.send(self.timesync_encode(tc1, ts1))
+
         def hil_gps_encode(self, time_usec, fix_type, lat, lon, alt, eph, epv, vel, vn, ve, vd, cog, satellites_visible):
                 '''
                 The global position, as returned by the Global Positioning System
@@ -8610,39 +8671,49 @@ class MAVLink(object):
                 '''
                 return self.send(self.hil_gps_encode(time_usec, fix_type, lat, lon, alt, eph, epv, vel, vn, ve, vd, cog, satellites_visible))
 
-        def hil_optical_flow_encode(self, time_usec, sensor_id, flow_x, flow_y, flow_comp_m_x, flow_comp_m_y, quality, ground_distance):
+        def hil_optical_flow_encode(self, time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance):
                 '''
-                Simulated optical flow from a flow sensor (e.g. optical mouse sensor)
+                Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical
+                mouse sensor)
 
-                time_usec                 : Timestamp (UNIX) (uint64_t)
+                time_usec                 : Timestamp (microseconds, synced to UNIX time or since system boot) (uint64_t)
                 sensor_id                 : Sensor ID (uint8_t)
-                flow_x                    : Flow in pixels in x-sensor direction (int16_t)
-                flow_y                    : Flow in pixels in y-sensor direction (int16_t)
-                flow_comp_m_x             : Flow in meters in x-sensor direction, angular-speed compensated (float)
-                flow_comp_m_y             : Flow in meters in y-sensor direction, angular-speed compensated (float)
-                quality                   : Optical flow quality / confidence. 0: bad, 255: maximum quality (uint8_t)
-                ground_distance           : Ground distance in meters. Positive value: distance known. Negative value: Unknown distance (float)
+                integration_time_us        : Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the. (uint32_t)
+                integrated_x              : Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.) (float)
+                integrated_y              : Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.) (float)
+                integrated_xgyro          : RH rotation around X axis (rad) (float)
+                integrated_ygyro          : RH rotation around Y axis (rad) (float)
+                integrated_zgyro          : RH rotation around Z axis (rad) (float)
+                temperature               : Temperature * 100 in centi-degrees Celsius (int16_t)
+                quality                   : Optical flow quality / confidence. 0: no valid flow, 255: maximum quality (uint8_t)
+                time_delta_distance_us        : Time in microseconds since the distance was sampled. (uint32_t)
+                distance                  : Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance. (float)
 
                 '''
-                msg = MAVLink_hil_optical_flow_message(time_usec, sensor_id, flow_x, flow_y, flow_comp_m_x, flow_comp_m_y, quality, ground_distance)
+                msg = MAVLink_hil_optical_flow_message(time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance)
                 msg.pack(self)
                 return msg
 
-        def hil_optical_flow_send(self, time_usec, sensor_id, flow_x, flow_y, flow_comp_m_x, flow_comp_m_y, quality, ground_distance):
+        def hil_optical_flow_send(self, time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance):
                 '''
-                Simulated optical flow from a flow sensor (e.g. optical mouse sensor)
+                Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical
+                mouse sensor)
 
-                time_usec                 : Timestamp (UNIX) (uint64_t)
+                time_usec                 : Timestamp (microseconds, synced to UNIX time or since system boot) (uint64_t)
                 sensor_id                 : Sensor ID (uint8_t)
-                flow_x                    : Flow in pixels in x-sensor direction (int16_t)
-                flow_y                    : Flow in pixels in y-sensor direction (int16_t)
-                flow_comp_m_x             : Flow in meters in x-sensor direction, angular-speed compensated (float)
-                flow_comp_m_y             : Flow in meters in y-sensor direction, angular-speed compensated (float)
-                quality                   : Optical flow quality / confidence. 0: bad, 255: maximum quality (uint8_t)
-                ground_distance           : Ground distance in meters. Positive value: distance known. Negative value: Unknown distance (float)
+                integration_time_us        : Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the. (uint32_t)
+                integrated_x              : Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.) (float)
+                integrated_y              : Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.) (float)
+                integrated_xgyro          : RH rotation around X axis (rad) (float)
+                integrated_ygyro          : RH rotation around Y axis (rad) (float)
+                integrated_zgyro          : RH rotation around Z axis (rad) (float)
+                temperature               : Temperature * 100 in centi-degrees Celsius (int16_t)
+                quality                   : Optical flow quality / confidence. 0: no valid flow, 255: maximum quality (uint8_t)
+                time_delta_distance_us        : Time in microseconds since the distance was sampled. (uint32_t)
+                distance                  : Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance. (float)
 
                 '''
-                return self.send(self.hil_optical_flow_encode(time_usec, sensor_id, flow_x, flow_y, flow_comp_m_x, flow_comp_m_y, quality, ground_distance))
+                return self.send(self.hil_optical_flow_encode(time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance))
 
         def hil_state_quaternion_encode(self, time_usec, attitude_quaternion, rollspeed, pitchspeed, yawspeed, lat, lon, alt, vx, vy, vz, ind_airspeed, true_airspeed, xacc, yacc, zacc):
                 '''
