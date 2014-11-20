@@ -4,4 +4,4 @@ https://github.com/mavlink/mavlink
 The MAVproxy code was downloded from
 https://github.com/tridge/MAVProxy
 
-on 20th December 2012
+Thu 20 Nov 2014 16:15:45 GMT

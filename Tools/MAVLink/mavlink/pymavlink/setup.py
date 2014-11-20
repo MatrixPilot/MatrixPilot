@@ -1,7 +1,7 @@
 from distutils.core import setup, Extension
-import glob, os, shutil
+import glob, os, shutil, fnmatch
 
-version = '1.1.30'
+version = '1.1.36'
 
 from generator import mavgen, mavparse
 
@@ -22,11 +22,17 @@ if not "NOGEN" in os.environ:
 
     for xml in v09_dialects:
         dialect = os.path.basename(xml)[:-4]
+        wildcard = os.getenv("MAVLINK_DIALECT",'*')
+        if not fnmatch.fnmatch(dialect, wildcard):
+            continue
         print("Building %s" % xml)
         mavgen.mavgen_python_dialect(dialect, mavparse.PROTOCOL_0_9)
 
     for xml in v10_dialects:
         dialect = os.path.basename(xml)[:-4]
+        wildcard = os.getenv("MAVLINK_DIALECT",'*')
+        if not fnmatch.fnmatch(dialect, wildcard):
+            continue
         print("Building %s" % xml)
         mavgen.mavgen_python_dialect(dialect, mavparse.PROTOCOL_1_0)
 
@@ -47,8 +53,8 @@ setup (name = 'pymavlink',
        package_dir = { 'pymavlink' : '.' },
        package_data = { 'pymavlink.dialects.v09' : ['*.xml'],
                         'pymavlink.dialects.v10' : ['*.xml'],
-                        'pymavlink.generator'    : [ '*.xsd' ],
-                        'pymavlink.generator'    : [ 'C/include_v0.9/*.h',
+                        'pymavlink.generator'    : [ '*.xsd',
+                                                     'C/include_v0.9/*.h',
                                                      'C/include_v1.0/*.h',
                                                      'C/include_v1.0/*.hpp' ],
                         'pymavlink.generator.lib.minixsv': [ '*.xsd' ] },

@@ -17,7 +17,7 @@ def generate_version_h(directory, xml):
     t.write(f,'''
 /** @file
  *	@brief MAVLink comm protocol built from ${basename}.xml
- *	@see http://pixhawk.ethz.ch/software/mavlink
+ *	@see http://mavlink.org
  */
 #ifndef MAVLINK_VERSION_H
 #define MAVLINK_VERSION_H
@@ -36,7 +36,7 @@ def generate_mavlink_h(directory, xml):
     t.write(f,'''
 /** @file
  *	@brief MAVLink comm protocol built from ${basename}.xml
- *	@see http://pixhawk.ethz.ch/software/mavlink
+ *	@see http://mavlink.org
  */
 #ifndef MAVLINK_H
 #define MAVLINK_H
@@ -70,13 +70,13 @@ def generate_main_h(directory, xml):
     t.write(f, '''
 /** @file
  *	@brief MAVLink comm protocol generated from ${basename}.xml
- *	@see http://qgroundcontrol.org/mavlink/
+ *	@see http://mavlink.org
  */
-#ifndef ${basename_upper}_H
-#define ${basename_upper}_H
+#ifndef MAVLINK_${basename_upper}_H
+#define MAVLINK_${basename_upper}_H
 
 #ifndef MAVLINK_H
-    #error Wrong include order: ${basename_upper}.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
+    #error Wrong include order: MAVLINK_${basename_upper}.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
 #endif
 
 #ifdef __cplusplus
@@ -136,7 +136,7 @@ ${{message:#include "./mavlink_msg_${name_lower}.h"
 #ifdef __cplusplus
 }
 #endif // __cplusplus
-#endif // ${basename_upper}_H
+#endif // MAVLINK_${basename_upper}_H
 ''', xml)
 
     f.close()
@@ -421,8 +421,8 @@ static void mavlink_test_${name_lower}(uint8_t system_id, uint8_t component_id, 
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_${name_lower}_t packet_in = {
-		${{ordered_fields:${c_test_value},
-	}}};
+		${{ordered_fields:${c_test_value},}}
+    };
 	mavlink_${name_lower}_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
         ${{scalar_fields:	packet1.${name} = packet_in.${name};
@@ -477,42 +477,17 @@ ${{message:	mavlink_test_${name_lower}(system_id, component_id, last_msg);
 def copy_fixed_headers(directory, xml):
     '''copy the fixed protocol headers to the target directory'''
     import shutil
-    hlist = [ 'protocol.h', 'mavlink_helpers.h', 'mavlink_types.h', 'checksum.h', 'mavlink_conversions.h', 'mavlink_protobuf_manager.hpp' ]
+    hlist = [ 'protocol.h', 'mavlink_helpers.h', 'mavlink_types.h', 'checksum.h', 'mavlink_conversions.h' ]
     basepath = os.path.dirname(os.path.realpath(__file__))
     srcpath = os.path.join(basepath, 'C/include_v%s' % xml.wire_protocol_version)
     print("Copying fixed headers")
     for h in hlist:
-        if (not ((h == 'mavlink_protobuf_manager.hpp' or h == 'mavlink_conversions.h') and xml.wire_protocol_version == '0.9')):
+        if (not ((h == 'mavlink_conversions.h') and xml.wire_protocol_version == '0.9')):
            src = os.path.realpath(os.path.join(srcpath, h))
            dest = os.path.realpath(os.path.join(directory, h))
            if src == dest:
                continue
            shutil.copy(src, dest)
-    # XXX This is a hack - to be removed
-    if (xml.basename == 'pixhawk' and xml.wire_protocol_version == '1.0'):
-        h = 'pixhawk/pixhawk.pb.h'
-        src = os.path.realpath(os.path.join(srcpath, h))
-        dest = os.path.realpath(os.path.join(directory, h))
-        if src != dest:
-            shutil.copy(src, dest)
-        
-def copy_fixed_sources(directory, xml):
-    # XXX This is a hack - to be removed
-    import shutil
-    basepath = os.path.dirname(os.path.realpath(__file__))
-    srcpath = os.path.join(basepath, 'C/src_v%s' % xml.wire_protocol_version)
-    if (xml.basename == 'pixhawk' and xml.wire_protocol_version == '1.0'):
-        print("Copying fixed sources")
-        src = os.path.realpath(os.path.join(srcpath, 'pixhawk/pixhawk.pb.cc'))
-        dest = os.path.realpath(os.path.join(directory, '../../../share/mavlink/src/v%s/pixhawk/pixhawk.pb.cc' % xml.wire_protocol_version))
-        destdir = os.path.realpath(os.path.join(directory, '../../../share/mavlink/src/v%s/pixhawk' % xml.wire_protocol_version))
-        try:
-           os.makedirs(destdir)
-        except:
-           print("Not re-creating directory")
-        shutil.copy(src, dest)
-        print("Copied to"),
-        print(dest)
 
 class mav_include(object):
     def __init__(self, base):
@@ -652,4 +627,3 @@ def generate(basename, xml_list):
     for xml in xml_list:
         generate_one(basename, xml)
     copy_fixed_headers(basename, xml_list[0])
-    copy_fixed_sources(basename, xml_list[0])

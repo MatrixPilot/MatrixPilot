@@ -1,3 +1,0 @@
-This is a test
-This is a test of a line with a unix style ending 
-This is a test of a line with a windows style ending 
