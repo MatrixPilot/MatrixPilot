@@ -5,7 +5,8 @@
 #if (defined _MSC_VER) && (_MSC_VER < 1800)
 #include <stdint.h>
 #else
-#include <inttypes.h>
+//#include <inttypes.h>
+#include <stdint.h> // MatrixPilot has standardised on using stdint.h 
 #endif
 
 #ifndef MAVLINK_MAX_PAYLOAD_LEN
