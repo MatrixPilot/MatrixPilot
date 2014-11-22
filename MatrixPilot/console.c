@@ -24,6 +24,7 @@
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
 #include "../libUDB/uart.h"
+#include "ports_config.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -258,7 +259,7 @@ extern uint16_t maxstack;
 
 static void cmd_stack(char* arg)
 {
-#if (RECORD_FREE_STACK_SPACE == 1)
+#if (RECORD_FREE_STACK_SPACE == 1 && SILSIM == 0)
 	printf("maxstack %x\r\n", maxstack);
 	printf("SP_start %x\r\n", SP_start());
 	printf("SP_limit %x\r\n", SP_limit());
@@ -365,7 +366,7 @@ void console(void)
 		char ch = getch();
 		console_inbyte(ch);
 	}
-#endif
+#endif // (CONSOLE_UART != 9)
 }
 
-#endif // CONSOLE_UART
+#endif // (CONSOLE_UART != 0)
