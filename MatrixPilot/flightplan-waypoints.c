@@ -26,6 +26,7 @@
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsData.h"
+#include "mavlink_options.h"
 #include <stdlib.h>
 
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
@@ -267,7 +268,7 @@ vect3_32t get_fixed_origin(void)
 	return standardizedOrigin;
 }
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 void mavlink_waypoint_reached(int16_t waypoint);
 void mavlink_waypoint_changed(int16_t waypoint);
 #endif
@@ -279,7 +280,7 @@ void set_waypoint(int16_t index)
 	if (index < numPointsInCurrentSet)
 	{
 		waypointIndex = index;
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 		mavlink_waypoint_changed(waypointIndex);
 #endif
 		if (waypointIndex == 0)
@@ -317,7 +318,7 @@ static void next_waypoint(void)
 {
 	if (extended_range == 0)
 	{
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 		mavlink_waypoint_reached(waypointIndex);
 #endif
 		waypointIndex++;
@@ -326,7 +327,7 @@ static void next_waypoint(void)
 		DPRINT("next_waypoint(%u)\r\n", waypointIndex);
 		set_waypoint(waypointIndex);
 /*
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 		mavlink_waypoint_changed(waypointIndex);
 #endif
 		if (waypointIndex == 0)

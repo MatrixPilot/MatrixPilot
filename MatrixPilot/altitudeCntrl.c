@@ -30,6 +30,7 @@
 #include "../libDCM/estWind.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/servoOut.h"
+#include "mavlink_options.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
@@ -156,11 +157,11 @@ static int32_t excess_energy_height(void)
 	return 0;
 }
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
 int16_t desiredSpeed = (DESIRED_SPEED*10);
-#endif // SERIAL_OUTPUT_FORMAT
+#endif // (USE_MAVLINK == 1)
 
 #endif //(SPEED_CONTROL == 1)  // speed control loop
 

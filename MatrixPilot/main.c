@@ -26,6 +26,9 @@
 #include "config.h"
 #include "states.h"
 #include "flightplan-waypoints.h"
+//#include "ports_config.h"
+//#include "telemetry_config.h"
+#include "mavlink_options.h"
 #include <setjmp.h>
 
 #include "../libFlashFS/filesys.h"
@@ -42,7 +45,7 @@
 #include "console.h"
 #endif
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (USE_MAVLINK == 1) 
 void parameter_table_init(void);
 #endif
 
@@ -80,7 +83,20 @@ int main(void)
 	init_states();
 	init_behavior();
 	init_serial();
+/*
+{
+void Init_4(void);
+void minim_osd_init(FILE* _fp);
+void print_iob(char* name, FILE* iob);
 
+	FILE* fp = fopen("com4", "w+");
+	printf("fp = %p\r\n", fp);
+//	print_iob("com4", fp);
+	Init_4();
+	minim_osd_init(fp);
+}
+	printf("osd_init complete\r\n");
+ */
 	if (setjmp(buf))
 	{
 		// a processor exception occurred and we're resuming execution here 
@@ -88,9 +104,9 @@ int main(void)
 	}
 
 #ifdef _MSC_VER
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (USE_MAVLINK == 1) 
 	parameter_table_init();
-#endif // SERIAL_OUTPUT_FORMAT
+#endif // (USE_MAVLINK == 1)
 #endif // _MSC_VER
 
 	while (1)

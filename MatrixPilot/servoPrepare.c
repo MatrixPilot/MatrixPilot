@@ -19,6 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// TODO: consider renaming this module, ie. pilot.c / autopilot.c
+
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
@@ -36,6 +38,7 @@
 #include "../libUDB/osd.h"
 #include "osd_config.h"
 #include "mp_osd.h"
+#include "mavlink_options.h"
 
 int16_t pitch_control;
 int16_t roll_control;
@@ -112,31 +115,36 @@ void dcm_heartbeat_callback(void)
 	
 	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 	{
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
+		// Poll the MAVLink subsystem at 40hz
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 		{
 			mavlink_output_40hz();
 		}
 #else
-		// This is a simple check to send telemetry at 8hz
+		// Send telemetry updates at 8hz
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
 // RobD			flight_state_8hz();
 			telemetry_output_8hz();
-
-#if (USE_OSD == OSD_REMZIBI)
-void remzibi_osd_8hz(void);
-			remzibi_osd_8hz();
-#elif (USE_OSD == OSD_MINIM)
-void minim_osd_8hz(void);
-			minim_osd_8hz();
-#endif // USE_OSD
-
 		}
-#endif // SERIAL_OUTPUT_FORMAT
+#endif // (USE_MAVLINK == 1)
 	}
 
-	mp_osd_run_step();
+	// Poll the OSD subsystem at 8hz
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
+	{
+#if (USE_OSD == OSD_NATIVE)
+		mp_osd_run_step(); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
+//		mp_osd_run_step(udb_heartbeat_counter); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
+#elif (USE_OSD == OSD_REMZIBI)
+void remzibi_osd_8hz(void);
+		remzibi_osd_8hz();
+#elif (USE_OSD == OSD_MINIM)
+void minim_osd_8hz(void);
+		minim_osd_8hz();
+#endif // USE_OSD
+	}
 }
 
 void manualPassthrough(void)

@@ -36,10 +36,12 @@
 //    MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
 //    MAV_DATA_STREAM_EXTRA3 not assigned yet
 
+
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
+#include "mavlink_options.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVParams.h"
@@ -153,8 +155,8 @@ void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
-//#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
-#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink" // xc16 uses this syntax
+#pragma warning ("SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink") // VC warns 'unknown user warning type'
+//#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink" // xc16 uses this syntax (but VC throws fatal error)
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();
@@ -1049,4 +1051,4 @@ void mavlink_output_40hz(void)
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)

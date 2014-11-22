@@ -20,8 +20,9 @@
 
 
 #include "../MatrixPilot/defines.h"
+#include "mavlink_options.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 
 #include "../MatrixPilot/MAVLink.h"
 #include "MAVFTP.h"
@@ -43,4 +44,4 @@ void MAVFTPOutput_40hz(void)
 {
 }
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)
