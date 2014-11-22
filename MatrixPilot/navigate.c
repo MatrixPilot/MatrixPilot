@@ -68,13 +68,13 @@ void init_navigation(void)
 	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_navigation(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKPAileron = (float)yawkpail / (RMAX);
 	gains.YawKPRudder  = (float)yawkprud / (RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 static void setup_origin(void)
 {

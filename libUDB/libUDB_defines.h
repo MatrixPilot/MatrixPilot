@@ -25,7 +25,7 @@
 
 #include "udbTypes.h"
 
-//#if SILSIM
+//#if USE_SILSIM
 #if (SILSIM == 1)
 #define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
 #else

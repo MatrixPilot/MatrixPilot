@@ -43,6 +43,8 @@
 #define USE_USB                             0
 #undef  USE_MSD
 #define USE_MSD                             0
+#undef  RECORD_FREE_STACK_SPACE
+#define RECORD_FREE_STACK_SPACE             0
 #undef  FAILSAFE_INPUT_MIN
 #define FAILSAFE_INPUT_MIN                  1500
 #include "../Tools/MatrixPilot-SIL/SIL-udb.h"

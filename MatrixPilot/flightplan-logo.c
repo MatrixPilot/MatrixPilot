@@ -391,6 +391,9 @@ static boolean logo_goal_has_moved(void)
 static void update_goal_from(struct relative3D old_goal)
 {
 	struct relative3D new_goal;
+#ifdef USE_EXTENDED_NAV
+	struct relative3D_32 old_goal_32, new_goal_32;
+#endif
 
 	lastGoal.x = new_goal.x = (turtleLocations[PLANE].x._.W1);
 	lastGoal.y = new_goal.y = (turtleLocations[PLANE].y._.W1);
@@ -405,7 +408,6 @@ static void update_goal_from(struct relative3D old_goal)
 
 #ifdef USE_EXTENDED_NAV
 	// TODO: RobD - review this change implemented to restore build, but not runtime tested
-	struct relative3D_32 old_goal_32, new_goal_32;
 	old_goal_32.x = old_goal.x;
 	old_goal_32.y = old_goal.y;
 	old_goal_32.z = old_goal.z;

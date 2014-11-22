@@ -25,13 +25,11 @@
 #include <Windows.h>
 #include <Time.h>
 
-#ifndef TEST
 struct timezone
 {
 	int tz_minuteswest; // of Greenwich
 	int tz_dsttime;     // type of dst correction to apply
 };
-#endif
 
 #if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
@@ -482,7 +480,7 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 
 #endif // MAG_YAW_DRIFT
 
-#ifndef TEST
+#ifdef _MSC_VER
 int setjmp(void)
 {
 	return 0;
