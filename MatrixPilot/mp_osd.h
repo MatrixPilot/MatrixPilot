@@ -24,7 +24,7 @@
 
 
 void mp_osd_init(void);
-void mp_osd_run_step(void);
+void mp_osd_run_step(uint16_t init_counter);
 
 
 #endif // MP_OSD_H

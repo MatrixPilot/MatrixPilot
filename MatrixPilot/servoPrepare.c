@@ -135,8 +135,7 @@ void dcm_heartbeat_callback(void)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 	{
 #if (USE_OSD == OSD_NATIVE)
-		mp_osd_run_step(); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
-//		mp_osd_run_step(udb_heartbeat_counter); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
+		mp_osd_run_step(udb_heartbeat_counter); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
 #elif (USE_OSD == OSD_REMZIBI)
 void remzibi_osd_8hz(void);
 		remzibi_osd_8hz();

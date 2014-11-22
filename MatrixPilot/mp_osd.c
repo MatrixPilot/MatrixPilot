@@ -550,15 +550,16 @@ static void osd_update_values_phase_3(void)
 #endif
 }
 
-void mp_osd_run_step(void)
+// what is the assumed polling rate here? (looks like HEARTBEAT_HZ is important) - RobD
+void mp_osd_run_step(uint16_t init_counter) // currently gets called with 'udb_heartbeat_counter'
 {
 	static uint8_t osd_phase = 0;
 	boolean osd_on = (OSD_MODE_SWITCH_INPUT_CHANNEL == CHANNEL_UNUSED || udb_pwIn[OSD_MODE_SWITCH_INPUT_CHANNEL] >= 3000 || !udb_flags._.radio_on);
 	int16_t countdown = 0;
 
-	if (!dcm_flags._.init_finished && udb_heartbeat_counter < 100)  // TODO: this will need updating for increased HEARTBEAT_HZ
+	if (!dcm_flags._.init_finished && init_counter < 100)  // TODO: this will need updating for increased HEARTBEAT_HZ
 	{
-		countdown = 100 - udb_heartbeat_counter;
+		countdown = 100 - init_counter;
 	}
 	if (countdown == 61)
 	{
@@ -642,6 +643,6 @@ void mp_osd_run_step(void)
 
 #else
 
-void mp_osd_run_step(void) {}
+void mp_osd_run_step(uint16_t init_counter) {}
 
 #endif // USE_OSD
