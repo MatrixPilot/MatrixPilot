@@ -30,7 +30,7 @@ int32_t long_scale(int32_t arg1, int16_t arg2);
 void rotate_2D_vector_by_vector(int16_t vector[2], int16_t rotate[2]);      //-> void vect2_16x16_rotate(vect2_16t* vector, const vect2_16t* rotate);
 void rotate_2D_long_vector_by_vector(int32_t vector[2], int16_t rotate[2]); //-> void vect2_32x16_rotate(vect2_32t* vector, const vect2_16t* rotate);
 void rotate_2D_vector_by_angle(int16_t vector[2], int8_t angle);            //-> void vect2_16phi_rotate(vect2_16t* vector, int8_t angle);
-void rotate(struct relative2D *xy, int8_t angle);     //-> void vect2_16phi_rotate(vect2_16t* vector, int8_t angle);
+void rotate_2D(struct relative2D *xy, int8_t angle);     //-> void vect2_16phi_rotate(vect2_16t* vector, int8_t angle);
 int8_t rect_to_polar(struct relative2D *xy);          //-> uint8_t vect2_polar(polar_16t* polar, const vect2_16t* vector);
 int16_t rect_to_polar16(struct relative2D *xy);       //-> uint16_t vect2_polar_16(polar_16t* polar, const vect2_16t* vector);
 uint16_t vector2_mag(int16_t x, int16_t y);                    //-> uint16_t vect2_16_mag(const vect2_16t* vector);

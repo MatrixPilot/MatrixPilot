@@ -70,9 +70,9 @@
 
 #ifdef USE_SD_INTERFACE_WITH_SPI
 
-#include "MDD File System/FSIO.h"
-#include "MDD File System/FSDefs.h"
-#include "MDD File System/SD-SPI.h"
+#include "MDD-File-System/FSIO.h"
+#include "MDD-File-System/FSDefs.h"
+#include "MDD-File-System/SD-SPI.h"
 #include "string.h"
 #include "FSconfig.h"
 

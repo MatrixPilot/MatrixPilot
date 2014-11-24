@@ -391,10 +391,7 @@ void mcu_init(void)
 	configureDigitalIO();
 	init_leds();
 #if (CONSOLE_UART != 0)
-	delay_ms(500);
 	init_uart();
-	delay_ms(500);
-//	DPRINT("Delay for UART clock stabilisation\r\n");
 	DPRINT("\r\n\r\nMatrixPilot " __TIME__ " " __DATE__ " @ %u mips\r\n", MIPS);
 	if (_SWR == 1)
 	{

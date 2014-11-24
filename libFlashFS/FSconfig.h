@@ -31,7 +31,7 @@
 #include "MDD_AT45D.h"
 #elif defined(USE_SD_INTERFACE_WITH_SPI)
 //#warning USE_SD_INTERFACE_WITH_SPI
-#include "MDD File System/SD-SPI.h"
+#include "MDD-File-System/SD-SPI.h"
 #else
 #error Must define a file system media interface
 #endif // USE_AT45D_FLASH

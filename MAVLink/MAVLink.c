@@ -841,7 +841,7 @@ void mavlink_output_40hz(void)
 		previous_earth_roll  = earth_roll;
 		previous_earth_yaw   = earth_yaw;
 
-		mavlink_msg_attitude_send(MAVLINK_COMM_0,msec, earth_roll, earth_pitch, earth_yaw,
+		mavlink_msg_attitude_send(MAVLINK_COMM_0, msec, earth_roll, earth_pitch, earth_yaw,
 		    earth_roll_velocity, earth_pitch_velocity, earth_yaw_velocity);
 		//    mavlink_msg_attitude_send(mavlink_channel_t chan, uint32_t time_boot_ms, float roll, float pitch, float yaw,
 		//    float rollspeed, float pitchspeed, float yawspeed)
@@ -856,7 +856,10 @@ void mavlink_output_40hz(void)
 		int16_t pwOut_max = 4000;
 		mavlink_heading = get_geo_heading_angle();
 		if (THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000;
-		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, (float)(air_speed_3DIMU / 100.0), (float)(ground_velocity_magnitudeXY / 100.0), (int16_t)mavlink_heading,
+		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0,
+		    (float)(air_speed_3DIMU / 100.0),
+		    (float)(ground_velocity_magnitudeXY / 100.0),
+		    (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
 		    ((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
 		    (float) -IMUvelocityz._.W1);

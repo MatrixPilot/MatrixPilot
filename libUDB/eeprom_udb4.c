@@ -23,6 +23,7 @@
 
 
 #include "libUDB_internal.h"
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #include "eeprom_udb4.h"
 
 #define SCL         PORTGbits.RG2       // I2C SCL (Clock) PORT
@@ -202,6 +203,7 @@ static void ack_poll(void)
 
 void eeprom_ByteWrite(uint16_t address, uint8_t data)
 {
+//DPRINT("eeprom_ByteWrite(%u, %u)\r\n", address, data);
 	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
 	byte_out(eeprom_control);       // Output control byte
@@ -214,6 +216,7 @@ void eeprom_ByteWrite(uint16_t address, uint8_t data)
 void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 {
 	uint8_t i;                      // Loop counter
+//DPRINT("eeprom_PageWrite(%u, %u)\r\n", address, numbytes);
 
 	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
@@ -222,13 +225,16 @@ void eeprom_PageWrite(uint16_t address, uint8_t *data, uint8_t numbytes)
 	byte_out((uint8_t)address);     // Output address LSB
 	for (i = 0; i < numbytes; i++)  // Loop through data bytes
 	{
+//DPRINT("%02x ", data[i]);
 		byte_out(data[i]);          // Output next data byte
 	}
 	bstop();                        // Generate Stop condition
+//DPRINT("\r\n");
 }
 
 void eeprom_ByteRead(uint16_t address, uint8_t *data)
 {
+//DPRINT("eeprom_ByteRead(%u, %u)\r\n", address, data);
 	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
 	byte_out(eeprom_control);       // Output control byte
@@ -243,6 +249,7 @@ void eeprom_ByteRead(uint16_t address, uint8_t *data)
 void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 {
 	uint16_t i;                     // Loop counter
+//DPRINT("eeprom_SequentialRead(%u, %u)\r\n", address, numbytes);
 
 	ack_poll();                     // Begin ACK polling
 	bstart();                       // Generate Start condition
@@ -261,6 +268,10 @@ void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 		{
 			data[i] = byte_in(NAKBIT); // If last byte, input byte & send NAK
 		}
+//DPRINT("%02x ", data[i]);
 	}
 	bstop();                        // Generate Stop condition
+//DPRINT("\r\n");
 }
+
+#endif // (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)

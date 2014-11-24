@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include "SIL-filesystem.h"
 #else
-#include "MDD File System/FSIO.h"
+#include "MDD-File-System/FSIO.h"
 #include "AT45D.h"
 #endif
 #include <string.h>

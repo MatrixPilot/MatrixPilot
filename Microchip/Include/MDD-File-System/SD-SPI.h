@@ -39,7 +39,7 @@
 
 #include "GenericTypeDefs.h"
 #include "FSconfig.h"
-#include "MDD File System/FSDefs.h"
+#include "MDD-File-System/FSDefs.h"
 
 
 #ifdef __18CXX

@@ -63,7 +63,7 @@ extern int16_t forward_acceleration;
 extern uint16_t air_speed_3DGPS;
 
 
-//extern void (*msg_parse)(uint8_t inchar);
+//extern void (*msg_parse)(uint8_t gpschar);
 //extern void (*gps_startup_sequence)(int16_t gpscount);
 //extern boolean (*gps_nav_valid)(void);
 //extern void (*gps_commit_data)(void);

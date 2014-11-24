@@ -281,7 +281,7 @@ udb_led_toggle(LED_BLUE);
 		accum_velocity.WW = (__builtin_mulss(sine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
 		GPSvelocity.y = accum_velocity._.W1;
 
-		rotate(&location_deltaXY, cog_delta); // this is a key step to account for rotation effects!!
+		rotate_2D(&location_deltaXY, cog_delta); // this is a key step to account for rotation effects!!
 
 		GPSlocation.x = location[0] + location_deltaXY.x;
 		GPSlocation.y = location[1] + location_deltaXY.y;

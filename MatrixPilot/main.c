@@ -46,7 +46,7 @@ void vApplicationIdleHook(void);
 
 #if (SILSIM == 1)
 int mp_argc;
-char **mp_argv;
+char** mp_argv;
 int main(int argc, char** argv)
 {
 	// keep these values available for later

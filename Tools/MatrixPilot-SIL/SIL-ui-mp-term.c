@@ -15,7 +15,7 @@
 
 #define BUFLEN 512
 
-UDBSocket stdioSocket;
+UDBSocket stdioSocket = NULL;
 uint8_t lastLedBits = 0;
 boolean showLEDs = 0;
 uint8_t inputState = 0;

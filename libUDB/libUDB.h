@@ -244,7 +244,9 @@ void udb_callback_read_sensors(void);       // Callback
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
-#define udb_led_toggle(x)                   ((x) = !(x))
+#define udb_led_toggle(x)               ((x) = !(x))
+#define led_on(x)                       ((x) = 0)
+#define led_off(x)                      ((x) = 1)
 
 
 ////////////////////////////////////////////////////////////////////////////////

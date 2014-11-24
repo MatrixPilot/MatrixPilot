@@ -161,6 +161,8 @@
 //					  the DO() instruction.
 // EXEC(FUNC)		- Call FUNC as though it were the beginning of the logo program.  This will never return.
 //					  When/if FUNC finishes, logo will start back at the beginning of the program.
+// DO(LOGO_MAIN) or
+// EXEC(LOGO_MAIN)      - Restart at the top of the LOGO program
 // DO_ARG(FUNC, PARAM) - Run subroutine FUNC, using an integer value as a parameter.
 // EXEC_ARG(FUNC, PARAM) - Exec subroutine FUNC, using an integer value as a parameter.
 // 
@@ -207,8 +209,8 @@
 // CURRENT_ANGLE		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_HOME		- in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL		- in degrees. 0-359 (clockwise, 0=North)
-// REL_ANGLE_TO_HOME	- in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
-// REL_ANGLE_TO_GOAL	- in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
+// REL_ANGLE_TO_HOME    - in degrees. -180-179 (0=heading directly towards Home. Home to the right of the nose of the plane is positive)
+// REL_ANGLE_TO_GOAL    - in degrees. -180-179 (0=heading directly towards Goal. Goal to the right of the nose of the plane is positive)
 // GROUND_SPEED			- in cm/s
 // AIR_SPEED			- in cm/s
 // AIR_SPEED_Z			- in cm/s

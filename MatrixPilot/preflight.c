@@ -73,7 +73,9 @@ void preflight(void)
 #if (USE_MSD != 0)
 			MSDTasks();
 #endif
+#if (USE_CDC == 1)
 			CDCTasks();
+#endif
 		}
 #if (CONSOLE_UART != 0)
 		console();
@@ -136,7 +138,9 @@ void USBPollingService(void)
 #if (USE_MSD != 0)
 			MSDTasks();
 #endif
+#if (USE_CDC == 1)
 			CDCTasks();
+#endif
 		}
 	}
 }

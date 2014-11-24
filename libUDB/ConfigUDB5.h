@@ -21,13 +21,19 @@
 
 // used for the UDB5
 
+// ACCEL_RANGE must be either 4 or 8
+// ACCEL_RANGE 2 will cause all sorts of trouble, do not use it
+
 #define ACCEL_RANGE         4       // 4 g range
 
 // note : it is possible to use other accelerometer ranges on the MPU6000
 #define SCALEGYRO           3.0016  // 500 degree/second range
-#define SCALEACCEL          1.29    // 4 g range
+//#define SCALEACCEL          1.29    // 4 g range
+#define SCALEACCEL          1.27    // 4 g range measured by WJP on a few UDB5s
 
-// A/D channels:
+#define NUM_ANALOG_INPUTS   4
+
+// External A/D channels:
 #define analogInput1BUFF    3
 #define analogInput2BUFF    4
 #define analogInput3BUFF    5
@@ -64,10 +70,10 @@
 #define MAX_OUTPUTS         8
 
 // LED pins
-#define LED_BLUE            LATEbits.LATE4
-#define LED_ORANGE          LATEbits.LATE3
-#define LED_GREEN           LATEbits.LATE2
-#define LED_RED             LATEbits.LATE1
+#define LED_BLUE            _LATE4
+#define LED_ORANGE          _LATE3
+#define LED_GREEN           _LATE2
+#define LED_RED             _LATE1
 
 // SPI SS pin definitions
 #define SPI1_SS             _LATB2
