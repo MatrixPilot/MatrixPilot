@@ -855,9 +855,6 @@ void HILSIM_set_gplane(void)
 	gplane[0] = g_a_x_sim.BB;
 	gplane[1] = g_a_y_sim.BB;
 	gplane[2] = g_a_z_sim.BB;
-	aero_force[0] = - gplane[0] ;
-	aero_force[1] = - gplane[1] ;
-	aero_force[2] = - gplane[2] ;
 }
 
 void HILSIM_set_omegagyro(void)

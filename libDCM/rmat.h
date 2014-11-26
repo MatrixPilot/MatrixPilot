@@ -48,7 +48,6 @@ extern fractional omegaAccum[];             //  accumulator for computing adjust
 extern fractional omegagyro[];
 extern fractional accelEarth[];             //  acceleration, as measured in GPS earth coordinate system
 extern fractional gplane[];
-extern int16_t aero_force[];
 extern fractional dirOverGndHGPS[];         //  horizontal velocity over ground, as measured by GPS (Vz = 0 )
 extern fractional dirOverGndHrmat[];        //  horizontal direction over ground, as indicated by Rmatrix
 extern union intbb dcm_declination_angle;   //  Declination +-32767 = +-360deg
