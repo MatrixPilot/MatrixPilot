@@ -48,7 +48,7 @@
 
 #include <stdarg.h>
 
-
+extern int16_t tiltError[3];
 union intbb voltage_milis = {0};
 union intbb voltage_temp;
 
@@ -648,7 +648,9 @@ void serial_output_8hz(void)
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
-				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
+//				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
+//					aero_force[0], aero_force[1], aero_force[2],
+					tiltError[0], tiltError[1], tiltError[2], 
 				    flags.WW, osc_fail_count,
 				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
 //				serial_output("tmp%i:prs%li:alt%li:agl%li:",

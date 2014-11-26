@@ -120,8 +120,10 @@ fractional omegaAccum[] = { 0, 0, 0 };
 // gravity, as measured in plane coordinate system
 #ifdef INITIALIZE_VERTICAL // VTOL vertical initialization
 fractional gplane[] = { 0, -GRAVITY, 0 };
+int16_t aero_force[] = { 0 , GRAVITY , 0 };
 #else  // horizontal initialization 
 fractional gplane[] = { 0, 0, GRAVITY };
+int16_t aero_force[] = { 0 , 0 , -GRAVITY };
 #endif
 
 // horizontal velocity over ground, as measured by GPS (Vz = 0)
@@ -207,6 +209,9 @@ static inline void read_accel(void)
 	gplane[0] = XACCEL_VALUE;
 	gplane[1] = YACCEL_VALUE;
 	gplane[2] = ZACCEL_VALUE;
+	aero_force[0] = - gplane[0] ;
+	aero_force[1] = - gplane[1] ;
+	aero_force[2] = - gplane[2] ;
 #endif
 
 #ifdef CATAPULT_LAUNCH_ENABLE
