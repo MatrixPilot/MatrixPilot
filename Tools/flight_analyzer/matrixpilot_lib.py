@@ -6,8 +6,8 @@ import os
 try:
     sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
     os.environ['MAVLINK10'] = '1'
-    import mavlinkv10 as mavlink
-    import mavutil
+    import pymavlink.dialects.v10.matrixpilot as mavlink
+    import pymavlink.mavutil as mavutil
 except:
     print "Not able to find Python MAVlink libraries"
 
@@ -19,9 +19,9 @@ class raw_mavlink_telemetry_file:
     """Model a mavlink file (one without local time stamps inserted)"""
     def __init__(self, filename, type_of_mavlink):
         if (type_of_mavlink == "SERIAL_MAVLINK_RAW"):
-            self.m = mavutil.mavlink_connection(filename, notimestamps = True)
+            self.m = mavutil.mavlink_connection(filename, notimestamps = True,dialect='matrixpilot')
         elif (type_of_mavlink == "SERIAL_MAVLINK_TIMESTAMPS"):
-            self.m = mavutil.mavlink_connection(filename, notimestamps = False)    
+            self.m = mavutil.mavlink_connection(filename, notimestamps = False, dialect='matrixpilot')    
         else:
             print "Error: Unknown Mavlink file type (not raw or timestamp)."
         self.total_mavlink_packets_received = 0
@@ -42,15 +42,18 @@ class raw_mavlink_telemetry_file:
                     print "Packets dropped in transmission:",  self.dropped_mavlink_packets
                     raise StopIteration
             elif self.msg.get_type() == "BAD_DATA":
+                print "Bad Data Packet"
                 pass
             else :  # We have a good mavlink packet
                 self.track_dropped_packets(self.msg.get_seq())
-                #print self.msg.get_seq()
+                #print self.msg
                 if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
+                        #print self.msg
                         self.last_F2_A_msg = self.msg
                         self.SUE_F2_A_needs_printing = True
                         continue
                 elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
+                        #print self.msg
                         try:
                             if self.msg.sue_time >= (self.last_F2_A_msg.sue_time - 250) : #A and B halves of message are a pair
                                 # Note for above: -250 is because time can go backwards by 1/4 of a second in MP when GPS updates.
