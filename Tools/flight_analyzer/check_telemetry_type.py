@@ -20,7 +20,7 @@ import array, struct
 
 
 try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
+    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink'))
     os.environ['MAVLINK10'] = '1'
     import pymavlink.dialects.v10.matrixpilot as mavlink
     import pymavlink.mavutil as mavutil 
