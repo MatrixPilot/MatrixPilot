@@ -44,6 +44,8 @@ int16_t pitchrate;
 
 int16_t elevInput;
 
+int16_t elevatorLoadingTrim = 0 ;
+
 static void normalPitchCntrl(void);
 static void hoverPitchCntrl(void);
 
@@ -101,7 +103,7 @@ static void normalPitchCntrl(void)
 	{
 		pitchAccum.WW = 0;
 	}
-	pitch_control = (int32_t)pitchAccum._.W1 ;
+	pitch_control = (int32_t)pitchAccum._.W1 + (int32_t) elevatorLoadingTrim ;
 }
 
 static void hoverPitchCntrl(void)

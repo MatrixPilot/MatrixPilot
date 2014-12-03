@@ -25,6 +25,7 @@
 
 extern int16_t throttle_control;
 extern int16_t pitch_control;
+extern int16_t elevatorLoadingTrim;
 extern int16_t roll_control;
 extern int16_t yaw_control;
 extern uint16_t wind_gain;
