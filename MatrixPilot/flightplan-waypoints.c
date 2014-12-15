@@ -213,7 +213,8 @@ void init_waypoints(void)
 
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
-void init_flightplan(int16_t flightplanNum)
+//void init_flightplan(int16_t flightplanNum)
+void flightplan_begin(int16_t flightplanNum)
 {
 	if (flightplanNum == 1)         // RTL waypoint set
 	{
