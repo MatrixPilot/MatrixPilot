@@ -53,9 +53,7 @@ void altimeter_calibrate(void)
 
 	sea_level_pressure = ((float)barometer_pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
 
-#ifdef USE_DEBUG_IO
-	printf("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
-#endif
+	DPRINT("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
 }
 
 #if (BAROMETER_ALTITUDE == 1)

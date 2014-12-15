@@ -93,3 +93,4 @@ boolean gps_nav_valid(void);
 // After dead reckoning is complete, this callback may go away.
 void dcm_callback_gps_location_updated(void);   // Callback
 
+int16_t udb_gps_callback_get_byte_to_send(void);

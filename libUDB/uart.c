@@ -279,8 +279,6 @@ void PutHex(int toPrint)
 
 	toPrint = printVar & 0x0F;
 	PutChar(CharacterArray[toPrint]);
-
-	return;
 }
 
 /*******************************************************************************

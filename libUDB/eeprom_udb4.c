@@ -22,7 +22,7 @@
 //    http://ww1.microchip.com/downloads/en/AppNotes/AN1100.zip
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #include "eeprom_udb4.h"
 

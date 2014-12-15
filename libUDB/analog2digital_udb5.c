@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"

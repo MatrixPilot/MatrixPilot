@@ -103,10 +103,11 @@ void filesys_format(void)
 
 int filesys_init(void)
 {
+#if (USE_FILESYS == 1)
 	DPRINT("filesys_init()\r\n");
 //	init_dataflash(); // this should now be getting device specific called from lower layers via FSInit()
 
-    MDD_InitIO();
+	MDD_InitIO();
 	if (!MDD_MediaDetect())
 	{
 		printf("no media detected\r\n");
@@ -124,6 +125,7 @@ int filesys_init(void)
 		}
 	}
 	printf("File system initalised\r\n");
+#endif // USE_FILESYS
 	return 1;
 }
 

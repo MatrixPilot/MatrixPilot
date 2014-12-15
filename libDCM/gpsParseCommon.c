@@ -36,8 +36,6 @@
 union longbbbb lat_gps_, lon_gps_;
 union longbbbb alt_sl_gps_;
 union longbbbb tow_;
-//union intbb sog_gps_, cog_gps_, climb_gps_;
-//union intbb nav_valid_, nav_type_, week_no_;
 union intbb hdop_;
 union longbbbb date_gps_, time_gps_;
 

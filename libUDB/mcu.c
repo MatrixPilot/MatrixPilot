@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "uart.h"
@@ -131,8 +131,7 @@ uint16_t get_reset_flags(void)
 }
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-// This method assigns all PPS registers
-void configurePPS(void)
+static void configurePPS(void)  // This method assigns all PPS registers
 {
 	// Unlock Registers
 	__builtin_write_OSCCONL(OSCCON & ~(1 << 6));
@@ -215,7 +214,7 @@ void configurePPS(void)
 }
 
 // This method configures TRISx for the digital IOs
-void configureDigitalIO(void)   // AUAV3 board
+static void configureDigitalIO(void)   // AUAV3 board
 {
 	// TRIS registers have no effect on pins mapped to peripherals
 	// TRIS assignments are made in the initialization methods for each function
@@ -285,7 +284,7 @@ void configureDigitalIO(void)   // AUAV3 board
 	CNPUEbits.CNPUE1  = 1;          // DIG0
 }
 #else
-void configureDigitalIO(void) // UDB4 and UDB5 boards
+static void configureDigitalIO(void) // UDB4 and UDB5 boards
 {
 	// TODO: this needs to be updated to support PPM input on user defined input channel
 	_TRISD8 = 1;
@@ -296,7 +295,7 @@ void configureDigitalIO(void) // UDB4 and UDB5 boards
 }
 #endif // BOARD_TYPE
 
-void init_leds(void)
+static void init_leds(void)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	_LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 

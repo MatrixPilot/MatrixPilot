@@ -257,7 +257,7 @@ const uint16_t enable_UBX_only_length = 28;
 const uint16_t enable_SBAS_length = 16;
 const uint16_t config_NAV5_length = 44;
 
-void (*msg_parse)(uint8_t inchar) = &msg_B3;
+void (*msg_parse)(uint8_t gpschar) = &msg_B3;
 
 static uint8_t un;
 //static union longbbbb xpg_, ypg_, zpg_;
@@ -943,16 +943,16 @@ void hilsim_handle_key_input(char c)
 			udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
 			printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
 			break;
-		case 35: // '1' Numpad End
+				case 35: // '1' Numpad End (switch mode to manual)
 			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
 			break;
-		case 111: // '2' Numpad /
+				case 111: // '2' Numpad / (switch mode to stabilised)
 			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
 			break;
-		case 106: // '3' Numpad *
+				case 106: // '3' Numpad * (switch mode to guided)
 			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
 			break;
-		case 36: // '4' Numpad Home
+				case 36: // '4' Numpad Home (switch mode to failsafe)
 			udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
 			break;
 		default:
@@ -962,7 +962,8 @@ void hilsim_handle_key_input(char c)
 
 void commit_keystroke_data(void)
 {
-	if ((x_vkey_ != 0) && ((x_ckey_ & 0x08) || (x_ckey_ & 0x00))) // key down or key repeat
+//	if ((x_vkey_ != 0) && ((x_ckey_ & 0x08) || (x_ckey_ & 0x00))) // key down or key repeat
+	if ((x_vkey_ != 0) && ((x_ckey_ & 0x08) || (x_ckey_ == 0x00))) // key down or key repeat
 	{
 /*
 xplm_ShiftFlag      1   The shift key is down
