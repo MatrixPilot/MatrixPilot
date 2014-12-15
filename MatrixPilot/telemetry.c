@@ -348,7 +348,7 @@ void sio_fbdl_data(unsigned char inchar)
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t len;
 	int16_t start_index;
@@ -387,7 +387,7 @@ void serial_output(char* format, ...)
 }
 #else
 // add this text to the output buffer
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t start_index;
 	int16_t remaining;

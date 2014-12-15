@@ -204,7 +204,7 @@ static void log_write(const char* str, int len)
 	}
 }
 
-// called from mainloop at background priority to write telemetry log data to log file
+// called from mainloop at background priority to write buffered telemetry log data to log file
 void telemetry_log(void)
 {
 	if (lb_in_use == 1)

@@ -237,7 +237,7 @@ void mav_printf(const char* format, ...)
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 // add printf library when running tests to output ascii messages of test results
-static void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t remaining = 0;
 	int16_t wrote = 0;
@@ -624,14 +624,14 @@ static void handleMessage(void)
 		handle_msg = &msg[0];
 	}
 
-	DPRINT("MAV MSG 0x%x\r\n", handle_msg->msgid);
+//	DPRINT("MAV MSG 0x%x\r\n", handle_msg->msgid);
 
 	handling_of_message_completed |= MAVParamsHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVFlexiFunctionsHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVFTPHandleMessage(handle_msg);
 
-	if (handling_of_message_completed == true)
+	if (handling_of_message_completed != false)
 	{
 		return;
 	}
@@ -654,7 +654,7 @@ static void handleMessage(void)
 			MAVLinkSetMode(handle_msg);
 			break;
 		default:
-			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
+//			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
 			break;
 	}
 	handling_of_message_completed = true;

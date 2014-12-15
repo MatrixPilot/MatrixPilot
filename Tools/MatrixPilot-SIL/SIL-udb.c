@@ -24,6 +24,7 @@
 #define SIL_WINDOWS_INCS
 #include <Windows.h>
 #include <Time.h>
+#include <process.h>
 
 struct timezone
 {
@@ -310,7 +311,7 @@ void sil_reset(void)
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket)    UDBSocket_close(serialSocket);
 
-	execv(mp_argv[0], args);
+	_execv(mp_argv[0], args); // this version keeps VC++ happy (along with <process.h> above)
 	fprintf(stderr, "Failed to reset UDB %s\n", mp_argv[0]);
 	exit(1);
 }

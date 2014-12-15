@@ -26,6 +26,7 @@
 #include "states.h"
 #include "altitudeCntrl.h"
 #include "sonarCntrl.h"
+#include "../libDCM/rmat.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/estWind.h"
 #include "../libDCM/deadReckoning.h"

@@ -40,6 +40,7 @@ extern int16_t progress_to_goal; // Fraction of the way to the goal in the range
 extern int8_t desired_dir;
 
 void init_navigation(void);
+void save_navigation(void);
 #ifdef USE_EXTENDED_NAV
 void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint);
 #else

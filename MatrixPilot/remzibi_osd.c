@@ -97,9 +97,12 @@ void rezibi_osd_init(FILE* _fp)
 
 static void serial_send_coord(int32_t coord)
 {
+	int32_t n1;
+	int32_t n2;
+
 	coord /= 10;
-	int32_t n1 = (coord / 1000000L);
-	int32_t n2 = (coord % 1000000L);
+	n1 = (coord / 1000000L);
+	n2 = (coord % 1000000L);
 	fprintf(fp, "%li.%06li", n1, n2);
 }
 
@@ -178,6 +181,15 @@ static void serial_send_cls(void)
 
 static void update_coords(void)
 {
+	int32_t date = 0;
+	int32_t time = 0;
+	int8_t earth_yaw;
+	int16_t angle1;
+	int16_t angle;
+	struct relative2D toGoal;
+	int16_t dist_to_home;
+	int16_t dist_to_goal;
+
 	uint16_t ground_speed_3DIMU = vector3_mag(IMUvelocityx._.W1,
 	                                          IMUvelocityy._.W1,
 	                                          IMUvelocityz._.W1);
@@ -185,27 +197,26 @@ static void update_coords(void)
 	struct relative2D curHeading;
 	curHeading.x = -rmat[1];
 	curHeading.y = rmat[4];
-	int8_t earth_yaw = rect_to_polar(&curHeading);  // -128 to 127 (0=East,  ccw)
+	earth_yaw = rect_to_polar(&curHeading);  // -128 to 127 (0=East,  ccw)
 
 	// convert to degrees
-	int16_t angle1 = (earth_yaw * 180 + 64) >> 7;   // -180 to 180 (0=East,  ccw)
+	angle1 = (earth_yaw * 180 + 64) >> 7;   // -180 to 180 (0=East,  ccw)
 	if (angle1 < 0) // 0 - 360
 	{
 		angle1 += 360;
 	}
 
-	int16_t angle = 90 - angle1;    // course as degree - as integer , range 0 - 360, cw!! 0=North
+	angle = 90 - angle1;    // course as degree - as integer , range 0 - 360, cw!! 0=North
 	if (angle < 0)
 	{
 		angle += 360;
 	}
 
-	struct relative2D toGoal;
 	toGoal.x = 0 - IMUlocationx._.W1;
 	toGoal.y = 0 - IMUlocationy._.W1;
 
-	int16_t dist_to_home = toGoal.x;
-	int16_t dist_to_goal;
+	dist_to_home = toGoal.x;
+	dist_to_goal;
 
 	if (state_flags._.GPS_steering)
 	{
@@ -216,9 +227,6 @@ static void update_coords(void)
 	{
 		dist_to_goal = dist_to_home;
 	}
-
-	int32_t date = 0;
-	int32_t time = 0;
 
 #if (GPS_TYPE == GPS_MTEK)
 //	date = date_gps_.WW;

@@ -49,6 +49,15 @@
 void parameter_table_init(void);
 #endif
 
+void cfg_init(void)
+{
+#if (USE_FILESYS == 1)
+	if (filesys_init())
+	{
+		config_load();
+	}
+#endif // USE_FILESYS
+}
 static jmp_buf buf;
 
 #if (SILSIM == 1)
@@ -62,19 +71,14 @@ int main(int argc, char** argv)
 #else
 int main(void)
 {
-	mcu_init();
+	mcu_init();     // initialise the processor specific registers
 #endif
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
-	udb_init();
-#if (USE_FILESYS == 1)
-	if (filesys_init())
-	{
-		config_load();
-	}
-#endif // USE_FILESYS
+	udb_init();     // this configure clocks and enables global interrupts
+	cfg_init();     // this attempts to load file system and .ini files
 	dcm_init();
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 	init_waypoints();

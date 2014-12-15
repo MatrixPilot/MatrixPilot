@@ -43,7 +43,8 @@ void AT45D_FormatFS(void);
 typedef struct tagCmds {
 	int index;
 	void (*fptr)(char*);
-	const char const * cmdstr;
+//	const char const * cmdstr;
+	const char* cmdstr;
 } cmds_t;
 
 

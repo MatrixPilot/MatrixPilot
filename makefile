@@ -65,7 +65,8 @@ LIBS     := -legacy-libc
 TARGET_ARCH := -mcpu=$(CPU)
 AFLAGS += -Wa,-g,--defsym=PSV_ERRATA=1
 CFLAGS += -x c -g -Wall -mlarge-code -mlarge-data -legacy-libc
-LFLAGS += -Wl,-Tp$(CPU).gld,-Map="$(TARGET_MAP)",--report-mem
+#LFLAGS += -Wl,-Tp$(CPU).gld,-Map="$(TARGET_MAP)",--report-mem
+LFLAGS += -Wl,-Tp$(CPU).gld,-Map="$(TARGET_MAP)"
 endif
 
 ifeq ($(TOOLCHAIN),XC16) 
@@ -190,7 +191,7 @@ clean:
 	$(RM) $(TARGET) $(objects) $(libraries) $(dependencies)
 
 ifneq "$(MAKECMDGOALS)" "clean"
-  include $(dependencies)
+  -include $(dependencies)
 endif
 
 %.d: %.c

@@ -20,8 +20,8 @@
 
 
 #include "defines.h"
-#include "navigate.h"
 #include "osd_config.h"
+#include "navigate.h"
 #include "states.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
