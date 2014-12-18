@@ -81,7 +81,7 @@ int main(void)
 	cfg_init();     // this attempts to load file system and .ini files
 	dcm_init();
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
-	init_waypoints();
+//	init_waypoints();
 #endif
 	init_servoPrepare();
 	init_states();

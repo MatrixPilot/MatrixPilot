@@ -57,6 +57,7 @@
 
 //printf("o_lon %li o_lat %li o_alt %li\r\n", o_lon, o_lat, o_alt); // o_lon 113480854 o_lat 472580108 o_alt 57763
 
+extern int16_t waypointIndex;
 
 boolean use_fixed_origin(void);
 vect3_32t get_fixed_origin(void);

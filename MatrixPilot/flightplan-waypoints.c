@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "flightplan.h"
 #include "cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
@@ -29,7 +30,7 @@
 #include "mavlink_options.h"
 #include <stdlib.h>
 
-#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
+//#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 
 
 #ifdef USE_EXTENDED_NAV
@@ -45,7 +46,7 @@ struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D vie
 #define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))
 
 //uint16_t number_of_waypoints = NUMBER_POINTS;
-int16_t waypointIndex = 0;
+//int16_t waypointIndex = 0;
 
 #ifdef USE_DYNAMIC_WAYPOINTS
 static struct waypointDef WaypointSet[MAX_WAYPOINTS];
@@ -206,7 +207,12 @@ static void load_flightplan(const struct waypointDef* waypoints, int count)
 
 #endif
 
-void init_waypoints(void)
+int16_t flightplan_waypoints_index_get(void)
+{
+	return waypointIndex;
+}
+
+void flightplan_waypoints_init(void)
 {
 	load_flightplan(waypoints, NUMBER_POINTS);
 }
@@ -214,7 +220,7 @@ void init_waypoints(void)
 // In the future, we could include more than 2 waypoint sets...
 // flightplanNum is 0 for main waypoints, and 1 for RTL waypoints
 //void init_flightplan(int16_t flightplanNum)
-void flightplan_begin(int16_t flightplanNum)
+void flightplan_waypoints_begin(int16_t flightplanNum)
 {
 	if (flightplanNum == 1)         // RTL waypoint set
 	{
@@ -247,26 +253,6 @@ vect3_32t getWaypoint3D(uint16_t wp)
 	return v;
 
 //	return currentWaypointSet[wp].loc;
-}
-
-boolean use_fixed_origin(void)
-{
-#if (USE_FIXED_ORIGIN == 1)
-	return 1;
-#else
-	return 0;
-#endif
-}
-
-vect3_32t get_fixed_origin(void)
-{
-	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
-
-	vect3_32t standardizedOrigin;
-	standardizedOrigin.x = origin.x;
-	standardizedOrigin.y = origin.y;
-	standardizedOrigin.z = (int32_t)(origin.z * 100);
-	return standardizedOrigin;
 }
 
 #if (USE_MAVLINK == 1)
@@ -367,7 +353,8 @@ static void next_waypoint(void)
 	}
 }
 
-void run_flightplan(void)
+//void run_flightplan(void)
+void flightplan_waypoints_update(void)
 {
 	// first run any injected wp from the serial port
 	if (wp_inject_pos == WP_INJECT_READY)
@@ -412,12 +399,12 @@ void run_flightplan(void)
 	}
 }
 
-void flightplan_live_begin(void)
+void flightplan_waypoints_live_begin(void)
 {
 	wp_inject_pos = 0;
 }
 
-void flightplan_live_received_byte(uint8_t inbyte)
+void flightplan_waypoints_live_received_byte(uint8_t inbyte)
 {
 	if (wp_inject_pos < sizeof(wp_inject_byte_order))
 	{
@@ -429,7 +416,7 @@ void flightplan_live_received_byte(uint8_t inbyte)
 	}
 }
 
-void flightplan_live_commit(void)
+void flightplan_waypoints_live_commit(void)
 {
 	if (wp_inject_pos == sizeof(wp_inject_byte_order))
 	{
@@ -441,4 +428,4 @@ void flightplan_live_commit(void)
 	}
 }
 
-#endif // FLIGHT_PLAN_TYPE
+//#endif // FLIGHT_PLAN_TYPE

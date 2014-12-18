@@ -25,6 +25,7 @@
 #include "cameraCntrl.h"
 #include "servoPrepare.h"
 #include "states.h"
+#include "flightplan.h"
 #include "flightplan-waypoints.h"
 #include "../libUDB/libUDB.h"
 #include "../libDCM/gpsParseCommon.h"
@@ -61,6 +62,17 @@ int8_t extended_range = 0;
 int8_t desired_bearing_over_ground;
 int16_t desired_bearing_over_ground_vector[2];
 
+
+int16_t navigate_get_goal(vect3_16t* _goal)
+{
+	if (_goal != NULL)
+	{
+		_goal->x = goal.x;
+		_goal->y = goal.y;
+		_goal->z = goal.height;
+	}
+	return goal.height;
+}
 
 void init_navigation(void)
 {
@@ -203,7 +215,7 @@ void navigate_process_flightplan(void)
 	if (gps_nav_valid() && state_flags._.GPS_steering)
 	{
 		navigate_compute_bearing_to_goal();
-		run_flightplan();
+		flightplan_update(); // was called run_flightplan();
 		compute_camera_view();
 	}
 }

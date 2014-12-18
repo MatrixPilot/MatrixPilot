@@ -21,7 +21,8 @@
 
 #include "defines.h"
 #include "mode_switch.h"
-#include "flightplan-waypoints.h"
+#include "flightplan.h"
+//#include "flightplan-waypoints.h"
 #include "states.h"
 #include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
@@ -39,7 +40,7 @@ static uint8_t counter = 0;
 #else
 #define CALIB_PAUSE (10.5 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
 #define STANDBY_PAUSE (48 * FSM_CLK)    // pause for 48 seconds of runs through the state machine
-										// This used to be 24 seconds, but that was not long enough
+                                        // This used to be 24 seconds, but that was not long enough
 #endif
 
 #define NUM_WAGGLES 4                   // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
@@ -96,7 +97,7 @@ void udb_heartbeat_40hz_callback(void)
 
 	delayCheck++;
 
-	// read flight mode switch (sets flags bits) at 40Hz
+	// read flight mode switch (sets state_flags bits) at 40Hz
 	flight_mode_switch_check_set();
 
 	// respond immediately to change in manual mode or launch detection
@@ -288,7 +289,8 @@ static void ent_waypointS(void)
 
 	if (!(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS))
 	{
-		init_flightplan(0); // Only reset non-rtl waypoints if not already following waypoints
+		//init_flightplan(0); // Only reset non-rtl waypoints if not already following waypoints
+		flightplan_begin(0); // Only reset non-rtl waypoints if not already following waypoints
 	}
 
 	waggle = 0;
@@ -309,7 +311,7 @@ static void ent_returnS(void)
 	state_flags._.rtl_hold = 1;
 #endif
 #if (FAILSAFE_TYPE == FAILSAFE_RTL)
-	init_flightplan(1);
+	flightplan_begin(1); // init_flightplan(1);
 #elif (FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN)
 	if (stateS != &waypointS)
 	{
@@ -457,9 +459,14 @@ static void manualS(void)
 	else
 	{
 		if (dcm_flags._.nav_capable)
+		{
+			DPRINT("manualS() calling ent_returnS()\r\n");
 			ent_returnS();
+		}
 		else
+		{
 			ent_stabilizedS();
+		}
 	}
 }
 
@@ -480,7 +487,10 @@ static void stabilizedS(void)
 	else
 	{
 		if (dcm_flags._.nav_capable)
+		{
+			DPRINT("stabilizedS() calling ent_returnS()\r\n");
 			ent_returnS();
+		}
 	}
 }
 
@@ -497,6 +507,7 @@ static void waypointS(void)
 	}
 	else
 	{
+		DPRINT("waypointS() calling ent_returnS()\r\n");
 		ent_returnS();
 	}
 }

@@ -47,8 +47,8 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN        0
-#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 30.0 }    // A point in Baylands Park in Sunnyvale, CA
+//#define USE_FIXED_ORIGIN        0
+//#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 30.0 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////

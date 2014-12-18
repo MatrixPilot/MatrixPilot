@@ -19,8 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef FLIGHTPLAN_LOGO_H
-#define FLIGHTPLAN_LOGO_H
+//#ifndef FLIGHTPLAN_LOGO_H
+//#define FLIGHTPLAN_LOGO_H
 
 ////////////////////////////////////////////////////////////////////////////////
 // UDB LOGO Waypoint handling
@@ -48,8 +48,8 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN        0
-#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
+//#define USE_FIXED_ORIGIN        0
+//#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -535,4 +535,4 @@ TO (INT_HANDLER_LEFT)
 END
 };
 */
-#endif // FLIGHTPLAN_LOGO_H
+//#endif // FLIGHTPLAN_LOGO_H

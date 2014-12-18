@@ -37,6 +37,7 @@ extern struct waypointparameters goal;
 extern struct relative2D togoal;
 extern int16_t tofinish_line;
 extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+extern int8_t extended_range;
 extern int8_t desired_dir;
 
 void init_navigation(void);

@@ -22,8 +22,10 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "flightplan.h"
 #include "cameraCntrl.h"
 #include "altitudeCntrl.h"
+#include "flightplan_logo.h"
 #include "../libDCM/rmat.h"
 #include "../libDCM/estWind.h"
 #include "../libDCM/mathlibNAV.h"
@@ -31,7 +33,7 @@
 #include "../libDCM/gpsParseCommon.h"
 #include <stdlib.h>
 
-#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 
 struct logoInstructionDef {
@@ -243,7 +245,7 @@ enum {
 #define NUM_INSTRUCTIONS ((sizeof instructions) / sizeof (struct logoInstructionDef))
 #define NUM_RTL_INSTRUCTIONS ((sizeof rtlInstructions) / sizeof (struct logoInstructionDef))
 static int16_t instructionIndex = 0;
-int16_t waypointIndex = 0; // used for telemetry
+//int16_t waypointIndex = 0; // used for telemetry
 static int16_t absoluteHighWord = 0;
 static union longww absoluteXLong;
 
@@ -299,10 +301,22 @@ static boolean process_one_instruction(struct logoInstructionDef instr);
 static void update_goal_from(struct relative3D old_waypoint);
 static void process_instructions(void);
 
+int16_t flightplan_logo_index_get(void)
+{
+	return waypointIndex;
+}
+
+
+
+void flightplan_logo_init(void)
+{
+	DPRINT("flightplan_logo_init()\r\n");
+}
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flightplan(int16_t flightplanNum)
+//void init_flightplan(int16_t flightplanNum)
+void flightplan_logo_begin(int16_t flightplanNum)
 {
 	struct relative2D curHeading;
 	struct relative3D IMUloc;
@@ -360,27 +374,6 @@ void init_flightplan(int16_t flightplanNum)
 	process_instructions();
 }
 
-boolean use_fixed_origin(void)
-{
-#if (USE_FIXED_ORIGIN == 1)
-	return 1;
-#else
-	return 0;
-#endif
-}
-
-vect3_32t get_fixed_origin(void)
-{
-	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
-
-	vect3_32t standardizedOrigin;
-	standardizedOrigin.x = origin.x;
-	standardizedOrigin.y = origin.y;
-	standardizedOrigin.z = (int32_t)(origin.z * 100);
-
-	return standardizedOrigin;
-}
-
 static boolean logo_goal_has_moved(void)
 {
 	return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
@@ -425,7 +418,8 @@ static void update_goal_from(struct relative3D old_goal)
 	set_camera_view(new_goal);
 }
 
-void run_flightplan(void)
+//void run_flightplan(void)
+void flightplan_logo_update(void)
 {
 	// first run any injected instruction from the serial port
 	if (logo_inject_pos == LOGO_INJECT_READY)
@@ -1039,14 +1033,14 @@ static void process_instructions(void)
 	}
 }
 
-void flightplan_live_begin(void)
+void flightplan_logo_live_begin(void)
 {
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
 	logo_inject_pos = 0;
 }
 
-void flightplan_live_received_byte(uint8_t inbyte)
+void flightplan_logo_live_received_byte(uint8_t inbyte)
 {
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
@@ -1062,7 +1056,7 @@ void flightplan_live_received_byte(uint8_t inbyte)
 			break;
 
 		case 2:
-			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F);
+			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F); // TODO: WARNING, right shift by too large amount, data loss
 			logo_inject_instr.use_param = (inbyte & 0x0F);
 			break;
 
@@ -1086,7 +1080,7 @@ void flightplan_live_received_byte(uint8_t inbyte)
 	logo_inject_pos++;
 }
 
-void flightplan_live_commit(void)
+void flightplan_logo_live_commit(void)
 {
 	// The cmd=1 commands (REPEAT, END, TO) are not allowed
 	// to be injected.
@@ -1100,4 +1094,4 @@ void flightplan_live_commit(void)
 	}
 }
 
-#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)
