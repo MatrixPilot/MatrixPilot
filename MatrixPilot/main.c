@@ -25,6 +25,7 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
 #include "states.h"
+#include "console.h"
 #include "flightplan-waypoints.h"
 //#include "ports_config.h"
 //#include "telemetry_config.h"
@@ -49,15 +50,6 @@
 void parameter_table_init(void);
 #endif
 
-void cfg_init(void)
-{
-#if (USE_FILESYS == 1)
-	if (filesys_init())
-	{
-		config_load();
-	}
-#endif // USE_FILESYS
-}
 static jmp_buf buf;
 
 #if (SILSIM == 1)
@@ -77,8 +69,9 @@ int main(void)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
-	udb_init();     // this configure clocks and enables global interrupts
-	cfg_init();     // this attempts to load file system and .ini files
+	udb_init();     // configure clocks and enables global interrupts
+	filesys_init(); // attempts to mount a file system
+	config_init();  // reads .ini files otherwise initialises with defaults
 	dcm_init();
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 //	init_waypoints();
@@ -87,20 +80,7 @@ int main(void)
 	init_states();
 	init_behavior();
 	init_serial();
-/*
-{
-void Init_4(void);
-void minim_osd_init(FILE* _fp);
-void print_iob(char* name, FILE* iob);
 
-	FILE* fp = fopen("com4", "w+");
-	printf("fp = %p\r\n", fp);
-//	print_iob("com4", fp);
-	Init_4();
-	minim_osd_init(fp);
-}
-	printf("osd_init complete\r\n");
- */
 	if (setjmp(buf))
 	{
 		// a processor exception occurred and we're resuming execution here 

@@ -139,3 +139,4 @@ extern union settings_word settings;
 
 void config_load(void);
 void config_save(void);
+void config_init(void);

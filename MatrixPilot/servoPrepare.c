@@ -19,6 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// TODO: rename this module to something such as MatrixPilot.c or FlightControl.c
 // TODO: consider renaming this module, ie. pilot.c / autopilot.c
 
 #include "defines.h"
@@ -46,8 +47,6 @@ int16_t yaw_control;
 int16_t throttle_control;
 uint16_t wind_gain;
 
-void manualPassthrough(void);
-
 void init_servoPrepare(void) // initialize the PWM
 {
 	int16_t i;
@@ -71,6 +70,7 @@ void init_servoPrepare(void) // initialize the PWM
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
+		// initialise the throttle channel to zero, all others to servo midpoint
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
 #endif
 	}
@@ -80,39 +80,50 @@ void init_servoPrepare(void) // initialize the PWM
 #endif
 }
 
+static void flight_controller(void)
+{
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+	{
+		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
+	}
+#if (DEADRECKONING == 1)
+	navigate_process_flightplan();
+#endif
+#if (ALTITUDE_GAINS_VARIABLE == 1)
+	airspeedCntrl();
+#endif // ALTITUDE_GAINS_VARIABLE
+	updateBehavior();
+	wind_gain = wind_gain_adjustment();
+	rollCntrl();
+	yawCntrl();
+	altitudeCntrl();
+	pitchCntrl();
+	servoMix();
+	cameraCntrl();
+	cameraServoMix();
+	updateTriggerAction();
+}
+
+static void manualPassthrough(void)
+{
+	roll_control = pitch_control = yaw_control = throttle_control = 0;
+	servoMix();
+}
+
 // Called at HEARTBEAT_HZ
 //void dcm_servo_callback_prepare_outputs(void)
 void dcm_heartbeat_callback(void)
 {
 	if (dcm_flags._.calib_finished)
 	{
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
-		}
-#if (DEADRECKONING == 1)
-		navigate_process_flightplan();
-#endif
-#if (ALTITUDE_GAINS_VARIABLE == 1)
-		airspeedCntrl();
-#endif // ALTITUDE_GAINS_VARIABLE
-		updateBehavior();
-		wind_gain = wind_gain_adjustment();
-		rollCntrl();
-		yawCntrl();
-		altitudeCntrl();
-		pitchCntrl();
-		servoMix();
-		cameraCntrl();
-		cameraServoMix();
-		updateTriggerAction();
+		flight_controller();
 	}
 	else
 	{
 		// otherwise, there is not anything to do
 		manualPassthrough();                // Allow manual control while starting up
 	}
-	
+	// TODO: move this block into the end of flight_controller or after it's called
 	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 	{
 #if (USE_MAVLINK == 1)
@@ -144,10 +155,4 @@ void minim_osd_8hz(void);
 		minim_osd_8hz();
 #endif // USE_OSD
 	}
-}
-
-void manualPassthrough(void)
-{
-	roll_control = pitch_control = yaw_control = throttle_control = 0;
-	servoMix();
 }

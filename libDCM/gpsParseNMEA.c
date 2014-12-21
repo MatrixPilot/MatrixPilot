@@ -318,7 +318,7 @@ static void gps_comma(uint8_t gpschar)
 //	if (rmc_counter > 11)
 //	{
 //#ifdef DEBUG_NMEA
-//	LED_RED = LED_ON;
+//		led_on(LED_RED);
 //#endif
 //		rmc_counter = 0;
 //		msg_parse = &msg_start;
@@ -326,7 +326,7 @@ static void gps_comma(uint8_t gpschar)
 //	if (gga_counter > 14)
 //	{
 //#ifdef DEBUG_NMEA
-//	LED_RED = LED_ON;
+//		led_on(LED_RED);
 //#endif
 //		gga_counter = 0;
 //		msg_parse = &msg_start;
@@ -647,7 +647,7 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 		}
 	}
 #ifdef DEBUG_NMEA
-LED_RED = LED_OFF;
+	led_off(LED_RED);
 #endif
 }
 
