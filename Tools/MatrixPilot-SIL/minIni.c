@@ -20,6 +20,8 @@
  *  Version: $Id: minIni.c 45 2012-05-14 11:53:09Z thiadmer.riemersma $
  */
 
+#if (WIN == 1 || NIX == 1)
+
 #if (defined _UNICODE || defined __UNICODE__ || defined UNICODE) && !defined MININI_ANSI
 # if !defined UNICODE   /* for Windows */
 #   define UNICODE
@@ -833,3 +835,5 @@ int ini_putf(const TCHAR *Section, const TCHAR *Key, INI_REAL Value, const TCHAR
 }
 #endif /* INI_REAL */
 #endif /* !INI_READONLY */
+
+#endif // (WIN == 1 || NIX == 1)
