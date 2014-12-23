@@ -28,44 +28,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// states.c
-void init_states(void);
-
-extern int16_t waggle;
-
-// these all moved to states.c as they are purely local defines
-//#define CALIB_PAUSE 21        // wait for 10.5 seconds of runs through the state machine
-//#define STANDBY_PAUSE 48      // pause for 24 seconds of runs through the state machine
-//#define NUM_WAGGLES 4         // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
-//#define WAGGLE_SIZE 300
-
-struct state_flags_bits {
-	uint16_t unused                     : 4;
-	uint16_t save_origin                : 1;
-	uint16_t GPS_steering               : 1;
-	uint16_t pitch_feedback             : 1;
-	uint16_t altitude_hold_throttle     : 1;
-	uint16_t altitude_hold_pitch        : 1;
-	uint16_t man_req                    : 1;
-	uint16_t auto_req                   : 1;
-	uint16_t home_req                   : 1;
-	uint16_t rtl_hold                   : 1;
-	uint16_t f13_print_req              : 1;
-	uint16_t disable_throttle           : 1;
-	uint16_t update_autopilot_state_asap: 1;
-};
-
-union state_flags_int { struct state_flags_bits _; int16_t WW; };
-extern union state_flags_int state_flags;
-
-
-////////////////////////////////////////////////////////////////////////////////
-// servoPrepare.c
-void init_servoPrepare(void);
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Control code - rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c
+// Control code - helicalTurnCntrl.c,rollCntrl.c, pitchCntrl.c, yawCntrl.c, altitudeCntrl.c
+void helicalTurnCntrl(void);
 void rollCntrl(void);
 void pitchCntrl(void);
 void yawCntrl(void);
@@ -85,35 +49,15 @@ void save_altitudeCntrl(void);
 void save_altitudeCntrlVariable(void);
 
 
-void calculate_sonar_height_above_ground(void);
+// Negate VALUE if NEEDS_REVERSING is true
+#define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE) ((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
 
 
-// wind gain adjustment
-uint16_t wind_gain_adjustment(void);
-extern uint16_t wind_gain;
-
-extern int16_t pitch_control;
-extern int16_t roll_control;
-extern int16_t yaw_control;
-extern int16_t throttle_control;
-extern union longww throttleFiltered;
-extern int16_t pitchAltitudeAdjust;
-
-#if (SPEED_CONTROL == 1)
-extern int16_t desiredSpeed; // Stored in 10ths of meters per second
-#endif
-
-// AltitudeHold type
+// ALTITUDEHOLD_STABILIZED and ALTITUDEHOLD_WAYPOINT options
 #define AH_NONE             0
 #define AH_PITCH_ONLY       1
 #define AH_FULL             3
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// servoMix.c
-void servoMix(void);
-void cameraServoMix(void);
 
 // Choose the type of air frame by setting AIRFRAME_TYPE in options.h
 // See options.h for a description of each type
@@ -123,6 +67,7 @@ void cameraServoMix(void);
 //#define AIRFRAME_HELI       3    // Untested
 //#define AIRFRAME_QUAD       4    // Under development
 
+// AIRFRAME_TYPE options
 #define AIRFRAME_NONE       0
 #define AIRFRAME_STANDARD   1
 #define AIRFRAME_VTAIL      2
@@ -130,32 +75,16 @@ void cameraServoMix(void);
 #define AIRFRAME_HELI       4    // Untested
 #define AIRFRAME_QUAD       5    // Under development
 
-// Negate VALUE if NEEDS_REVERSING is true
-#define REVERSE_IF_NEEDED(NEEDS_REVERSING, VALUE) ((NEEDS_REVERSING) ? (-(VALUE)) : (VALUE))
-
-extern int16_t cam_pitch_servo_pwm_delta;  
-extern int16_t cam_yaw_servo_pwm_delta;
-int32_t cam_pitchServoLimit(int32_t pwm_pulse);
-int32_t cam_yawServoLimit(int32_t pwm_pulse);
-
-
-// Failsafe Type
+// FAILSAFE_TYPE options
 #define FAILSAFE_RTL                1
 #define FAILSAFE_MAIN_FLIGHTPLAN    2
 
+// FLIGHT_PLAN_TYPE options
+#define FP_NONE                     0
 #define FP_WAYPOINTS                1
 #define FP_LOGO                     2
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// serialIO.c
-void init_serial(void);
-void serial_output(char* format, ...);
-void serial_output_8hz(void);
-void mavlink_output_40hz(void);
-
-// Serial Output Format
+// TELEMETRY_OUTPUT_FORMAT options
 #define SERIAL_NONE         0    // No serial data is sent
 #define SERIAL_DEBUG        1    // UAV Dev Board debug info
 #define SERIAL_ARDUSTATION  2    // Compatible with ArduStation
@@ -168,15 +97,10 @@ void mavlink_output_40hz(void);
 #define SERIAL_MAVLINK      9    // The Micro Air Vehicle Link protocol from the PixHawk Project
 
 
-////////////////////////////////////////////////////////////////////////////////
-// mp_osd.c
-void osd_run_step(void);
-
-
 #include "gain_variables.h"
 
 // GNU compiler specific macros for specifically marking variables as unused
-// If not using GNU, then macro makes no alteration to the code
+// If not using GNU, then these macros make no alteration to the code
 #ifdef __GNUC__
 #  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
 #else

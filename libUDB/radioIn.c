@@ -22,6 +22,8 @@
 #include "libUDB_internal.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "radioIn.h"
+#include "../MatrixPilot/states.h"
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -77,7 +79,7 @@ void udb_servo_record_trims(void)
 	}
 }
 
-void udb_init_capture(void)
+void radioIn_init(void) // was called udb_init_capture(void)
 {
 	int16_t i;
 
@@ -155,13 +157,13 @@ void radioIn_failsafe_check(void)
 			udb_flags._.radio_on = 0;
 			udb_callback_radio_did_turn_off();
 		}
-		LED_GREEN = LED_OFF;
+		led_off(LED_GREEN);
 		noisePulses = 0; // reset count of noise pulses
 	}
 	else
 	{
 		udb_flags._.radio_on = 1;
-		LED_GREEN = LED_ON;
+		led_on(LED_GREEN);
 	}
 	failSafePulses = 0;
 }

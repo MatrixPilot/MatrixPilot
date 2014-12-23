@@ -29,9 +29,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "interrupt.h"
-
-#include "defines.h"
-//#include "../libUDB/libUDB_internal.h"
+#include "mcu.h"
 
 //#define USE_SETJMP
 
@@ -65,7 +63,7 @@ void restart(uint16_t flags, uint32_t addrs)
 	trap_flags = flags;
 	trap_source = addrs;
 
-	DPRINT("TRAP: %04x %04x%04x\r\n", 
+	printf("TRAP: %04x %04x%04x\r\n", 
 	    trap_flags, 
 	    (unsigned int)(trap_source >> 16), 
 	    (unsigned int)(trap_source & 0xffff));

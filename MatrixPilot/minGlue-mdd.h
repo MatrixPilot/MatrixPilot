@@ -27,7 +27,7 @@
 
 /* Since the Memory Disk Drive file system library reads only blocks of files,
  * the function to read a text line does so by "over-reading" a block of the
- * of the maximum size and truncating it behind the end-of-line.
+ * maximum size and truncating it behind the end-of-line.
  */
 static int ini_read(char *buffer, int size, INI_FILETYPE *file)
 {
@@ -60,3 +60,4 @@ static int ini_rename(const char *source, const char *dest)
 #define INI_REAL float
 #define ini_ftoa(string,value) sprintf((string),"%f",(value))
 #define ini_atof(string) (INI_REAL)strtod((string),NULL)
+

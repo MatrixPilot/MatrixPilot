@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "mathlibNAV.h"
 #include "deadReckoning.h"
 #include "gpsParseCommon.h"
@@ -27,6 +27,7 @@
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/magnetometer.h"
 #include "magnetometerOptions.h"
+#include "rmat.h"
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane
@@ -45,10 +46,10 @@
 #define RMAX15 24576 //0b0110000000000000   // 1.5 in 2.14 format
 
 #define GGAIN SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ)) // integration multiplier for gyros
-fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
+static fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
 
-uint16_t spin_rate = 0;
-fractional spin_axis[] = { 0, 0, RMAX };
+static uint16_t spin_rate = 0;
+static fractional spin_axis[] = { 0, 0, RMAX };
 
 #if (BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == UDB5_BOARD)
 // modified gains for MPU6000
@@ -166,24 +167,6 @@ void dcm_init_rmat(void)
 	declinationVector[0] = cosine((int8_t) (DECLINATIONANGLE >> 8));
 	declinationVector[1] = sine((int8_t) (DECLINATIONANGLE >> 8));
 #endif
-}
-
-static void VectorCross(fractional * dest, fractional * src1, fractional * src2)
-{
-	// Implement the cross product. *dest = *src1X*src2;
-	union longww crossaccum;
-	crossaccum.WW = __builtin_mulss(src1[1], src2[2]);
-	crossaccum.WW -= __builtin_mulss(src1[2], src2[1]);
-	crossaccum.WW *= 4;
-	dest[0] = crossaccum._.W1;
-	crossaccum.WW = __builtin_mulss(src1[2], src2[0]);
-	crossaccum.WW -= __builtin_mulss(src1[0], src2[2]);
-	crossaccum.WW *= 4;
-	dest[1] = crossaccum._.W1;
-	crossaccum.WW = __builtin_mulss(src1[0], src2[1]);
-	crossaccum.WW -= __builtin_mulss(src1[1], src2[0]);
-	crossaccum.WW *= 4;
-	dest[2] = crossaccum._.W1;
 }
 
 static inline void read_gyros(void)

@@ -20,12 +20,13 @@
 
 
 int16_t sine(int8_t angle);
-int8_t arcsine(int16_t angle);
+int8_t arcsine(int16_t y);  // arcsine takes the y coordinate of an x,y point and returns an angle
 int16_t cosine(int8_t angle);
 
 uint16_t sqrt_int(uint16_t sqr);
 uint16_t sqrt_long(uint32_t sqr);
 int32_t long_scale(int32_t arg1, int16_t arg2);
+void VectorCross(int16_t * dest, int16_t * src1, int16_t * src2);
 
 void rotate_2D_vector_by_vector(int16_t vector[2], int16_t rotate[2]);      //-> void vect2_16x16_rotate(vect2_16t* vector, const vect2_16t* rotate);
 void rotate_2D_long_vector_by_vector(int32_t vector[2], int16_t rotate[2]); //-> void vect2_32x16_rotate(vect2_32t* vector, const vect2_16t* rotate);

@@ -9,8 +9,8 @@
 #if (WIN == 1 || NIX == 1)
 
 #include <stdio.h>
-#include "libUDB.h"
-#include "events.h"
+#include "../../libUDB/libUDB.h"
+#include "../../libUDB/events.h"
 #include "SIL-events.h"
 
 #define MAX_EVENTS 16

@@ -23,23 +23,6 @@
 #define _UART_H_
 
 
-#ifdef USE_BLUETOOTH_UART
-#define BAUDRATEX       9600UL
-#define BRGHX           0
-#else
-#define BAUDRATEX       115200UL
-#define BRGHX           1
-#endif
-
-
-#if (BRGHX == 0)
-	#define BRG_DIVX    16
-#elif (BRGHX == 1)
-	#define BRG_DIVX    4
-#else
-	#error Must select a valid BRGHX value
-#endif
-
 void init_uart(void);
 
 char GetBaudError(void);
@@ -63,9 +46,11 @@ char Hex2Char(char hex);
 void ClrError(void);
 int DataReceived(void);
 
+#if (SILSIM != 1)
 #define kbhit IsPressed
 #define getch GetChar
 #define putch PutChar
+#endif
 
 
 #endif // _UART_H_

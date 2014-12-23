@@ -23,12 +23,14 @@
 
 
 #include "../libDCM/libDCM.h"
-#include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/serialIO.h"
+#include "../libUDB/servoOut.h"
 
 // Used for serial debug output
 #include <stdio.h>
-
 
 char debug_buffer[128];
 int db_index = 0;
@@ -55,9 +57,9 @@ int main(void)
 	return 0;
 }
 
-void init_events(void)
-{
-}
+//void init_events(void)
+//{
+//}
 
 // Called every 1/40 second at high priority
 void udb_heartbeat_40hz_callback(void)
@@ -152,6 +154,6 @@ void udb_callback_radio_did_turn_off(void)
 {
 }
 
-void osd_init(void)
-{
-}
+//void osd_init(void)
+//{
+//}

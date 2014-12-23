@@ -115,7 +115,7 @@ void udb_gps_msg_parse(uint8_t rxchar);
 		}
 		else
 		{
-			DPRINT("gps_rx timeout\r\n");
+			DPRINT("gps_rx timeout\r");
 		}
 	}
 }

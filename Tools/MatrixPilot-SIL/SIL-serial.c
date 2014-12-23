@@ -10,8 +10,9 @@
 
 #include <stdio.h>
 #include "SIL-udb.h"
-#include "libUDB.h"
-//#include "UDBSocket.h"
+#include "../../libUDB/libUDB.h"
+#include "../../libUDB/serialIO.h"
+#include "UDBSocket.h"
 
 UDBSocket gpsSocket;
 UDBSocket telemetrySocket;

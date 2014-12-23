@@ -24,7 +24,11 @@
 
 
 // number of heartbeats per second
-#define HEARTBEAT_HZ 200
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+#define HEARTBEAT_HZ 200    // MPU6000 is set to update at 200Hz
+#else
+#define HEARTBEAT_HZ 40     // legacy UDB4 and SILSIM update frequency
+#endif
 
 // number of servo updates per second
 #define SERVO_HZ 40

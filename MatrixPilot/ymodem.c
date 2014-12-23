@@ -1,3 +1,4 @@
+#if 0
 /* ymodem for RTD Serial Recovery (rtdsr)
  *
  * copyright (c) 2011 Pete B. <xtreamerdev@gmail.com>
@@ -484,3 +485,5 @@ unsigned long ymodem_send(unsigned char* buf, unsigned long size, char* filename
 	printf("\naborted.\n");
 	return 0;
 }
+
+#endif // 0

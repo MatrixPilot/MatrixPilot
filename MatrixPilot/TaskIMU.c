@@ -36,7 +36,7 @@ static xSemaphoreHandle xSemaphoreIMU = NULL;
 
 //uint16_t heartbeat_counter = 0;
 
-inline void pulse(void)
+inline static void TaskIMU_heartbeat_pulse(void)
 {
 //	heartbeat_counter = (heartbeat_counter+1) % HEARTBEAT_MAX;
 
@@ -71,12 +71,7 @@ inline void pulse(void)
 #endif // NORADIO
  */
 	calculate_analog_sensor_values();
-	udb_callback_read_sensors();
-//void udb_callback_read_sensors(void)
-//{
-//	read_gyros(); // record the average values for both DCM and for offset measurements
-//	read_accel();
-//}
+	udb_callback_read_sensors(); // read_gyros, read_accel
 	udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
 
 /***** THEN CALLED UP TO THE libDCM LAYER ****/
@@ -97,7 +92,7 @@ inline void pulse(void)
 	{
 		dcm_run_imu_step();
 	}
-/* FOO
+//* FOO
 	if (dcm_flags._.calib_finished)
 	{
 		// MOVED HERE FROM flight_controller()
@@ -126,15 +121,15 @@ inline void pulse(void)
 		// otherwise, there is not anything to do
 		manualPassthrough();                // Allow manual control while starting up
 	}
-	osd_run_step();
- */
-/***** FINISHED OFF BACK IN THE libDCM LAYER ****/
+//	osd_run_step();
+// */
+/***** RETURNING BACK INTO THE libDCM LAYER ****/
 	if (!dcm_flags._.init_finished)
 	{
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
 		{
-			dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
-			gps_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_flags._.calib_finished |= dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_flags._.init_finished |= gps_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
 		}
 	}
 
@@ -177,8 +172,13 @@ static void TaskIMU(void* pvParameters)
 		{
 ///////////////////////////////////////////////////////////////////////////////
 			LED_RED = LED_ON;
-			heartbeat();
-			pulse();
+// FIXME
+//   make udb_background_trigger_pulse() a noop and call heartbeat then pulse
+//			heartbeat();
+//			pulse();
+//
+			TaskIMU_heartbeat_pulse(); // simulate limited heartbeat & pulse above
+//
 			LED_RED = LED_OFF;
 ///////////////////////////////////////////////////////////////////////////////
 //			IMU_update();  // this one at full speed
@@ -202,6 +202,7 @@ void TaskIMU_Trigger(void)
 {
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 //	static int i = 0;
+//	DPRINT("TaskIMU_Trigger\r\n");
 
 	if (xSemaphoreIMU != NULL)
 	{

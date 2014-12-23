@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// TODO: RobD - rename this interrupts.c ??
+
 #include "FreeRTOS.h"
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
@@ -42,9 +44,9 @@ inline uint8_t udb_cpu_load(void)
 	return (uint8_t)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16);
 }
 
-inline void init_heartbeat(void)
-{
 #ifndef USE_FREERTOS
+static inline void init_heartbeat(void)
+{
 //#ifdef USE_MPU_HEARTBEAT
 //#if (HEARTBEAT_HZ != 200)
 //#error HEARTBEAT_HZ must be set to 200 when using the MPU6000 as a heartbeat
@@ -52,8 +54,6 @@ inline void init_heartbeat(void)
 //#endif
 
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
-
-#ifndef USE_FREERTOS
 
 	// MPU6000 interrupt is used as the HEARTBEAT_HZ heartbeat of libUDB.
 	// Timer1 is not used for heartbeat, but its interrupt flag is set in the
@@ -66,13 +66,9 @@ inline void init_heartbeat(void)
 
 	// TODO: can we use timer1 to determine the error between the mcu and the mpu 200Hz?
 
-#endif // USE_FREERTOS
+#else // BOARD_TYPE && HEARTBEAT_HZ
 
-#else // use Timer1 as the HEARTBEAT source
-
-#ifdef USE_FREERTOS
-#error Attempt to configure timer1 when USE_FREERTOS is selected
-#endif // USE_FREERTOS
+	// use Timer1 as the HEARTBEAT source
 
 #if (HEARTBEAT_HZ < 150)
 #define TMR1_PRESCALE 64
@@ -98,8 +94,8 @@ inline void init_heartbeat(void)
 	T1CONbits.TON = 1;      // turn on timer 1
 
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
-#endif // USE_FREERTOS
 }
+#endif // USE_FREERTOS
 
 static inline void init_cpu_timer(void)
 {
@@ -153,7 +149,9 @@ static inline void init_callback_2(void)
 
 void udb_init_clock(void)   // initialize timers
 {
+#ifndef USE_FREERTOS
 	init_heartbeat();
+#endif // USE_FREERTOS
 	init_cpu_timer();
 	init_callback_1();
 	init_callback_2();
@@ -168,23 +166,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 	_T1IF = 0;              // clear the interrupt
 	heartbeat();
 	interrupt_restore_corcon;
-}
-#endif // USE_FREERTOS
-
-uint16_t rtos_ticks = 0;
-
-#ifdef USE_FREERTOS
-void vApplicationTickHook(void) // 1000 Hz
-{
-	static int16_t i = 0;
-
-	rtos_ticks++;
-
-	if (++i > (configTICK_RATE_HZ / HEARTBEAT_HZ)) // 40 Hz
-	{
-		i = 0;
-		// heartbeat() is now registered as a callback with the MPU6000 driver @ 200Hz
-	}
 }
 #endif // USE_FREERTOS
 
@@ -206,8 +187,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	_T6IF = 0;              // clear the interrupt
-	//pulse();
-	if (callback_fptr_1) callback_fptr_1();
+	if (callback_fptr_1) callback_fptr_1();	// was called pulse()/heartbeat_pulse()
 	interrupt_restore_corcon;
 }
 

@@ -22,7 +22,7 @@
 #ifndef I2C_H
 #define I2C_H
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 
 typedef void (*I2C_callbackFunc)(boolean);
 

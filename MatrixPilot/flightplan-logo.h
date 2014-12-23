@@ -19,6 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+//#ifndef FLIGHTPLAN_LOGO_H
+//#define FLIGHTPLAN_LOGO_H
+
 ////////////////////////////////////////////////////////////////////////////////
 // UDB LOGO Waypoint handling
 
@@ -45,8 +48,8 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN        0
-#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
+//#define USE_FIXED_ORIGIN        0
+//#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -283,8 +286,7 @@ const struct logoInstructionDef instructions[] = {
 	REPEAT_FOREVER
 		DO_ARG(SQUARE, 100)
 	END
-	
-	
+
 	TO (SQUARE)
 		REPEAT(4)
 			FD_PARAM
@@ -292,7 +294,6 @@ const struct logoInstructionDef instructions[] = {
 		END
 	END
 };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTL Flight Plan
@@ -402,17 +403,13 @@ const struct logoInstructionDef rtlInstructions[] = {
 	USE_ANGLE_TO_GOAL
 	BK(250)
 	PEN_DOWN
-	
 	FLAG_ON(F_LAND)
-	
 	PEN_UP
 	HOME
 	USE_ANGLE_TO_GOAL
 	BK(200)
 	PEN_DOWN
-	
 	SET_ALT(-32)
-	
 	PEN_UP
 	HOME
 	USE_ANGLE_TO_GOAL
@@ -538,3 +535,4 @@ TO (INT_HANDLER_LEFT)
 END
 };
 */
+//#endif // FLIGHTPLAN_LOGO_H

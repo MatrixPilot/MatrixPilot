@@ -150,8 +150,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U##x##RXInterrupt(void) { \
 
 #else // SILSIM
 
-?
-
 #define SIO_INIT(w, x) \
 void w##_sio_init(sio_rx_callback rx_callback, int rx_pri, sio_tx_callback tx_callback, int tx_pri) { }
 

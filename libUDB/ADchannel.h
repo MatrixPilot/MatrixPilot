@@ -42,6 +42,7 @@ extern struct ADchannel udb_zrate;
 
 extern struct ADchannel udb_vref;
 
+extern struct ADchannel udb_analogInputs[];
 
 void udb_a2d_record_offsets(void);
 

@@ -19,14 +19,16 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
+#include "mavlink_options.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVMission.h"
-#include "behaviour.h"
-#include "flightplan-waypoints.h"
+#include "../MatrixPilot/behaviour.h"
+#include "../MatrixPilot/flightplan.h"
+#include "../MatrixPilot/flightplan-waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
 
 uint16_t waypoint_request_i;
@@ -59,13 +61,13 @@ void mavlink_waypoint_changed(int16_t waypoint)
 	mavlink_flags.mavlink_send_waypoint_changed = 1;
 }
 
-void set(uint16_t index, uint16_t data)
+static void set(uint16_t index, uint16_t data)
 {
 	if (index < MAX_PARAMS)
 		params[index] = data;
 }
 
-uint16_t get(uint16_t index)
+static uint16_t get(uint16_t index)
 {
 	uint16_t data = 0;
 	if (index < MAX_PARAMS)
@@ -485,20 +487,21 @@ static inline void MissionAck(mavlink_message_t* handle_msg)
 
 static inline void MissionClearAll(mavlink_message_t* handle_msg)
 {
+	mavlink_mission_clear_all_t packet;
+	uint8_t type = 0; // ok (0), error(1)
+	int16_t i;
+
 	//send_text((uint8_t*)"waypoint clear all\r\n");
 	DPRINT("mission clear all\r\n");
 
 	// decode
-	mavlink_mission_clear_all_t packet;
 	mavlink_msg_mission_clear_all_decode(handle_msg, &packet);
 	if (mavlink_check_target(packet.target_system, packet.target_component)) return;
 
 	// clear all waypoints
-	uint8_t type = 0; // ok (0), error(1)
 	set(PARAM_WP_TOTAL, 0);
 
 	// send acknowledgement 3 times to makes sure it is received
-	int16_t i;
 	for (i = 0; i < 3; i++)
 	{
 		mavlink_msg_mission_ack_send(MAVLINK_COMM_0, handle_msg->sysid, handle_msg->compid, type);
@@ -554,6 +557,8 @@ static inline void MissionCount(mavlink_message_t* handle_msg)
 
 static inline void MissionItem(mavlink_message_t* handle_msg)
 {
+	int16_t flags;
+	struct waypoint3D wp;
 	mavlink_mission_item_t packet;
 	//send_text((uint8_t*)"waypoint\r\n");
 //	DPRINT("mission item\r\n");
@@ -581,11 +586,17 @@ static inline void MissionItem(mavlink_message_t* handle_msg)
 			//tell_command.lng = 1.0e7*packet.x;
 			//tell_command.lat = 1.0e7*packet.y;
 			//tell_command.alt = packet.z*1.0e2;
+
+			// MatrixPilot uses X & Y in reverse to QGC
+			wp.x = packet.y * 1.0e7;
+			wp.y = packet.x * 1.0e7;
+			wp.z = packet.z;
+			flags = F_ABSOLUTE;
 			break;
 		}
 		case MAV_FRAME_LOCAL_NED: // local (relative to home position)
 		{
-			DPRINT("FRAME_LOCAL\r\n");
+			DPRINT("FRAME_LOCAL - not implemented\r\n");
 			//tell_command.lng = 1.0e7*ToDeg(packet.x/
 					//(radius_of_earth*cos(ToRad(home.lat/1.0e7)))) + home.lng;
 			//tell_command.lat = 1.0e7*ToDeg(packet.y/radius_of_earth) + home.lat;
@@ -602,10 +613,12 @@ static inline void MissionItem(mavlink_message_t* handle_msg)
 		case MAV_CMD_NAV_TAKEOFF:
 			DPRINT("NAV_TAKEOFF\r\n");
 			//tell_command.id = CMD_TAKEOFF;
+			flags |= F_TAKEOFF;
 			break;
 		case MAV_CMD_NAV_LAND:
 			DPRINT("NAV_LAND\r\n");
 			//tell_command.id = CMD_LAND;
+			flags |= F_LAND;
 			break;
 		case MAV_CMD_NAV_WAYPOINT:
 			DPRINT("NAV_WAYPOINT\r\n");
@@ -726,6 +739,8 @@ void MAVMissionOutput_40hz(void)
 	// SEND NUMBER OF WAYPOINTS IN WAYPOINTS LIST
 	if (mavlink_flags.mavlink_send_waypoint_count == 1)
 	{
+		int16_t number_of_waypoints = waypoint_count();
+
 		//send_text((uint8_t *)"Sending waypoint count\r\n");
 		DPRINT("Sending waypoint count: %u\r\n", number_of_waypoints);
 		mavlink_msg_mission_count_send(MAVLINK_COMM_0, mavlink_waypoint_dest_sysid, mavlink_waypoint_dest_compid, number_of_waypoints);
@@ -783,4 +798,5 @@ void MAVMissionOutput_40hz(void)
  */
 }
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)
+

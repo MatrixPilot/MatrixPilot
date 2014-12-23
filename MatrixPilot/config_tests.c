@@ -221,12 +221,12 @@
 	#error("Console UART's greater than 2 only supported on AUAV3 board"
 #endif
 
-#if ((USE_TELELOG == 1) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("USE_TELELOG only supported on AUAV3 board"
+#if ((USE_TELELOG == 1) && (USE_FILESYS == 0))
+	#error("USE_TELELOG requires USE_FILESYS"
 #endif
 
-#if ((USE_CONFIGFILE == 1) && (BOARD_TYPE != AUAV3_BOARD))
-	#error("USE_CONFIGFILE only supported on AUAV3 board"
+#if ((USE_CONFIGFILE == 1) && (USE_FILESYS == 0))
+	#error("USE_CONFIGFILE requires USE_FILESYS"
 #endif
 
 #if ((USE_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))

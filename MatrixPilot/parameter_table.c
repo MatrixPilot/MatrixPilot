@@ -1,12 +1,15 @@
 // pyparam generated file - DO NOT EDIT
 
 #include "defines.h" 
+#include "mavlink_options.h"
 
-#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SILSIM == 0 && USE_MAVLINK == 1)
 
 #include "parameter_table.h"
 #include "data_storage.h"
+#include "altitudeCntrl.h"
 #include "../libUDB/ADchannel.h"
+
 
 extern struct ADchannel udb_xaccel;
 extern struct ADchannel udb_yaccel;
@@ -23,10 +26,6 @@ extern int16_t alt_hold_pitch_min;
 extern int16_t alt_hold_pitch_max;
 extern int16_t alt_hold_pitch_high;
 extern int16_t rtl_pitch_down;
-extern int16_t minimum_groundspeed;
-extern int16_t maximum_airspeed;
-extern int16_t minimum_airspeed;
-extern int16_t desiredSpeed;
 extern int16_t minimum_groundspeed;
 extern int16_t maximum_airspeed;
 extern int16_t minimum_airspeed;
@@ -127,5 +126,4 @@ const mavlink_parameter mavlink_parameters_list[] = {
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif 
-
+#endif // (SILSIM == 0 && USE_MAVLINK == 1) 

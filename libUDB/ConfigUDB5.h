@@ -38,6 +38,7 @@
 #define analogInput2BUFF    4
 #define analogInput3BUFF    5
 #define analogInput4BUFF    6
+
 #define A_VOLT_BUFF         7       // V, pin label Bat Volt
 #define A_AMPS_BUFF         8       // I, pin label CS Curr
 #define A_RSSI_BUFF         9       // RS, pin label RSSI
@@ -81,7 +82,7 @@
 #define SPI1_TRIS           _TRISB2
 #define SPI2_TRIS           _TRISG9
 
-// Input Capture pin difinitions
+// Input Capture pin definitions
 #define IC_PIN1             _RD8
 #define IC_PIN2             _RD9
 #define IC_PIN3             _RD10

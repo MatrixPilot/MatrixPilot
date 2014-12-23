@@ -31,7 +31,29 @@
 #ifndef DATA_STORAGE_H
 #define DATA_STORAGE_H
 
-//#include "../libUDB/libUDB_internal.h"
+#include "../libUDB/libUDB.h"
+
+// CONFIGURATION OPTIONS
+
+// Defines the chunks size for data areas.  Can be used to allign with
+// NV memory page size.
+#define FAT_CHUNK_BYTE_SIZE     64
+
+// Size of data pre-amble used to mark the start of a memory area
+#define DATA_PREAMBLE_SIZE      4
+
+// Maximum number of data areas
+#define MAX_DATA_HANDLES        30
+
+// callback type for data storage user
+typedef void (*DS_callbackFunc)(boolean);
+
+// A constant preamble used to determine the start of a data block
+// This also allows the data to be found if the FAT is broken
+extern const uint8_t data_storage_preamble[DATA_PREAMBLE_SIZE];
+
+// A constant preamble used to determine the start of the data storage table
+extern const uint8_t table_storage_preamble[DATA_PREAMBLE_SIZE];
 
 // Data storage types defines the way in which the storage area works
 //
@@ -49,8 +71,33 @@ typedef enum
 	DATA_STORAGE_SELF_MANAGED,
 } DATA_STORAGE_TYPE;
 
-// callback type for data storage user
-typedef void (*DS_callbackFunc)(boolean);
+#if(DATA_HANDLE_MAX >= MAX_DATA_HANDLES)
+	#error("Number of defined data handles exceeds the maximum number of defined handles")
+#endif
+
+// Structure for entry to data directory array
+typedef struct tagDATA_STORAGE_ENTRY
+{
+	uint16_t data_address;
+	uint16_t data_type;
+	uint16_t data_size;
+} DATA_STORAGE_ENTRY;
+
+// Structure of complete data directory including checksum.
+typedef struct tagDATA_STORAGE_TABLE
+{
+	uint8_t            table_preamble[DATA_PREAMBLE_SIZE];
+	DATA_STORAGE_ENTRY table[MAX_DATA_HANDLES];
+	uint16_t           table_checksum;
+} DATA_STORAGE_TABLE;
+
+typedef struct tagDATA_STORAGE_HEADER
+{
+	uint8_t  data_preamble[DATA_PREAMBLE_SIZE];
+	uint16_t data_handle;
+	uint16_t data_version;
+	uint16_t data_checksum;
+} DATA_STORAGE_HEADER;
 
 // Trigger storage service in low priority process.
 void storage_service_trigger(void);
@@ -76,17 +123,17 @@ boolean storage_check_area_exists(uint16_t data_handle, uint16_t size, uint16_t 
 boolean storage_services_started(void);
 
 // For access to a checksummed array data area
-//extern boolean storage_write_array(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback);
-//extern boolean storage_read_array(uint16_t data_handle, uint8_t* prdData, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_write_array(uint16_t data_handle, uint8_t* pwrData, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_read_array(uint16_t data_handle, uint8_t* prdData, uint16_t size, DS_callbackFunc callback);
 
 // For random access to a self managed area
-//extern boolean storage_write_part(uint16_t data_handle, uint8_t* pwrData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
-//extern boolean storage_read_part(uint16_t data_handle, uint8_t* prdData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_write_part(uint16_t data_handle, uint8_t* pwrData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_read_part(uint16_t data_handle, uint8_t* prdData, uint16_t offset, uint16_t size, DS_callbackFunc callback);
 
-//extern boolean storage_resize(uint16_t data_handle, uint16_t size, DS_callbackFunc callback);
+extern boolean storage_resize(uint16_t data_handle, uint16_t size, DS_callbackFunc callback);
 
 // Clear all data storage areas by invalidating data
-//extern boolean storage_clear_all(DS_callbackFunc callback);
+extern boolean storage_clear_all(DS_callbackFunc callback);
 
 // Clear specific data storage area by invalidating data
 boolean storage_clear_area(uint16_t data_handle, DS_callbackFunc callback);

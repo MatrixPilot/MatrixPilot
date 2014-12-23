@@ -1,3 +1,4 @@
+#ifdef _MSC_VER
 /*
     FreeRTOS V7.6.0 - Copyright (C) 2013 Real Time Engineers Ltd. 
     All rights reserved
@@ -531,4 +532,4 @@ long lMutexNeedsReleasing;
 	}
 }
 /*-----------------------------------------------------------*/
-
+#endif // _MSC_VER

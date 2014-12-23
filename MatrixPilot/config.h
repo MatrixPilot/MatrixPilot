@@ -49,8 +49,6 @@ struct network_module_bits {
 
 union network_module_word { struct network_module_bits _; int16_t W; };
 
-extern union network_module_word network_modules;
-
 /*
 struct dcm_flag_bits {
 	uint16_t unused                     : 4;
@@ -79,7 +77,7 @@ struct option_bits {
 };
  */
 
-struct config_bits {
+struct settings_bits {
 	uint16_t unused                     : 3;
 	uint16_t IsDirty                    : 1;
 	uint16_t RollStabilizaionAilerons   : 1;
@@ -94,12 +92,7 @@ struct config_bits {
 	uint16_t RacingMode	                : 1;
 };
 
-union config_word { struct config_bits _; int16_t W; };
-
-extern union config_word config;
-
-void init_config(void);
-void save_config(void);
+union settings_word { struct settings_bits _; int16_t W; };
 
 
 struct gains_variables {
@@ -141,5 +134,8 @@ struct gains_variables {
 };
 
 extern struct gains_variables gains;
+extern union settings_word settings;
+//extern union network_module_word network_modules;
 
-void init_gains(void);
+void config_load(void);
+void config_save(void);

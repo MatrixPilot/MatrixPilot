@@ -19,12 +19,13 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <stdint.h>
-#include "Compiler.h"
-#include "GenericTypeDefs.h"
 #include "FSconfig.h"
 
 #ifdef USE_AT45D_FLASH
+
+#include <stdint.h>
+#include "Compiler.h"
+#include "GenericTypeDefs.h"
 
 #include "AT45D.h"
 #include "MDD_AT45D.h"
@@ -46,7 +47,7 @@
 //------------------------------------------------------------------------------
 //First FAT sector at LBA = 0
 //------------------------------------------------------------------------------
-ROM BYTE BootSector[] =
+const BYTE BootSector[] =
 {
 0xEB, 0x3C, 0x90,                                   // Jump instruction
 'M', 'S', 'D', 'O', 'S', '5', '.', '0',             // OEM Name "MSDOS5.0"
@@ -89,12 +90,12 @@ MDD_AT45D_FLASH_NUM_FAT_SECTORS, 0x00,              // Sectors per FAT
 //(no pad bits).  This means every other byte is a "shared" byte, that is split
 //down the middle and is part of two adjacent 12-bit entries.  
 //The entries are in little endian format.
-ROM BYTE FAT0[] =
+const BYTE FAT0[] =
 {
     0xF8,0xFF,0xFF   // Copy of the media descriptor 0xFF8
 };
 
-ROM BYTE RootDirectory0[] =
+const BYTE RootDirectory0[] =
 {
 //Root
 //	'D','r','i','v','e',' ','N','a','m','e',' ',    // Drive Name (11 characters, padded with spaces)

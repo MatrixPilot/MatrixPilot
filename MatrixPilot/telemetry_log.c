@@ -21,13 +21,13 @@
 
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
+#include "telemetry.h"
 #include "telemetry_log.h"
 #if (WIN == 1 || NIX == 1)
 #include <stdio.h>
-#include "SIL-filesystem.h"
+#include "../Tools/MatrixPilot-SIL/SIL-filesystem.h"
 #else
 #include "MDD-File-System/FSIO.h"
-#include "AT45D.h"
 #endif
 #include <string.h>
 #include <stdarg.h>
@@ -68,7 +68,7 @@ static char logfile_name[13];
 static FSFILE* fsp = NULL;
 
 
-static int16_t log_append(char* logbuf, int index, char* data, int len)
+static int16_t log_append(char* logbuf, int index, const char* data, int len)
 {
 	int16_t end_index = 0;
 	int16_t remaining = LOGBUF_BUFFER_SIZE - index;
@@ -134,29 +134,6 @@ static int fs_nextlog(char* filename)
 	return 0;
 }
 
-// called at startup to initialise the telemetry log system
-void log_init(void)
-{
-//	init_dataflash(); // this should now be getting device specific called from lower layers via FSInit()
-	if (!FSInit())
-	{
-#ifdef USE_AT45D_FLASH
-		AT45D_FormatFS();
-#elif (WIN == 1) || (NIX == 1)
-#else
-#warning No Mass Storage Device Format Function Defined
-#endif // USE_AT45D_FLASH
-		if (!FSInit())
-		{
-			printf("File system initialisation failed\r\n");
-			return;
-		}
-	}
-	printf("File system initalised\r\n");
-}
-
-void restart_telemetry(void);
-
 static void log_open(void)
 {
 	static uint8_t log_error = 0;
@@ -173,7 +150,7 @@ static void log_open(void)
 	{
 		lb1_end_index = 0;  // empty the logfile ping-pong buffers
 		lb2_end_index = 0;
-		restart_telemetry();// signal telemetry to send startup data again
+		telemetry_restart();// signal telemetry to send startup data again
 		printf("%s opened\r\n", logfile_name);
 	}
 	else
@@ -195,9 +172,6 @@ void log_close(void)
 		printf("%s closed\r\n", logfile_name);
 	}
 }
-
-void restart_telemetry(void);
-boolean inflight_state(void);
 
 static void log_check(void)
 {
@@ -226,12 +200,11 @@ static void log_check(void)
 	}
 }
 
-static void log_write(char* str, int len)
+static void log_write(const char* str, int len)
 {
-//	printf("log_write() %u bytes\r\n", len);
 	if (fsp)
 	{
-		LED_BLUE = LED_ON;
+		led_on(LED_BLUE);
 		if (FSfwrite(str, 1, len, fsp) != len)
 		{
 			DPRINT("ERROR: FSfwrite\r\n");

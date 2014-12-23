@@ -22,13 +22,18 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
-#include "../libCntrl/cameraCntrl.h"
+#include "flightplan.h"
+#include "cameraCntrl.h"
+#include "altitudeCntrl.h"
+#include "flightplan_logo.h"
+#include "../libDCM/rmat.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
 #include <stdlib.h>
 
-#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 
 struct logoInstructionDef {
@@ -231,33 +236,35 @@ enum {
                                 _SET_ABS_VAL_HIGH((((uint32_t)(y))>>16)&0xFFFF) _SET_ABS_Y_LOW(((uint32_t)(y))&0xFFFF, 1)
 #define HOME                    _HOME(1)
 
+#define LOGO_MAIN   0   // Allows for DO(LOGO_MAIN) or EXEC(LOGO_MAIN) to start at the top
+
 
 #include "flightplan-logo.h"
 
 
 #define NUM_INSTRUCTIONS ((sizeof instructions) / sizeof (struct logoInstructionDef))
 #define NUM_RTL_INSTRUCTIONS ((sizeof rtlInstructions) / sizeof (struct logoInstructionDef))
-int16_t instructionIndex = 0;
-int16_t waypointIndex = 0; // used for telemetry
-int16_t absoluteHighWord = 0;
-union longww absoluteXLong;
+static int16_t instructionIndex = 0;
+//int16_t waypointIndex = 0; // used for telemetry
+static int16_t absoluteHighWord = 0;
+static union longww absoluteXLong;
 
-struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions;
-int16_t numInstructionsInCurrentSet = NUM_INSTRUCTIONS;
+static struct logoInstructionDef *currentInstructionSet = (struct logoInstructionDef*)instructions;
+static int16_t numInstructionsInCurrentSet = NUM_INSTRUCTIONS;
 
 // If we've processed this many instructions without commanding the plane to fly,
 // then stop and continue on the next run through
 #define MAX_INSTRUCTIONS_PER_CYCLE  32
-int16_t instructionsProcessed = 0;
+static int16_t instructionsProcessed = 0;
 
 // Storage for command injection
-struct logoInstructionDef logo_inject_instr;
-uint8_t logo_inject_pos = 0;
+static struct logoInstructionDef logo_inject_instr;
+static uint8_t logo_inject_pos = 0;
 #define LOGO_INJECT_READY 255
 
 // Storage for interrupt handling
-int16_t interruptIndex = 0;     // intruction index of the beginning of the interrupt function
-int8_t interruptStackBase = 0;  // stack depth when entering interrupt (clear interrupt when dropping below this depth)
+static int16_t interruptIndex = 0;     // instruction index of the beginning of the interrupt function
+static int8_t interruptStackBase = 0;  // stack depth when entering interrupt (clear interrupt when dropping below this depth)
 
 // How many layers deep can Ifs, Repeats and Subroutines be nested
 #define LOGO_STACK_DEPTH            12
@@ -268,34 +275,48 @@ struct logoStackFrame {
 	int16_t arg                     : 16;
 };
 struct logoStackFrame logoStack[LOGO_STACK_DEPTH];
-int16_t logoStackIndex = 0;
+static int16_t logoStackIndex = 0;
 
 #define LOGO_FRAME_TYPE_IF          1
 #define LOGO_FRAME_TYPE_REPEAT      2
 #define LOGO_FRAME_TYPE_SUBROUTINE  3
 
-#define LOGO_MAIN   0   // Allows for DO(LOGO_MAIN) or EXEC(LOGO_MAIN) to start at the top
-
 // These values are relative to the origin, and North
 // x and y are in 16.16 fixed point
-struct logoLocation { union longww x; union longww y; int16_t z; };
-struct logoLocation turtleLocations[2];
-struct relative3D lastGoal = {0, 0, 0};
+struct logoLocation { 
+	union longww x;
+	union longww y;
+	int16_t z;
+};
+static struct logoLocation turtleLocations[2];
+static struct relative3D lastGoal = {0, 0, 0};
 
 // Angles are stored as 0-359
-int16_t turtleAngles[2] = {0, 0};
+static int16_t turtleAngles[2] = {0, 0};
 
-uint8_t currentTurtle;
-int16_t penState;
+static uint8_t currentTurtle;
+static int16_t penState;
 
-boolean process_one_instruction(struct logoInstructionDef instr);
-void update_goal_from(struct relative3D old_waypoint);
-void process_instructions(void);
+static boolean process_one_instruction(struct logoInstructionDef instr);
+static void update_goal_from(struct relative3D old_waypoint);
+static void process_instructions(void);
 
+int16_t flightplan_logo_index_get(void)
+{
+	return waypointIndex;
+}
+
+
+
+void flightplan_logo_init(void)
+{
+	DPRINT("flightplan_logo_init()\r\n");
+}
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flightplan (int16_t flightplanNum)
+//void init_flightplan(int16_t flightplanNum)
+void flightplan_logo_begin(int16_t flightplanNum)
 {
 	struct relative2D curHeading;
 	struct relative3D IMUloc;
@@ -353,37 +374,19 @@ void init_flightplan (int16_t flightplanNum)
 	process_instructions();
 }
 
-boolean use_fixed_origin(void)
-{
-#if (USE_FIXED_ORIGIN == 1)
-	return 1;
-#else
-	return 0;
-#endif
-}
-
-vect3_32t get_fixed_origin(void)
-{
-	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
-
-	vect3_32t standardizedOrigin;
-	standardizedOrigin.x = origin.x;
-	standardizedOrigin.y = origin.y;
-	standardizedOrigin.z = (int32_t)(origin.z * 100);
-
-	return standardizedOrigin;
-}
-
-boolean logo_goal_has_moved(void)
+static boolean logo_goal_has_moved(void)
 {
 	return (lastGoal.x != turtleLocations[PLANE].x._.W1 ||
 			lastGoal.y != turtleLocations[PLANE].y._.W1 ||
 			lastGoal.z != turtleLocations[PLANE].z);
 }
 
-void update_goal_from(struct relative3D old_goal)
+static void update_goal_from(struct relative3D old_goal)
 {
 	struct relative3D new_goal;
+#ifdef USE_EXTENDED_NAV
+	struct relative3D_32 old_goal_32, new_goal_32;
+#endif
 
 	lastGoal.x = new_goal.x = (turtleLocations[PLANE].x._.W1);
 	lastGoal.y = new_goal.y = (turtleLocations[PLANE].y._.W1);
@@ -396,7 +399,18 @@ void update_goal_from(struct relative3D old_goal)
 		old_goal.z = IMUlocationz._.W1;
 	}
 
+#ifdef USE_EXTENDED_NAV
+	// TODO: RobD - review this change implemented to restore build, but not runtime tested
+	old_goal_32.x = old_goal.x;
+	old_goal_32.y = old_goal.y;
+	old_goal_32.z = old_goal.z;
+	new_goal_32.x = new_goal.x;
+	new_goal_32.y = new_goal.y;
+	new_goal_32.z = new_goal.z;
+	navigate_set_goal(old_goal_32, new_goal_32);
+#else
 	navigate_set_goal(old_goal, new_goal);
+#endif // USE_EXTENDED_NAV
 
 	new_goal.x = (turtleLocations[CAMERA].x._.W1);
 	new_goal.y = (turtleLocations[CAMERA].y._.W1);
@@ -404,7 +418,8 @@ void update_goal_from(struct relative3D old_goal)
 	set_camera_view(new_goal);
 }
 
-void run_flightplan(void)
+//void run_flightplan(void)
+void flightplan_logo_update(void)
 {
 	// first run any injected instruction from the serial port
 	if (logo_inject_pos == LOGO_INJECT_READY)
@@ -417,9 +432,10 @@ void run_flightplan(void)
 		}
 		else
 		{
-			if (logo_goal_has_moved()) {
+			if (logo_goal_has_moved())
+			{
 				update_goal_from(lastGoal);
-				compute_bearing_to_goal();
+				navigate_compute_bearing_to_goal();
 			}
 		}
 		logo_inject_pos = 0;
@@ -449,7 +465,7 @@ void run_flightplan(void)
 
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
+		if (abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
 		{
 			process_instructions();
 		}
@@ -464,7 +480,7 @@ void run_flightplan(void)
 }
 
 // For DO and EXEC, find the location of the given subroutine
-int16_t find_start_of_subroutine(uint8_t subcmd)
+static int16_t find_start_of_subroutine(uint8_t subcmd)
 {
 	int16_t i;
 
@@ -482,7 +498,7 @@ int16_t find_start_of_subroutine(uint8_t subcmd)
 
 // When an IF condition was false, use this to skip to ELSE or END
 // When an IF condition was true, and we ran the block, and reach an ELSE, skips to the END
-uint16_t find_end_of_current_if_block(void)
+static uint16_t find_end_of_current_if_block(void)
 {
 	int16_t i;
 	int16_t nestedDepth = 0;
@@ -503,7 +519,7 @@ uint16_t find_end_of_current_if_block(void)
 
 // Referencing PARAM in a LOGO program uses the PARAM from the current subroutine frame, even if
 // we're also nested deeper inside of IF or REPEAT frames.  This finds the current subroutine's frame.
-int16_t get_current_stack_parameter_frame_index(void)
+static int16_t get_current_stack_parameter_frame_index(void)
 {
 	int16_t i;
 
@@ -517,7 +533,7 @@ int16_t get_current_stack_parameter_frame_index(void)
 	return 0;
 }
 
-int16_t get_current_angle(void)
+static int16_t get_current_angle(void)
 {
 	// Calculate heading from Direction Cosine Matrix (rather than GPS), 
 	// So that this code works when the plane is static. e.g. at takeoff
@@ -534,7 +550,7 @@ int16_t get_current_angle(void)
 	return angle;
 }
 
-int16_t get_angle_to_point(int16_t x, int16_t y)
+static int16_t get_angle_to_point(int16_t x, int16_t y)
 {
 	struct relative2D vectorToGoal;
 	int8_t dir_to_goal;
@@ -548,10 +564,11 @@ int16_t get_angle_to_point(int16_t x, int16_t y)
 	angle = (dir_to_goal * 180 + 64) >> 7;  // 0-359 (ccw, 0=East)
 	angle = -angle + 90;                            // 0-359 (clockwise, 0=North)
 	if (angle < 0) angle += 360;
+	if (angle > 360) angle -= 360;
 	return angle;
 }
 
-int16_t logo_value_for_identifier(uint8_t ident)
+static int16_t logo_value_for_identifier(uint8_t ident)
 {
 	if (ident > 0 && ident <= NUM_INPUTS)
 	{
@@ -572,24 +589,31 @@ int16_t logo_value_for_identifier(uint8_t ident)
 			return get_current_angle();
 
 		case ANGLE_TO_HOME: // in degrees. 0-359 (clockwise, 0=North)
-			return get_angle_to_point(0, 0);
-
+		{
+			int16_t angle = get_angle_to_point(0,0);
+			angle += 180;
+			if (angle < 0) angle += 360;
+			if (angle > 360) angle -= 360;
+			return angle;
+		}
 		case ANGLE_TO_GOAL: // in degrees. 0-359 (clockwise, 0=North)
 			return get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1);
 
-		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards home. clockwise offset is positive)
+		case REL_ANGLE_TO_HOME: // in degrees. -180-179 (0=heading directly towards Home. Home to the right of the nose of the plane is positive)
 		{
-			int16_t angle = get_current_angle() - get_angle_to_point(0, 0);
+			int16_t angle = get_angle_to_point(0,0);
+			angle = get_current_angle() - angle;
+			angle += 180;
 			if (angle < -180) angle += 360;
 			if (angle >= 180) angle -= 360;
-			return angle;
+			return -angle;
 		}
-		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards goal. clockwise offset is positive)
+		case REL_ANGLE_TO_GOAL: // in degrees. -180-179 (0=heading directly towards Goal. Goal to the right of the nose of the plane is positive)
 		{
 			int16_t angle = get_current_angle() - get_angle_to_point(IMUlocationx._.W1, IMUlocationy._.W1);
 			if (angle < -180) angle += 360;
 			if (angle >= 180) angle -= 360;
-			return angle;
+			return -angle;
 		}
 		case GROUND_SPEED: // in cm/s
 			return ground_velocity_magnitudeXY;
@@ -621,13 +645,13 @@ int16_t logo_value_for_identifier(uint8_t ident)
 	return 0;
 }
 
-boolean process_one_instruction(struct logoInstructionDef instr)
+static boolean process_one_instruction(struct logoInstructionDef instr)
 {
 	if (instr.use_param)
 	{
 		// Use the subroutine's parameter instead of the instruction's arg value
 		int16_t ind = get_current_stack_parameter_frame_index();
-		instr.arg *= logoStack[ind].arg;
+		instr.arg = logoStack[ind].arg;
 	}
 
 	switch (instr.cmd)
@@ -901,8 +925,8 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 					}
 					break;
 				}
-				break;
 			}
+			break;
 
 		case 11: // Speed
 #if (SPEED_CONTROL == 1)
@@ -955,14 +979,16 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 			else if (instr.cmd == 18 && val >= instr.arg) condTrue = true;  // IF_GE
 			else if (instr.cmd == 19 && val <= instr.arg) condTrue = true;  // IF_LE
 
-			if (condTrue) {
+			if (condTrue)
+			{
 				if (logoStackIndex < LOGO_STACK_DEPTH-1)
 				{
 					logoStackIndex++;
 					logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_IF;
 				}
 			}
-			else {
+			else
+			{
 				// jump to the matching END or ELSE
 				instructionIndex = find_end_of_current_if_block();
 				if (currentInstructionSet[instructionIndex].subcmd == 3) // is entering an ELSE block
@@ -980,7 +1006,7 @@ boolean process_one_instruction(struct logoInstructionDef instr)
 	return instr.do_fly;
 }
 
-void process_instructions(void)
+static void process_instructions(void)
 {
 	instructionsProcessed = 0;
 
@@ -1001,25 +1027,27 @@ void process_instructions(void)
 
 	waypointIndex = instructionIndex - 1;
 
-	if (logo_goal_has_moved()) {
+	if (logo_goal_has_moved())
+	{
 		update_goal_from(lastGoal);
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 	}
 }
 
-void flightplan_live_begin(void)
+void flightplan_logo_live_begin(void)
 {
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
 	logo_inject_pos = 0;
 }
 
-void flightplan_live_received_byte(uint8_t inbyte)
+void flightplan_logo_live_received_byte(uint8_t inbyte)
 {
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
 
-	switch (logo_inject_pos) {
+	switch (logo_inject_pos)
+	{
 		case 0:
 			logo_inject_instr.cmd = inbyte;
 			break;
@@ -1029,7 +1057,7 @@ void flightplan_live_received_byte(uint8_t inbyte)
 			break;
 
 		case 2:
-			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F);
+			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F); // TODO: WARNING, right shift by too large amount, data loss
 			logo_inject_instr.use_param = (inbyte & 0x0F);
 			break;
 
@@ -1053,9 +1081,9 @@ void flightplan_live_received_byte(uint8_t inbyte)
 	logo_inject_pos++;
 }
 
-void flightplan_live_commit(void)
+void flightplan_logo_live_commit(void)
 {
-	// The cmd=1 commads (REPEAT, END, TO) are not allowed
+	// The cmd=1 commands (REPEAT, END, TO) are not allowed
 	// to be injected.
 	if (logo_inject_pos == 5 && logo_inject_instr.cmd != 1)
 	{
@@ -1067,4 +1095,4 @@ void flightplan_live_commit(void)
 	}
 }
 
-#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)

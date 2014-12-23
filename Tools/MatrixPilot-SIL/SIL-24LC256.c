@@ -18,14 +18,14 @@
 
 #if (WIN == 1 || NIX == 1)
 
-#include "libUDB_internal.h"
+#include "../../libUDB/libUDB.h"
 #include "nv_memory_options.h"
 
 #if (USE_NV_MEMORY == 1)
 
-#include "NV_memory.h"
-#include "I2C.h"
-#include "events.h"
+#include "../../libUDB/NV_memory.h"
+#include "../../libUDB/I2C.h"
+#include "../../libUDB/events.h"
 
 #define MCP24LC256_COMMAND  0xA0
 

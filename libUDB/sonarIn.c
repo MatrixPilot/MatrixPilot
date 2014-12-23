@@ -19,7 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
+#include "interrupt.h"
+#include "sonarIn.h"
 
 #if (USE_SONAR_INPUT != 0)
 
@@ -36,6 +38,26 @@ uint16_t get_sonar_count(void)
 {
 	return sonar_pwm_count;
 }
+
+#if (BOARD_TYPE == AUAV3_BOARD)
+#define REGTOK1 N1
+#define REGLBL1 bits.ICTSEL
+#else // UDB4 or 5
+#define REGTOK1 N
+#define REGLBL1 bits.ICTMR
+#endif
+
+//	_TRISD15 = 1; \  // TODO: check if we need to be setting the tris bit for our input capture
+
+#define _SONAR_INIT(x, y, z) \
+{ \
+	IC##x##CO##y##z = 0; \
+	IC##x##CO##y##bits.ICM = 1; \
+	_IC##x##IP = 6; \
+	_IC##x##IF = 0; \
+	_IC##x##IE = 1; \
+}
+#define SONAR_INIT(x, y, z) _SONAR_INIT(x, y, z)
 
 void udb_init_sonar(void)
 {
@@ -55,37 +77,37 @@ void udb_init_sonar(void)
 	T3CONbits.TCS = 0;      // use the internal clock
 	T3CONbits.TON = 1;      // turn on timer 3
 
-	IC8CONbits.ICTMR = 0;   // use timer 3
-	IC8CONbits.ICM = 1;     // capture every edge
-	_TRISD15 = 1;
-	_IC8IP = 6;
-	_IC8IF = 0;
-	_IC8IE = 1;             // enable sonar intterupt
+	SONAR_INIT(USE_SONAR_INPUT, REGTOK1, REGLBL1);
+
 }
 
-void __attribute__((__interrupt__,__no_auto_psv__)) _IC8Interrupt(void)
-{
-	indicate_loading_inter;
-	interrupt_save_set_corcon;
+#define _SONAR_HANDLER(x, y) \
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
+{ \
+	indicate_loading_inter; \
+	interrupt_save_set_corcon; \
+	uint16_t time; \
+	_IC##x##IF = 0; \
+	while (IC##x##CO##y##bits.ICBNE) \
+	{ \
+		time = IC##x##BUF; \
+	} \
+	if (IC_PIN##x) \
+	{ \
+		udb_pwm_sonar_rise = time; \
+		sonar_pwm_count++; \
+	} \
+	else \
+	{ \
+		udb_pwm_sonar = time - udb_pwm_sonar_rise; \
+		udb_flags._.sonar_updated = 1; \
+	} \
+	interrupt_restore_corcon; \
+	}
+#define SONAR_HANDLER(x, y) _SONAR_HANDLER(x, y)
 
-	uint16_t time;
-
-	_IC8IF = 0;             // clear the interrupt
-	while (IC8CONbits.ICBNE)
-	{
-		time = IC8BUF;
-	}
-	if (PORTDbits.RD15)     // TODO: make this portable to the AUAV3
-	{
-		udb_pwm_sonar_rise = time;
-		sonar_pwm_count++;
-	}
-	else
-	{
-		udb_pwm_sonar = time - udb_pwm_sonar_rise;
-		udb_flags._.sonar_updated = 1;
-	}
-	interrupt_restore_corcon;
-}
+#if (USE_SONAR_INPUT != 0)
+SONAR_HANDLER(USE_SONAR_INPUT, REGTOK1);
+#endif // USE_SONAR_INPUT
 
 #endif // USE_SONAR_INPUT

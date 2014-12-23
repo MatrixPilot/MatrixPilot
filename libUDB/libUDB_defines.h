@@ -25,7 +25,7 @@
 
 #include "udbTypes.h"
 
-//#if SILSIM
+//#ifdef USE_SILSIM // may move to this style of USE_xxx macro in the future..
 #if (SILSIM == 1)
 #define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
 #else
@@ -74,7 +74,7 @@
 
 
 // define the board rotations here.
-// This include must go jsut after the board type has been declared
+// This include must go just after the board type has been declared
 // Do not move this
 // Orientation of the board
 #define ORIENTATION_FORWARDS    0

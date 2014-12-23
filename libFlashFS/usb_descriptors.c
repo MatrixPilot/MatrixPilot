@@ -121,6 +121,10 @@ state according to the definition in the USB specification.
 #ifndef __USB_DESCRIPTORS_C
 #define __USB_DESCRIPTORS_C
 
+#include "../libUDB/libUDB.h"
+
+#if (USE_USB == 1)
+
 /** INCLUDES *******************************************************/
 #include "./USB/usb.h"
 #include "./USB/usb_function_msd.h"
@@ -132,7 +136,7 @@ state according to the definition in the USB specification.
 #endif
 
 /* Device Descriptor */
-ROM USB_DEVICE_DESCRIPTOR device_dsc=
+const USB_DEVICE_DESCRIPTOR device_dsc=
 {
     0x12,    // Size of this descriptor in bytes
     USB_DESCRIPTOR_DEVICE,                // DEVICE descriptor type
@@ -151,7 +155,7 @@ ROM USB_DEVICE_DESCRIPTOR device_dsc=
 };
 
 /* Configuration 1 Descriptor */
-ROM BYTE configDescriptor1[]={
+const BYTE configDescriptor1[]={
     /* Configuration Descriptor */
     9,    // Size of this descriptor in bytes
     USB_DESCRIPTOR_CONFIGURATION,                // CONFIGURATION descriptor type
@@ -279,7 +283,7 @@ ROM BYTE configDescriptor1[]={
 };
 
 //Language code string descriptor
-ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={
+const struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={
     sizeof(sd000),
     USB_DESCRIPTOR_STRING,
     {0x0409
@@ -287,14 +291,14 @@ ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={
 };
 
 //Manufacturer string descriptor
-ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={
+const struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={
 sizeof(sd001),USB_DESCRIPTOR_STRING,
 {'M','i','c','r','o','c','h','i','p',' ',
 'T','e','c','h','n','o','l','o','g','y',' ','I','n','c','.'
 }};
 
 //Product string descriptor
-ROM struct{BYTE bLength;BYTE bDscType;WORD string[28];}sd002={
+const struct{BYTE bLength;BYTE bDscType;WORD string[28];}sd002={
 sizeof(sd002),USB_DESCRIPTOR_STRING,
 {'M','i','c','r','o','c','h','i','p',' ','C','o','m','p','o','s','i','t','e',' ','D','e','v','i','c','e'
 }};
@@ -305,25 +309,27 @@ sizeof(sd002),USB_DESCRIPTOR_STRING,
 //all hosts support all character values in the serial number string.  The MSD 
 //Bulk Only Transport (BOT) specs v1.0 restrict the serial number to consist only
 //of ASCII characters "0" through "9" and capital letters "A" through "F".
-ROM struct{BYTE bLength;BYTE bDscType;WORD string[12];}sd003={
+const struct{BYTE bLength;BYTE bDscType;WORD string[12];}sd003={
 sizeof(sd003),USB_DESCRIPTOR_STRING,
 {'1','2','3','4','5','6','7','8','9','9','9','9'}};
 
 //Array of configuration descriptors
-ROM BYTE *ROM USB_CD_Ptr[]=
+const BYTE *const USB_CD_Ptr[]=
 {
-    (ROM BYTE *ROM)&configDescriptor1
+    (const BYTE *const)&configDescriptor1
 };
 
 //Array of string descriptors
-ROM BYTE *ROM USB_SD_Ptr[]=
+const BYTE *const USB_SD_Ptr[]=
 {
-    (ROM BYTE *ROM)&sd000,
-    (ROM BYTE *ROM)&sd001,
-    (ROM BYTE *ROM)&sd002,
-    (ROM BYTE *ROM)&sd003
+    (const BYTE *const)&sd000,
+    (const BYTE *const)&sd001,
+    (const BYTE *const)&sd002,
+    (const BYTE *const)&sd003
 };
 
 
-#endif
+#endif // (USE_USB == 1)
+
+#endif // __USB_DESCRIPTORS_C
 /** EOF usb_descriptors.c ***************************************************/

@@ -1,3 +1,4 @@
+#ifndef _MSC_VER
 /*
     FreeRTOS V7.5.3 - Copyright (C) 2013 Real Time Engineers Ltd. 
     All rights reserved
@@ -469,3 +470,4 @@ void __attribute__((__interrupt__, auto_psv)) configTICK_INTERRUPT_HANDLER( void
 	}
 }
 
+#endif // _MSC_VER

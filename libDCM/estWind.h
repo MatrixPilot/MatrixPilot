@@ -19,5 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-void estWind(vect3_16t* est_wind, struct relative3D gps_velocity);
+//void estWind(vect3_16t* est_wind, struct relative3D gps_velocity);
+
+extern int16_t estimatedWind[3];    // wind velocity vectors in cm / sec
+
+void estWind(void);
 

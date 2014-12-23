@@ -44,7 +44,7 @@ struct dcm_flag_bits {
 	uint16_t nmea_passthrough       : 1; // only used by ublox
 	uint16_t init_finished          : 1;
 	uint16_t calib_finished         : 1;
-	uint16_t integrate_req          : 1;
+	uint16_t integrate_req          : 1; // for multirotor support, under development
 };
 
 
@@ -95,7 +95,8 @@ struct dcm_flag_bits {
 
 #define ACCELSCALE ((int32_t)(GRAVITY/GRAVITYM))
 
-#define CENTRISCALE ((int32_t)(((int64_t)519168.0)*GRAVITY)/((int64_t)RADPERSEC*GRAVITYM))
+//#define CENTRISCALE ((int32_t)(((int64_t)519168.0)*GRAVITY)/((int64_t)RADPERSEC*GRAVITYM))
+#define CENTRISCALE ((uint64_t)((((uint64_t)519168.0)*(uint64_t)GRAVITY)/((uint64_t)RADPERSEC*(uint64_t)GRAVITYM)))
 // scale factor in multiplying omega times velocity to get centrifugal acceleration
 
 #define CENTRIFSAT ((int32_t)(GRAVITYM*RADPERSEC)/(GRAVITY*((int64_t)32)))

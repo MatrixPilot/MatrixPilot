@@ -37,6 +37,7 @@ extern struct waypointparameters goal;
 extern struct relative2D togoal;
 extern int16_t tofinish_line;
 extern int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+extern int8_t extended_range;
 extern int8_t desired_dir;
 
 void init_navigation(void);
@@ -47,7 +48,7 @@ void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPo
 void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint);
 #endif // USE_EXTENDED_NAV
 void navigate_set_goal_height(int16_t z);
-void compute_bearing_to_goal(void);
+void navigate_compute_bearing_to_goal(void);
 void navigate_process_flightplan(void);
 int16_t navigate_determine_deflection(char navType);
 int16_t navigate_desired_height(void);
@@ -55,5 +56,6 @@ int16_t navigate_desired_height(void);
 // NEW STUFF:
 int16_t navigate_get_goal(vect3_16t* goal);
 
+uint16_t wind_gain_adjustment(void);
 
 #endif // NAVIGATE_H

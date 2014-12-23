@@ -20,28 +20,34 @@
 
 
 #include "defines.h"
+#include "states.h"
 #include "navigate.h"
-#include "../libCntrl/cameraCntrl.h"
+#include "cameraCntrl.h"
 #include "flightplan-waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/osd.h"
-//#include "../libUDB/magnetometerOptions.h"
 #include "magnetometerOptions.h"
 #include "osd_config.h"
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
+#include "../libUDB/mcu.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/rmat.h"
 #include <string.h>
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -84,7 +90,7 @@ void init_serial(void)
 
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 19200 // default
-#warning SERIAL_BAUDRATE set to default value of 19200 bps
+#pragma warning ("SERIAL_BAUDRATE set to default value of 19200 bps for telemetry")
 #endif
 
 	udb_serial_set_rate(SERIAL_BAUDRATE);
@@ -344,7 +350,7 @@ void sio_fbdl_data(unsigned char inchar)
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t len;
 	int16_t start_index;
@@ -383,7 +389,7 @@ void serial_output(char* format, ...)
 }
 #else
 // add this text to the output buffer
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t start_index;
 	int16_t remaining;
@@ -427,14 +433,14 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 
 static int16_t telemetry_counter = 8;
 
-void restart_telemetry(void)
+void telemetry_restart(void)
 {
 	telemetry_counter = 8;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
 	    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW,
@@ -447,7 +453,7 @@ void serial_output_8hz(void)
 
 extern int16_t desiredHeight;
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	uint16_t mode;
 	struct relative2D matrix_accum;
@@ -520,11 +526,13 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	int16_t i;
-//	static int16_t telemetry_counter = 8;
 	static int toggle = 0;
+#endif
+//	static int16_t telemetry_counter = 8;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
 	// F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
@@ -648,7 +656,7 @@ void serial_output_8hz(void)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
 				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
-				    flags.WW, osc_fail_count,
+				    state_flags.WW, osc_fail_count,
 				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
 //				serial_output("tmp%i:prs%li:alt%li:agl%li:",
 //				    get_barometer_temperature(), get_barometer_pressure(), 
@@ -695,7 +703,7 @@ extern int16_t udb_magOffset[3];
 
 #warning SERIAL_OSD_REMZIBI undergoing merge to trunk
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	// TODO: Output interesting information for OSD.
 	// But first we'll have to implement a buffer for passthrough characters to avoid
@@ -725,7 +733,7 @@ extern int16_t I2interrupts;
 #define I2CSTATREG I2CSTAT
 #endif
 /*
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	serial_output("MagMessage: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\nMessages: %i\r\nInterrupts: %i\r\n\r\n",
 	    magMessage,
@@ -734,7 +742,7 @@ void serial_output_8hz(void)
 }
  */
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
@@ -760,7 +768,7 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_CAM_TRACK)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	uint8_t checksum = 0;
 	checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1;
@@ -783,10 +791,11 @@ void serial_output_8hz(void)
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
 #if (USE_OSD != OSD_MINIM) && (USE_OSD != OSD_REMZIBI)
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 }
 #endif // USE_OSD
 
 #endif
-#endif // (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+#endif // SERIAL_OUTPUT_FORMAT
+#endif // SERIAL_MAVLINK

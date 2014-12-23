@@ -21,12 +21,15 @@
 
 #include "defines.h"
 #include "behaviour.h"
-#include "flightplan-waypoints.h"
+#include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
-
+#include "states.h"
+#include "flightplan-waypoints.h"
 #include "FreeRTOS.h"
 #include "task.h"
+
+#include <setjmp.h>
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -40,9 +43,10 @@
 #include "console.h"
 #endif
 
-void init_tasks(void);
+void TaskInit_Create(void);
 void vApplicationIdleHook(void);
 
+static jmp_buf buf;
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -55,26 +59,27 @@ int main(int argc, char** argv)
 #else
 int main(void)
 {
-	mcu_init();
+	mcu_init();     // initialise the processor specific registers
 #endif
 
-#if (USE_TELELOG == 1)
-	log_init();
-#endif
+//#if (USE_TELELOG == 1)
+//	log_init();
+//#endif
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
-	udb_init();
+	udb_init();     // configure clocks and enables global interrupts
+	filesys_init(); // attempts to mount a file system
+	config_init();  // reads .ini files otherwise initialises with defaults
 	dcm_init();
-//	init_config();  // this will need to be moved up in order to support runtime hardware options
 //	init_waypoints();
-//	init_servoPrepare();
-//	init_states();
-//	init_behavior();
-//	init_serial();
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	init_serial();
 
-	if (setjmp())
+	if (setjmp(buf))
 	{
 		// a processor exception occurred and we're resuming execution here 
 		DPRINT("longjmp'd\r\n");
@@ -85,7 +90,7 @@ int main(void)
 //#undef USE_FREERTOS
 #ifdef USE_FREERTOS
 	DPRINT("Initialising RTOS\r\n");
-	init_tasks();   // initialise the RTOS
+	TaskInit_Create();   // initialise the RTOS
 	DPRINT("Starting Scheduler\r\n");
 	vTaskStartScheduler();  // start the RTOS running, this function should never return
 #else
@@ -100,7 +105,7 @@ int main(void)
 void vApplicationIdleHook(void)
 {
 //	static int i = 0;
-/*
+//*
 #if (USE_TELELOG == 1)
 	telemetry_log();
 #endif
@@ -113,15 +118,33 @@ void vApplicationIdleHook(void)
 //#ifndef (USE_FREERTOS)
 	udb_run();
 //#endif
- */
+// */
 }
 
 void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 {
-	DPRINT("Stack: %s\r\N", pcTaskName);
+	DPRINT("Stack: %s\r\n", pcTaskName);
 }
 
 void vApplicationMallocFailedHook(void)
 {
 	DPRINT("Malloc Failed\r\n");
 }
+
+uint16_t rtos_ticks = 0;
+
+#ifdef USE_FREERTOS
+void vApplicationTickHook(void) // 1000 Hz
+{
+	static int16_t i = 0;
+
+	rtos_ticks++;
+
+//	if (++i > (configTICK_RATE_HZ / HEARTBEAT_HZ)) // 40 Hz
+//	{
+//		i = 0;
+//		// heartbeat() is now registered as a callback with the MPU6000 driver @ 200Hz
+//	}
+}
+#endif // USE_FREERTOS
+

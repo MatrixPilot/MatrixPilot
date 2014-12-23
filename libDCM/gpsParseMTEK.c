@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 
 
 #if (GPS_TYPE == GPS_MTEK || GPS_TYPE == GPS_ALL)
@@ -37,7 +39,7 @@ static void msg_DD(uint8_t gpschar);
 static void msg_MSG_DATA(uint8_t gpschar);
 static void msg_CS1(uint8_t gpschar);
 
-void (*msg_parse)(uint8_t inchar) = &msg_start;
+void (*msg_parse)(uint8_t gpschar) = &msg_start;
 
 static const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
 static const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200
@@ -55,9 +57,7 @@ static uint8_t svs_;
 static uint8_t fix_type_;
 //union intbb hdop_;
 static union intbb checksum;
-//uint8_t day_of_week;
 
-static union longbbbb last_alt;
 static uint8_t CK_A;
 static uint8_t CK_B;
 static int16_t store_index = 0;
@@ -183,6 +183,8 @@ static void msg_CS1(uint8_t gpschar)
 
 void gps_commit_data(void)
 {
+	static union longbbbb last_alt = { 0 };
+
 	if (week_no.BB == 0)
 	{
 		week_no.BB = calculate_week_num(date_gps_.WW);
@@ -197,6 +199,11 @@ void gps_commit_data(void)
 	hdop         = (uint8_t)(hdop_.BB / 20);
 	svs          = svs_;
 	last_alt     = alt_sl_gps_;
+}
+
+void gps_update_basic_data(void)
+{
+	svs          = svs_;
 }
 
 void init_gps_mtek(void)

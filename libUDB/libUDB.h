@@ -35,17 +35,19 @@
 #define HILSIM                              1
 #undef  MODE_SWITCH_TWO_POSITION
 #define MODE_SWITCH_TWO_POSITION            0
-#undef  USE_TELELOG
-#define USE_TELELOG                         0
-#undef  USE_CONFIGFILE
-#define USE_CONFIGFILE                      0
+//#undef  USE_TELELOG
+//#define USE_TELELOG                         0
+//#undef  USE_CONFIGFILE
+//#define USE_CONFIGFILE                      0
 #undef  USE_USB
 #define USE_USB                             0
 #undef  USE_MSD
 #define USE_MSD                             0
+#undef  RECORD_FREE_STACK_SPACE
+#define RECORD_FREE_STACK_SPACE             0
 #undef  FAILSAFE_INPUT_MIN
 #define FAILSAFE_INPUT_MIN                  1500
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #undef BAROMETER_ALTITUDE
 #else
 #define SILSIM                              0
@@ -59,9 +61,17 @@
 // See the MatrixPilot wiki for more details on different board types.
 #ifdef UDB4
 #define BOARD_TYPE                          UDB4_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef UDB5
 #define BOARD_TYPE                          UDB5_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
@@ -140,16 +150,6 @@ void udb_heartbeat_40hz_callback(void);
 void udb_heartbeat_callback(void);
 
 typedef void (*background_callback)(void);
-typedef void (*callback_fptr_t)(void);
-/*
-static callback_fptr_t callback = NULL;
-
-void some_function(callback_fptr_t fptr)
-{
-	callback = fptr;
-	if (callback) callback();
-}
- */
 
 // Trigger the background_callback() functions from a low priority ISR.
 void udb_background_trigger(background_callback callback);
@@ -157,8 +157,7 @@ void udb_background_trigger_pulse(background_callback callback);
 
 // Return the current CPU load as an integer percentage value from 0-100.
 uint8_t udb_cpu_load(void);
-//inline void cpu_load_calc(void);
-void cpu_load_calc(void);
+inline void cpu_load_calc(void);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,12 +233,6 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 #endif
 
 
-// Calibrate the sensors
-// Call this function once, soon after booting up, after a few seconds of
-// holding the UDB very still.
-void udb_callback_read_sensors(void);       // Callback
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
@@ -248,42 +241,6 @@ void udb_callback_read_sensors(void);       // Callback
 #define led_on(x)                       ((x) = 0)
 #define led_off(x)                      ((x) = 1)
 
-
-////////////////////////////////////////////////////////////////////////////////
-// GPS IO
-
-// Set the GPS serial data rate.
-void udb_gps_set_rate(int32_t rate);
-boolean udb_gps_check_rate(int32_t rate);  // returns true if the rate arg is the current rate
-
-// Call this function to initiate sending a data to the GPS
-void udb_gps_start_sending_data(void);
-
-// Implement this callback to tell the UDB what byte is next to send on the GPS.
-// Return -1 to stop sending data.
-int16_t udb_gps_callback_get_byte_to_send(void);        // Callback
-
-// Implement this callback to handle receiving a byte from the GPS
-void udb_gps_callback_received_byte(uint8_t rxchar);    // Callback
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Serial IO
-
-// Set the serial port data rate.  Use the UDB_BAUD_* constants defined in the Config*.h
-// files.
-void udb_serial_set_rate(int32_t rate);
-boolean udb_serial_check_rate(int32_t rate);// returns true if the rate arg is the current rate
-
-// Call this function to initiate sending a data to the serial port
-void udb_serial_start_sending_data(void);
-
-// Implement this callback to tell the UDB what byte is next to send on the serial port.
-// Return -1 to stop sending data.
-int16_t udb_serial_callback_get_byte_to_send(void);     // Callback
-
-// Implement this callback to handle receiving a byte from the serial port
-void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
 
 
 #endif // LIB_UDB_H

@@ -1,3 +1,4 @@
+#if 0
 /*
     FreeRTOS V7.6.0 - Copyright (C) 2013 Real Time Engineers Ltd. 
     All rights reserved
@@ -223,3 +224,4 @@ _vPortYield:
 
 #endif /* defined( __dsPIC33E__ ) */
 
+#endif // 0

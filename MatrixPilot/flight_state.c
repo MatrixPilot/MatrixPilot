@@ -20,9 +20,8 @@
 
 
 #include "defines.h"
-//#include "../libDCM/libDCM_internal.h"
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
-//#include <stdlib.h>
 
 
 #define MIN_THROTTLE        2240

@@ -18,7 +18,7 @@ the tools directory. e.g. Tools/MAVLink/pymavlink/generator/gen_matrixpilot.py .
 The script reads the XML definitions that are "common" to all MAVLink protocol
 enabled vehicles, as well as specific mesages for "matrixpilot". These two xml
 files, common.xml and matrixpilot.xml can be found in -
-Toools/MAVlink/pymavlink/generator/message-definitions .
+Tools/MAVlink/pymavlink/generator/message-definitions .
 
 You will need to have Python installed. The scripts have been tested under
 Windows7 64 bit, with Python 2.7.1 and Python 2.7.2.
@@ -80,7 +80,7 @@ The Mavlink directory can also be created using the following recipe:
   }
 
 * Added all the *.h files in MAVLink include directory and MAVLink/include/common
-  directory to MPLAB project list for MatrixPilot (relative file addressing). 
+  directory to the MPLAB project list for MatrixPilot (relative file addressing). 
   (we are currently only using the "common" message types.
 
 Pete Hollands

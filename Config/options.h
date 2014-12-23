@@ -62,7 +62,9 @@
 //    AIRFRAME_HELI             Not currently supported
 //    AIRFRAME_QUAD             Under development
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
+#ifndef AIRFRAME_TYPE
 #define AIRFRAME_TYPE                       AIRFRAME_STANDARD
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +116,7 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED             AH_PITCH_ONLY
+#define ALTITUDEHOLD_STABILIZED             AH_FULL
 #define ALTITUDEHOLD_WAYPOINT               AH_FULL
 
 // Speed Control
@@ -122,7 +124,7 @@
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL                       1
-#define DESIRED_SPEED                       30.0    // meters/second
+#define DESIRED_SPEED                       70.0    // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -144,7 +146,9 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
+#ifndef MAG_YAW_DRIFT
 #define MAG_YAW_DRIFT                       0
+#endif
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
@@ -167,7 +171,9 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
+#ifndef NORADIO
 #define NORADIO                             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +192,7 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT                       2
+#define USE_PPM_INPUT                       0
 #define PPM_NUMBER_OF_CHANNELS              8
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
@@ -213,7 +219,8 @@
 #define AILERON_INPUT_CHANNEL               CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
 #define RUDDER_INPUT_CHANNEL                CHANNEL_4
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
+#define LANDING_GEAR_INPUT_CHANNEL          CHANNEL_5
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_6
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -245,6 +252,7 @@
 #define AILERON_OUTPUT_CHANNEL              CHANNEL_1
 #define ELEVATOR_OUTPUT_CHANNEL             CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL               CHANNEL_4
+#define LANDING_GEAR_OUTPUT_CHANNEL         CHANNEL_5
 #define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL         CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL           CHANNEL_UNUSED
@@ -266,6 +274,7 @@
 #define THROTTLE_CHANNEL_REVERSED           0
 #define CAMERA_PITCH_CHANNEL_REVERSED       0
 #define CAMERA_YAW_CHANNEL_REVERSED         0
+#define LANDING_GEAR_CHANNEL_REVERSED       0
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
 #define ELEVON_VTAIL_SURFACES_REVERSED      0
@@ -288,7 +297,9 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
-#define MODE_SWITCH_TWO_POSITION            1
+#ifndef MODE_SWITCH_TWO_POSITION
+#define MODE_SWITCH_TWO_POSITION            0
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -304,7 +315,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN                  2015
+#define FAILSAFE_INPUT_MIN                  1980
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -356,9 +367,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// MAVLink requires an aircraft Identifier (I.D) as it is deaigned to control multiple aircraft
+// MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       55
+//#define MAVLINK_SYSID                       55
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -783,6 +794,8 @@
 
 //#define USE_BLUETOOTH_UART
 
+#define USE_FILESYS                         1
+
 #ifdef USE_BLUETOOTH_UART
 // Use this with BlueTooth dongle
 #define TLM_PORT                            2
@@ -792,15 +805,24 @@
 #define DBG_PORT                            2
 #endif
 
-
-// Set this to 1 to enable logging telemetry to dataflash on AUAV3
+// Set this to 1 to enable logging telemetry to onboard storage
+#ifndef USE_TELELOG
 #define USE_TELELOG                         0
+#endif
 
-// Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      0
+// Set this to 1 to enable loading options settings from an initialisation (ini) file
+#ifndef USE_CONFIGFILE
+#define USE_CONFIGFILE                      1
+#endif
 
 // Set this to 1 to enable the USB stack on AUAV3
+#ifndef USE_USB
 #define USE_USB                             0
+#endif
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#ifndef USE_MSD
 #define USE_MSD                             0
+#endif
+
+#define USE_FREERTOS

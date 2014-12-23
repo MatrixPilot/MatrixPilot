@@ -43,7 +43,8 @@ void AT45D_FormatFS(void);
 typedef struct tagCmds {
 	int index;
 	void (*fptr)(char*);
-	const char const * cmdstr;
+//	const char const * cmdstr;
+	const char* cmdstr;
 } cmds_t;
 
 
@@ -79,14 +80,18 @@ static void cmd_stop(char* arg)
 
 static void cmd_on(char* arg)
 {
+#if (SILSIM != 1)
 	printf("on.\r\n");
 	SRbits.IPL = 0; // turn on all interrupt priorities
+#endif
 }
 
 static void cmd_off(char* arg)
 {
+#if (SILSIM != 1)
 	printf("off.\r\n");
 	SRbits.IPL = 7; // turn off all interrupt priorities
+#endif
 }
 
 static void cmd_cpuload(char* arg)
@@ -96,12 +101,14 @@ static void cmd_cpuload(char* arg)
 
 static void cmd_crash(char* arg)
 {
+#if (SILSIM != 1)
 	static int i;
 	char buffer[32];
 
 	sprintf(buffer, "overflowing stack %u.\r\n", i++);
 	printf(buffer);
 	cmd_crash(arg);
+#endif
 }
 
 static void cmd_adc(char* arg)
@@ -111,12 +118,14 @@ static void cmd_adc(char* arg)
 
 static void cmd_barom(char* arg)
 {
+#if (SILSIM != 1)
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
 	       get_barometer_temperature(),
 	       (uint16_t)get_barometer_pressure(),
 	       (uint16_t)get_barometer_altitude(),
 	       (uint16_t)get_barometer_agl_altitude()
 	      );
+#endif
 }
 
 static void cmd_magno(char* arg)
@@ -205,7 +214,9 @@ void gentrap(void);
 
 static void cmd_trap(char* arg)
 {
+#if (SILSIM != 1)
 	gentrap();
+#endif
 }
 
 static void cmd_reg(char* arg)
@@ -249,7 +260,7 @@ extern uint16_t maxstack;
 
 static void cmd_stack(char* arg)
 {
-#if (RECORD_FREE_STACK_SPACE == 1)
+#if (RECORD_FREE_STACK_SPACE == 1 && SILSIM == 0)
 	printf("maxstack %x\r\n", maxstack);
 	printf("SP_start %x\r\n", SP_start());
 	printf("SP_limit %x\r\n", SP_limit());
@@ -262,7 +273,9 @@ static void cmd_stack(char* arg)
 
 static void cmd_reset(char* arg)
 {
+#if (SILSIM != 1)
 	asm("reset");
+#endif
 }
 
 static void cmd_help(char* arg);
@@ -380,31 +393,7 @@ void console(void)
 		char ch = getch();
 		console_inbyte(ch);
 	}
-#endif
-}
-
-/*
-void console(void)
-{
-	if (kbhit()) {
-		char ch = getch();
-		if (cmdlen < sizeof(cmdstr)) {
-			cmdstr[cmdlen] = ch;
-			if ((ch == '\r') || (ch == '\n')) {
-				cmdstr[cmdlen] = '\0';
-//				cmdlen = 0;
-				if (strlen(cmdstr) > 0) {
-					putch('\r');
-					command(cmdstr, cmdlen);
-				}
-			} else {
-				putch(ch);
-				cmdlen++;
+#endif // (CONSOLE_UART != 9)
 			}
-		} else {
-			cmdlen = 0;
-		}
-	}
-}
- */
-#endif // CONSOLE_UART
+
+#endif // (CONSOLE_UART != 0)

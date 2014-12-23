@@ -19,11 +19,16 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
-#include "eeprom_udb4.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "serialIO.h"
+#include "servoOut.h"
+#include "radioIn.h"
+#include "eeprom_udb4.h"
+#include "ADchannel.h"
+#include "mpu6000.h"
 #include "analogs.h"
 #include "events.h"
 #include "osd.h"
@@ -62,7 +67,8 @@ void udb_skip_imu_calibration(boolean b)
 }
 #endif // (USE_NV_MEMORY == 1)
 
-void TriggerIMU(void);
+void udb_init_ADC(void);
+void udb_init_clock(void);
 
 void udb_init(void)
 {
@@ -83,8 +89,8 @@ void udb_init(void)
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 	flexiFunctionServiceInit();
 #endif
-	udb_init_clock();
-	udb_init_capture();
+	udb_init_clock(); // on non RTOS, this starts the heartbeat
+	radioIn_init(); // was udb_init_capture();
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
@@ -94,7 +100,7 @@ void udb_init(void)
 #if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif
-	udb_init_pwm();
+	servoOut_init(); // was udb_init_pwm()
 	osd_init();
 
 //FIXME: add AUAV3 support
@@ -103,8 +109,8 @@ void udb_init(void)
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-#if (USE_FREERTOS)
-	void TaskIMU_Trigger(void);
+#if defined (USE_FREERTOS)
+void TaskIMU_Trigger(void);
 	MPU6000_init16(&TaskIMU_Trigger);
 #else
 	MPU6000_init16(&heartbeat);

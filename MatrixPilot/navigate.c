@@ -22,13 +22,19 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
-#include "../libCntrl/cameraCntrl.h"
+#include "cameraCntrl.h"
+#include "servoPrepare.h"
+#include "states.h"
+#include "flightplan.h"
 #include "flightplan-waypoints.h"
+#include "../libUDB/libUDB.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../libUDB/libUDB.h"
+#include "../libDCM/mathlib.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 #include <stdlib.h>
 
 // Compute actual and desired courses.
@@ -46,14 +52,14 @@
 uint16_t yawkpail; // only exported for parameter_table
 uint16_t yawkprud; // only exported for parameter_table
 
+struct waypointparameters goal;
 struct relative2D togoal = { 0, 0 };
-int16_t progress_to_goal = 0;
 int16_t tofinish_line = 0;
+int16_t progress_to_goal = 0;
 int8_t desired_dir = 0;
 int8_t extended_range = 0;
 
 int8_t desired_bearing_over_ground;
-struct waypointparameters goal;
 int16_t desired_bearing_over_ground_vector[2];
 
 extern union longww IMUintegralAccelerationx;
@@ -61,14 +67,13 @@ extern union longww IMUintegralAccelerationy;
 
 
 // NEW STUFF:
-int16_t navigate_get_goal(vect3_16t* g)
+int16_t navigate_get_goal(vect3_16t* _goal)
 {
-//	*g = navgoal;
-	if (g != NULL)
+	if (_goal != NULL)
 	{
-		g->x = goal.x;
-		g->y = goal.y;
-		g->z = goal.height;
+		_goal->x = goal.x;
+		_goal->y = goal.y;
+		_goal->z = goal.height;
 	}
 	return goal.height;
 }
@@ -79,13 +84,13 @@ void init_navigation(void)
 	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_navigation(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKPAileron = (float)yawkpail / (RMAX);
 	gains.YawKPRudder  = (float)yawkprud / (RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 static void setup_origin(void)
 {
@@ -196,7 +201,7 @@ void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 
 //struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
 //extern struct waypointparameters goal;
-//	DPRINT("set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
+//	DPRINT("navigate_set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
 
 //  New method for computing cosine and sine of course direction
 	vector2_normalize(&courseDirection[0], &courseDirection[0]);
@@ -213,13 +218,38 @@ void navigate_process_flightplan(void)
 {
 	if (gps_nav_valid() && state_flags._.GPS_steering)
 	{
-		compute_bearing_to_goal();
-		run_flightplan();
+		navigate_compute_bearing_to_goal();
+		flightplan_update(); // was called run_flightplan();
 		compute_camera_view();
 	}
 }
 
-void compute_bearing_to_goal(void)
+static int16_t compute_progress_to_goal(int16_t totalDist, int16_t remainingDist)
+{
+	// progress is the fraction of the distance from the start to the finish of
+	// the current waypoint leg, that is still remaining. it ranges from 0 - 1<<12 (4096).
+	int16_t progress;
+
+	if (totalDist > 0)
+	{
+		progress = (((int32_t)totalDist - remainingDist) << 12) / totalDist;
+		if (progress < 0)
+		{
+			progress = 0;
+		}
+		if (progress > (int32_t)1 << 12)
+		{
+			progress = (int32_t)1 << 12;
+		}
+	}
+	else
+	{
+		progress = (int32_t)1 << 12;
+	}
+	return progress;
+}
+
+void navigate_compute_bearing_to_goal(void)
 {
 	union longww temporary;
 
@@ -314,24 +344,7 @@ void compute_bearing_to_goal(void)
 	if (state_flags._.GPS_steering)   // return to home or waypoints state
 	{
 		desired_dir = goal.phi;
-		if (goal.legDist > 0)
-		{
-			// progress_to_goal is the fraction of the distance from the start to the finish of
-			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((int32_t)goal.legDist - tofinish_line) << 12) / goal.legDist;
-			if (progress_to_goal < 0)
-			{
-				progress_to_goal = 0;
-			}
-			if (progress_to_goal > (int32_t)1 << 12)
-			{
-				progress_to_goal = (int32_t)1 << 12;
-			}
-		}
-		else
-		{
-			progress_to_goal = (int32_t)1 << 12;
-		}
+		progress_to_goal = compute_progress_to_goal(goal.legDist, tofinish_line);
 	}
 	else
 	{

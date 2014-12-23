@@ -43,45 +43,6 @@
 #include "../MAVLink/include/mavlink_types.h"
 #include "../MAVLink/include/checksum.h"
 
-// CONFIGURATION OPTIONS
-
-// Defines the chunks size for data areas.  Can be used to allign with
-// NV memory page size.
-#define FAT_CHUNK_BYTE_SIZE     64
-
-// Size of data pre-amble used to mark the start of a memory area
-#define DATA_PREAMBLE_SIZE      4
-
-// Maximum number of data areas
-#define MAX_DATA_HANDLES        30
-
-// Structure for entry to data directory array
-typedef struct tagDATA_STORAGE_ENTRY
-{
-	uint16_t data_address;
-	uint16_t data_type;
-	uint16_t data_size;
-} DATA_STORAGE_ENTRY;
-
-// Structure of complete data directory including checksum.
-typedef struct tagDATA_STORAGE_TABLE
-{
-	uint8_t            table_preamble[DATA_PREAMBLE_SIZE];
-	DATA_STORAGE_ENTRY table[MAX_DATA_HANDLES];
-	uint16_t           table_checksum;
-} DATA_STORAGE_TABLE;
-
-typedef struct tagDATA_STORAGE_HEADER
-{
-	uint8_t  data_preamble[DATA_PREAMBLE_SIZE];
-	uint16_t data_handle;
-	uint16_t data_version;
-	uint16_t data_checksum;
-} DATA_STORAGE_HEADER;
-
-#if(DATA_HANDLE_MAX >= MAX_DATA_HANDLES)
-	#error("Number of defined data handles exceeds the maximum number of defined handles")
-#endif
 
 enum
 {

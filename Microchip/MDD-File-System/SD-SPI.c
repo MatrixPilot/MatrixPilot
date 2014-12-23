@@ -74,7 +74,7 @@
 #include "MDD-File-System/FSDefs.h"
 #include "MDD-File-System/SD-SPI.h"
 #include "string.h"
-#include "FSconfig.h"
+//#include "FSconfig.h"
 
 /******************************************************************************
  * Global Variables
@@ -436,18 +436,16 @@ DWORD MDD_SDSPI_ReadCapacity(void)
 void MDD_SDSPI_InitIO (void)
 {
     // Turn off the card
-#ifndef MEDIA_SOFT_DETECT
     SD_CD_TRIS = INPUT;            //Card Detect - input
-#endif
     SD_CS = 1;                     //Initialize Chip Select line
-//    SD_CS_TRIS = OUTPUT;           //Card Select - output
-//    SD_WE_TRIS = INPUT;            //Write Protect - input
+    SD_CS_TRIS = OUTPUT;           //Card Select - output
+    SD_WE_TRIS = INPUT;            //Write Protect - input
 
 #if defined	(__dsPIC33E__) || defined (__PIC24E__)
-//    SD_CS_ANSEL = 0;
-//    SD_SCK_ANSEL = 0;
-//    SD_SDI_ANSEL = 0;
-//    SD_SDO_ANSEL = 0;
+    SD_CS_ANSEL = 0;
+    SD_SCK_ANSEL = 0;
+    SD_SDI_ANSEL = 0;
+    SD_SDO_ANSEL = 0;
 #endif
 }
 

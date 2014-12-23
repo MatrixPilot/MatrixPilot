@@ -22,7 +22,6 @@
 #ifndef _MAVLINK_H_
 #define _MAVLINK_H_
 
-#define MAVLINK_EXTERNAL_RX_STATUS
 
 #include "mavlink_options.h"
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
@@ -44,7 +43,7 @@
 // The following macro enables MAVLink packets to be sent in one call to the serial driver
 // rather than character by character.
 #define MAVLINK_SEND_UART_BYTES mavlink_serial_send
-int16_t mavlink_serial_send(mavlink_channel_t chan, const uint8_t buf[], uint16_t len);
+int16_t mavlink_serial_send(mavlink_channel_t chan, const uint8_t buf[], uint16_t len); // RobD
 #endif
 
 #include "../MAVLink/include/matrixpilot/mavlink.h"
@@ -64,8 +63,7 @@ typedef struct mavlink_flag_bits {
 
 extern mavlink_flags_t mavlink_flags;
 
-//boolean mavlink_check_target(uint8_t target_system, uint8_t target_component);
-
+boolean mavlink_check_target(uint8_t target_system, uint8_t target_component);
 void mavlink_output_40hz(void);
 
 

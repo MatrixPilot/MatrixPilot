@@ -19,9 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "serialIO.h"
 
 #ifdef USE_FREERTOS
 
@@ -72,6 +73,8 @@ void udb_serial_start_sending_data(void)
 }
 
 #else
+
+#include "serialIO.h"
 
 // Baud Rate Generator -- See section 19.3.1 of datasheet.
 // Fcy = FREQOSC / CLK_PHASES

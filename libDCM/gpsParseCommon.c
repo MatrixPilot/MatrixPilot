@@ -20,64 +20,30 @@
 
 
 #include "libDCM_internal.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "estLocation.h"
 #include "estAltitude.h"
+#include "estYawDrift.h"
+#include "estWind.h"
 #include "mathlibNAV.h"
 #include "rmat.h"
 #include "../libUDB/interrupt.h"
+#include "../libUDB/serialIO.h"
 #include <string.h>
-
-
-// GPS modules global variables
-#ifdef USE_EXTENDED_NAV
-struct relative3D_32 GPSlocation = { 0, 0, 0 };
-#else
-struct relative3D GPSlocation = { 0, 0, 0 };
-#endif // USE_EXTENDED_NAV
-struct relative3D GPSvelocity = { 0, 0, 0 };
-int16_t cos_lat = 0;
-int16_t gps_data_age;
-
-union longbbbb lat_origin, lon_origin, alt_origin;
-volatile union longbbbb lat_gps, lon_gps, alt_sl_gps;// latitude, longitude, altitude
-volatile union intbb hilsim_airspeed;  // referenced in estWind and deadReckoning modules
-volatile uint8_t hdop;                              // horizontal dilution of precision
-volatile uint8_t svs;                               // number of satellites
-
-// these are only exported for telemetry output
-volatile union intbb week_no;
-volatile union intbb sog_gps;                                // speed over ground
-volatile union uintbb cog_gps;                               // course over ground
-volatile union intbb climb_gps;                              // climb
-volatile union longbbbb tow;
-
-
-static const uint8_t* gps_out_buffer = 0;
-static int16_t gps_out_buffer_length = 0;
-static int16_t gps_out_index = 0;
 
 // GPS parser modules variables
 union longbbbb lat_gps_, lon_gps_;
 union longbbbb alt_sl_gps_;
 union longbbbb tow_;
 union intbb hdop_;
-
-int8_t actual_dir;
-uint16_t ground_velocity_magnitudeXY = 0;
-int16_t forward_acceleration = 0;
-uint16_t air_speed_magnitudeXY = 0;
-uint16_t air_speed_3DGPS = 0;
-int8_t calculated_heading;           // takes into account wind velocity
-
-static int8_t cog_previous = 64;
-static int16_t sog_previous = 0;
-static int16_t climb_rate_previous = 0;
-static int16_t location_previous[] = { 0, 0, 0 };
-static uint16_t velocity_previous = 0;
+union longbbbb date_gps_, time_gps_;
 
 extern void (*msg_parse)(uint8_t gpschar);
 
-union longbbbb date_gps_, time_gps_;
+static const uint8_t* gps_out_buffer = 0;
+static int16_t gps_out_buffer_length = 0;
+static int16_t gps_out_index = 0;
 
 int32_t get_gps_date(void)
 {
@@ -149,12 +115,12 @@ int16_t udb_gps_callback_get_byte_to_send(void)
 	return -1;
 }
 
+// Got a character from the GPS
 #if defined (USE_FREERTOS)
 void udb_gps_msg_parse(uint8_t rxchar)
 #else
 void udb_gps_callback_received_byte(uint8_t rxchar)
 #endif
-// Got a character from the GPS
 {
 	//bin_out(rxchar);      // binary out to the debugging USART
 	(*msg_parse)(rxchar);   // parse the input byte
@@ -183,23 +149,6 @@ void gps_parse_common(void)
 static void udb_background_callback_triggered(void)
 #endif
 {
-	union longbbbb accum;
-	union longww accum_velocity;
-	int8_t cog_circular;
-	int8_t cog_delta;
-	int16_t sog_delta;
-	int16_t climb_rate_delta;
-#ifdef USE_EXTENDED_NAV
-	int32_t location[3];
-#else
-	int16_t location[3];
-	union longbbbb accum_nav;
-#endif // USE_EXTENDED_NAV
-	int16_t location_deltaZ;
-	struct relative2D location_deltaXY;
-	struct relative2D velocity_thru_air;
-	int16_t velocity_thru_airz;
-
 	dirOverGndHrmat[0] = rmat[1];
 	dirOverGndHrmat[1] = rmat[4];
 	dirOverGndHrmat[2] = 0;
@@ -208,121 +157,19 @@ udb_led_toggle(LED_BLUE);
 	if (gps_nav_valid())
 	{
 		gps_commit_data();
-
 		gps_data_age = 0;
-
 		dcm_callback_gps_location_updated();
 
-#ifdef USE_EXTENDED_NAV
-		location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
-		location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
-		location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
-#else // USE_EXTENDED_NAV
-		accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
-		location[1] = accum_nav._.W0;
-		accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
-		location[0] = accum_nav._.W0;
-#ifdef USE_PRESSURE_ALT
-#warning "using pressure altitude instead of GPS altitude"
-		// division by 100 implies alt_origin is in centimeters; not documented elsewhere
-		// longword result = (longword/10 - longword)/100 : range
-		accum_nav.WW = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
-#else
-		accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
-#endif // USE_PRESSURE_ALT
-		location[2] = accum_nav._.W0;
-#endif // USE_EXTENDED_NAV
-
-		// convert GPS course of 360 degrees to a binary model with 256
-		accum.WW = __builtin_muluu(COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
-		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East
-		cog_circular = -accum.__.B2 + 64;
-
-		// compensate for GPS reporting latency.
-		// The dynamic model of the EM406 and uBlox is not well known.
-		// However, it seems likely much of it is simply reporting latency.
-		// This section of the code compensates for reporting latency.
-		// markw: what is the latency? It doesn't appear numerically or as a comment
-		// in the following code. Since this method is called at the GPS reporting rate
-		// it must be assumed to be one reporting interval?
-
-		if (dcm_flags._.gps_history_valid)
-		{
-			cog_delta = cog_circular - cog_previous;
-			sog_delta = sog_gps.BB - sog_previous;
-			climb_rate_delta = climb_gps.BB - climb_rate_previous;
-
-			location_deltaXY.x = location[0] - location_previous[0];
-			location_deltaXY.y = location[1] - location_previous[1];
-			location_deltaZ    = location[2] - location_previous[2];
-		}
-		else
-		{
-			cog_delta = 0;
-			sog_delta = 0;
-			climb_rate_delta = 0;
-			location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0;
-		}
-		dcm_flags._.gps_history_valid = 1;
-		actual_dir = cog_circular + cog_delta;
-		cog_previous = cog_circular;
-
-		// Note that all these velocities are in centimeters / second
-
-		ground_velocity_magnitudeXY = sog_gps.BB + sog_delta;
-		sog_previous = sog_gps.BB;
-
-		GPSvelocity.z = climb_gps.BB + climb_rate_delta;
-		climb_rate_previous = climb_gps.BB;
-
-		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
-		GPSvelocity.x = accum_velocity._.W1;
-
-		accum_velocity.WW = (__builtin_mulss(sine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
-		GPSvelocity.y = accum_velocity._.W1;
-
-		rotate_2D(&location_deltaXY, cog_delta); // this is a key step to account for rotation effects!!
-
-		GPSlocation.x = location[0] + location_deltaXY.x;
-		GPSlocation.y = location[1] + location_deltaXY.y;
-		GPSlocation.z = location[2] + location_deltaZ;
-
-		location_previous[0] = location[0];
-		location_previous[1] = location[1];
-		location_previous[2] = location[2];
-
-		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1];
-		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
-		velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
-
-#if (HILSIM == 1)
-		air_speed_3DGPS = hilsim_airspeed.BB; // use Xplane as a pitot
-#else
-		air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
-#endif
-
-		calculated_heading = rect_to_polar(&velocity_thru_air);
-		// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
-		air_speed_magnitudeXY = velocity_thru_air.x; // in cm / sec
-
-#if (GPS_RATE == 4)
-		forward_acceleration = (air_speed_3DGPS - velocity_previous) << 2; // Ublox enters code 4 times per second
-#elif (GPS_RATE == 2)
-		forward_acceleration = (air_speed_3DGPS - velocity_previous) << 1; // Ublox enters code 2 times per second
-#else
-		forward_acceleration = (air_speed_3DGPS - velocity_previous);      // EM406 standard GPS enters code once per second
-#endif
-
-		velocity_previous = air_speed_3DGPS;
-
-		estimateWind();
+		estLocation();
+		estWind();
 		estAltitude();
 		estYawDrift();
+
 		dcm_flags._.yaw_req = 1;       // request yaw drift correction
 		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
 		dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
-		process_flightplan();
+		navigate_process_flightplan();
 #endif
 	}
 	else
@@ -333,6 +180,9 @@ udb_led_toggle(LED_BLUE);
 		dirOverGndHGPS[2] = 0;
 		dcm_flags._.yaw_req = 1;            // request yaw drift correction
 		dcm_flags._.gps_history_valid = 0;  // gps history has to be restarted
+#if (GPS_TYPE != GPS_NONE)
+		gps_update_basic_data();            // update svs
+#endif
 	}
 }
 

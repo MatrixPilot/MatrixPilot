@@ -9,6 +9,9 @@
  *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 1.0      Inspirati            18/01/10    Initial Version 
  *****************************************************************************/
+
+#if 0
+
 #include "HardwareProfile.h"
 //#define PIC32_STARTER_KIT
 //#include "db_utils.h"
@@ -172,3 +175,5 @@ int16_t HMC6352_proc(void)
    	}
 	return heading;
 }
+
+#endif // 0

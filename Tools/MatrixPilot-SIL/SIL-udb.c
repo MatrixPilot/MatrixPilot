@@ -12,10 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libUDB.h"
+#include "../../libUDB/libUDB.h"
 #include "../../libUDB/magnetometer.h"
-#include "../../libUDB/barometer.h"
 #include "../../libUDB/heartbeat.h"
+#include "../../libUDB/serialIO.h"
+#include "../../libDCM/rmat.h"
 #include "SIL-config.h"
 
 #ifdef WIN
@@ -23,6 +24,7 @@
 #define SIL_WINDOWS_INCS
 #include <Windows.h>
 #include <Time.h>
+#include <process.h>
 
 struct timezone
 {
@@ -30,9 +32,10 @@ struct timezone
 	int tz_dsttime;     // type of dst correction to apply
 };
 
-#if 1
+#if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
 #else
+/*
 #ifndef _TIMEVAL_DEFINED // also in winsock[2].h
 #define _TIMEVAL_DEFINED
 struct timeval {
@@ -47,6 +50,7 @@ struct timeval {
 	 ((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)  (tvp)->tv_sec = (tvp)->tv_usec = 0
 #endif // _TIMEVAL_DEFINED
+ */
 
 //void  GetSystemTimeAsFileTime(FILETIME*);
 
@@ -72,13 +76,10 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 
 #endif // WIN
 
-#include "libUDB.h"
-#include "ADchannel.h"
-#include "magnetometer.h"
+#include "../../libUDB/ADchannel.h"
 #include "magnetometerOptions.h"
-#include "events.h"
+#include "../../libUDB/events.h"
 #include "SIL-udb.h"
-//#include "UDBSocket.h"
 #include "SIL-ui.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
@@ -119,7 +120,7 @@ uint16_t mp_rcon = 3;                           // default RCON state at normal 
 extern int mp_argc;
 extern char **mp_argv;
 
-uint8_t leds[4] = {0, 0, 0, 0};
+uint8_t leds[5] = {0, 0, 0, 0, 0};
 UDBSocket serialSocket;
 uint8_t sil_radio_on;
 
@@ -149,7 +150,7 @@ void udb_init(void)
 {
 	int16_t i;
 
-	// If we were reest:
+	// If we were reset:
 	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
 	{
 		mp_rcon = 128; // enable just the external/MCLR reset bit
@@ -194,6 +195,7 @@ void udb_init(void)
 //#define UDB_STEP_TIME 25
 #define UDB_STEP_TIME (UDB_WRAP_TIME/HEARTBEAT_HZ)
 
+void TaskIMU_Trigger(void);
 int initialised = 0;
 
 void udb_run(void)
@@ -238,8 +240,7 @@ void udb_run(void)
 
 			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 
-#if (USE_FREERTOS)
-			void TaskIMU_Trigger(void);
+#if defined (USE_FREERTOS)
 			TaskIMU_Trigger();
 #else
 //			udb_heartbeat_40hz_callback(); // Run at 40Hz
@@ -271,14 +272,15 @@ uint8_t udb_cpu_load(void)
 {
 	return 5; // sounds reasonable for a fake cpu%
 }
-/* commented out to make SILSIM gcc build work
+//* commented out to make SILSIM gcc build work
+// pulled back in to make SILSIM MSC build work
 int16_t udb_servo_pulsesat(int32_t pw)
 {
 	if (pw > SERVOMAX) pw = SERVOMAX;
 	if (pw < SERVOMIN) pw = SERVOMIN;
 	return (int16_t)pw;
 }
- */
+// */
 void udb_servo_record_trims(void)
 {
 	int16_t i;
@@ -322,7 +324,7 @@ void sil_reset(void)
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket)    UDBSocket_close(serialSocket);
 
-	execv(mp_argv[0], args);
+	_execv(mp_argv[0], args); // this version keeps VC++ happy (along with <process.h> above)
 	fprintf(stderr, "Failed to reset UDB %s\n", mp_argv[0]);
 	exit(1);
 }
@@ -565,13 +567,13 @@ int16_t FindFirstBitFromLeft(int16_t val)
 	return i;
 }
 
-int rxBarometer(barometer_callback_funcptr callback)
-{
-	(void)callback;
-	return 0;
-}
+//int rxBarometer(barometer_callback_funcptr callback)
+//{
+//	(void)callback;
+//	return 0;
+//}
 
-void vApplicationTickHook(void) {}
+//void vApplicationTickHook(void) {}
 //void vApplicationIdleHook(void) {}
 /*
 void *pvPortMalloc( size_t xWantedSize )

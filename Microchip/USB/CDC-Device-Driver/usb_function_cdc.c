@@ -101,6 +101,10 @@
 
 ********************************************************************/
 
+#include "../../../libUDB/libUDB.h"
+
+#if (USE_USB == 1)
+
 /** I N C L U D E S **********************************************************/
 #include "USB/usb.h"
 #include "USB/usb_function_cdc.h"
@@ -1051,5 +1055,7 @@ void CDCTxService(void)
 }//end CDCTxService
 
 #endif //USB_USE_CDC
+
+#endif // (USE_USB == 1)
 
 /** EOF cdc.c ****************************************************************/

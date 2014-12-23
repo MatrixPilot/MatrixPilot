@@ -20,16 +20,26 @@
 
 
 // TODO: rename this module to something such as MatrixPilot.c or FlightControl.c
+// TODO: consider renaming this module, ie. pilot.c / autopilot.c
 
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
-#include "../libCntrl/cameraCntrl.h"
-#include "../libUDB/heartbeat.h"
-#include "../libUDB/osd.h"
 #include "mode_switch.h"
-#include "../libCntrl/airspeedCntrl.h"
+#include "servoMix.h"
+#include "servoPrepare.h"
+#include "../MAVLink/MAVLink.h"
+#include "telemetry.h"
 #include "flightplan-waypoints.h"
+#include "libCntrl.h"
+#include "airspeedCntrl.h"
+#include "cameraCntrl.h"
+#include "../libUDB/heartbeat.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/osd.h"
+#include "osd_config.h"
+#include "mp_osd.h"
+#include "mavlink_options.h"
 
 int16_t pitch_control;
 int16_t roll_control;
@@ -77,7 +87,7 @@ void flight_controller(void)
 //		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
 //	}
 #if (DEADRECKONING == 1)
-	navigate_process_flightplan();
+		navigate_process_flightplan();  // TODO: perhaps move this to the 40Hz case above
 #endif
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 	airspeedCntrl();
@@ -110,19 +120,20 @@ void manualPassthrough(void)
 //	}
 //	else
 //	{
-//		// otherwise, there is not anything to do
+		// otherwise, there is not anything to do
 //		manualPassthrough();                // Allow manual control while starting up
 //	}	
 //	// TODO: move this block into the end of flight_controller or after it's called
 //	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 //	{
 //#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+		// Poll the MAVLink subsystem at 40hz
 //		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 //		{
 //			mavlink_output_40hz();
 //		}
 //#else
-//		// This is a simple check to send telemetry at 8hz
+		// Send telemetry updates at 8hz
 //		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 //		{
 //// RobD			flight_state_8hz();

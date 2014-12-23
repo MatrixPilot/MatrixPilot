@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "ring_buf.h"
+#include <string.h>
 
 unsigned int modulo_inc(const unsigned int value, const unsigned int modulus)
 {

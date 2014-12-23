@@ -23,10 +23,6 @@
 #define _SERVOMIX_H_
 
 
-// This takes a servo out value, and clips it to be within
-// 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int16_t udb_servo_pulsesat(int32_t pw);
-
 void servoMix(void);
 void cameraServoMix(void);
 

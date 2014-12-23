@@ -19,10 +19,14 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "servoOut.h"
+#include "analogs.h"
+#include "radioIn.h"
+#include "../libDCM/rmat.h"
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif
@@ -66,7 +70,6 @@ inline void heartbeat(void) // called from ISR or TaskIMU
 #if defined (USE_FREERTOS)
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 #else
-/* FOO
 	// Call the periodic callback at 40 Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
@@ -77,16 +80,15 @@ inline void heartbeat(void) // called from ISR or TaskIMU
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 //	_T6IF = 1;
 	udb_background_trigger_pulse(&pulse);
- */
-#endif
+#endif // USE_FREERTOS
 }
 
+#ifndef USE_FREERTOS
 // Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 // This is a good place to eventually compute pulse widths for servos.
 //static void pulse(void)
-//inline void pulse(void)
 //{
-////	LED_BLUE = LED_OFF;     // indicates logfile activity
+//	led_off(LED_BLUE);  // indicates logfile activity
 //#if (NORADIO != 1)
 //	// 20Hz testing of radio link
 //	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
@@ -126,3 +128,7 @@ inline void heartbeat(void) // called from ISR or TaskIMU
 //#endif
 //	}
 //}
+
+#else
+
+#endif // USE_FREERTOS

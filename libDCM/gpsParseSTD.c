@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 
 
 #if (GPS_TYPE == GPS_STD || GPS_TYPE == GPS_ALL)
@@ -52,7 +54,7 @@ const uint8_t mode[] = {
 };
 const uint16_t mode_length = 9;
 
-void (*msg_parse)(uint8_t inchar) = &msg_B3;
+void (*msg_parse)(uint8_t gpschar) = &msg_B3;
 union intbb payloadlength;
 int16_t store_index = 0;
 uint8_t un;
@@ -347,6 +349,11 @@ void gps_commit_data(void)
 	//mode1       = mode1_;
 	//mode2       = mode2_;
 	svs         = svs_;
+}
+
+void gps_update_basic_data(void)
+{
+	svs          = svs_;
 }
 
 void init_gps_std(void)

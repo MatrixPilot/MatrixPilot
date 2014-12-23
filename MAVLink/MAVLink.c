@@ -36,9 +36,12 @@
 //    MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
 //    MAV_DATA_STREAM_EXTRA3 not assigned yet
 
-#include "defines.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
+#include "mavlink_options.h"
+
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVParams.h"
@@ -47,27 +50,26 @@
 #include "MAVUDBExtra.h"
 
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h" // Needed for access to internal DCM value
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
-#include "parameter_table.h"
-#include "telemetry_log.h"
-#include "euler_angles.h"
-#include "navigate.h"
-#include "config.h"
+#include "../MatrixPilot/telemetry_log.h"
+#include "../MatrixPilot/euler_angles.h"
+#include "../MatrixPilot/config.h"
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
 
-
-//int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 mavlink_message_t last_msg;
@@ -150,13 +152,14 @@ void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
-#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
+#pragma warning ("SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink") // VC warns 'unknown user warning type'
+//#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink" // xc16 uses this syntax (but VC throws fatal error)
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();
 }
 
-void restart_telemetry(void)
+void telemetry_restart(void)
 {
 }
 
@@ -174,7 +177,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len) // RobD
 // Note: Channel Number, chan, is currently ignored.
 {
 	int16_t start_index;
@@ -230,7 +233,7 @@ void mav_printf(const char* format, ...)
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 // add printf library when running tests to output ascii messages of test results
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t remaining = 0;
 	int16_t wrote = 0;
@@ -391,15 +394,13 @@ static void handleMessage(void)
 	{
 		case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
 		{
+			int16_t freq = 0; // packet frequency
 			// decode
 			mavlink_request_data_stream_t packet;
 			mavlink_msg_request_data_stream_decode(handle_msg, &packet);
 			//send_text((const uint8_t*) "Action: Request data stream\r\n");
 			// QgroundControl sends data stream request to component ID 1, which is not our component for UDB.
 			if (packet.target_system != mavlink_system.sysid) break;
-
-			int16_t freq = 0; // packet frequency
-
 			if (packet.start_stop == 0) freq = 0; // stop sending
 			else if (packet.start_stop == 1) freq = packet.req_message_rate; // start sending
 			else break;
@@ -588,9 +589,9 @@ static void handleMessage(void)
 		default:
 			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
 			break;
-	} // end switch
+	}
 	handling_of_message_completed = true;
-} // end handle mavlink
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -676,11 +677,13 @@ void mavlink_output_40hz(void)
 	if (mavlink_test_first_pass_flag == 1)
 	{
 		serial_output("\r\nRunning MAVLink encode / decode Tests.\r\n");
+		printf("\r\nRunning MAVLink encode / decode Tests.\r\n");
 		// reset serial buffer in preparation for testing against buffer
 		mavlink_tests_pass = 0;
 		mavlink_tests_fail = 0;
 		mavlink_test_all(mavlink_system.sysid, mavlink_system.compid, &last_msg);
 		serial_output("\r\nMAVLink Tests Pass: %d\r\nMAVLink Tests Fail: %d\r\n", mavlink_tests_pass, mavlink_tests_fail);
+		printf("\r\nMAVLink Tests Pass: %d\r\nMAVLink Tests Fail: %d\r\n", mavlink_tests_pass, mavlink_tests_fail);
 		mavlink_test_first_pass_flag = 0;
 	}
 }
@@ -979,4 +982,4 @@ void mavlink_output_40hz(void)
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)
