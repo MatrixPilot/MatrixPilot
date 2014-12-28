@@ -504,9 +504,23 @@
 #define PITCHKD                             0.00
 #define ELEVATOR_BOOST                      0.50
 
-// Neutral pitch angle of the plane (in degrees) when flying inverted
-// Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-#define INVERTED_NEUTRAL_PITCH              8.0
+// Parameters below are used in the computation of angle of attack and pitch trim.
+// ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.)
+// If these parameters are not defined, angle of attack and pitch trim will be set to zero.
+// CRUISE_SPEED							The nominal speed in meters per second at which the parameters are defined.
+// ANGLE_OF_ATTACK_NORMAL				Angle of attack in degrees in the body frame for normal straight and level flight at cruise speed.
+// ANGLE_OF_ATTACK_INVERTED				Angle of attack in degrees in the body frame for inverted straight and level flight at cruise speed.
+// Note: ANGLE_OF_ATTACK_INVERTED is usually negative, with typical values in the -5 to -10 degree range.
+// ELEVATOR_TRIM_NORMAL					Elevator trim in fractional servo units (-1.0 to 1.0 ) for normal straight and level flight at cruise speed.
+// ELEVATOR_TRIM_INVERTED				Elevator trim in fractional servo units (-1.0 to 1.0 ) for inverted straight and level flight at cruise speed.
+// Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
+
+// The following are the values for HILSIM EasyStar2:
+//#define CRUISE_SPEED							( 12.0 )
+//#define ANGLE_OF_ATTACK_NORMAL				( -0.8 )
+//#define ANGLE_OF_ATTACK_INVERTED				( -7.2 )
+//#define ELEVATOR_TRIM_NORMAL					( -0.03 )
+//#define ELEVATOR_TRIM_INVERTED				( -0.67 )
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.

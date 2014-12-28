@@ -1,7 +1,7 @@
 [HEADER]
 magic_cookie={66E99B07-E706-4689-9E80-9B2582898A13}
 file_version=1.0
-device=dsPIC33EP512MU810
+device=dsPIC33FJ256GP710A
 [PATH_INFO]
 BuildDirPolicy=BuildDirIsProjectDir
 dir_src=
@@ -358,6 +358,7 @@ file_330=MAVLink
 file_331=MAVLink
 file_332=MAVLink
 file_333=MAVLink
+file_334=MatrixPilot
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -693,6 +694,7 @@ file_330=no
 file_331=no
 file_332=no
 file_333=no
+file_334=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -1028,6 +1030,7 @@ file_330=no
 file_331=no
 file_332=no
 file_333=no
+file_334=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1363,6 +1366,7 @@ file_330=..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f15.h
 file_331=..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f16.h
 file_332=..\MAVLink\include\matrixpilot\testsuite.h
 file_333=..\MAVLink\include\matrixpilot\version.h
+file_334=behaviour.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

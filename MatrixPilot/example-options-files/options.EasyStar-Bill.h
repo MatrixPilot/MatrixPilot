@@ -358,20 +358,6 @@
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID                       55
 
-
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-#define USE_OSD                             0
-
-// NUM_ANALOG_INPUTS:
-// For classic boards: Set to 0, 1, or 2
-//   1 enables Radio In 1 as an analog Input
-//   2 also enables Radio In 2 as another analog Input
-//   NOTE: Can only be set this higher than 0 if USE_PPM_INPUT is enabled above.
-// For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
-#define NUM_ANALOG_INPUTS                   0
-
 // Channel numbers for each analog input
 //   - Only assign each channel number to one analog sensor
 //   - If you don't want to use an output channel, set it to CHANNEL_UNUSED
@@ -436,6 +422,19 @@
 #define TRIGGER_PULSE_DURATION              250
 #define TRIGGER_REPEAT_PERIOD               4000
 
+// FEED_FORWARD is a feed forward gain for deflecting control surfaces for turn rate.
+// The KP gains for each axis are multiplied by FEED_FORWARD to determine
+// the feed forward gain for that axis.
+// For each axis, a deflection term is added equal to the feed forward gain for that axis
+// times projection of the desired earth vertical rotation rate onto that axis
+#define FEED_FORWARD						1.0
+
+// TURN_RATE_NAV and TURN_RATE_FBW set the gains of the helical turn control for
+// waypoint navigation mode and fly by wire mode respectively.
+// They are specified in terms of the maximum desired turning rate in degrees per second in each mode.
+// The largest possible value is 240 degrees per second, anything larger will be clipped to 240.
+#define TURN_RATE_NAV							30.0
+#define TURN_RATE_FBW							60.0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.
@@ -705,11 +704,6 @@
 // surfaces. While this is enabled, instead of the usual manual/stabilized/WP flight modes, it's
 // FBDL/stabilized/WP. For saftey reasons, an RC transmitter is still required for flight to set the modes.
 #define FLY_BY_DATALINK_ENABLED             0
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE                        0
 
 
 ////////////////////////////////////////////////////////////////////////////////

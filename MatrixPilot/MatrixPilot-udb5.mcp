@@ -328,6 +328,7 @@ file_300=MAVLink
 file_301=MAVLink
 file_302=MAVLink
 file_303=MAVLink
+file_304=MatrixPilot
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -633,6 +634,7 @@ file_300=no
 file_301=no
 file_302=no
 file_303=no
+file_304=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -938,6 +940,7 @@ file_300=no
 file_301=no
 file_302=no
 file_303=no
+file_304=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1243,6 +1246,7 @@ file_300=..\..\MatrixPilot_wjp_helicalTurns\MAVLink\include\mavlink_conversions.
 file_301=..\..\MatrixPilot_wjp_helicalTurns\MAVLink\include\mavlink_helpers.h
 file_302=..\..\MatrixPilot_wjp_helicalTurns\MAVLink\include\mavlink_types.h
 file_303=..\..\MatrixPilot_wjp_helicalTurns\MAVLink\include\protocol.h
+file_304=behaviour.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=

@@ -320,6 +320,7 @@ file_292=MAVLink
 file_293=MAVLink
 file_294=MAVLink
 file_295=MAVLink
+file_296=MatrixPilot
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -617,6 +618,7 @@ file_292=no
 file_293=no
 file_294=no
 file_295=no
+file_296=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -914,6 +916,7 @@ file_292=no
 file_293=no
 file_294=no
 file_295=no
+file_296=no
 [FILE_INFO]
 file_000=config_tests.c
 file_001=..\libUDB\background.c
@@ -1211,6 +1214,7 @@ file_292=..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f15.h
 file_293=..\MAVLink\include\matrixpilot\mavlink_msg_serial_udb_extra_f16.h
 file_294=..\MAVLink\include\matrixpilot\testsuite.h
 file_295=..\MAVLink\include\matrixpilot\version.h
+file_296=behaviour.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=
