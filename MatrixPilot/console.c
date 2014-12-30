@@ -25,6 +25,7 @@
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
 #include "../libUDB/uart.h"
+#include "ports_config.h"
 #include <string.h>
 #include <stdio.h>
 

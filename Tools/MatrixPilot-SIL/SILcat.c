@@ -5,7 +5,7 @@
 //  Created by Ben Levitt on 2/1/13.
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
-
+#if 0
 #if (WIN == 1 || NIX == 1)
 
 #include <stdio.h>
@@ -149,3 +149,4 @@ uint8_t readSockets(void)
 }
 
 #endif // (WIN == 1 || NIX == 1)
+#endif // 0

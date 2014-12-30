@@ -20,7 +20,12 @@
 
 
 #include "defines.h"
+#include "servoPrepare.h"
+#include "altitudeCntrl.h"
 #include "airspeedCntrl.h"
+#include "../libDCM/estWind.h"
+#include "../libDCM/mathlibNAV.h"
+#include "../libDCM/deadReckoning.h"
 
 int16_t minimum_groundspeed;
 int16_t minimum_airspeed;

@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2013 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -19,15 +19,29 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "navigate.h"
-#include "behaviour.h"
-#include "servoPrepare.h"
-#include "altitudeCntrl.h"
-#include "../libDCM/deadReckoning.h"
-#include "../libDCM/mathlibNAV.h"
+#ifndef _MDD_EEPROM_H_
+#define _MDD_EEPROM_H_
 
 
-void helicalTurnCntrl(void)
-{
-}
+#include "GenericTypeDefs.h"
+#include "FSconfig.h"
+#include "MDD-File-System/FSDefs.h"
+
+#define FALSE   0
+#define TRUE    !FALSE
+
+#define MDD_EEPROM_FLASH_TOTAL_DISK_SIZE 64
+
+#define INITIALIZATION_VALUE            0x55
+
+BYTE MDD_EEPROM_InitIO(void);
+BYTE MDD_EEPROM_MediaDetect(void);
+MEDIA_INFORMATION * MDD_EEPROM_MediaInitialize(void);
+BYTE MDD_EEPROM_SectorRead(DWORD sector_addr, BYTE* buffer);
+BYTE MDD_EEPROM_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZero);
+WORD MDD_EEPROM_ReadSectorSize(void);
+DWORD MDD_EEPROM_ReadCapacity(void);
+BYTE MDD_EEPROM_WriteProtectState(void);
+
+
+#endif // _MDD_EEPROM_H_

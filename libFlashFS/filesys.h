@@ -19,37 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "../libDCM/gpsParseCommon.h"
-#include "config.h"
-
-#if (USE_TELELOG == 1)
-#include "telemetry_log.h"
-#endif
-
-#if (USE_USB == 1)
-#include "preflight.h"
-#endif
-
-#if (CONSOLE_UART != 0)
-#include "console.h"
-#endif
+#ifndef FILESYS_H
+#define FILESYS_H
 
 
-void init_tasks(void)
-{
-	while (1)
-	{
-#if (USE_TELELOG == 1)
-		telemetry_log();
-#endif
-#if (USE_USB == 1)
-		USBPollingService();
-#endif
-#if (CONSOLE_UART != 0 && SILSIM == 0)
-		console();
-#endif
-		udb_run();
-	}
-//	return 0;
-}
+int filesys_init(void);
+void filesys_chkdsk(void);
+void filesys_format(void);
+void filesys_dir(char* arg);
+void filesys_cat(char* arg);
+
+
+#endif // FILESYS_H

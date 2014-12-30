@@ -1,7 +1,9 @@
+#if 0
 //#include "HardwareProfile.h"
 //#include "Compiler.h"
 //#include <GenericTypeDefs.h>
 #include "defines.h"
+#include "../libUDB/oscillator.h"
 #include <uart.h>
 
 #include <string.h>
@@ -94,3 +96,4 @@ void dprintf(char* fmt,...)
 
 	putsUART(buffer);
 }
+#endif // 0

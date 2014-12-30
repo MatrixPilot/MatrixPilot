@@ -144,13 +144,13 @@ sources :=
 defines :=
 
 ifeq ($(DEVICE),SILSIM)
-modules := $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/MAVLink $(SOURCE_DIR)/Tools/MatrixPilot-SIL
-include_dirs := $(SOURCE_DIR)/Config
+modules := $(SOURCE_DIR)/FreeRTOS $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/MAVLink $(SOURCE_DIR)/Tools/MatrixPilot-SIL
+include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/FreeRTOS/include
 endif
 
 ifneq (,$(filter $(DEVICE), UDB4 UDB5 AUAV3))
 modules := $(subst /module.mk,,$(shell $(FIND) $(SOURCE_DIR) -name module.mk))
-include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/Include $(SOURCE_DIR)/libVectorMatrix
+include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/Microchip $(SOURCE_DIR)/Microchip/Include $(SOURCE_DIR)/libVectorMatrix $(SOURCE_DIR)/FreeRTOS/include
 endif
 
 

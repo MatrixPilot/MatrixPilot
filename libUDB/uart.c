@@ -22,6 +22,7 @@
 #include "libUDB.h"
 #include "oscillator.h"
 #include "uart.h"
+#include "ports_config.h"
 
 #if defined(__dsPIC33E__)
 #include <p33Exxxx.h>

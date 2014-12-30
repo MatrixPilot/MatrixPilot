@@ -1,4 +1,5 @@
-#ifdef _MSC_VER
+//#ifdef _MSC_VER
+#if (WIN == 1 || NIX == 1)
 
 #include "../portable/MSVC-MingW/portmacro.h"
 

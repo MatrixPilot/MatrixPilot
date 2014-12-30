@@ -21,6 +21,12 @@
 #ifndef _CAMERA_CNTRL_H_
 #define _CAMERA_CNTRL_H_
 
+extern int16_t cam_pitch_servo_pwm_delta;
+extern int16_t cam_yaw_servo_pwm_delta;
+
+int32_t cam_pitchServoLimit(int32_t pwm_pulse);
+int32_t cam_yawServoLimit(int32_t pwm_pulse);
+
 void set_camera_view(struct relative3D current_view);
 void compute_camera_view(void);
 void cameraCntrl(void);

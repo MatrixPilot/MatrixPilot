@@ -22,6 +22,9 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
+#include "states.h"
+#include "../libDCM/rmat.h"
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
@@ -46,16 +49,16 @@ void init_rollCntrl(void)
 	hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_rollCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKDAileron = (float)yawkdail    / (SCALEGYRO*RMAX);
 	gains.RollKP       = (float)rollkp      / (RMAX);
 	gains.RollKD       = (float)rollkd      / (SCALEGYRO*RMAX);
 	gains.HoverRollKP  = (float)hoverrollkp / (SCALEGYRO*RMAX);
 	gains.HoverRollKD  = (float)hoverrollkd / (SCALEGYRO*RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 void rollCntrl(void)
 {

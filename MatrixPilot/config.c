@@ -28,7 +28,7 @@
 
 //#if (USE_CONFIGFILE == 1)
 
-#include "../libFlashFS/minIni.h"
+#include "minIni.h"
 
 union settings_word settings;
 struct gains_variables gains;

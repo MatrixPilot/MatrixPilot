@@ -28,8 +28,11 @@
 #include "flightplan-waypoints.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "mavlink_options.h"
 
 #include <setjmp.h>
+
+#include "../libFlashFS/filesys.h"
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -45,6 +48,7 @@
 
 void TaskInit_Create(void);
 void vApplicationIdleHook(void);
+void init_serial(void);
 
 static jmp_buf buf;
 

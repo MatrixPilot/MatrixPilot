@@ -316,7 +316,7 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
-	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+	const char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 
 	sil_ui_will_reset();
 
@@ -547,10 +547,12 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 
 #endif // MAG_YAW_DRIFT
 
+#ifdef _MSC_VER
 int setjmp(void)
 {
 	return 0;
 }
+#endif
 
 int16_t FindFirstBitFromLeft(int16_t val)
 {

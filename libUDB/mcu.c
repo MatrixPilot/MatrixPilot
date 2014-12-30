@@ -24,6 +24,7 @@
 #include "interrupt.h"
 #include "uart.h"
 #include "mcu.h"
+#include "ports_config.h"
 #include <stdio.h>
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
@@ -211,6 +212,12 @@ static void configurePPS(void) // This method assigns all PPS registers
 	#if (CONSOLE_UART != 0) && (CONSOLE_UART != 9)
 		UART_TO_PORT(CONSOLE_UART, DBG_PORT)
 	#endif // CONSOLE_UART
+
+	#ifdef AUAV3
+		#if (OSD_UART != 0)
+			UART_TO_PORT(OSD_UART, OSD_PORT)
+		#endif // OSD_UART
+	#endif // AUAV3
 
 	// Lock Registers
 	__builtin_write_OSCCONL(OSCCON | (1 << 6));

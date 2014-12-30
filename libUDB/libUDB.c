@@ -32,6 +32,7 @@
 #include "analogs.h"
 #include "events.h"
 #include "osd.h"
+#include "ports_config.h"
 
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"

@@ -739,70 +739,17 @@
 // Set this to 1 to calculate and print out free stack space
 #define RECORD_FREE_STACK_SPACE             0
 
-
-////////////////////////////////////////////////////////////////////////////////
-// The UDB4/5 has two UART's, while the AUAV3 has four UART's.
-// Three MatrixPilot features are currently defined for using a UART. 
-// These being the GPS, Telemetry and a 'debug' console.
-// Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
-//
-// CONSOLE_UART specfies which UART is used for stdio support, aka the console.
-// Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
-// Setting CONSOLE_UART to 0 disables console support.
-// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
-// the default usage of that UART, being the GPS and Telemetry respectively.
-// CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
-// Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-#define CONSOLE_UART                        3
-//#define CONSOLE_UART                        1
-
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
 //#define USE_MAVLINK_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// AUAV3 only options
+//
 
-////////////////////////////////////////////////////////////////////////////////
-// At present, the AUAV3 schematic and 'installation & basic connections' document
-// are drafts and hence there is some inconsistency in labelling conventions.
-//
-// The following standard labelling convention is proposed.
-//
-// AUAV3 schematic:
-//        TLM      -    PORT1
-//        OSD      -    PORT2
-//        UART3    -    PORT3
-//        GPS      -    PORT4
-//
-// 'AUAV3 Installation and Basic Connections' document:
-//        OUART1   -    PORT1
-//        OUART2   -    PORT2
-//        UART3    -    PORT3
-//        GPS      -    PORT4
-//
-////////////////////////////////////////////////////////////////////////////////
-// On the AUAV3, the external UART connections are known as ports 1 through 4.
-// The definitions below specifies which feature maps to an external port.
-//
-// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
-// external port assignment.
-// Assign the console to an internal UART with CONSOLE_UART, map this console to
-// external port connection with DBG_PORT.
-#define GPS_PORT                            4
-
-//#define USE_BLUETOOTH_UART
-
+// Set this to 1 to enable filesystem support
+#ifndef USE_FILESYS
 #define USE_FILESYS                         1
-
-#ifdef USE_BLUETOOTH_UART
-// Use this with BlueTooth dongle
-#define TLM_PORT                            2
-#define DBG_PORT                            3
-#else
-#define TLM_PORT                            3
-#define DBG_PORT                            2
 #endif
 
 // Set this to 1 to enable logging telemetry to onboard storage

@@ -1,4 +1,5 @@
-extra_dirs := portable/MemMang MPLAB/PIC24_dsPIC
+#extra_dirs := portable/MemMang MPLAB/PIC24_dsPIC
+extra_dirs := portable/MemMang portable/MSVC-MingW
 
 $(call mkoutdir, $(addprefix $(subdirectory)/,$(extra_dirs)))
 
