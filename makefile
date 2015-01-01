@@ -130,8 +130,8 @@ SED := sed
 space = $(empty) $(empty)
 comma := ,
 
-$(if $(filter $(MAKE_VERSION),3.80 3.81 3.90 3.92),,\
-  $(error This makefile requires one of GNU make version ….))
+#$(if $(filter $(MAKE_VERSION),3.80 3.81 3.90 3.92),,\
+#  $(error This makefile requires one of GNU make version ….))
 
 $(if $(filter $(notdir $(SOURCE_DIR)),$(notdir $(CURDIR))),\
   $(error Please run the makefile from the binary tree.))
