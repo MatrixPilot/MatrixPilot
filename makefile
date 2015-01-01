@@ -46,7 +46,7 @@ $(warning **********************************************************************
 ifeq ($(TOOLCHAIN),GCC) 
 CC := gcc
 ifeq ($(OS),Windows_NT) 
-LIBS := -lws2_32
+LIBS := -lws2_32 -lWinmm
 TARGET_ARCH :=
 CFLAGS += -DWIN=1
 else

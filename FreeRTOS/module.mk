@@ -1,5 +1,12 @@
-#extra_dirs := portable/MemMang MPLAB/PIC24_dsPIC
-extra_dirs := portable/MemMang portable/MSVC-MingW
+ifeq ($(DEVICE),SILSIM) 
+ifeq ($(OS),Windows_NT)
+extra_dirs := portable/MSVC-MingW
+else
+extra_dirs := portable/POSIX
+endif
+extra_dirs := MPLAB/PIC24_dsPIC
+endif
+extra_dirs += portable/MemMang
 
 $(call mkoutdir, $(addprefix $(subdirectory)/,$(extra_dirs)))
 
