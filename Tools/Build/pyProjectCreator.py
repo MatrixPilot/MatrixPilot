@@ -26,12 +26,17 @@ def count_files(masks, dir):
 			for mask in masks:
 				if fnmatch.fnmatch(entry, mask):
 					count = count + 1
+		if os.path.isdir(os.path.join(dir, entry)):
+# recursively walk down the dir tree counting source modules matching 'masks'
+			count = count + count_files(masks, os.path.join(dir, entry))
 	return count
 
 def find_files(masks, dir):
 	str = ""
+#	print "find_files: " + dir
 	for entry in os.listdir(dir):
 		if os.path.isdir(os.path.join(dir, entry)):
+#			print "DIR: " + entry
 			title = entry.replace(rootdir, "")
 			count = count_files(masks, os.path.join(dir, title))
 			if count != 0:
@@ -41,6 +46,7 @@ def find_files(masks, dir):
 		else:
 			for mask in masks:
 				if fnmatch.fnmatch(entry, mask):
+#					print "FILE: " + entry
 					str = str + "        <itemPath>" + dir.replace("\\", "/") + "/" + entry + "</itemPath>\n"
 	return str
 
@@ -134,6 +140,7 @@ def vs2010_project_filters(mcu_type, target_board, config_dir, header_files, sou
 def mplabX_scan_dirs(masks, directories):
 	str = ""
 	for dir in directories:
+#		print "DIR: " + dir
 		path = os.path.join(rootdir, dir)
 		str = str + "      <logicalFolder name=\"" + dir + "\" displayName=\"" + dir + "\" projectFiles=\"true\">\n"
 		str = str + find_files(masks, path)
