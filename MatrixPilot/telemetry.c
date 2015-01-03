@@ -45,6 +45,8 @@
 #include "../libDCM/rmat.h"
 #include <string.h>
 
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
@@ -88,7 +90,7 @@ void init_serial(void)
 
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 19200 // default
-#warning "SERIAL_BAUDRATE set to default value of 19200 bps for telemetry"
+//#warning "SERIAL_BAUDRATE set to default value of 19200 bps for telemetry"
 #endif
 
 	udb_serial_set_rate(SERIAL_BAUDRATE);
@@ -796,3 +798,4 @@ void telemetry_output_8hz(void)
 
 #endif
 #endif // SERIAL_OUTPUT_FORMAT
+#endif // SERIAL_MAVLINK

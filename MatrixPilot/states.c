@@ -22,7 +22,6 @@
 #include "defines.h"
 #include "mode_switch.h"
 #include "flightplan.h"
-//#include "flightplan-waypoints.h"
 #include "states.h"
 #include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
