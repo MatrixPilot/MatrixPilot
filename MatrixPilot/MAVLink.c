@@ -981,7 +981,9 @@ void mavlink_output_40hz(void)
 
 	spread_transmission_load = 30;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
-	{
+
+        {
+#if (HILSIM !=1 )
 #if (MAG_YAW_DRIFT == 1)    // Magnetometer is connected
 		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
@@ -993,7 +995,15 @@ void mavlink_output_40hz(void)
 		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
 		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
 		    (int16_t)   0,                (int16_t)   0,                (int16_t)   0); // zero as mag not connected.
-#endif
+#endif //(MAG_YAW_DRIFT == 1)
+#else  // HILSIM bypasses use of uxb_xaccel etc, and uses gplane[] directly; similarly udb_xrate is sent straight to omega
+       // However gplane[] may be modified by further calculations. So MAVLink uses aero_force which is the negative of gplane[]
+        	extern int16_t magFieldRaw[];
+		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
+		    (int16_t) - aero_force[0], (int16_t) - aero_force[1], (int16_t) - aero_force[2],
+		    (int16_t) omegagyro[0],  (int16_t) omegagyro[1],  (int16_t) omegagyro[2],
+		    (int16_t)   0,   (int16_t)   0,   (int16_t)   0 );
+#endif  // (HILSIM !=1 )
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}
