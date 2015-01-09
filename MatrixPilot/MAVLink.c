@@ -987,13 +987,13 @@ void mavlink_output_40hz(void)
 #if (MAG_YAW_DRIFT == 1)    // Magnetometer is connected
 		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
-		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
+		    (int16_t)   XACCEL_VALUE, (int16_t)   YACCEL_VALUE, (int16_t)  ZACCEL_VALUE,
+		    (int16_t)   XRATE_VALUE,  (int16_t)   YRATE_VALUE,  (int16_t)   ZRATE_VALUE,
 		    (int16_t)   magFieldRaw[0],   (int16_t)   magFieldRaw[1],   (int16_t)   magFieldRaw[2]);
 #else // magnetometer is not connected
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
-		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
+		    (int16_t)   XACCEL_VALUE, (int16_t)   YACCEL_VALUE, (int16_t)  ZACCEL_VALUE,
+		    (int16_t)   XRATE_VALUE,  (int16_t)   YRATE_VALUE,  (int16_t)   ZRATE_VALUE,
 		    (int16_t)   0,                (int16_t)   0,                (int16_t)   0); // zero as mag not connected.
 #endif //(MAG_YAW_DRIFT == 1)
 #else  // HILSIM bypasses use of uxb_xaccel etc, and uses gplane[] directly; similarly udb_xrate is sent straight to omega
