@@ -29,8 +29,8 @@
 #define FSFILE FILE
 
 int FSInit(void);
-FSFILE * FSfopen(const char * fileName, const char *mode);
-int FSfclose(FSFILE *fo);
-size_t FSfwrite(const void *data_to_write, size_t size, size_t n, FSFILE *stream);
+FSFILE* FSfopen(const char* fileName, const char* mode);
+int FSfclose(FSFILE* fo);
+size_t FSfwrite(const void* data_to_write, size_t size, size_t n, FSFILE* stream);
 
 

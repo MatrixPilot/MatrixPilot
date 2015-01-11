@@ -52,8 +52,8 @@
 #define REC_NOT_FOUND                   1
 #define REC_FOUND_BUT_NOT_FLASHED       2
 
-#define DATA_RECORD 		            0
-#define END_OF_FILE_RECORD 	            1
+#define DATA_RECORD                     0
+#define END_OF_FILE_RECORD              1
 #define EXT_SEG_ADRS_RECORD             2
 #define EXT_LIN_ADRS_RECORD             4
 
@@ -70,10 +70,10 @@ typedef struct
 	DWORD_VAL Address;
 	UINT8 RecType;
 	UINT8* Data;
-	UINT8 CheckSum;	
+	UINT8 CheckSum;
 	DWORD_VAL ExtSegAddress;
 	DWORD_VAL ExtLinAddress;
-} T_HEX_RECORD;	
+} T_HEX_RECORD;
 
 static void file_flash(FSFILE* file);
 static void ConvertAsciiToHex(UINT8* asciiRec, UINT8* hexRec);
