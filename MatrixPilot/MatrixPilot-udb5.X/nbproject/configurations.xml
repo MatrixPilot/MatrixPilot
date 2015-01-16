@@ -332,6 +332,7 @@
         <itemPath>../MAVParams.c</itemPath>
         <itemPath>../MAVUDBExtra.c</itemPath>
         <itemPath>../helicalTurnCntrl.c</itemPath>
+        <itemPath>../cutDown.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -359,7 +360,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.11</languageToolchainVersion>
+        <languageToolchainVersion>1.10</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -367,11 +368,8 @@
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
-        <archiverTool>
-        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -422,8 +420,6 @@
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>
-      <C30-AR>
-      </C30-AR>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>

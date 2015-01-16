@@ -333,6 +333,7 @@
         <itemPath>../MAVParams.c</itemPath>
         <itemPath>../MAVUDBExtra.c</itemPath>
         <itemPath>../helicalTurnCntrl.c</itemPath>
+        <itemPath>../cutDown.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -365,11 +366,8 @@
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
-        <archiverTool>
-        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -421,8 +419,6 @@
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
       </C30>
-      <C30-AR>
-      </C30-AR>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>

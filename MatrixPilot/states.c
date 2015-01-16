@@ -42,8 +42,8 @@ uint8_t counter = 0;
 										// to improve the accuracy of the origin during a fast warm start
 #endif
 
-#define NUM_WAGGLES 4                   // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
-#define WAGGLE_SIZE 300
+#define NUM_WAGGLES   4     // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
+#define WAGGLE_SIZE   300
 
 static int16_t calib_timer = CALIB_PAUSE;
 static int16_t standby_timer = STANDBY_PAUSE;
@@ -70,6 +70,9 @@ static void ent_returnS(void);
 
 static void (*stateS)(void) = &startS;
 
+extern void init_cut_down(void) ;
+extern void cut_down_logic(void ) ;
+
 void init_states(void)
 {
 	DPRINT("init_states()\r\n");
@@ -79,6 +82,7 @@ void init_states(void)
 	dcm_flags._.dead_reckon_enable = 0;
 	flags._.update_autopilot_state_asap = 0;
 	stateS = &startS;
+	init_cut_down() ;
 }
 
 void udb_callback_radio_did_turn_off(void)
@@ -178,7 +182,7 @@ static void ent_calibrateS(void)
 	LED_RED = LED_ON; // turn on mode led
 }
 
-// Acquire state is used to wait for the GPS to achieve lock.
+//	Acquire state is used to wait for the GPS to achieve lock.
 static void ent_acquiringS(void)
 {
 	DPRINT("\r\nent_acquiringS\r\n");
@@ -190,8 +194,8 @@ static void ent_acquiringS(void)
 
 	// almost ready to turn the control on, save the trims and sensor offsets
 #if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
- #if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_radio_trim == 0)
+ #if(USE_NV_MEMORY == 1)
+	if(udb_skip_flags.skip_radio_trim == 0)
 	{
 		udb_servo_record_trims();
 	}
@@ -307,7 +311,7 @@ static void ent_returnS(void)
 	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
 #if (FAILSAFE_HOLD == 1)
 	flags._.rtl_hold = 1;
-#endif
+#endif	
 #if (FAILSAFE_TYPE == FAILSAFE_RTL)
 	init_flightplan(1);
 #elif (FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN)
@@ -442,6 +446,7 @@ static void cat_delayS(void)
 
 static void manualS(void)
 {
+	cut_down_logic() ;
 	if (udb_flags._.radio_on)
 	{
 #ifdef CATAPULT_LAUNCH_ENABLE
@@ -463,8 +468,9 @@ static void manualS(void)
 	}
 }
 
-static void stabilizedS(void)
+static void stabilizedS(void) 
 {
+	cut_down_logic() ;
 	if (udb_flags._.radio_on)
 	{
 #ifdef CATAPULT_LAUNCH_ENABLE
@@ -486,6 +492,7 @@ static void stabilizedS(void)
 
 static void waypointS(void)
 {
+	cut_down_logic() ;
 	udb_led_toggle(LED_RED);
 
 	if (udb_flags._.radio_on)
@@ -503,6 +510,7 @@ static void waypointS(void)
 
 static void returnS(void)
 {
+	cut_down_logic() ;
 	if (udb_flags._.radio_on)
 	{
 		if (flight_mode_switch_manual())

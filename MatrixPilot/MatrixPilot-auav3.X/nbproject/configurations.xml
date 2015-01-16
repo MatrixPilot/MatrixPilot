@@ -379,6 +379,7 @@
         <itemPath>../MAVParams.c</itemPath>
         <itemPath>../MAVUDBExtra.c</itemPath>
         <itemPath>../helicalTurnCntrl.c</itemPath>
+        <itemPath>../cutDown.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
         <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
@@ -419,11 +420,8 @@
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
-        <archiverTool>
-        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -476,9 +474,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
       </C30>
-      <C30-AR>
-        <property key="additional-options-chop-files" value="false"/>
-      </C30-AR>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
         <property key="expand-macros" value="false"/>
