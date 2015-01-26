@@ -1,4 +1,8 @@
 extra_dirs := MDD-File-System USB USB/CDC-Device-Driver USB/MSD-Device-Driver
+#extra_dirs := MDD-File-System
+#ifeq ($(DEVICE),AUAV3) 
+#extra_dirs +=  USB USB/CDC-Device-Driver USB/MSD-Device-Driver
+#endif
 
 $(call mkoutdir, $(addprefix $(subdirectory)/,$(extra_dirs)))
 

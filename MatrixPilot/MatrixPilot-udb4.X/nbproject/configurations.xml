@@ -7,10 +7,12 @@
         <itemPath>../../Config/airspeed_options.h</itemPath>
         <itemPath>../../Config/FSconfig.h</itemPath>
         <itemPath>../../Config/magnetometerOptions.h</itemPath>
+        <itemPath>../../Config/mavlink_options.h</itemPath>
         <itemPath>../../Config/nv_memory_options.h</itemPath>
         <itemPath>../../Config/options.h</itemPath>
         <itemPath>../../Config/options_auav3.h</itemPath>
         <itemPath>../../Config/osd_config.h</itemPath>
+        <itemPath>../../Config/ports_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MatrixPilot" displayName="MatrixPilot" projectFiles="true">
         <itemPath>../../MatrixPilot/airspeedCntrl.h</itemPath>
@@ -35,16 +37,21 @@
         <itemPath>../../MatrixPilot/flightplan-logo.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan-waypoints.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan.h</itemPath>
+        <itemPath>../../MatrixPilot/flightplan_logo.h</itemPath>
+        <itemPath>../../MatrixPilot/flightplan_waypoints.h</itemPath>
         <itemPath>../../MatrixPilot/fly_by_datalink.h</itemPath>
         <itemPath>../../MatrixPilot/gain_variables.h</itemPath>
         <itemPath>../../MatrixPilot/libCntrl.h</itemPath>
         <itemPath>../../MatrixPilot/MAVFlexiFunctions.h</itemPath>
         <itemPath>../../MatrixPilot/MAVLink.h</itemPath>
-        <itemPath>../../MatrixPilot/mavlink_options.h</itemPath>
         <itemPath>../../MatrixPilot/MAVMission.h</itemPath>
         <itemPath>../../MatrixPilot/MAVParams.h</itemPath>
         <itemPath>../../MatrixPilot/MAVUDBExtra.h</itemPath>
+        <itemPath>../../MatrixPilot/minGlue-mdd.h</itemPath>
+        <itemPath>../../MatrixPilot/minGlue.h</itemPath>
+        <itemPath>../../MatrixPilot/minIni.h</itemPath>
         <itemPath>../../MatrixPilot/mode_switch.h</itemPath>
+        <itemPath>../../MatrixPilot/mp_osd.h</itemPath>
         <itemPath>../../MatrixPilot/navigate.h</itemPath>
         <itemPath>../../MatrixPilot/osd_layout.h</itemPath>
         <itemPath>../../MatrixPilot/osd_layout_remzibi.h</itemPath>
@@ -116,11 +123,6 @@
         <itemPath>../../libFlashFS/FSconfig.h</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
         <itemPath>../../libFlashFS/MDD_EEPROM.h</itemPath>
-        <itemPath>../../libFlashFS/minGlue-mdd.h</itemPath>
-        <itemPath>../../libFlashFS/minGlue.h</itemPath>
-        <itemPath>../../libFlashFS/minIni.h</itemPath>
-        <itemPath>../../libFlashFS/usb_cdc.h</itemPath>
-        <itemPath>../../libFlashFS/usb_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
@@ -307,6 +309,8 @@
       <logicalFolder name="USB" displayName="USB" projectFiles="true">
         <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
       </logicalFolder>
+        <itemPath>../../Microchip/usb_cdc.h</itemPath>
+        <itemPath>../../Microchip/usb_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="Tools/MatrixPilot-SIL" displayName="Tools/MatrixPilot-SIL" projectFiles="true">
         <itemPath>../../Tools/MatrixPilot-SIL/dsp.h</itemPath>
@@ -341,6 +345,7 @@
         <itemPath>../../MatrixPilot/euler_angles.c</itemPath>
         <itemPath>../../MatrixPilot/flightplan-logo.c</itemPath>
         <itemPath>../../MatrixPilot/flightplan-waypoints.c</itemPath>
+        <itemPath>../../MatrixPilot/flightplan.c</itemPath>
         <itemPath>../../MatrixPilot/flight_state.c</itemPath>
         <itemPath>../../MatrixPilot/fly_by_datalink.c</itemPath>
         <itemPath>../../MatrixPilot/helicalTurnCntrl.c</itemPath>
@@ -351,6 +356,7 @@
         <itemPath>../../MatrixPilot/MAVParams.c</itemPath>
         <itemPath>../../MatrixPilot/MAVUDBExtra.c</itemPath>
         <itemPath>../../MatrixPilot/minim_osd.c</itemPath>
+        <itemPath>../../MatrixPilot/minIni.c</itemPath>
         <itemPath>../../MatrixPilot/mode_switch.c</itemPath>
         <itemPath>../../MatrixPilot/mp_osd.c</itemPath>
         <itemPath>../../MatrixPilot/navigate.c</itemPath>
@@ -434,7 +440,6 @@
         <itemPath>../../libFlashFS/filesys.c</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
         <itemPath>../../libFlashFS/MDD_EEPROM.c</itemPath>
-        <itemPath>../../libFlashFS/minIni.c</itemPath>
         <itemPath>../../libFlashFS/usb.c</itemPath>
         <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
         <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
@@ -495,6 +500,7 @@
         <itemPath>../../Tools/MatrixPilot-SIL/SIL-serial.c</itemPath>
         <itemPath>../../Tools/MatrixPilot-SIL/SIL-udb.c</itemPath>
         <itemPath>../../Tools/MatrixPilot-SIL/SIL-ui-mp-term.c</itemPath>
+        <itemPath>../../Tools/MatrixPilot-SIL/UDBSocketUnix.c</itemPath>
         <itemPath>../../Tools/MatrixPilot-SIL/UDBSocketWin.c</itemPath>
       </logicalFolder>
 </logicalFolder>
@@ -563,7 +569,7 @@
         <property key="enable-symbols" value="true" />
         <property key="enable-unroll-loops" value="false" />
         <property key="extra-include-directories"
-        value="../../Config;../../MAVLink/include;../../Microchip;../../Microchip/include" />
+        value="../../Config;../../MAVLink/include;../../Microchip;../../Microchip/Include" />
         <property key="isolate-each-function" value="false" />
         <property key="keep-inline" value="false" />
         <property key="oXC16gcc-align-arr" value="false" />
