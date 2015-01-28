@@ -470,7 +470,7 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void* refcon)
 	beta = XPLMGetDataf(drBeta)   / 180 * PI;
 
 	
-    // On 25th Jan 2015, Bill Permerlani confirmed with Austin Meyer, author of X-Plane
+    // On 25th Jan 2015, Bill Premerlani confirmed with Austin Meyer, author of X-Plane
     // that P, Q and R are rotations in the body frame. So they do not need to be rotated into
     // any other frame of reference, other than a small sign correction for the UDB frame conventions.
     // Austin Meyer said: "now, i CAN say that P is roll, Q is pitch, and R is yaw, all in degrees per second
