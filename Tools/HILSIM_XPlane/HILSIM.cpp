@@ -469,7 +469,12 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void* refcon)
 	alpha = XPLMGetDataf(drAlpha) / 180 * PI;
 	beta = XPLMGetDataf(drBeta)   / 180 * PI;
 
-	FLIGHTtoBCBF(P_flight, Q_flight, R_flight, alpha, beta);
+	
+    // On 25th Jan 2015, Bill Premerlani confirmed with Austin Meyer, author of X-Plane
+    // that P, Q and R are rotations in the body frame. So they do not need to be rotated into
+    // any other frame of reference, other than a small sign correction for the UDB frame conventions.
+    // Austin Meyer said: "now, i CAN say that P is roll, Q is pitch, and R is yaw, all in degrees per second
+    //about the aircraft axis,..... (i just looked at the code to confirm this)"
 
 	P_plane = P_flight;
 	Q_plane = -Q_flight;   // convert from NED to UDB
