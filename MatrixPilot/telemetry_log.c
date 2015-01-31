@@ -44,6 +44,12 @@ extern boolean inflight_state(void);
 #define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
 #endif
 
+#ifdef SILSIM
+#define FSFILE    FILE
+#define FSfopen   fopen
+#define FSfclose  fclose
+#define FSfwrite  fwrite
+#endif
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
