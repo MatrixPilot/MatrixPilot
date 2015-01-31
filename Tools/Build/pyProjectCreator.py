@@ -204,6 +204,38 @@ def mplabX_project(mcu_type, name, target_board, config_dir, includes, header_fi
 		file.write(data)
 
 #
+# Em::Blocks section
+#
+
+def emBlocks_scan_dirs(masks, sources, directories):
+	str = ""
+	for dir in directories:
+		path = os.path.join(rootdir, dir)
+		for mask in masks:
+			files = find(mask, path)
+			for filename in files:
+				if sources == 1:
+					if mask == "*.s":
+						str = str + "\t\t<Unit filename=\"" + filename.replace("/", "\\") + "\">\n\t\t\t<Option compilerVar=\"ASM\" />\n\t\t</Unit>\n"
+					else:
+						str = str + "\t\t<Unit filename=\"" + filename.replace("/", "\\") + "\">\n\t\t\t<Option compilerVar=\"CC\" />\n\t\t</Unit>\n"
+				else:
+					str = str + "\t\t<Unit filename=\"" + filename.replace("/", "\\") + "\" />\n"
+	return str
+
+def emBlocks_project(mcu_type, target_board, config_dir, includes, header_files, source_files, project_output_file):
+	with open (script_path + "template.ebp", "r") as file:
+		data = file.read()
+		data = data.replace("%%PROJECT%%", "MatrixPilot-PX4")
+		data = data.replace("%%INCLUDES%%", includes)
+		data = data.replace("%%TARGET_BOARD%%", target_board)
+		data = data.replace("%%SOURCE_FILES%%", source_files)
+		data = data.replace("%%HEADER_FILES%%", header_files)
+	mkdirnotex(project_output_file)
+	with open (project_output_file, "w") as file:
+		file.write(data)
+
+#
 # main application
 #
 
@@ -213,7 +245,7 @@ if __name__ == '__main__':
 	parser = OptionParser("pyProjectCreator.py [options]")
 	parser.add_option("-n", "--name", dest="name", help="specify the project name", type="string", default="MatrixPilot", metavar="MatrixPilot")
 	parser.add_option("-t", "--target", dest="target", help="specify the target board", type="string", default="UDB5", metavar="UDB5")
-	parser.add_option("-d", "--dir", dest="directories", help="search directory for source files", action='append')
+	parser.add_option("-m", "--mod",    dest="modules",  help="search path for module.mk file", action='append')
 	parser.add_option("-i", "--inc",    dest="includes",    help="additional include files directory", default=[], action='append')
 	parser.add_option("-c", "--cfg", dest="config", help="specify configuration files directory", default="../Config")
 	parser.add_option("-o", "--out", dest="out", help="project files output path", default="output")
@@ -231,6 +263,8 @@ if __name__ == '__main__':
 		arch = "dsPIC33FJ256GP710A"
 	elif opts.target == "AUAV3":
 		arch = "dsPIC33EP512MU810"
+	elif opts.target == "PX4":
+		arch = "STM32F401xE"
 	else:
 		arch = ""
 
@@ -239,30 +273,40 @@ if __name__ == '__main__':
 	includes = ';'.join(inc_list)
 
 	filters = ""
+	project = os.path.join(opts.out, opts.name + "-" + opts.target)
 
-	if opts.target == "SIL":
-		sources = vs2010_scan_dirs(["*.c"], 1, opts.directories)
-		headers = vs2010_scan_dirs(["*.h"], 0, opts.directories)
-		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".vcxproj")
+	if opts.target == "PX4":
+		sources  = emBlocks_scan_dirs(["*.c", "*.s"], 1, opts.modules)
+		headers  = emBlocks_scan_dirs(["*.h"], 0, opts.modules + ["libUDB"])
+		project_path = project + ".ebp"
+		includes = ""
+		for inc in inc_list:
+			includes = includes + "\t\t\t<Add directory=\"" + inc + "\" />\n"
+		print "writing: " + project_path
+		emBlocks_project(arch, opts.target, opts.config, includes, headers, sources, project_path)
+	elif opts.target == "SIL":
+		sources = vs2010_scan_dirs(["*.c"], 1, opts.modules)
+		headers = vs2010_scan_dirs(["*.h"], 0, opts.modules)
+		project_path = project + ".vcxproj"
 		print "writing: " + project_path
 		vs2010_project(arch, opts.target, opts.config, includes, headers, sources, project_path)
-		sources = vs2010_scan_filter_dirs(["*.c"], 1, opts.directories, "Source Files\\")
-		headers = vs2010_scan_filter_dirs(["*.h"], 0, opts.directories, "Header Files\\")
+		sources = vs2010_scan_filter_dirs(["*.c"], 1, opts.modules, "Source Files\\")
+		headers = vs2010_scan_filter_dirs(["*.h"], 0, opts.modules, "Header Files\\")
 		filters = filters + vs2010_make_filter_dirs("Source", source_folders)
 		filters = filters + vs2010_make_filter_dirs("Header", header_folders)
-		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".vcxproj.filters")
+		project_path = project + ".vcxproj.filters"
 		vs2010_filters(arch, opts.target, opts.config, filters, headers, sources, project_path)
 	else:
-		mplab8_scan_dirs("*.c", opts.directories)
-		mplab8_scan_dirs("*.s", opts.directories)
-		mplab8_scan_dirs("*.h", opts.directories)
-		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".mcp")
+		mplab8_scan_dirs("*.c", opts.modules)
+		mplab8_scan_dirs("*.s", opts.modules)
+		mplab8_scan_dirs("*.h", opts.modules)
+		project_path = project + ".mcp"
 		print "writing: " + project_path
 		mplab8_project(arch, opts.target, opts.config, includes, project_path)
 
-		headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.directories)
-		sources = mplabX_scan_dirs(["*.c", "*.s"], opts.directories)
-		project_path = os.path.join(opts.out, opts.name + "-" + opts.target + ".X")
+		headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.modules)
+		sources = mplabX_scan_dirs(["*.c", "*.s"], opts.modules)
+		project_path = project + ".X"
 		print "writing: " + project_path
 
 		includes = ';'.join(["../" + str(x) for x in inc_list])
