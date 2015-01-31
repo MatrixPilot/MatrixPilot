@@ -43,6 +43,7 @@
 #define UDB5_BOARD              8   // board with dsPIC33 and MPU6000
 #define AUAV3_BOARD             9   // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 #define AUAV4_BOARD             10  // AUAV4 with PIC32MX
+#define PX4_BOARD               11  // PX4 with STM32F4xx
 
 #if (SILSIM == 0)
 
@@ -53,6 +54,8 @@
 #include "ConfigUDB5.h"
 #elif (BOARD_TYPE == AUAV3_BOARD)
 #include "ConfigAUAV3.h"
+#elif (BOARD_TYPE == PX4_BOARD)
+#include "ConfigPX4.h"
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "../CANInterface/ConfigCANInterface.h"
 #else

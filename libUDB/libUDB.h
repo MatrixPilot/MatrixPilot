@@ -27,6 +27,11 @@
 #include <stdio.h>
 
 #include "options.h"
+//#include "options_quad.h"
+
+#ifdef PX4
+#include "../libSTM/libSTM.h"
+#endif
 
 #if (WIN == 1 || NIX == 1)
 #define inline __inline
@@ -75,6 +80,10 @@
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
 #include "options_auav3.h"
+#endif
+#ifdef PX4
+#define BOARD_TYPE                          PX4_BOARD
+#include "libSTM.h"
 #endif
 
 #ifndef BOARD_TYPE
@@ -237,9 +246,17 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
+#ifdef PX4
+void udb_led_toggle(uint8_t x);
+void led_on(uint8_t x);
+void led_off(uint8_t x);
+#else
 #define udb_led_toggle(x)               ((x) = !(x))
-#define led_on(x)                       ((x) = 0)
-#define led_off(x)                      ((x) = 1)
+//#define led_on(x)                       ((x) = 0)
+//#define led_off(x)                      ((x) = 1)
+#define led_on(x)                       ((x) = LED_ON)
+#define led_off(x)                      ((x) = LED_OFF)
+#endif
 
 
 

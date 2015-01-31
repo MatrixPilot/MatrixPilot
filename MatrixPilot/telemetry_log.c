@@ -23,7 +23,7 @@
 #include "../libUDB/heartbeat.h"
 #include "telemetry.h"
 #include "telemetry_log.h"
-#if (WIN == 1 || NIX == 1)
+#if (WIN == 1 || NIX == 1 || PX4 == 1)
 #include <stdio.h>
 #include "../Tools/MatrixPilot-SIL/SIL-filesystem.h"
 #else
@@ -36,19 +36,16 @@ extern void restart_telemetry(void);
 extern boolean inflight_state(void);
 
 
-#if (WIN == 1 || NIX == 1)
+#if (WIN == 1 || NIX == 1 || PX4 == 1)
+#define FSFILE    FILE
+#define FSfopen   fopen
+#define FSfclose  fclose
+#define FSfwrite  fwrite
 #define LOGFILE_ENABLE_PIN 0
 #else
 //#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
 //#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
 #define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
-#endif
-
-#ifdef SILSIM
-#define FSFILE    FILE
-#define FSfopen   fopen
-#define FSfclose  fclose
-#define FSfwrite  fwrite
 #endif
 
 #define MIN(a,b) (((a)<(b))?(a):(b))

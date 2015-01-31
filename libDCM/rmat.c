@@ -51,7 +51,7 @@ static fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
 static uint16_t spin_rate = 0;
 static fractional spin_axis[] = { 0, 0, RMAX };
 
-#if (BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == PX4_BOARD)
 // modified gains for MPU6000
 #define KPROLLPITCH (ACCEL_RANGE * 1280/3)
 #define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)
