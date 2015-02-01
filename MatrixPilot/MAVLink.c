@@ -849,7 +849,8 @@ void mavlink_output_40hz(void)
 
 		mavlink_heading = get_geo_heading_angle() * 100;    // mavlink global position expects heading value x 100
 		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon, alt, relative_alt,
-		    -IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity  normal units are in cm / second
+		    IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity upper word gives V in cm / second
+                    // MAVLink is using North,East,Down Frame (NED). MatrixPilot IMUVelocity is in earth frame (X is East, Y is North, Z is Up)
 		    mavlink_heading); // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
 		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
 		//   int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg)
