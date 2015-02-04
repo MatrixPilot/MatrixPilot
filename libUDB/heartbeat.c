@@ -54,6 +54,8 @@ inline uint16_t heartbeat_cnt(void)
 	return udb_heartbeat_counter;
 }
 
+// NOTE: RobD - udb_heartbeat_counter is not being used at the libUDB layer
+//              outside of this module, so it could be moved up.
 inline void heartbeat(void) // called from ISR
 {
 	// Start the sequential servo pulses at frequency SERVO_HZ
@@ -70,16 +72,22 @@ inline void heartbeat(void) // called from ISR
 	}
 
 	// TODO: determine why this is called from the high priority interrupt handler? is it req?
+	// This calls the state machine implemented in MatrixPilot/states.c
+	// it is called at high priority to ensure manual control takeover can
+	// occur, even if the lower priority tasks hang
 	// Call the periodic callback at 40 Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
+		// by default runs the MatrixPilot state machine in states.c
 		udb_heartbeat_40hz_callback(); // this was called udb_background_callback_periodic()
 	}
 
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 //	_T6IF = 1;
 	udb_background_trigger_pulse(&heartbeat_pulse);
-
+	// TODO: RobD - potential inversion issue here with incrementing the counter
+	//              before versus after the pulse occurs, depending on the
+	//              trigger implementation..
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 }
 

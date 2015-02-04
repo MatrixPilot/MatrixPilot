@@ -34,4 +34,7 @@ make -f ../../makefile SOURCE_DIR=../.. DEVICE=UDB5 TOOLCHAIN=XC16
 popd
 
 popd
+
+dir build\*.hex build\*.exe build\*.map /B /S
+
 pause
