@@ -221,12 +221,26 @@ static inline void read_accel(void)
 	}
 #endif
 
-	// transform gplane from body frame to earth frame
-	// x component in earth frame is earth x unit vector (rmat[0,1,2]) dotted with gplane
-	//FIXME: But why are the y and z components negated?
-	accelEarth[0] =  VectorDotProduct(3, &rmat[0], gplane) << 1;
-	accelEarth[1] = -VectorDotProduct(3, &rmat[3], gplane) << 1;
-	accelEarth[2] = -((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane) << 1);
+        // gplane is a vector that represents the gravity vector minus the acceleration vector,
+        // as seen in the body frame. Taking the dot products of gplane with the rows of the
+        // rotation matrix is the same thing as multiplying the rotation matrix times gplane vector,
+        // which is the same thing as transforming gplane into the earth frame,
+        // which gives us gravity minus acceleration in the earth frame,
+        // regardless of the orientation of the aircraft.
+        //
+        // We want acceleration minus gravity in the earth frame, so sign flip all three components.
+        // Going from UDB coordinates to Earth coordinates (east, north, up) requires us to apply
+        // another sign flip to x and z. So, taking the dot products and
+        // flipping only the sign of y, gives us acceleration minus gravity in the earth frame.
+        //
+        // The final step is to add gravity, which is equal to -GRAVITY, since gravity (which is down)
+        // is in the opposite direction to the earth up direction. so, the final step is to add -GRAVITY.
+        //
+        // See the following URL for further details of the frame reference conventions for UDB / MatrixPilot
+        // https://code.google.com/p/gentlenav/wiki/UDBCoordinateSystems
+	accelEarth[0] = +(VectorDotProduct(3, &rmat[0], gplane) << 1);
+	accelEarth[1] = -(VectorDotProduct(3, &rmat[3], gplane) << 1);
+	accelEarth[2] = +(-((int16_t)GRAVITY) + (VectorDotProduct(3, &rmat[6], gplane) << 1));
 
 //	accelEarthFiltered[0].WW += ((((int32_t)accelEarth[0])<<16) - accelEarthFiltered[0].WW)>>5;
 //	accelEarthFiltered[1].WW += ((((int32_t)accelEarth[1])<<16) - accelEarthFiltered[1].WW)>>5;
