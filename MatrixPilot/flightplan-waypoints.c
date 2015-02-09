@@ -22,7 +22,7 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
-#include "../libCntrl/cameraCntrl.h"
+#include "cameraCntrl.h"
 #include "flightplan_waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsData.h"

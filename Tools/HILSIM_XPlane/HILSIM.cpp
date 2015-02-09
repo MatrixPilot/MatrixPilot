@@ -56,7 +56,7 @@ unsigned char var_channel_count;        // Number of channels to be recieved
 unsigned char ck_in_a, ck_in_b, ck_calc_a, ck_calc_b;
 
 void SetupDefaultServoZeros(void);
-void ServosToControls();
+void ServosToControls(void);
 
 int GPSCount = 0;
 int store_index = 0;

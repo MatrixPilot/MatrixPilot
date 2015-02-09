@@ -23,7 +23,7 @@
 #include "mode_switch.h"
 #include "flightplan.h"
 #include "states.h"
-#include "../libCntrl/altitudeCntrl.h"
+#include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
 #include <stdio.h>

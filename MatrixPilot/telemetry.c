@@ -23,7 +23,7 @@
 #include "telemetry.h"
 #include "flightplan.h"
 #include "states.h"
-#include "../libCntrl/cameraCntrl.h"
+#include "cameraCntrl.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif

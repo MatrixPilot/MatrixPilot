@@ -49,7 +49,6 @@
 #else
 #error unknown processor family
 #endif
-
 #endif
 
 /*

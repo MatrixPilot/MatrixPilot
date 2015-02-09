@@ -22,8 +22,8 @@
 #include "defines.h"
 #include "behaviour.h"
 #include "states.h"
-#include "../libDCM/estYawDrift.h"
 #include "../libUDB/servoOut.h"
+#include "../libDCM/estYawDrift.h"
 #include "../libDCM/rmat.h"
 
 int16_t current_orientation;

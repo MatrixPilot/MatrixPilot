@@ -23,7 +23,7 @@
 //#include "options.h"
 //#include "options_quad.h"
 #include "quad.h"
-#include "../libCntrl/motorCntrl.h"
+#include "motorCntrl.h"
 #include "../libDCM/libDCM.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/eeprom_udb4.h"

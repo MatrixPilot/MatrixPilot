@@ -19,7 +19,7 @@
 #ifndef MININI_H
 #define MININI_H
 
-#if (WIN == 1 || NIX ==1)
+#if (WIN == 1 || NIX == 1 || BOARD_TYPE == PX4_BOARD)
 #include "minGlue.h"
 #else
 #include "minGlue-mdd.h"

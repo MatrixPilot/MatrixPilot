@@ -302,7 +302,7 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
-	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+	const char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 
 	sil_ui_will_reset();
 

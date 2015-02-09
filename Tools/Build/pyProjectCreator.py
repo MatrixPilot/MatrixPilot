@@ -18,10 +18,10 @@ file_cnt = 0
 #header = ""
 #source = ""
 
-def mkdirnotex(filename):  
-	folder = os.path.dirname(filename)  
-	if not os.path.exists(folder):  
-		os.makedirs(folder) 
+def mkdirnotex(filename):
+	folder = os.path.dirname(filename)
+	if not os.path.exists(folder):
+		os.makedirs(folder)
 
 def count_files(masks, dir):
 	count = 0

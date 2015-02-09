@@ -208,7 +208,7 @@ void configurePPS(void)
 }
 
 // This method configures TRISx for the digital IOs
-void configureDigitalIO(void)   // AUAV3 board
+static void configureDigitalIO(void)   // AUAV3 board
 {
 	// TRIS registers have no effect on pins mapped to peripherals
 	// TRIS assignments are made in the initialization methods for each function

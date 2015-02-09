@@ -19,15 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../MatrixPilot/defines.h"
-#include "../MatrixPilot/navigate.h"
-#include "../MatrixPilot/behaviour.h"
-#include "../MatrixPilot/servoPrepare.h"
-#include "../MatrixPilot/states.h"
-#include "../libUDB/servoOut.h"
-#include "../libDCM/rmat.h"
+#include "defines.h"
+#include "navigate.h"
+#include "behaviour.h"
+#include "servoPrepare.h"
+#include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
+#include "../libUDB/servoOut.h"
+#include "../libDCM/rmat.h"
 
 //  If the state machine selects pitch feedback, compute it from the pitch gyro and accelerometer.
 
@@ -66,17 +66,17 @@ void init_pitchCntrl(void)
 	rollElevMixGain = (uint16_t)(ROLL_ELEV_MIX*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_pitchCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.Pitchgain      = (float)pitchgain         / (RMAX);
 	gains.PitchKD        = (float)pitchkd           / (SCALEGYRO*RMAX);
 	gains.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
 	gains.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
 	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
 	gains.RollElevMix    = (float)rollElevMixGain   / (RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 void pitchCntrl(void)
 {

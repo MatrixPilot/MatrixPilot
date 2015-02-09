@@ -19,35 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// Manages software triggered events to run registered callbacks
-
-#ifndef EVENTS_H
-#define EVENTS_H
+#ifndef MP_OSD_H
+#define MP_OSD_H
 
 
-#define MAX_EVENTS 16
-#define INVALID_HANDLE 0xFFFF
-
-void init_events(void);
-void trigger_event(uint16_t hEvent);
-
-typedef enum eventP
-{
-	EVENT_PRIORITY_LOW = 0,
-	EVENT_PRIORITY_MEDIUM,
-	EVENT_PRIORITY_HIGH,
-} eventPriority;
-
-typedef struct tagEVENT
-{
-	boolean eventPending;
-	void (*event_callback)(void);
-	int16_t priority;
-} EVENT;
-
-uint16_t register_event(void (*event_callback)(void));
-
-uint16_t register_event_p(void (*event_callback)(void), eventPriority priority);
+void mp_osd_init(void);
+void mp_osd_run_step(uint16_t init_counter);
 
 
-#endif // EVENTS_H
+#endif // MP_OSD_H

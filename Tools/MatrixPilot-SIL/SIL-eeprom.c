@@ -8,8 +8,8 @@
 
 #if (WIN == 1 || NIX == 1)
 
-#include <stdio.h>
 #include "../../libUDB/libUDB.h"
+#include <stdio.h>
 #include <string.h>
 
 #define EEPROMFilePath "EEPROM.bin"

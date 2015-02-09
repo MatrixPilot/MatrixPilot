@@ -20,10 +20,11 @@
 
 
 #include "../../libUDB/libUDB.h"
-#include "../../libUDB/eeprom_udb4.h"
-#include "../../libUDB/heartbeat.h"
-#include "../../libUDB/ADchannel.h"
 #include "../../libUDB/mpu6000.h"
+#include "../../libUDB/servoOut.h"
+#include "../../libUDB/ADchannel.h"
+#include "../../libUDB/heartbeat.h"
+#include "../../libUDB/eeprom_udb4.h"
 #include <libpic30.h>
 
 #if (BOARD_TYPE == UDB4_BOARD)

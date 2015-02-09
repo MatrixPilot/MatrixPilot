@@ -19,13 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//#include "defines.h"
 #include <stdint.h>
+#include <stdio.h>
 #include "FSconfig.h"
 #include "EEPROM.h"
 #include "../libUDB/I2C.h"
-#include <stdio.h>
-
 #include "../libUDB/eeprom_udb4.h"
 
 #ifdef USE_EEPROM_FLASH

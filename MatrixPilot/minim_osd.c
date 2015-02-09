@@ -20,8 +20,8 @@
 
 
 #include "defines.h"
-#include "navigate.h"
 #include "osd_config.h"
+#include "navigate.h"
 #include "states.h"
 #include "flightplan_waypoints.h"
 #include "../libDCM/deadReckoning.h"
@@ -39,12 +39,13 @@
 #include <string.h>
 #include "osd_layout_remzibi.h"
 
+static FILE* fp = NULL;
 static int16_t telemetry_counter = 0;
 
-//void init_serial(void)
-//{
-//	udb_serial_set_rate(57600);
-//}
+void minim_osd_init(FILE* _fp)
+{
+	fp = _fp;
+}
 
 static void update_coords(void)
 {

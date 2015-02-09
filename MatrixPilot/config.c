@@ -24,12 +24,12 @@
 #include <stdio.h>
 
 #include "navigate.h"
-#include "../libCntrl/libCntrl.h"
-#include "../libCntrl/airspeedCntrl.h"
+#include "libCntrl.h"
+#include "airspeedCntrl.h"
 
 #if (USE_CONFIGFILE == 1)
 
-#include "../libFlashFS/minIni.h"
+#include "minIni.h"
 
 union settings_word settings;
 struct gains_variables gains;

@@ -20,15 +20,15 @@
 
 
 #include "defines.h"
-#include "flightplan_waypoints.h"
+#include "flightplan-waypoints.h"
 #include "../libDCM/rmat.h"
 #include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/osd.h"
 #include "osd_config.h"
 #include "navigate.h"
-#include "states.h"
 
 #if (USE_OSD == OSD_REMZIBI)
 
@@ -61,6 +61,8 @@ enum PLANE_FLIGHT_MODE
 	extern union longbbbb date_gps_, time_gps_;
 #endif
 
+static FILE* fp = NULL;
+
 static int16_t telemetry_counter = 0;
 static int16_t home_saved = false;
 static int16_t mp_mode = 0;
@@ -87,17 +89,21 @@ static const char* mp_mode_name[] = {
 	"R"
 };
 
-//void init_serial(void)
-//{
+void rezibi_osd_init(FILE* _fp)
+{
 //	udb_serial_set_rate(19200);
-//}
+	fp = _fp;
+}
 
 static void serial_send_coord(int32_t coord)
 {
+	int32_t n1;
+	int32_t n2;
+
 	coord /= 10;
-	int32_t n1 = (coord / 1000000L);
-	int32_t n2 = (coord % 1000000L);
-	serial_output("%li.%06li", n1, n2);
+	n1 = (coord / 1000000L);
+	n2 = (coord % 1000000L);
+	fprintf(fp, "%li.%06li", n1, n2);
 }
 
 static void serial_send_location(int16_t loc)
@@ -117,64 +123,73 @@ static void serial_send_location(int16_t loc)
 		row -= 512;
 		col += 128;
 	}
-	serial_output("$M,%i,%i,", col, row);
+	fprintf(fp, "$M,%i,%i,", col, row);
 }
 
 static void serial_send_string(const char* str, uint8_t leading, uint8_t tailing)
 {
 	if (leading != 0)
 	{
-		serial_output("%i", leading);
+		fprintf(fp, "%i", leading);
 	}
-	serial_output(",");
+	fprintf(fp, ",");
 	if (tailing != 0)
 	{
-		serial_output("%i", tailing);
+		fprintf(fp, "%i", tailing);
 	}
-	serial_output(",");
-	serial_output(str);
-	serial_output(",\r\n");
+	fprintf(fp, ",");
+	fprintf(fp, str);
+	fprintf(fp, ",\r\n");
 }
 
 static void serial_send_int(int16_t num, uint8_t leading, uint8_t tailing)
 {
 	if (leading != 0)
 	{
-		serial_output("%i", leading);
+		fprintf(fp, "%i", leading);
 	}
-	serial_output(",");
+	fprintf(fp, ",");
 	if (tailing != 0)
 	{
-		serial_output("%i", tailing);
+		fprintf(fp, "%i", tailing);
 	}
-	serial_output(",");
-	serial_output("%i", num);
-	serial_output(",\r\n");
+	fprintf(fp, ",");
+	fprintf(fp, "%i", num);
+	fprintf(fp, ",\r\n");
 }
 
 static void serial_send_long(int32_t num, uint8_t leading, uint8_t tailing)
 {
 	if (leading != 0)
 	{
-		serial_output("%i", leading);
+		fprintf(fp, "%i", leading);
 	}
-	serial_output(",");
+	fprintf(fp, ",");
 	if (tailing != 0)
 	{
-		serial_output("%i", tailing);
+		fprintf(fp, "%i", tailing);
 	}
-	serial_output(",");
-	serial_output("%li", num);
-	serial_output(",\r\n");
+	fprintf(fp, ",");
+	fprintf(fp, "%li", num);
+	fprintf(fp, ",\r\n");
 }
 
 static void serial_send_cls(void)
 {
-	serial_output("$CLS\r\n");
+	fprintf(fp, "$CLS\r\n");
 }
 
 static void update_coords(void)
 {
+	int32_t date = 0;
+	int32_t time = 0;
+	int8_t earth_yaw;
+	int16_t angle1;
+	int16_t angle;
+	struct relative2D toGoal;
+	int16_t dist_to_home;
+	int16_t dist_to_goal;
+
 	uint16_t ground_speed_3DIMU = vector3_mag(IMUvelocityx._.W1,
 	                                          IMUvelocityy._.W1,
 	                                          IMUvelocityz._.W1);
@@ -182,27 +197,26 @@ static void update_coords(void)
 	struct relative2D curHeading;
 	curHeading.x = -rmat[1];
 	curHeading.y = rmat[4];
-	int8_t earth_yaw = rect_to_polar(&curHeading);  // -128 to 127 (0=East,  ccw)
+	earth_yaw = rect_to_polar(&curHeading);  // -128 to 127 (0=East,  ccw)
 
 	// convert to degrees
-	int16_t angle1 = (earth_yaw * 180 + 64) >> 7;   // -180 to 180 (0=East,  ccw)
+	angle1 = (earth_yaw * 180 + 64) >> 7;   // -180 to 180 (0=East,  ccw)
 	if (angle1 < 0) // 0 - 360
 	{
 		angle1 += 360;
 	}
 
-	int16_t angle = 90 - angle1;    // course as degree - as integer , range 0 - 360, cw!! 0=North
+	angle = 90 - angle1;    // course as degree - as integer , range 0 - 360, cw!! 0=North
 	if (angle < 0)
 	{
 		angle += 360;
 	}
 
-	struct relative2D toGoal;
 	toGoal.x = 0 - IMUlocationx._.W1;
 	toGoal.y = 0 - IMUlocationy._.W1;
 
-	int16_t dist_to_home = toGoal.x;
-	int16_t dist_to_goal;
+	dist_to_home = toGoal.x;
+	dist_to_goal;
 
 	if (state_flags._.GPS_steering)
 	{
@@ -213,9 +227,6 @@ static void update_coords(void)
 	{
 		dist_to_goal = dist_to_home;
 	}
-
-	int32_t date = 0;
-	int32_t time = 0;
 
 #if (GPS_TYPE == GPS_MTEK)
 //	date = date_gps_.WW;
@@ -240,12 +251,12 @@ static void update_coords(void)
 	// alt - as integer
 	// course as degree - as integer , range -180 to 180 
 	//
-	serial_output("$A,");
+	fprintf(fp, "$A,");
 	serial_send_coord(lat_gps.WW);
-	serial_output(",");
+	fprintf(fp, ",");
 	serial_send_coord(lon_gps.WW);
 
-	serial_output(",%i,%i,%i,%i,%i,,%li,%li,\r\n",
+	fprintf(fp, ",%i,%i,%i,%i,%i,,%li,%li,\r\n",
 		(int16_t)svs,
 		dist_to_home,
 		IMUlocationz._.W1,
@@ -257,12 +268,12 @@ static void update_coords(void)
 
 #if (OSD_LOC_REMZIBI_DEBUG != OSD_LOC_DISABLED)
 	serial_send_location(OSD_LOC_REMZIBI_DEBUG);
-	serial_output(",,E %i A1 %i A %i\r\n", (int16_t)earth_yaw, angle1, angle);
+	fprintf(fp, ",,E %i A1 %i A %i\r\n", (int16_t)earth_yaw, angle1, angle);
 #endif
 
 #if (OSD_LOC_AP_MODE != OSD_LOC_DISABLED)
 	serial_send_location(OSD_LOC_AP_MODE);
-	//serial_output("$M,131,4,");
+	//fprintf(fp, "$M,131,4,");
 	serial_send_string(mp_mode_name[mp_mode], 0, 0);
 #endif
 
@@ -321,10 +332,10 @@ static void update_flight_time(void)
 {
 #if (OSD_LOC_FLIGHT_TIME != OSD_LOC_DISABLED)
 	serial_send_location(OSD_LOC_FLIGHT_TIME);
-	serial_output("232,,");
+	fprintf(fp, "232,,");
 	int16_t mm = (in_flight_counter / 2) / 60;
 	int16_t ss = (in_flight_counter / 2) % 60;
-	serial_output("%02i:%02i,\r\n", mm, ss);
+	fprintf(fp, "%02i:%02i,\r\n", mm, ss);
 #endif
 
 #if (OSD_LOC_DISTANCE != OSD_LOC_DISABLED)
@@ -343,7 +354,7 @@ static void update_flight_time(void)
 	serial_send_location(OSD_LOC_WP_NO);
 	if (mp_mode >= MODE_WAYPOINT)
 	{
-		serial_send_int(flightplan_index_get(), 0, 0);
+		serial_send_int(waypointIndex, 0, 0);
 	} 
 	else
 	{
@@ -356,7 +367,7 @@ static void show_rssi(void)
 {
 #if (OSD_LOC_RSSI != OSD_LOC_DISABLED && ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	serial_send_location(OSD_LOC_RSSI);
-	serial_output("179,,%i,\r\n", rc_signal_strength);
+	fprintf(fp, "179,,%i,\r\n", rc_signal_strength);
 #endif
 }
 
@@ -394,7 +405,7 @@ static void serial_show_AH(void)
 	//	ex .  $I,23,-112,CRLF          CRLF -are two bytes termination of line (dec 13 10) (hex 0D 0A) 
 	//	Support graphical artificial horizon and pitch presentation , roll and pitch as integer type as degrees (-180,180)
 	//
-	serial_output("$I,%li,%li,\r\n", earth_roll, earth_pitch);
+	fprintf(fp, "$I,%li,%li,\r\n", earth_roll, earth_pitch);
 #endif // OSD_SHOW_HORIZON
 }
 
@@ -426,7 +437,7 @@ static void init_sequence(void)
 		//  Save Home command
 		//  $SH<CRLF>
 
-		serial_output("$SH\r\n");
+		fprintf(fp, "$SH\r\n");
 		home_saved = true;
 		telemetry_counter = 0;  // used to run initial cls
 	}
@@ -488,62 +499,65 @@ static void update_in_flight(void)
 	}
 }
 
-void serial_output_8hz(void)
+void remzibi_osd_8hz(void)
 {
-	if (home_saved)
+	if (fp != NULL)
 	{
-		if (flight_mode == PLANE_ON_GROUND || flight_mode == PLANE_IN_FLIGHT)
+		if (home_saved)
 		{
-			serial_show_AH();
+			if (flight_mode == PLANE_ON_GROUND || flight_mode == PLANE_IN_FLIGHT)
+			{
+				serial_show_AH();
+			}
+			if (telemetry_counter & 1)
+			{
+				update_coords();
+			}
+			if (telemetry_counter % 4 == 0)
+			{
+				get_mp_mode();
+				update_in_flight();
+				show_rssi();
+			}
+			if (telemetry_counter % 8 == 0)
+			{
+				update_flight_time();
+			}
 		}
-		if (telemetry_counter & 1)
+		else
 		{
-			update_coords();
+			if (gps_nav_valid())
+			{
+				init_sequence();
+			}
+			fprintf(fp, "$M,11,8,,,MATRIXPILOT,\r\n");
+			fprintf(fp, "$M,136,7,,,WAITING FOR GPS %i,\r\n", (int16_t)svs);
 		}
-		if (telemetry_counter % 4 == 0)
+	
+		if (telemetry_counter == 24 || telemetry_counter % (OSD_REMZIBI_CLS_TIME * 8) == 0)	// 3 secs after home save or about every OSD_REMZIBI_CLS_TIME secs
 		{
-			get_mp_mode();
-			update_in_flight();
-			show_rssi();
+			serial_send_cls();
 		}
-		if (telemetry_counter % 8 == 0)
+	
+		if (on_ground_cnt > (OSD_REMZIBI_SUMMARY_DELAY * 2))    // seconds * 2 ticks per second
 		{
-			update_flight_time();
-		}
-	}
-	else
-	{
-		if (gps_nav_valid())
-		{
-			init_sequence();
-		}
-		serial_output("$M,11,8,,,MATRIXPILOT,\r\n");
-		serial_output("$M,136,7,,,WAITING FOR GPS %i,\r\n", (int16_t)svs);
-	}
-
-	if (telemetry_counter == 24 || telemetry_counter % (OSD_REMZIBI_CLS_TIME * 8) == 0)	// 3 secs after home save or about every OSD_REMZIBI_CLS_TIME secs
-	{
-		serial_send_cls();
-	}
-
-	if (on_ground_cnt > (OSD_REMZIBI_SUMMARY_DELAY * 2))    // seconds * 2 ticks per second
-	{
-		// flight summary
-		serial_output("$M,2,7,,,MAX,\r\n");
-		serial_output("$M,130,8,167,177,%i,\r\n", max_dist);
-		serial_output("$M,130,9,166,177,%i,\r\n", max_height);
+			// flight summary
+			fprintf(fp, "$M,2,7,,,MAX,\r\n");
+			fprintf(fp, "$M,130,8,167,177,%i,\r\n", max_dist);
+			fprintf(fp, "$M,130,9,166,177,%i,\r\n", max_height);
 #if OSD_USE_METRIC_UNITS
-		serial_output("$M,130,10,168,222,%i,\r\n", max_speed /28);
-		serial_output("$M,130,11,168,177,%i,\r\n", distance / 10);
+			fprintf(fp, "$M,130,10,168,222,%i,\r\n", max_speed /28);
+			fprintf(fp, "$M,130,11,168,177,%li,\r\n", distance / 10);
 #else
-		serial_output("$M,130,10,168,223,%i,\r\n", max_speed / 51);
-		serial_output("$M,130,11,168,170,%i,\r\n",(distance * 33) / 100);
+			fprintf(fp, "$M,130,10,168,223,%i,\r\n", max_speed / 51);
+			fprintf(fp, "$M,130,11,168,170,%i,\r\n",(distance * 33) / 100);
 #endif
-		int16_t mm = (in_flight_counter / 2) / 60;
-		int16_t ss = (in_flight_counter / 2) % 60;
-		serial_output("$M,130,12,232,,%02i:%02i,\r\n", mm, ss);
+			int16_t mm = (in_flight_counter / 2) / 60;
+			int16_t ss = (in_flight_counter / 2) % 60;
+			fprintf(fp, "$M,130,12,232,,%02i:%02i,\r\n", mm, ss);
+		}
+		++telemetry_counter;
 	}
-	++telemetry_counter;
 }
 
 #endif // (USE_OSD == OSD_REMZIBI)

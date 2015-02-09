@@ -520,7 +520,7 @@ void console(void)
 		char ch = getch();
 		console_inbyte(ch);
 	}
-#endif
+#endif // (CONSOLE_UART != 9)
 }
 
-#endif // CONSOLE_UART
+#endif // (CONSOLE_UART != 0)

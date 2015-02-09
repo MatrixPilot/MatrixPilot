@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../MatrixPilot/defines.h"
+#include "defines.h"
 #include "sonarCntrl.h"
 #include "../libUDB/sonarIn.h"
 #include "../libDCM/rmat.h"

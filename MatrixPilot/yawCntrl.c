@@ -19,11 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../MatrixPilot/defines.h"
-#include "../MatrixPilot/navigate.h"
-#include "../MatrixPilot/behaviour.h"
-#include "../MatrixPilot/servoPrepare.h"
-#include "../MatrixPilot/states.h"
+#include "defines.h"
+#include "navigate.h"
+#include "behaviour.h"
+#include "servoPrepare.h"
+#include "states.h"
 #include "../libDCM/rmat.h"
 
 #define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
@@ -51,16 +51,16 @@ void init_yawCntrl(void)
 	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_yawCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKDRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
 	gains.RollKPRudder = (float)rollkprud  / (RMAX);
 	gains.RollKDRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
 	gains.HoverYawKP   = (float)hoveryawkp / (RMAX);
 	gains.HoverYawKD   = (float)hoveryawkd / (SCALEGYRO*RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 void yawCntrl(void)
 {

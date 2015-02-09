@@ -29,14 +29,16 @@
 #include "servoMix.h"
 #include "servoPrepare.h"
 #include "../MAVLink/MAVLink.h"
-#include "../libCntrl/libCntrl.h"
-#include "../libCntrl/airspeedCntrl.h"
-#include "../libCntrl/cameraCntrl.h"
+#include "libCntrl.h"
+#include "airspeedCntrl.h"
+#include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
 
-void mp_osd_run_step(void);
+#include "osd_config.h"
+#include "mp_osd.h"
+#include "mavlink_options.h"
 
 int16_t pitch_control;
 int16_t roll_control;
@@ -136,6 +138,6 @@ void dcm_heartbeat_callback(void)   // was called dcm_servo_callback_prepare_out
 		mavlink_output_40hz();
 	}
 #endif // SERIAL_OUTPUT_FORMAT
-	mp_osd_run_step();
+	mp_osd_run_step(udb_heartbeat_counter);
 #endif // AIRFRAME_TYPE
 }

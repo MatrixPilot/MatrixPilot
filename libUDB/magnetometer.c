@@ -88,11 +88,11 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)     // service the m
 #if (LED_RED_MAG_CHECK == 1)
 	if (magMessage == 7)
 	{
-		LED_RED = LED_OFF;
+		led_off(LED_RED);
 	}
 	else
 	{
-		LED_RED = LED_ON;
+		led_on(LED_RED);
 	}
 #endif
 

@@ -47,10 +47,10 @@
 #define RMAX15 24576 //0b0110000000000000   // 1.5 in 2.14 format
 
 #define GGAIN SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ)) // integration multiplier for gyros
-fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
+static fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
 
-uint16_t spin_rate = 0;
-fractional spin_axis[] = { 0, 0, RMAX };
+static uint16_t spin_rate = 0;
+static fractional spin_axis[] = { 0, 0, RMAX };
 
 #if (BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == PX4_BOARD)
 // modified gains for MPU6000

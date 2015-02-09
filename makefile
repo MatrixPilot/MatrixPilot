@@ -1,3 +1,15 @@
+# Top level MatrixPilot makefile
+#
+# EXTENDING
+# - to add another library (aka, directory) to the build process simply copy 
+#   file 'module.mk' from one of the existing sub-directories and edit to suit.
+# - the build system does not yet build actual libraries, however some support
+#   is already included in the makefile system.
+#
+# NOTES:
+#
+#
+# SOME SIMPLE MAKE SYNTAX:
 #  = recursively expanded variable
 # := simply expanded variables
 #::= simply expanded variables (posix standard)
@@ -15,7 +27,11 @@ TARGET_NAME ?= MatrixPilot
 
 ifeq ($(DEVICE),SILSIM) 
 TOOLCHAIN := GCC
+ifeq ($(OS),Windows_NT)
 TARGET_TYPE := exe
+else
+TARGET_TYPE := out
+endif
 CPU :=
 endif
 
@@ -58,9 +74,16 @@ $(warning **********************************************************************
 #include ToolChain-$(TOOLCHAIN).mk
 
 ifeq ($(TOOLCHAIN),GCC) 
+CC := gcc
+ifeq ($(OS),Windows_NT) 
 LIBS := -lws2_32
 TARGET_ARCH :=
 CFLAGS += -DWIN=1
+else
+LIBS := -lm
+TARGET_ARCH :=
+CFLAGS += -DNIX=1
+endif
 endif
 
 ifeq ($(TOOLCHAIN),C30) 
@@ -134,7 +157,11 @@ LFLAGS += -omf=elf -Wl,-script=p$(CPU).gld,--heap=256,--stack=16,--check-section
 endif
 
 # $(call mkoutdir, dir-list)
+ifeq ($(OS),Windows_NT) 
 mkoutdir = $(shell for %%f in ($(subst /,\,$(subst ../,,$(1)))); do [ -d %%f ] || $(MKDIR) %%f)
+else
+mkoutdir = $(shell for f in $(subst ../,,$(1)); do [ -d $$f ] || $(MKDIR) $$f; done)
+endif
 
 # $(call source-to-object, source-file-list)
 source-to-object = $(subst $(SOURCE_DIR)/,,$(subst .c,.o,$(filter %.c,$1))) \
@@ -180,7 +207,7 @@ MKDIR := mkdir
 space = $(empty) $(empty)
 comma := ,
 
-$(if $(filter $(MAKE_VERSION),3.80 3.81 3.90 3.92),,\
+$(if $(filter $(MAKE_VERSION),3.80 3.81 3.82.90 3.90 3.92),,\
   $(error This makefile requires one of GNU make version ….))
 
 $(if $(filter $(notdir $(SOURCE_DIR)),$(notdir $(CURDIR))),\
@@ -194,7 +221,7 @@ sources :=
 defines :=
 
 ifeq ($(DEVICE),SILSIM)
-modules := $(SOURCE_DIR)/libCntrl $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/MAVLink $(SOURCE_DIR)/Tools/MatrixPilot-SIL
+modules := $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/MAVLink $(SOURCE_DIR)/Tools/MatrixPilot-SIL
 #include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/libUDB
 include_dirs := $(SOURCE_DIR)/Config
 endif
@@ -202,7 +229,7 @@ endif
 ifeq ($(DEVICE),PX4)
 #modules := $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/Tools/MatrixPilot-SIL
 #include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/Tools/MatrixPilot-SIL
-modules := $(SOURCE_DIR)/libSTM $(SOURCE_DIR)/libCntrl $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/MAVLink
+modules := $(SOURCE_DIR)/libSTM $(SOURCE_DIR)/libDCM $(SOURCE_DIR)/MatrixPilot $(SOURCE_DIR)/MAVLink
 include_dirs := $(SOURCE_DIR)/Config $(SOURCE_DIR)/libSTM
 endif
 
@@ -250,12 +277,13 @@ all:
 #include $(patsubst %,$(SOURCE_DIR)/%/module.mk,$(modules))
 include $(addsuffix /module.mk,$(modules))
 
+ifeq ($(OS),Windows_NT) 
 create-output-directories := \
 	$(Q) $(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(modules)))); do [ -d %%f ] || $(MKDIR) %%f)
-
-#create-output-directories := \
-#	$(warning creating output directories $(subst $(SOURCE_DIR)/,,$(modules))) \
-#	$(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(modules)))); do [ -d %%f ] || $(MKDIR) %%f)
+else
+create-output-directories := \
+	$(shell for f in $(subst $(SOURCE_DIR)/,,$(modules)); do [ -d $$f ] || $(MKDIR) $$f; done)
+endif
 
 .PHONY: all
 all: $(TARGET)
@@ -270,7 +298,7 @@ clean:
 	$(RM) $(TARGET) $(objects) $(libraries) $(dependencies)
 
 ifneq "$(MAKECMDGOALS)" "clean"
-  include $(dependencies)
+  -include $(dependencies)
 endif
 
 %.d: %.c

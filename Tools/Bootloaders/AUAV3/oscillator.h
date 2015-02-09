@@ -25,7 +25,7 @@
 
 #define MIPS                    32
 
-// clock-frequecy in Hz with suffix LL (64-bit-long), eg. 32000000LL for 32MHz
+// clock-frequency in Hz with suffix LL (64-bit-long), eg. 32000000LL for 32MHz
 #if (MIPS == 16)
 #define FREQOSC                 32000000LL  // 16 MIPS
 #elif (MIPS == 32)

@@ -23,7 +23,7 @@
 #include "servoMix.h"
 #include "servoPrepare.h"
 #include "states.h"
-#include "../libCntrl/cameraCntrl.h"
+#include "cameraCntrl.h"
 #include "../libUDB/servoOut.h"
 
 // Perform control based on the airframe type.

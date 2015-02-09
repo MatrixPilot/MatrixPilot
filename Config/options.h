@@ -796,10 +796,10 @@
 // Set this to 1 to enable filesystem support
 #define USE_FILESYS                         1
 
-// Set this to 1 to enable logging telemetry to dataflash on AUAV3
+// Set this to 1 to enable logging telemetry to filesystem
 #define USE_TELELOG                         0
 
-// Set this to 1 to enable loading options settings from a config file on AUAV3
+// Set this to 1 to enable loading options settings from an initialisation (ini) file
 #define USE_CONFIGFILE                      0
 
 // Set this to 1 to enable the USB stack on AUAV3

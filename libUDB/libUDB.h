@@ -199,10 +199,6 @@ extern int16_t udb_pwTrim[];                // initial pulse widths for trimming
 // whether the receiver is currently receiving values from the transmitter.
 extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
 
-// This takes a servo out value, and clips it to be within
-// 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-//int16_t udb_servo_pulsesat(int32_t pw);
-
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
 void udb_servo_record_trims(void);
@@ -271,43 +267,6 @@ void led_off(uint8_t x);
 #define led_on(x)                       ((x) = 0)
 #define led_off(x)                      ((x) = 1)
 #endif
-
-
-////////////////////////////////////////////////////////////////////////////////
-// GPS IO
-
-// Set the GPS serial data rate.
-//void udb_gps_set_rate(int32_t rate);
-//boolean udb_gps_check_rate(int32_t rate);  // returns true if the rate arg is the current rate
-
-// Call this function to initiate sending a data to the GPS
-//void udb_gps_start_sending_data(void);
-
-// Implement this callback to tell the UDB what byte is next to send on the GPS.
-// Return -1 to stop sending data.
-//int16_t udb_gps_callback_get_byte_to_send(void);        // Callback
-
-// Implement this callback to handle receiving a byte from the GPS
-//void udb_gps_callback_received_byte(uint8_t rxchar);    // Callback
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Serial IO
-
-// Set the serial port data rate.  Use the UDB_BAUD_* constants defined in the Config*.h
-// files.
-//void udb_serial_set_rate(int32_t rate);
-//boolean udb_serial_check_rate(int32_t rate);// returns true if the rate arg is the current rate
-
-// Call this function to initiate sending a data to the serial port
-//void udb_serial_start_sending_data(void);
-
-// Implement this callback to tell the UDB what byte is next to send on the serial port.
-// Return -1 to stop sending data.
-//int16_t udb_serial_callback_get_byte_to_send(void);     // Callback
-
-// Implement this callback to handle receiving a byte from the serial port
-//void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
 
 
 #endif // LIB_UDB_H

@@ -1,8 +1,3 @@
-/* ==========================================
-    Unity Project - A Test Framework for C
-    Copyright (c) 2007 Mike Karlesky, Mark VanderVoord, Greg Williams
-    [Released under MIT License. Please refer to license.txt for details]
-========================================== */
 
 #include <setjmp.h>
 #include "unity.h"
@@ -10,7 +5,7 @@
 #include "../../libUDB/udbTypes.h"
 #include "../../libDCM/dcmTypes.h"
 
-#include "../../libDCM/libDCM_internal.h"
+#include "../../libDCM/libDCM.h"
 #include "../../libDCM/mathlibNAV.h"
 
 
