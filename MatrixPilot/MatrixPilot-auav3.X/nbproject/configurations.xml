@@ -230,6 +230,7 @@
           <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f8.h</itemPath>
           <itemPath>../../MAVLink/include/matrixpilot/testsuite.h</itemPath>
           <itemPath>../../MAVLink/include/matrixpilot/version.h</itemPath>
+          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_force.h</itemPath>
         </logicalFolder>
         <itemPath>../../MAVLink/include/checksum.h</itemPath>
         <itemPath>../../MAVLink/include/inttypes.h</itemPath>
@@ -400,6 +401,7 @@
     <Elem>../../libDCM</Elem>
     <Elem>../../Microchip</Elem>
     <Elem>../../MAVLink/include/common</Elem>
+    <Elem>../../MAVLink/include/matrixpilot</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

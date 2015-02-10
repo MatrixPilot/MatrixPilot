@@ -812,7 +812,7 @@ void mavlink_output_40hz(void)
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE);
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
-
+        // GPS RAW INT - Data from GPS Sensor sent as raw integers.
 	spread_transmission_load = 4;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
@@ -1030,6 +1030,15 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_EXTRA1], mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
 	{
 		MAVUDBExtraOutput_40hz();
+                mavlink_msg_force_send(MAVLINK_COMM_0, msec, aero_force[0], aero_force[1], aero_force[2]);
+                //static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t aero_x, int16_t aero_y, int16_t aero_z)
+	}
+        // Send FORCE information
+        spread_transmission_load = 15;
+	if (mavlink_frequency_send(MAVLINK_RATE_FORCE, mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
+	{
+                mavlink_msg_force_send(MAVLINK_COMM_0, msec, aero_force[0], aero_force[1], aero_force[2]);
+                //static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t aero_x, int16_t aero_y, int16_t aero_z)
 	}
 	MAVParamsOutput_40hz();
 	MAVMissionOutput_40hz();
