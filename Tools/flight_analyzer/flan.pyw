@@ -1524,14 +1524,14 @@ class clock() :
         xml_time = time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return (xml_time)
     
-    def synthesize(self,gps_time):
+    def synthesize(self,gps_time,record_no):
        """Create synthetic time between entries which have identical gps time"""
        assumed_telemetry_time_delta = 250     # expected time difference between telemetry entries in ms
        if gps_time == self.last_gps_time :
            self.identical_gps_time_count += 1
            if self.identical_gps_time_count > 4 :
                print "Warning: More than 4 identical telemetry entries with identical time stamps"
-               print "at gps time:", gps_time
+               print "at gps time:", gps_time,"record number:",record_no
            return(gps_time + assumed_telemetry_time_delta)
        else:
            self.last_gps_time = gps_time
@@ -2128,7 +2128,7 @@ def create_log_book(options) :
                     log_book.primary_locator = IMU
                 if ((log.inline_waypoint_x != 0) or (log.inline_waypoint_y != 0) or (log.inline_waypoint_z != 0)):
                     log_book.waypoints_in_telemetry = True
-                log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
+                log.tm = flight_clock.synthesize(log.tm,record_no) # interpolate time between identical entries
                 if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
                     log_book.entries.append(log)
                     miss_out_counter = 0
@@ -2268,7 +2268,7 @@ def write_csv(options,log_book):
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
-    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR"
+    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z"
     for entry in log_book.entries :
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
@@ -2291,7 +2291,8 @@ def write_csv(options,log_book):
               int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z), "," , \
               entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
               entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
-              entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar
+              entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
+              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z
 
     f_csv.close()
     return

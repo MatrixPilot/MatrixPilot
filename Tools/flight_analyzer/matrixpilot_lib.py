@@ -28,12 +28,16 @@ class raw_mavlink_telemetry_file:
         self.dropped_mavlink_packets = 0
         self.first_packet_flag = True
         self.SUE_F2_A_needs_printing = False
+        self.last_aero_force_x = 0
+        self.last_aero_force_y = 0
+        self.last_aero_force_z = 0
+        
         
     def __iter__(self):
         return(self)
         
     def next(self):
-        """return the next good SERIAL UDB EXTRA (SUE) Binary MAVLink record"""
+        """return the next good Binary MAVLink record of interest (e.g. SUE)"""
         while True :
             self.msg = self.m.recv_match(blocking=False)
             if not self.msg:
@@ -77,7 +81,13 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
                             #print self.msg.get_seq(),"DEBUG: ", self.msg.get_type()
-                            return self.msg                
+                            return self.msg
+                elif self.msg.get_type() == 'FORCE':
+                        self.last_aero_force_x = self.msg.aero_x # hang onto message until we process F2_B message later
+                        self.last_aero_force_y = self.msg.aero_y
+                        self.last_aero_force_z = self.msg.aero_z
+                        #print self.msg
+                        continue
                 else :
                         #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                         pass
@@ -223,6 +233,9 @@ class base_telemetry :
         self.flags = 0
         self.sonar_direct = 0 # Direct distance in cm to sonar target
         self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
+        self.aero_force_x = 0
+        self.aero_force_y = 0
+        self.aero_force_z = 0
        
 
 class mavlink_telemetry(base_telemetry):
@@ -276,6 +289,12 @@ class mavlink_telemetry(base_telemetry):
                 self.svs = int(telemetry_file.last_F2_A_msg.sue_svs)
                 self.hdop = int(telemetry_file.last_F2_A_msg.sue_hdop)
 
+                # Storing the last aero force message received before
+                # the F2 SUE message, with the F2 Sue message. 
+                self.aero_force_x = int(telemetry_file.last_aero_force_x)
+                self.aero_force_y = int(telemetry_file.last_aero_force_y)
+                self.aero_force_z = int(telemetry_file.last_aero_force_z)           
+
                 self.pwm_input[1] = int(telemetry_file.msg.sue_pwm_input_1)
                 self.pwm_input[2] = int(telemetry_file.msg.sue_pwm_input_2)
                 self.pwm_input[3] = int(telemetry_file.msg.sue_pwm_input_3)
@@ -301,12 +320,12 @@ class mavlink_telemetry(base_telemetry):
                 self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
                 self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
                 self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
-                self.sue_flags = int(telemetry_file.msg.sue_flags)
+                self.flags = int(telemetry_file.msg.sue_flags)
 
-                self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
-                self.sue_imu_velocity_x = int(telemetry_file.msg.sue_imu_velocity_x)
-                self.sue_imu_velocity_y = int(telemetry_file.msg.sue_imu_velocity_y)
-                self.sue_imu_velocity_z = int(telemetry_file.msg.sue_imu_velocity_z)
+                self.osc_fails = int(telemetry_file.msg.sue_osc_fails)
+                self.IMUvelocityx = int(telemetry_file.msg.sue_imu_velocity_x)
+                self.IMUvelocityy = int(telemetry_file.msg.sue_imu_velocity_y)
+                self.IMUvelocityz = int(telemetry_file.msg.sue_imu_velocity_z)
                 self.inline_waypoint_x = int(telemetry_file.msg.sue_waypoint_goal_x)
                 self.inline_waypoint_y = int(telemetry_file.msg.sue_waypoint_goal_y)
                 self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
@@ -405,7 +424,7 @@ class mavlink_telemetry(base_telemetry):
             self.id_diy_drones_url = telemetry_file.msg.sue_ID_DIY_DRONES_URL
 
             return("F16")
-
+        
         else :
             err_message = "Warn:" + telemetry_file.msg.get_type()
             return(err_message)
