@@ -1,6 +1,7 @@
 import re
 import sys
 import os
+import math
 
 
 try:
@@ -1890,6 +1891,23 @@ def matrix_transpose(a) :
     b[7] = a[5]
     b[8] = a[8]
     return b
+
+def normalize_vector_3x1(a) :
+    """ Make an arbitary 3x1 vector to have a unit length of 1"""
+    scalar_length = math.sqrt( a[0]**2 + a[1]**2 + a[2]**2 )
+    if scalar_length > 0 :
+        a[0] = a[0] / scalar_length
+        a[1] = a[1] / scalar_length
+        a[2] = a[2] / scalar_length
+    else :
+        a[0] = 0
+        a[1] = 0
+        a[2] = 0
+    return(a)
+
+def matrix_dot_product_vector_3x1(a,b) :
+    """ Perform a dot product operation on two vectors of dimensions 3x1"""
+    return(a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
 
 def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filename, telemetry_type):
     """Filter out all the SERIAL_UDB_EXTRA messages from a MAVLink log file, and print them to

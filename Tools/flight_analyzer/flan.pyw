@@ -35,6 +35,8 @@ from matrixpilot_lib import ascii_telemetry
 from matrixpilot_lib import raw_mavlink_telemetry_file
 from matrixpilot_lib import ascii_telemetry_file
 from matrixpilot_lib import write_mavlink_to_serial_udb_extra
+from matrixpilot_lib import normalize_vector_3x1
+from matrixpilot_lib import matrix_dot_product_vector_3x1
 
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
@@ -2268,8 +2270,10 @@ def write_csv(options,log_book):
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
-    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z"
+    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI "
     for entry in log_book.entries :
+        aoa = angle_of_attack(entry.rmat1, entry.rmat4,entry.rmat7, \
+                    entry.IMUvelocityx,entry.IMUvelocityy, entry.IMUvelocityz)
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
               entry.status, "," , \
@@ -2278,7 +2282,8 @@ def write_csv(options,log_book):
               entry.rmat0, "," , entry.rmat1, "," , entry.rmat2 , "," ,\
               entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
               entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
-              int(-entry.pitch), ",", int(-entry.roll), ",", int(entry.heading_degrees) , "," , \
+              "{0:.2f}".format(-entry.pitch), ",", "{0:.2f}".format(-entry.roll), \
+                              ",", "{0:.2f}".format(entry.heading_degrees), "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
               entry.est_airspeed, "," , entry.est_wind_x, "," , entry.est_wind_y, ",", entry.est_wind_z , "," , \
@@ -2292,10 +2297,30 @@ def write_csv(options,log_book):
               entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
               entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
               entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
-              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z
+              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(aoa)
 
     f_csv.close()
     return
+
+def angle_of_attack(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ):
+    """Calculate difference in heading vector from flight path vector for angle of attack"""
+    # rmat1,4,7 gives heading vector of plane but we want it in same earth reference as IMUVelocity
+    # rmat is using UDB aviation coordinates with rmat1: West as positive, rmat4: North Positive, rmat7 Down Positive
+    # IMUVelocity is using earth coordinates with X being East, Y being North, and Z being Up
+    a = [ - rmat1, rmat4, - rmat7]
+    b = [ IMUVelocityX, IMUVelocityY, IMUVelocityZ ]
+    c = normalize_vector_3x1(a)
+    d = normalize_vector_3x1(b)
+    e = matrix_dot_product_vector_3x1(c,d)
+    #print c,d,e
+    angle_radians = acos(e)
+    angle_degrees = 180 * angle_radians / pi
+    if e < 0:
+        angle_degrees = angle_degrees + 90
+    # Note: angle_degrees is Angle of Incidence (AoI) which is the same angle of attack in mich of the flight.
+    # Plesae be aware that AoI includes also an aspect of side slip. So it is not exactly
+    # Angle of Attack.
+    return(angle_degrees)
        
 
  
