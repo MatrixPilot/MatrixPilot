@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import sys
 import os
@@ -1908,6 +1909,15 @@ def normalize_vector_3x1(a) :
 def matrix_dot_product_vector_3x1(a,b) :
     """ Perform a dot product operation on two vectors of dimensions 3x1"""
     return(a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
+
+def matrix_cross_product_vector_3x1(a,b) :
+    """ Performa a cross product operation on two vectors of dimensions 3x1"""
+    #   a  × b = a2b3 − a3b2, a3b1 − a1b3, a1b2 − a2b1
+    c = [0,0,0]
+    c[0] = (a[1]*b[2]) - (a[2]*b[1])
+    c[1] = (a[2]*b[0]) - (a[0]*b[2])
+    c[2] = (a[0]*b[1]) - (a[1]*b[0])
+    return(c)
 
 def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filename, telemetry_type):
     """Filter out all the SERIAL_UDB_EXTRA messages from a MAVLink log file, and print them to

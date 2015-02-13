@@ -37,6 +37,7 @@ from matrixpilot_lib import ascii_telemetry_file
 from matrixpilot_lib import write_mavlink_to_serial_udb_extra
 from matrixpilot_lib import normalize_vector_3x1
 from matrixpilot_lib import matrix_dot_product_vector_3x1
+from matrixpilot_lib import matrix_cross_product_vector_3x1
 
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
@@ -2311,12 +2312,12 @@ def angle_of_attack(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ):
     b = [ IMUVelocityX, IMUVelocityY, IMUVelocityZ ]
     c = normalize_vector_3x1(a)
     d = normalize_vector_3x1(b)
-    e = matrix_dot_product_vector_3x1(c,d)
+    #e = matrix_dot_product_vector_3x1(c,d)
+    e = matrix_cross_product_vector_3x1(c,d)
+    magnitude_of_e = sqrt(e[0]**2+e[1]**2+e[2]**2)
     #print c,d,e
-    angle_radians = acos(e)
+    angle_radians = asin(magnitude_of_e)
     angle_degrees = 180 * angle_radians / pi
-    if e < 0:
-        angle_degrees = angle_degrees + 90
     # Note: angle_degrees is Angle of Incidence (AoI) which is the same angle of attack in mich of the flight.
     # Plesae be aware that AoI includes also an aspect of side slip. So it is not exactly
     # Angle of Attack.
