@@ -38,6 +38,8 @@ from matrixpilot_lib import write_mavlink_to_serial_udb_extra
 from matrixpilot_lib import normalize_vector_3x1
 from matrixpilot_lib import matrix_dot_product_vector_3x1
 from matrixpilot_lib import matrix_cross_product_vector_3x1
+from matrixpilot_lib import matrix_transpose
+from matrixpilot_lib import matrix_multiply_3x3_3x1
 
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
@@ -2271,10 +2273,29 @@ def write_csv(options,log_book):
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
-    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI "
+    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA"
+    print "Calculating average air speed to use...",
+    counter = 0
+    total = 0
     for entry in log_book.entries :
-        aoa = angle_of_attack(entry.rmat1, entry.rmat4,entry.rmat7, \
+        if ( entry.est_airspeed > 0):
+            counter += 1
+            total += entry.est_airspeed
+    average_est_airspeed = int(float(total) / counter)
+    print average_est_airspeed / 100, "m/sec"
+    print "Writing CSV file..."
+    for entry in log_book.entries :
+        incidence = angle_of_incidence(entry.rmat1, entry.rmat4,entry.rmat7, \
                     entry.IMUvelocityx,entry.IMUvelocityy, entry.IMUvelocityz)
+        rmat = [entry.rmat0, entry.rmat1, entry.rmat2, \
+                entry.rmat3, entry.rmat4, entry.rmat5, \
+                entry.rmat6, entry.rmat7, entry.rmat8]
+        IMUvelocity = [entry.IMUvelocityx, entry.IMUvelocityy, entry.IMUvelocityz]
+        cruise_speed = average_est_airspeed  # Typical Cruise speed in cm / second
+        aoa = angle_of_attack(rmat,IMUvelocity)
+        relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, cruise_speed)
+        
+        
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
               entry.status, "," , \
@@ -2298,12 +2319,13 @@ def write_csv(options,log_book):
               entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
               entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
               entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
-              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(aoa)
+              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(incidence), \
+              ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa)
 
     f_csv.close()
     return
 
-def angle_of_attack(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ):
+def angle_of_incidence(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ):
     """Calculate difference in heading vector from flight path vector for angle of attack"""
     # rmat1,4,7 gives heading vector of plane but we want it in same earth reference as IMUVelocity
     # rmat is using UDB aviation coordinates with rmat1: West as positive, rmat4: North Positive, rmat7 Down Positive
@@ -2318,12 +2340,35 @@ def angle_of_attack(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ):
     #print c,d,e
     angle_radians = asin(magnitude_of_e)
     angle_degrees = 180 * angle_radians / pi
-    # Note: angle_degrees is Angle of Incidence (AoI) which is the same angle of attack in mich of the flight.
+    # Note: angle_degrees is Angle of Incidence (AoI) which is the same angle of attack in much of the flight.
     # Plesae be aware that AoI includes also an aspect of side slip. So it is not exactly
     # Angle of Attack.
     return(angle_degrees)
-       
 
+def angle_of_attack(rmat,IMUvelocity):
+    """Calculated a true estimate of angle of attack"""
+    earth_to_body_matrix = matrix_transpose(rmat)
+    
+    # convert IMUVelocity from earth GPS frame to UDB Earth frame
+    IMUvelocity[0] = - IMUvelocity[0]
+    IMUvelocity[2] = - IMUvelocity[2]
+    # convert IMUVelocity from UDB Earth frame to the UDB Body Frame
+    IMUvelocity_in_body = matrix_multiply_3x3_3x1(earth_to_body_matrix, IMUvelocity)
+    # calculate and accurate angle of attack that excludes sid slip
+    if (IMUvelocity_in_body[1] == 0):
+        aoa2 = 0
+    else:
+        aoa2 = (180.0 / pi)* atan(float(IMUvelocity_in_body[2])/float(IMUvelocity_in_body[1])) 
+    return(aoa2)
+
+def wing_loading(aero_force, air_speed, cruise_speed):
+    """Calculate relative wing loading"""
+    gravity = 2000 # MatrixPilot represents the force of gravity with 2000 units
+    if (air_speed < (cruise_speed / 10.0)):
+        relative_wing_loading = 0; # To prevent divide by zero and or reports of very large wing loading
+    else :
+        relative_wing_loading = (float(-aero_force) / gravity) * ((float(cruise_speed) / float(air_speed))**2)
+    return(relative_wing_loading)
  
 ########## User Interface Routines, functions and classes ##########
 
@@ -2462,7 +2507,6 @@ def process_telemetry():
             write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
                                               options.telemetry_type)
     if (options.CSV_selector == 1) and(kml_result == True ):
-        print "Writing CSV file"
         write_csv(options,log_book)
     message_text = "Flight Analyzer Processing Completed"
     showinfo(title  = "Processing Completed", message = message_text)
