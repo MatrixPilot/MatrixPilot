@@ -2300,7 +2300,7 @@ def write_csv(options,log_book):
               flight_clock.convert(entry.tm, log_book), ",", \
               entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
-              entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
+              entry.waypointIndex, ",", "{0:.2f}".format(entry.altitude / 100.0), "," , \
               entry.rmat0, "," , entry.rmat1, "," , entry.rmat2 , "," ,\
               entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
               entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
@@ -2346,7 +2346,7 @@ def angle_of_incidence(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ)
     return(angle_degrees)
 
 def angle_of_attack(rmat,IMUvelocity):
-    """Calculated a true estimate of angle of attack"""
+    """Calculate a true estimate of angle of attack"""
     earth_to_body_matrix = matrix_transpose(rmat)
     
     # convert IMUVelocity from earth GPS frame to UDB Earth frame
@@ -2354,12 +2354,12 @@ def angle_of_attack(rmat,IMUvelocity):
     IMUvelocity[2] = - IMUvelocity[2]
     # convert IMUVelocity from UDB Earth frame to the UDB Body Frame
     IMUvelocity_in_body = matrix_multiply_3x3_3x1(earth_to_body_matrix, IMUvelocity)
-    # calculate and accurate angle of attack that excludes sid slip
+    # calculate an accurate angle of attack that excludes sideslip
     if (IMUvelocity_in_body[1] == 0):
-        aoa2 = 0
+        aoa = 0
     else:
-        aoa2 = (180.0 / pi)* atan(float(IMUvelocity_in_body[2])/float(IMUvelocity_in_body[1])) 
-    return(aoa2)
+        aoa = (180.0 / pi)* atan(float(IMUvelocity_in_body[2])/float(IMUvelocity_in_body[1])) 
+    return(aoa)
 
 def wing_loading(aero_force, air_speed, cruise_speed):
     """Calculate relative wing loading"""
