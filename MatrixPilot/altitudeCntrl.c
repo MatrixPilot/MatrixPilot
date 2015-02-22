@@ -19,17 +19,20 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../MatrixPilot/defines.h"
-#include "../MatrixPilot/navigate.h"
-#include "../MatrixPilot/behaviour.h"
-#include "../MatrixPilot/servoPrepare.h"
-#include "../MatrixPilot/states.h"
+#include "defines.h"
+#include "navigate.h"
+#include "behaviour.h"
+#include "servoPrepare.h"
+#include "states.h"
 #include "altitudeCntrl.h"
 #include "sonarCntrl.h"
+#include "../libDCM/rmat.h"
+#include "../libDCM/gpsData.h"
 #include "../libDCM/estWind.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libUDB/servoOut.h"
+#include "mavlink_options.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
@@ -90,9 +93,9 @@ void init_altitudeCntrl(void)
 	desiredSpeed          = DESIRED_SPEED * 10; // Stored in 10ths of meters per second
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_altitudeCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 //	gains.YawKDAileron = yawkdail / (SCALEGYRO*RMAX);
 	gains.HeightTargetMax = height_target_max;
 	gains.HeightTargetMin = height_target_min;
@@ -102,8 +105,8 @@ void save_altitudeCntrl(void)
 	gains.AltHoldPitchMax = alt_hold_pitch_max;
 	gains.AltHoldPitchHigh = alt_hold_pitch_high;
 //	desiredSpeed / 10;
-}
 #endif // USE_CONFIGFILE
+}
 
 #if (SPEED_CONTROL == 1)  // speed control loop
 

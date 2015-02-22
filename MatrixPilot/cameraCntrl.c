@@ -18,8 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "../MatrixPilot/defines.h"
-#include "../MatrixPilot/states.h"
+#include "defines.h"
+#include "states.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/rmat.h"
 #include "cameraCntrl.h"

@@ -33,6 +33,10 @@
 #include "options.h"
 #include "options_quad.h"
 
+#ifdef PX4
+#include "../libSTM/libSTM.h"
+#endif
+
 #if (WIN == 1 || NIX == 1)
 #define inline __inline
 #define SILSIM                              1
@@ -48,6 +52,8 @@
 #define USE_USB                             0
 #undef  USE_MSD
 #define USE_MSD                             0
+#undef  RECORD_FREE_STACK_SPACE
+#define RECORD_FREE_STACK_SPACE             0
 #undef  FAILSAFE_INPUT_MIN
 #define FAILSAFE_INPUT_MIN                  1500
 #include "../Tools/MatrixPilot-SIL/SIL-udb.h"
@@ -69,9 +75,17 @@
 // See the MatrixPilot wiki for more details on different board types.
 #ifdef UDB4
 #define BOARD_TYPE                          UDB4_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef UDB5
 #define BOARD_TYPE                          UDB5_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
@@ -155,15 +169,6 @@ void udb_heartbeat_40hz_callback(void);
 void udb_heartbeat_callback(void);
 
 typedef void (*background_callback)(void);
-//typedef void (*callback_fptr_t)(void);
-/*
-//static callback_fptr_t callback = NULL;
-//void some_function(callback_fptr_t fptr)
-//{
-//	callback = fptr;
-//	if (callback) callback();
-//}
- */
 
 // Trigger the background_callback() functions from a low priority ISR.
 void udb_background_trigger(background_callback callback);
@@ -246,12 +251,6 @@ extern union longww battery_voltage;        // battery_voltage._.W1 is in tenths
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as percent of full signal
 #endif
-
-
-// Calibrate the sensors
-// Call this function once, soon after booting up, after a few seconds of
-// holding the UDB very still.
-//void udb_callback_read_sensors(void);       // Callback
 
 
 ////////////////////////////////////////////////////////////////////////////////

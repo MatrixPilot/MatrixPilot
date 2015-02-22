@@ -171,7 +171,6 @@ BOOL USBSleepOnSuspend(void)
     return TRUE;
 }
 
-#endif //USB_HAL_DSPIC33E_C
-
 #endif // (USE_USB == 1)
 
+#endif //USB_HAL_DSPIC33E_C

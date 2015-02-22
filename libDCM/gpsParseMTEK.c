@@ -39,7 +39,7 @@ static void msg_DD(uint8_t gpschar);
 static void msg_MSG_DATA(uint8_t gpschar);
 static void msg_CS1(uint8_t gpschar);
 
-void (*msg_parse)(uint8_t inchar) = &msg_start;
+void (*msg_parse)(uint8_t gpschar) = &msg_start;
 
 static const char gps_refresh_rate[]           = "$PMTK220,250*29\r\n";        // Set to 4Hz
 static const char gps_baud_rate[]              = "$PMTK251,19200*22\r\n";      // Set to 19200

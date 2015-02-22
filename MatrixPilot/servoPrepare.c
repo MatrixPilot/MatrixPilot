@@ -20,22 +20,22 @@
 
 
 // TODO: rename this module to something such as MatrixPilot.c or FlightControl.c
+// TODO: consider renaming this module, ie. pilot.c / autopilot.c
 
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
-#include "telemetry.h"
 #include "mode_switch.h"
 #include "servoMix.h"
 #include "servoPrepare.h"
 #include "../MAVLink/MAVLink.h"
+#include "telemetry.h"
 #include "libCntrl.h"
 #include "airspeedCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
-
 #include "osd_config.h"
 #include "mp_osd.h"
 #include "mavlink_options.h"

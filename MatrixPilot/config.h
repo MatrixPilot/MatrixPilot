@@ -68,7 +68,7 @@ struct dcm_flag_bits {
 
 //extern union dcm_fbts_word { struct dcm_flag_bits _; int16_t W; } 
 
-//union dcm_fbts_word dcm_flags;
+union dcm_fbts_word dcm_flags;
  */
 /*
 struct option_bits {
@@ -139,3 +139,4 @@ extern union settings_word settings;
 
 void config_load(void);
 void config_save(void);
+void config_init(void);

@@ -19,8 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//extern struct relative2D velocity_thru_air; // derived horizontal velocity relative to air in cm/sec
-
 void estLocation_init(void);
 void estLocation(void);
 

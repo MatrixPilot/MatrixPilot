@@ -24,9 +24,6 @@
 #if (WIN == 1 || NIX == 1)
 #include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #endif // (WIN == 1 || NIX == 1)
-#if (PX4 == 1)
-#include "../libUDB/builtins.h"
-#endif // (PX4 == 1)
 
 //  math libraray
 

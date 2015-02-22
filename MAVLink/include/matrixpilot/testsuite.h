@@ -30,8 +30,7 @@ static void mavlink_test_flexifunction_set(uint8_t system_id, uint8_t component_
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_set_t packet_in = {
-		5,
-	}72,
+		5,72
 	};
 	mavlink_flexifunction_set_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -75,10 +74,7 @@ static void mavlink_test_flexifunction_read_req(uint8_t system_id, uint8_t compo
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_read_req_t packet_in = {
-		17235,
-	}17339,
-	}17,
-	}84,
+		17235,17339,17,84
 	};
 	mavlink_flexifunction_read_req_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -124,13 +120,7 @@ static void mavlink_test_flexifunction_buffer_function(uint8_t system_id, uint8_
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_buffer_function_t packet_in = {
-		17235,
-	}17339,
-	}17443,
-	}17547,
-	}29,
-	}96,
-	}{ 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210 },
+		17235,17339,17443,17547,29,96,{ 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210 }
 	};
 	mavlink_flexifunction_buffer_function_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -179,10 +169,7 @@ static void mavlink_test_flexifunction_buffer_function_ack(uint8_t system_id, ui
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_buffer_function_ack_t packet_in = {
-		17235,
-	}17339,
-	}17,
-	}84,
+		17235,17339,17,84
 	};
 	mavlink_flexifunction_buffer_function_ack_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -228,12 +215,7 @@ static void mavlink_test_flexifunction_directory(uint8_t system_id, uint8_t comp
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_directory_t packet_in = {
-		5,
-	}72,
-	}139,
-	}206,
-	}17,
-	}{ 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131 },
+		5,72,139,206,17,{ 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131 }
 	};
 	mavlink_flexifunction_directory_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -281,12 +263,7 @@ static void mavlink_test_flexifunction_directory_ack(uint8_t system_id, uint8_t 
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_directory_ack_t packet_in = {
-		17235,
-	}139,
-	}206,
-	}17,
-	}84,
-	}151,
+		17235,139,206,17,84,151
 	};
 	mavlink_flexifunction_directory_ack_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -334,9 +311,7 @@ static void mavlink_test_flexifunction_command(uint8_t system_id, uint8_t compon
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_command_t packet_in = {
-		5,
-	}72,
-	}139,
+		5,72,139
 	};
 	mavlink_flexifunction_command_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -381,8 +356,7 @@ static void mavlink_test_flexifunction_command_ack(uint8_t system_id, uint8_t co
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_flexifunction_command_ack_t packet_in = {
-		17235,
-	}17339,
+		17235,17339
 	};
 	mavlink_flexifunction_command_ack_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -426,34 +400,7 @@ static void mavlink_test_serial_udb_extra_f2_a(uint8_t system_id, uint8_t compon
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f2_a_t packet_in = {
-		963497464,
-	}963497672,
-	}963497880,
-	}963498088,
-	}18067,
-	}18171,
-	}18275,
-	}18379,
-	}18483,
-	}18587,
-	}18691,
-	}18795,
-	}18899,
-	}19003,
-	}19107,
-	}19211,
-	}19315,
-	}19419,
-	}19523,
-	}19627,
-	}19731,
-	}19835,
-	}19939,
-	}20043,
-	}20147,
-	}20251,
-	}20355,
-	}63,
+		963497464,963497672,963497880,963498088,18067,18171,18275,18379,18483,18587,18691,18795,18899,19003,19107,19211,19315,19419,19523,19627,19731,19835,19939,20043,20147,20251,20355,63
 	};
 	mavlink_serial_udb_extra_f2_a_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -523,39 +470,7 @@ static void mavlink_test_serial_udb_extra_f2_b(uint8_t system_id, uint8_t compon
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f2_b_t packet_in = {
-		963497464,
-	}963497672,
-	}17651,
-	}17755,
-	}17859,
-	}17963,
-	}18067,
-	}18171,
-	}18275,
-	}18379,
-	}18483,
-	}18587,
-	}18691,
-	}18795,
-	}18899,
-	}19003,
-	}19107,
-	}19211,
-	}19315,
-	}19419,
-	}19523,
-	}19627,
-	}19731,
-	}19835,
-	}19939,
-	}20043,
-	}20147,
-	}20251,
-	}20355,
-	}20459,
-	}20563,
-	}20667,
-	}20771,
+		963497464,963497672,17651,17755,17859,17963,18067,18171,18275,18379,18483,18587,18691,18795,18899,19003,19107,19211,19315,19419,19523,19627,19731,19835,19939,20043,20147,20251,20355,20459,20563,20667,20771
 	};
 	mavlink_serial_udb_extra_f2_b_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -630,16 +545,7 @@ static void mavlink_test_serial_udb_extra_f4(uint8_t system_id, uint8_t componen
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f4_t packet_in = {
-		5,
-	}72,
-	}139,
-	}206,
-	}17,
-	}84,
-	}151,
-	}218,
-	}29,
-	}96,
+		5,72,139,206,17,84,151,218,29,96
 	};
 	mavlink_serial_udb_extra_f4_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -691,12 +597,7 @@ static void mavlink_test_serial_udb_extra_f5(uint8_t system_id, uint8_t componen
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f5_t packet_in = {
-		17.0,
-	}45.0,
-	}73.0,
-	}101.0,
-	}129.0,
-	}157.0,
+		17.0,45.0,73.0,101.0,129.0,157.0
 	};
 	mavlink_serial_udb_extra_f5_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -744,11 +645,7 @@ static void mavlink_test_serial_udb_extra_f6(uint8_t system_id, uint8_t componen
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f6_t packet_in = {
-		17.0,
-	}45.0,
-	}73.0,
-	}101.0,
-	}129.0,
+		17.0,45.0,73.0,101.0,129.0
 	};
 	mavlink_serial_udb_extra_f6_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -795,12 +692,7 @@ static void mavlink_test_serial_udb_extra_f7(uint8_t system_id, uint8_t componen
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f7_t packet_in = {
-		17.0,
-	}45.0,
-	}73.0,
-	}101.0,
-	}129.0,
-	}157.0,
+		17.0,45.0,73.0,101.0,129.0,157.0
 	};
 	mavlink_serial_udb_extra_f7_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -848,13 +740,7 @@ static void mavlink_test_serial_udb_extra_f8(uint8_t system_id, uint8_t componen
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f8_t packet_in = {
-		17.0,
-	}45.0,
-	}73.0,
-	}101.0,
-	}129.0,
-	}157.0,
-	}185.0,
+		17.0,45.0,73.0,101.0,129.0,157.0,185.0
 	};
 	mavlink_serial_udb_extra_f8_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -903,10 +789,7 @@ static void mavlink_test_serial_udb_extra_f13(uint8_t system_id, uint8_t compone
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f13_t packet_in = {
-		963497464,
-	}963497672,
-	}963497880,
-	}17859,
+		963497464,963497672,963497880,17859
 	};
 	mavlink_serial_udb_extra_f13_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -952,17 +835,7 @@ static void mavlink_test_serial_udb_extra_f14(uint8_t system_id, uint8_t compone
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f14_t packet_in = {
-		963497464,
-	}17443,
-	}17547,
-	}17651,
-	}163,
-	}230,
-	}41,
-	}108,
-	}175,
-	}242,
-	}53,
+		963497464,17443,17547,17651,163,230,41,108,175,242,53
 	};
 	mavlink_serial_udb_extra_f14_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -1015,8 +888,7 @@ static void mavlink_test_serial_udb_extra_f15(uint8_t system_id, uint8_t compone
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f15_t packet_in = {
-		{ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 },
-	}{ 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144 },
+		{ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 },{ 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144 }
 	};
 	mavlink_serial_udb_extra_f15_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -1060,8 +932,7 @@ static void mavlink_test_serial_udb_extra_f16(uint8_t system_id, uint8_t compone
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_serial_udb_extra_f16_t packet_in = {
-		{ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 },
-	}{ 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194 },
+		{ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 },{ 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194 }
 	};
 	mavlink_serial_udb_extra_f16_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -1105,13 +976,7 @@ static void mavlink_test_altitudes(uint8_t system_id, uint8_t component_id, mavl
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_altitudes_t packet_in = {
-		963497464,
-	}963497672,
-	}963497880,
-	}963498088,
-	}963498296,
-	}963498504,
-	}963498712,
+		963497464,963497672,963497880,963498088,963498296,963498504,963498712
 	};
 	mavlink_altitudes_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -1160,13 +1025,7 @@ static void mavlink_test_airspeeds(uint8_t system_id, uint8_t component_id, mavl
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
 	mavlink_airspeeds_t packet_in = {
-		963497464,
-	}17443,
-	}17547,
-	}17651,
-	}17755,
-	}17859,
-	}17963,
+		963497464,17443,17547,17651,17755,17859,17963
 	};
 	mavlink_airspeeds_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));

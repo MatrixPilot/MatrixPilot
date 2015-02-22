@@ -50,6 +50,7 @@ void parameter_table_init(void);
 
 static jmp_buf buf;
 
+#if 0
 #if (SILSIM == 1)
 int mp_argc;
 char** mp_argv;
@@ -61,7 +62,7 @@ int main(int argc, char** argv)
 #else
 int main(void)
 {
-	mcu_init();
+	mcu_init();     // initialise the processor specific registers
 #endif
 
 #if (USE_TELELOG == 1)
@@ -71,12 +72,10 @@ int main(void)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
-	udb_init();
+	udb_init();     // configure clocks and enables global interrupts
 	dcm_init();
-	init_config();  // this will need to be moved up in order to support runtime hardware options
+//	init_config();  // this will need to be moved up in order to support runtime hardware options
 	flightplan_init();
-
-	for (;;) {}
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 //#error here
@@ -134,6 +133,105 @@ void idle_task(void)
 		udb_run();
 	}
 }
+
+#else
+
+int matrixpilot_init(void)
+{
+#if (USE_TELELOG == 1)
+	log_init();
+#endif
+#if (USE_USB == 1)
+	preflight();    // perhaps this would be better called usb_init()
+#endif
+	gps_init();     // this sets function pointers so i'm calling it early for now
+	udb_init();     // configure clocks and enables global interrupts
+	dcm_init();
+//	init_config();  // this will need to be moved up in order to support runtime hardware options
+	flightplan_init();
+
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+//#error here
+	quad_init();
+#else // AIRFRAME_TYPE
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	telemetry_init();
+#endif // AIRFRAME_TYPE
+
+	return 0;
+}
+
+int matrixpilot_loop(void)
+{
+#if (USE_TELELOG == 1)
+	telemetry_log();
+#endif
+#if (USE_USB == 1)
+	USBPollingService();
+#endif
+#if (CONSOLE_UART != 0 && SILSIM == 0)
+	console();
+#endif
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+	quad_background_task(); // this was called run_background_task()
+#endif // AIRFRAME_TYPE
+	udb_run();
+	return 0;
+}
+
+#if (SILSIM == 1)
+int mp_argc;
+char** mp_argv;
+int main(int argc, char** argv)
+{
+	// keep these values available for later
+	mp_argc = argc;
+	mp_argv = argv;
+#else
+int main(void)
+{
+	mcu_init();     // initialise the processor specific registers
+#endif
+	matrixpilot_init();
+
+	if (setjmp(buf))
+	{
+		// a processor exception occurred and we're resuming execution here 
+		DPRINT("longjmp'd\r\n");
+	}
+
+#ifdef _MSC_VER
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+	parameter_table_init();
+#endif // SERIAL_OUTPUT_FORMAT
+#endif // _MSC_VER
+
+//	MatrixPilot();
+//	dcm_fract_test(472580108);
+
+//#undef USE_FREERTOS
+#ifdef USE_FREERTOS
+	DPRINT("Initialising RTOS\r\n");
+	init_tasks();   // initialise the RTOS
+	DPRINT("Starting Scheduler\r\n");
+	vTaskStartScheduler();  // start the RTOS running, this function should never return
+	return 0;
+}
+
+void idle_task(void)
+{
+#else
+#endif
+
+	while (1)
+	{
+		matrixpilot_loop();
+	}
+}
+
+#endif // 0
 
 void vApplicationMallocFailedHook(void)
 {

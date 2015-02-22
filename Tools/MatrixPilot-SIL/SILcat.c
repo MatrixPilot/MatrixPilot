@@ -1,3 +1,4 @@
+#if 0
 //
 //  SIL-udb.c
 //  MatrixPilot-SIL
@@ -149,3 +150,4 @@ uint8_t readSockets(void)
 }
 
 #endif // (WIN == 1 || NIX == 1)
+#endif // 0

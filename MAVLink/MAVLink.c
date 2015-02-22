@@ -36,10 +36,12 @@
 //    MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
 //    MAV_DATA_STREAM_EXTRA3 not assigned yet
 
+
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
+#include "mavlink_options.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVParams.h"
@@ -185,7 +187,8 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)
+//int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len) // RobD
 // Note: Channel Number, chan, is currently ignored.
 {
 	int16_t start_index;
@@ -241,7 +244,7 @@ void mav_printf(const char* format, ...)
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 // add printf library when running tests to output ascii messages of test results
-static void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t remaining = 0;
 	int16_t wrote = 0;
@@ -1208,4 +1211,4 @@ float xtrack_error = 0.0;
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)

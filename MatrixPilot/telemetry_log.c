@@ -23,47 +23,29 @@
 #include "../libUDB/heartbeat.h"
 #include "telemetry.h"
 #include "telemetry_log.h"
-#if (WIN == 1 || NIX == 1)
+#if (WIN == 1 || NIX == 1 || PX4 == 1)
 #include <stdio.h>
 #include "../Tools/MatrixPilot-SIL/SIL-filesystem.h"
 #else
-#if (BOARD_TYPE != PX4_BOARD)
 #include "MDD-File-System/FSIO.h"
-#include "../libFlashFS/AT45D.h"
-#endif
 #endif
 #include <string.h>
 #include <stdarg.h>
 
+extern void restart_telemetry(void);
+extern boolean inflight_state(void);
 
-#if (WIN == 1 || NIX == 1 || BOARD_TYPE == PX4_BOARD)
-#define LOGFILE_ENABLE_PIN 0
-#else
-#if defined( __dsPIC33E__ )
-//#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
-//#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
-#define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
-#elif defined( __dsPIC33F__ )
-//#define LOGFILE_ENABLE_PIN PORTAbits.RA5
-#define LOGFILE_ENABLE_PIN 1 // don't force logfile open
-#else
-#error unknown processor family
-#endif
-#endif
 
-/*
-#define FILE FSFILE
-#define fopen FSfopen     // (logfile_name, "a");
-#define fclose FSfclose
-#define fwrite FSfwrite   // (str, 1, len, fsp) != len)
- */
-#if (BOARD_TYPE == PX4_BOARD)
-#undef LOGFILE_ENABLE_PIN
-#define LOGFILE_ENABLE_PIN 0
+#if (WIN == 1 || NIX == 1 || PX4 == 1)
 #define FSFILE    FILE
 #define FSfopen   fopen
 #define FSfclose  fclose
 #define FSfwrite  fwrite
+#define LOGFILE_ENABLE_PIN 0
+#else
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
+//#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
+#define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
 #endif
 
 boolean log_enabled(void)

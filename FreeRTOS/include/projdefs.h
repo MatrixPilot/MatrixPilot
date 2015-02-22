@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.6.0 - Copyright (C) 2013 Real Time Engineers Ltd. 
+    FreeRTOS V8.1.2 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -24,10 +24,10 @@
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
 
-    >>! NOTE: The modification to the GPL is included to allow you to distribute
-    >>! a combined work that includes FreeRTOS without being obliged to provide
-    >>! the source code for proprietary components outside of the FreeRTOS
-    >>! kernel.
+    >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+    >>!   distribute a combined work that includes FreeRTOS without being   !<<
+    >>!   obliged to provide the source code for proprietary components     !<<
+    >>!   outside of the FreeRTOS kernel.                                   !<<
 
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -66,20 +66,25 @@
 #ifndef PROJDEFS_H
 #define PROJDEFS_H
 
-/* Defines the prototype to which task functions must conform. */
-typedef void (*pdTASK_CODE)( void * );
+/*
+ * Defines the prototype to which task functions must conform.  Defined in this
+ * file to ensure the type is known before portable.h is included.
+ */
+typedef void (*TaskFunction_t)( void * );
 
-#define pdFALSE		( ( portBASE_TYPE ) 0 )
-#define pdTRUE		( ( portBASE_TYPE ) 1 )
+/* Converts a time in milliseconds to a time in ticks. */
+#define pdMS_TO_TICKS( xTimeInMs ) ( ( ( TickType_t ) ( xTimeInMs ) * configTICK_RATE_HZ ) / ( TickType_t ) 1000 )
 
-#define pdPASS									( pdTRUE )
-#define pdFAIL									( pdFALSE )
-#define errQUEUE_EMPTY							( ( portBASE_TYPE ) 0 )
-#define errQUEUE_FULL							( ( portBASE_TYPE ) 0 )
+#define pdFALSE			( ( BaseType_t ) 0 )
+#define pdTRUE			( ( BaseType_t ) 1 )
+
+#define pdPASS			( pdTRUE )
+#define pdFAIL			( pdFALSE )
+#define errQUEUE_EMPTY	( ( BaseType_t ) 0 )
+#define errQUEUE_FULL	( ( BaseType_t ) 0 )
 
 /* Error definitions. */
 #define errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY	( -1 )
-#define errNO_TASK_TO_RUN						( -2 )
 #define errQUEUE_BLOCKED						( -4 )
 #define errQUEUE_YIELD							( -5 )
 

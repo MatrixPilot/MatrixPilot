@@ -1,3 +1,4 @@
+
 // This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
@@ -135,7 +136,7 @@ double gcdist(double lat1, double lon1, double lat2, double lon2) // Compute dis
 //	double p1, p2;
 
 //	p1 = pow((sin((lat1 - lat2) / 2)), 2);
-//	p2 = 
+//	p2 =
 	result = 2 * asin(sqrt( pow((sin((lat1 - lat2) / 2)), 2) + cos(lat1) * cos(lat2) * pow((sin((lon1 - lon2) / 2)), 2)));
 	return result;
 }
@@ -359,7 +360,7 @@ static void cross_track(vect2_16t* result)
 
 	// Using Cross Tracking
 	// CROSS_TRACK_MARGIN is the value of cross track error in meters
-	// beyond which cross tracking correction saturates at 45 degrees 
+	// beyond which cross tracking correction saturates at 45 degrees
 #if (CROSS_TRACK_MARGIN >= 1024)
 #error ("CTMARGIN is too large, it must be less than 1024")
 #endif

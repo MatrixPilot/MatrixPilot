@@ -21,7 +21,9 @@
 
 #include "../MatrixPilot/defines.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#include "mavlink_options.h"
+
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVMission.h"
@@ -58,13 +60,13 @@ void mavlink_waypoint_changed(int16_t waypoint)
 	mavlink_flags.mavlink_send_waypoint_changed = 1;
 }
 
-void set(uint16_t index, uint16_t data)
+static void set(uint16_t index, uint16_t data)
 {
 	if (index < MAX_PARAMS)
 		params[index] = data;
 }
 
-uint16_t get(uint16_t index)
+static uint16_t get(uint16_t index)
 {
 	uint16_t data = 0;
 	if (index < MAX_PARAMS)
@@ -422,6 +424,7 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 {
 	switch (handle_msg->msgid)
 	{
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 		case MAVLINK_MSG_ID_MISSION_REQUEST_LIST:
 			MissionRequestList(handle_msg);
 			break;
@@ -443,6 +446,7 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 		case MAVLINK_MSG_ID_MISSION_ITEM:
 			MissionItem(handle_msg);
 			break;
+#endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 		default:
 			DPRINT("MAVMissionHandleMessage(handle_msg->msgid %u) - NOT HANDLED\r\n", handle_msg->msgid);
 			return false;
@@ -454,6 +458,7 @@ vect3_32t getWaypoint3D(uint16_t wp);
 
 void MAVMissionOutput_40hz(void)
 {
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS) // LOGO_WAYPOINTS cannot be uploaded / downloaded
 	vect3_32t wp;
 
 	if (mavlink_flags.mavlink_send_waypoint_reached == 1)
@@ -540,6 +545,8 @@ void MAVMissionOutput_40hz(void)
 			mavlink_flags.mavlink_send_specific_waypoint = 0;
 	}
 	if (mavlink_waypoint_timeout  > 0) mavlink_waypoint_timeout--;
+
+#endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 /*
 	// Acknowledge a command if flaged to do so.
 	if (mavlink_send_command_ack == true)
@@ -550,4 +557,4 @@ void MAVMissionOutput_40hz(void)
  */
 }
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)

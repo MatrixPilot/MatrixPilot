@@ -71,11 +71,11 @@ SRC_DCM_FILES = \
 $(SRC_UDB_FILES)
 
 SRC_MPX_FILES = \
-../../libCntrl/airspeedCntrl.c \
-../../libCntrl/altitudeCntrl.c \
-../../libCntrl/altitudeCntrlVariable.c \
+../../MatrixPilot/airspeedCntrl.c \
+../../MatrixPilot/altitudeCntrl.c \
+../../MatrixPilot/altitudeCntrlVariable.c \
 ../../MatrixPilot/behavior.c \
-../../libCntrl/cameraCntrl.c \
+../../MatrixPilot/cameraCntrl.c \
 ../../MatrixPilot/crc16.c \
 ../../MatrixPilot/crc32.c \
 ../../MatrixPilot/config.c \
@@ -95,14 +95,14 @@ SRC_MPX_FILES = \
 ../../MatrixPilot/navigate.c \
 ../../MatrixPilot/parameter_table.c \
 ../../MatrixPilot/parameter_table2.c \
-../../libCntrl/pitchCntrl.c \
-../../libCntrl/rollCntrl.c \
+../../MatrixPilot/pitchCntrl.c \
+../../MatrixPilot/rollCntrl.c \
 ../../MatrixPilot/servoMix.c \
 ../../MatrixPilot/servoPrepare.c \
 ../../MatrixPilot/states.c \
 ../../MatrixPilot/stptok.c \
 ../../MatrixPilot/telemetry.c \
-../../libCntrl/yawCntrl.c \
+../../MatrixPilot/yawCntrl.c \
 $(SRC_DCM_FILES)
 
 TEST_MPX_FILES = \

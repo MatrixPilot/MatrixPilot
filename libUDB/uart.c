@@ -19,11 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//#include "defines.h"
 #include "libUDB.h"
-
 #include "oscillator.h"
 #include "uart.h"
+#include "ports_config.h"
 
 #if defined(__dsPIC33E__)
 #include <p33Exxxx.h>
@@ -288,8 +287,6 @@ void PutHex(int toPrint)
 
 	toPrint = printVar & 0x0F;
 	PutChar(CharacterArray[toPrint]);
-
-	return;
 }
 
 /*******************************************************************************

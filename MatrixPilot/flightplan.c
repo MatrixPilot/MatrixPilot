@@ -44,23 +44,22 @@ vect3_32t get_fixed_origin(void)
 	return standardizedOrigin;
 }
 
+#if (FLIGHT_PLAN_TYPE != FP_NONE)
+
 static boolean flightplan_logo_active = false;
 
 void flightplan_init(void)
 {
-#if (FLIGHT_PLAN_TYPE != FP_NONE)
-	DPRINT("flightplan_init() - %s\r\n", flightplan_logo_active ? "LOGO" : "WAYPOINTS");
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	flightplan_logo_active = true;
 #endif
 	flightplan_logo_init();
 	flightplan_waypoints_init();
-#endif // FLIGHT_PLAN_TYPE
+	DPRINT("flightplan_init() - %s\r\n", flightplan_logo_active ? "LOGO" : "WAYPOINTS");
 }
 
 void flightplan_begin(int16_t flightplanNum)
 {
-#if (FLIGHT_PLAN_TYPE != FP_NONE)
 	DPRINT("flightplan_begin(%u)\r\n", flightplanNum);
 
 	if (flightplan_logo_active) {
@@ -68,60 +67,61 @@ void flightplan_begin(int16_t flightplanNum)
 	} else {
 		flightplan_waypoints_begin(flightplanNum);
 	}
-#endif // FLIGHT_PLAN_TYPE
 }
 
 void flightplan_update(void)
 {
-#if (FLIGHT_PLAN_TYPE != FP_NONE)
 	if (flightplan_logo_active) {
 		flightplan_logo_update();
 	} else {
 		flightplan_waypoints_update();
 	}	
-#endif // FLIGHT_PLAN_TYPE
 }
 
 int16_t flightplan_index_get(void)
 {
-#if (FLIGHT_PLAN_TYPE != FP_NONE)
 	if (flightplan_logo_active) {
 		return flightplan_logo_index_get();
 	} else {
 		return flightplan_waypoints_index_get();
 	}
-#endif // FLIGHT_PLAN_TYPE
 }
 
 void flightplan_live_begin(void)
 {
-#if (FLIGHT_PLAN_TYPE != FP_NONE)
 	if (flightplan_logo_active) {
 		flightplan_logo_live_begin();
 	} else {
 		flightplan_waypoints_live_begin();
 	}
-#endif // FLIGHT_PLAN_TYPE
 }
 
 void flightplan_live_received_byte(uint8_t inbyte)
 {
-#if (FLIGHT_PLAN_TYPE != FP_NONE)
 	if (flightplan_logo_active) {
 		flightplan_logo_live_received_byte(inbyte);
 	} else {
 		flightplan_waypoints_live_received_byte(inbyte);
 	}
-#endif // FLIGHT_PLAN_TYPE
 }
 
 void flightplan_live_commit(void)
 {
-#if (FLIGHT_PLAN_TYPE != FP_NONE)
 	if (flightplan_logo_active) {
 		flightplan_logo_live_commit();
 	} else {
 		flightplan_waypoints_live_commit();
 	}
-#endif // FLIGHT_PLAN_TYPE
 }
+
+#else
+
+void flightplan_init(void) {}
+void flightplan_begin(int16_t flightplanNum) {}
+void flightplan_update(void) {}
+int16_t flightplan_index_get(void) { return 0; }
+void flightplan_live_begin(void) {}
+void flightplan_live_received_byte(uint8_t inbyte) {}
+void flightplan_live_commit(void) {}
+
+#endif // FLIGHT_PLAN_TYPE

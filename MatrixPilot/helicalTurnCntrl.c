@@ -19,13 +19,15 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// USE_OSD enables the OSD system
-#define USE_OSD         OSD_NONE
-//#define USE_OSD         OSD_NATIVE
-//#define USE_OSD         OSD_REMZIBI
+#include "defines.h"
+#include "navigate.h"
+#include "behaviour.h"
+#include "servoPrepare.h"
+#include "altitudeCntrl.h"
+#include "../libDCM/deadReckoning.h"
+#include "../libDCM/mathlibNAV.h"
 
-#define USE_OSD_SPI     0   // set this to 1 to use the SPI peripheral, 0 to bit-bash
-#define OSD_SF          5   // scale factor for SPI delays - TODO: get rid of
 
-#define OSD_NTSC        0
-#define OSD_PAL         1
+void helicalTurnCntrl(void)
+{
+}

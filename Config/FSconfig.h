@@ -25,14 +25,14 @@
 #include "HardwareProfile.h"
 
 #ifdef USE_AT45D_FLASH
-#warning USE_AT45D_FLASH
+//#warning USE_AT45D_FLASH
 #include "../libFlashFS/MDD_AT45D.h"
 #elif defined USE_EEPROM_FLASH
-#warning USE_EEPROM_FLASH
+//#warning USE_EEPROM_FLASH
 #define USE_I2C1_DRIVER                 1
 #include "../libFlashFS/MDD_EEPROM.h"
 #elif defined(USE_SD_INTERFACE_WITH_SPI)
-#warning USE_SD_INTERFACE_WITH_SPI
+//#warning USE_SD_INTERFACE_WITH_SPI
 #include "MDD-File-System/SD-SPI.h"
 #else
 #error Must define a file system media interface

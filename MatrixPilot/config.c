@@ -27,7 +27,7 @@
 #include "libCntrl.h"
 #include "airspeedCntrl.h"
 
-#if (USE_CONFIGFILE == 1)
+//#if (USE_CONFIGFILE == 1)
 
 #include "minIni.h"
 
@@ -113,7 +113,7 @@ url = "http://www.diydrones.com"
 
 static void load_settings(void)
 {
-	printf("load_settings()\r\n");
+//	printf("load_settings()\r\n");
 
 	settings._.RollStabilizaionAilerons = ini_getbool(strStabilise, "roll_ail", ROLL_STABILIZATION_AILERONS, strConfigFile);
 	settings._.RollStabilizationRudder = ini_getbool(strStabilise, "roll_rud", ROLL_STABILIZATION_RUDDER, strConfigFile);
@@ -244,18 +244,14 @@ static void save_gains(void)
 	ini_putf(strHover, "radius", gains.HoverNavMaxPitchRadius, strConfigFile);
 }
 
-#endif // USE_CONFIGFILE
-
-void init_config(void)
-{
-}
+//#endif // USE_CONFIGFILE
 
 void config_load(void)
 {
-#if (USE_CONFIGFILE == 1)
+//#if (USE_CONFIGFILE == 1)
 	load_settings();
 	load_gains();
-#endif // USE_CONFIGFILE
+//#endif // USE_CONFIGFILE
 
 	init_yawCntrl();
 	init_rollCntrl();
@@ -285,4 +281,9 @@ void config_save(void)
 	save_settings();
 	save_gains();
 #endif // USE_CONFIGFILE
+}
+
+void config_init(void)
+{
+	config_load();
 }

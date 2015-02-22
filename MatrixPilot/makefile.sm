@@ -1,0 +1,80 @@
+#################################################################
+# Macros.
+#
+
+SOURCE_DIR ?= ..
+DEVICE ?= SILSIM
+SM_SOURCES=     FlightState.sm
+SOURCES=        $(SM_SOURCES:.sm=_sm.c) \
+                FlightState.c FlightState_test.c
+HEADERS=        $(SM_SOURCES:.sm=_sm.h) \
+                FlightState.h
+OBJECTS=        $(SOURCES:.c=.o)
+TARGET=         FlightState_test
+CHECKSTRING=    ./$(TARGET)
+
+# Uncomment to turn on debug message generation.
+TRACE=          -g
+
+#SMC=            java -jar ../../../bin/Smc.jar
+
+SMC = java -jar $(SOURCE_DIR)/Tools/Smc.jar
+
+
+SMC_FLAGS=      -c -verbose $(TRACE)
+
+DOT := "C:\Program Files (x86)\Graphviz2.38\bin\dot.exe"
+
+CC=             gcc
+CFLAGS=         -g -I$(SOURCE_DIR)/Config
+CFLAGS+=        -I$(SOURCE_DIR)/libUDB
+CFLAGS+=        -I$(SOURCE_DIR)/Tools/MatrixPilot-SIL
+CFLAGS+=        -D$(DEVICE)=1
+CFLAGS+=        -DFSM_TEST
+CFLAGS+=        -DWIN=1
+RM_F=           rm -f
+
+#################################################################
+# Rules.
+#
+
+%_sm.h %_sm.c : %.sm
+		$(SMC) $(SMC_FLAGS) $<
+
+%_sm.dot :      %.sm
+		$(SMC) -graph -glevel 2 $<
+
+%_sm.png :      %_sm.dot
+		$(DOT) -T png -o $@ $<
+
+%_sm.html :     %.sm
+		$(SMC) -table $<
+
+all :           $(TARGET)
+
+$(TARGET) :     $(HEADERS) $(SOURCES)
+		$(CC) $(CFLAGS) -o $@ $(SOURCES)
+		cp .\$(TARGET).exe .\$(TARGET)
+
+test :          $(TARGET)
+		-$(CHECKSTRING) ""
+		-$(CHECKSTRING) 000
+		-$(CHECKSTRING) 00011
+		-$(CHECKSTRING) 111
+		-$(CHECKSTRING) 000111100
+		-$(CHECKSTRING) 00011a1b10c0
+
+graph :         $(SM_SOURCES:%.sm=%_sm.dot)
+
+png :           $(SM_SOURCES:%.sm=%_sm.png)
+
+table :         $(SM_SOURCES:%.sm=%_sm.html)
+
+clean :
+		-$(RM_F) $(TARGET)
+		-$(RM_F) $(OBJECTS)
+		-$(RM_F) *_sm.h
+		-$(RM_F) *_sm.c
+		-$(RM_F) *_sm.dot
+		-$(RM_F) *_sm.png
+		-$(RM_F) *_sm.html

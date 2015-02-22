@@ -26,6 +26,7 @@
 #include "gpsParseCommon.h"
 #include "estLocation.h"
 #include "mathlibNAV.h"
+#include "estWind.h"
 
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)

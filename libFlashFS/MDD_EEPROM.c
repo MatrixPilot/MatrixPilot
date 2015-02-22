@@ -28,7 +28,7 @@
 
 #include "MDD_EEPROM.h"
 #include "EEPROM.h"
-#include "I2C.h"
+#include "../libUDB/I2C.h"
 #include "../libUDB/eeprom_udb4.h"
 
 extern void Delayms(BYTE milliseconds);

@@ -28,5 +28,4 @@ extern volatile uint16_t osc_fail_count;
 // Get flags telling the reason for the last reset (RCON)
 uint16_t get_reset_flags(void);
 
-void init_leds(void);
 void mcu_init(void);

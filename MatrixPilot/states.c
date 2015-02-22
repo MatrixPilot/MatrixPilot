@@ -414,7 +414,7 @@ static boolean launch_enabled(void)
 }
 
 //  State: catapult launch armed
-//  entered only from manualS iff (radio_on and gear_up and nav_capable and switch_home)
+//  entered only from manualS if (radio_on and gear_up and nav_capable and switch_home)
 static void cat_armedS(void)
 {
 	// transition to manual if flight_mode_switch no longer in waypoint mode
@@ -467,9 +467,14 @@ static void manualS(void)
 	else
 	{
 		if (dcm_flags._.nav_capable)
+		{
+			DPRINT("manualS() calling ent_returnS()\r\n");
 			ent_returnS();
+		}
 		else
+		{
 			ent_stabilizedS();
+		}
 	}
 }
 
@@ -490,7 +495,10 @@ static void stabilizedS(void)
 	else
 	{
 		if (dcm_flags._.nav_capable)
+		{
+			DPRINT("stabilizedS() calling ent_returnS()\r\n");
 			ent_returnS();
+		}
 	}
 }
 
@@ -507,6 +515,7 @@ static void waypointS(void)
 	}
 	else
 	{
+		DPRINT("waypointS() calling ent_returnS()\r\n");
 		ent_returnS();
 	}
 }

@@ -293,7 +293,8 @@ void flightplan_logo_update(void)
 		}
 		else
 		{
-			if (logo_goal_has_moved()) {
+			if (logo_goal_has_moved())
+			{
 				update_goal_from(lastGoal);
 				navigate_compute_bearing_to_goal();
 			}

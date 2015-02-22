@@ -114,7 +114,7 @@ Change History:
 
 #if defined(__C30__) || defined(__C32__) || defined __XC16__
     #if defined(USE_INTERNAL_FLASH)
-        #include "MDD-File-System/Internal Flash.h"
+        #include "MDD-File-System/Internal-Flash.h"
     #endif
 
     #if defined(USE_SD_INTERFACE_WITH_SPI)
@@ -131,7 +131,7 @@ Change History:
     #define LUNSectorRead(bLBA,pSrc)            LUN[LUN_INDEX].SectorRead(bLBA, pSrc)
 #else
     #if defined(USE_INTERNAL_FLASH)
-        #include "MDD-File-System/Internal Flash.h"
+        #include "MDD-File-System/Internal-Flash.h"
     #endif
 
     #if defined(USE_SD_INTERFACE_WITH_SPI)

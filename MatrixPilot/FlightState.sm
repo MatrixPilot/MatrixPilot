@@ -1,0 +1,106 @@
+//static void startS(void);
+//static void calibrateS(void);
+//static void acquiringS(void);
+//static void manualS(void);
+//static void stabilizedS(void);
+//static void waypointS(void);
+//static void returnS(void);	
+
+%{
+/* FlightState.sm
+
+  Build FlightState_sm.c & .h from this file in the MatrixPilot module source directory with:
+ 
+  >java -jar ../Tools/Smc.jar -c -verbose FlightState.sm
+ 
+*/
+#include "defines.h"
+#include "mode_switch.h"
+#include "flightplan.h"
+#include "states.h"
+
+extern int YellowTimer;
+extern int NSGreenTimer;
+extern int EWGreenTimer;
+%}
+
+%start FlightStateMap::Manual
+%class FlightState
+%header FlightState.h
+
+%map FlightStateMap
+%%
+// State		Transition		End State		Action(s)
+Manual
+{
+				go_Stabilised	Stabilised		{ ent_Stabilised(); }
+				go_Return		Return			{ ent_Return();     }
+//				go_update		nil				{}
+//				Entry			nil				{}
+//				Exit							{}
+}
+
+Stabilised
+{
+				go_Manual		Manual			{ ent_Manual();     }
+				go_Waypoint		Waypoint		{ ent_Waypoint();   }
+				go_Return		Return			{ ent_Return();     }
+//				go_update		nil				{}
+}
+
+Waypoint
+{
+				go_Stabilised	Stabilised		{ ent_Stabilised(); }
+				go_Return		Return			{ ent_Return();     }
+//				go_update		nil				{}
+}
+
+Return
+{
+				go_Stabilised	Stabilised		{ ent_Stabilised(); }
+				go_Waypoint		Waypoint		{ ent_Waypoint();   }
+//				go_update		nil				{}
+}
+
+//Default
+//{
+//				Manual			nil				{}
+//				Stabilised		nil				{}
+//				Waypoint		nil				{}
+//				Return			nil				{}
+//}
+
+%%
+
+
+
+%map StartupMap
+%%
+// State		Transition		End State		Action(s)
+Start
+{
+				go_Calibrate	Calibrate		{ ent_Calibrate(); }
+}
+
+Calibrate
+Entry {}
+Exit {}
+{
+				go_Acquiring	Acquiring		{ ent_Acquiring(); }
+}
+
+Acquiring
+{
+				go_Manual		Start			{ ent_Manual(); }
+}
+
+
+//Default
+//{
+//				Start			nil				{}
+//				Calibrate		nil				{}
+//				Acquiring		nil				{}
+//				Manual			nil				{}
+//}
+
+%%

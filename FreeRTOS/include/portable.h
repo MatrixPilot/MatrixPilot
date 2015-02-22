@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.6.0 - Copyright (C) 2013 Real Time Engineers Ltd. 
+    FreeRTOS V8.1.2 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -24,10 +24,10 @@
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
 
-    >>! NOTE: The modification to the GPL is included to allow you to distribute
-    >>! a combined work that includes FreeRTOS without being obliged to provide
-    >>! the source code for proprietary components outside of the FreeRTOS
-    >>! kernel.
+    >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+    >>!   distribute a combined work that includes FreeRTOS without being   !<<
+    >>!   obliged to provide the source code for proprietary components     !<<
+    >>!   outside of the FreeRTOS kernel.                                   !<<
 
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -70,8 +70,10 @@
 #ifndef PORTABLE_H
 #define PORTABLE_H
 
-/* Include the macro file relevant to the port being used. */
-
+/* Include the macro file relevant to the port being used.
+NOTE:  The following definitions are *DEPRECATED* as it is preferred to instead
+just add the path to the correct portmacro.h header file to the compiler's
+include path. */
 #ifdef OPEN_WATCOM_INDUSTRIAL_PC_PORT
 	#include "..\..\Source\portable\owatcom\16bitdos\pc\portmacro.h"
 	typedef void ( __interrupt __far *pxISR )();
@@ -91,16 +93,16 @@
 #endif
 
 #ifdef MPLAB_PIC24_PORT
-	#include "..\..\Source\portable\MPLAB\PIC24_dsPIC\portmacro.h"
+	#include "../../Source/portable/MPLAB/PIC24_dsPIC/portmacro.h"
 #endif
 
 #ifdef MPLAB_DSPIC_PORT
-//	#include "..\..\Source\portable\MPLAB\PIC24_dsPIC\portmacro.h"
+//	#include "../../Source/portable/MPLAB/PIC24_dsPIC/portmacro.h"
 	#include "..\..\FreeRTOS\portable\MPLAB\PIC24_dsPIC\portmacro.h"
 #endif
 
 #ifdef MPLAB_PIC18F_PORT
-	#include "..\..\Source\portable\MPLAB\PIC18F\portmacro.h"
+	#include "../../Source/portable/MPLAB/PIC18F/portmacro.h"
 #endif
 
 #ifdef MPLAB_PIC32MX_PORT
@@ -321,7 +323,7 @@ to find the path to the correct portmacro.h file. */
 #endif
 
 #if portBYTE_ALIGNMENT == 8
-	#define portBYTE_ALIGNMENT_MASK ( 0x0007 )
+	#define portBYTE_ALIGNMENT_MASK ( 0x0007U )
 #endif
 
 #if portBYTE_ALIGNMENT == 4
@@ -357,10 +359,31 @@ extern "C" {
  *
  */
 #if( portUSING_MPU_WRAPPERS == 1 )
-	portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters, portBASE_TYPE xRunPrivileged ) PRIVILEGED_FUNCTION;
+	StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters, BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
 #else
-	portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
+	StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
 #endif
+
+/* Used by heap_5.c. */
+typedef struct HeapRegion
+{
+	uint8_t *pucStartAddress;
+	size_t xSizeInBytes;
+} HeapRegion_t;
+
+/*
+ * Used to define multiple heap regions for use by heap_5.c.  This function
+ * must be called before any calls to pvPortMalloc() - not creating a task,
+ * queue, semaphore, mutex, software timer, event group, etc. will result in
+ * pvPortMalloc being called.
+ *
+ * pxHeapRegions passes in an array of HeapRegion_t structures - each of which
+ * defines a region of memory that can be used as the heap.  The array is 
+ * terminated by a HeapRegions_t structure that has a size of 0.  The region 
+ * with the lowest start address must appear first in the array.
+ */
+void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions );
+
 
 /*
  * Map to the memory management routines required for the port.
@@ -369,12 +392,13 @@ void *pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
 void vPortFree( void *pv ) PRIVILEGED_FUNCTION;
 void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
+size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 
 /*
  * Setup the hardware ready for the scheduler to take control.  This generally
  * sets up a tick interrupt and sets timers for the correct tick frequency.
  */
-portBASE_TYPE xPortStartScheduler( void ) PRIVILEGED_FUNCTION;
+BaseType_t xPortStartScheduler( void ) PRIVILEGED_FUNCTION;
 
 /*
  * Undo any hardware/ISR setup that was performed by xPortStartScheduler() so
@@ -392,7 +416,7 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
  */
 #if( portUSING_MPU_WRAPPERS == 1 )
 	struct xMEMORY_REGION;
-	void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, portSTACK_TYPE *pxBottomOfStack, unsigned short usStackDepth ) PRIVILEGED_FUNCTION;
+	void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, StackType_t *pxBottomOfStack, uint16_t usStackDepth ) PRIVILEGED_FUNCTION;
 #endif
 
 #ifdef __cplusplus

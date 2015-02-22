@@ -26,9 +26,9 @@
 // Use I2C port 1 drivers
 // Set to 1 to use and 0 to not include
 // WARNING: Use on UDB4+ only
-#ifndef USE_I2C1_DRIVER
-#define USE_I2C1_DRIVER                 0
-#endif
+//#ifndef USE_I2C1_DRIVER
+//#define USE_I2C1_DRIVER                 0
+//#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////

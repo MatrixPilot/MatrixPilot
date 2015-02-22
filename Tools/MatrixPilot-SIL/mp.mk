@@ -1,5 +1,9 @@
 MP_OBJECTS = \
+../../MatrixPilot/airspeedCntrl.o \
+../../MatrixPilot/altitudeCntrl.o \
+../../MatrixPilot/altitudeCntrlVariable.o \
 ../../MatrixPilot/behavior.o \
+../../MatrixPilot/cameraCntrl.o \
 ../../MatrixPilot/config.o \
 ../../MatrixPilot/config_tests.o \
 ../../MatrixPilot/crc16.o \
@@ -19,10 +23,13 @@ MP_OBJECTS = \
 ../../MatrixPilot/navigate.o \
 ../../MatrixPilot/nv_memory_table.o \
 ../../MatrixPilot/parameter_table.o \
+../../MatrixPilot/pitchCntrl.o \
+../../MatrixPilot/rollCntrl.o \
 ../../MatrixPilot/preflight.o \
 ../../MatrixPilot/servoMix.o \
 ../../MatrixPilot/servoPrepare.o \
 ../../MatrixPilot/states.o \
 ../../MatrixPilot/stptok.o \
-../../MatrixPilot/telemetry.o
+../../MatrixPilot/telemetry.o \
+../../MatrixPilot/yawCntrl.o
 

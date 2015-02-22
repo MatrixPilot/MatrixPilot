@@ -17,8 +17,20 @@
 #include "../libUDB/magnetometer.h"
 #include "magnetometerOptions.h"
 #include "../libUDB/events.h"
+#include "../libUDB/osd.h"
+#include "../libUDB/mpu6000.h"
+
+#include "../libUDB/uart.h"
 
 #if (BOARD_TYPE == PX4_BOARD)
+
+#include "stm32f4xx_hal.h"
+#include "usart.h"
+
+//#include "cmsis_os.h"
+//#include "ff.h"
+//#include "ff_gen_drv.h"
+//#include "sd_diskio.h" /* defines SD_Driver as external */
 
 //#include "SIL-config.h"
 //#include "SIL-udb.h"
@@ -79,21 +91,6 @@ void udb_skip_imu_calibration(boolean b)
 	udb_skip_flags.skip_imu_cal = 1;
 }
 #endif
-
-void udb_init(void)
-{
-	udb_heartbeat_counter = 0;
-	udb_flags.B = 0;
-}
-
-void udb_run(void)
-{
-}
-
-void udb_background_trigger(background_callback callback)
-{
-	if (callback) callback();
-}
 
 uint8_t udb_cpu_load(void)
 {
@@ -192,16 +189,11 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 
 #endif // MAG_YAW_DRIFT
 
-int setjmp(void)
-{
-	return 0;
-}
-
 int16_t FindFirstBitFromLeft(int16_t val)
 {
 	int16_t i = 0;
 
-	if (val != 0) 
+	if (val != 0)
 	{
 		for (i = 1; i <= 16; i++)
 		{
@@ -212,40 +204,213 @@ int16_t FindFirstBitFromLeft(int16_t val)
 	return i;
 }
 
+void udb_led_toggle(uint8_t x)
+{
+    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+}
+void led_on(uint8_t x)
+{
+//void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+}
+void led_off(uint8_t x)
+{
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+}
 
-int led_dummy;
-
-void udb_led_toggle(uint8_t x) { led_dummy = x; }
-void led_on(uint8_t x) { led_dummy = x; }
-void led_off(uint8_t x) { led_dummy = x; }
+int32_t gps_baud_rate = 0;
+int32_t serial_baud_rate = 0;
 
 void udb_gps_start_sending_data(void) {}
-void udb_gps_set_rate(int32_t rate) { led_dummy = rate; }
+void udb_gps_set_rate(int32_t rate) { gps_baud_rate = rate; }
+boolean udb_gps_check_rate(int32_t rate) { return (gps_baud_rate == rate); }
 
 void udb_serial_start_sending_data(void) {}
-void udb_serial_set_rate(int32_t rate) { led_dummy = rate; }
+void udb_serial_set_rate(int32_t rate) { serial_baud_rate = rate; }
 
-char IsPressed(void) {}
-char GetChar(void) { return 0; }
-
-//void console(void) {}
-void mcu_init(void) {}
-void gentrap(void) {}
-
-//void telemetry_restart(void) {}
-void FSInit(void) {}
-void filesys_init(void) {}
-boolean udb_gps_check_rate(int32_t rate) { return 0; }
 uint16_t register_event_p(void (*event_callback)(void), eventPriority priority) { return 0; }
 void trigger_event(uint16_t hEvent) {}
 
-void Reset_Handler(void) {}
+void osd_init(void) {}
+void osd_reset(void) {}
+void osd_spi_init(void) {}
+void osd_spi_write(int8_t address, int8_t byte) {}
+void osd_spi_write_byte(int8_t byte) {}
+void osd_spi_write_location(int16_t loc) {}
+void osd_spi_write_string(const uint8_t* str) {}
+void osd_spi_write_vertical_string_at_location(int16_t loc, const uint8_t* str) {}
+void osd_spi_erase_chars(uint8_t n) {}
+void osd_spi_write_number(int32_t val, int8_t num_digits, int8_t decimal_places, int8_t num_flags, int8_t header, int8_t footer) {}
 
-//int32_t  __builtin_mulss(int16_t p0,   int16_t p1)   { return (p0 * p1); }
-//int32_t  __builtin_mulus(uint16_t p0,  int16_t p1)   { return (p0 * p1); }
-//int32_t  __builtin_mulsu(int16_t p0,   uint16_t p1)  { return (p0 * p1); }
-//uint32_t __builtin_muluu(uint16_t p0,  uint16_t p1)  { return (p0 * p1); }
-//uint16_t __builtin_divud(uint32_t num, uint16_t den) { return (num / den); }
-//int16_t  __builtin_divsd(int32_t num,  int16_t den)  { return (num / den); }
+void filesys_init(void) {}
+
+//static jmp_buf default_jmp_buf;
+
+int setjmp(void)
+{
+	return 0;
+}
+
+void __delay32(unsigned long cycles)
+{
+    /* Insert delay in ms */
+//    HAL_Delay(cycles);
+}
+
+//#if (CONSOLE_UART == 0)
+//void console(void) {}
+//#endif // CONSOLE_UART
+
+//void Reset_Handler(void) {} // this must be loosely defined in the startup code and the default seems to call main()
+//void mcu_init(void) {} // now provided by main() in the STMCubeMX generated code (redef'd to mcu_init()
+
+void heartbeat(void) // called from MPU6000 ISR
+{
+}
+
+void udb_init(void)
+{
+	udb_heartbeat_counter = 0;
+	udb_flags.B = 0;
+	MPU6000_init16(&heartbeat);
+}
+
+void udb_run(void)
+{
+}
+
+void udb_background_trigger(background_callback callback)
+{
+	if (callback) callback();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#ifdef __GNUC__
+  /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+
+/**
+  * @brief  Retargets the C library printf function to the USART.
+  * @param  None
+  * @retval None
+  */
+PUTCHAR_PROTOTYPE
+{
+// CONSOLE_UART
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+
+  return ch;
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  // we want to signal the process responsible for this uart
+}
+
+//void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+
+}
+/*
+void vApplicationIdleHook(void)
+{
+	{
+#if (USE_TELELOG == 1)
+		telemetry_log();
+#endif
+#if (USE_USB == 1)
+		USBPollingService();
+#endif
+#if (CONSOLE_UART != 0 && SILSIM == 0)
+		console();
+#endif
+		udb_run();
+	}
+}
+ */
+
+void ClrError(void)
+{
+//	if (U##x##STAbits.OERR) U##x##STAbits.OERR = 0;
+}
+
+uint8_t buffered_char = 0;
+uint8_t buffered_full = 0;
+
+char IsPressed(void)
+{
+	HAL_StatusTypeDef status;
+	uint8_t Data[2];
+
+// HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+
+	if (buffered_full == 1)
+	{
+		return 1;
+	}
+
+	status = HAL_UART_Receive(&huart2, &Data[0], 1, 0);
+	if (status == HAL_OK)
+	{
+		buffered_char = Data[0];
+		buffered_full = 1;
+		return 1;
+	}
+
+//	if (U##x##STAbits.URXDA)
+	return 0;
+}
+
+char GetChar(void)
+{
+	HAL_StatusTypeDef status;
+	uint8_t Data[2];
+	char Temp;
+//	while (!IsPressed());
+//	Temp = U##x##RXREG;
+
+	if (buffered_full == 1)
+	{
+		Temp = buffered_char;
+		buffered_full = 0;
+	}
+	else
+	{
+		status = HAL_UART_Receive(&huart6, &Data[0], 1, 0);
+		if (status == HAL_OK)
+		{
+			Temp = Data[0];
+		}
+	}
+//	ClrError();
+	return Temp;
+}
+
+void PutChar(char ch)
+{
+	HAL_StatusTypeDef status;
+
+//HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+
+	status = HAL_UART_Transmit(&huart6, &ch, 1, 0);
+	if (status == HAL_OK)
+	{
+	}
+
+//	U##x##TXREG = ch;
+//	while (U##x##STAbits.TRMT == 0);
+}
+
+void FSInit(void) {}
+
+void vApplicationTickHook(void) {}
 
 #endif // (BOARD_TYPE == PX4_BOARD)

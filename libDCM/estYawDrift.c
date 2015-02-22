@@ -23,6 +23,7 @@
 #include "gpsData.h"
 #include "gpsParseCommon.h"
 #include "mathlibNAV.h"
+#include "estWind.h"
 #include "rmat.h"
 #include "estYawDrift.h"
 

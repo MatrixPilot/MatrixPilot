@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include "FSconfig.h"
 #include "EEPROM.h"
+#include "../libUDB/libUDB.h"
 #include "../libUDB/I2C.h"
 #include "../libUDB/eeprom_udb4.h"
 
@@ -126,11 +127,11 @@ void WriteSector(uint16_t sector, uint8_t* buffer)
 	}
 }
 
-void eeprom_test_write()
+void eeprom_test_read()
 {
 }
 
-void eeprom_test_read()
+void eeprom_test_write()
 {
 }
 

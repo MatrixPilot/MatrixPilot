@@ -24,8 +24,10 @@
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
 #include "../libUDB/uart.h"
+#include "ports_config.h"
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
@@ -42,7 +44,8 @@ void AT45D_FormatFS(void);
 typedef struct tagCmds {
 	int index;
 	void (*fptr)(char*);
-	const char const * cmdstr;
+//	const char const * cmdstr;
+	const char* cmdstr;
 } cmds_t;
 
 
@@ -140,7 +143,7 @@ static void cmd_stop(char* arg)
 
 static void cmd_on(char* arg)
 {
-#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
+#if (SILSIM != 1 && PX4 != 1)
 	printf("on.\r\n");
 	SRbits.IPL = 0; // turn on all interrupt priorities
 #endif
@@ -148,7 +151,7 @@ static void cmd_on(char* arg)
 
 static void cmd_off(char* arg)
 {
-#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
+#if (SILSIM != 1 && PX4 != 1)
 	printf("off.\r\n");
 	SRbits.IPL = 7; // turn off all interrupt priorities
 #endif
@@ -161,7 +164,7 @@ static void cmd_cpuload(char* arg)
 
 static void cmd_crash(char* arg)
 {
-#if (SILSIM != 1)
+#if (SILSIM != 1 && PX4 != 1)
 	static int i;
 	char buffer[32];
 
@@ -178,7 +181,7 @@ static void cmd_adc(char* arg)
 
 static void cmd_barom(char* arg)
 {
-#if (SILSIM != 1)
+#if (SILSIM != 1 && PX4 != 1)
 	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
 	       get_barometer_temperature(),
 	       (uint16_t)get_barometer_pressure(),
@@ -274,7 +277,7 @@ void gentrap(void);
 
 static void cmd_trap(char* arg)
 {
-#if (SILSIM != 1)
+#if (SILSIM != 1 && PX4 != 1)
 	gentrap();
 #endif
 }
@@ -330,7 +333,7 @@ extern uint16_t maxstack;
 
 static void cmd_stack(char* arg)
 {
-#if (RECORD_FREE_STACK_SPACE == 1)
+#if (RECORD_FREE_STACK_SPACE == 1 && SILSIM == 0)
 	printf("maxstack %x\r\n", maxstack);
 	printf("SP_start %x\r\n", SP_start());
 	printf("SP_limit %x\r\n", SP_limit());
@@ -343,7 +346,7 @@ static void cmd_stack(char* arg)
 
 static void cmd_reset(char* arg)
 {
-#if (SILSIM != 1 && BOARD_TYPE != PX4_BOARD)
+#if (SILSIM != 1 && PX4 != 1)
 	asm("reset");
 #endif
 }
@@ -467,7 +470,8 @@ static void cmd_help(char* arg)
 	int i;
 
 	printf("Commands:\r\n");
-	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++) {
+	for (i = 0; i < (sizeof(cmdslist)/sizeof(cmdslist[0])); i++)
+	{
 		printf("\t%s\r\n", cmdslist[i].cmdstr);
 	}
 }

@@ -23,6 +23,12 @@
 // mavlink_options.h
 //
 
+#define USE_MAVLINK                         1
+
+// MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
+// Each aircraft in the sky will need a unique I.D. in the range from 0-255
+#define MAVLINK_SYSID                       1
+
 // Common data rates
 #define MAVLINK_RATE_RC_CHAN                0   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |
 #define MAVLINK_RATE_IMU_RAW                0   // ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. |
@@ -55,3 +61,5 @@
 // Include code to remove rounding errors on PID values when using QGroundControl
 // 1 = Yes, 0 = No
 #define QGROUNDCTONROL_PID_COMPATIBILITY    1
+
+#define MAVLINK_EXTERNAL_RX_STATUS          1

@@ -20,8 +20,6 @@
 
 //	routines to drive the PWM pins for the servos,
 
-#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
-//#include "options.h"
 #include "libUDB.h"
 #include "../libDCM/libDCM.h"
 #include "oscillator.h"

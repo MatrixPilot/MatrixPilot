@@ -261,7 +261,7 @@ static uint8_t logo_parse(defs_t* defslist, uint8_t* defscnt, logoInstructionDef
 		}
 		fclose(fp);
 	} else {
-		DPRINT("ERROR: failed to open %s\r\n", filename);
+		DPRINT("WARNING: failed to open %s\r\n", filename);
 	}
 	return count;
 }

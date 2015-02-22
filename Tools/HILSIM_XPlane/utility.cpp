@@ -136,17 +136,29 @@ void OGLtoBCBF(float &x, float &y, float &z, float phi, float theta, float psi)
 
 void FLIGHTtoBCBF(float &x, float &y, float &z, float alpha, float beta)
 {
-	// conversion is done in NED frame of reference
+	// Note: the standard sign convention for beta is opposite to what
+	// is used in X-Plane. So if you are calling this with X-Plane beta,
+	// you need to flip the sign of beta during the call.
+
+	// Conversion is done in NED frame of reference
 	// on entry, vector x, y, and z is in flight frame
 	// on exit, vector x, y, and z is in body frame
+
 	float Ca = cos(alpha);
 	float Cb = cos(beta);
 	float Sa = sin(alpha);
 	float Sb = sin(beta);
 
-	float X_plane =  (x * Ca * Cb)  - (y * Sb) - (z * Sa * Cb);
-	float Y_plane =  (x * Ca * Sb)  + (y * Cb) - (z * Sa * Sb);
-	float Z_plane =  (x * Sa)       + (z * Ca);
+    // The following was prior to 23/1/2014, before Bill's analysis
+	//float X_plane =  (x * Ca * Cb)  - (y * Sb) - (z * Sa * Cb);
+	//float Y_plane =  (x * Ca * Sb)  + (y * Cb) - (z * Sa * Sb);
+	//float Z_plane =  (x * Sa)       + (z * Ca);
+    
+    // New conversion taken from page 18 of "Small Unmanned Aircraft, Theory and Practice":
+    // Randall W. Beard; Timothy W. McLain
+    float X_plane = (x * Cb * Ca) - (y * Sb * Ca) - (z * Sa);
+    float Y_plane = (x * Sb ) + (y * Cb);
+    float Z_plane = (x * Cb * Sa) - (y * Sb * Sa) + (z *Ca);
 
 	x = X_plane;
 	y = Y_plane;

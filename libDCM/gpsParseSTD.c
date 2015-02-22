@@ -54,7 +54,7 @@ const uint8_t mode[] = {
 };
 const uint16_t mode_length = 9;
 
-void (*msg_parse)(uint8_t inchar) = &msg_B3;
+void (*msg_parse)(uint8_t gpschar) = &msg_B3;
 union intbb payloadlength;
 int16_t store_index = 0;
 uint8_t un;
