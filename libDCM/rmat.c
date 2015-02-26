@@ -277,7 +277,8 @@ static int16_t omegaSOG(int16_t omega, uint16_t speed)
 	}
 }
 
-static void adj_accel_no_gps(void)
+#if( CENTRIFUGAL_WITHOUT_GPS == 1 )
+static void adj_accel(void)
 {
 	// Performs centrifugal compensation without a GPS.
 	// Based on the fact that the magnitude of the
@@ -349,14 +350,13 @@ static void adj_accel_no_gps(void)
 	{
 		omega_times_velocity = 0 ;
 	}
-
 	// now compute omega vector cross velocity vector and adjust
 	accum.WW = ( __builtin_mulss( omega_times_velocity , rotation_axis[1] ) ) << 2 ;
 	gplane[0] = gplane[0] - accum._.W1 ;
 	accum.WW = ( __builtin_mulss( omega_times_velocity , rotation_axis[0] ) ) << 2 ;
 	gplane[0] = gplane[0] + accum._.W1 ;	
 }
-
+#else
 static void adj_accel(void)
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
@@ -364,6 +364,7 @@ static void adj_accel(void)
 	gplane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
 	gplane[1] = gplane[1] + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
 }
+#endif // CENTRIFUGAL_WITHOUT_GPS
 
 // The update algorithm!!
 static void rupdate(void)
