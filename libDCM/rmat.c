@@ -277,6 +277,86 @@ static int16_t omegaSOG(int16_t omega, uint16_t speed)
 	}
 }
 
+static void adj_accel_no_gps(void)
+{
+	// Performs centrifugal compensation without a GPS.
+	// Based on the fact that the magnitude of the
+	// compensated gplane vector should be GRAVITY*GRAVITY.
+	// This produces another equation from which the
+	// product of airspeed time rotation rate can be reasonably estimated.
+	int16_t omega_times_velocity ; // it should be positive, but noise
+								   // in the computations could produce neg
+	uint16_t radical ;
+	union longww accum ;
+	int16_t accelY ;
+	int16_t vertical_cross_rotation_axis ;
+	int16_t force_cross_rotation_axis ;
+	int16_t rotation_axis[2] ;
+
+	// Compute the X-Z rotation axis
+	// by normalizing the X-Z gyro vector
+	rotation_axis[0] = omegagyro[0] ;
+	rotation_axis[1] = omegagyro[2] ;
+	vector2_normalize( rotation_axis , rotation_axis ) ;
+
+	// compute force cross rotation axis:
+	accum.WW =  ( __builtin_mulss( gplane[0] , rotation_axis[1] ) - __builtin_mulss( gplane[2] , rotation_axis[0] ) ) << 2 ;
+	force_cross_rotation_axis = accum._.W1 ;
+
+	// compute vertical cross rotation axis:
+	accum.WW = ( __builtin_mulss( rmat[6] , rotation_axis[1] ) - __builtin_mulss( rmat[8] , rotation_axis[0] ) ) << 2;
+	vertical_cross_rotation_axis = accum._.W1 ;
+
+	// compute the square root of the sum of the square of the
+	// force cross rotation, minus the square of the magnitude of the accelerometer vector,
+	// plus the square of GRAVITY
+
+	// Start by using rmat for accelY instead of the measured value.
+	// It is less sensitive to forward acceleration, which cannot be compensated without GPS.
+	accum.WW = ( __builtin_mulsu( rmat[7] , GRAVITY ) ) << 2 ;
+	accelY = accum._.W1 ;
+
+	// form the sum
+	accum.WW = 	__builtin_mulss( force_cross_rotation_axis , force_cross_rotation_axis )
+				+ __builtin_muluu( GRAVITY , GRAVITY )
+				- __builtin_mulss( gplane[0] , gplane[0] )
+				- __builtin_mulss( gplane[2] , gplane[2] )
+				- __builtin_mulss( accelY , accelY ) ;
+	if ( accum.WW < 0 )
+	{
+		accum.WW = 0 ;
+	}
+	radical = sqrt_long ( (uint32_t ) accum.WW ) ;
+
+	// Now we are using the solution to quadratic equation in the theory,
+	// and there is some logic for selecting the positive or negative square root
+	if ( force_cross_rotation_axis < 0 )
+	{
+		omega_times_velocity = force_cross_rotation_axis + radical ;
+	}
+	else
+	{
+		if ( vertical_cross_rotation_axis < 0 )
+		{
+			omega_times_velocity = force_cross_rotation_axis + radical ;
+		}
+		else
+		{
+			omega_times_velocity = force_cross_rotation_axis - radical ;
+		}
+	}
+	if ( omega_times_velocity < 0 )
+	{
+		omega_times_velocity = 0 ;
+	}
+
+	// now compute omega vector cross velocity vector and adjust
+	accum.WW = ( __builtin_mulss( omega_times_velocity , rotation_axis[1] ) ) << 2 ;
+	gplane[0] = gplane[0] - accum._.W1 ;
+	accum.WW = ( __builtin_mulss( omega_times_velocity , rotation_axis[0] ) ) << 2 ;
+	gplane[0] = gplane[0] + accum._.W1 ;	
+}
+
 static void adj_accel(void)
 {
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
