@@ -37,6 +37,10 @@
 #include "../libSTM/libSTM.h"
 #endif
 
+#if (SIL == 1)
+#define SILSIM                              1
+#endif
+
 #if (WIN == 1 || NIX == 1)
 #define inline __inline
 #define SILSIM                              1

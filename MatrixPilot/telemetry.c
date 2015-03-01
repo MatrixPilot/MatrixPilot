@@ -18,11 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include "defines.h"
+#include "states.h"
 #include "navigate.h"
 #include "telemetry.h"
 #include "flightplan.h"
-#include "states.h"
 #include "cameraCntrl.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -45,7 +46,9 @@
 #include "../libDCM/rmat.h"
 #include <string.h>
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -792,4 +795,5 @@ void telemetry_output_8hz(void)
 #endif // USE_OSD
 
 #endif
-#endif // (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+#endif // SERIAL_OUTPUT_FORMAT
+#endif // SERIAL_MAVLINK

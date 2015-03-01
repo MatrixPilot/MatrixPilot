@@ -108,13 +108,13 @@ SOURCE_DIR ?= $(subst $(space),/,$(TMP_SRC_DIR))
 ################################################################################
 # Collect information from each module in the following variables.
 # Initialize them here as simple variables.
-libraries :=
-modules := 
-sources :=
-defines :=
-incpath :=
-cfgpath :=
-#defines :=$(DEVICE)=1
+#libraries :=
+#modules := 
+#sources :=
+#defines :=
+#incpath :=
+#cfgpath :=
+##defines :=$(DEVICE)=1
 
 ################################################################################
 # Include the target and device specific makefile to load our variables as above
@@ -122,9 +122,16 @@ cfgpath :=
 include $(SOURCE_DIR)/target-$(TARGET_NAME).mk
 include $(SOURCE_DIR)/device-$(DEVICE).mk
 modules := $(addprefix $(SOURCE_DIR)/,$(modules))
-INCPATH := $(addprefix $(SOURCE_DIR)/,$(cfgpath)) $(addprefix $(SOURCE_DIR)/,$(incpath))
+#INCPATH := $(addprefix $(SOURCE_DIR)/,$(cfgpath)) $(addprefix $(SOURCE_DIR)/,$(incpath))
 
-#$(warning INCPATH = $(INCPATH))
+ifneq ($(CONFIG),) 
+INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath)/$(CONFIG))
+endif
+INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath))
+INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
+
+#INCPATH = $(sort $(INC_PATH))
+#$(warning INCPATH: $(INCPATH))
 
 ################################################################################
 # Determine the full target names and include the toolchain specific makefile
@@ -194,19 +201,15 @@ all:
 include $(addsuffix /module.mk,$(modules))
 #include $(patsubst %,$(SOURCE_DIR)/%/module.mk,$(modules))
 
-INCPATH += $(incpath)
-
-DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
-INCLUDES += $(addprefix -I,$(INCPATH))
-
-#$(warning INCPATH: $(INCPATH))
-$(warning DEFINES: $(subst -D,,$(DEFINES)))
-#$(warning INCLUDES: $(subst -I$(SOURCE_DIR)/,,$(INCLUDES)))
 $(warning libraries: $(subst $(SOURCE_DIR)/,,$(libraries)))
 
-#$(warning incpath = $(incpath))
-#$(warning TARGET = $(TARGET))
-#$(warning libraries = $(libraries))
+DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
+$(warning DEFINES: $(subst -D,,$(DEFINES)))
+
+INCPATH += $(incpath)
+$(warning INCPATH: $(INCPATH))
+INCLUDES += $(addprefix -I,$(INCPATH))
+#$(warning INCLUDES: $(subst -I$(SOURCE_DIR)/,,$(INCLUDES)))
 #$(warning objects = $(objects))
 #$(warning *******************************************************************************)
 

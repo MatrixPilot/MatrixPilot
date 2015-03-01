@@ -60,15 +60,15 @@ extern uint16_t maxstack;
 // An explanation of the MAVLink protocol for changing paramaters can be found at:
 // http://www.qgroundcontrol.org/parameter_interface
 
-#if (RECORD_FREE_STACK_SPACE ==  1)
-static void mavlink_send_param_maxstack(int16_t);
-static void mavlink_set_maxstack(float setting, int16_t i);
-
 static boolean mavlink_check_target(uint8_t target_system, uint8_t target_component)
 //boolean mavlink_check_target(uint8_t target_system, uint8_t target_component)
 {
 	return false;
 }
+
+#if (RECORD_FREE_STACK_SPACE ==  1)
+static void mavlink_send_param_maxstack(int16_t);
+static void mavlink_set_maxstack(float setting, int16_t i);
 
 static void mavlink_send_param_maxstack(int16_t i)
 {

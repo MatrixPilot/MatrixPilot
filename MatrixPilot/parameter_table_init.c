@@ -3,8 +3,9 @@
 #ifdef _MSC_VER
 
 #include "defines.h" 
+#include "mavlink_options.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (USE_MAVLINK == 1)
 
 #include "parameter_table.h"
 #include "data_storage.h"
@@ -76,5 +77,5 @@ mavlink_parameters_list[61].min.param_float=0.0; mavlink_parameters_list[61].max
 mavlink_parameters_list[62].min.param_int32=0.0; mavlink_parameters_list[62].max.param_int32=45.0; // airspeed_pitch_ki_limit - ASPD_P_KI_LIMIT
 }
 
-#endif // SERIAL_OUTPUT_FORMAT
+#endif // (USE_MAVLINK == 1)
 #endif // _MSC_VER

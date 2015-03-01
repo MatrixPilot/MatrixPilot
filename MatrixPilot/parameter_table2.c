@@ -1,8 +1,9 @@
 // pyparam generated file - DO NOT EDIT
 
 #include "defines.h" 
+#include "mavlink_options.h"
 
-#if (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SILSIM == 1 && USE_MAVLINK == 1)
 
 #include "parameter_table.h"
 #include "data_storage.h"
@@ -148,4 +149,4 @@ const mavlink_parameter mavlink_parameters_list[] = {
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif // (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#endif // (SILSIM == 1 && USE_MAVLINK == 1) 
