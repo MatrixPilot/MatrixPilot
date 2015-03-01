@@ -253,13 +253,13 @@ void udb_callback_read_sensors(void)
 	read_accel();
 }
 
-static int16_t omegaSOG(int16_t omega, uint16_t speed)
+static int16_t omegaSOG(int16_t omega, int16_t speed)
 {
 	// multiplies omega times speed, and scales appropriately
 	// omega in radians per second, speed in cm per second
 	union longww working;
 	speed = speed >> 3;
-	working.WW = __builtin_mulsu(omega, speed);
+	working.WW = __builtin_mulss(omega, speed);
 	if (((int16_t)working._.W1) > ((int16_t)CENTRIFSAT))
 	{
 		return RMAX;
@@ -359,10 +359,16 @@ static void adj_accel(void)
 #else
 static void adj_accel(void)
 {
+	union longww accum ;
+	int16_t air_speed_z ;
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
-	gplane[0] = gplane[0] - omegaSOG(omegaAccum[2], air_speed_3DGPS);
+	// compute Z component of airspeed due to angle of attack
+	accum.WW = __builtin_mulsu( angleOfAttack , air_speed_3DGPS ) << 2 ;
+	air_speed_z = accum._.W1 ;	
+	// compute centrifugal and forward acceleration compensation
+	gplane[0] = gplane[0] - omegaSOG(omegaAccum[2], air_speed_3DGPS)+ omegaSOG( omegaAccum[1] , air_speed_z );
 	gplane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
-	gplane[1] = gplane[1] + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
+	gplane[1] = gplane[1] - omegaSOG( omegaAccum[0] , air_speed_z ) + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
 }
 #endif // CENTRIFUGAL_WITHOUT_GPS
 

@@ -150,10 +150,10 @@ int16_t relativeWingLoading( int16_t wingLoad ,  uint16_t airSpeed )
 	union longww long_signed_accum ;
 	uint16_t unsigned_accum ;
 
-	// if airspeed is less than or equal to stall speed, compute loading as if airspeed is slightly higher than stall speed
+	// if airspeed is less than or equal to stall speed, return zero to turn off the downstream computations
 	if ( airSpeed <= stallSpeed )
 	{
-		airSpeed = stallSpeed + 1 ;
+		return 0 ;
 	}
 
 	long_unsigned_accum = ( uint32_t ) stallSpeed ;
