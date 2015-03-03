@@ -13,22 +13,22 @@
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
 #include "../MatrixPilot/config.h"
-#include "../MatrixPilot/flightplan-waypoints.h"
+#include "../MatrixPilot/flightplan.h"
 #include "../libUDB/servoOut.h"
 #include <stdio.h>
 
 #define BUFLEN 512
 
-UDBSocket stdioSocket = NULL;
-uint8_t lastLedBits = 0;
-boolean showLEDs = 0;
-uint8_t inputState = 0;
-int hasShownInitStates = 0;
+static UDBSocket stdioSocket = NULL;
+static uint8_t lastLedBits = 0;
+static boolean showLEDs = 0;
+static uint8_t inputState = 0;
+static int hasShownInitStates = 0;
 
-int sil_handle_key_input(char c);
-void sil_checkForLedUpdates(void);
+static int sil_handle_key_input(char c);
+static void sil_checkForLedUpdates(void);
 
-void print_help(void)
+static void print_help(void)
 {
 	printf("1/2/3/4 = mode manual/stabilized/waypoint/signal-lost\n");
 	printf("w/s     = throttle up/down\n");
@@ -89,7 +89,7 @@ void sil_ui_update(void)
 	}
 }
 
-void print_LED_status(void)
+static void print_LED_status(void)
 {
 	printf("LEDs: %c %c %c %c\r",
 	    (leds[0] == LED_ON) ? 'R' : '-',
@@ -98,7 +98,7 @@ void print_LED_status(void)
 	    (leds[3] == LED_ON) ? 'B' : '-');
 }
 
-void sil_checkForLedUpdates(void)
+static void sil_checkForLedUpdates(void)
 {
 	uint8_t newLedBits = 0;
 
@@ -115,7 +115,7 @@ void sil_checkForLedUpdates(void)
 	}
 }
 
-void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
+static void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 {
 	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
 	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
@@ -128,7 +128,7 @@ void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 
 #define KEYPRESS_INPUT_DELTA 50
 
-int sil_handle_key_input(char c)
+static int sil_handle_key_input(char c)
 {
 	switch (inputState) {
 		case 0:
