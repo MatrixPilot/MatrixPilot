@@ -14,13 +14,10 @@
 #  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010, 2011, 2012
 #
 
-from xml.dom import minidom
 from math  import *
 from Tkinter import *
 from tkMessageBox import *
 from zipfile import ZipFile,ZIP_DEFLATED
-from time import sleep
-from time import time
 from check_telemetry_type import check_type_of_telemetry_file
 import tkFileDialog
 import datetime
@@ -31,12 +28,10 @@ import sys
 import os
 import stat
 
-from matrixpilot_lib import ascii_telemetry
 from matrixpilot_lib import raw_mavlink_telemetry_file
 from matrixpilot_lib import ascii_telemetry_file
 from matrixpilot_lib import write_mavlink_to_serial_udb_extra
 from matrixpilot_lib import normalize_vector_3x1
-from matrixpilot_lib import matrix_dot_product_vector_3x1
 from matrixpilot_lib import matrix_cross_product_vector_3x1
 from matrixpilot_lib import matrix_transpose
 from matrixpilot_lib import matrix_multiply_3x3_3x1
@@ -718,7 +713,6 @@ def create_flown_waypoint_kml_using_telemetry(flight_origin,file_handle_kml,flig
     """Create a waypoint flown state machine; write KML to create lines in GE that represent Logo waypoints"""
     state_debug = False   # Set to True see state machine in operation if debugging
     list_debug  = False   # Set to True to see each waypoint structure after it is created
-    waypoint_log = []
     
     STATE_NONE = 1
     STATE_START = 2
@@ -2277,6 +2271,9 @@ def write_csv(options,log_book):
     print "Calculating average air speed to use...",
     counter = 0
     total = 0
+    aoa_list = []
+    wing_loading_list = []
+    elevator_with_trim_removed = []
     for entry in log_book.entries :
         if ( entry.est_airspeed > 0):
             counter += 1
@@ -2291,10 +2288,16 @@ def write_csv(options,log_book):
                 entry.rmat3, entry.rmat4, entry.rmat5, \
                 entry.rmat6, entry.rmat7, entry.rmat8]
         IMUvelocity = [entry.IMUvelocityx, entry.IMUvelocityy, entry.IMUvelocityz]
-        cruise_speed = average_est_airspeed  # Typical Cruise speed in cm / second
+        #cruise_speed = average_est_airspeed  # Typical Cruise speed in cm / second
+        cruise_speed = 1200 # hard coded from setting in PDH options.h file
         aoa = angle_of_attack(rmat,IMUvelocity)
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, cruise_speed)
+        elevator_without_trim = entry.pwm_input[2] - 3000 # hardcoded 3000, but need to calculate it
         
+        if is_level_flight_data(entry, cruise_speed):
+            aoa_list.append(aoa)
+            wing_loading_list.append(relative_wing_loading)
+            elevator_with_trim_removed.append(float(elevator_without_trim) / 1000)
         
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
@@ -2323,7 +2326,33 @@ def write_csv(options,log_book):
               ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa)
 
     f_csv.close()
+##    print "Plotting aoa graph...",
+##    try:
+##        from pylab import plot
+##        from pylab import show
+##        from pylab import polyfit
+##        from pylab import poly1d
+##    except:
+##        print "No plotted: pylab library was not availble"
+##        return
+##    print "fitting...",
+##    print len(wing_loading_list), len(aoa_list)
+##    fit = polyfit(wing_loading_list,aoa_list,1)
+##    fit_function = poly1d(fit)
+##    print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function( 1.0))
+##    print "#define ANGLE_OF_ATTACK_INVERTED","{0:.2f}".format(fit_function(-1.0))
+##    print "plotting"
+##    plot(wing_loading_list, aoa_list, 'yo',wing_loading_list, fit_function(wing_loading_list), '--k')
+##    show()
+##    print "plot finished"
     return
+    
+def is_level_flight_data(entry, cruise_speed):
+    if ((abs(entry.IMUvelocityz) < 20 ) and ((abs(entry.roll) < 3) or (abs(entry.roll) > 177) )\
+                                             and (entry.est_airspeed > (0.5 * cruise_speed))):
+        return True
+    else:
+        return False
 
 def angle_of_incidence(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ):
     """Calculate difference in heading vector from flight path vector for angle of attack"""

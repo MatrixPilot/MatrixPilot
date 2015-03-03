@@ -424,7 +424,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 8;
+static int16_t telemetry_counter = 10;
 
 void restart_telemetry(void)
 {
@@ -540,27 +540,36 @@ void serial_output_8hz(void)
 	switch (telemetry_counter)
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
-		case 8:
-			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
-			              "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
-			              "CLOCK=%i:FP=%d:\r\n",
-			    WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
-			    get_reset_flags(), trap_flags, trap_source, osc_fail_count,
-			    CLOCK_CONFIG, FLIGHT_PLAN_TYPE);
-			break;
-		case 7:
+		case 10:
 			serial_output("F15:IDA=");
 			serial_output(ID_VEHICLE_MODEL_NAME);
 			serial_output(":IDB=");
 			serial_output(ID_VEHICLE_REGISTRATION);
 			serial_output(":\r\n");
 			break;
-		case 6:
+		case 9:
 			serial_output("F16:IDC=");
 			serial_output(ID_LEAD_PILOT);
 			serial_output(":IDD=");
 			serial_output(ID_DIY_DRONES_URL);
 			serial_output(":\r\n");
+			break;
+                case 8:
+                        serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
+			    FEED_FORWARD, TURN_RATE_NAV, TURN_RATE_FBW);
+                        break;
+                case 7:
+                        serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
+			    ANGLE_OF_ATTACK_NORMAL, ANGLE_OF_ATTACK_INVERTED, ELEVATOR_TRIM_NORMAL,
+                            ELEVATOR_TRIM_INVERTED, CRUISE_SPEED);
+                        break;
+		case 6:
+			serial_output("F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
+			              "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:\r\n",
+			              "CLOCK=%i:FP=%d:\r\n",
+			    WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
+			    get_reset_flags(), trap_flags, trap_source, osc_fail_count,
+			    CLOCK_CONFIG, FLIGHT_PLAN_TYPE);
 			break;
 		case 5:
 			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
@@ -568,12 +577,12 @@ void serial_output_8hz(void)
 			    AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE);
 			break;
 		case 4:
-			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:\r\n",
+			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%5.3f:A_BOOST=NULL\r\n",
 			    YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD);
 			break;
 		case 3:
-			serial_output("F6:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:P_GAIN=%5.3f:P_KD=%5.3f:E_BOOST=%3.1f:\r\n",
-			    FEED_FORWARD, TURN_RATE_NAV, TURN_RATE_FBW, PITCHGAIN, PITCHKD, ELEVATOR_BOOST);
+                        serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=NULL:ROL_E_MIX=NULL:E_BOOST=%3.1f:\r\n",
+                            PITCHGAIN, PITCHKD, ELEVATOR_BOOST);
 			break;
 		case 2:
 			serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",

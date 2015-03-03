@@ -1309,7 +1309,7 @@ class ascii_telemetry(base_telemetry):
             
             match = re.match(".*:A_BOOST=(.*?):",line) # AILERON_BOOST
             if match :
-                self.aileron_boost = float(match.group(1))
+                self.aileron_boost = match.group(1)
             else :
                 print "Failure parsing AILERON_BOOST at line", line_no
                 return "Error"
@@ -1338,14 +1338,14 @@ class ascii_telemetry(base_telemetry):
                 return "Error"
             match = re.match(".*:RUD_E_MIX=(.*?):",line) # RUDDER_ELEV_MIX
             if match :
-                self.rudder_elev_mix = float(match.group(1))
+                self.rudder_elev_mix = match.group(1)
             else :
                 print "Failure parsing RUDDER_ELEV_MIX at line", line_no
                 return "Error"
             
             match = re.match(".*:ROL_E_MIX=(.*?):",line) # ROLL_ELEV_MIX
             if match :
-                self.roll_elev_mix = float (match.group(1))
+                self.roll_elev_mix = match.group(1)
             else :
                 print "Failure parsing ROLL_ELEV_MIX at line", line_no
                 return "Error"
