@@ -1170,7 +1170,6 @@ class ascii_telemetry(base_telemetry):
                     return "Error"
             else :
                 pass
-
             match = re.match(".*:fgs([-0-9]*?):",line) # flags from defines.h 
             if match :
                 try:
@@ -1199,6 +1198,16 @@ class ascii_telemetry(base_telemetry):
                 except:
                     print "Corrupt F2: sonar value in line", line_no
                     pass
+            match = re.match(".*:AF([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
+            if match :
+                try:
+                    self.aero_force_x = int(match.group(1))
+                    self.aero_force_y = int(match.group(2))
+                    self.aero_force_z = int(match.group(3))
+                except:
+                    print "Corrupt F2: waypoint value in line", line_no
+                    pass
+            
             
              # line was parsed without major errors
             return "F2"

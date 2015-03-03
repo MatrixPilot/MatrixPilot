@@ -2370,7 +2370,7 @@ def angle_of_incidence(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ)
     angle_radians = asin(magnitude_of_e)
     angle_degrees = 180 * angle_radians / pi
     # Note: angle_degrees is Angle of Incidence (AoI) which is the same angle of attack in much of the flight.
-    # Plesae be aware that AoI includes also an aspect of side slip. So it is not exactly
+    # Please be aware that AoI includes also an aspect of side slip. So it is not exactlyaer
     # Angle of Attack.
     return(angle_degrees)
 

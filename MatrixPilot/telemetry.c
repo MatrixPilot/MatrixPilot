@@ -656,10 +656,10 @@ void serial_output_8hz(void)
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
+				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:AF%i,%i,%i:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
 				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
 				    flags.WW, osc_fail_count,
-				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height);
+				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height, aero_force[0], aero_force[1], aero_force[2]);
 //				serial_output("tmp%i:prs%li:alt%li:agl%li:",
 //				    get_barometer_temperature(), get_barometer_pressure(), 
 //				    get_barometer_alt(), get_barometer_agl());
