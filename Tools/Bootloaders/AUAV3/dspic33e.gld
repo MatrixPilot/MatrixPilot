@@ -18,7 +18,7 @@ MEMORY
   ivt            : ORIGIN = 0x7FFFFA,           LENGTH = 0x4
 /*  program (xr)   : ORIGIN = 0x200,         LENGTH = 0x555FE
   auxflash (xr)  : ORIGIN = 0x7FC004,      LENGTH = 0x3FFA*/
-  program (xr)  : ORIGIN = 0x7FC004,      LENGTH = 0x3FFA
+  program (xr)   : ORIGIN = 0x7FC004,      LENGTH = 0x3FFA
   FGS            : ORIGIN = 0xF80004,      LENGTH = 0x2
   FOSCSEL        : ORIGIN = 0xF80006,      LENGTH = 0x2
   FOSC           : ORIGIN = 0xF80008,      LENGTH = 0x2
