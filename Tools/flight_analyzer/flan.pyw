@@ -1931,6 +1931,8 @@ class flight_log_book:
         self.F14 = "Empty"
         self.F15 = "Empty"
         self.F16 = "Empty"
+        self.F17 = "Empty"
+        self.F17 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
@@ -2198,6 +2200,20 @@ def create_log_book(options) :
             log_book.id_lead_pilot = log.id_lead_pilot
             log_book.id_diy_drones_url = log.id_diy_drones_url
             log_book.F16 = "Recorded"
+        elif log.log_format == "F17" : # We have Helical Turns related Control Gains
+            log_book.feed_forward = log.feed_forward
+            log_book.navigation_max_earth_vertical_axis_rotation_rate = \
+                    log.navigation_max_earth_vertical_axis_rotation_rate
+            log_book.fly_by_wire_max_earth_vertical_axis_rotation_rate = \
+                    log.fly_by_wire_max_earth_vertical_axis_rotation_rate
+            log_book.F17 = "Recorded"
+        elif log.log_format == "F18" : # We have Helical Turns related angle of attack and trim values
+            log_book.angle_of_attack_normal = log.angle_of_attack_normal
+            log_book.angle_of_attack_inverted = log.angle_of_attack_inverted
+            log_book.elevator_trim_normal = log.elevator_trim_normal
+            log_book.elevator_trim_inverted = log.elevator_trim_inverted
+            log_book.nominal_cruise_speed = log.nominal_cruise_speed
+            log_book.F18 = "Recorded"
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch

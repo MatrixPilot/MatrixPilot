@@ -235,9 +235,19 @@ class base_telemetry :
         self.flags = 0
         self.sonar_direct = 0 # Direct distance in cm to sonar target
         self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
+        # The following variables added for the Helical Turns method of fly by wire and auto  flight
         self.aero_force_x = 0
         self.aero_force_y = 0
         self.aero_force_z = 0
+        self.feed_forward = 0
+        self.navigation_max_earth_vertical_axis_rotation_rate = 0
+        self.fly_by_wire_max_earth_vertical_axis_rotation_rate = 0
+        self.angle_of_attack_normal = 0
+        self.angle_of_attack_inverted = 0
+        self.elevator_trim_normal = 0
+        self.elevator_trim_inverted = 0
+        self.nominal_cruise_speed = 0
+        # End of new variables for Helical Turns
        
 
 class mavlink_telemetry(base_telemetry):
@@ -1205,7 +1215,7 @@ class ascii_telemetry(base_telemetry):
                     self.aero_force_y = int(match.group(2))
                     self.aero_force_z = int(match.group(3))
                 except:
-                    print "Corrupt F2: waypoint value in line", line_no
+                    print "Corrupt F2: Aero Force value in line", line_no
                     pass
             
             
@@ -1676,7 +1686,65 @@ class ascii_telemetry(base_telemetry):
             else :
                 print "Failure parsing ID_DIY_DRONES_URL at line", line_no
             return "F16"
- 
+        
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F17:",line) # If line starts with F17
+        if match :
+            # Parse the line for options.h values
+           
+            match = re.match(".*:FD_FWD=(.*?):",line) # FEED FORWARD for Helical Turns
+            if match :
+                self.feed_forward = float(match.group(1))
+            else :
+                print "Failure parsing FEED FORWARD at line", line_no
+            match = re.match(".*:TR_NAV=(.*?):",line) # TR_NAV
+            if match :
+                self.navigation_max_earth_vertical_axis_rotation_rate = float(match.group(1))
+            else :
+                print "Failure parsing TURN_RATE_NAV at line", line_no
+            match = re.match(".*:TR_FBW=(.*?):",line) # TR_FBW
+            if match :
+                self.fly_by_wire_max_earth_vertical_axis_rotation_rate = float(match.group(1))
+            else :
+                print "Failure parsing TURN_RATE_FBW  at line", line_no
+            return "F17"
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F18:",line) # If line starts with F18
+        if match :
+            # Parse the line for options.h values
+           
+            match = re.match(".*:AOA_NRM=(.*?):",line) # ANGLE_OF_ATTACK_NORMAL 
+            if match :
+                self.angle_of_attack_normal = float(match.group(1))
+            else :
+                print "Failure parsing ANGLE_OF_ATTACK_NORMAL  at line", line_no
+            match = re.match(".*:AOA_INV=(.*?):",line) # ANGLE_OF_ATTACK_INVERTED
+            if match :
+                self.angle_of_attack_inverted = float(match.group(1))
+            else :
+                print "Failure parsing ANGLE_OF_ATTACK_INVERTED at line", line_no
+            match = re.match(".*:EL_TRIM_NRM=(.*?):",line) # ELEVTOR_TRIM_NORMAL
+            if match :
+                self.elevator_trim_normal = float(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR_TRIM_NORMAL at line", line_no
+            match = re.match(".*:EL_TRIM_INV=(.*?):",line) # ELEVTOR_TRIM_INVERTED
+            if match :
+                self.elevator_trim_inverted = float(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR_TRIM_INVERTED at line", line_no
+            match = re.match(".*:CRUISE_SPD=(.*?):",line) # Nominal CRUISE_SPEED
+            if match :
+                self.nominal_cruise_speed = float(match.group(1))
+            else :
+                print "Failure parsing nominal CRUISE_SPEED at line", line_no
+            return "F18"
+       
         #################################################################
         # Try Another format of telemetry
         
