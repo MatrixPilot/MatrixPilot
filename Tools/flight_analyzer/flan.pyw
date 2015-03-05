@@ -1932,7 +1932,7 @@ class flight_log_book:
         self.F15 = "Empty"
         self.F16 = "Empty"
         self.F17 = "Empty"
-        self.F17 = "Empty"
+        self.F18 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
