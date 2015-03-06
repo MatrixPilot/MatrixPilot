@@ -2284,18 +2284,27 @@ def write_csv(options,log_book):
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
     print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA"
-    print "Calculating average air speed to use...",
+    
     counter = 0
     total = 0
     aoa_list = []
     wing_loading_list = []
     elevator_with_trim_removed = []
-    for entry in log_book.entries :
-        if ( entry.est_airspeed > 0):
-            counter += 1
-            total += entry.est_airspeed
-    average_est_airspeed = int(float(total) / counter)
-    print average_est_airspeed / 100, "m/sec"
+
+    if (log_book.nominal_cruise_speed > 0 ):
+        cruise_speed = log_book.nominal_cruise_speed
+        print "Using Nominal Cruise Speed from options.h of ", cruise_speed, " m/s"
+    else:
+        #Don't have a cruise speed from options.h so calculate one for ourselves
+        for entry in log_book.entries :
+            if ( entry.est_airspeed > 0):
+                counter += 1
+                total += entry.est_airspeed
+        average_est_airspeed = int(float(total) / counter) # cm / second
+        cruise_speed = int( average_est_airspeed / 100)
+        print "Using calculated Cruise Speed (options.h CRUISE_SPEED not found)", cruise_speed, " m/s"
+    centimeter_cruise_speed = cruise_speed * 100
+    
     print "Writing CSV file..."
     for entry in log_book.entries :
         incidence = angle_of_incidence(entry.rmat1, entry.rmat4,entry.rmat7, \
@@ -2304,13 +2313,12 @@ def write_csv(options,log_book):
                 entry.rmat3, entry.rmat4, entry.rmat5, \
                 entry.rmat6, entry.rmat7, entry.rmat8]
         IMUvelocity = [entry.IMUvelocityx, entry.IMUvelocityy, entry.IMUvelocityz]
-        #cruise_speed = average_est_airspeed  # Typical Cruise speed in cm / second
-        cruise_speed = 1200 # hard coded from setting in PDH options.h file
-        aoa = angle_of_attack(rmat,IMUvelocity)
-        relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, cruise_speed)
-        elevator_without_trim = entry.pwm_input[2] - 3000 # hardcoded 3000, but need to calculate it
         
-        if is_level_flight_data(entry, cruise_speed):
+        aoa = angle_of_attack(rmat,IMUvelocity)
+        relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
+        elevator_without_trim = -(entry.pwm_input[2] - 3000) # hardcoded 3000, but need to calculate it
+        
+        if is_level_flight_data(entry, centimeter_cruise_speed):
             aoa_list.append(aoa)
             wing_loading_list.append(relative_wing_loading)
             elevator_with_trim_removed.append(float(elevator_without_trim) / 1000)
@@ -2342,25 +2350,56 @@ def write_csv(options,log_book):
               ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa)
 
     f_csv.close()
-##    print "Plotting aoa graph...",
-##    try:
-##        from pylab import plot
-##        from pylab import show
-##        from pylab import polyfit
-##        from pylab import poly1d
-##    except:
-##        print "No plotted: pylab library was not availble"
-##        return
-##    print "fitting...",
-##    print len(wing_loading_list), len(aoa_list)
-##    fit = polyfit(wing_loading_list,aoa_list,1)
-##    fit_function = poly1d(fit)
-##    print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function( 1.0))
-##    print "#define ANGLE_OF_ATTACK_INVERTED","{0:.2f}".format(fit_function(-1.0))
-##    print "plotting"
-##    plot(wing_loading_list, aoa_list, 'yo',wing_loading_list, fit_function(wing_loading_list), '--k')
-##    show()
-##    print "plot finished"
+    if (options.graph == 1): graph_wing_loading(wing_loading_list, aoa_list,elevator_with_trim_removed, cruise_speed)
+    return
+
+def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, nominal_cruise_speed):
+    """Graph Angle of Attack against Relative Wing Loading"""
+    try:
+            from pylab import polyfit
+            from pylab import poly1d
+            from pylab import plot
+            from pylab import show
+            from pylab import xlabel
+            from pylab import ylabel
+            from pylab import title
+            from pylab import figure
+            from pylab import subplot
+    except:
+            print "Not plotted: pylab library was not available."
+            return
+    print "Plotting AoA and Elevator Graph..."
+    print "Fitting linear lines to scatter plot..."
+    #print len(wing_loading_list), len(aoa_list)
+    fit = polyfit(wing_loading_list,aoa_list,1)
+    fit_function = poly1d(fit)
+   
+    
+    figure('Analysis of AoA and Elevator deflection against Relative Wing Loading')
+    
+    subplot(2,1,1)
+    ylabel('Angle of Attack (Degrees)')
+    title('Angle of Attack against Relative Wing Loading')
+    plot(wing_loading_list, aoa_list, 'yo',wing_loading_list, fit_function(wing_loading_list), '--k')
+
+    #print len(wing_loading_list), len(elevator_with_trim_removed)
+    fit = polyfit(wing_loading_list,elevator_with_trim_removed,1)
+    fit_function2 = poly1d(fit)
+    
+    subplot(2,1,2)
+    xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
+    ylabel('Elevator difference from Trim (UDB PWM Units / 1000)')
+    title('Level Flight Elevator Deflection against Relative Wing Loading')
+    plot(wing_loading_list, elevator_with_trim_removed, 'yo',wing_loading_list, fit_function2(wing_loading_list), '--k')
+    
+    print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function(  1.0))
+    print "#define ANGLE_OF_ATTACK_INVERTED","{0:.2f}".format(fit_function( -1.0))
+    print "#define ELEVATOR_TRIM_NORMAL",    "{0:.2f}".format(fit_function2( 1.0))
+    print "#define ELEVATOR_TRIM_INVERTED",  "{0:.2f}".format(fit_function2(-1.0))
+    
+    print "plotting"
+    show()
+    print "Plot finished."
     return
     
 def is_level_flight_data(entry, cruise_speed):
@@ -2406,13 +2445,13 @@ def angle_of_attack(rmat,IMUvelocity):
         aoa = (180.0 / pi)* atan(float(IMUvelocity_in_body[2])/float(IMUvelocity_in_body[1])) 
     return(aoa)
 
-def wing_loading(aero_force, air_speed, cruise_speed):
+def wing_loading(aero_force, air_speed, centimeter_cruise_speed):
     """Calculate relative wing loading"""
     gravity = 2000 # MatrixPilot represents the force of gravity with 2000 units
-    if (air_speed < (cruise_speed / 10.0)):
+    if (air_speed < (centimeter_cruise_speed / 10.0)):
         relative_wing_loading = 0; # To prevent divide by zero and or reports of very large wing loading
     else :
-        relative_wing_loading = (float(-aero_force) / gravity) * ((float(cruise_speed) / float(air_speed))**2)
+        relative_wing_loading = (float(-aero_force) / gravity) * ((float(centimeter_cruise_speed) / float(air_speed))**2)
     return(relative_wing_loading)
  
 ########## User Interface Routines, functions and classes ##########
@@ -2432,6 +2471,7 @@ class flan_options :
         self.loglevel = 0
         self.gps_delay_correction = 0
         self.relocate = 0
+        self.graph = 0
         pass
 
 def saveObject(filename, object_h) :
@@ -2486,6 +2526,7 @@ def process_telemetry():
     options.altitude_correction = myframe.scl.get()
     options.gps_delay_correction = 0 # now obsolete concept with HBDR: myframe.gps_scl.get()
     options.relocate = myframe.relocate_flag.get()
+    options.graph = myframe.graph_flag.get()
     options.telemetry_type = myframe.telemetry_type
     
     if (options.waypoint_selector == 1 and options.telemetry_selector == 0):
@@ -2633,6 +2674,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         self.CSV_FileShown = Label(self,text = cropped, anchor = W)
         self.CSV_FileShown.grid(row = 7, column = 3, sticky = W)
 
+        self.graph_flag = IntVar()
+        self.Graph = Checkbutton(self, text ="Graph Trim & AoA",variable = self.graph_flag,  \
+                          command = self.graph_selected, anchor=W)
+        if (options.graph == 1) : self.Graph.select()
+        else : self.Graph.deselect()
+        self.Graph.grid( row = 8 , column = 1, sticky = "NW")
         
         Label(self, text = "    ", anchor=W).grid(row = 9, column = 1, sticky=W)
         
@@ -2642,7 +2689,7 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
 
         self.relocate_flag = IntVar()
         Label(self, text = "Options", anchor=W).grid(row = 10, column = 2, sticky=W)
-        self.Relocate = Checkbutton(self, text ="Process\n as race\nin\nVenice",variable = self.relocate_flag,  \
+        self.Relocate = Checkbutton(self, text ="Process\n as race",variable = self.relocate_flag,  \
                                 anchor=W)
         if (options.relocate == 1) : self.Relocate.select()
         else : self.Relocate.deselect()
@@ -2650,7 +2697,6 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         #self.gps_scl = Scale(self, from_=15, to=0, tickinterval = 5, resolution = 1)
         #self.gps_scl.set(options.gps_delay_correction)
         #self.gps_scl.grid(row=11, column = 2, sticky=W)
-
 
         self.start_button = Button(self, text = 'Start', command = process_telemetry , state = "disabled")
         self.start_button.grid(row = 11,column = 3)
@@ -2660,7 +2706,25 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         Label(self, text = "   ", anchor=W).grid(row = 11, column = 5, sticky=W) # add space to right
         Label(self, text = "   ", anchor=W).grid(row = 11, column =0, sticky=W)  # add space to left
         return
-
+    
+    def graph_selected(self):
+        """Check that graphing routines are available"""
+        try:
+            from pylab import plot
+            from pylab import show
+            from pylab import polyfit
+            from pylab import poly1d
+        except:
+            print "Not plotted: pylab library was not available"
+            showinfo(title='Routines for graphing are not available\n',  \
+                           message='Routines for graphing are not available.\n'+
+                                 'It would appear that the python "pylab" routines are not installed on this computer.\n'+
+                                 'It is best to download a pre-loaded version of python that includes these routines. '+
+                                 'The following site is recommended:-\n\n'+
+                                 'https://www.enthought.com/products/canopy/\n\n'+
+                                 'The free version of python in "Canopy Express" contains the necessary pylab library.')
+            self.Graph.deselect()
+        
     def crop_filename(self,filename):
         """Crop a filename for display pourposes"""
         max_length = 72
@@ -2961,6 +3025,10 @@ if __name__=="__main__":
                 options.relocate
             except:
                 options.relocate = 0
+            try :
+                options.graph
+            except:
+                options.graph = 0
         except:
             options = flan_options() # Assume we have not run the program before.
         root = Tk()
