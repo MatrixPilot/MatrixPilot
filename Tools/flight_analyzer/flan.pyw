@@ -1936,6 +1936,7 @@ class flight_log_book:
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
+        self.nominal_cruise_speed = 0
 
 def calc_average_wind_speed(log_book):
     if log_book.racing_mode == 0 :
