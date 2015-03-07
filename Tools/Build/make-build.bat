@@ -21,6 +21,21 @@
 
 @rem pyProjectCreator.py -r ../.. -t SIL -o build  -----  and then compute  (-f ../../device-SILSIM.mk)
 
+pyProjectCreator.py -t SIL   -r ../..
+pyProjectCreator.py -t PX4   -r ../..
+pyProjectCreator.py -t UDB4  -r ../..
+pyProjectCreator.py -t UDB5  -r ../..
+pyProjectCreator.py -t AUAV3 -r ../..
+
+pyProjectCreator.py -n RollPitchYaw -t UDB4  -r ../..
+pyProjectCreator.py -n RollPitchYaw -t UDB5  -r ../..
+pyProjectCreator.py -n RollPitchYaw -t AUAV3 -r ../..
+
+pyProjectCreator.py -n LedTest -t UDB5  -r ../..
+
+goto END:
+
+
 pyProjectCreator.py -t SIL   -o ../../build -r ../.. -f ../../device-SILSIM.mk
 pyProjectCreator.py -t PX4   -o ../../build -r ../.. -f ../../device-PX4.mk
 pyProjectCreator.py -t UDB4  -o ../../build -r ../.. -f ../../device-UDB4.mk
@@ -28,8 +43,6 @@ pyProjectCreator.py -t UDB5  -o ../../build -r ../.. -f ../../device-UDB5.mk
 pyProjectCreator.py -t AUAV3 -o ../../build -r ../.. -f ../../device-AUAV3.mk
 
 pyProjectCreator.py -n RollPitchYaw -t UDB5  -o ../../build -r ../.. -f ../../device-UDB5.mk
-
-goto END:
 
 pyProjectCreator.py -t SIL   -o ../../build -r ../.. -c ../Config -m Config -m MatrixPilot -m libDCM -m MAVLink -m Tools/MatrixPilot-SIL -i FreeRTOS/include
 pyProjectCreator.py -t PX4   -o ../../build -r ../.. -c ../Config -m Config -m MatrixPilot -m libDCM -m libSTM -m MAVLink -i FreeRTOS/include
@@ -46,5 +59,4 @@ pyProjectCreator.py -n LedTest -t UDB5  -o ../../build -r ../.. -c ../../Tools/L
 pyProjectCreator.py -n LedTest -t AUAV3 -o ../../build -r ../.. -c ../../Tools/LedTest -m Tools/LedTest -m libUDB -i MAVLink/include -i Microchip -i Microchip/Include
 
 :END
-
 pause

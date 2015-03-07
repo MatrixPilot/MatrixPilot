@@ -152,7 +152,6 @@ def mplabX_count_files(masks, dir):
 
 def mplabX_find_files(masks, dir):
 	str = ""
-#        print "mplabX_find_files: ", dir
 	for entry in os.listdir(dir):
 		if os.path.isdir(os.path.join(dir, entry)):
 			title = entry
@@ -257,7 +256,7 @@ def parse_options_file(filename, option):
 		data = file.read()
 		match = re.search(r"(^" + option + " .= )(.*$)", data, re.MULTILINE)
 		if match:
-                        str = match.group(2)
+			str = match.group(2)
 	return str
 
 #
@@ -306,28 +305,28 @@ if __name__ == '__main__':
 	else:
 		arch = ""
 
-        target_mk_path = "../../target-" + opts.name + ".mk"
+	target_mk_path = opts.root + "/target-" + opts.name + ".mk"
 	opts.modules  = opts.modules  + parse_options_file(target_mk_path, "modules").split(' ')
 	opts.defines  = opts.includes + parse_options_file(target_mk_path, "defines").split(' ')
 	opts.includes = opts.includes + parse_options_file(target_mk_path, "incpath").split(' ')
 	opts.config   = opts.config   + parse_options_file(target_mk_path, "cfgpath")
 
-#        print "modules1 =", opts.modules
+#	print "modules1 =", opts.modules
 	if opts.file != "":
 		opts.modules = opts.modules + parse_options_file(opts.file, "modules").split(' ')
 #		print "modules2 =", opts.modules
 		opts.includes = opts.includes + parse_options_file(opts.file, "incpath").split(' ')
-#        	print "includes =", opts.includes
+#		print "includes =", opts.includes
 		opts.defines = opts.defines + parse_options_file(opts.file, "defines").split(' ')
 #		print "defines =", opts.defines
 #		opts.config = opts.config + parse_options_file(opts.file, "cfgpath")
-#        	print "cfgpath =", opts.config
+#		print "cfgpath =", opts.config
 		arch = "dsPIC" + parse_options_file(opts.file, "CPU")
 #		print "arch =", arch
 
 # TODO: prehaps we want to check that the modules list (etc) is not empty..
 
- #       print "modules2 =", opts.modules
+#		print "modules2 =", opts.modules
 
 	rootsep = "../"
 	inc_list = [rootsep + str(x) for x in opts.includes]

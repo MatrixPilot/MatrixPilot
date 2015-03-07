@@ -77,4 +77,7 @@ goto END:
 :END
 
 popd
+
+dir build\*.hex build\*.exe build\*.map /B /S
+
 pause

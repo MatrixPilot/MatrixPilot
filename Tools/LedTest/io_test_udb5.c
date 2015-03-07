@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifdef UDB5
+#if (UDB5 == 1)
 
 #include "../../libUDB/libUDB.h"
 
