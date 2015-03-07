@@ -2357,15 +2357,9 @@ def write_csv(options,log_book):
 def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, nominal_cruise_speed):
     """Graph Angle of Attack against Relative Wing Loading"""
     try:
-            from pylab import polyfit
-            from pylab import poly1d
-            from pylab import plot
-            from pylab import show
-            from pylab import xlabel
-            from pylab import ylabel
-            from pylab import title
-            from pylab import figure
-            from pylab import subplot
+            from pylab import polyfit, poly1d
+            from pylab import plot, show, xlabel,ylabel, title
+            from pylab import figure, subplot,subplots_adjust
     except:
             print "Not plotted: pylab library was not available."
             return
@@ -2379,8 +2373,9 @@ def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, 
     figure('Analysis of AoA and Elevator deflection against Relative Wing Loading')
     
     subplot(2,1,1)
-    ylabel('Angle of Attack (Degrees)')
-    title('Angle of Attack against Relative Wing Loading')
+    xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
+    ylabel('Angle of Attack\n(Degrees)')
+    title('Level flight: Angle of Attack against Relative Wing Loading')
     plot(wing_loading_list, aoa_list, 'yo',wing_loading_list, fit_function(wing_loading_list), '--k')
 
     #print len(wing_loading_list), len(elevator_with_trim_removed)
@@ -2389,8 +2384,8 @@ def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, 
     
     subplot(2,1,2)
     xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
-    ylabel('Elevator difference from Trim (UDB PWM Units / 1000)')
-    title('Level Flight Elevator Deflection against Relative Wing Loading')
+    ylabel('Elevator difference from Trim\n(UDB PWM Units / 1000)')
+    title('Level flight: Elevator Deflection against Relative Wing Loading')
     plot(wing_loading_list, elevator_with_trim_removed, 'yo',wing_loading_list, fit_function2(wing_loading_list), '--k')
     
     print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function(  1.0))
@@ -2399,6 +2394,7 @@ def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, 
     print "#define ELEVATOR_TRIM_INVERTED",  "{0:.2f}".format(fit_function2(-1.0))
     
     print "plotting"
+    subplots_adjust(hspace = 0.45)
     show()
     print "Plot finished."
     return
