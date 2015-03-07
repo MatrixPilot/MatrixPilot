@@ -2399,9 +2399,13 @@ def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, 
     print "Plot finished."
     return
     
-def is_level_flight_data(entry, cruise_speed):
-    if ((abs(entry.IMUvelocityz) < 20 ) and ((abs(entry.roll) < 3) or (abs(entry.roll) > 177) )\
-                                             and (entry.est_airspeed > (0.5 * cruise_speed))):
+def is_level_flight_data(entry, centimeter_cruise_speed):
+    allowed_pitch_error  = 5 # degrees: Note this is fligh path pitch, not heading pitch
+    allowed_roll_error   = 5 # degrees
+    max_IMUvelocityz = entry.est_airspeed * sin(allowed_pitch_error * pi/180)
+    if ((abs(entry.IMUvelocityz) < max_IMUvelocityz ) and ((abs(entry.roll) < allowed_pitch_error)  \
+            or (abs(entry.roll) > (180 - allowed_pitch_error)) )\
+            and (entry.est_airspeed > (0.5 * centimeter_cruise_speed))):
         return True
     else:
         return False
