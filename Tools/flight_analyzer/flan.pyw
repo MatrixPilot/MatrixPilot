@@ -2403,8 +2403,8 @@ def is_level_flight_data(entry, centimeter_cruise_speed):
     allowed_pitch_error  = 5 # degrees: Note this is fligh path pitch, not heading pitch
     allowed_roll_error   = 5 # degrees
     max_IMUvelocityz = entry.est_airspeed * sin(allowed_pitch_error * pi/180)
-    if ((abs(entry.IMUvelocityz) < max_IMUvelocityz ) and ((abs(entry.roll) < allowed_pitch_error)  \
-            or (abs(entry.roll) > (180 - allowed_pitch_error)) )\
+    if ((abs(entry.IMUvelocityz) < max_IMUvelocityz ) and ((abs(entry.roll) < allowed_roll_error)  \
+            or (abs(entry.roll) > (180 - allowed_roll_error)) )\
             and (entry.est_airspeed > (0.5 * centimeter_cruise_speed))):
         return True
     else:
