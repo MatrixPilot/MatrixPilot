@@ -424,11 +424,11 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 11;
+static int16_t telemetry_counter = 12;
 
 void restart_telemetry(void)
 {
-	telemetry_counter = 8;
+	telemetry_counter = 12;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
@@ -536,37 +536,44 @@ void serial_output_8hz(void)
 	// Saves CPU and XBee power.
 	if (udb_heartbeat_counter % 20 != 0) return;    // Every 4 runs (5 heartbeat counts per 8Hz)
 #endif // SERIAL_OUTPUT_FORMAT
-
 	switch (telemetry_counter)
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
-		case 11:
+		case 12:
 			serial_output("F15:IDA=");
 			serial_output(ID_VEHICLE_MODEL_NAME);
 			serial_output(":IDB=");
 			serial_output(ID_VEHICLE_REGISTRATION);
 			serial_output(":\r\n");
 			break;
-		case 10:
+		case 11:
 			serial_output("F16:IDC=");
 			serial_output(ID_LEAD_PILOT);
 			serial_output(":IDD=");
 			serial_output(ID_DIY_DRONES_URL);
 			serial_output(":\r\n");
 			break;
-                case 9:
+                case 10:
                         serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
 			    FEED_FORWARD, TURN_RATE_NAV, TURN_RATE_FBW);
                         break;
-                case 8:
+                case 9:
                         serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
 			    ANGLE_OF_ATTACK_NORMAL, ANGLE_OF_ATTACK_INVERTED, ELEVATOR_TRIM_NORMAL,
                             ELEVATOR_TRIM_INVERTED, CRUISE_SPEED);
                         break;
-                case 7:
+                case 8:
                         serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:,RUDD=%i,%i:\r\n",
 			    AILERON_OUTPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_OUTPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
                             THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
+                        break;
+                case 7:
+                        serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
+                        for (i= 1; i <= NUM_INPUTS; i++)
+                        {
+                            serial_output("%i,",udb_pwTrim[i]);
+                        }
+                        serial_output(":\r\n");
                         break;
 		case 6:
 			serial_output("F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
