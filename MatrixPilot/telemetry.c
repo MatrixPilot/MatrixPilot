@@ -553,28 +553,28 @@ void serial_output_8hz(void)
 			serial_output(ID_DIY_DRONES_URL);
 			serial_output(":\r\n");
 			break;
-                case 10:
-                        serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
+		case 10:
+			serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
 			    FEED_FORWARD, TURN_RATE_NAV, TURN_RATE_FBW);
-                        break;
-                case 9:
-                        serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
+			break;
+		case 9:
+			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
 			    ANGLE_OF_ATTACK_NORMAL, ANGLE_OF_ATTACK_INVERTED, ELEVATOR_TRIM_NORMAL,
-                            ELEVATOR_TRIM_INVERTED, CRUISE_SPEED);
-                        break;
-                case 8:
-                        serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:,RUDD=%i,%i:\r\n",
+			    ELEVATOR_TRIM_INVERTED, CRUISE_SPEED);
+			break;
+		case 8:
+			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:,RUDD=%i,%i:\r\n",
 			    AILERON_OUTPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_OUTPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
-                            THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
-                        break;
-                case 7:
-                        serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
-                        for (i= 1; i <= NUM_INPUTS; i++)
-                        {
-                            serial_output("%i,",udb_pwTrim[i]);
-                        }
-                        serial_output(":\r\n");
-                        break;
+			    THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
+			break;
+		case 7:
+			serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
+			for (i= 1; i <= NUM_INPUTS; i++)
+			{
+				serial_output("%i,",udb_pwTrim[i]);
+			}
+			serial_output(":\r\n");
+			break;
 		case 6:
 			serial_output("F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
 			              "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"
@@ -593,8 +593,8 @@ void serial_output_8hz(void)
 			    YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD);
 			break;
 		case 3:
-                        serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=NULL:ROL_E_MIX=NULL:E_BOOST=%3.1f:\r\n",
-                            PITCHGAIN, PITCHKD, ELEVATOR_BOOST);
+			serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=NULL:ROL_E_MIX=NULL:E_BOOST=%3.1f:\r\n",
+			    PITCHGAIN, PITCHKD, ELEVATOR_BOOST);
 			break;
 		case 2:
 			serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",
