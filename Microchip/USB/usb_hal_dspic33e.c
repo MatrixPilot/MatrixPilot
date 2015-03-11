@@ -88,6 +88,8 @@ Description:
 #ifndef USB_HAL_DSPIC33E_C
 #define USB_HAL_DSPIC33E_C
 
+#if defined(__dsPIC33E__)
+
 #include "USB/usb.h"
 
 
@@ -167,5 +169,6 @@ BOOL USBSleepOnSuspend(void)
     return TRUE;
 }
 
-#endif //USB_HAL_DSPIC33E_C
+#endif // defined(__dsPIC33E__)
 
+#endif //USB_HAL_DSPIC33E_C
