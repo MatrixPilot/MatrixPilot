@@ -248,6 +248,16 @@ class base_telemetry :
         self.elevator_trim_inverted = 0
         self.nominal_cruise_speed = 0
         # End of new variables for Helical Turns
+        self.aileron_output_channel  = 0
+        self.elevator_output_channel = 0
+        self.throttle_output_channel = 0
+        self.rudder_output_channel   = 0
+        self.aileron_output_reversed  = 0
+        self.elevator_output_reversed = 0
+        self.throttle_output_reversed = 0
+        self.rudder_output_reversed   = 0
+        self.number_of_input_channels = 0
+        self.channel_trim_values = [0]
        
 
 class mavlink_telemetry(base_telemetry):
@@ -1744,7 +1754,55 @@ class ascii_telemetry(base_telemetry):
             else :
                 print "Failure parsing nominal CRUISE_SPEED at line", line_no
             return "F18"
-       
+        
+        #################################################################
+        # Try Another format of telemetry
+
+        match = re.match("^F19:",line) # If line starts with F19
+        if match :
+            # Parse the line for options.h values
+            match = re.match(".*:AIL=([0-9]*?),([0-9]*?):",line)   # Aileron Channel, and reversal 
+            if match :
+                self.aileron_output_channel  = int(match.group(1))
+                self.aileron_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing AILERON CHANNEL at line", line_no
+            match = re.match(".*:ELEV=([0-9]*?),([0-9]*?):",line)  # Elevator Channel, and reversal 
+            if match :
+                self.elevator_output_channel   = int(match.group(1))
+                self.elevator_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing ELEVATOR CHANNEL at line", line_no
+            match = re.match(".*:THROT=([0-9]*?),([0-9]*?):",line) # Throttle Channel, and reversal 
+            if match :
+                self.throttle_output_channel  = int(match.group(1))
+                self.throttle_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing THROTTLE CHANNEL at line", line_no
+            match = re.match(".*:RUDD=([0-9]*?),([0-9]*?):",line) # Rudder Channel, and reversal 
+            if match :
+                self.rudder_output_channel  = int(match.group(1))
+                self.rudder_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing RUDDER CHANNEL at line", line_no
+            return "F19"
+        
+        #################################################################
+        # Try Another format of telemetry
+        match = re.match("^F20:",line) # If line starts with F20
+        if match :
+            # Parse the line for options.h values
+            match = re.match(".*:NUM_IN=([0-9]*?):",line)   # Number of Input Channels
+            if match :
+                self.number_of_input_channels  = int(match.group(1))
+            else :
+                print "Failure parsing NUMBER OF INPUT CHANNELS at line", line_no
+            # Only Trim values will match in the follwoing iterative line. Here is an example:
+            # F20:NUM_IN=5:TRIM=2992,3000,2057,2989,2043,:
+            for match in re.finditer('([0-9]*?),',line):
+                self.channel_trim_values.append(match.group(0))
+            return "F20"
+        
         #################################################################
         # Try Another format of telemetry
         

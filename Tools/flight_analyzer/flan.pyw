@@ -1933,6 +1933,8 @@ class flight_log_book:
         self.F16 = "Empty"
         self.F17 = "Empty"
         self.F18 = "Empty"
+        self.F19 = "Empty"
+        self.F20 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
@@ -2215,6 +2217,19 @@ def create_log_book(options) :
             log_book.elevator_trim_inverted = log.elevator_trim_inverted
             log_book.nominal_cruise_speed = log.nominal_cruise_speed
             log_book.F18 = "Recorded"
+        elif log.log_format == "F19" : # Channels numbers and reversal of channels
+            log_book.aileron_output_reversed = log.aileron_output_reversed
+            log_book.elevator_output_channel = log.elevator_output_channel
+            log_book.elevator_output_reversed = log.elevator_output_reversed 
+            log_book.throttle_output_channel = log.throttle_output_channel
+            log_book.throttle_output_reversed = log.throttle_output_reversed
+            log_book.rudder_output_channel = log.rudder_output_channel
+            log_book.rudder_output_reversed = log.rudder_output_reversed
+            log_book.F19 = "Recorded"
+        elif log.log_format == "F20" : # Number of Input Channels and Trim Values
+            log_book.number_of_input_channels = log.number_of_input_channels
+            log_book.channel_trim_values = log.channel_trim_values
+            log_book.F19 = "Recorded"
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
@@ -2400,7 +2415,7 @@ def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, 
     return
     
 def is_level_flight_data(entry, centimeter_cruise_speed):
-    allowed_pitch_error  = 5 # degrees: Note this is fligh path pitch, not heading pitch
+    allowed_pitch_error  = 5 # degrees: Note this is flight path pitch, not heading pitch
     allowed_roll_error   = 5 # degrees
     max_IMUvelocityz = entry.est_airspeed * sin(allowed_pitch_error * pi/180)
     if ((abs(entry.IMUvelocityz) < max_IMUvelocityz ) and ((abs(entry.roll) < allowed_roll_error)  \
