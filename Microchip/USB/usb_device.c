@@ -250,6 +250,8 @@ allow for much more relaxed timing requirements, and therefore greater applicati
 firmware design flexibility.
 //----------------------------------------------------------------------------------*/
 
+#if defined(__dsPIC33E__)
+
 /** INCLUDES *******************************************************/
 #include "./USB/usb.h"
 #include "HardwareProfile.h"
@@ -3130,5 +3132,6 @@ static void USBStdFeatureReqHandler(void)
     }//end if (lots of checks for set/clear endpoint halt)
 }//end USBStdFeatureReqHandler
 
+#endif // defined(__dsPIC33E__)
 
 /** EOF USBDevice.c *****************************************************/

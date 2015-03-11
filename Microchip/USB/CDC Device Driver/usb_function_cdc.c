@@ -101,6 +101,8 @@
 
 ********************************************************************/
 
+#if defined(__dsPIC33E__)
+
 /** I N C L U D E S **********************************************************/
 #include "USB/usb.h"
 #include "USB/usb_function_cdc.h"
@@ -1051,5 +1053,7 @@ void CDCTxService(void)
 }//end CDCTxService
 
 #endif //USB_USE_CDC
+
+#endif // defined(__dsPIC33E__)
 
 /** EOF cdc.c ****************************************************************/

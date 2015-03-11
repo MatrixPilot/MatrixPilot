@@ -19,6 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#if defined(__dsPIC33E__)
+
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include "FSconfig.h"
@@ -91,3 +93,4 @@ const ROM InquiryResponse inq_resp = {
 	}
 };
 
+#endif // defined(__dsPIC33E__)

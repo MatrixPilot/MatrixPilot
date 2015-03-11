@@ -93,6 +93,8 @@ Change History:
 
 ********************************************************************/
  
+#if defined(__dsPIC33E__)
+ 
 /** I N C L U D E S **************************************************/
 #include "USB/usb.h"
 #include "HardwareProfile.h"
@@ -1706,3 +1708,5 @@ void MSDErrorHandler(BYTE ErrorCase)
 //-----------------------------------------------------------------------------------------
 #endif //end of #ifdef USB_USE_MSD
 //End of file usb_function_msd.c
+
+#endif // defined(__dsPIC33E__)
