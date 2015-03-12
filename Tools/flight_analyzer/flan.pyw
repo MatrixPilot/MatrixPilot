@@ -2345,7 +2345,8 @@ def write_csv(options,log_book):
         
         aoa = angle_of_attack(rmat,IMUvelocity)
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
-        elevator_without_trim = elevator_reversal_multiplier * (entry.pwm_input[2] - elevator_trim_pwm_value) 
+        elevator_without_trim = elevator_reversal_multiplier * \
+                                (entry.pwm_input[log_book.elevator_output_channel] - elevator_trim_pwm_value) 
         
         if is_level_flight_data(entry, centimeter_cruise_speed):
             aoa_list.append(aoa)

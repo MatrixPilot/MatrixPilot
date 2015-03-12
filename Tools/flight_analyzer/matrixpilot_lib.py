@@ -1801,10 +1801,6 @@ class ascii_telemetry(base_telemetry):
             # F20:NUM_IN=5:TRIM=2992,3000,2057,2989,2043,:
             for match in re.finditer('([0-9]*?),',line):
                 self.channel_trim_values.append(int(match.group(1)))
-            print "Trims:",self.number_of_input_channels
-            for chan in self.channel_trim_values :
-                print chan,
-                print
             return "F20"
         
         #################################################################
