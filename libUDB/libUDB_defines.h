@@ -74,7 +74,7 @@
 
 
 // define the board rotations here.
-// This include must go jsut after the board type has been declared
+// This include must go just after the board type has been declared
 // Do not move this
 // Orientation of the board
 #define ORIENTATION_FORWARDS    0
