@@ -2336,13 +2336,15 @@ def write_csv(options,log_book):
     
     print "Writing CSV file..."
     for entry in log_book.entries :
-        incidence = angle_of_incidence(entry.rmat1, entry.rmat4,entry.rmat7, \
-                    entry.IMUvelocityx,entry.IMUvelocityy, entry.IMUvelocityz)
         rmat = [entry.rmat0, entry.rmat1, entry.rmat2, \
                 entry.rmat3, entry.rmat4, entry.rmat5, \
                 entry.rmat6, entry.rmat7, entry.rmat8]
-        IMUvelocity = [entry.IMUvelocityx, entry.IMUvelocityy, entry.IMUvelocityz]
-        
+        IMUvelocity =   [entry.IMUvelocityx, entry.IMUvelocityy, entry.IMUvelocityz]
+        EstimatedWind = [entry.est_wind_x,   entry.est_wind_y,   entry.est_wind_z  ]
+        VelocityThruAir = []
+        for i in range(3) :
+            VelocityThruAir.append(IMUvelocity[i] - EstimatedWind[i])
+        incidence = angle_of_incidence(rmat, VelocityThruAir)
         aoa = angle_of_attack(rmat,IMUvelocity)
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
         elevator_without_trim = elevator_reversal_multiplier * \
@@ -2434,18 +2436,19 @@ def is_level_flight_data(entry, centimeter_cruise_speed):
     max_IMUvelocityz = entry.est_airspeed * sin(allowed_pitch_error * pi/180)
     if ((abs(entry.IMUvelocityz) < max_IMUvelocityz ) and ((abs(entry.roll) < allowed_roll_error)  \
             or (abs(entry.roll) > (180 - allowed_roll_error)) )\
-            and (entry.est_airspeed > (0.5 * centimeter_cruise_speed))):
+            and (entry.est_airspeed > (0.5 * centimeter_cruise_speed))) \
+            and (entry.IMUlocationz_W1 > 10): # Exclude data below 10m above boot location to remove non-flight runway data
         return True
     else:
         return False
 
-def angle_of_incidence(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ):
+def angle_of_incidence(rmat, VelocityThruAir):
     """Calculate difference in heading vector from flight path vector for angle of attack"""
     # rmat1,4,7 gives heading vector of plane but we want it in same earth reference as IMUVelocity
     # rmat is using UDB aviation coordinates with rmat1: West as positive, rmat4: North Positive, rmat7 Down Positive
     # IMUVelocity is using earth coordinates with X being East, Y being North, and Z being Up
-    a = [ - rmat1, rmat4, - rmat7]
-    b = [ IMUVelocityX, IMUVelocityY, IMUVelocityZ ]
+    a = [ - rmat[1], rmat[4], - rmat[7]]
+    b = VelocityThruAir
     c = normalize_vector_3x1(a)
     d = normalize_vector_3x1(b)
     #e = matrix_dot_product_vector_3x1(c,d)
@@ -2459,20 +2462,20 @@ def angle_of_incidence(rmat1,rmat4,rmat7,IMUVelocityX,IMUVelocityY,IMUVelocityZ)
     # Angle of Attack.
     return(angle_degrees)
 
-def angle_of_attack(rmat,IMUvelocity):
+def angle_of_attack(rmat,velocity):
     """Calculate a true estimate of angle of attack"""
     earth_to_body_matrix = matrix_transpose(rmat)
     
     # convert IMUVelocity from earth GPS frame to UDB Earth frame
-    IMUvelocity[0] = - IMUvelocity[0]
-    IMUvelocity[2] = - IMUvelocity[2]
+    velocity[0] = - velocity[0]
+    velocity[2] = - velocity[2]
     # convert IMUVelocity from UDB Earth frame to the UDB Body Frame
-    IMUvelocity_in_body = matrix_multiply_3x3_3x1(earth_to_body_matrix, IMUvelocity)
+    velocity_in_body = matrix_multiply_3x3_3x1(earth_to_body_matrix, velocity)
     # calculate an accurate angle of attack that excludes sideslip
-    if (IMUvelocity_in_body[1] == 0):
+    if (velocity_in_body[1] == 0):
         aoa = 0
     else:
-        aoa = (180.0 / pi)* atan(float(IMUvelocity_in_body[2])/float(IMUvelocity_in_body[1])) 
+        aoa = (180.0 / pi)* atan(float(velocity_in_body[2])/float(velocity_in_body[1])) 
     return(aoa)
 
 def wing_loading(aero_force, air_speed, centimeter_cruise_speed):
