@@ -2218,6 +2218,7 @@ def create_log_book(options) :
             log_book.nominal_cruise_speed = log.nominal_cruise_speed
             log_book.F18 = "Recorded"
         elif log.log_format == "F19" : # Channels numbers and reversal of channels
+            log_book.aileron_output_channel = log.aileron_output_channel
             log_book.aileron_output_reversed = log.aileron_output_reversed
             log_book.elevator_output_channel = log.elevator_output_channel
             log_book.elevator_output_reversed = log.elevator_output_reversed 
@@ -2229,7 +2230,7 @@ def create_log_book(options) :
         elif log.log_format == "F20" : # Number of Input Channels and Trim Values
             log_book.number_of_input_channels = log.number_of_input_channels
             log_book.channel_trim_values = log.channel_trim_values
-            log_book.F19 = "Recorded"
+            log_book.F20 = "Recorded"
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
@@ -2306,7 +2307,18 @@ def write_csv(options,log_book):
     aoa_list = []
     wing_loading_list = []
     elevator_with_trim_removed = []
-
+    elevator_reversal_multiplier = 1 # 1 Meaning do not reverse; -1 to reverse
+    if log_book.F20 == "Empty" or log_book.F19 == "Empty" :
+        print ("Did not receive Elevator Trim Values: setting to default of 3000")
+        print "Reversal of Trim Channel may not be correct"
+        print log_book.F19, log_book.F20
+        elevator_trim_pwm_value = 3000
+    else :
+        elevator_trim_pwm_value = log_book.channel_trim_values[log_book.elevator_output_channel]
+        print "Elevator Trim Value set to ",elevator_trim_pwm_value, "(UDB PWM Units)"
+        if log_book.elevator_output_reversed == 1:
+            elevator_reversal_multiplier = -1
+        
     if (log_book.nominal_cruise_speed > 0 ):
         cruise_speed = log_book.nominal_cruise_speed
         print "Using Nominal Cruise Speed from options.h of ", cruise_speed, " m/s"
@@ -2316,6 +2328,7 @@ def write_csv(options,log_book):
             if ( entry.est_airspeed > 0):
                 counter += 1
                 total += entry.est_airspeed
+                
         average_est_airspeed = int(float(total) / counter) # cm / second
         cruise_speed = int( average_est_airspeed / 100)
         print "Using calculated Cruise Speed (options.h CRUISE_SPEED not found)", cruise_speed, " m/s"
@@ -2332,7 +2345,7 @@ def write_csv(options,log_book):
         
         aoa = angle_of_attack(rmat,IMUvelocity)
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
-        elevator_without_trim = -(entry.pwm_input[2] - 3000) # hardcoded 3000, but need to calculate it
+        elevator_without_trim = elevator_reversal_multiplier * (entry.pwm_input[2] - elevator_trim_pwm_value) 
         
         if is_level_flight_data(entry, centimeter_cruise_speed):
             aoa_list.append(aoa)
