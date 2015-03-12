@@ -2345,7 +2345,7 @@ def write_csv(options,log_book):
         for i in range(3) :
             VelocityThruAir.append(IMUvelocity[i] - EstimatedWind[i])
         incidence = angle_of_incidence(rmat, VelocityThruAir)
-        aoa = angle_of_attack(rmat,IMUvelocity)
+        aoa = angle_of_attack(rmat,VelocityThruAir)
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
         elevator_without_trim = elevator_reversal_multiplier * \
                                 (entry.pwm_input[log_book.elevator_output_channel] - elevator_trim_pwm_value) 
