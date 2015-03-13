@@ -2399,10 +2399,7 @@ def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, 
     #print len(wing_loading_list), len(aoa_list)
     fit = polyfit(wing_loading_list,aoa_list,1)
     fit_function = poly1d(fit)
-   
-    
-    figure('Analysis of AoA and Elevator deflection against Relative Wing Loading')
-    
+    figure(1)
     subplot(2,1,1)
     xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
     ylabel('Angle of Attack\n(Degrees)')
