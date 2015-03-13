@@ -2300,11 +2300,12 @@ def write_csv(options,log_book):
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
-    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA"
+    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA Pitch"
     
     counter = 0
     total = 0
-    aoa_list = []
+    aoa_using_pitch_list = []
+    aoa_using_velocity_list = []
     wing_loading_list = []
     elevator_with_trim_removed = []
     elevator_reversal_multiplier = 1 # 1 Meaning do not reverse; -1 to reverse
@@ -2345,13 +2346,18 @@ def write_csv(options,log_book):
         for i in range(3) :
             VelocityThruAir.append(IMUvelocity[i] - EstimatedWind[i])
         incidence = angle_of_incidence(rmat, VelocityThruAir)
-        aoa = angle_of_attack(rmat,VelocityThruAir)
+        aoa_using_velocity = angle_of_attack(rmat,VelocityThruAir)
+        if ( abs(entry.roll) > 90 ):
+            aoa_using_pitch = rmat[7] / 287     # creates degrees of pitch : plane is inverted
+        else :
+            aoa_using_pitch = - (rmat[7] / 287) # plane is right way up
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
         elevator_without_trim = elevator_reversal_multiplier * \
                                 (entry.pwm_input[log_book.elevator_output_channel] - elevator_trim_pwm_value) 
         
         if is_level_flight_data(entry, centimeter_cruise_speed):
-            aoa_list.append(aoa)
+            aoa_using_pitch_list.append(aoa_using_pitch)
+            aoa_using_velocity_list.append(aoa_using_velocity)
             wing_loading_list.append(relative_wing_loading)
             elevator_with_trim_removed.append(float(elevator_without_trim) / 1000)
         
@@ -2379,13 +2385,15 @@ def write_csv(options,log_book):
               entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
               entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
               entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(incidence), \
-              ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa)
+              ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa_using_pitch)
 
     f_csv.close()
-    if (options.graph == 1): graph_wing_loading(wing_loading_list, aoa_list,elevator_with_trim_removed, cruise_speed)
+    if (options.graph == 1): graph_wing_loading(wing_loading_list, aoa_using_pitch_list,
+                                aoa_using_velocity_list,elevator_with_trim_removed, cruise_speed)
     return
 
-def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, nominal_cruise_speed):
+def graph_wing_loading(wing_loading_list, aoa_using_pitch_list, aoa_using_velocity_list,
+                       elevator_with_trim_removed, nominal_cruise_speed):
     """Graph Angle of Attack against Relative Wing Loading"""
     try:
             from pylab import polyfit, poly1d
@@ -2397,20 +2405,28 @@ def graph_wing_loading(wing_loading_list, aoa_list, elevator_with_trim_removed, 
     print "Plotting AoA and Elevator Graph..."
     print "Fitting linear lines to scatter plot..."
     #print len(wing_loading_list), len(aoa_list)
-    fit = polyfit(wing_loading_list,aoa_list,1)
+    fit = polyfit(wing_loading_list,aoa_using_pitch_list,1)
     fit_function = poly1d(fit)
     figure(1)
-    subplot(2,1,1)
+    subplot(3,1,1)
+    title('Level flight: Angle of Attack (derived via Pitch) against Relative Wing Loading')
     xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
-    ylabel('Angle of Attack\n(Degrees)')
-    title('Level flight: Angle of Attack against Relative Wing Loading')
-    plot(wing_loading_list, aoa_list, 'yo',wing_loading_list, fit_function(wing_loading_list), '--k')
+    ylabel('Angle of Attack\nIn Degrees')
+    plot(wing_loading_list, aoa_using_pitch_list, 'yo',wing_loading_list, fit_function(wing_loading_list), '--k')
+
+    fit = polyfit(wing_loading_list,aoa_using_velocity_list,1)
+    fit_function3 = poly1d(fit)
+    subplot(3,1,2)
+    title('Level flight: Angle of Attack (derived from Velocity) against Relative Wing Loading')
+    xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
+    ylabel('Angle of Attack\nin Degrees')
+    plot(wing_loading_list, aoa_using_velocity_list, 'yo',wing_loading_list, fit_function3(wing_loading_list), '--k')
 
     #print len(wing_loading_list), len(elevator_with_trim_removed)
     fit = polyfit(wing_loading_list,elevator_with_trim_removed,1)
     fit_function2 = poly1d(fit)
     
-    subplot(2,1,2)
+    subplot(3,1,3)
     xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
     ylabel('Elevator difference from Trim\n(UDB PWM Units / 1000)')
     title('Level flight: Elevator Deflection against Relative Wing Loading')
