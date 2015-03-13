@@ -521,8 +521,8 @@ void serial_output_8hz(void)
 
 void serial_output_8hz(void)
 {
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	int16_t i;
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	static int toggle = 0;
 #endif
 //	static int16_t telemetry_counter = 8;
@@ -569,7 +569,7 @@ void serial_output_8hz(void)
 			break;
 		case 7:
 			serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
-			for (i= 1; i <= NUM_INPUTS; i++)
+			for (i = 1; i <= NUM_INPUTS; i++)
 			{
 				serial_output("%i,",udb_pwTrim[i]);
 			}

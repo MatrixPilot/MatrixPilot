@@ -28,6 +28,10 @@
 
 #include "options.h"
 
+#if (SIL == 1)
+#define SILSIM                              1
+#endif
+
 #if (WIN == 1 || NIX == 1)
 #define inline __inline
 #define SILSIM                              1
@@ -43,9 +47,11 @@
 #define USE_USB                             0
 #undef  USE_MSD
 #define USE_MSD                             0
+#undef  RECORD_FREE_STACK_SPACE
+#define RECORD_FREE_STACK_SPACE             0
 #undef  FAILSAFE_INPUT_MIN
 #define FAILSAFE_INPUT_MIN                  1500
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #else
 #define SILSIM                              0
 #include <dsp.h>
@@ -58,12 +64,21 @@
 // See the MatrixPilot wiki for more details on different board types.
 #ifdef UDB4
 #define BOARD_TYPE                          UDB4_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef UDB5
 #define BOARD_TYPE                          UDB5_BOARD
+#undef  USE_USB
+#define USE_USB                             0
+#undef  USE_MSD
+#define USE_MSD                             0
 #endif
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
+//#include "options_auav3.h"
 #endif
 
 #ifndef BOARD_TYPE
