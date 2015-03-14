@@ -1,0 +1,329 @@
+#------------------------------------------------------------------------------
+# NOTE: (Windows) this makefile assumes that the MinGW\bin & MinGW\msys\1.0\bin
+#                 directories are added to the PATH environment variable.
+#
+# Top level MatrixPilot makefile
+#
+# - This make system depends upon a mostly clean source tree.
+# - It is designed to be invoked from a command script for multiple targets.
+# - With the exception of source code generators, all build output is 
+#    directed to a binary tree, which will be built.
+#
+# EXTENDING
+# - to add another library (aka, directory) to the build process simply copy 
+#   file 'module.mk' from one of the existing sub-directories and edit to suit.
+#
+# NOTES:
+# - the build system now builds libraries where specified in module.mk
+#
+#
+# SOME SIMPLE MAKE SYNTAX:
+#  = recursively expanded variable
+# := simply expanded variables
+#::= simply expanded variables (posix standard)
+# ?= conditional variable assignment operator, only has an effect if the variable is not yet defined
+#
+# DEFINE 'V' ENVIRONMENT VARIABLE IN ORDERR TO BE VERBOSE: (set V=1, set V= to unset (Windows)) 
+Q := $(if $(V),,@)
+
+# Establish some sensible defaults for build system critical variables (if not already defined)
+TARGET_NAME ?= MatrixPilot
+#SOURCE_DIR ?= ..
+DEVICE ?= SILSIM
+
+#$(if $(filter $(MAKE_VERSION),3.80 3.81 3.90 3.92),,\
+#  $(error This makefile requires one of GNU make version ….))
+
+# Fetch the makefile directory with a trailing /
+ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+
+#################################################################
+# Do not build targets if make invoked from source tree root
+NOMAKE:=show
+ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NOMAKE))))
+$(if $(filter $(ROOT_DIR),$(CURDIR)/),\
+  $(error Please run the makefile from the binary tree, or use the build-all script.))
+endif
+
+#################################################################
+# Establish the host system build support tools
+
+ifeq ($(OS),Windows_NT) 
+mkoutdir = $(shell for %%f in ($(subst /,\,$(subst ../,,$(1)))); do [ -d %%f ] || $(MKDIR) %%f)
+QT = "
+RM = del /Q /F
+#MV ?= move /Y
+MV ?= mv -f
+CP = copy /Y
+FIND := C:\MinGW\msys\1.0\bin\find.exe
+DOT := "C:\Program Files (x86)\Graphviz2.38\bin\dot.exe"
+ifdef ComSpec
+SHELL := $(ComSpec)
+endif
+ifdef COMSPEC
+SHELL := $(COMSPEC)
+endif
+MKDIR := mkdir
+else
+mkoutdir = $(shell for f in $(subst ../,,$(1)); do [ -d $$f ] || $(MKDIR) $$f; done)
+QT = '
+RM = rm -rf
+MV ?= mv -f
+CP = cp -f
+FIND := find
+DOT := dot
+MKDIR := mkdir -p
+endif
+SED := sed
+#TEST := [
+space = $(empty) $(empty)
+comma := ,
+
+SMC = java -jar $(SOURCE_DIR)/Tools/Smc.jar
+ifeq ($(V),)
+SMC_FLAGS = -c
+else
+SMC_FLAGS = -c -verbose
+endif
+
+# add or replace existing objects only if newer
+ARFLAGS := -ru
+
+
+################################################################################
+# From current directory determine relative path to makefile (source root)
+
+define source-path-rel-dir
+  TMP_SRC_DIR += ..
+endef
+$(foreach l,$(subst /, ,$(subst $(ROOT_DIR),,$(CURDIR))),$(eval $(call source-path-rel-dir,$l)))
+SOURCE_DIR ?= $(subst $(space),/,$(TMP_SRC_DIR))
+#$(warning SOURCE_DIR: $(SOURCE_DIR))
+
+################################################################################
+# Collect information from each module in the following variables.
+# Initialize them here as simple variables.
+#libraries :=
+#modules := 
+#sources :=
+#defines :=
+#incpath :=
+#cfgpath :=
+##defines :=$(DEVICE)=1
+
+################################################################################
+# Include the target and device specific makefile to load our variables as above
+
+include $(SOURCE_DIR)/target-$(TARGET_NAME).mk
+include $(SOURCE_DIR)/device-$(DEVICE).mk
+modules := $(addprefix $(SOURCE_DIR)/,$(modules))
+#INCPATH := $(addprefix $(SOURCE_DIR)/,$(cfgpath)) $(addprefix $(SOURCE_DIR)/,$(incpath))
+
+ifneq ($(CONFIG),) 
+INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath)/$(CONFIG))
+endif
+INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath))
+INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
+
+#$(warning INCPATH: $(INCPATH))
+
+################################################################################
+# Determine the full target names and include the toolchain specific makefile
+
+TARGET_NAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
+TARGET_MAP := $(TARGET_NAME).map
+TARGET := $(TARGET_NAME).$(TARGET_TYPE)
+
+include $(SOURCE_DIR)/toolchain-$(TOOLCHAIN).mk
+
+################################################################################
+# Support routines/macros
+
+# $(subdirectory)
+subdirectory = $(patsubst $(SOURCE_DIR)/%/module.mk,%, \
+                 $(word \
+                   $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
+# $(call source-to-object, source-file-list)
+source-to-object = $(subst $(SOURCE_DIR)/,,$(subst .c,.o,$(filter %.c,$1))) \
+                   $(subst $(SOURCE_DIR)/,,$(subst .s,.o,$(filter %.s,$1)))
+
+# $(call make-library, library-name, source-file-list)
+define make-library
+  libraries += $1
+#  sources   += $2
+
+  $1: $(call source-to-object,$2)
+	$(Q) $(AR) $(ARFLAGS) $$@ $$^
+endef
+
+# $(call make-target, source-file-list)
+define make-target
+  sources += $2
+  $1: $(call source-to-object,$2)
+endef
+
+################################################################################
+# As we build in the output tree, let make know where to look for source files
+
+vpath %.c $(SOURCE_DIR)
+vpath %.s $(SOURCE_DIR)
+vpath %.h $(INCPATH)
+vpath %.inc $(INCPATH)
+vpath %.dot $(SOURCE_DIR)
+vpath %.sm $(SOURCE_DIR)
+
+################################################################################
+# The final list of objects and a dependency file for each
+
+objects = $(call source-to-object,$(sources))
+dependencies = $(subst .o,.d,$(objects))
+
+$(warning *******************************************************************************)
+$(warning Building $(TARGET))
+
+$(warning modules: $(subst $(SOURCE_DIR)/,,$(modules)))
+
+all: 
+include $(addsuffix /module.mk,$(modules))
+#include $(patsubst %,$(SOURCE_DIR)/%/module.mk,$(modules))
+
+$(warning library: $(subst $(SOURCE_DIR)/,,$(libraries)))
+
+$(warning incpath: $(incpath))
+#INCPATH += $(incpath)
+#$(warning INCPATH: $(INCPATH))
+INCLUDES += $(addprefix -I,$(INCPATH))
+#$(warning INCLUDES: $(subst -I$(SOURCE_DIR)/,,$(INCLUDES)))
+#$(warning INCLUDES: $(INCLUDES))
+#$(warning objects = $(objects))
+
+#DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
+DEFINES += $(addprefix -D,$(DEVICE)=1 $(DEFS) $(defines))
+$(warning DEFINES: $(subst -D,,$(DEFINES)))
+
+#$(warning *******************************************************************************)
+
+################################################################################
+# Mirror the source tree structure into the build target directory
+
+ifeq ($(OS),Windows_NT) 
+create-output-directories := \
+	$(Q) $(shell for %%f in ($(subst /,\,$(subst $(SOURCE_DIR)/,,$(modules)))); do [ -d %%f ] || $(MKDIR) %%f)
+else
+create-output-directories := \
+	$(shell for f in $(subst $(SOURCE_DIR)/,,$(modules)); do [ -d $$f ] || $(MKDIR) $$f; done)
+endif
+
+################################################################################
+# Define makes targets
+
+.PHONY: all
+all: $(TARGET)
+
+.PHONY: libraries
+libraries: $(libraries)
+
+#.PHONY : clean clean_with_libs
+.PHONY: clean
+clean:
+	$(RM) $(TARGET) $(objects) $(libraries) $(dependencies)
+
+#.PHONY: graph
+#graph: MatrixPilot/FlightState_sm.dot MatrixPilot/FlightState_sm.png
+#graph: MatrixPilot/AppClass_sm.dot MatrixPilot/AppClass_sm.png
+
+show:
+	@echo PROJECT  = $(PROJECT)
+	@echo CONF     = $(CONF)
+	@echo VPATH    = $(VPATH)
+	@echo C_SRCS   = $(C_SRCS)
+	@echo CPP_SRCS = $(CPP_SRCS)
+	@echo C_OBJS_EXT   = $(C_OBJS_EXT)
+	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
+	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
+
+################################################################################
+# Make sure not to generate dependencies when doing cleans
+NODEPS:=clean cleanall cleanlibs cleandirs
+ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
+ifeq ($(V),)
+  -include $(dependencies) # suppress output with -
+else
+  include $(dependencies)
+endif
+endif
+
+################################################################################
+# Dependency and Object generation rules
+
+%.d: %.c
+	$(Q) $(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
+	$(Q) $(MV) $@.tmp $@
+
+%.o: %.c
+	$(Q) $(CC) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+
+%.d: %.s
+	$(Q) $(CC) $(TARGET_ARCH) $(AFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
+	$(Q) $(MV) $@.tmp $@
+
+%.o: %.s
+	$(Q) $(CC) $(TARGET_ARCH) -c -o $@ $< $(AFLAGS),$(subst $(space),$(comma),$(INCLUDES))
+
+################################################################################
+# Library generation rules (note: seems to work without them)
+
+#%.a: %.o
+#	$(Q) $(AR) -ru $@ $<
+
+#%.a: $(objects)
+#	$(AR) -ru $@ $(objects)
+
+################################################################################
+# Windows and *nix target rules
+
+%.exe: $(objects) $(libraries)
+	$(CC) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
+
+%.out: %.exe
+	mv $< $@
+
+################################################################################
+# Microchip build tools rules
+
+%.cof: $(objects) $(libraries)
+	$(CC) $(TARGET_ARCH) -o $@ $(objects) $(libraries) $(LFLAGS) $(LIBS)
+
+%.hex: %.cof
+	$(Q) $(BIN2HEX) $<
+
+%.elf: $(objects) $(libraries)
+	$(CC) $(TARGET_ARCH) $(objects) $(LFLAGS) $(libraries) $(LIBS) -o $@
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary $< $@
+
+################################################################################
+# PixHawk project PX4 loader image generation rules
+
+%.px4: %.bin
+	$(MKFW) --prototype $(SOURCE_DIR)/libSTM/target.prototype --image $< --outfile $@
+	sleep 3
+
+################################################################################
+# State Machine Compiler (SMC) rules
+
+%_sm.h %_sm.c : %.sm
+	$(SMC) $(SMC_FLAGS) $<
+
+%_sm.dot: %.sm
+	$(SMC) -graph -glevel 1 $<
+
+%_sm.png: %_sm.dot
+	$(DOT) -T png -o $@ $<
+
+%_sm.html: %.sm
+	$(SMC) -table $<
