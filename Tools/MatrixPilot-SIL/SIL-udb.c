@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libUDB.h"
+#include "../../libUDB/libUDB.h"
 #include "../../libUDB/magnetometer.h"
 #include "../../libUDB/heartbeat.h"
 #include "SIL-config.h"
@@ -72,11 +72,11 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 
 #endif // WIN
 
-#include "libUDB.h"
-#include "ADchannel.h"
-#include "magnetometer.h"
+//#include "../../libUDB/libUDB.h"
+#include "../../libUDB/ADchannel.h"
+//#include "magnetometer.h"
 #include "magnetometerOptions.h"
-#include "events.h"
+#include "../../libUDB/events.h"
 #include "SIL-udb.h"
 //#include "UDBSocket.h"
 #include "SIL-ui.h"

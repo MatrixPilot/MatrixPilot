@@ -22,7 +22,7 @@
 #include "dcmTypes.h"
 #include "mathlibNAV.h"
 #if (WIN == 1 || NIX == 1)
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #endif // (WIN == 1 || NIX == 1)
 
 //  math libraray
