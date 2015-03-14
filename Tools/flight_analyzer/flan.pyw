@@ -2348,9 +2348,9 @@ def write_csv(options,log_book):
         incidence = angle_of_incidence(rmat, VelocityThruAir)
         aoa_using_velocity = angle_of_attack(rmat,VelocityThruAir)
         if ( abs(entry.roll) > 90 ):
-            aoa_using_pitch = rmat[7] / 287     # creates degrees of pitch : plane is inverted
+            aoa_using_pitch = rmat[7] / 287.0     # creates degrees of pitch : plane is inverted
         else :
-            aoa_using_pitch = - (rmat[7] / 287) # plane is right way up
+            aoa_using_pitch = - (rmat[7] / 287.0) # plane is right way up
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
         elevator_without_trim = elevator_reversal_multiplier * \
                                 (entry.pwm_input[log_book.elevator_output_channel] - elevator_trim_pwm_value) 
