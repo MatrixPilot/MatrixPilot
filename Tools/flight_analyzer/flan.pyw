@@ -2343,8 +2343,10 @@ def write_csv(options,log_book):
         IMUvelocity =   [entry.IMUvelocityx, entry.IMUvelocityy, entry.IMUvelocityz]
         EstimatedWind = [entry.est_wind_x,   entry.est_wind_y,   entry.est_wind_z  ]
         VelocityThruAir = []
-        for i in range(3) :
-            VelocityThruAir.append(IMUvelocity[i] - EstimatedWind[i])
+        VelocityThruAir.append(IMUvelocity[0] - EstimatedWind[0])
+        VelocityThruAir.append(IMUvelocity[1] - EstimatedWind[1])
+        # For purposes of AoA calibration ignore vertical wind as that wind calculation effected by AoA settings
+        VelocityThruAir.append(IMUvelocity[2])
         incidence = angle_of_incidence(rmat, VelocityThruAir)
         aoa_using_velocity = angle_of_attack(rmat,VelocityThruAir)
         if ( abs(entry.roll) > 90 ):
