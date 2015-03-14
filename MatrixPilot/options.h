@@ -516,11 +516,11 @@
 // Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
 
 // The following are the values for HILSIM EasyStar2:
-//#define CRUISE_SPEED							( 12.0 )
-//#define ANGLE_OF_ATTACK_NORMAL				( -0.8 )
-//#define ANGLE_OF_ATTACK_INVERTED				( -7.2 )
-//#define ELEVATOR_TRIM_NORMAL					( -0.03 )
-//#define ELEVATOR_TRIM_INVERTED				( -0.67 )
+#define CRUISE_SPEED						( 12.0 )
+#define ANGLE_OF_ATTACK_NORMAL				( -0.8 )
+#define ANGLE_OF_ATTACK_INVERTED			( -7.2 )
+#define ELEVATOR_TRIM_NORMAL				( -0.03 )
+#define ELEVATOR_TRIM_INVERTED				( -0.67 )
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.
