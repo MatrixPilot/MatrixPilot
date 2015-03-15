@@ -26,6 +26,29 @@ def find(masks, startdir=os.curdir):
 	return fullpath
 
 #
+# configuration from makefile scripts
+#
+def parse_options_file(filename, option):
+	str = ""
+	with open (filename, "r") as file:
+		data = file.read()
+		match = re.search(r"(^" + option + " .= )(.*$)", data, re.MULTILINE)
+		if match:
+			str = match.group(2)
+	return str
+
+#
+# EXAMPLE MAKEFILE/OPTIONS FILE:
+#
+# TOOLCHAIN ?= XC16
+# TARGET_TYPE := hex
+# CPU := 33FJ256GP710A
+# modules := libUDB libDCM MatrixPilot MAVLink
+# incpath := Config Microchip Microchip/Include libVectorMatrix
+#
+
+
+#
 # MPLAB-8 section
 #
 
