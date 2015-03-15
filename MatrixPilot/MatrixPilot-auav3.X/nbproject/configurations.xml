@@ -241,8 +241,8 @@
         <itemPath>../../MAVLink/include/protocol.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="Microchip" projectFiles="true">
-        <itemPath>../../Microchip/Include/MDD File System/FSDefs.h</itemPath>
-        <itemPath>../../Microchip/Include/MDD File System/FSIO.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD-File-System/FSDefs.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD-File-System/FSIO.h</itemPath>
         <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
         <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
         <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
@@ -382,11 +382,11 @@
         <itemPath>../helicalTurnCntrl.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Microchip" projectFiles="true">
-        <itemPath>../../Microchip/MDD File System/FSIO.c</itemPath>
+        <itemPath>../../Microchip/MDD-File-System/FSIO.c</itemPath>
         <itemPath>../../Microchip/USB/usb_device.c</itemPath>
-        <itemPath>../../Microchip/USB/MSD Device Driver/usb_function_msd.c</itemPath>
+        <itemPath>../../Microchip/USB/MSD-Device-Driver/usb_function_msd.c</itemPath>
         <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
-        <itemPath>../../Microchip/USB/CDC Device Driver/usb_function_cdc.c</itemPath>
+        <itemPath>../../Microchip/USB/CDC-Device-Driver/usb_function_cdc.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

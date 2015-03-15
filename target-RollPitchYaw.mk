@@ -2,4 +2,4 @@
 
 modules := RollPitchYaw libDCM
 incpath :=
-cfgpath := RollPitchYaw/Config
+cfgpath := RollPitchYaw
