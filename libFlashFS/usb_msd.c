@@ -27,8 +27,10 @@
 
 #ifdef USE_AT45D_FLASH
 #include "MDD_AT45D.h"
+#elif defined USE_EEPROM_FLASH
+#include "MDD_EEPROM.h"
 #elif defined USE_SD_INTERFACE_WITH_SPI
-#include "MDD File System/SD-SPI.h"
+#include "MDD-File-System/SD-SPI.h"
 #else
 #error here
 #endif // USE_AT45D_FLASH

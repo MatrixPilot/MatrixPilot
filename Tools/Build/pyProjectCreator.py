@@ -228,7 +228,6 @@ def mplabX_project(mcu_type, name, target_board, root_sep, config_dir, includes,
 		data = file.read()
 		data = data.replace("%%NAME%%", name)
 		data = data.replace("%%DEVICE%%", mcu_type)
-		print "config_dir: " + config_dir
 		data = data.replace("%%CONFIG%%", config)
 		data = data.replace("%%INCLUDES%%", includes)
 		data = data.replace("%%TARGET_BOARD%%", target_board)
