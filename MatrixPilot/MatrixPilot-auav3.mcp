@@ -1,7 +1,7 @@
 [HEADER]
 magic_cookie={66E99B07-E706-4689-9E80-9B2582898A13}
 file_version=1.0
-device=dsPIC33FJ256GP710A
+device=dsPIC33EP512MU810
 [PATH_INFO]
 BuildDirPolicy=BuildDirIsProjectDir
 dir_src=
@@ -1118,11 +1118,11 @@ file_082=console.c
 file_083=..\libUDB\read.c
 file_084=..\libUDB\uart.c
 file_085=..\libUDB\write.c
-file_086=..\Microchip\MDD File System\FSIO.c
+file_086=..\Microchip\MDD-File-System\FSIO.c
 file_087=..\Microchip\USB\usb_device.c
-file_088=..\Microchip\USB\MSD Device Driver\usb_function_msd.c
+file_088=..\Microchip\USB\MSD-Device-Driver\usb_function_msd.c
 file_089=..\Microchip\USB\usb_hal_dspic33e.c
-file_090=..\Microchip\USB\CDC Device Driver\usb_function_cdc.c
+file_090=..\Microchip\USB\CDC-Device-Driver\usb_function_cdc.c
 file_091=..\libFlashFS\usb_msd.c
 file_092=..\libFlashFS\usb_cdc.c
 file_093=..\libDCM\gpsParseNMEA.c
@@ -1198,8 +1198,8 @@ file_162=..\Microchip\Include\USB\usb_common.h
 file_163=..\Microchip\Include\USB\usb_device.h
 file_164=..\Microchip\USB\usb_device_local.h
 file_165=..\Microchip\Include\USB\usb_hal.h
-file_166=..\Microchip\Include\MDD File System\FSIO.h
-file_167=..\Microchip\Include\MDD File System\FSDefs.h
+file_166=..\Microchip\Include\MDD-File-System\FSIO.h
+file_167=..\Microchip\Include\MDD-File-System\FSDefs.h
 file_168=..\Microchip\Include\Compiler.h
 file_169=..\Microchip\Include\GenericTypeDefs.h
 file_170=..\Microchip\Include\USB\usb_function_cdc.h
@@ -1380,7 +1380,7 @@ enable=0
 transport=0
 format=0
 [CUSTOM_BUILD]
-Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
+Pre-Build=cscript "$(ProjectDir)..\libUDB\fixDeps.vbs" "$(ProjectDir)options.h" "$(ProjectDir)..\libUDB\fixDeps.h"
 Pre-BuildEnabled=1
 Post-Build=
 Post-BuildEnabled=1
