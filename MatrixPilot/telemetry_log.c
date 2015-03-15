@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#if (AUAV3 == 1)
 
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
@@ -249,3 +250,5 @@ void telemetry_log(void)
 	}
 	log_check();
 }
+
+#endif // (AUAV3 == 1)
