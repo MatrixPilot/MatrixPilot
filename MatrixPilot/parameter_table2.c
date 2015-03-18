@@ -2,7 +2,7 @@
 
 #include "defines.h" 
 
-#if(SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
 #include "parameter_table.h"
 #include "data_storage.h"
@@ -83,7 +83,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
     {"PID_YAWKDAIL" , {0.0} , {0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdail, sizeof(yawkdail) },
     {"PID_PITCHGAIN" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &pitchgain, sizeof(pitchgain) },
     {"PID_PITCHKD" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &pitchkd, sizeof(pitchkd) },
-    {"PID_RUDELEVGAIN" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
+//    {"PID_RUDELEVGAIN" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rudderElevMixGain, sizeof(rudderElevMixGain) },
     {"PID_ROLLKPRUD" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &rollkprud, sizeof(rollkprud) },
     {"PID_YAWKPRUD" , {0.0} , {0.5} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &yawkprud, sizeof(yawkprud) },
     {"PID_YAWKDRUD" , {0.0} , {0.5} , UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*) &yawkdrud, sizeof(yawkdrud) },
@@ -151,5 +151,4 @@ const mavlink_parameter mavlink_parameters_list[] = {
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif 
-
+#endif // (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)

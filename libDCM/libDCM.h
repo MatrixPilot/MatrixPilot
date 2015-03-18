@@ -27,8 +27,8 @@
 #include "libDCM_defines.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// libDCM.h defines the API for accessing the location and orientation information
-// from the DCM algorithm and GPS.
+// libDCM.h defines the API for accessing the location and orientation
+// information from the DCM algorithm and GPS.
 // 
 // Requires libUDB.
 // 

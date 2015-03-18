@@ -1,4 +1,4 @@
-flan.py (which stands for Flight Analyzer)is  UAV Telemetry Analyzer for the
+flan.py (which stands for Flight Analyzer) is an UAV Telemetry Analyzer for the
 UAV DevBoard and it's assocated firmware called MatrixPilot.
 
 It reads output from a telemetry file - and turns it into KML that

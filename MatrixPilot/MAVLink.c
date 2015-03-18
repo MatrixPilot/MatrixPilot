@@ -99,7 +99,7 @@ mavlink_flags_t mavlink_flags;
 mavlink_system_t mavlink_system;
 
 uint16_t mavlink_process_message_handle = INVALID_HANDLE;
-uint8_t handling_of_message_completed = true;
+boolean handling_of_message_completed = true;
 
 uint8_t mavlink_counter_40hz = 0;
 uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
@@ -146,7 +146,7 @@ void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
-#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
+//#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();
@@ -914,7 +914,10 @@ void mavlink_output_40hz(void)
 		int16_t pwOut_max = 4000;
 		mavlink_heading = get_geo_heading_angle();
 		if (THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000;
-		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, (float)(air_speed_3DIMU / 100.0), (float)(ground_velocity_magnitudeXY / 100.0), (int16_t)mavlink_heading,
+		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0,
+		    (float)(air_speed_3DIMU / 100.0),
+		    (float)(ground_velocity_magnitudeXY / 100.0),
+		    (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
 		    ((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
 		    (float) -IMUvelocityz._.W1);

@@ -46,7 +46,7 @@ inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
 void altimeter_calibrate(void)
 {
-	int ground_altitude = alt_origin.WW / 100;    // meters
+	int ground_altitude = alt_origin.WW / 100;    // gps altitude in meters - TODO: this value should be verified valid before use..
 	barometer_temperature_gnd = barometer_temperature;
 	barometer_pressure_gnd = barometer_pressure;
 
