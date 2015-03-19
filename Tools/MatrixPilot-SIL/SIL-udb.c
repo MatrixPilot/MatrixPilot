@@ -72,13 +72,10 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 
 #endif // WIN
 
-//#include "../../libUDB/libUDB.h"
 #include "../../libUDB/ADchannel.h"
-//#include "magnetometer.h"
 #include "magnetometerOptions.h"
 #include "../../libUDB/events.h"
 #include "SIL-udb.h"
-//#include "UDBSocket.h"
 #include "SIL-ui.h"
 #include "SIL-events.h"
 #include "SIL-eeprom.h"
@@ -119,7 +116,7 @@ uint16_t mp_rcon = 3;                           // default RCON state at normal 
 extern int mp_argc;
 extern char **mp_argv;
 
-uint8_t leds[4] = {0, 0, 0, 0};
+uint8_t leds[5] = {0, 0, 0, 0, 0};
 UDBSocket serialSocket;
 uint8_t sil_radio_on;
 
@@ -149,7 +146,7 @@ void udb_init(void)
 {
 	int16_t i;
 
-	// If we were reest:
+	// If we were reset:
 	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
 	{
 		mp_rcon = 128; // enable just the external/MCLR reset bit
@@ -303,7 +300,7 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
-	char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+	const char *args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 
 	sil_ui_will_reset();
 

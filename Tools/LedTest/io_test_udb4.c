@@ -19,6 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#if (UDB4 == 1)
+
 #include "../../libUDB/libUDB.h"
 
 
@@ -333,3 +335,5 @@ void IOTest(void)
 	PMD1bits.AD1MD = 0;
 	PMD3bits.AD2MD = 0;
 }
+
+#endif

@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "SIL-udb.h"
 #include "../../libUDB/libUDB.h"
-//#include "../HILSIM_XPlane/UDBSocket.h"
+#include "UDBSocket.h"
 
 UDBSocket gpsSocket;
 UDBSocket telemetrySocket;
