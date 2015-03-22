@@ -150,7 +150,7 @@ int16_t relativeWingLoading( int16_t wingLoad ,  uint16_t airSpeed )
 	union longww long_signed_accum ;
 	uint16_t unsigned_accum ;
 
-	// if airspeed is less than or equal to stall speed, return zero to turn off the downstream computations
+	// if airspeed is less than or equal to stall speed, return zero
 	if ( airSpeed <= stallSpeed )
 	{
 		return 0 ;
@@ -306,21 +306,33 @@ void helicalTurnCntrl( void )
 	// b = ( y_normal + y_inverted ) / 2.
 	// 2m = ( y_normal - y_inverted ) .
 
-	// compute "x/2", the relative wing loading
-	relativeLoading = relativeWingLoading( estimatedLift , air_speed_3DIMU ) ;
+	// If airspeed is greater than stall speed, compute angle of attack and elevator trim,
+	// otherwise set AoA and trim to zero.
 
-	// multiply x/2 by 2m for angle of attack
-	accum.WW = __builtin_mulss( AOA_SLOPE , relativeLoading ) ;
-	// add mx to b
-	angleOfAttack = AOA_OFFSET + accum._.W1 ;
+	if ( air_speed_3DIMU > STALL_SPEED_CM_SEC )
+	{
+		// compute "x/2", the relative wing loading
+		relativeLoading = relativeWingLoading( estimatedLift , air_speed_3DIMU ) ;
 
-	// project angle of attack into the earth frame
-	accum.WW = ( __builtin_mulss( angleOfAttack , rmat[8] ) ) << 2 ;
-	pitchAdjustAngleOfAttack = accum._.W1 ;	
+		// multiply x/2 by 2m for angle of attack
+		accum.WW = __builtin_mulss( AOA_SLOPE , relativeLoading ) ;
+		// add mx to b
+		angleOfAttack = AOA_OFFSET + accum._.W1 ;
 
-	// similarly, compute elevator trim
-	accum.WW = __builtin_mulss( ELEVATOR_TRIM_SLOPE , relativeLoading ) ;
-	elevatorLoadingTrim = ELEVATOR_TRIM_OFFSET + accum._.W1 ;
+		// project angle of attack into the earth frame
+		accum.WW = ( __builtin_mulss( angleOfAttack , rmat[8] ) ) << 2 ;
+		pitchAdjustAngleOfAttack = accum._.W1 ;	
+
+		// similarly, compute elevator trim
+		accum.WW = __builtin_mulss( ELEVATOR_TRIM_SLOPE , relativeLoading ) ;
+		elevatorLoadingTrim = ELEVATOR_TRIM_OFFSET + accum._.W1 ;
+	}
+	else
+	{
+		angleOfAttack = 0 ;
+		pitchAdjustAngleOfAttack = 0 ;
+		elevatorLoadingTrim = 0 ;
+	}
 	
 	// convert desired turn rate from radians/second to gyro units
 
