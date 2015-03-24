@@ -24,7 +24,8 @@
 #include "../libUDB/heartbeat.h"
 #include "config.h"
 
-#ifdef USE_FREERTOS
+//#ifdef USE_FREERTOS
+#if defined USE_FREERTOS || defined PX4
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -38,9 +39,9 @@ void TriggerGPS(void)
 }
 
 // Got a character from the GPS
-void udb_gps_callback_received_byte(uint8_t rxchar)
-{
-}
+//void udb_gps_callback_received_byte(uint8_t rxchar)
+//{
+//}
 
 static void TaskGPS(void* pvParameters)
 {

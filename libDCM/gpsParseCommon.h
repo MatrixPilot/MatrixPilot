@@ -105,3 +105,6 @@ boolean gps_nav_valid(void);
 // After dead reckoning is complete, this callback may go away.
 void dcm_callback_gps_location_updated(void);   // Callback
 
+const uint8_t* gps_out_buffer_get(void);
+int16_t gps_out_buffer_length_get(void);
+void gps_out_buffer_reset(void);

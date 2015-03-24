@@ -26,7 +26,7 @@
 #include "udbTypes.h"
 
 //#ifdef USE_SILSIM // may move to this style of USE_xxx macro in the future..
-#if (SILSIM == 1)
+#if (SILSIM == 1 || PX4 == 1)
 #define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
 #else
 #define NUM_POINTERS_IN(x)      (sizeof(x)>>1)
@@ -104,10 +104,10 @@
 #endif
 
 // Wind Estimation and Navigation
-// Set this to 1 to use automatic wind estimation and navigation. 
+// Set this to 1 to use automatic wind estimation and navigation.
 // Wind estimation is done using a mathematical model developed by William Premerlani.
 // Every time the plane performs a significant turn, the plane estimates the wind.
-// This facility only requires a working GPS and the UAV DevBoard. 
+// This facility only requires a working GPS and the UAV DevBoard.
 #ifndef WIND_ESTIMATION         // define only if not already defined in options.h
 #define WIND_ESTIMATION         1
 #endif

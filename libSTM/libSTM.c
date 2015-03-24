@@ -218,16 +218,6 @@ void led_off(uint8_t x)
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 }
 
-int32_t gps_baud_rate = 0;
-int32_t serial_baud_rate = 0;
-
-void udb_gps_start_sending_data(void) {}
-void udb_gps_set_rate(int32_t rate) { gps_baud_rate = rate; }
-boolean udb_gps_check_rate(int32_t rate) { return (gps_baud_rate == rate); }
-
-void udb_serial_start_sending_data(void) {}
-void udb_serial_set_rate(int32_t rate) { serial_baud_rate = rate; }
-
 uint16_t register_event_p(void (*event_callback)(void), eventPriority priority) { return 0; }
 void trigger_event(uint16_t hEvent) {}
 
@@ -270,13 +260,45 @@ void heartbeat(void) // called from MPU6000 ISR
 
 void udb_init(void)
 {
+	int16_t i;
+
+	for (i = 0; i < 4; i++)
+	{
+		leds[i] = LED_OFF;
+	}
+
 	udb_heartbeat_counter = 0;
 	udb_flags.B = 0;
+	sil_radio_on = 1;
+
+//	sil_ui_init(mp_rcon);
+
 	MPU6000_init16(&heartbeat);
 }
 
 void udb_run(void)
 {
+//			udb_callback_read_sensors();
+
+			udb_flags._.radio_on = (sil_radio_on &&
+			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN &&
+			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
+
+//			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
+
+			udb_heartbeat_40hz_callback(); // Run at 40Hz
+			udb_heartbeat_callback(); // Run at HEARTBEAT_HZ
+
+//			sil_ui_update();
+
+//			if (udb_heartbeat_counter % (2 * HEARTBEAT_HZ) == 0)
+//			{
+//				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
+//			}
+
+			udb_heartbeat_counter++;
+//			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
+//			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
 }
 
 void udb_background_trigger(background_callback callback)
@@ -299,7 +321,7 @@ void udb_background_trigger(background_callback callback)
   * @param  None
   * @retval None
   */
-PUTCHAR_PROTOTYPE
+PUTCHAR_PROTOTYPE      //  __io_putchar()
 {
 // CONSOLE_UART
   /* Place your implementation of fputc here */
@@ -384,7 +406,7 @@ char GetChar(void)
 	}
 	else
 	{
-		status = HAL_UART_Receive(&huart6, &Data[0], 1, 0);
+		status = HAL_UART_Receive(&huart2, &Data[0], 1, 0);
 		if (status == HAL_OK)
 		{
 			Temp = Data[0];
@@ -394,23 +416,49 @@ char GetChar(void)
 	return Temp;
 }
 
+/*
+void UART_PutChar(UART_HandleTypeDef *huart, char ch);
+void UART_PutChar(UART_HandleTypeDef *huart, char ch)
+{
+	if (UART_WaitOnFlagUntilTimeout(huart, UART_FLAG_TXE, RESET, 0xffff) == HAL_OK)
+	{
+		huart->Instance->DR = ch;
+	}
+}
+static HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_t Flag, FlagStatus Status, uint32_t Timeout);
+//HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+ */
 void PutChar(char ch)
 {
-	HAL_StatusTypeDef status;
+//	HAL_StatusTypeDef status;
 
-//HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+//	status = HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+//	if (status == HAL_OK)
+//	{
+//	}
 
-	status = HAL_UART_Transmit(&huart6, &ch, 1, 0);
-	if (status == HAL_OK)
+
+	while(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TXE) == RESET)
 	{
 	}
+	huart2.Instance->DR = ch;
 
-//	U##x##TXREG = ch;
-//	while (U##x##STAbits.TRMT == 0);
+//	UART_PutChar(&huart2, ch);
 }
 
 void FSInit(void) {}
 
 void vApplicationTickHook(void) {}
+
+
+int tsirq = 0;
+
+void TAMP_STAMP_IRQHandler(void)
+{
+	tsirq = 1;
+}
+
+
+
 
 #endif // (BOARD_TYPE == PX4_BOARD)

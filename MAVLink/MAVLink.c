@@ -60,12 +60,8 @@
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/servoOut.h"
-#include "../libUDB/serialIO.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
-//#include "../MatrixPilot/parameter_table.h"
-#include "../MatrixPilot/telemetry_log.h"
-#include "../MatrixPilot/telemetry.h"
 #include "../MatrixPilot/euler_angles.h"
 #include "../MatrixPilot/navigate.h"
 #include "../MatrixPilot/config.h"
@@ -73,8 +69,6 @@
 #include <stdarg.h>
 #include <math.h>
 
-
-//int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 mavlink_message_t last_msg;
@@ -101,31 +95,25 @@ mavlink_status_t r_mavlink_status;
 #include "../MAVLink/include/matrixpilot/testsuite.h"
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
-uint8_t mavlink_system_status = MAV_STATE_UNINIT;
+static uint8_t mavlink_system_status = MAV_STATE_UNINIT;
 mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 
-#define	SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
 #define	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Convert 16 bit byte circular to radians
 
 mavlink_flags_t mavlink_flags;
 mavlink_system_t mavlink_system;
 
-uint16_t mavlink_process_message_handle = INVALID_HANDLE;
-uint8_t handling_of_message_completed = true;
+static uint16_t mavlink_process_message_handle = INVALID_HANDLE;
+static uint8_t handling_of_message_completed = true;
 
-uint8_t mavlink_counter_40hz = 0;
-uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
-uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+static uint8_t mavlink_counter_40hz = 0;
+static uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+static uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 
-int16_t sb_index = 0;
-int16_t end_index = 0;
-char serial_interrupt_stopped = 1;
-uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
-
-uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
-uint16_t mavlink_command_ack_command = 0;
-boolean mavlink_send_command_ack = false;
-uint16_t mavlink_command_ack_result = 0;
+static uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
+static uint16_t mavlink_command_ack_command = 0;
+static boolean mavlink_send_command_ack = false;
+static uint16_t mavlink_command_ack_result = 0;
 
 static void handleMessage(void);
 #if (USE_NV_MEMORY == 1)
@@ -134,7 +122,7 @@ inline void preflight_storage_complete_callback(boolean success);
 #endif // (USE_NV_MEMORY == 1)
 
 
-void init_mavlink(void)
+static void mavlink_init(void)
 {
 	int16_t index;
 
@@ -166,67 +154,11 @@ void telemetry_init(void)
 #pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
-	init_mavlink();
+	mavlink_init();
 }
 
 void telemetry_restart(void)
 {
-}
-
-int16_t udb_serial_callback_get_byte_to_send(void)
-{
-	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
-	{
-		uint8_t txchar = serial_buffer[sb_index++];
-		return txchar;
-	}
-	else
-	{
-		serial_interrupt_stopped = 1;
-	}
-	return -1;
-}
-
-//int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
-int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len) // RobD
-// Note: Channel Number, chan, is currently ignored.
-{
-	int16_t start_index;
-	int16_t remaining;
-
-#if (USE_TELELOG == 1)
-//printf("calling log_telemetry with %u bytes\r\n", len);
-	log_telemetry(buf, len);
-#endif // USE_TELELOG
-
-	// Note at the moment, all channels lead to the one serial port
-	if (serial_interrupt_stopped == 1)
-	{
-		sb_index = 0;
-		end_index = 0;
-	}
-	start_index = end_index;
-	remaining = SERIAL_BUFFER_SIZE - start_index;
-
-//	printf("%u\r\n", remaining);
-
-	if (len > remaining)
-	{
-		// Chuck away the entire packet, as sending partial packet
-		// will break MAVLink CRC checks, and so receiver will throw it away anyway.
-		return (-1);
-	}
-	if (remaining > 1)
-	{
-		memcpy(&serial_buffer[start_index], buf, len);
-		end_index = start_index + len;
-	}
-	if (serial_interrupt_stopped == 1)
-	{
-		serial_interrupt_stopped = 0;
-		udb_serial_start_sending_data();
-	}
-	return (1);
 }
 
 void mav_printf(const char* format, ...)
@@ -323,15 +255,16 @@ void send_text(uint8_t text[])
 // MAIN MATRIXPILOT MAVLINK CODE FOR RECEIVING COMMANDS FROM THE GROUND CONTROL STATION
 //
 
-mavlink_message_t msg[2];
-uint8_t mavlink_message_index = 0;
-mavlink_status_t r_mavlink_status;
+static mavlink_message_t msg[2];
+static uint8_t mavlink_message_index = 0;
+static mavlink_status_t r_mavlink_status;
 
-void udb_serial_callback_received_byte(uint8_t rxchar)
+//void udb_serial_callback_received_byte(uint8_t byte)
+void mavlink_input_byte(uint8_t byte)
 {
-//	DPRINT("%u \r\n", rxchar);
+//	DPRINT("%u \r\n", byte);
 
-	if (mavlink_parse_char(0, rxchar, &msg[mavlink_message_index], &r_mavlink_status))
+	if (mavlink_parse_char(0, byte, &msg[mavlink_message_index], &r_mavlink_status))
 	{
 		// Check that handling of previous message has completed before calling again
 		if (handling_of_message_completed == true)
@@ -650,7 +583,7 @@ void MAVLinkSetMode(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_SET_MODE:
 				break;
 		}
 	}
-}	
+}
 
 // Portions of the following code in handlesmessage() are templated off source code written by James Goppert for the
 // ArdupilotMega, and are used by his kind permission and also in accordance with the GPS V3 licensing
@@ -732,9 +665,9 @@ typedef struct __mavlink_message {
 		default:
 			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
 			break;
-	} // end switch
+	}
 	handling_of_message_completed = true;
-} // end handle mavlink
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -896,7 +829,7 @@ void mavlink_output_40hz(void)
 			mavlink_base_mode = MAV_MODE_TEST_ARMED; // Unknown state
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL;
 		}
-#if 0 
+#if 0
 enum MAV_STATE
 {
 	MAV_STATE_UNINIT=0, /* Uninitialized system, state is unknown. | */
@@ -964,7 +897,8 @@ enum MAV_STATE
 
 		mavlink_heading = get_geo_heading_angle() * 100;    // mavlink global position expects heading value x 100
 		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon, alt, relative_alt,
-		    -IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity  normal units are in cm / second
+		    -IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity upper word gives V in cm / second
+		        // MAVLink is using North,East,Down Frame (NED). MatrixPilot IMUVelocity is in earth frame (X is East, Y is North, Z is Up)
 		    mavlink_heading); // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
 		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
 		//   int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg)
@@ -1003,7 +937,7 @@ enum MAV_STATE
 // TODO: investigate why earth_yaw_velocity occasionally spikes with a value of over 50 or below 50..
 //		if (earth_yaw_velocity > 40.0 || earth_yaw_velocity < -40.0) {
 //			time_t ltime;
-//			time(&ltime); 
+//			time(&ltime);
 //			DPRINT("earth_yaw_velocity %f earth_yaw %f  previous_earth_yaw %f ", earth_yaw_velocity, earth_yaw, previous_earth_yaw);
 //			DPRINT("streamRates %u ", (unsigned int)streamRates[MAV_DATA_STREAM_POSITION]);
 //			DPRINT("%s\r\n", ctime(&ltime));

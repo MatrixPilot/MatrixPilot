@@ -311,7 +311,9 @@ if __name__ == '__main__':
 	opts.includes = opts.includes + parse_options_file(target_mk_path, "incpath").split(' ')
 	opts.config   = opts.config   + parse_options_file(target_mk_path, "cfgpath")
 
-#	print "modules1 =", opts.modules
+	opts.out = opts.root + "/build"
+	opts.file = opts.root + "/device-" + opts.target + ".mk"
+
 	if opts.file != "":
 		opts.modules = opts.modules + parse_options_file(opts.file, "modules").split(' ')
 #		print "modules2 =", opts.modules

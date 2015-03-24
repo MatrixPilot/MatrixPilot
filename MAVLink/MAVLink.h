@@ -70,6 +70,7 @@ extern mavlink_flags_t mavlink_flags;
 
 //boolean mavlink_check_target(uint8_t target_system, uint8_t target_component);
 
+void mavlink_input_byte(uint8_t byte);
 void mavlink_output_40hz(void);
 
 

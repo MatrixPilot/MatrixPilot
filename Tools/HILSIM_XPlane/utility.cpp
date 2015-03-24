@@ -149,16 +149,16 @@ void FLIGHTtoBCBF(float &x, float &y, float &z, float alpha, float beta)
 	float Sa = sin(alpha);
 	float Sb = sin(beta);
 
-    // The following was prior to 23/1/2014, before Bill's analysis
+	// The following was prior to 23/1/2014, before Bill's analysis
 	//float X_plane =  (x * Ca * Cb)  - (y * Sb) - (z * Sa * Cb);
 	//float Y_plane =  (x * Ca * Sb)  + (y * Cb) - (z * Sa * Sb);
 	//float Z_plane =  (x * Sa)       + (z * Ca);
-    
-    // New conversion taken from page 18 of "Small Unmanned Aircraft, Theory and Practice":
-    // Randall W. Beard; Timothy W. McLain
-    float X_plane = (x * Cb * Ca) - (y * Sb * Ca) - (z * Sa);
-    float Y_plane = (x * Sb ) + (y * Cb);
-    float Z_plane = (x * Cb * Sa) - (y * Sb * Sa) + (z *Ca);
+
+	// New conversion taken from page 18 of "Small Unmanned Aircraft, Theory and Practice":
+	// Randall W. Beard; Timothy W. McLain
+	float X_plane = (x * Cb * Ca) - (y * Sb * Ca) - (z * Sa);
+	float Y_plane = (x * Sb ) + (y * Cb);
+	float Z_plane = (x * Cb * Sa) - (y * Sb * Sa) + (z *Ca);
 
 	x = X_plane;
 	y = Y_plane;

@@ -23,7 +23,8 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "../libUDB/heartbeat.h"
 
-#ifdef USE_FREERTOS
+//#ifdef USE_FREERTOS
+#if defined USE_FREERTOS || defined PX4
 
 #include "FreeRTOS.h"
 #include "task.h"

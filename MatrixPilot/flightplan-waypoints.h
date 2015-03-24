@@ -26,8 +26,6 @@
 //#define USE_DYNAMIC_WAYPOINTS
 #define MAX_WAYPOINTS 20
 
-extern int16_t waypointIndex;
-
 vect3_32t getWaypoint3D(uint16_t wp);
 int16_t waypoint_count(void);
 void set_waypoint(int16_t index);

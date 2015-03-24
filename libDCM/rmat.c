@@ -752,6 +752,7 @@ static void calibrate_gyros(void)
 	int32_t calib_accum;
 	int16_t gain_change;
 	uint16_t spin_rate_over2;
+
 	if (spin_rate > (uint16_t) (MINIMUM_SPIN_RATE_GYRO_CALIB * DEGPERSEC))
 	{
 		spin_rate_over2 = spin_rate>>1;

@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#error this header is deprecated
 
 #ifndef FLIGHTPLAN_WAYPOINTS_H
 #define FLIGHTPLAN_WAYPOINTS_H
@@ -26,15 +27,11 @@
 #define USE_DYNAMIC_WAYPOINTS
 #define MAX_WAYPOINTS 50
 
-void init_waypoints(void);
-
 vect3_32t getWaypoint3D(uint16_t wp);
 int16_t waypoint_count(void);
 void set_waypoint(int16_t index);
-
 void clear_flightplan(void);
 void add_waypoint(struct waypoint3D wp, int16_t flags);
-
 
 void flightplan_waypoints_init(void);
 void flightplan_waypoints_begin(int16_t flightplanNum);

@@ -489,7 +489,7 @@ static void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
 		if (packet.param_index != -1)
 		{
 //			DPRINT("Requested specific parameter %u %u\r\n", packet.param_index, count_of_parameters_list);
-			DPRINT("Requested specific parameter %u %s\r\n", packet.param_index, (const char*)packet.param_id);
+			DPRINT("Requested specific parameter %i %s\r\n", packet.param_index, (const char*)packet.param_id);
 			if ((packet.param_index >= 0) && (packet.param_index <= count_of_parameters_list))
 			{
 				send_by_index = packet.param_index;

@@ -354,7 +354,7 @@ static void update_flight_time(void)
 	serial_send_location(OSD_LOC_WP_NO);
 	if (mp_mode >= MODE_WAYPOINT)
 	{
-		serial_send_int(waypointIndex, 0, 0);
+		serial_send_int(flightplan_logo_index_get(), 0, 0);
 	} 
 	else
 	{

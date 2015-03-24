@@ -286,6 +286,10 @@ void udb_set_action_state(boolean newValue)
 
 void udb_a2d_record_offsets(void)
 {
+}
+/*
+void udb_a2d_record_offsets(void)
+{
 	UDB_XACCEL.offset = UDB_XACCEL.value;
 	udb_xrate.offset  = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
@@ -294,6 +298,7 @@ void udb_a2d_record_offsets(void)
 	udb_zrate.offset  = udb_zrate.value;
 	udb_vref.offset   = udb_vref.value;
 }
+ */
 
 uint16_t get_reset_flags(void)
 {

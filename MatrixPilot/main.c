@@ -25,7 +25,7 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
 #include "states.h"
-#include "flightplan_waypoints.h"
+#include "flightplan-waypoints.h"
 #include <setjmp.h>
 
 #include "../libFlashFS/filesys.h"
@@ -44,7 +44,7 @@
 
 void init_tasks(void);
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 void parameter_table_init(void);
 #endif
 
@@ -89,12 +89,12 @@ int main(void)
 
 	if (setjmp(buf))
 	{
-		// a processor exception occurred and we're resuming execution here 
+		// a processor exception occurred and we're resuming execution here
 		DPRINT("longjmp'd\r\n");
 	}
 
 #ifdef _MSC_VER
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 	parameter_table_init();
 #endif // SERIAL_OUTPUT_FORMAT
 #endif // _MSC_VER
@@ -198,12 +198,12 @@ int main(void)
 
 	if (setjmp(buf))
 	{
-		// a processor exception occurred and we're resuming execution here 
+		// a processor exception occurred and we're resuming execution here
 		DPRINT("longjmp'd\r\n");
 	}
 
 #ifdef _MSC_VER
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 	parameter_table_init();
 #endif // SERIAL_OUTPUT_FORMAT
 #endif // _MSC_VER
@@ -232,7 +232,7 @@ void idle_task(void)
 }
 
 #endif // 0
-
+#if 0
 void vApplicationMallocFailedHook(void)
 {
 	/* vApplicationMallocFailedHook() will only be called if
@@ -250,3 +250,4 @@ void vApplicationMallocFailedHook(void)
 //	taskDISABLE_INTERRUPTS();
 	for( ;; );
 }
+#endif

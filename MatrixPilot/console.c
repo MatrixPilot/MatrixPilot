@@ -97,7 +97,7 @@ static void cmd_dir(char* arg)
 	char* fileName = "*.*";
 
 //int FindFirst(const char* fileName, unsigned int attr, SearchRec* rec);
-//int FindNext(SearchRec* rec); 
+//int FindNext(SearchRec* rec);
 
 	if (arg != NULL) {
 		fileName = arg;
@@ -289,6 +289,10 @@ static void cmd_uart(char* arg)
 	printf("\tU1MODE = %s\r\n", word_to_binary(U1MODE));
 	printf("\tU1STA  = %s\r\n", word_to_binary(U1STA));
 	printf("\tU1BRG  = %s\r\n", word_to_binary(U1BRG));
+#else
+	printf("sending test data to uart 6... ");
+	Test_HAL_UART_Transmit_IT();
+	printf("done.\r\n");
 #endif
 }
 
@@ -398,7 +402,7 @@ double gcdist(double lat1, double lon1, double lat2, double lon2) // Compute dis
 //	double p1, p2;
 
 //	p1 = pow((sin((lat1 - lat2) / 2)), 2);
-//	p2 = 
+//	p2 =
 	result = 2 * asin(sqrt( pow((sin((lat1 - lat2) / 2)), 2) + cos(lat1) * cos(lat2) * pow((sin((lon1 - lon2) / 2)), 2)));
 	return result;
 }
@@ -502,13 +506,11 @@ void console_inbyte(char ch)
 			cmdstr[cmdlen] = '\0';
 //			cmdlen = 0;
 			if (strlen(cmdstr) > 0) {
-//				putch('\r');
 				printf("\r");
 				command(cmdstr, cmdlen);
 			}
 			cmdlen = 0;
 		} else {
-//			putch(ch);
 			printf("%c", ch);
 			cmdlen++;
 		}

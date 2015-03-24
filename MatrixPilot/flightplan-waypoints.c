@@ -23,7 +23,7 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "cameraCntrl.h"
-#include "flightplan_waypoints.h"
+#include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsData.h"
 #include "../MAVLink/MAVLink.h"
@@ -147,7 +147,6 @@ void add_waypoint(struct waypoint3D wp, int16_t flags)
 	}
 #else
 	DPRINT("Must define USE_DYNAMIC_WAYPOINTS in order to add waypoints\r\n");
-
 #endif // USE_DYNAMIC_WAYPOINTS
 }
 /*
@@ -390,7 +389,7 @@ void flightplan_waypoints_update(void)
 	//       velocities are in centimeters per second
 
 	// locations have a range of +-32000 meters (20 miles) from origin
-	
+
 	if (desired_behavior._.altitude)
 	{
 		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t)HEIGHT_MARGIN))

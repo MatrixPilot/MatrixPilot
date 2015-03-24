@@ -132,6 +132,46 @@ void init_uart_stdio(unsigned long baud)
 }
 #endif
 
+int trap_handling = 0;
+/*
+int _read(int file, char *ptr, int len) {
+    int n;
+    int num = 0;
+    switch (file) {
+    case STDIN_FILENO:
+        for (n = 0; n < len; n++) {
+            char c = Usart1Get();
+            *ptr++ = c;
+            num++;
+        }
+        break;
+    default:
+        errno = EBADF;
+        return -1;
+    }
+    return num;
+}
+
+int _write(int file, char *ptr, int len) {
+    int n;
+    switch (file) {
+    case STDOUT_FILENO: // stdout
+        for (n = 0; n < len; n++) {
+            Usart1Put(*ptr++ & (uint16_t)0x01FF);
+        }
+        break;
+    case STDERR_FILENO: // stderr
+        for (n = 0; n < len; n++) {
+            Usart1Put(*ptr++ & (uint16_t)0x01FF);
+        }
+        break;
+    default:
+        errno = EBADF;
+        return -1;
+    }
+    return len;
+}
+ */
 int _write(int file, char *ptr, int len)
 {
 #if 0
@@ -147,7 +187,14 @@ int _write(int file, char *ptr, int len)
 
 	for (DataIdx = 0; DataIdx < len; DataIdx++)
 	{
-	   __io_putchar( *ptr++ );
+		if (trap_handling)
+		{
+			PutChar(*ptr++);
+		}
+		else
+		{
+			__io_putchar( *ptr++ );
+		}
 	}
 #endif
 	return len;

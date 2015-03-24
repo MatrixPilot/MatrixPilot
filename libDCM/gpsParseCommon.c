@@ -55,6 +55,13 @@ static const uint8_t* gps_out_buffer = 0;
 static int16_t gps_out_buffer_length = 0;
 static int16_t gps_out_index = 0;
 
+const uint8_t* gps_out_buffer_get(void) { return gps_out_buffer; }
+int16_t gps_out_buffer_length_get(void) { return gps_out_buffer_length; }
+void gps_out_buffer_reset(void)
+{
+	gps_out_buffer = 0;
+	gps_out_buffer_length = 0;
+}
 
 int32_t get_gps_date(void)
 {
@@ -262,7 +269,7 @@ int32_t calculate_time_of_week(int32_t time)
 	uint8_t s;
 	uint8_t m;
 	uint8_t h;
-	
+
 //	DPRINT("time %li\r\n", time);
 
 	// Convert time from HHMMSSmil to time_of_week in ms

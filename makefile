@@ -201,16 +201,16 @@ all:
 include $(addsuffix /module.mk,$(modules))
 #include $(patsubst %,$(SOURCE_DIR)/%/module.mk,$(modules))
 
-$(warning libraries: $(subst $(SOURCE_DIR)/,,$(libraries)))
-
-DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
-$(warning DEFINES: $(subst -D,,$(DEFINES)))
+$(warning library: $(subst $(SOURCE_DIR)/,,$(libraries)))
 
 INCPATH += $(incpath)
 $(warning INCPATH: $(INCPATH))
 INCLUDES += $(addprefix -I,$(INCPATH))
 #$(warning INCLUDES: $(subst -I$(SOURCE_DIR)/,,$(INCLUDES)))
 #$(warning objects = $(objects))
+
+DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
+$(warning DEFINES: $(subst -D,,$(DEFINES)))
 #$(warning *******************************************************************************)
 
 ################################################################################
