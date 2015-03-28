@@ -428,7 +428,7 @@ static int16_t telemetry_counter = 12;
 
 void restart_telemetry(void)
 {
-	telemetry_counter = 12;
+	telemetry_counter = 11;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
@@ -539,41 +539,33 @@ void serial_output_8hz(void)
 	switch (telemetry_counter)
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
-		case 12:
+		case 11:
 			serial_output("F15:IDA=");
 			serial_output(ID_VEHICLE_MODEL_NAME);
 			serial_output(":IDB=");
 			serial_output(ID_VEHICLE_REGISTRATION);
 			serial_output(":\r\n");
 			break;
-		case 11:
+		case 10:
 			serial_output("F16:IDC=");
 			serial_output(ID_LEAD_PILOT);
 			serial_output(":IDD=");
 			serial_output(ID_DIY_DRONES_URL);
 			serial_output(":\r\n");
 			break;
-		case 10:
+		case 9:
 			serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
 			    FEED_FORWARD, TURN_RATE_NAV, TURN_RATE_FBW);
 			break;
-		case 9:
+		case 8:
 			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
 			    ANGLE_OF_ATTACK_NORMAL, ANGLE_OF_ATTACK_INVERTED, ELEVATOR_TRIM_NORMAL,
 			    ELEVATOR_TRIM_INVERTED, CRUISE_SPEED);
 			break;
-		case 8:
+		case 7:
 			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",
 			    AILERON_OUTPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_OUTPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
 			    THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
-			break;
-		case 7:
-			serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
-			for (i = 1; i <= NUM_INPUTS; i++)
-			{
-				serial_output("%i,",udb_pwTrim[i]);
-			}
-			serial_output(":\r\n");
 			break;
 		case 6:
 			serial_output("F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
@@ -696,9 +688,15 @@ extern int16_t udb_magOffset[3];
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-				if (udb_heartbeat_counter % 10 != 0) return;
+				if (toggle) return;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
+                                serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
+                                for (i = 1; i <= NUM_INPUTS; i++)
+                                {
+                                        serial_output("%i,",udb_pwTrim[i]);
+                                }
+                                serial_output(":\r\n");
 				flags._.f13_print_req = 0;
 			}
 			break;
