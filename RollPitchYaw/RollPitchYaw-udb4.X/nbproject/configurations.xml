@@ -3,16 +3,50 @@
   <logicalFolder name="root" displayName="root"
   projectFiles="true">
     <logicalFolder name="HeaderFiles" displayName="Header Files"
-    projectFiles="true">      <logicalFolder name="RollPitchYaw" displayName="RollPitchYaw" projectFiles="true">
+    projectFiles="true">      <logicalFolder name="RollPitchYaw/Config" displayName="RollPitchYaw/Config" projectFiles="true">
+        <itemPath>../../RollPitchYaw/Config/FSconfig.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/magnetometerOptions.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/nv_memory_options.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/options.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/osd_config.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/ports_config.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="RollPitchYaw" displayName="RollPitchYaw" projectFiles="true">
+      <logicalFolder name="Config" displayName="Config" projectFiles="true">
+        <itemPath>../../RollPitchYaw/Config/FSconfig.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/magnetometerOptions.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/nv_memory_options.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/options.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/osd_config.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/ports_config.h</itemPath>
+      </logicalFolder>
         <itemPath>../../RollPitchYaw/options.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/dcmTypes.h</itemPath>
+        <itemPath>../../libDCM/deadReckoning.h</itemPath>
+        <itemPath>../../libDCM/estAltitude.h</itemPath>
+        <itemPath>../../libDCM/estLocation.h</itemPath>
+        <itemPath>../../libDCM/estWind.h</itemPath>
+        <itemPath>../../libDCM/estYawDrift.h</itemPath>
+        <itemPath>../../libDCM/gpsData.h</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
+        <itemPath>../../libDCM/libDCM.h</itemPath>
+        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
+        <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/mathlib.h</itemPath>
+        <itemPath>../../libDCM/mathlibNAV.h</itemPath>
+        <itemPath>../../libDCM/rmat.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ADchannel.h</itemPath>
         <itemPath>../../libUDB/analogs.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
+        <itemPath>../../libUDB/builtins.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigHILSIM.h</itemPath>
+        <itemPath>../../libUDB/ConfigPX4.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
         <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.h</itemPath>
@@ -38,24 +72,45 @@
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/dcmTypes.h</itemPath>
-        <itemPath>../../libDCM/deadReckoning.h</itemPath>
-        <itemPath>../../libDCM/estAltitude.h</itemPath>
-        <itemPath>../../libDCM/estLocation.h</itemPath>
-        <itemPath>../../libDCM/estWind.h</itemPath>
-        <itemPath>../../libDCM/estYawDrift.h</itemPath>
-        <itemPath>../../libDCM/gpsData.h</itemPath>
-        <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
-        <itemPath>../../libDCM/libDCM.h</itemPath>
-        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
-        <itemPath>../../libDCM/libDCM_internal.h</itemPath>
-        <itemPath>../../libDCM/mathlib.h</itemPath>
-        <itemPath>../../libDCM/mathlibNAV.h</itemPath>
-        <itemPath>../../libDCM/rmat.h</itemPath>
-      </logicalFolder>
       <logicalFolder name="libVectorMatrix" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>../../libFlashFS/AT45D.h</itemPath>
+        <itemPath>../../libFlashFS/EEPROM.h</itemPath>
+        <itemPath>../../libFlashFS/filesys.h</itemPath>
+        <itemPath>../../libFlashFS/FSconfig.h</itemPath>
+        <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
+        <itemPath>../../libFlashFS/MDD_EEPROM.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
+        <itemPath>../../Microchip/HardwareProfile.h</itemPath>
+      <logicalFolder name="Include" displayName="Include" projectFiles="true">
+        <itemPath>../../Microchip/Include/Compiler.h</itemPath>
+        <itemPath>../../Microchip/Include/GenericTypeDefs.h</itemPath>
+      <logicalFolder name="MDD-File-System" displayName="MDD-File-System" projectFiles="true">
+        <itemPath>../../Microchip/Include/MDD-File-System/FSDefs.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD-File-System/FSIO.h</itemPath>
+        <itemPath>../../Microchip/Include/MDD-File-System/SD-SPI.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="USB" displayName="USB" projectFiles="true">
+        <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_function_cdc.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
+        <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
+      </logicalFolder>
+      </logicalFolder>
+        <itemPath>../../Microchip/NetConfig.h</itemPath>
+        <itemPath>../../Microchip/Sockets.h</itemPath>
+      <logicalFolder name="USB" displayName="USB" projectFiles="true">
+        <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
+      </logicalFolder>
+        <itemPath>../../Microchip/usb_cdc.h</itemPath>
+        <itemPath>../../Microchip/usb_config.h</itemPath>
       </logicalFolder>
 </logicalFolder>
     <logicalFolder name="LinkerScript" displayName="Linker Files"
@@ -63,6 +118,25 @@
     <logicalFolder name="SourceFiles" displayName="Source Files"
     projectFiles="true">      <logicalFolder name="RollPitchYaw" displayName="RollPitchYaw" projectFiles="true">
         <itemPath>../../RollPitchYaw/main.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/deadReckoning.c</itemPath>
+        <itemPath>../../libDCM/estAirspeed.c</itemPath>
+        <itemPath>../../libDCM/estAltitude.c</itemPath>
+        <itemPath>../../libDCM/estLocation.c</itemPath>
+        <itemPath>../../libDCM/estWind.c</itemPath>
+        <itemPath>../../libDCM/estYawDrift.c</itemPath>
+        <itemPath>../../libDCM/gpsData.c</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
+        <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
+        <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
+        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
+        <itemPath>../../libDCM/hilsim.c</itemPath>
+        <itemPath>../../libDCM/libDCM.c</itemPath>
+        <itemPath>../../libDCM/mathlib.c</itemPath>
+        <itemPath>../../libDCM/mathlibNAV.c</itemPath>
+        <itemPath>../../libDCM/rmat.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/24LC256.c</itemPath>
@@ -75,6 +149,7 @@
         <itemPath>../../libUDB/barometer.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
+        <itemPath>../../libUDB/fbcl.s</itemPath>
         <itemPath>../../libUDB/heartbeat.c</itemPath>
         <itemPath>../../libUDB/I2C1.c</itemPath>
         <itemPath>../../libUDB/I2C2.c</itemPath>
@@ -96,26 +171,6 @@
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/deadReckoning.c</itemPath>
-        <itemPath>../../libDCM/estAirspeed.c</itemPath>
-        <itemPath>../../libDCM/estAltitude.c</itemPath>
-        <itemPath>../../libDCM/estLocation.c</itemPath>
-        <itemPath>../../libDCM/estWind.c</itemPath>
-        <itemPath>../../libDCM/estYawDrift.c</itemPath>
-        <itemPath>../../libDCM/fbcl.s</itemPath>
-        <itemPath>../../libDCM/gpsData.c</itemPath>
-        <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
-        <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
-        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
-        <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
-        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
-        <itemPath>../../libDCM/hilsim.c</itemPath>
-        <itemPath>../../libDCM/libDCM.c</itemPath>
-        <itemPath>../../libDCM/mathlib.c</itemPath>
-        <itemPath>../../libDCM/mathlibNAV.c</itemPath>
-        <itemPath>../../libDCM/rmat.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="libVectorMatrix" displayName="libVectorMatrix" projectFiles="true">
         <itemPath>../../libVectorMatrix/madd.s</itemPath>
         <itemPath>../../libVectorMatrix/mmul.s</itemPath>
@@ -135,6 +190,36 @@
         <itemPath>../../libVectorMatrix/vscl.s</itemPath>
         <itemPath>../../libVectorMatrix/vsub.s</itemPath>
         <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
+        <itemPath>../../libFlashFS/AT45D.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
+        <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
+        <itemPath>../../libFlashFS/EEPROM.c</itemPath>
+        <itemPath>../../libFlashFS/EEPROM_FS.c</itemPath>
+        <itemPath>../../libFlashFS/filesys.c</itemPath>
+        <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
+        <itemPath>../../libFlashFS/MDD_EEPROM.c</itemPath>
+        <itemPath>../../libFlashFS/usb.c</itemPath>
+        <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
+        <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
+        <itemPath>../../libFlashFS/usb_msd.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
+      <logicalFolder name="MDD-File-System" displayName="MDD-File-System" projectFiles="true">
+        <itemPath>../../Microchip/MDD-File-System/FSIO.c</itemPath>
+        <itemPath>../../Microchip/MDD-File-System/SD-SPI.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="USB" displayName="USB" projectFiles="true">
+      <logicalFolder name="CDC-Device-Driver" displayName="CDC-Device-Driver" projectFiles="true">
+        <itemPath>../../Microchip/USB/CDC-Device-Driver/usb_function_cdc.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="MSD-Device-Driver" displayName="MSD-Device-Driver" projectFiles="true">
+        <itemPath>../../Microchip/USB/MSD-Device-Driver/usb_function_msd.c</itemPath>
+      </logicalFolder>
+        <itemPath>../../Microchip/USB/usb_device.c</itemPath>
+        <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
+      </logicalFolder>
       </logicalFolder>
 </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -202,7 +287,7 @@
         <property key="enable-symbols" value="true" />
         <property key="enable-unroll-loops" value="false" />
         <property key="extra-include-directories"
-        value="../../../RollPitchYaw;../../MAVLink/include;../../Microchip;../../Microchip/include" />
+        value="../../RollPitchYaw/Config;../../;../../Microchip;../../Microchip/Include;../../libVectorMatrix" />
         <property key="isolate-each-function" value="false" />
         <property key="keep-inline" value="false" />
         <property key="oXC16gcc-align-arr" value="false" />
