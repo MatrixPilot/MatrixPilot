@@ -33,6 +33,10 @@
 #include "../libSTM/libSTM.h"
 #endif
 
+#if (SIL == 1)
+#define SILSIM                              1
+#endif
+
 #if (WIN == 1 || NIX == 1)
 #define inline __inline
 #define SILSIM                              1
@@ -83,7 +87,7 @@
 #endif
 #ifdef PX4
 #define BOARD_TYPE                          PX4_BOARD
-//#include "libSTM.h"
+#include "libSTM.h"
 #endif
 
 #ifndef BOARD_TYPE
@@ -110,21 +114,21 @@ void mav_printf(const char * format, ...);
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.
-//
+// 
 // This is the lowest-level component of MatrixPilot, and should not reference
 // anything from the higher-level components.  This library is designed to be
 // useful in its own right, independent of libDCM or MatrixPilot.
 //
 // libUDB requires an options.h file be provided that defines at least the
 // following constants:
-//
+// 
 // #define NUM_INPUTS
 // #define NUM_OUTPUTS
-//
+// 
 // #define FAILSAFE_INPUT_CHANNEL
 // #define FAILSAFE_INPUT_MIN
 // #define FAILSAFE_INPUT_MAX
-//
+// 
 // #define NORADIO
 // #define SERVOSAT
 

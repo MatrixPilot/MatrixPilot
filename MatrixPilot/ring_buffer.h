@@ -6,7 +6,7 @@
  */
 
 #ifndef RING_BUFFER_H
-#define	RING_BUFFER_H
+#define RING_BUFFER_H
 
 
 boolean ring_get(char* b);
@@ -19,4 +19,4 @@ int16_t queue_string(const char* string);
 void queue_prepend(const char* buff, int16_t nbytes);
 
 
-#endif	/* RING_BUFFER_H */
+#endif /* RING_BUFFER_H */

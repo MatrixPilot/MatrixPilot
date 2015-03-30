@@ -488,15 +488,12 @@ void MAVMissionOutput_40hz(void)
 //			    float x, float y, float z)
 
 			//BUILDING
-
 			//struct waypoint3D    { int32_t x; int32_t y; int16_t z; };
 
 //			struct waypoint3D getWaypoint3D(uint16_t wp);
 //			struct waypoint3D wp;
 //			wp = getWaypoint3D(mavlink_waypoint_requested_sequence_number);
 			wp = getWaypoint3D(mavlink_waypoint_requested_sequence_number);
-
-
 
 			//float lat_float, lon_float, alt_float = 0.0;
 			//uint32_t accum_long = IMUlocationy._.W1 + (lat_origin.WW / 90); //  meters North from Equator

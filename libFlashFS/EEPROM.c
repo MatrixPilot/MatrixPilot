@@ -43,7 +43,9 @@ enum MCP24LC256_STATES
 static uint8_t commandData[4] = {0x00, 0x00}; 
 static uint16_t MCP24LC256_state = MCP24LC256_STATE_STOPPED;
 
-void PageErase(uint16_t PageAdr) {}
+void PageErase(uint16_t PageAdr)
+{
+}
 
 //typedef void (*I2C_callbackFunc)(boolean);
 static void MCP24LC256_callback(boolean I2CtrxOK)

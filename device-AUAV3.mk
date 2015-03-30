@@ -9,4 +9,4 @@ modules += libUDB libFlashFS libVectorMatrix Microchip
 incpath += Microchip Microchip/Include libVectorMatrix
 #cfgpath := Config
 
-#defines += USE_USB USE_CDC USE_MSD USE_FILESYS
+defines += USE_USB USE_CDC USE_MSD USE_FILESYS

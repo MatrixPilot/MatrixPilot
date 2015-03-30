@@ -319,8 +319,7 @@ static void init_leds(void)
 }
 
 static void init_pll(void)
-	{
-
+{
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #if (MIPS == 16)
 #warning 16 MIPS selected

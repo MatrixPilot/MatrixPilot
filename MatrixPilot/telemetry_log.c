@@ -55,9 +55,9 @@ extern boolean inflight_state(void);
 
 static char logbuf1[LOGBUF_BUFFER_SIZE+1];  // TODO: added 1 byte until buffer overflow confirmed good
 static char logbuf2[LOGBUF_BUFFER_SIZE+1];  // TODO: added 1 byte until buffer overflow confirmed good
-static int lb1_end_index = 0;
-static int lb2_end_index = 0;
-static int lb_in_use = 1;
+static volatile int lb1_end_index = 0;
+static volatile int lb2_end_index = 0;
+static volatile int lb_in_use = 1;
 static char logfile_name[13];
 static FSFILE* fsp = NULL;
 

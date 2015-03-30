@@ -418,7 +418,6 @@ static void update_goal_from(struct relative3D old_goal)
 	set_camera_view(new_goal);
 }
 
-//void run_flightplan(void)
 void flightplan_logo_update(void)
 {
 	// first run any injected instruction from the serial port

@@ -113,7 +113,7 @@ url = "http://www.diydrones.com"
 
 static void load_settings(void)
 {
-	printf("load_settings()\r\n");
+//	printf("load_settings()\r\n");
 
 	settings._.RollStabilizaionAilerons = ini_getbool(strStabilise, "roll_ail", ROLL_STABILIZATION_AILERONS, strConfigFile);
 	settings._.RollStabilizationRudder = ini_getbool(strStabilise, "roll_rud", ROLL_STABILIZATION_RUDDER, strConfigFile);

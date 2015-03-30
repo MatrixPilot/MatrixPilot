@@ -28,7 +28,7 @@
 #define HEARTBEAT_HZ 40
 #else
 #define HEARTBEAT_HZ 200
-#endif
+#endif // (BOARD_TYPE != UDB4_BOARD)
 
 // number of servo updates per second
 #define SERVO_HZ 40

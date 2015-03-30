@@ -558,4 +558,3 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
 }
 
 #endif // (USE_USB == 1)
-

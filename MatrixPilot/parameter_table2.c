@@ -149,4 +149,4 @@ const mavlink_parameter mavlink_parameters_list[] = {
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif // (SILSIM == 1 && USE_MAVLINK == 1) 
+#endif // (SILSIM == 1 && USE_MAVLINK == 1)

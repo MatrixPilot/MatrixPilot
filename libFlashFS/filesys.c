@@ -81,7 +81,7 @@ void filesys_cat(char* arg)
 	if (fp != NULL) {
 		while (FSfread(buf, 1, sizeof(char), fp) == 1) {
 			printf("%c", buf[0]);
-}
+		}
 		FSfclose(fp);
 	} else {
 		DPRINT("failed to open %s\r\n", arg);

@@ -215,7 +215,7 @@
 #endif
 
 #if ((CONSOLE_UART > 2) && (BOARD_TYPE != AUAV3_BOARD) && (SILSIM == 0))
-	#error("Console UART's greater than 2 only supported on AUAV3 board"
+//	#error("Console UART's greater than 2 only supported on AUAV3 board"
 #endif
 
 #if ((USE_TELELOG == 1) && (USE_FILESYS == 0))

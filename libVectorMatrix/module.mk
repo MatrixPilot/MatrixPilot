@@ -11,4 +11,5 @@ endif
 #$(eval $(call make-library,$(subdirectory).a,$(local_src)))
 $(eval $(call make-library,$(subdirectory)/$(subdirectory).a,$(local_src)))
 
-incpath += $(subdirectory)
+#incpath += $(subdirectory)
+#incpath += $(SOURCE_DIR)/$(subdirectory)

@@ -56,31 +56,31 @@
 #include <stdarg.h>
 
 
-union intbb voltage_milis = {0};
-union intbb voltage_temp;
+static union intbb voltage_milis = {0};
+static union intbb voltage_temp;
 
-void sio_newMsg(uint8_t);
-void sio_voltage_low(uint8_t inchar);
-void sio_voltage_high(uint8_t inchar);
+static void sio_newMsg(uint8_t);
+static void sio_voltage_low(uint8_t inchar);
+static void sio_voltage_high(uint8_t inchar);
 
-void sio_fp_data(uint8_t inchar);
-void sio_fp_checksum(uint8_t inchar);
+static void sio_fp_data(uint8_t inchar);
+static void sio_fp_checksum(uint8_t inchar);
 
-void sio_cam_data(uint8_t inchar);
-void sio_cam_checksum(uint8_t inchar);
+static void sio_cam_data(uint8_t inchar);
+static void sio_cam_checksum(uint8_t inchar);
 
-void sio_fbdl_data(unsigned char inchar);
+static void sio_fbdl_data(unsigned char inchar);
 
-char fp_high_byte;
-uint8_t fp_checksum;
+static char fp_high_byte;
+static uint8_t fp_checksum;
 
-void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
+static void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
 
 
 #define SERIAL_BUFFER_SIZE 256
-char serial_buffer[SERIAL_BUFFER_SIZE+1];
-int16_t sb_index = 0;
-int16_t end_index = 0;
+static char serial_buffer[SERIAL_BUFFER_SIZE+1];
+static int16_t sb_index = 0;
+static int16_t end_index = 0;
 
 void init_serial(void)
 {
@@ -106,7 +106,7 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 	(*sio_parse)(rxchar); // parse the input byte
 }
 
-void sio_newMsg(uint8_t inchar)
+static void sio_newMsg(uint8_t inchar)
 {
 	switch (inchar)
 	{
@@ -148,14 +148,14 @@ void sio_newMsg(uint8_t inchar)
 	} // switch
 }
 
-void sio_voltage_high(uint8_t inchar)
+static void sio_voltage_high(uint8_t inchar)
 {
 	voltage_temp.BB = 0; // initialize our temp variable
 	voltage_temp._.B1 = inchar;
 	sio_parse = &sio_voltage_low;
 }
 
-void sio_voltage_low(uint8_t inchar)
+static void sio_voltage_low(uint8_t inchar)
 {
 	voltage_temp._.B0 = inchar;
 	voltage_temp.BB = voltage_temp.BB * 2; // convert to voltage
@@ -163,7 +163,7 @@ void sio_voltage_low(uint8_t inchar)
 	sio_parse = &sio_newMsg;
 }
 
-int8_t hex_char_val(uint8_t inchar)
+static int8_t hex_char_val(uint8_t inchar)
 {
 	if (inchar >= '0' && inchar <= '9')
 	{
@@ -208,7 +208,7 @@ int8_t hex_char_val(uint8_t inchar)
 // the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
 //
 
-void sio_fp_data(uint8_t inchar)
+static void sio_fp_data(uint8_t inchar)
 {
 	if (inchar == '*')
 	{
@@ -236,7 +236,7 @@ void sio_fp_data(uint8_t inchar)
 	}
 }
 
-void sio_fp_checksum(uint8_t inchar)
+static void sio_fp_checksum(uint8_t inchar)
 {
 	int8_t hexVal = hex_char_val(inchar);
 
@@ -261,7 +261,7 @@ void sio_fp_checksum(uint8_t inchar)
 
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
-void sio_cam_data(uint8_t inchar)
+static void sio_cam_data(uint8_t inchar)
 {
 	if (inchar == '*')
 	{
@@ -290,7 +290,7 @@ void sio_cam_data(uint8_t inchar)
 	}
 }
 
-void sio_cam_checksum(uint8_t inchar)
+static void sio_cam_checksum(uint8_t inchar)
 {
 	int8_t hexVal = hex_char_val(inchar);
 
@@ -315,7 +315,7 @@ void sio_cam_checksum(uint8_t inchar)
 #endif // CAM_USE_EXTERNAL_TARGET_DATA
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
-void sio_fbdl_data(unsigned char inchar)
+static void sio_fbdl_data(unsigned char inchar)
 {
 	if (get_fbdl_pos() < LENGTH_OF_PACKET)
 	{
