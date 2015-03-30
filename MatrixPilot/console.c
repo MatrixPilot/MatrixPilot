@@ -290,9 +290,11 @@ static void cmd_uart(char* arg)
 	printf("\tU1STA  = %s\r\n", word_to_binary(U1STA));
 	printf("\tU1BRG  = %s\r\n", word_to_binary(U1BRG));
 #else
+#if (PX4 == 1)
 	printf("sending test data to uart 6... ");
 	Test_HAL_UART_Transmit_IT();
 	printf("done.\r\n");
+#endif
 #endif
 }
 

@@ -147,13 +147,13 @@ void init_navigation(void)
 	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_navigation(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKPAileron = (float)yawkpail / (RMAX);
 	gains.YawKPRudder  = (float)yawkprud / (RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 static void setup_origin(void)
 {
@@ -296,7 +296,7 @@ void navigate_process_flightplan(void)
 	if (gps_nav_valid() && state_flags._.GPS_steering)
 	{
 		navigate_compute_bearing_to_goal();
-		flightplan_update();
+		flightplan_update(); // was called run_flightplan();
 		compute_camera_view();
 	}
 }

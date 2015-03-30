@@ -271,9 +271,11 @@ static void update_goal_from(struct relative3D old_goal)
 	ng.y = new_goal.y;
 	ng.z = new_goal.z;
 
+#ifdef USE_EXTENDED_NAV
 	navigate_set_goal(og, ng);
-//	navigate_set_goal(old_goal, new_goal);
-
+#else
+	navigate_set_goal(old_goal, new_goal);
+#endif
 	new_goal.x = (turtleLocations[CAMERA].x._.W1);
 	new_goal.y = (turtleLocations[CAMERA].y._.W1);
 	new_goal.z =  turtleLocations[CAMERA].z;

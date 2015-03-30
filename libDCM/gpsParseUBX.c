@@ -441,7 +441,7 @@ const char endchar = 0xB5;
 // Only the first 5 bytes following a B3 are displayed.
 void hex_out(char outchar)
 {
-	if (hex_count > 0) 
+	if (hex_count > 0)
 	{
 		U1TXREG = convert[((outchar>>4) & 0x0F)];
 		U1TXREG = convert[(outchar & 0x0F)];
@@ -839,7 +839,7 @@ static void msg_CS1(uint8_t gpschar)
 	}
 	else
 	{
-		gps_data_age = GPS_DATA_MAX_AGE+1;  // if the checksum is wrong then the data from this packet is invalid. 
+		gps_data_age = GPS_DATA_MAX_AGE+1;  // if the checksum is wrong then the data from this packet is invalid.
 		                                    // setting this ensures the nav routine does not try to use this data.
 	}
 	msg_parse = &msg_B3;
@@ -943,16 +943,16 @@ void hilsim_handle_key_input(char c)
 			udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
 			printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
 			break;
-				case 35: // '1' Numpad End (switch mode to manual)
+		case 35: // '1' Numpad End (switch mode to manual)
 			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
 			break;
-				case 111: // '2' Numpad / (switch mode to stabilised)
+		case 111: // '2' Numpad / (switch mode to stabilised)
 			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
 			break;
-				case 106: // '3' Numpad * (switch mode to guided)
+		case 106: // '3' Numpad * (switch mode to guided)
 			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
 			break;
-				case 36: // '4' Numpad Home (switch mode to failsafe)
+		case 36: // '4' Numpad Home (switch mode to failsafe)
 			udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
 			break;
 		default:

@@ -652,15 +652,12 @@ const struct logoInstructionDef rtlInstructions_default[] = {
 	PEN_DOWN
 
 	FLAG_ON(F_LAND)
-
 	PEN_UP
 	HOME
 	USE_ANGLE_TO_GOAL
 	BK(200)
 	PEN_DOWN
-
 	SET_ALT(-32)
-
 	PEN_UP
 	HOME
 	USE_ANGLE_TO_GOAL

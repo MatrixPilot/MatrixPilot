@@ -239,13 +239,13 @@ void flightplan_waypoints_begin(int16_t flightplanNum)
 	{
 //		currentWaypointSet = (struct waypointDef*)rtlWaypoints;
 		currentWaypointSet = rtlWaypoints;
-		numPointsInCurrentSet = RTL_WAYPOINTS_COUNT;
+		numPointsInCurrentSet = rtlWaypoints_count;
 	}
 	else if (flightplanNum == 0)    // Main waypoint set
 	{
 //		currentWaypointSet = (struct waypointDef*)stdWaypoints;
 		currentWaypointSet = stdWaypoints;
-		numPointsInCurrentSet = STD_WAYPOINTS_COUNT;
+		numPointsInCurrentSet = stdWaypoints_count;
 	}
 
 	if (numPointsInCurrentSet != 0)
@@ -394,7 +394,7 @@ void flightplan_waypoints_update(void)
 	{
 		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t)HEIGHT_MARGIN))
 		{
-			DPRINT("flightplan_wayoints() IMUheight %i goal.height %i\r\n", IMUheight, navigate_get_goal(NULL));
+			DPRINT("flightplan_waypoints() IMUheight %i goal.height %i\r\n", IMUheight, navigate_get_goal(NULL));
 			next_waypoint();
 		}
 	}

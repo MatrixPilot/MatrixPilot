@@ -34,7 +34,7 @@ int16_t waggle = 0;
 static uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
-#if (SILSIM == 1)
+#if (HILSIM == 1)
 #define CALIB_PAUSE   (2  * FSM_CLK)    // wait for 2 seconds of runs through the state machine
 //#define STANDBY_PAUSE (24 * FSM_CLK)    // pause for 24 seconds of runs through the state machine
 #define STANDBY_PAUSE (5 * FSM_CLK)    // pause for 5 seconds of runs through the state machine
