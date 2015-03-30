@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifdef AUAV3
+#if (AUAV3 == 1)
 
 #include "../../libUDB/libUDB.h"
 
