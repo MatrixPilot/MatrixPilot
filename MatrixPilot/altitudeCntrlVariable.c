@@ -53,7 +53,6 @@
 union longww throttleFiltered = { 0 };
 int16_t pitchAltitudeAdjust = 0;
 boolean filterManual = false;
-int32_t speed_height = 0;
 int16_t desiredHeight;
 
 static void normalAltitudeCntrl(void);
@@ -209,6 +208,7 @@ static void normalAltitudeCntrl(void)
 	int16_t throttleIn;
 	int16_t throttleInOffset;
 	union longww heightError = { 0 };
+	int32_t speed_height;
 
 	union longww temp;
 
@@ -272,14 +272,15 @@ static void normalAltitudeCntrl(void)
 
 		if (state_flags._.GPS_steering)
 		{
-			if (desired_behavior._.takeoff || desired_behavior._.altitude)
-			{
-				desiredHeight = goal.height;
-			}
-			else
-			{
-				desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal)>>12);
-			}
+			desiredHeight = navigate_desired_height();
+//			if (desired_behavior._.takeoff || desired_behavior._.altitude)
+//			{
+//				desiredHeight = goal.height;
+//			}
+//			else
+//			{
+//				desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal)>>12);
+//			}
 		}
 		else
 		{

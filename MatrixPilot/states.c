@@ -34,8 +34,8 @@ static uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
 #if (HILSIM == 1) // implied when SILSIM == 1
-#define CALIB_PAUSE   (2  * FSM_CLK)    // wait for 2 seconds of runs through the state machine
-#define STANDBY_PAUSE (24 * FSM_CLK)    // pause for 24 seconds of runs through the state machine
+#define CALIB_PAUSE   (2 * FSM_CLK)     // wait for 2 seconds of runs through the state machine
+#define STANDBY_PAUSE (5 * FSM_CLK)     // pause for 5 seconds of runs through the state machine
 #else
 #define CALIB_PAUSE (10.5 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
 #define STANDBY_PAUSE (48 * FSM_CLK)    // pause for 48 seconds of runs through the state machine
@@ -161,6 +161,7 @@ void udb_heartbeat_40hz_callback(void)
 }
 #endif // CATAPULT_LAUNCH_ENABLE
 
+////////////////////////////////////////////////////////////////////////////////
 //	Functions that are executed upon first entrance into a state.
 
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
@@ -274,8 +275,8 @@ static void ent_cat_delayS(void)
 }
 #endif // CATAPULT_LAUNCH_ENABLE
 
-//	Same as the come home state, except the radio is on.
-//	Come home is commanded by the mode switch channel (defaults to channel 4).
+// Same as the come home state, except the radio is on.
+// Come home is commanded by the mode switch channel (defaults to channel 4).
 static void ent_waypointS(void)
 {
 	DPRINT("ent_waypointS\r\n");
@@ -322,6 +323,9 @@ static void ent_returnS(void)
 	led_on(LED_RED);
 	stateS = &returnS;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// State handlers - these are polled
 
 static void startS(void)
 {

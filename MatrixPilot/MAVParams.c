@@ -32,10 +32,10 @@
 //#include <stdarg.h>
 #include <math.h>
 
-#if (DECLINATIONANGLE_VARIABLE != 1)
+//#if (DECLINATIONANGLE_VARIABLE != 1)
 //union intbb dcm_declination_angle = { .BB = 0};
-union intbb dcm_declination_angle = { 0 };
-#endif
+//union intbb dcm_declination_angle = { 0 };
+//#endif
 
 #include "../MatrixPilot/parameter_table.h"
 
@@ -62,17 +62,17 @@ static boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16
 // http://www.qgroundcontrol.org/parameter_interface
 
 #if (RECORD_FREE_STACK_SPACE ==  1)
-void mavlink_send_param_maxstack(int16_t);
-void mavlink_set_maxstack(float setting, int16_t i);
+static void mavlink_send_param_maxstack(int16_t);
+static void mavlink_set_maxstack(float setting, int16_t i);
 
-void mavlink_send_param_maxstack(int16_t i)
+static void mavlink_send_param_maxstack(int16_t i)
 {
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
 	    (4096 - maxstack), MAVLINK_TYPE_FLOAT,  count_of_parameters_list, i);
 	//mavlink_msg_param_value_send(mavlink_channel_t chan, const char *param_id, float param_value, uint8_t param_type, uint16_t param_count, uint16_t param_index)
 }
 
-void mavlink_set_maxstack(float setting, int16_t i)
+static void mavlink_set_maxstack(float setting, int16_t i)
 {
 	mavlink_param_union_t param;
 	param.type = MAVLINK_TYPE_FLOAT;
@@ -84,7 +84,6 @@ void mavlink_set_maxstack(float setting, int16_t i)
 	maxstack = (int16_t)(4096 - setting);
 }
 #endif // RECORD_FREE_STACK_SPACE
-
 
 static boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i)
 {
@@ -482,10 +481,10 @@ static void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
 	{
 //		const char* key = (const char*)packet.param_id;
 		packet.param_index = get_param_index((const char*)packet.param_id);
-//		DPRINT("Requested specific parameter %u %u\r\n", packet.param_index, count_of_parameters_list);
-		DPRINT("Requested specific parameter %u %s\r\n", packet.param_index, (const char*)packet.param_id);
 		if ((packet.param_index >= 0) && (packet.param_index <= count_of_parameters_list))
 		{
+//			DPRINT("Requested specific parameter %u %u\r\n", packet.param_index, count_of_parameters_list);
+			DPRINT("Requested specific parameter %u %s\r\n", packet.param_index, (const char*)packet.param_id);
 			send_by_index = packet.param_index;
 			mavlink_flags.mavlink_send_specific_variable = 1;
 			DPRINT("Sending specific parameter\r\n");

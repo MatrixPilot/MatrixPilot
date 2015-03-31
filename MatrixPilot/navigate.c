@@ -64,6 +64,25 @@ int8_t desired_bearing_over_ground;
 int16_t desired_bearing_over_ground_vector[2];
 
 
+void navigate_print_goal(struct waypointparameters* pgoal)
+{
+	printf("x:          %i\r\n", pgoal->x);
+	printf("y:          %i\r\n", pgoal->y);
+	printf("cosphi:     %i\r\n", pgoal->cosphi);
+	printf("sinphi:     %i\r\n", pgoal->sinphi);
+	printf("phi:        %i\r\n", pgoal->phi);
+	printf("height:     %i\r\n", pgoal->height);
+	printf("fromHeight: %i\r\n", pgoal->fromHeight);
+	printf("legDist:    %i\r\n", pgoal->legDist);
+
+//	printf(" %i\r\n", pgoal->);
+}
+
+void navigate_print(void)
+{
+	navigate_print_goal(&goal);
+}
+
 int16_t navigate_get_goal(vect3_16t* _goal)
 {
 	if (_goal != NULL)
@@ -221,6 +240,65 @@ void navigate_process_flightplan(void)
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+static int16_t compute_progress_to_goal(int16_t totalDist, int16_t remainingDist)
+{
+	// progress is the fraction of the distance from the start to the finish of
+	// the current waypoint leg, that is still remaining. it ranges from 0 - 1<<12 (4096).
+	int16_t progress;
+
+	if (totalDist > 0)
+	{
+		progress = (((int32_t)totalDist - remainingDist) << 12) / totalDist;
+		if (progress < 0)
+		{
+			progress = 0;
+		}
+		if (progress > (int32_t)1 << 12)
+		{
+			progress = (int32_t)1 << 12;
+		}
+	}
+	else
+	{
+		progress = (int32_t)1 << 12;
+	}
+	return progress;
+}
+
+int16_t navigate_desired_height(void)
+{
+	int16_t height;
+
+	if (desired_behavior._.takeoff || desired_behavior._.altitude)
+	{
+		height = goal.height;
+	}
+	else
+	{
+//		int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+//		progress_to_goal = compute_progress_to_goal(navgoal.legDist, tofinish_line);
+		height = goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal) >> 12);
+	}
+	return height;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static void cross_track(vect2_16t* result)
+{
+// INPUTS: navgoal, IMUlocation, IMUintegralAcceleration
+// OUTPUT: desired_bearing_over_ground_vector
+//
+
+//struct ww   { int16_t W0; int16_t W1; };
+//union longww     { int32_t WW;  struct ww _; };
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void navigate_compute_bearing_to_goal(void)
 {
 	union longww temporary;
@@ -316,24 +394,25 @@ void navigate_compute_bearing_to_goal(void)
 	if (state_flags._.GPS_steering)   // return to home or waypoints state
 	{
 		desired_dir = goal.phi;
-		if (goal.legDist > 0)
-		{
-			// progress_to_goal is the fraction of the distance from the start to the finish of
-			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((int32_t)goal.legDist - tofinish_line) << 12) / goal.legDist;
-			if (progress_to_goal < 0)
-			{
-				progress_to_goal = 0;
-			}
-			if (progress_to_goal > (int32_t)1 << 12)
-			{
-				progress_to_goal = (int32_t)1 << 12;
-			}
-		}
-		else
-		{
-			progress_to_goal = (int32_t)1 << 12;
-		}
+		progress_to_goal = compute_progress_to_goal(goal.legDist, tofinish_line);
+//		if (goal.legDist > 0)
+//		{
+//			// progress_to_goal is the fraction of the distance from the start to the finish of
+//			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
+//			progress_to_goal = (((int32_t)goal.legDist - tofinish_line) << 12) / goal.legDist;
+//			if (progress_to_goal < 0)
+//			{
+//				progress_to_goal = 0;
+//			}
+//			if (progress_to_goal > (int32_t)1 << 12)
+//			{
+//				progress_to_goal = (int32_t)1 << 12;
+//			}
+//		}
+//		else
+//		{
+//			progress_to_goal = (int32_t)1 << 12;
+//		}
 	}
 	else
 	{

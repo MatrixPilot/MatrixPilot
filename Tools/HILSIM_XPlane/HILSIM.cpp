@@ -327,12 +327,21 @@ int MyKeySniffer(char         inChar,
                  char         inVirtualKey,
                  void*        inRefcon)
 {
+//	if ((inVirtualKey >= 33 && inVirtualKey <= 40) || (inVirtualKey >= 96 && inVirtualKey <= 111))
+//	{
+//		NAV_KEYSTROKE[6] = (unsigned char)inFlags;
+//		NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
+//		CalculateChecksum(NAV_KEYSTROKE);
+//		SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
+//		return 0;   // Returning 0 consumes the keystroke
+//	}
+//	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane
+	NAV_KEYSTROKE[6] = (unsigned char)inFlags;
+	NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
+	CalculateChecksum(NAV_KEYSTROKE);
+	SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
 	if ((inVirtualKey >= 33 && inVirtualKey <= 40) || (inVirtualKey >= 96 && inVirtualKey <= 111))
 	{
-		NAV_KEYSTROKE[6] = (unsigned char)inFlags;
-		NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
-		CalculateChecksum(NAV_KEYSTROKE);
-		SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
 		return 0;   // Returning 0 consumes the keystroke
 	}
 	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane

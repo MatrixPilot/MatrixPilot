@@ -72,8 +72,6 @@
 #include <math.h>
 
 
-//int16_t mavlink_serial_send(mavlink_channel_t chan, uint8_t buf[], uint16_t len);
-
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 mavlink_message_t last_msg;
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
@@ -107,22 +105,22 @@ mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 mavlink_flags_t mavlink_flags;
 mavlink_system_t mavlink_system;
 
-uint16_t mavlink_process_message_handle = INVALID_HANDLE;
-uint8_t handling_of_message_completed = true;
+static uint16_t mavlink_process_message_handle = INVALID_HANDLE;
+static uint8_t handling_of_message_completed = true;
 
-uint8_t mavlink_counter_40hz = 0;
-uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
-uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+static uint8_t mavlink_counter_40hz = 0;
+static uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+static uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 
 int16_t sb_index = 0;
 int16_t end_index = 0;
 char serial_interrupt_stopped = 1;
 uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
 
-uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
-uint16_t mavlink_command_ack_command = 0;
-boolean mavlink_send_command_ack = false;
-uint16_t mavlink_command_ack_result = 0;
+static uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
+static uint16_t mavlink_command_ack_command = 0;
+static boolean mavlink_send_command_ack = false;
+static uint16_t mavlink_command_ack_result = 0;
 
 static void handleMessage(void);
 #if (USE_NV_MEMORY == 1)
@@ -155,7 +153,7 @@ void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
-#pragma warning ("SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink") // VC warns 'unknown user warning type'
+#pragma warning ("SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink") // VC warns 'unknown user warning type', arm-gnu-eabi warns, unknown pragma
 //#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink" // xc16 uses this syntax (but VC throws fatal error)
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
@@ -316,9 +314,9 @@ void send_text(uint8_t text[])
 // MAIN MATRIXPILOT MAVLINK CODE FOR RECEIVING COMMANDS FROM THE GROUND CONTROL STATION
 //
 
-mavlink_message_t msg[2];
-uint8_t mavlink_message_index = 0;
-mavlink_status_t r_mavlink_status;
+static mavlink_message_t msg[2];
+static uint8_t mavlink_message_index = 0;
+static mavlink_status_t r_mavlink_status;
 
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
@@ -365,7 +363,11 @@ static void command_ack(uint16_t command, uint16_t result)
 	}
 }
 
-void MAVLinkRequestDataStream(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_REQUEST_DATA_STREAM
+static void MAVLinkDataStream(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_DATA_STREAM
+{
+}
+
+static void MAVLinkRequestDataStream(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_REQUEST_DATA_STREAM
 {
 	int16_t freq = 0; // packet frequency
 	mavlink_request_data_stream_t packet;
@@ -427,14 +429,14 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 #if (USE_NV_MEMORY == 1)
 			case MAV_CMD_PREFLIGHT_STORAGE:
 				DPRINT("MAV_CMD_PREFLIGHT_STORAGE %u\r\n", packet.command);
-				if (packet.param1 == MAV_PFS_CMD_WRITE_ALL)
+				if (packet.param1 == MAV_PFS_CMD_WRITE_ALL) // 1
 				{
 					if (packet.param2 == MAV_PFS_CMD_WRITE_ALL)
 						data_services_save_all(STORAGE_FLAG_STORE_CALIB | STORAGE_FLAG_STORE_WAYPOINTS, &preflight_storage_complete_callback);
 					else
 						data_services_save_all(STORAGE_FLAG_STORE_CALIB, &preflight_storage_complete_callback);
 				}
-				else if (packet.param1 == MAV_PFS_CMD_READ_ALL)
+				else if (packet.param1 == MAV_PFS_CMD_READ_ALL) // 0
 				{
 					if (packet.param2 == MAV_PFS_CMD_READ_ALL)
 						data_services_load_all(STORAGE_FLAG_STORE_CALIB | STORAGE_FLAG_STORE_WAYPOINTS, &preflight_storage_complete_callback);
@@ -604,7 +606,7 @@ void MAVLinkSetMode(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_SET_MODE:
 				break;
 		}
 	}
-}	
+}
 
 // Portions of the following code in handlesmessage() are templated off source code written by James Goppert for the
 // ArdupilotMega, and are used by his kind permission and also in accordance with the GPS V3 licensing
@@ -860,7 +862,8 @@ void mavlink_output_40hz(void)
 
 		mavlink_heading = get_geo_heading_angle() * 100;    // mavlink global position expects heading value x 100
 		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon, alt, relative_alt,
-		    -IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity  normal units are in cm / second
+		    IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity upper word gives V in cm / second
+		        // MAVLink is using North,East,Down Frame (NED). MatrixPilot IMUVelocity is in earth frame (X is East, Y is North, Z is Up)
 		    mavlink_heading); // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
 		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
 		//   int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg)
@@ -899,7 +902,7 @@ void mavlink_output_40hz(void)
 // TODO: investigate why earth_yaw_velocity occasionally spikes with a value of over 50 or below 50..
 //		if (earth_yaw_velocity > 40.0 || earth_yaw_velocity < -40.0) {
 //			time_t ltime;
-//			time(&ltime); 
+//			time(&ltime);
 //			DPRINT("earth_yaw_velocity %f earth_yaw %f  previous_earth_yaw %f ", earth_yaw_velocity, earth_yaw, previous_earth_yaw);
 //			DPRINT("streamRates %u ", (unsigned int)streamRates[MAV_DATA_STREAM_POSITION]);
 //			DPRINT("%s\r\n", ctime(&ltime));

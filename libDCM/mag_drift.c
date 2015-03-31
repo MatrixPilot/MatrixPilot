@@ -42,6 +42,7 @@
 // This combination allows values of matrix elements between -2 and +2.
 // Multiplication produces results scaled by 1/2.
 
+union intbb dcm_declination_angle;
 
 #if (MAG_YAW_DRIFT == 1)
 
@@ -53,10 +54,6 @@ fractional magFieldEarthNormalizedPrevious[3];
 fractional magAlignment[4] = { 0, 0, 0, RMAX };
 fractional magFieldBodyMagnitudePrevious;
 fractional magFieldBodyPrevious[3];
-
-#if (DECLINATIONANGLE_VARIABLE == 1)
-union intbb dcm_declination_angle;
-#endif
 
 #ifdef INITIALIZE_VERTICAL  // for VTOL vertical initialization
 static fractional rmatDelayCompensated[] =  { RMAX, 0, 0, 0, 0, RMAX, 0, -RMAX, 0 };
