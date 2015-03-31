@@ -7,5 +7,7 @@ local_src += $(wildcard $(SOURCE_DIR)/$(subdirectory)/*.s)
 else
 endif
 
-$(eval $(call make-library, $(subdirectory)/$(subdirectory).a, $(local_src)))
-#$(eval $(call make-target,$(subdirectory)/$(subdirectory).a,$(local_src)))
+local_src += $(wildcard $(SOURCE_DIR)/$(subdirectory)/*.sm)
+
+$(eval $(call make-target,$(subdirectory)/$(subdirectory).a,$(local_src)))
+#$(eval $(call make-library, $(subdirectory)/$(subdirectory).a, $(local_src)))
