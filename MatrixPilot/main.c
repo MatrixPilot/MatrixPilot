@@ -46,25 +46,14 @@
 #include "console.h"
 #endif
 
-#if (USE_MAVLINK == 1) 
+#if (USE_MAVLINK == 1)
 void parameter_table_init(void);
 #endif
 
 static jmp_buf buf;
 
-#if (SILSIM == 1)
-int mp_argc;
-char **mp_argv;
-int main(int argc, char** argv)
+int matrixpilot_init(void)
 {
-	// keep these values available for later
-	mp_argc = argc;
-	mp_argv = argv;
-#else
-int main(void)
-{
-	mcu_init();     // initialise the processor specific registers
-#endif
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
@@ -81,30 +70,52 @@ int main(void)
 	init_behavior();
 	init_serial();
 
-	if (setjmp(buf))
-	{
-		// a processor exception occurred and we're resuming execution here 
-		DPRINT("longjmp'd\r\n");
-	}
-
 #ifdef _MSC_VER
-#if (USE_MAVLINK == 1) 
+#if (USE_MAVLINK == 1)
 	parameter_table_init();
 #endif // (USE_MAVLINK == 1)
 #endif // _MSC_VER
+	return 0;
+}
 
-	while (1)
-	{
+int matrixpilot_loop(void)
+{
 #if (USE_TELELOG == 1)
-		telemetry_log();
+	telemetry_log();
 #endif
 #if (USE_USB == 1)
-		USBPollingService();
+	USBPollingService();
 #endif
 #if (CONSOLE_UART != 0 && SILSIM == 0)
-		console();
+	console();
 #endif
-		udb_run();
+	udb_run();
+	return 0;
+}
+
+#if (SILSIM == 1)
+int mp_argc;
+char **mp_argv;
+int main(int argc, char** argv)
+{
+	// keep these values available for later
+	mp_argc = argc;
+	mp_argv = argv;
+#else
+int main(void)
+{
+	mcu_init();     // initialise the processor specific registers
+#endif
+	matrixpilot_init();
+
+	if (setjmp(buf))
+	{
+		// a processor exception occurred and we're resuming execution here
+		DPRINT("longjmp'd\r\n");
+	}
+	while (1)
+	{
+		matrixpilot_loop();
 	}
 	return 0;
 }
