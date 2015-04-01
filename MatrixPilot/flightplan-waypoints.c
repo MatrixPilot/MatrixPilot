@@ -378,7 +378,7 @@ void flightplan_waypoints_update(void)
 	
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - goal.height) < ((int16_t)HEIGHT_MARGIN))
+		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t)HEIGHT_MARGIN))
 		{
 			next_waypoint();
 		}

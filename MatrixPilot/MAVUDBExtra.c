@@ -147,11 +147,15 @@ void MAVUDBExtraOutput_40hz(void)
 					}
 					else
 					{
+						vect3_16t goal;
 						int16_t stack_free = 0;
 						mavlink_sue_telemetry_f2_a = true;
 #if (RECORD_FREE_STACK_SPACE == 1)
 						stack_free = (int16_t)(4096-maxstack); // This is actually wrong for the UDB4, but currently left the same as for telemetry.c
 #endif // (RECORD_FREE_STACK_SPACE == 1)
+
+//void navigate_get_goal(vect3_16t* goal);
+						navigate_get_goal(&goal);
 
 						mavlink_msg_serial_udb_extra_f2_b_send(MAVLINK_COMM_0, tow.WW,
 						    pwIn_save[1], pwIn_save[2], pwIn_save[3], pwIn_save[4], pwIn_save[5],
@@ -165,7 +169,7 @@ void MAVUDBExtraOutput_40hz(void)
 						    0,
 #endif // (SILSIM != 1)
 						    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-						    goal.x, goal.y, goal.height, stack_free);
+						    goal.x, goal.y, goal.z, stack_free);
 					}
 				}
 		}

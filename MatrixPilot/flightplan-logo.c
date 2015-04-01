@@ -464,7 +464,7 @@ void flightplan_logo_update(void)
 
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
+		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
 		{
 			process_instructions();
 		}
