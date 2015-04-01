@@ -62,7 +62,7 @@
 #define INT_PRI_PULSE   1
 #define INT_PRI_IMU     1
 
-
+// and some proposed macro's
 #define ATTRIB_INT __attribute__((__interrupt__,__no_auto_psv__)) 
 #define INTERRUPT(x) __attribute__((__interrupt__,__no_auto_psv__)) void _##x##Interrupt(void)
 #define ISR(x) __attribute__((__interrupt__,__no_auto_psv__)) void _##x##Interrupt(void)

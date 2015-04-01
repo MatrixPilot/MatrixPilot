@@ -62,7 +62,6 @@ static void normalAltitudeCntrl(void);
 static void manualThrottle(int16_t throttleIn);
 static void hoverAltitudeCntrl(void);
 
-int32_t speed_height = 0;
 int16_t pitchAltitudeAdjust = 0;
 boolean filterManual = false;
 int16_t desiredHeight;
@@ -169,7 +168,7 @@ int16_t desiredSpeed = (DESIRED_SPEED*10);
 
 void altitudeCntrl(void)
 {
-#if (USE_SONAR_INPUT != 0)
+#if (USE_SONAR_INPUT == 1)
 	calculate_sonar_height_above_ground();
 #endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)

@@ -38,7 +38,6 @@ uint8_t rc_signal_strength;
 #define RSSI_RANGE ((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
 #endif
 
-extern int one_hertz_flag;
 
 void init_analogs(void)
 {
@@ -54,10 +53,6 @@ void init_analogs(void)
 #endif
 }
 
-extern fractional Float2Fract(float aVal);  /* Converts float into fractional */
-                                            /* float value in range [-1, 1) */
-extern float Fract2Float(fractional aVal);  /* Converts fractional into float */
-                                            /* fract value in range {-1, 1-2^-15} */
 void calculate_analog_sensor_values(void)
 {
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
@@ -85,10 +80,16 @@ void calculate_analog_sensor_values(void)
 		rc_signal_strength = 100;
 	else
 		rc_signal_strength = (uint8_t)rssi_accum._.W1;
-
 #endif
+}
 
 /*
+extern int one_hertz_flag;
+extern fractional Float2Fract(float aVal);  // Converts float into fractional
+                                            // float value in range [-1, 1)
+extern float Fract2Float(fractional aVal);  // Converts fractional into float
+                                            // fract value in range {-1, 1-2^-15}
+
 	if (one_hertz_flag)
 	{
 //		printf("R %f     \r\n", (double)Fract2Float(udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value));
@@ -102,4 +103,3 @@ void calculate_analog_sensor_values(void)
 		one_hertz_flag = 0;
 	}
  */
-}
