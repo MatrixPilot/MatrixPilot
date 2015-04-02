@@ -46,7 +46,7 @@
 #include "MAVLink.h"
 #include "MAVParams.h"
 #include "MAVMission.h"
-#include "MAVFlexiFunctions.h"
+#include "../MAVLink/MAVFlexiFunctions.h"
 #include "MAVUDBExtra.h"
 
 #if (SILSIM != 1)

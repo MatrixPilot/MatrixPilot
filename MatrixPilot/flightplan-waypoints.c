@@ -26,8 +26,8 @@
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsData.h"
-#include "../MAVLink/MAVLink.h"
-#include "../MAVLink/MAVMission.h"
+#include "MAVLink.h"
+#include "MAVMission.h"
 #include <stdlib.h>
 
 
