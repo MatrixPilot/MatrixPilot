@@ -411,7 +411,7 @@ double gcdist(double lat1, double lon1, double lat2, double lon2) // Compute dis
 
 //	  radians = degrees * 3.1415926 / 180;
 
-static void cmd_nav(char* arg)
+static void cmd_navcalc(char* arg)
 {
 	double lat1 = -0.025244442;
 	double lon1 = 1.892460508;
@@ -443,6 +443,12 @@ gcdist = 1.369933 rad
 gcdist = 4709.484375 Nm
  */
 
+void navigate_print(void);
+static void cmd_nav(char* arg)
+{
+	navigate_print();
+}
+
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
 	{ 0, cmd_ver,    "ver" },
@@ -459,6 +465,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_barom,  "bar" },
 	{ 0, cmd_cpuload,"cpu" },
 	{ 0, cmd_magno,  "mag" },
+	{ 0, cmd_magno,  "navcalc" },
 	{ 0, cmd_crash,  "crash" },
 	{ 0, cmd_gains,  "gains" },
 	{ 0, cmd_options,"options" },

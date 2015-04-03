@@ -1,4 +1,3 @@
-
 // This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
@@ -72,15 +71,33 @@ static struct waypointparameters navgoal;
 //static int16_t desired_bearing_over_ground_vector[2];
 static vect2_16t desired_bearing_over_ground_vector;
 
-// NEW STUFF:
-int16_t navigate_get_goal(vect3_16t* goal)
+void navigate_print_goal(struct waypointparameters* pgoal)
 {
-//	*goal = navgoal;
-	if (goal != NULL)
+	printf("x:          %i\r\n", pgoal->x);
+	printf("y:          %i\r\n", pgoal->y);
+	printf("cosphi:     %i\r\n", pgoal->cosphi);
+	printf("sinphi:     %i\r\n", pgoal->sinphi);
+	printf("phi:        %i\r\n", pgoal->phi);
+	printf("height:     %i\r\n", pgoal->height);
+	printf("fromHeight: %i\r\n", pgoal->fromHeight);
+	printf("legDist:    %i\r\n", pgoal->legDist);
+
+//	printf(" %i\r\n", pgoal->);
+}
+
+void navigate_print(void)
+{
+	navigate_print_goal(&navgoal);
+}
+
+int16_t navigate_get_goal(vect3_16t* _goal)
+{
+//	*_goal = navgoal;
+	if (_goal != NULL)
 	{
-		goal->x = navgoal.x;
-		goal->y = navgoal.y;
-		goal->z = navgoal.height;
+		_goal->x = navgoal.x;
+		_goal->y = navgoal.y;
+		_goal->z = navgoal.height;
 	}
 	return navgoal.height;
 }
@@ -259,7 +276,7 @@ void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 //  an angle, and also the leg distance is required.
 //  But leg distance is produced as a by product of vector2_normalize.
 //  TODO: revise the following two lines.
-
+/*
 {
 	struct relative2D foo;
 	int16_t  phi;
@@ -270,7 +287,7 @@ void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 	phi = rect_to_polar16(&foo); // binary angle (0 - 256 = 360 degrees)
 	DPRINT("returned phi %i, x %i, y %i:\r\n", phi, foo.x, foo.y);
 }
-
+ */
 //	DPRINT("navigate_set_goal:rect_to_polar(courseLeg.x %i, .y %i) ", courseLeg.x, courseLeg.y);
 	navgoal.phi = rect_to_polar(&courseLeg); // binary angle (0 - 256 = 360 degrees)
 //	DPRINT("returned phi %i, x %i, y %i:\r\n", navgoal.phi, courseLeg.x, courseLeg.y);
@@ -354,16 +371,16 @@ static void cross_track(vect2_16t* result)
 //struct ww   { int16_t W0; int16_t W1; };
 //union longww     { int32_t WW;  struct ww _; };
 
-	vect2_32t crossVector;
-	vect2_16t cross_rotate;
-	int16_t crosstrack;
-
 	// Using Cross Tracking
 	// CROSS_TRACK_MARGIN is the value of cross track error in meters
 	// beyond which cross tracking correction saturates at 45 degrees
 #if (CROSS_TRACK_MARGIN >= 1024)
 #error ("CTMARGIN is too large, it must be less than 1024")
 #endif
+	vect2_32t crossVector;
+	vect2_16t cross_rotate;
+	int16_t crosstrack;
+
 	// cross_rotate is a vector parallel to the desired course track
 	cross_rotate.x =  navgoal.cosphi;
 	cross_rotate.y = -navgoal.sinphi;
@@ -372,7 +389,11 @@ static void cross_track(vect2_16t* result)
 	// IMU velocity is in centimeters per second, so right shifting by 4 produces
 	// about 6 times the IMU velocity in meters per second.
 	// This sets the time constant of the exponential decay to about 6 seconds
-	crossVector.x  = navgoal.x;
+//	crossVector[0]._.W1 = navgoal.x;
+//	crossVector[1]._.W1 = navgoal.y;
+//	crossVector[0].WW -= IMUlocationx.WW + ((IMUintegralAccelerationx.WW) >> 4);
+//	crossVector[1].WW -= IMUlocationy.WW + ((IMUintegralAccelerationy.WW) >> 4);
+	crossVector.x  = navgoal.x; // TODO: confirm this is okay given how we used to do it (as above)
 	crossVector.y  = navgoal.y;
 	crossVector.x -= IMUlocationx.WW + ((IMUintegralAccelerationx.WW) >> 4);
 	crossVector.y -= IMUlocationy.WW + ((IMUintegralAccelerationy.WW) >> 4);
@@ -419,8 +440,6 @@ static void cross_track(vect2_16t* result)
 		}
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 void navigate_compute_bearing_to_goal(void)
 {

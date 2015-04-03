@@ -24,7 +24,7 @@
 
 #if (USE_MAVLINK == 1)
 
-#include "MAVLink.h"
+#include "../MatrixPilot/MAVLink.h"
 #include "../libUDB/serialIO.h"
 #include "../MatrixPilot/telemetry_log.h"
 #include <string.h>

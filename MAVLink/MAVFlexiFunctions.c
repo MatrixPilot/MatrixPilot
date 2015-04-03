@@ -24,7 +24,7 @@
 
 #if (USE_MAVLINK == 1)
 
-#include "MAVLink.h"
+#include "../MatrixPilot/MAVLink.h"
 #include "MAVFlexiFunctions.h"
 #if (USE_FLEXIFUNCTION_MIXING == 1)
 #include "../libFlexiFunctions/flexiFunctionServices.h"

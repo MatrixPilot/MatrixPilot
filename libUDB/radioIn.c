@@ -178,13 +178,13 @@ void radioIn_failsafe_check(void)
 			udb_flags._.radio_on = 0;
 			udb_callback_radio_did_turn_off();
 		}
-		LED_GREEN = LED_OFF;
+		led_off(LED_GREEN);
 		noisePulses = 0; // reset count of noise pulses
 	}
 	else
 	{
 		udb_flags._.radio_on = 1;
-		LED_GREEN = LED_ON;
+		led_on(LED_GREEN);
 	}
 	failSafePulses = 0;
 }

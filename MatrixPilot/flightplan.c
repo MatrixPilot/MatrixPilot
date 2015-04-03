@@ -58,6 +58,8 @@ void flightplan_init(void)
 	DPRINT("flightplan_init() - %s\r\n", flightplan_logo_active ? "LOGO" : "WAYPOINTS");
 }
 
+void navigate_print(void);
+
 void flightplan_begin(int16_t flightplanNum)
 {
 	DPRINT("flightplan_begin(%u)\r\n", flightplanNum);
@@ -67,6 +69,7 @@ void flightplan_begin(int16_t flightplanNum)
 	} else {
 		flightplan_waypoints_begin(flightplanNum);
 	}
+	navigate_print();
 }
 
 void flightplan_update(void)

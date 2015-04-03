@@ -283,7 +283,7 @@ void set_waypoint(int16_t index)
 	if (index < numPointsInCurrentSet)
 	{
 		waypointIndex = index;
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 		mavlink_waypoint_changed(waypointIndex);
 #endif
 		if (waypointIndex == 0)
@@ -320,7 +320,7 @@ static void next_waypoint(void)
 {
 	if (extended_range == 0)
 	{
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 		mavlink_waypoint_reached(waypointIndex);
 #endif
 		waypointIndex++;
@@ -329,7 +329,7 @@ static void next_waypoint(void)
 		DPRINT("next_waypoint(%u)\r\n", waypointIndex);
 		set_waypoint(waypointIndex);
 /*
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 		mavlink_waypoint_changed(waypointIndex);
 #endif
 		if (waypointIndex == 0)

@@ -339,7 +339,7 @@ static void normalAltitudeCntrl(void)
 		{
 			manualThrottle(throttleIn);
 		}
-		else if (flags._.GPS_steering && desired_behavior._.land)
+		else if (state_flags._.GPS_steering && desired_behavior._.land)
 		{
 			// place a ceiling, in other words, go down, but not up.
 			if (pitchAltitudeAdjust > 0)

@@ -28,7 +28,7 @@
 #include "mode_switch.h"
 #include "servoMix.h"
 #include "servoPrepare.h"
-#include "../MAVLink/MAVLink.h"
+#include "MAVLink.h"
 #include "telemetry.h"
 #include "libCntrl.h"
 #include "airspeedCntrl.h"
@@ -113,26 +113,12 @@ inline static void manualPassthrough(void)
 void dcm_heartbeat_callback(void)   // was called dcm_servo_callback_prepare_outputs()
 {
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
-	quad_heartbeat_callback();      // this was called dcm_servo_callback_prepare_outputs();
+	quad_heartbeat_callback();      // was called dcm_servo_callback_prepare_outputs();
 #else
 	if (dcm_flags._.calib_finished)
 	{
 		flight_controller();
-//#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
-//		// This is a simple check to send telemetry at 8hz
-//		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
-//		{
-//// RobD			flight_state_8hz();
-//			telemetry_output_8hz();
-//		}
-//#endif // SERIAL_OUTPUT_FORMAT
-#if (USE_MAVLINK == 1)
-		// Poll the MAVLink subsystem at 40hz
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			mavlink_output_40hz();
-		}
-#else
+#if (USE_MAVLINK == 0)
 		// Send telemetry updates at 8hz
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
@@ -146,7 +132,7 @@ void dcm_heartbeat_callback(void)   // was called dcm_servo_callback_prepare_out
 		// otherwise, there is not anything to do
 		manualPassthrough();        // Allow manual control while starting up
 	}
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
 		mavlink_output_40hz();

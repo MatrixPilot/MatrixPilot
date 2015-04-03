@@ -28,15 +28,17 @@
 
 int16_t udb_magFieldBody[3];                    // magnetic field in the body frame of reference 
 int16_t udb_magOffset[3] = { 0 , 0 , 0 };       // magnetic offset in the body frame of reference
+// To use static offsets, Change the variable name udb_magOffset to udb_staticMagOffset on lines 169, 170, 171
+int16_t udb_staticMagOffset[3] = { 0 , 0 , 0 }; // Enter the static magnetic offset in the body frame of reference here.
 int16_t magGain[3] = { RMAX , RMAX , RMAX };    // magnetometer calibration gains
 int16_t rawMagCalib[3] = { 0 , 0 , 0 };
 int16_t magFieldRaw[3];
 int16_t magMessage = 0;                         // message type
 
-static magnetometer_callback_funcptr magnetometer_callback = NULL;
-
 #if (MAG_YAW_DRIFT == 1)
 //#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+
+static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 #define HMC5883_COMMAND 0x3C
 
@@ -164,9 +166,9 @@ static void I2C_callback(boolean I2CtrxOK)
 		}
 		if (magMessage == 7)
 		{
-			udb_magFieldBody[0] = MAG_X_SIGN((__builtin_mulsu((magFieldRaw[MAG_X_AXIS]), magGain[MAG_X_AXIS]))>>14) - (udb_magOffset[0]>>1);
-			udb_magFieldBody[1] = MAG_Y_SIGN((__builtin_mulsu((magFieldRaw[MAG_Y_AXIS]), magGain[MAG_Y_AXIS]))>>14) - (udb_magOffset[1]>>1);
-			udb_magFieldBody[2] = MAG_Z_SIGN((__builtin_mulsu((magFieldRaw[MAG_Z_AXIS]), magGain[MAG_Z_AXIS]))>>14) - (udb_magOffset[2]>>1);
+			udb_magFieldBody[0] = MAG_X_SIGN((__builtin_mulsu((magFieldRaw[MAG_X_AXIS]), magGain[MAG_X_AXIS]))>>14) - (udb_magOffset[0]>>1); // To use static offsets, Change udb_magOffset to udb_staticMagOffset
+			udb_magFieldBody[1] = MAG_Y_SIGN((__builtin_mulsu((magFieldRaw[MAG_Y_AXIS]), magGain[MAG_Y_AXIS]))>>14) - (udb_magOffset[1]>>1); // To use static offsets, Change udb_magOffset to udb_staticMagOffset
+			udb_magFieldBody[2] = MAG_Z_SIGN((__builtin_mulsu((magFieldRaw[MAG_Z_AXIS]), magGain[MAG_Z_AXIS]))>>14) - (udb_magOffset[2]>>1); // To use static offsets, Change udb_magOffset to udb_staticMagOffset
 
 			if ((abs(udb_magFieldBody[0]) < MAGNETICMAXIMUM) &&
 			    (abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM) &&

@@ -21,13 +21,13 @@
 
 #include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for AIRFRAME_TYPE
 #include "libUDB.h"
-#include "eeprom_udb4.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
 #include "serialIO.h"
 #include "servoOut.h"
 #include "radioIn.h"
+#include "eeprom_udb4.h"
 #include "ADchannel.h"
 #include "mpu6000.h"
 #include "analogs.h"

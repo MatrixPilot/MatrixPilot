@@ -25,6 +25,7 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
 #include "states.h"
+#include "console.h"
 #include "flightplan-waypoints.h"
 #include <setjmp.h>
 
@@ -44,97 +45,11 @@
 
 void init_tasks(void);
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 void parameter_table_init(void);
 #endif
 
 static jmp_buf buf;
-
-#if 0
-#if (SILSIM == 1)
-int mp_argc;
-char** mp_argv;
-int main(int argc, char** argv)
-{
-	// keep these values available for later
-	mp_argc = argc;
-	mp_argv = argv;
-#else
-int main(void)
-{
-	mcu_init();     // initialise the processor specific registers
-#endif
-
-#if (USE_TELELOG == 1)
-	log_init();
-#endif
-#if (USE_USB == 1)
-	preflight();    // perhaps this would be better called usb_init()
-#endif
-	gps_init();     // this sets function pointers so i'm calling it early for now
-	udb_init();     // configure clocks and enables global interrupts
-	dcm_init();
-//	init_config();  // this will need to be moved up in order to support runtime hardware options
-	flightplan_init();
-
-#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
-//#error here
-	quad_init();
-#else // AIRFRAME_TYPE
-	init_servoPrepare();
-	init_states();
-	init_behavior();
-	telemetry_init();
-#endif // AIRFRAME_TYPE
-
-	if (setjmp(buf))
-	{
-		// a processor exception occurred and we're resuming execution here
-		DPRINT("longjmp'd\r\n");
-	}
-
-#ifdef _MSC_VER
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-	parameter_table_init();
-#endif // SERIAL_OUTPUT_FORMAT
-#endif // _MSC_VER
-
-//	MatrixPilot();
-//	dcm_fract_test(472580108);
-
-//#undef USE_FREERTOS
-#ifdef USE_FREERTOS
-	DPRINT("Initialising RTOS\r\n");
-	init_tasks();   // initialise the RTOS
-	DPRINT("Starting Scheduler\r\n");
-	vTaskStartScheduler();  // start the RTOS running, this function should never return
-	return 0;
-}
-
-void idle_task(void)
-{
-#else
-#endif
-
-	while (1)
-	{
-#if (USE_TELELOG == 1)
-		telemetry_log();
-#endif
-#if (USE_USB == 1)
-		USBPollingService();
-#endif
-#if (CONSOLE_UART != 0 && SILSIM == 0)
-		console();
-#endif
-#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
-		quad_background_task(); // this was called run_background_task()
-#endif // AIRFRAME_TYPE
-		udb_run();
-	}
-}
-
-#else
 
 int matrixpilot_init(void)
 {
@@ -146,12 +61,16 @@ int matrixpilot_init(void)
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();     // configure clocks and enables global interrupts
+
+	filesys_init(); // attempts to mount a file system
+	config_init();  // reads .ini files otherwise initialises with defaults
+
 	dcm_init();
 //	init_config();  // this will need to be moved up in order to support runtime hardware options
 	flightplan_init();
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
-//#error here
+#error here
 	quad_init();
 #else // AIRFRAME_TYPE
 	init_servoPrepare();
@@ -160,6 +79,11 @@ int matrixpilot_init(void)
 	telemetry_init();
 #endif // AIRFRAME_TYPE
 
+#ifdef _MSC_VER
+#if (USE_MAVLINK == 1)
+	parameter_table_init();
+#endif // (USE_MAVLINK == 1)
+#endif // _MSC_VER
 	return 0;
 }
 
@@ -202,12 +126,6 @@ int main(void)
 		DPRINT("longjmp'd\r\n");
 	}
 
-#ifdef _MSC_VER
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
-	parameter_table_init();
-#endif // SERIAL_OUTPUT_FORMAT
-#endif // _MSC_VER
-
 //	MatrixPilot();
 //	dcm_fract_test(472580108);
 
@@ -231,7 +149,6 @@ void idle_task(void)
 	}
 }
 
-#endif // 0
 #if 0
 void vApplicationMallocFailedHook(void)
 {
@@ -250,4 +167,4 @@ void vApplicationMallocFailedHook(void)
 //	taskDISABLE_INTERRUPTS();
 	for( ;; );
 }
-#endif
+#endif // 0

@@ -34,7 +34,7 @@ int16_t waggle = 0;
 static uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
-#if (HILSIM == 1)
+#if (HILSIM == 1) // implied when SILSIM == 1
 #define CALIB_PAUSE   (2  * FSM_CLK)    // wait for 2 seconds of runs through the state machine
 //#define STANDBY_PAUSE (24 * FSM_CLK)    // pause for 24 seconds of runs through the state machine
 #define STANDBY_PAUSE (5 * FSM_CLK)    // pause for 5 seconds of runs through the state machine
@@ -44,8 +44,6 @@ static uint8_t counter = 0;
 #define STANDBY_PAUSE (5 * FSM_CLK)    // pause for 5 seconds of runs through the state machine
 #endif
 
-//#define CALIB_PAUSE (10.5 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
-//#define STANDBY_PAUSE (24 * FSM_CLK)    // pause for 24 seconds of runs through the state machine
 #define NUM_WAGGLES 4                   // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
 #define WAGGLE_SIZE 300
 
@@ -331,6 +329,9 @@ static void ent_returnS(void)
 	led_on(LED_RED);
 	stateS = &returnS;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// State handlers - these are polled via the function pointer stateS
 
 static void startS(void)
 {

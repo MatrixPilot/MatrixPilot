@@ -88,6 +88,9 @@ inline void heartbeat(void) // called from ISR
 	}
 
 	// TODO: determine why this is called from the high priority interrupt handler? is it req?
+	// This calls the state machine implemented in MatrixPilot/states.c
+	// it is called at high priority to ensure manual control takeover can
+	// occur, even if the lower priority tasks hang
 	// Call the periodic callback at 40 Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
