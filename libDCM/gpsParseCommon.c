@@ -130,15 +130,7 @@ boolean gps_nav_capable_check_set(void)
 	return dcm_flags._.nav_capable;
 }
 
-static void udb_background_callback_triggered(void);
-
-// Received a full set of GPS messages
-void gps_parse_common(void)
-{
-	udb_background_trigger(&udb_background_callback_triggered);
-}
-
-static void udb_background_callback_triggered(void)
+static void gps_parse_common_callback(void)
 {
 	dirOverGndHrmat[0] = rmat[1];
 	dirOverGndHrmat[1] = rmat[4];
@@ -175,6 +167,13 @@ static void udb_background_callback_triggered(void)
 		gps_update_basic_data();            // update svs
 #endif
 	}
+}
+
+// Received a full set of GPS messages
+void gps_parse_common(void)
+{
+	// TODO: perhaps have a boolean variable to reset gps_data_age??
+	udb_background_trigger(&gps_parse_common_callback);
 }
 
 #define MS_PER_DAY 86400000 // = (24 * 60 * 60 * 1000)

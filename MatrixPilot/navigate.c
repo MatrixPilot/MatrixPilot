@@ -54,35 +54,23 @@ uint16_t yawkpail; // only exported for parameter_table
 uint16_t yawkprud; // only exported for parameter_table
 
 int16_t tofinish_line = 0;
-int16_t progress_to_goal = 0;
 int8_t desired_dir = 0;
 int8_t extended_range = 0;
 
-struct relative2D togoal = { 0, 0 };
-int8_t desired_bearing_over_ground;
 
+struct waypointparameters {
+	int16_t x;
+	int16_t y;
+	int16_t cosphi;
+	int16_t sinphi;
+	int8_t  phi;
+	int16_t height;
+	int16_t fromHeight;
+	int16_t legDist;
+};
 
 static struct waypointparameters navgoal;
 static int16_t desired_bearing_over_ground_vector[2];
-
-void navigate_print_goal(struct waypointparameters* pgoal)
-{
-	printf("x:          %i\r\n", pgoal->x);
-	printf("y:          %i\r\n", pgoal->y);
-	printf("cosphi:     %i\r\n", pgoal->cosphi);
-	printf("sinphi:     %i\r\n", pgoal->sinphi);
-	printf("phi:        %i\r\n", pgoal->phi);
-	printf("height:     %i\r\n", pgoal->height);
-	printf("fromHeight: %i\r\n", pgoal->fromHeight);
-	printf("legDist:    %i\r\n", pgoal->legDist);
-
-//	printf(" %i\r\n", pgoal->);
-}
-
-void navigate_print(void)
-{
-	navigate_print_goal(&navgoal);
-}
 
 int16_t navigate_get_goal(vect3_16t* _goal)
 {
@@ -278,16 +266,14 @@ int16_t navigate_desired_height(void)
 	}
 	else
 	{
-//		int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
-//		progress_to_goal = compute_progress_to_goal(navgoal.legDist, tofinish_line);
+		int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+		progress_to_goal = compute_progress_to_goal(navgoal.legDist, tofinish_line);
 		height = navgoal.fromHeight + (((navgoal.height - navgoal.fromHeight) * (int32_t)progress_to_goal) >> 12);
 	}
 	return height;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-static void cross_track(vect2_16t* result)
+static void cross_track(void)
 {
 // INPUTS: navgoal, IMUlocation, IMUintegralAcceleration
 // OUTPUT: desired_bearing_over_ground_vector
@@ -296,12 +282,68 @@ static void cross_track(vect2_16t* result)
 //struct ww   { int16_t W0; int16_t W1; };
 //union longww     { int32_t WW;  struct ww _; };
 
-}
+	// Using Cross Tracking
+	// CROSS_TRACK_MARGIN is the value of cross track error in meters
+	// beyond which cross tracking correction saturates at 45 degrees 
+#if (CROSS_TRACK_MARGIN >= 1024)
+#error ("CTMARGIN is too large, it must be less than 1024")
+#endif
+	union longww crossVector[2];
+	int16_t cross_rotate[2];
+	int16_t crosstrack;
 
-///////////////////////////////////////////////////////////////////////////////
+	// cross_rotate is a vector parallel to the desired course track
+	cross_rotate[0] =  navgoal.cosphi;
+	cross_rotate[1] = -navgoal.sinphi;
+
+	// cross_vector is a weighted sum of cross track distance error and cross velocity.
+	// IMU velocity is in centimeters per second, so right shifting by 4 produces
+	// about 6 times the IMU velocity in meters per second.
+	// This sets the time constant of the exponential decay to about 6 seconds
+	crossVector[0]._.W1 = navgoal.x;
+	crossVector[1]._.W1 = navgoal.y;
+	crossVector[0].WW -= IMUlocationx.WW + ((IMUintegralAccelerationx.WW) >> 4);
+	crossVector[1].WW -= IMUlocationy.WW + ((IMUintegralAccelerationy.WW) >> 4);
+
+	// The following rotation transforms the cross track error vector into the
+	// frame of the desired course track
+	rotate_2D_long_vector_by_vector(&crossVector[0].WW, cross_rotate);
+	crosstrack = crossVector[1]._.W1;
+
+	// Compute the adjusted desired bearing over ground.
+	// Start with the straight line between waypoints.
+	desired_bearing_over_ground_vector[0] = navgoal.cosphi;
+	desired_bearing_over_ground_vector[1] = navgoal.sinphi;
+
+	// Determine if the crosstrack error is within saturation limit.
+	// If so, then multiply by 64 to pick up an extra 6 bits of resolution.
+	if (abs(crosstrack) < ((uint16_t)(CROSS_TRACK_MARGIN)))
+	{
+		crossVector[1].WW <<= 6;
+		cross_rotate[1] = crossVector[1]._.W1;
+		cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN));
+		vector2_normalize(cross_rotate, cross_rotate);
+		// At this point, the implicit angle of the cross correction rotation
+		// is atan of (the cross error divided by the cross margin).
+		// Rotate the base course by the cross correction
+		rotate_2D_vector_by_vector(desired_bearing_over_ground_vector, cross_rotate);
+	}
+	else
+	{
+		if (crosstrack > 0)
+		{
+			rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (32));
+		}
+		else
+		{
+			rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (- 32));
+		}
+	}
+}
 
 void navigate_compute_bearing_to_goal(void)
 {
+	struct relative2D togoal;
 	union longww temporary;
 
 	// compute the goal vector from present position to waypoint target in meters:
@@ -326,63 +368,7 @@ void navigate_compute_bearing_to_goal(void)
 	              + __builtin_mulss(IMUintegralAccelerationy._.W1, navgoal.sinphi));
 	if ((desired_behavior._.cross_track) && (temporary._.W1 > 0))
 	{
-		// Using Cross Tracking
-		// CROSS_TRACK_MARGIN is the value of cross track error in meters
-		// beyond which cross tracking correction saturates at 45 degrees 
-#if (CROSS_TRACK_MARGIN >= 1024)
-#error ("CTMARGIN is too large, it must be less than 1024")
-#endif
-		union longww crossVector[2];
-		int16_t cross_rotate[2];
-		int16_t crosstrack;
-
-		// cross_rotate is a vector parallel to the desired course track
-		cross_rotate[0] =  navgoal.cosphi;
-		cross_rotate[1] = -navgoal.sinphi;
-
-		// cross_vector is a weighted sum of cross track distance error and cross velocity.
-		// IMU velocity is in centimeters per second, so right shifting by 4 produces
-		// about 6 times the IMU velocity in meters per second.
-		// This sets the time constant of the exponential decay to about 6 seconds
-		crossVector[0]._.W1 = navgoal.x;
-		crossVector[1]._.W1 = navgoal.y;
-		crossVector[0].WW -= IMUlocationx.WW + ((IMUintegralAccelerationx.WW) >> 4);
-		crossVector[1].WW -= IMUlocationy.WW + ((IMUintegralAccelerationy.WW) >> 4);
-
-		// The following rotation transforms the cross track error vector into the
-		// frame of the desired course track
-		rotate_2D_long_vector_by_vector(&crossVector[0].WW, cross_rotate);
-		crosstrack = crossVector[1]._.W1;
-
-		// Compute the adjusted desired bearing over ground.
-		// Start with the straight line between waypoints.
-		desired_bearing_over_ground_vector[0] = navgoal.cosphi;
-		desired_bearing_over_ground_vector[1] = navgoal.sinphi;
-
-		// Determine if the crosstrack error is within saturation limit.
-		// If so, then multiply by 64 to pick up an extra 6 bits of resolution.
-		if (abs(crosstrack) < ((uint16_t)(CROSS_TRACK_MARGIN)))
-		{
-			crossVector[1].WW <<= 6;
-			cross_rotate[1] = crossVector[1]._.W1;
-			cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN));
-			vector2_normalize(cross_rotate, cross_rotate);
-			// At this point, the implicit angle of the cross correction rotation
-			// is atan of (the cross error divided by the cross margin).
-			// Rotate the base course by the cross correction
-			rotate_2D_vector_by_vector(desired_bearing_over_ground_vector, cross_rotate);
-		}
-		else
-		{
-			if (crosstrack > 0)
-			{
-				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (32));
-			}
-			else
-			{
-				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (- 32));
-			}
-		}
+		cross_track();
 	}
 	else
 	{
@@ -395,25 +381,6 @@ void navigate_compute_bearing_to_goal(void)
 	if (state_flags._.GPS_steering)   // return to home or waypoints state
 	{
 		desired_dir = navgoal.phi;
-		progress_to_goal = compute_progress_to_goal(navgoal.legDist, tofinish_line);
-//		if (navgoal.legDist > 0)
-//		{
-//			// progress_to_goal is the fraction of the distance from the start to the finish of
-//			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-//			progress_to_goal = (((int32_t)navgoal.legDist - tofinish_line) << 12) / navgoal.legDist;
-//			if (progress_to_goal < 0)
-//			{
-//				progress_to_goal = 0;
-//			}
-//			if (progress_to_goal > (int32_t)1 << 12)
-//			{
-//				progress_to_goal = (int32_t)1 << 12;
-//			}
-//		}
-//		else
-//		{
-//			progress_to_goal = (int32_t)1 << 12;
-//		}
 	}
 	else
 	{
