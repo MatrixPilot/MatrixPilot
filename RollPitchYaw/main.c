@@ -36,22 +36,29 @@ char debug_buffer[128];
 int db_index = 0;
 void send_debug_line(void);
 
-int main(void)
+void matrixpilot_init(void)
 {
-	mcu_init();
-
-	// Set up the libraries
 	udb_init();
 	dcm_init();
 
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 
 	LED_GREEN = LED_OFF;
+}
 
-	// Start it up!
+void matrixpilot_loop(void)
+{
+	udb_run();
+}
+
+int main(void)
+{
+	mcu_init();
+	matrixpilot_init();
+
 	while (1)
 	{
-		udb_run();
+		matrixpilot_loop();
 	}
 
 	return 0;
@@ -126,10 +133,10 @@ void dcm_heartbeat_callback(void) // was called dcm_servo_callback_prepare_outpu
 void send_debug_line(void)
 {
 	db_index = 0;
-	sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
-		lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, 
-		rmat[0], rmat[1], rmat[2], 
-		rmat[3], rmat[4], rmat[5], 
+	sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
+		lat_gps.WW, lon_gps.WW, alt_sl_gps.WW,
+		rmat[0], rmat[1], rmat[2],
+		rmat[3], rmat[4], rmat[5],
 		rmat[6], rmat[7], rmat[8]);
 	udb_serial_start_sending_data();
 }
@@ -157,3 +164,8 @@ void udb_callback_radio_did_turn_off(void)
 //void osd_init(void)
 //{
 //}
+
+uint8_t mode_switch_check_set(boolean radio_on)
+{
+	return 0;
+}

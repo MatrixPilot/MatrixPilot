@@ -229,3 +229,6 @@
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
 #define USE_MSD                             0
+
+// NEW STUFF
+#define MODE_SWITCH_INPUT_CHANNEL           3

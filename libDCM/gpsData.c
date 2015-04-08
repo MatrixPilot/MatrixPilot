@@ -59,6 +59,25 @@ volatile union longbbbb tow;
 ///////////////////////////////////////////////////////////////////////////////
 // PASS THE STRUCTURE* TO THE gps_commit_data() functions
 
+
+//struct relative3D    { int16_t x; int16_t y; int16_t z; };  // vect3_16t
+//struct relative3D_32 { int32_t x; int32_t y; int16_t z; };  // vect3_32t (compat)
+
+void gps_print(void)
+{
+	printf("lat_gps:    %i\r\n", lat_gps);
+	printf("lon_gps:    %i\r\n", lon_gps);
+	printf("alt_sl_gps: %i\r\n", alt_sl_gps);
+	printf("hdop:       %i\r\n", hdop);
+	printf("svs:        %i\r\n", svs);
+	printf("cog_gps:    %i\r\n", cog_gps);
+	printf("sog_gps:    %i\r\n", sog_gps);
+	printf("climb_gps:  %i\r\n", climb_gps);
+
+	printf("loc x: %i y: %i z: %i\r\n", GPSlocation.x, GPSlocation.y, GPSlocation.z);
+	printf("vel x: %i y: %i z: %i\r\n", GPSvelocity.x, GPSvelocity.y, GPSvelocity.z);
+}
+
 /*
 void gps_commit_data(void) // MTEK
 {

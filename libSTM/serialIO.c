@@ -19,10 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB.h"
-//#include "oscillator.h"
-//#include "interrupt.h"
-#include "serialIO.h"
+#include "../libUDB/libUDB.h"
+//#include "../libUDB/oscillator.h"
+//#include "../libUDB/interrupt.h"
+#include "../libUDB/serialIO.h"
 #include "stm32f4xx_hal.h"
 
 
@@ -56,9 +56,9 @@ void udb_init_GPS(void)
 }
 
 //#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
-#include "libDCM.h"
-//#include "gpsData.h"
-#include "gpsParseCommon.h"
+#include "../libDCM/libDCM.h"
+//#include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
 
 void MP_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {

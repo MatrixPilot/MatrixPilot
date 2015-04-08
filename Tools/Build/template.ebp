@@ -59,26 +59,9 @@
 		</Device>
 		<Compiler>
 			<Add option="-mfloat-abi=hard" />
-			<Add option="-DARM_MATH_CM4" />
-			<Add option="-D__FPU_USED" />
-			<Add option="-DSTM32F401RE" />
-			<Add option="-DSTM32F4XX" />
-			<Add option="-DUSE_STDPERIPH_DRIVER" />
-			<Add option="-DSTM32F401xE" />
-			<Add option="-DPX4" />
 			<Add option="-fno-strict-aliasing" />
+%%DEFINES%%
 %%INCLUDES%%
-			<Add directory="..\libSTM\inc" />
-			<Add directory="..\libSTM\src" />
-			<Add directory="..\libSTM\cmsis" />
-			<Add directory="..\libSTM\Drivers" />
-			<Add directory="..\libSTM\Drivers\CMSIS\Device\ST\STM32F4xx\Include" />
-			<Add directory="..\libSTM\Drivers\CMSIS\Include" />
-			<Add directory="..\libSTM\Drivers\STM32F4xx_HAL_Driver\Inc" />
-			<Add directory="..\libSTM\Middlewares" />
-			<Add directory="..\libSTM\Middlewares\Third_Party\FreeRTOS\Source\include" />
-			<Add directory="..\libSTM\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS" />
-			<Add directory="..\libSTM\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM4F" />
 		</Compiler>
 		<Linker>
 			<Add option="-eb_start_files" />

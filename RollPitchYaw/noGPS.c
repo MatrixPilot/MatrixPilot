@@ -20,6 +20,7 @@
 
 
 #include "../libDCM/libDCM.h"
+/*
 #include "../libDCM/gpsParseCommon.h"
 
 // GPS MatrixPilot global variables (these are the GPS system outputs)
@@ -41,10 +42,10 @@ void dead_reckon(struct relative3D gps_velocity) {}
 int16_t udb_gps_callback_get_byte_to_send(void) { return -1; }
 void udb_gps_callback_received_byte(uint8_t rxchar) {}
 void gps_startup_sequence(int16_t gpscount) {}
-
+ */
 ///////////////////////////////////////////////////////////////////////////////
 
-void calculate_analog_sensor_values(void) {}
-void init_analogs(void) {}
-void udb_init_capture(void) {}
-void udb_init_ADC(void) {}
+//void calculate_analog_sensor_values(void) {}
+//void init_analogs(void) {}
+//void udb_init_capture(void) {}
+//void udb_init_ADC(void) {}

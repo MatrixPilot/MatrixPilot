@@ -11,6 +11,14 @@ import re
 rootdir = ""
 script_path = ""
 
+def is_empty(any_structure):
+	if any_structure:
+		print('Structure is not empty.')
+		return False
+	else:
+		print('Structure is empty.')
+		return True
+
 def mkdirnotex(filename):  
 	folder = os.path.dirname(filename)  
 	if not os.path.exists(folder):  
@@ -37,14 +45,37 @@ def parse_options_file(filename, option):
 			str = match.group(2)
 	return str
 
+
 #
-# EXAMPLE MAKEFILE/OPTIONS FILE:
+# EXAMPLE MAKEFILE/target-* FILE:
+#
+# modules := MatrixPilot MAVLink libDCM
+# incpath := MAVLink/include
+# cfgpath := Config
+
+#
+# EXAMPLE MAKEFILE/device-* FILE:
 #
 # TOOLCHAIN ?= XC16
 # TARGET_TYPE := hex
 # CPU := 33FJ256GP710A
 # modules := libUDB libDCM MatrixPilot MAVLink
 # incpath := Config Microchip Microchip/Include libVectorMatrix
+#
+# defines += ARM_MATH_CM4 __FPU_USED STM32F401RE STM32F4XX USE_STDPERIPH_DRIVER STM32F401xE
+
+#
+# EXAMPLE MAKEFILE/module FILE:
+#
+# extra_dirs := Src Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates Drivers/STM32F4xx_HAL_Driver/Src Middlewares/Third_Party/FreeRTOS/Source Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang Middlewares/Third_Party/FatFs/src Middlewares/Third_Party/FatFs/src/drivers Middlewares/Third_Party/FatFs/src/option
+# $(call mkoutdir, $(addprefix $(subdirectory)/,$(extra_dirs)))
+# local_src := $(wildcard $(SOURCE_DIR)/$(subdirectory)/*.c)
+# local_src += $(foreach i,$(extra_dirs),$(wildcard $(SOURCE_DIR)/$(subdirectory)/$(i)/*.c))
+# local_inc := Inc Src Drivers Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Drivers/STM32F4xx_HAL_Driver/Inc Middlewares Middlewares/Third_Party/FreeRTOS/Source/include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+# local_inc += Middlewares/Third_Party/FatFs/src
+# local_inc += Middlewares/Third_Party/FatFs/src/drivers
+# incpath += $(addprefix $(SOURCE_DIR)/$(subdirectory)/,$(local_inc))
+# $(eval $(call make-library,$(subdirectory)/$(subdirectory).a,$(local_src)))
 #
 
 
@@ -258,10 +289,12 @@ def emBlocks_scan_dirs(masks, sources, directories):
 #
 # <Unit filename="Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_usb.h" />
 
-def emBlocks_project(mcu_type, target_board, config_dir, includes, header_files, source_files, project_output_file):
+def emBlocks_project(mcu_type, name, target_board, config_dir, defines, includes, header_files, source_files, project_output_file):
 	with open (script_path + "template.ebp", "r") as file:
 		data = file.read()
-		data = data.replace("%%PROJECT%%", "MatrixPilot-PX4")
+#		data = data.replace("%%PROJECT%%", "MatrixPilot-PX4")
+		data = data.replace("%%PROJECT%%", name + "-" + target_board)
+		data = data.replace("%%DEFINES%%", defines)
 		data = data.replace("%%INCLUDES%%", includes)
 		data = data.replace("%%TARGET_BOARD%%", target_board)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
@@ -306,16 +339,16 @@ if __name__ == '__main__':
 	else:
 		arch = ""
 
+	opts.out = opts.root + "/build"
+
 	target_mk_path = opts.root + "/target-" + opts.name + ".mk"
 	opts.modules  = opts.modules  + parse_options_file(target_mk_path, "modules").split(' ')
 	opts.defines  = opts.includes + parse_options_file(target_mk_path, "defines").split(' ')
 	opts.includes = opts.includes + parse_options_file(target_mk_path, "incpath").split(' ')
 	opts.config   = opts.config   + parse_options_file(target_mk_path, "cfgpath")
 
-	opts.out = opts.root + "/build"
-	opts.file = opts.root + "/device-" + opts.target + ".mk"
-
-	if opts.file != "":
+	if opts.target != "":
+		opts.file = opts.root + "/device-" + opts.target + ".mk"
 		opts.modules = opts.modules + parse_options_file(opts.file, "modules").split(' ')
 #		print "modules2 =", opts.modules
 		opts.includes = opts.includes + parse_options_file(opts.file, "incpath").split(' ')
@@ -327,29 +360,49 @@ if __name__ == '__main__':
 		arch = "dsPIC" + parse_options_file(opts.file, "CPU")
 #		print "arch =", arch
 
-# TODO: prehaps we want to check that the modules list (etc) is not empty..
+	# TODO: prehaps we want to check that the modules list (etc) is not empty..
+#	print "modules = ", opts.modules
+#	print "defines = ", opts.defines
 
-#		print "modules2 =", opts.modules
+	for mod in opts.modules:
+		mod_incs = parse_options_file(opts.root + "/" + mod + "/module.mk", "local_inc").split(' ')
+		if not mod_incs == ['']:
+#			print "mod_incs = ", mod_incs
+			for mi in mod_incs:
+				opts.includes = opts.includes + [mod + "/" + mi]
+		mod_defs = parse_options_file(opts.root + "/" + mod + "/module.mk", "defines").split(' ')
+		if not mod_defs == ['']:
+#			print "mod_defs = ", mod_defs
+			for md in mod_defs:
+				if not md == '':
+#					print "md = ", md
+					opts.defines = opts.defines + [md]
 
 	rootsep = "../"
 	inc_list = [rootsep + str(x) for x in opts.includes]
 	includes = ';'.join(inc_list)
 
-#	print "includes = ", includes
+	print "includes = ", includes
 #	print "config = ", rootsep + opts.config
 
 	filters = ""
 	project = os.path.join(opts.out, opts.name + "-" + opts.target)
 
 	if opts.target == "PX4":
-		sources  = emBlocks_scan_dirs(["*.c", "*.s"], 1, opts.modules)
-		headers  = emBlocks_scan_dirs(["*.h"], 0, [opts.config] + opts.modules + ["libUDB"])
+		sources = emBlocks_scan_dirs(["*.c", "*.s"], 1, opts.modules)
+		headers = emBlocks_scan_dirs(["*.h"], 0, [opts.config] + opts.modules + ["libUDB"])
 		project_path = project + ".ebp"
+		defines = "\t\t\t<Add option=\"-D" + opts.target + "\" />\n"
 		includes = ""
+		for d in opts.defines:
+#			if not d == ['']:
+			if d:
+				print "d = ", d
+				defines = defines + "\t\t\t<Add option=\"-D" + d + "\" />\n"
 		for inc in inc_list:
 			includes = includes + "\t\t\t<Add directory=\"" + inc + "\" />\n"
 		print "writing: " + project_path
-		emBlocks_project(arch, opts.target, rootsep + opts.config, includes, headers, sources, project_path)
+		emBlocks_project(arch, opts.name, opts.target, rootsep + opts.config, defines, includes, headers, sources, project_path)
 	elif opts.target == "SIL":
 		sources = vs2010_scan_dirs(["*.c"], 1, opts.modules)
 		headers = vs2010_scan_dirs(["*.h"], 0, [opts.config] + opts.modules + ["libUDB"])

@@ -449,6 +449,12 @@ static void cmd_nav(char* arg)
 	navigate_print();
 }
 
+void gps_print(void);
+static void cmd_gps(char* arg)
+{
+	gps_print();
+}
+
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
 	{ 0, cmd_ver,    "ver" },
@@ -475,6 +481,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_send,   "send" },
 	{ 0, cmd_receive,"receive" },
 	{ 0, cmd_nav,    "nav" },
+	{ 0, cmd_gps,    "gps" },
 	{ 0, cmd_uart,   "uart" },
 };
 
