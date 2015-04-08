@@ -38,8 +38,20 @@ popd
 
 mkdir PX4 >nul 2>&1
 pushd PX4
-make -j 8 -f ../../makefile DEVICE=PX4
+make -j 8 -f ../../makefile TARGET_NAME=MatrixPilot DEVICE=PX4
 popd
+
+mkdir PX4-RPY >nul 2>&1
+pushd PX4-RPY
+make -j 8 -f ../../makefile TARGET_NAME=RollPitchYaw DEVICE=PX4
+popd
+
+mkdir UDB5-RPY >nul 2>&1
+pushd UDB5-RPY
+make -j 8 -f ../../makefile TARGET_NAME=RollPitchYaw DEVICE=UDB5
+popd
+
+goto END:
 
 mkdir AUAV3-C30 >nul 2>&1
 pushd AUAV3-C30

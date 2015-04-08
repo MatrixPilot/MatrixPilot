@@ -258,6 +258,10 @@ void heartbeat(void) // called from MPU6000 ISR
 {
 }
 
+void pulse(void) // called from TaskIMU
+{
+}
+
 void udb_init(void)
 {
 	int16_t i;
@@ -281,8 +285,10 @@ void udb_run(void)
 //			udb_callback_read_sensors();
 
 			udb_flags._.radio_on = (sil_radio_on &&
-			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN &&
-			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
+			    udb_pwIn[3] >= FAILSAFE_INPUT_MIN &&
+			    udb_pwIn[3] <= FAILSAFE_INPUT_MAX);
+//			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN &&
+//			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
 
 //			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 
