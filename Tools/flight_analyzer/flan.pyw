@@ -2434,8 +2434,13 @@ def graph_wing_loading(wing_loading_list, aoa_using_pitch_list, aoa_using_veloci
     title('Level flight: Elevator Deflection against Relative Wing Loading')
     plot(wing_loading_list, elevator_with_trim_removed, 'yo',wing_loading_list, fit_function2(wing_loading_list), '--k')
     
+    print "Angle of attack parameters usinging pitch:"
     print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function(  1.0))
     print "#define ANGLE_OF_ATTACK_INVERTED","{0:.2f}".format(fit_function( -1.0))
+    print "Angle of attack parameters using velocity:"
+    print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function3(  1.0))
+    print "#define ANGLE_OF_ATTACK_INVERTED","{0:.2f}".format(fit_function3( -1.0))
+    print "Trim parameters:"
     print "#define ELEVATOR_TRIM_NORMAL",    "{0:.2f}".format(fit_function2( 1.0))
     print "#define ELEVATOR_TRIM_INVERTED",  "{0:.2f}".format(fit_function2(-1.0))
     
