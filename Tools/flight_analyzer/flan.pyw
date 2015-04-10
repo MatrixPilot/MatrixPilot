@@ -2500,11 +2500,14 @@ def angle_of_attack(rmat,velocity):
 
 def wing_loading(aero_force, air_speed, centimeter_cruise_speed):
     """Calculate relative wing loading"""
-    gravity = 2000 # MatrixPilot represents the force of gravity with 2000 units
+    # gravity = 2000 # MatrixPilot represents the force of gravity with 2000 units (this works only for HILSIM)
     if (air_speed < (centimeter_cruise_speed / 10.0)):
         relative_wing_loading = 0; # To prevent divide by zero and or reports of very large wing loading
     else :
-        relative_wing_loading = (float(-aero_force) / gravity) * ((float(centimeter_cruise_speed) / float(air_speed))**2)
+        if ( aero_force < 0):
+            relative_wing_loading = ((float(centimeter_cruise_speed) / float(air_speed))**2)
+        else:
+            relative_wing_loading = -((float(centimeter_cruise_speed) / float(air_speed))**2)    
     return(relative_wing_loading)
  
 ########## User Interface Routines, functions and classes ##########
