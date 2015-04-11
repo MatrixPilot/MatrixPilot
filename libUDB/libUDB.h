@@ -124,21 +124,21 @@ void mav_printf(const char * format, ...);
 
 ////////////////////////////////////////////////////////////////////////////////
 // libUDB.h defines the API for accessing the UDB hardware through libUDB.
-// 
+//
 // This is the lowest-level component of MatrixPilot, and should not reference
 // anything from the higher-level components.  This library is designed to be
 // useful in its own right, independent of libDCM or MatrixPilot.
 //
 // libUDB requires an options.h file be provided that defines at least the
 // following constants:
-// 
+//
 // #define NUM_INPUTS
 // #define NUM_OUTPUTS
-// 
+//
 // #define FAILSAFE_INPUT_CHANNEL
 // #define FAILSAFE_INPUT_MIN
 // #define FAILSAFE_INPUT_MAX
-// 
+//
 // #define NORADIO
 // #define SERVOSAT
 
@@ -210,7 +210,7 @@ extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
 
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
-void udb_servo_record_trims(void);
+void udb_servo_record_trims(void);      //elgarbe: it will be here or on radioIn.h
 
 // Called immediately whenever the radio_on flag is set to 0
 void udb_callback_radio_did_turn_off(void);     // Callback

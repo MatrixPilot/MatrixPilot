@@ -40,7 +40,7 @@
 
 /* USER CODE END 0 */
 /* External variables --------------------------------------------------------*/
- 
+
 extern void xPortSysTickHandler(void);
 
 extern I2C_HandleTypeDef hi2c1;
@@ -49,9 +49,12 @@ extern TIM_HandleTypeDef htim10;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart6;
+extern TIM_HandleTypeDef htim5;     //Input Capture CH1 and CH2 timer base
+extern TIM_HandleTypeDef htim4;     //Input Capture CH3 to CH6 timer base
+
 
 /******************************************************************************/
-/*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
+/*            Cortex-M4 Processor Interruption and Exception Handlers         */
 /******************************************************************************/
 
 /**
@@ -173,6 +176,17 @@ void SPI2_IRQHandler(void)
   /* USER CODE END SPI2_IRQn 1 */
 }
 
-/* USER CODE BEGIN 1 */
-/* USER CODE END 1 */
+//IC on CH1 or CH2
+void TIM5_IRQHandler(void)
+{
+    //Go to global HAL ISR
+	HAL_TIM_IRQHandler(&htim5);
+}
+
+//IC on CH3 or CH6
+void TIM4_IRQHandler(void)
+{
+    //Go to global HAL ISR
+	HAL_TIM_IRQHandler(&htim4);
+}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

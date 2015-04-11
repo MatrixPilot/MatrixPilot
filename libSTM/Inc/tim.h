@@ -45,6 +45,8 @@
 extern TIM_HandleTypeDef htim10;
 
 void MX_TIM10_Init(void);
+void MX_TIM5_Init(void);
+void MX_TIM4_Init(void);
 
 #ifdef __cplusplus
 }
