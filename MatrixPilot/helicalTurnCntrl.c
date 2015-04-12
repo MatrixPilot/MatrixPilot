@@ -209,7 +209,7 @@ void helicalTurnCntrl( void )
 	int16_t pitchDot ;
 	int16_t pitchCross ;
 	int16_t pitchError ;
-	int16_t pitchErrorBody[2] ;	
+	int16_t pitchEarthBodyProjection[2] ;	
 #ifdef TestGains
 	flags._.GPS_steering = 0; // turn off navigation
 	flags._.pitch_feedback = 1; // turn on stabilization
@@ -408,12 +408,12 @@ void helicalTurnCntrl( void )
 
 	// start by computing the projection of earth frame pitch error to body frame
 
-	pitchErrorBody[0] = rmat[6] ;
-	pitchErrorBody[1] = rmat[8] ;
+	pitchEarthBodyProjection[0] = rmat[6] ;
+	pitchEarthBodyProjection[1] = rmat[8] ;
 
 	// normalize the projection vector and compute the cosine of the actual pitch as a side effect 
 
-	actualPitchVector[1] = ( int16_t ) vector2_normalize( pitchErrorBody , pitchErrorBody ) ;
+	actualPitchVector[1] = ( int16_t ) vector2_normalize( pitchEarthBodyProjection , pitchEarthBodyProjection ) ;
 
 	// complete the actual pitch vector
 
@@ -457,10 +457,10 @@ void helicalTurnCntrl( void )
 
 	// multiply the normalized rmat[6] , rmat[8] vector by the pitch error
 
-	VectorScale( 2 , pitchErrorBody , pitchErrorBody , pitchError ) ;
+	VectorScale( 2 , pitchEarthBodyProjection , pitchEarthBodyProjection , pitchError ) ;
 
-	tiltError[0] = 2*pitchErrorBody[1] ;
-	tiltError[2] = - 2*pitchErrorBody[0] ;
+	tiltError[0] = 2*pitchEarthBodyProjection[1] ;
+	tiltError[2] = - 2*pitchEarthBodyProjection[0] ;
 
 	// compute the rotation rate error vector
 
