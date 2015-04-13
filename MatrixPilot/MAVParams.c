@@ -32,10 +32,11 @@
 //#include <stdarg.h>
 #include <math.h>
 
-#if (DECLINATIONANGLE_VARIABLE != 1)
-//union intbb dcm_declination_angle = { .BB = 0};
-union intbb dcm_declination_angle = { 0 };
-#endif
+//#if (DECLINATIONANGLE_VARIABLE != 1)
+////union intbb dcm_declination_angle = { .BB = 0};
+//union intbb dcm_declination_angle = { 0 };
+//#endif
+extern union intbb dcm_declination_angle;
 
 #include "../MatrixPilot/parameter_table.h"
 

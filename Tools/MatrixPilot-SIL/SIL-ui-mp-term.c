@@ -12,7 +12,9 @@
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
 #include "../MatrixPilot/config.h"
+#include "../MatrixPilot/flightplan.h"
 #include "../MatrixPilot/flightplan-waypoints.h"
+#include "../libUDB/servoOut.h"
 #include <stdio.h>
 
 #define BUFLEN 512
