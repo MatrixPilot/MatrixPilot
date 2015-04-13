@@ -125,8 +125,8 @@ void radioIn_init(void) // was called udb_init_capture(void)
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
 //	#endif
 //	}
-    MX_TIM5_Init();           //Input Capture CH1 and CH2 timer base
-    MX_TIM4_Init();           //Input Capture CH3 to CH6 timer base
+	MX_TIM5_Init();     //Input Capture CH1 and CH2 timer base
+	MX_TIM4_Init();     //Input Capture CH3 to CH6 timer base
 }
 
 // called from heartbeat pulse at 20Hz
@@ -218,108 +218,108 @@ static void set_udb_pwIn(int pwm, int index)
 // There is just one IC_HANDLER callback for any IC
 #if (USE_PPM_INPUT == 0)
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
-
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
 	uint16_t time = 0;
 	static uint16_t rise=0;
 
-    if( htim->Instance == TIM5 )
-    {
-        /* CHANNEL 1 called ISR */
-        if( htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-        {
-            //Get the Captured timer
-        //	time = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_1);
-            //Is it ok? I remove a warning passing htim instead of &htim, but it is ok?
-            time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            if(IC_PIN1) //Rising edge?
-            {
-                // There is a problem with this approach. if previous capture were 65000 and current capture is 23 so
-                // 23-65000 -> overflow. I think that this is filtered out by noise filter function
-                rise = time;
-            }
-            else        //falling edge
-            {
-                set_udb_pwIn(rise-time, 1);      //Return captured timer
-            }
-        }
-        /* CHANNEL 2 called ISR */
-        else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
-        {
-            time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            if(IC_PIN2)
-            {
-                rise = time;
-            }
-            else
-            {
-                set_udb_pwIn(rise-time, 2);
-            }
-        }
-    }
-    else if( htim->Instance == TIM4 )
-    {
-        /* CHANNEL 1 called ISR */
-        if( htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-        {
-            time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            if(IC_PIN3)
-            {
-                rise = time;
-            }
-            else
-            {
-                set_udb_pwIn(rise-time, 3);
-            }
-        }
-        /* CHANNEL 2 called ISR */
-        else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
-        {
-            time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            if(IC_PIN4)
-            {
-                rise = time;
-            }
-            else
-            {
-                set_udb_pwIn(rise-time, 4);
-            }
-        }
-            /* CHANNEL 3 called ISR */
-        else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
-        {
-            time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-            if(IC_PIN5)
-            {
-                rise = time;
-            }
-            else
-            {
-                set_udb_pwIn(rise-time, 5);
-            }
-        }
-        /* CHANNEL 4 called ISR */
-        else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4)
-        {
-            time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
-            if(IC_PIN6)
-            {
-                rise = time;
-            }
-            else
-            {
-                set_udb_pwIn(rise-time, 6);
-            }
-        }
-    }
+	if (htim->Instance == TIM5 )
+	{
+		/* CHANNEL 1 called ISR */
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+		{
+			// Get the Captured timer
+		//	time = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_1);
+			// Is it ok? I remove a warning passing htim instead of &htim, but it is ok?
+			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+			if (IC_PIN1) //Rising edge?
+			{
+				// There is a problem with this approach. if previous capture were 65000 and current capture is 23 so
+				// 23-65000 -> overflow. I think that this is filtered out by noise filter function
+				rise = time;
+			}
+			else // falling edge
+			{
+				set_udb_pwIn(rise-time, 1); // Return captured timer
+			}
+		}
+		/* CHANNEL 2 called ISR */
+		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+		{
+			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+			if (IC_PIN2)
+			{
+				rise = time;
+			}
+			else
+			{
+				set_udb_pwIn(rise-time, 2);
+			}
+		}
+	}
+	else if (htim->Instance == TIM4)
+	{
+		/* CHANNEL 1 called ISR */
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+		{
+			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+			if (IC_PIN3)
+			{
+				rise = time;
+			}
+			else
+			{
+				set_udb_pwIn(rise-time, 3);
+			}
+		}
+		/* CHANNEL 2 called ISR */
+		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+		{
+			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+			if (IC_PIN4)
+			{
+				rise = time;
+			}
+			else
+			{
+				set_udb_pwIn(rise-time, 4);
+			}
+		}
+			/* CHANNEL 3 called ISR */
+		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
+		{
+			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+			if (IC_PIN5)
+			{
+				rise = time;
+			}
+			else
+			{
+				set_udb_pwIn(rise-time, 5);
+			}
+		}
+		/* CHANNEL 4 called ISR */
+		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4)
+		{
+			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
+			if (IC_PIN6)
+			{
+				rise = time;
+			}
+			else
+			{
+				set_udb_pwIn(rise-time, 6);
+			}
+		}
+	}
 }
 #else // (USE_PPM_INPUT != 0)
 
-    #if (PPM_SIGNAL_INVERTED == 1)
-    #define PPM_PULSE_VALUE 0
-    #else
-    #define PPM_PULSE_VALUE 1
-    #endif
+	#if (PPM_SIGNAL_INVERTED == 1)
+	#define PPM_PULSE_VALUE 0
+	#else
+	#define PPM_PULSE_VALUE 1
+	#endif
 
 /*
 PPM_2
@@ -340,93 +340,93 @@ PPM_1
 __|   |_|   |_| |___|   |_|   |_| |___|   |____
 
  */
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+	extern int one_hertz_flag;
 
-    extern int one_hertz_flag;
-
-// 	indicate_loading_inter;
+//	indicate_loading_inter;
 //	interrupt_save_set_corcon;
 
 	static uint16_t rise_ppm = 0;
 	static uint8_t ppm_ch = 0;
 	uint16_t time = 0;
 
-    if( htim->Instance == TIM5 )
-    {
+	if (htim->Instance == TIM5)
+	{
 #if (USE_PPM_INPUT == 1)
-        /* CHANNEL 1 called ISR */
-        if( htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-        {
-            time = HAL_TIM_ReadCapturedValue(TIM5, TIM_CHANNEL_1);
+		/* CHANNEL 1 called ISR */
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+		{
+			time = HAL_TIM_ReadCapturedValue(TIM5, TIM_CHANNEL_1);
 
-            if ((IC_PIN1) == PPM_PULSE_VALUE)
-            {
-                uint16_t pulse = time - rise_ppm;
-                rise_ppm = time;
+			if ((IC_PIN1) == PPM_PULSE_VALUE)
+			{
+				uint16_t pulse = time - rise_ppm;
+				rise_ppm = time;
 
-                if (pulse > MIN_SYNC_PULSE_WIDTH)
-                {
-        //			if (one_hertz_flag)
-        //			{
-        //				one_hertz_flag = 0;
-        //				DPRINT("**: %u %u\r\n", pulse, MIN_SYNC_PULSE_WIDTH);
-        //			}
-                    ppm_ch = 1;
-                }
-                else
-                {
-        //			if (one_hertz_flag)
-        //			{
-        //				one_hertz_flag = 0;
-        //				DPRINT("--: %u\r\n", pulse);
-        //			}
-                    if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
-                    {
-                        if (ppm_ch <= NUM_INPUTS)
-                        {
-                            set_udb_pwIn(pulse, ppm_ch);
-                        }
-                        ppm_ch++;
-                    }
-                }
-            }
-            else
-            {
-        //		if (one_hertz_flag)
-        //		{
-        //			one_hertz_flag = 0;
-        //			DPRINT("DIS %u\r\n", time);
-        //		}
-            }
-        }
-#elif  (USE_PPM_INPUT == 2)
-        /* CHANNEL 2 called ISR */
-        if( htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
-        {
-            uint16_t pulse = time - rise_ppm;
-            rise_ppm = time;
+				if (pulse > MIN_SYNC_PULSE_WIDTH)
+				{
+		//			if (one_hertz_flag)
+		//			{
+		//				one_hertz_flag = 0;
+		//				DPRINT("**: %u %u\r\n", pulse, MIN_SYNC_PULSE_WIDTH);
+		//			}
+					ppm_ch = 1;
+				}
+				else
+				{
+		//			if (one_hertz_flag)
+		//			{
+		//				one_hertz_flag = 0;
+		//				DPRINT("--: %u\r\n", pulse);
+		//			}
+					if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+					{
+						if (ppm_ch <= NUM_INPUTS)
+						{
+							set_udb_pwIn(pulse, ppm_ch);
+						}
+						ppm_ch++;
+					}
+				}
+			}
+			else
+			{
+		//		if (one_hertz_flag)
+		//		{
+		//			one_hertz_flag = 0;
+		//			DPRINT("DIS %u\r\n", time);
+		//		}
+			}
+		}
+#elif (USE_PPM_INPUT == 2)
+		/* CHANNEL 2 called ISR */
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+		{
+			uint16_t pulse = time - rise_ppm;
+			rise_ppm = time;
 
-            if ((IC_PIN2) == PPM_PULSE_VALUE)
-            {
-                if (pulse > MIN_SYNC_PULSE_WIDTH)
-                {
-                    ppm_ch = 1;
-                }
-            }
-            else
-            {
-                if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
-                {
-                    if (ppm_ch <= NUM_INPUTS)
-                    {
-                        set_udb_pwIn(pulse, ppm_ch);
-                    }
-                    ppm_ch++;
-                }
-            }
-        }
-    }
-#else  // USE_PPM_INPUT > 2
+			if ((IC_PIN2) == PPM_PULSE_VALUE)
+			{
+				if (pulse > MIN_SYNC_PULSE_WIDTH)
+				{
+					ppm_ch = 1;
+				}
+			}
+			else
+			{
+				if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+				{
+					if (ppm_ch <= NUM_INPUTS)
+					{
+						set_udb_pwIn(pulse, ppm_ch);
+					}
+					ppm_ch++;
+				}
+			}
+		}
+	}
+#else // USE_PPM_INPUT > 2
 #error Invalid USE_PPM_INPUT setting
 #endif // USE_PPM_INPUT
 //	interrupt_restore_corcon;
