@@ -35,6 +35,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
+//ToDo: Include interrupt.h to get INT_PRI_IC
+#define INT_PRI_IC 6
+//#include ".\libUDB\interrupts.h"
 #include "options.h"    // To get NUM_IMPUTS
 
 /* USER CODE BEGIN 0 */
@@ -94,7 +97,7 @@ void MX_TIM5_Init(void)
 	if (NUM_INPUTS > 1)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
 #else
     //ToDo: I need to work on it after finish parallel decode!!!!! Transform PPM_IC to TIM_CHANNELx
-    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);};
+    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
 //	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
 #endif // USE_PPM_INPUT
 
@@ -152,7 +155,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         __TIM10_CLK_ENABLE();
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, INT_PRI_IC, 0);
         HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     }
     else if(htim_base->Instance==TIM5)
@@ -161,7 +164,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         __TIM5_CLK_ENABLE();
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM5_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM5_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(TIM5_IRQn);
     }
     else if(htim_base->Instance==TIM4)
@@ -170,7 +173,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         __TIM4_CLK_ENABLE();
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM4_IRQn, INT_PRI_IC, 0);
         HAL_NVIC_EnableIRQ(TIM4_IRQn);
     }
 }
@@ -198,7 +201,7 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* htim_ic)
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM5_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM5_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(TIM5_IRQn);
     }
     else if(htim_ic->Instance==TIM4)
@@ -220,7 +223,7 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* htim_ic)
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM4_IRQn, INT_PRI_IC, 0);
         HAL_NVIC_EnableIRQ(TIM4_IRQn);
     }
 }

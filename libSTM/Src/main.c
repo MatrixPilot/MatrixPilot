@@ -96,6 +96,7 @@ int main(void)
   MX_USART6_UART_Init();
 
   /* USER CODE BEGIN 2 */
+    radioIn_init();     //elgarbe**************************************************
 
   /* USER CODE END 2 */
 
@@ -106,7 +107,6 @@ int main(void)
   osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
-
 
   /* USER CODE BEGIN 3 */
   /* Infinite loop */

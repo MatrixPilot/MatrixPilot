@@ -58,8 +58,8 @@ int16_t  __builtin_divsd(int32_t num,  int16_t den);
 #define HW_SWITCH_2     0
 #define HW_SWITCH_3     0
 
-#define MAX_INPUTS      8
-#define MAX_OUTPUTS     8
+#define MAX_INPUTS      6
+#define MAX_OUTPUTS     6
 
 
 extern uint8_t sil_radio_on;

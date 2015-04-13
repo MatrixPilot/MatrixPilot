@@ -41,8 +41,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_tim.h"
 
 extern TIM_HandleTypeDef htim10;
+extern TIM_HandleTypeDef htim5;
 
 void MX_TIM10_Init(void);
 void MX_TIM5_Init(void);
