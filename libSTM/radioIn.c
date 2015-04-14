@@ -218,12 +218,12 @@ static void set_udb_pwIn(int pwm, int index)
 // There is just one IC_HANDLER callback for any IC
 #if (USE_PPM_INPUT == 0)
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+
 	uint16_t time = 0;
 	static uint16_t rise=0;
 
-	// NOTE: did something go astray here? (RobD)
+    if( htim->Instance == TIM5 )
 	{
 		/* CHANNEL 1 called ISR */
 		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
@@ -326,6 +326,17 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 	#endif
 
 /*
+elgarbe: On my receiver I've PPM1 signal, but Toff is the part that change and Ton is fixd at 0.5mSeg
+is it PPM1 with PPM_PULSE_VALUE = 1 I think not
+PPM_3
+
+       1     2       3        4      5       6      7
+   ___   ___   ___       ___    ___     ___     ___
+  |   | |   | |   |     |   |  |   |   |   |   |   |
+  |   | |   | |   |     |   |  |   |   |   |   |   |
+__|   |_|   |_|   |_____|   |__|   |___|   |___|   |____
+
+
 PPM_2
 
     1   2  3  4   5  6  7
@@ -344,8 +355,7 @@ PPM_1
 __|   |_|   |_| |___|   |_|   |_| |___|   |____
 
  */
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 
 //	extern int one_hertz_flag;
 
@@ -365,7 +375,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
 #if (USE_PPM_INPUT == 1)
 			// ToDo: Use PPM_IC to get IC_PINx
-			if ((IC_PIN1) == PPM_PULSE_VALUE)
+            if ((IC_PIN2) == PPM_PULSE_VALUE)
 			{
 				uint16_t pulse = time - rise_ppm;
 				rise_ppm = time;
@@ -404,6 +414,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 		//			DPRINT("DIS %u\r\n", time);
 		//		}
 			}
+        }
 #elif (USE_PPM_INPUT == 2)
 
 
@@ -429,11 +440,12 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 				}
 			}
 
+        }
+
 
 #else // USE_PPM_INPUT > 2
 #error Invalid USE_PPM_INPUT setting
 #endif // USE_PPM_INPUT
-		}
 //	interrupt_restore_corcon;
 	}
 }

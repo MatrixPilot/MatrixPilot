@@ -192,7 +192,7 @@
 //
 #define USE_PPM_INPUT                       1
 #define PPM_NUMBER_OF_CHANNELS              8
-#define PPM_SIGNAL_INVERTED                 0
+#define PPM_SIGNAL_INVERTED                 1
 #define PPM_ALT_OUTPUT_PINS                 0
 
 // Select which Input Capture pin the PPM device is connected to
@@ -206,7 +206,7 @@
 // If using PWM inputs (parallel Rx connections), set to the number of cables connected, 1-8
 // If using PPM inputs (serial Rx connection), set to the number of Rx channels, up to PPM_NUMBER_OF_CHANNELS
 // If using LRS library (integrated SPI tranceiver), set to the number of Rx channels, up to 16
-#define NUM_INPUTS                          6
+#define NUM_INPUTS                          8
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.

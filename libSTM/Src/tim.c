@@ -70,7 +70,8 @@ void MX_TIM5_Init(void)
     TIM_IC_InitTypeDef sConfigIC;
 
     htim5.Instance = TIM5;
-    htim5.Init.Prescaler = (uint16_t) (((SystemCoreClock / 1000000) / 2) - 1);    //500KHz
+//    htim5.Init.Prescaler = (uint16_t) (((SystemCoreClock / 1000000) / 2) - 1);    //500KHz
+    htim5.Init.Prescaler = 84-1;     //2MHz
     htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim5.Init.Period = 0xFFFF;
     htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -148,6 +149,7 @@ void MX_TIM4_Init(void)
 
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
+  GPIO_InitTypeDef GPIO_InitStruct;
 
     if(htim_base->Instance==TIM10)
     {
@@ -162,6 +164,16 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     {
         /* Peripheral clock enable */
         __TIM5_CLK_ENABLE();
+//This is the portion of code tha I deleted from my eclipse
+//work. I deleted becouse ther is same initialization on
+//HAL_TIM_IC_MspInit. But it seems to be necesary to be here.
+//I will investigate this isue
+        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+        GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
         /* Peripheral interrupt init*/
         HAL_NVIC_SetPriority(TIM5_IRQn, 0, 0);
@@ -190,10 +202,8 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* htim_ic)
         /**TIM5 GPIO Configuration
         PA0-WKUP     ------> TIM5_CH1
         PA1     ------> TIM5_CH2
-        PA2     ------> TIM5_CH3
-        PA3     ------> TIM5_CH4
         */
-        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3;
+        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
