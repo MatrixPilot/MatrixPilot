@@ -36,7 +36,8 @@ int mavlink_fh = 0;
 int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len)
 {
 //int _write(int file, char *ptr, int len);
-//	_write(mavlink_fh, buf, len);
+//	return _write(mavlink_fh, buf, len);
+	return 0;
 }
 
 #else

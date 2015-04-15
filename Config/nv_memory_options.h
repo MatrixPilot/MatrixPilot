@@ -35,7 +35,7 @@
 // Use non volatile memory to store and recall settings
 // Set to 1 to include non volatile memory service in compilation
 // WARNING: Use on UDB4+ only
-// WARNING: Can only be used with SERIAL_MAVLINK and USE_i2C1_DRIVER
+// WARNING: Can only be used with SERIAL_MAVLINK and USE_I2C1_DRIVER
 #define USE_NV_MEMORY                   0
 
 

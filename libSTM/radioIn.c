@@ -370,7 +370,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	{
 
 		/* CHANNEL 1 called ISR */
-		if( htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
 		{
 			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
 #if (USE_PPM_INPUT == 1)
@@ -446,8 +446,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 #else // USE_PPM_INPUT > 2
 #error Invalid USE_PPM_INPUT setting
 #endif // USE_PPM_INPUT
-//	interrupt_restore_corcon;
 	}
+//	interrupt_restore_corcon;
 }
 #endif
 

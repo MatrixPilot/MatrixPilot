@@ -312,14 +312,15 @@ if __name__ == '__main__':
 
 	from optparse import OptionParser
 	parser = OptionParser("pyProjectCreator.py [options]")
+	parser.add_option("-r", "--root",   dest="root",     help="project root path",                       default=".")
 	parser.add_option("-n", "--name",   dest="name",     help="specify the project name", type="string", default="MatrixPilot", metavar="MatrixPilot")
 	parser.add_option("-t", "--target", dest="target",   help="specify the target board", type="string", default="UDB5", metavar="UDB5")
-	parser.add_option("-m", "--mod",    dest="modules",  help="search path for module.mk file",          default=[], action='append')
-	parser.add_option("-d", "--def",    dest="defines",  help="additional preprocessor defines",         default=[], action='append')
-	parser.add_option("-i", "--inc",    dest="includes", help="additional include files directory",      default=[], action='append')
 	parser.add_option("-c", "--cfg",    dest="config",   help="specify configuration files directory",   default="")
+	parser.add_option("-d", "--def",    dest="defines",  help="additional preprocessor defines",         default=[], action='append')
+
+	parser.add_option("-i", "--inc",    dest="includes", help="additional include files directory",      default=[], action='append')
+	parser.add_option("-m", "--mod",    dest="modules",  help="search path for module.mk file",          default=[], action='append')
 	parser.add_option("-o", "--out",    dest="out",      help="project files output path",               default="output")
-	parser.add_option("-r", "--root",   dest="root",     help="project root path",                       default=".")
 	parser.add_option("-f", "--file",   dest="file",     help="configuration file",                      default="")
 	(opts, args) = parser.parse_args()
 
