@@ -47,15 +47,20 @@
 #include "MAVUDBExtra.h"
 
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h" // Needed for access to internal DCM value
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
+#include "telemetry_log.h"
 #include "euler_angles.h"
 #include "config.h"
 #include <string.h>
@@ -227,7 +232,7 @@ void mav_printf(const char* format, ...)
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 // add printf library when running tests to output ascii messages of test results
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t remaining = 0;
 	int16_t wrote = 0;
@@ -417,14 +422,14 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 #if (USE_NV_MEMORY == 1)
 			case MAV_CMD_PREFLIGHT_STORAGE:
 				DPRINT("MAV_CMD_PREFLIGHT_STORAGE %u\r\n", packet.command);
-				if (packet.param1 == MAV_PFS_CMD_WRITE_ALL)
+				if (packet.param1 == MAV_PFS_CMD_WRITE_ALL) // 1
 				{
 					if (packet.param2 == MAV_PFS_CMD_WRITE_ALL)
 						data_services_save_all(STORAGE_FLAG_STORE_CALIB | STORAGE_FLAG_STORE_WAYPOINTS, &preflight_storage_complete_callback);
 					else
 						data_services_save_all(STORAGE_FLAG_STORE_CALIB, &preflight_storage_complete_callback);
 				}
-				else if (packet.param1 == MAV_PFS_CMD_READ_ALL)
+				else if (packet.param1 == MAV_PFS_CMD_READ_ALL) // 0
 				{
 					if (packet.param2 == MAV_PFS_CMD_READ_ALL)
 						data_services_load_all(STORAGE_FLAG_STORE_CALIB | STORAGE_FLAG_STORE_WAYPOINTS, &preflight_storage_complete_callback);
@@ -453,16 +458,16 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 				}
 				break;
 #endif // (USE_NV_MEMORY == 1)
-			case 245:
+			case 245: // MAV_CMD_PREFLIGHT_STORAGE:
 				switch ((uint16_t)packet.param1)
 				{
 					case 0: // Read
 						DPRINT("Read (ROM)\r\n");
-						init_config();
+						config_load();
 						break;
 					case 1: // Write
 						DPRINT("Write (ROM)\r\n");
-						save_config();
+						config_save();
 						break;
 					default:
 						DPRINT("245 packet.param1 %f packet.param2 %f\r\n", (double)packet.param1, (double)packet.param2);
@@ -614,7 +619,7 @@ static void handleMessage(void)
 		handle_msg = &msg[0];
 	}
 
-	DPRINT("MAV MSG 0x%x\r\n", handle_msg->msgid);
+//	DPRINT("MAV MSG 0x%x\r\n", handle_msg->msgid);
 
 	handling_of_message_completed |= MAVParamsHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
@@ -643,7 +648,7 @@ static void handleMessage(void)
 			MAVLinkSetMode(handle_msg);
 			break;
 		default:
-			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
+//			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
 			break;
 	}
 	handling_of_message_completed = true;

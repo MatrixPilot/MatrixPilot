@@ -25,8 +25,9 @@
 
 #include "MAVLink.h"
 #include "MAVMission.h"
-#include "behaviour.h"
-#include "flightplan-waypoints.h"
+#include "../MatrixPilot/behaviour.h"
+#include "../MatrixPilot/flightplan.h"
+#include "../MatrixPilot/flightplan-waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
 
 uint16_t waypoint_request_i;
@@ -57,13 +58,13 @@ void mavlink_waypoint_changed(int16_t waypoint)
 	mavlink_flags.mavlink_send_waypoint_changed = 1;
 }
 
-void set(uint16_t index, uint16_t data)
+static void set(uint16_t index, uint16_t data)
 {
 	if (index < MAX_PARAMS)
 		params[index] = data;
 }
 
-uint16_t get(uint16_t index)
+static uint16_t get(uint16_t index)
 {
 	uint16_t data = 0;
 	if (index < MAX_PARAMS)
@@ -354,6 +355,8 @@ static inline void MissionItem(mavlink_message_t* handle_msg)
 			//tell_command.id = CMD_LOITER_TIME;
 			//tell_command.p1 = packet.param2/1.0e2;
 			break;
+		default:
+			return;
 	}
 
 	// save waypoint
@@ -411,7 +414,7 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 			break;
 #endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 		default:
-			DPRINT("MAVMissionHandleMessage(handle_msg->msgid %u) - NOT HANDLED\r\n", handle_msg->msgid);
+//			DPRINT("MAVMissionHandleMessage(handle_msg->msgid %u) - NOT HANDLED\r\n", handle_msg->msgid);
 			return false;
 	}
 	return true;

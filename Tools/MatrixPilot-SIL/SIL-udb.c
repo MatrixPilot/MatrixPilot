@@ -15,6 +15,8 @@
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/magnetometer.h"
 #include "../../libUDB/heartbeat.h"
+#include "../../libUDB/serialIO.h"
+#include "../../libDCM/rmat.h"
 #include "SIL-config.h"
 
 #ifdef WIN

@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "states.h"
 #include "mode_switch.h"
 
 #define  MAX_PAUSE_TOGGLE  20  // 20 frames at 40Hz is 1/2 second.

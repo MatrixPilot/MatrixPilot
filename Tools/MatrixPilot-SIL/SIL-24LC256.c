@@ -18,7 +18,7 @@
 
 #if (WIN == 1 || NIX == 1)
 
-#include "../../libUDB/libUDB_internal.h"
+#include "../../libUDB/libUDB.h"
 #include "nv_memory_options.h"
 
 #if (USE_NV_MEMORY == 1)

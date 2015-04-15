@@ -24,6 +24,8 @@
 #include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
+#include "states.h"
+#include "console.h"
 #include "flightplan-waypoints.h"
 #include <setjmp.h>
 
@@ -56,7 +58,7 @@ int main(int argc, char** argv)
 #else
 int main(void)
 {
-	mcu_init();
+	mcu_init();     // initialise the processor specific registers
 #endif
 #if (USE_TELELOG == 1)
 	log_init();

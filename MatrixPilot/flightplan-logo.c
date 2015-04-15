@@ -22,8 +22,12 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "flightplan.h"
 #include "cameraCntrl.h"
 #include "altitudeCntrl.h"
+#include "flightplan_logo.h"
+#include "../libDCM/rmat.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
@@ -297,10 +301,23 @@ static boolean process_one_instruction(struct logoInstructionDef instr);
 static void update_goal_from(struct relative3D old_waypoint);
 static void process_instructions(void);
 
+int16_t flightplan_logo_index_get(void)
+{
+	return waypointIndex;
+}
+
+
+
+void flightplan_logo_init(void)
+{
+	DPRINT("flightplan_logo_init()\r\n");
+}
+
 
 // In the future, we could include more than 2 flight plans...
 // flightplanNum is 0 for the main lgo instructions, and 1 for RTL instructions
-void init_flightplan(int16_t flightplanNum)
+//void init_flightplan(int16_t flightplanNum)
+void flightplan_logo_begin(int16_t flightplanNum)
 {
 	struct relative2D curHeading;
 	struct relative3D IMUloc;
@@ -358,26 +375,6 @@ void init_flightplan(int16_t flightplanNum)
 	process_instructions();
 }
 
-boolean use_fixed_origin(void)
-{
-#if (USE_FIXED_ORIGIN == 1)
-	return 1;
-#else
-	return 0;
-#endif
-}
-
-vect3_32t get_fixed_origin(void)
-{
-	struct fixedOrigin3D origin = FIXED_ORIGIN_LOCATION;
-
-	vect3_32t standardizedOrigin;
-	standardizedOrigin.x = origin.x;
-	standardizedOrigin.y = origin.y;
-	standardizedOrigin.z = (int32_t)(origin.z * 100);
-
-	return standardizedOrigin;
-}
 
 static boolean logo_goal_has_moved(void)
 {

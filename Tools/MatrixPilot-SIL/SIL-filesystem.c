@@ -8,8 +8,8 @@
 
 #if (WIN == 1 || NIX == 1)
 
-#include "../../MatrixPilot/defines.h"
-//#include "../../libUDB/libUDB_internal.h"
+
+#include "../../libUDB/libUDB.h"
 #include "../../libUDB/heartbeat.h"
 #include "SIL-filesystem.h"
 

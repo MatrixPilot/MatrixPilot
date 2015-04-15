@@ -149,11 +149,6 @@ void mavlink_output_40hz(void);
 #define SERIAL_MAVLINK      9    // The Micro Air Vehicle Link protocol from the PixHawk Project
 
 
-////////////////////////////////////////////////////////////////////////////////
-// mp_osd.c
-void osd_run_step(void);
-
-
 #include "gain_variables.h"
 
 // GNU compiler specific macros for specifically marking variables as unused

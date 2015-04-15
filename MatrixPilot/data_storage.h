@@ -31,7 +31,7 @@
 #ifndef DATA_STORAGE_H
 #define DATA_STORAGE_H
 
-#include "../libUDB/libUDB_internal.h"
+#include "../libUDB/libUDB.h"
 
 // CONFIGURATION OPTIONS
 

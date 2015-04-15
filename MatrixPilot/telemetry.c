@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "states.h"
 #include "navigate.h"
 #include "cameraCntrl.h"
 #include "flightplan-waypoints.h"
@@ -27,13 +28,17 @@
 #include "telemetry_log.h"
 #endif
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/osd.h"
-#include "../libUDB/magnetometerOptions.h"
+#include "magnetometerOptions.h"
 #include "osd_config.h"
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
+#include "../libUDB/mcu.h"
 #include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"

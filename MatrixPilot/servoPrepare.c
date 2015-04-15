@@ -19,15 +19,27 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// TODO: rename this module to something such as MatrixPilot.c or FlightControl.c
+// TODO: consider renaming this module, ie. pilot.c / autopilot.c
+
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "mode_switch.h"
+#include "servoMix.h"
+#include "servoPrepare.h"
+#include "MAVLink.h"
+#include "telemetry.h"
+#include "flightplan-waypoints.h"
+#include "libCntrl.h"
+#include "airspeedCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
-#include "mode_switch.h"
-#include "airspeedCntrl.h"
-#include "flightplan-waypoints.h"
+#include "osd_config.h"
+#include "mp_osd.h"
+#include "mavlink_options.h"
 
 int16_t pitch_control;
 int16_t roll_control;
@@ -60,6 +72,7 @@ void init_servoPrepare(void) // initialize the PWM
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
+		// initialise the throttle channel to zero, all others to servo midpoint
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
 #endif
 	}
