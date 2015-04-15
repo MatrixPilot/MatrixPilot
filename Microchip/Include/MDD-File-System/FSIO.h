@@ -40,23 +40,23 @@
 
 #include "GenericTypeDefs.h"
 #include "FSconfig.h"
-#include "MDD File System/FSDefs.h" 
+#include "MDD-File-System/FSDefs.h" 
 #include "stddef.h"
 
 #ifdef USE_SD_INTERFACE_WITH_SPI
-    #include    "MDD File System/SD-SPI.h"
+    #include    "MDD-File-System/SD-SPI.h"
 #endif
 #ifdef USE_CF_INTERFACE_WITH_PMP
-    #include    "MDD File System/CF-PMP.h"
+    #include    "MDD-File-System/CF-PMP.h"
 #endif
 #ifdef USE_MANUAL_CF_INTERFACE
-    #include    "MDD File System/CF- Bit transaction.h"
+    #include    "MDD-File-System/CF- Bit transaction.h"
 #endif
 #ifdef USE_USB_INTERFACE
     #include    "USB/usb_host_msd_scsi.h"
 #endif
 #ifdef USE_INTERNAL_FLASH
-    #include    "MDD File System/Internal Flash.h"
+    #include    "MDD-File-System/Internal Flash.h"
 #endif
 
 

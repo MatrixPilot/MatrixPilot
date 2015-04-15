@@ -214,16 +214,16 @@
 #endif
 
 #if ((CONSOLE_UART > 2) && (BOARD_TYPE != AUAV3_BOARD) && (SILSIM == 0))
-	#error("Console UART's greater than 2 only supported on AUAV3 board"
+//	#error("Console UART's greater than 2 only supported on AUAV3 board"
 #endif
 
-//#if ((USE_TELELOG == 1) && (BOARD_TYPE != AUAV3_BOARD))
-//	#error("USE_TELELOG only supported on AUAV3 board"
-//#endif
+#if ((USE_TELELOG == 1) && (USE_FILESYS == 0))
+	#error("USE_TELELOG requires USE_FILESYS"
+#endif
 
-//#if ((USE_CONFIGFILE == 1) && (BOARD_TYPE != AUAV3_BOARD))
-//	#error("USE_CONFIGFILE only supported on AUAV3 board"
-//#endif
+#if ((USE_CONFIGFILE == 1) && (USE_FILESYS == 0))
+	#error("USE_CONFIGFILE requires USE_FILESYS"
+#endif
 
 #if ((USE_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("USE_USB only supported on AUAV3 board"
@@ -236,3 +236,10 @@
 #if ((HILSIM_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("HILSIM_USB only supported on AUAV3 board"
 #endif
+
+#ifdef INVERTED_NEUTRAL_PITCH
+#ifdef ANGLE_OF_ATTACK_INVERTED
+#error ( "Both INVERTED_NEUTRAL_PITCH and ANGLE_OF_ATTACK_INVERTED are being used. Use only one or the other."
+#endif // ANGLE_OF_ATTACK_INVERTED
+#endif // INVERTED_NEUTRAL_PITCH
+

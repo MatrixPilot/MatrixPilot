@@ -19,14 +19,18 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#if defined(__dsPIC33E__)
+
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include "FSconfig.h"
 
 #ifdef USE_AT45D_FLASH
 #include "MDD_AT45D.h"
+#elif defined USE_EEPROM_FLASH
+#include "MDD_EEPROM.h"
 #elif defined USE_SD_INTERFACE_WITH_SPI
-#include "MDD File System/SD-SPI.h"
+#include "MDD-File-System/SD-SPI.h"
 #else
 #error here
 #endif // USE_AT45D_FLASH
@@ -91,3 +95,4 @@ const ROM InquiryResponse inq_resp = {
 	}
 };
 
+#endif // defined(__dsPIC33E__)

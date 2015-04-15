@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#if (WIN == 1)
+#if (WIN == 1 || WIN32 == 1) // WIN defined in GGC builds, WIN32 defined in VC++
 
 #include "UDBSocket.h"
 
@@ -332,8 +332,6 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 		case UDBSocketSerial:
 		{
 			unsigned long bytesTransferred = 0;
-			//DWORD dwRetFlag;
-			//char ErrorString[80];
 
 			if (socket->hComms != INVALID_HANDLE_VALUE)
 			{

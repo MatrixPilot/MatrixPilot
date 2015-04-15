@@ -62,6 +62,14 @@ void estimateWind(void)
 	fuselageDirection[1] =  rmat[4];
 	fuselageDirection[2] = -rmat[7];
 
+	// adjust "fuselage direction" for angle of attack
+	longaccum.WW = ( __builtin_mulss( - rmat[2] , angleOfAttack ) ) << 2 ;
+	fuselageDirection[0] += longaccum._.W1 ;
+	longaccum.WW = ( __builtin_mulss(  rmat[5] , angleOfAttack ) ) << 2 ;
+	fuselageDirection[1] += longaccum._.W1 ;
+	longaccum.WW = ( __builtin_mulss( - rmat[8] , angleOfAttack ) ) << 2 ;
+	fuselageDirection[2] += longaccum._.W1 ;
+
 	for (index = 0; index < 3; index++)
 	{
 		groundVelocity[index] >>= 1;

@@ -20,10 +20,10 @@ import array, struct
 
 
 try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
+    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink'))
     os.environ['MAVLINK10'] = '1'
-    import mavlinkv10 as mavlink
-    import mavutil
+    import pymavlink.dialects.v10.matrixpilot as mavlink
+    import pymavlink.mavutil as mavutil 
 except:
     print "Not able to find Python MAVlink libraries"
 
@@ -85,7 +85,8 @@ def check_type_of_telemetry_file(filename):
             if (parsing_index + payload_length + 7) < len(bytes) :
                 mycrc.accumulate(bytes[(parsing_index + 1 ):(parsing_index + payload_length + 6)])
                 msgId = bytes[parsing_index + 5]
-                (fmt, type, order_map, crc_extra) = mavlink.mavlink_map[msgId]
+            
+                (fmt, type, order_map, len_map, crc_extra) = mavlink.mavlink_map[msgId]
                 mycrc.accumulate(struct.pack('B',crc_extra))
                 
                 low_byte_sent_crc = bytes[parsing_index + payload_length + 6]

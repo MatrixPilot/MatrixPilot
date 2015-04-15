@@ -22,7 +22,7 @@
 #include "dcmTypes.h"
 #include "mathlibNAV.h"
 #if (WIN == 1 || NIX == 1)
-#include "SIL-udb.h"
+#include "../Tools/MatrixPilot-SIL/SIL-udb.h"
 #endif // (WIN == 1 || NIX == 1)
 
 //  math libraray
@@ -73,7 +73,7 @@ int16_t sine(int8_t angle)
 	}
 }
 
-int8_t arcsine(int16_t y)
+int8_t arcsine(int16_t y)  // arcsine takes the y coordinate of an x,y point and returns an angle
 {
 	// returns the inverse sine of y
 	// y is in Q2.14 format, 16384 is maximum value

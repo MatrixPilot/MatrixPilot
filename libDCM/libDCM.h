@@ -27,8 +27,8 @@
 #include "libDCM_defines.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// libDCM.h defines the API for accessing the location and orientation information
-// from the DCM algorithm and GPS.
+// libDCM.h defines the API for accessing the location and orientation
+// information from the DCM algorithm and GPS.
 // 
 // Requires libUDB.
 // 
@@ -91,6 +91,7 @@ extern struct relative3D GPSlocation;
 #endif // USE_EXTENDED_NAV
 extern struct relative3D GPSvelocity;
 extern struct relative2D velocity_thru_air; // derived horizontal velocity relative to air in cm/sec
+extern int16_t angleOfAttack ;
 extern int16_t estimatedWind[3];            // wind velocity vectors in cm / sec
 
 //extern uint16_t air_speed_3DIMU;

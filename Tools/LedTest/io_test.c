@@ -1,3 +1,4 @@
+#if 0
 // This file is part of the MatrixPilot LedTest demo.
 //
 //    http://code.google.com/p/gentlenav/
@@ -333,3 +334,4 @@ void IOTest(void)
 	PMD1bits.AD1MD = 0;
 	PMD3bits.AD2MD = 0;
 }
+#endif

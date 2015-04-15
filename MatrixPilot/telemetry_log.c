@@ -18,29 +18,35 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#if (AUAV3 == 1)
 
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
 #include "telemetry_log.h"
 #if (WIN == 1 || NIX == 1)
 #include <stdio.h>
-#include "SIL-filesystem.h"
+#include "../Tools/MatrixPilot-SIL/SIL-filesystem.h"
 #else
-#include "MDD File System/FSIO.h"
-#include "AT45D.h"
+#include "MDD-File-System/FSIO.h"
 #endif
 #include <string.h>
 #include <stdarg.h>
 
+extern void restart_telemetry(void);
+extern boolean inflight_state(void);
+
 
 #if (WIN == 1 || NIX == 1)
+#define FSFILE    FILE
+#define FSfopen   fopen
+#define FSfclose  fclose
+#define FSfwrite  fwrite
 #define LOGFILE_ENABLE_PIN 0
 #else
 //#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
 //#define LOGFILE_ENABLE_PIN PORTBbits.RB1  // PGC
 #define LOGFILE_ENABLE_PIN PORTAbits.RA6  // DIG2
 #endif
-
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
@@ -49,14 +55,14 @@
 
 static char logbuf1[LOGBUF_BUFFER_SIZE+1];  // TODO: added 1 byte until buffer overflow confirmed good
 static char logbuf2[LOGBUF_BUFFER_SIZE+1];  // TODO: added 1 byte until buffer overflow confirmed good
-static int lb1_end_index = 0;
-static int lb2_end_index = 0;
-static int lb_in_use = 1;
+static volatile int lb1_end_index = 0;
+static volatile int lb2_end_index = 0;
+static volatile int lb_in_use = 1;
 static char logfile_name[13];
 static FSFILE* fsp = NULL;
 
 
-static int16_t log_append(char* logbuf, int index, char* data, int len)
+static int16_t log_append(char* logbuf, int index, const char* data, int len)
 {
 	int16_t end_index = 0;
 	int16_t remaining = LOGBUF_BUFFER_SIZE - index;
@@ -143,8 +149,6 @@ void log_init(void)
 	printf("File system initalised\r\n");
 }
 
-void restart_telemetry(void);
-
 static void log_open(void)
 {
 	static uint8_t log_error = 0;
@@ -184,9 +188,6 @@ void log_close(void)
 	}
 }
 
-void restart_telemetry(void);
-boolean inflight_state(void);
-
 static void log_check(void)
 {
 	static uint16_t debounce = 0;
@@ -214,7 +215,7 @@ static void log_check(void)
 	}
 }
 
-static void log_write(char* str, int len)
+static void log_write(const char* str, int len)
 {
 	if (fsp)
 	{
@@ -227,7 +228,7 @@ static void log_write(char* str, int len)
 	}
 }
 
-// called from mainloop at background priority to write telemetry log data to log file
+// called from mainloop at background priority to write buffered telemetry log data to log file
 void telemetry_log(void)
 {
 	if (lb_in_use == 1)
@@ -248,3 +249,5 @@ void telemetry_log(void)
 	}
 	log_check();
 }
+
+#endif // (AUAV3 == 1)

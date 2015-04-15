@@ -177,6 +177,7 @@ static void udb_background_callback_triggered(void)
 {
 	union longbbbb accum;
 	union longww accum_velocity;
+	union longww longaccum ;
 	int8_t cog_circular;
 	int8_t cog_delta;
 	int16_t sog_delta;
@@ -192,8 +193,12 @@ static void udb_background_callback_triggered(void)
 	struct relative2D velocity_thru_air;
 	int16_t velocity_thru_airz;
 
-	dirOverGndHrmat[0] = rmat[1];
-	dirOverGndHrmat[1] = rmat[4];
+	// compute horizontal projection of air velocity,
+	// taking into account the angle of attack.
+	longaccum.WW = ( __builtin_mulss( rmat[2] , angleOfAttack ) ) << 2 ;
+	dirOverGndHrmat[0] = rmat[1] + longaccum._.W1 ;
+	longaccum.WW = ( __builtin_mulss( rmat[5] , angleOfAttack ) ) << 2 ;
+	dirOverGndHrmat[1] = rmat[4] + longaccum._.W1 ;
 	dirOverGndHrmat[2] = 0;
 
 	if (gps_nav_valid())

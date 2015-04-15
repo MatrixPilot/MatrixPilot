@@ -99,7 +99,7 @@ mavlink_flags_t mavlink_flags;
 mavlink_system_t mavlink_system;
 
 uint16_t mavlink_process_message_handle = INVALID_HANDLE;
-uint8_t handling_of_message_completed = true;
+boolean handling_of_message_completed = true;
 
 uint8_t mavlink_counter_40hz = 0;
 uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
@@ -146,7 +146,7 @@ void init_serial(void)
 {
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
-#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
+//#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 	init_mavlink();
@@ -812,7 +812,7 @@ void mavlink_output_40hz(void)
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE);
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
-
+        // GPS RAW INT - Data from GPS Sensor sent as raw integers.
 	spread_transmission_load = 4;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
@@ -849,7 +849,8 @@ void mavlink_output_40hz(void)
 
 		mavlink_heading = get_geo_heading_angle() * 100;    // mavlink global position expects heading value x 100
 		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon, alt, relative_alt,
-		    -IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity  normal units are in cm / second
+		    IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity upper word gives V in cm / second
+                    // MAVLink is using North,East,Down Frame (NED). MatrixPilot IMUVelocity is in earth frame (X is East, Y is North, Z is Up)
 		    mavlink_heading); // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
 		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
 		//   int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg)
@@ -913,7 +914,10 @@ void mavlink_output_40hz(void)
 		int16_t pwOut_max = 4000;
 		mavlink_heading = get_geo_heading_angle();
 		if (THROTTLE_CHANNEL_REVERSED == 1) pwOut_max = 2000;
-		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0, (float)(air_speed_3DIMU / 100.0), (float)(ground_velocity_magnitudeXY / 100.0), (int16_t)mavlink_heading,
+		mavlink_msg_vfr_hud_send(MAVLINK_COMM_0,
+		    (float)(air_speed_3DIMU / 100.0),
+		    (float)(ground_velocity_magnitudeXY / 100.0),
+		    (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
 		    ((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
 		    (float) -IMUvelocityz._.W1);
@@ -981,19 +985,29 @@ void mavlink_output_40hz(void)
 
 	spread_transmission_load = 30;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
-	{
+
+        {
+#if (HILSIM !=1 )
 #if (MAG_YAW_DRIFT == 1)    // Magnetometer is connected
 		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
-		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
+		    (int16_t)   XACCEL_VALUE, (int16_t)   YACCEL_VALUE, (int16_t)  ZACCEL_VALUE,
+		    (int16_t)   XRATE_VALUE,  (int16_t)   YRATE_VALUE,  (int16_t)   ZRATE_VALUE,
 		    (int16_t)   magFieldRaw[0],   (int16_t)   magFieldRaw[1],   (int16_t)   magFieldRaw[2]);
 #else // magnetometer is not connected
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
-		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
-		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
+		    (int16_t)   XACCEL_VALUE, (int16_t)   YACCEL_VALUE, (int16_t)  ZACCEL_VALUE,
+		    (int16_t)   XRATE_VALUE,  (int16_t)   YRATE_VALUE,  (int16_t)   ZRATE_VALUE,
 		    (int16_t)   0,                (int16_t)   0,                (int16_t)   0); // zero as mag not connected.
-#endif
+#endif //(MAG_YAW_DRIFT == 1)
+#else  // HILSIM bypasses use of uxb_xaccel etc, and uses gplane[] directly; similarly udb_xrate is sent straight to omega
+       // However gplane[] may be modified by further calculations. So MAVLink uses aero_force which is the negative of gplane[]
+        	extern int16_t magFieldRaw[];
+		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
+		    (int16_t) - aero_force[0], (int16_t) - aero_force[1], (int16_t) - aero_force[2],
+		    (int16_t) omegagyro[0],  (int16_t) omegagyro[1],  (int16_t) omegagyro[2],
+		    (int16_t)   0,   (int16_t)   0,   (int16_t)   0 );
+#endif  // (HILSIM !=1 )
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}
@@ -1019,6 +1033,13 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_EXTRA1], mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
 	{
 		MAVUDBExtraOutput_40hz();
+	}
+        // Send FORCE information
+        spread_transmission_load = 15;
+	if (mavlink_frequency_send(MAVLINK_RATE_FORCE, mavlink_counter_40hz + spread_transmission_load))
+	{
+                mavlink_msg_force_send(MAVLINK_COMM_0, msec, aero_force[0], aero_force[1], aero_force[2]);
+                //static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t aero_x, int16_t aero_y, int16_t aero_z)
 	}
 	MAVParamsOutput_40hz();
 	MAVMissionOutput_40hz();

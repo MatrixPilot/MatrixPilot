@@ -216,6 +216,7 @@
           <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f8.h</itemPath>
           <itemPath>../../MAVLink/include/matrixpilot/testsuite.h</itemPath>
           <itemPath>../../MAVLink/include/matrixpilot/version.h</itemPath>
+          <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_force.h</itemPath>
         </logicalFolder>
         <itemPath>../../MAVLink/include/checksum.h</itemPath>
         <itemPath>../../MAVLink/include/inttypes.h</itemPath>
@@ -360,7 +361,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
-        <platform>3</platform>
+        <platform>4</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

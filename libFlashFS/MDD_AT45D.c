@@ -20,8 +20,8 @@
 
 
 #include "defines.h"
-#include "MDD File System/FSIO.h"
-#include "MDD File System/FSDefs.h"
+#include "MDD-File-System/FSIO.h"
+#include "MDD-File-System/FSDefs.h"
 #include "FSconfig.h"
 
 #ifdef USE_AT45D_FLASH

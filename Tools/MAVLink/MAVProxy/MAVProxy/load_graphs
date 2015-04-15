@@ -1,0 +1,7 @@
+module unload battery
+module load graph
+graph SERIAL_UDB_EXTRA_F2_B.sue_pwm_input_1 SERIAL_UDB_EXTRA_F2_B.sue_pwm_input_2 SERIAL_UDB_EXTRA_F2_B.sue_pwm_input_3 SERIAL_UDB_EXTRA_F2_B.sue_pwm_input_4
+graph SERIAL_UDB_EXTRA_F2_B.sue_pwm_output_1 SERIAL_UDB_EXTRA_F2_B.sue_pwm_output_2 SERIAL_UDB_EXTRA_F2_B.sue_pwm_output_3 SERIAL_UDB_EXTRA_F2_B.sue_pwm_output_4
+graph SERIAL_UDB_EXTRA_F2_A.sue_sog
+graph SERIAL_UDB_EXTRA_F2_A.sue_altitude
+graph SERIAL_UDB_EXTRA_F2_A.sue_rmat6 SERIAL_UDB_EXTRA_F2_A.sue_rmat7

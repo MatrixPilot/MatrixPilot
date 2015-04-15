@@ -1440,6 +1440,7 @@ MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 = 179
 MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 = 180
 MAVLINK_MSG_ID_ALTITUDES = 181
 MAVLINK_MSG_ID_AIRSPEEDS = 182
+MAVLINK_MSG_ID_FORCE = 183
 MAVLINK_MSG_ID_HEARTBEAT = 0
 MAVLINK_MSG_ID_SYS_STATUS = 1
 MAVLINK_MSG_ID_SYSTEM_TIME = 2
@@ -1946,6 +1947,21 @@ class MAVLink_airspeeds_message(MAVLink_message):
 
         def pack(self, mav):
                 return MAVLink_message.pack(self, mav, 154, struct.pack('<Ihhhhhh', self.time_boot_ms, self.airspeed_imu, self.airspeed_pitot, self.airspeed_hot_wire, self.airspeed_ultrasonic, self.aoa, self.aoy))
+
+class MAVLink_force_message(MAVLink_message):
+        '''
+        The Forces acting on the aircraft
+        '''
+        def __init__(self, time_boot_ms, aero_x, aero_y, aero_z):
+                MAVLink_message.__init__(self, MAVLINK_MSG_ID_FORCE, 'FORCE')
+                self._fieldnames = ['time_boot_ms', 'aero_x', 'aero_y', 'aero_z']
+                self.time_boot_ms = time_boot_ms
+                self.aero_x = aero_x
+                self.aero_y = aero_y
+                self.aero_z = aero_z
+
+        def pack(self, mav):
+                return MAVLink_message.pack(self, mav, 221, struct.pack('<Ihhh', self.time_boot_ms, self.aero_x, self.aero_y, self.aero_z))
 
 class MAVLink_heartbeat_message(MAVLink_message):
         '''
@@ -4156,6 +4172,7 @@ mavlink_map = {
         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 : ( '<40B70B', MAVLink_serial_udb_extra_f16_message, [0, 1], [40, 70], 222 ),
         MAVLINK_MSG_ID_ALTITUDES : ( '<Iiiiiii', MAVLink_altitudes_message, [0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 1, 1, 1, 1], 55 ),
         MAVLINK_MSG_ID_AIRSPEEDS : ( '<Ihhhhhh', MAVLink_airspeeds_message, [0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 1, 1, 1, 1], 154 ),
+        MAVLINK_MSG_ID_FORCE : ( '<Ihhh', MAVLink_force_message, [0, 1, 2, 3], [1, 1, 1, 1], 221 ),
         MAVLINK_MSG_ID_HEARTBEAT : ( '<IBBBBB', MAVLink_heartbeat_message, [1, 2, 3, 0, 4, 5], [1, 1, 1, 1, 1, 1], 50 ),
         MAVLINK_MSG_ID_SYS_STATUS : ( '<IIIHHhHHHHHHb', MAVLink_sys_status_message, [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 124 ),
         MAVLINK_MSG_ID_SYSTEM_TIME : ( '<QI', MAVLink_system_time_message, [0, 1], [1, 1], 137 ),
@@ -5189,6 +5206,32 @@ class MAVLink(object):
 
                 '''
                 return self.send(self.airspeeds_encode(time_boot_ms, airspeed_imu, airspeed_pitot, airspeed_hot_wire, airspeed_ultrasonic, aoa, aoy))
+
+        def force_encode(self, time_boot_ms, aero_x, aero_y, aero_z):
+                '''
+                The Forces acting on the aircraft
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                aero_x                    : Aeroforce in UDB X Axis, in units of gravity * 2000 (int16_t)
+                aero_y                    : Aeroforce in UDB Y Axis,  in units of gravity * 2000 (int16_t)
+                aero_z                    : Aeroforce in UDB Z axis (Wing loading), in units of gravity * 2000 (int16_t)
+
+                '''
+                msg = MAVLink_force_message(time_boot_ms, aero_x, aero_y, aero_z)
+                msg.pack(self)
+                return msg
+
+        def force_send(self, time_boot_ms, aero_x, aero_y, aero_z):
+                '''
+                The Forces acting on the aircraft
+
+                time_boot_ms              : Timestamp (milliseconds since system boot) (uint32_t)
+                aero_x                    : Aeroforce in UDB X Axis, in units of gravity * 2000 (int16_t)
+                aero_y                    : Aeroforce in UDB Y Axis,  in units of gravity * 2000 (int16_t)
+                aero_z                    : Aeroforce in UDB Z axis (Wing loading), in units of gravity * 2000 (int16_t)
+
+                '''
+                return self.send(self.force_encode(time_boot_ms, aero_x, aero_y, aero_z))
 
         def heartbeat_encode(self, type, autopilot, base_mode, custom_mode, system_status, mavlink_version=3):
                 '''

@@ -11,7 +11,7 @@
 
 #define INI_BUFFERSIZE  256				// maximum line length, maximum path length 
 
-#include "MDD File System/FSIO.h"
+#include "MDD-File-System/FSIO.h"
 #include <string.h>
 
 #define INI_FILETYPE					FSFILE*

@@ -23,6 +23,7 @@
 
 
 #include "libUDB_internal.h"
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #include "eeprom_udb4.h"
 
 #define SCL         PORTGbits.RG2       // I2C SCL (Clock) PORT
@@ -272,3 +273,5 @@ void eeprom_SequentialRead(uint16_t address, uint8_t *data, uint16_t numbytes)
 	bstop();                        // Generate Stop condition
 //DPRINT("\r\n");
 }
+
+#endif // (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)

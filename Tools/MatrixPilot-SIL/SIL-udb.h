@@ -10,7 +10,7 @@
 #define MatrixPilot_SIL_dsp_compat_h
 
 #include "SIL-dsp.h"
-#include "../HILSIM_XPlane/UDBSocket.h"
+#include "UDBSocket.h"
 
 
 // Fake ASM calls
@@ -39,11 +39,12 @@ static inline int16_t  __builtin_divsd(const int32_t num,  const int16_t den)  {
 #endif
 
 // LEDs
-extern uint8_t leds[4];
+extern uint8_t leds[5];
 #define LED_RED         leds[0]
 #define LED_GREEN       leds[1]
 #define LED_ORANGE      leds[2]
 #define LED_BLUE        leds[3]
+#define LED_TAIL_LIGHT  leds[4]
 
 // There are no hardware toggle switches on the UDB4, so use values of 0
 #define HW_SWITCH_1     0

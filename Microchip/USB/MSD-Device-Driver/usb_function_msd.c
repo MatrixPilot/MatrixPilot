@@ -93,6 +93,8 @@ Change History:
 
 ********************************************************************/
  
+#if defined(__dsPIC33E__) 
+
 /** I N C L U D E S **************************************************/
 #include "USB/usb.h"
 #include "HardwareProfile.h"
@@ -110,11 +112,11 @@ Change History:
 
 #if defined(__C30__) || defined(__C32__) || defined __XC16__
     #if defined(USE_INTERNAL_FLASH)
-        #include "MDD File System/Internal Flash.h"
+        #include "MDD-File-System/Internal-Flash.h"
     #endif
 
     #if defined(USE_SD_INTERFACE_WITH_SPI)
-        #include "MDD File System/SD-SPI.h"
+        #include "MDD-File-System/SD-SPI.h"
     #endif
 
     extern LUN_FUNCTIONS LUN[MAX_LUN + 1];
@@ -127,11 +129,11 @@ Change History:
     #define LUNSectorRead(bLBA,pSrc)            LUN[LUN_INDEX].SectorRead(bLBA, pSrc)
 #else
     #if defined(USE_INTERNAL_FLASH)
-        #include "MDD File System/Internal Flash.h"
+        #include "MDD-File-System/Internal-Flash.h"
     #endif
 
     #if defined(USE_SD_INTERFACE_WITH_SPI)
-        #include "MDD File System/SD-SPI.h"
+        #include "MDD-File-System/SD-SPI.h"
     #endif
 
     #define LUNMediaInitialize()                MDD_MediaInitialize()
@@ -1706,3 +1708,5 @@ void MSDErrorHandler(BYTE ErrorCase)
 //-----------------------------------------------------------------------------------------
 #endif //end of #ifdef USB_USE_MSD
 //End of file usb_function_msd.c
+
+#endif // defined(__dsPIC33E__) 

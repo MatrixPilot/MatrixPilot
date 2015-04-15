@@ -44,6 +44,8 @@ int16_t pitchrate;
 
 int16_t elevInput;
 
+int16_t elevatorLoadingTrim = 0 ;
+
 static void normalPitchCntrl(void);
 static void hoverPitchCntrl(void);
 
@@ -96,12 +98,12 @@ static void normalPitchCntrl(void)
 		pitchAccum.WW = __builtin_mulsu(tiltError[0], pitchgain) 
 					  - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd)
 		              + __builtin_mulsu(rotationRateError[0], pitchkd );
+		pitch_control = (int32_t)pitchAccum._.W1 + (int32_t) elevatorLoadingTrim ;
 	}
 	else
 	{
-		pitchAccum.WW = 0;
+		pitch_control = 0 ;
 	}
-	pitch_control = (int32_t)pitchAccum._.W1 ;
 }
 
 static void hoverPitchCntrl(void)

@@ -4,7 +4,7 @@
 
 #include "defines.h" 
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
 
 #include "parameter_table.h"
 #include "data_storage.h"
@@ -17,7 +17,7 @@ mavlink_parameters_list[2].min.param_float=0.0; mavlink_parameters_list[2].max.p
 mavlink_parameters_list[3].min.param_float=0.0; mavlink_parameters_list[3].max.param_float=0.5; // yawkdail - PID_YAWKDAIL
 mavlink_parameters_list[4].min.param_float=0.0; mavlink_parameters_list[4].max.param_float=0.5; // pitchgain - PID_PITCHGAIN
 mavlink_parameters_list[5].min.param_float=0.0; mavlink_parameters_list[5].max.param_float=0.5; // pitchkd - PID_PITCHKD
-mavlink_parameters_list[6].min.param_float=0.0; mavlink_parameters_list[6].max.param_float=0.5; // rudderElevMixGain - PID_RUDELEVGAIN
+//mavlink_parameters_list[6].min.param_float=0.0; mavlink_parameters_list[6].max.param_float=0.5; // rudderElevMixGain - PID_RUDELEVGAIN
 mavlink_parameters_list[7].min.param_float=0.0; mavlink_parameters_list[7].max.param_float=0.5; // rollkprud - PID_ROLLKPRUD
 mavlink_parameters_list[8].min.param_float=0.0; mavlink_parameters_list[8].max.param_float=0.5; // yawkprud - PID_YAWKPRUD
 mavlink_parameters_list[9].min.param_float=0.0; mavlink_parameters_list[9].max.param_float=0.5; // yawkdrud - PID_YAWKDRUD

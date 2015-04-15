@@ -26,10 +26,53 @@
 #include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
+#include "../libDCM/rmat.h"
 
-#define ANGLE_90DEG (RMAX/(2*57.3)) // FIXME: never used
+#ifndef RTL_PITCH_DOWN
+#define RTL_PITCH_DOWN ( 0.0 )
+#endif // RLT_PITCH_DOWN 
+
+#ifndef INVERTED_NEUTRAL_PITCH
+#define INVERTED_NEUTRAL_PITCH ( 0.0 )
+#endif // INVERTED_NEUTRAL_PITCH 
+
+#ifndef ANGLE_OF_ATTACK_NORMAL
+#define ANGLE_OF_ATTACK_NORMAL ( 0.0 )
+#endif // ANGLE_OF_ATTACK_NORMAL 
+
+#ifndef ANGLE_OF_ATTACK_INVERTED
+#define ANGLE_OF_ATTACK_INVERTED ( 0.0 )
+#endif // ANGLE_OF_ATTACK_INVERTED 
+
+#ifndef ELEVATOR_TRIM_NORMAL
+#define ELEVATOR_TRIM_NORMAL ( 0.0 )
+#endif // ELEVATOR_TRIM_NORMAL 
+
+#ifndef ELEVATOR_TRIM_INVERTED
+#define ELEVATOR_TRIM_INVERTED ( 0.0 )
+#endif // ELEVATOR_TRIM_INVERTED 
+
+#ifndef CRUISE_SPEED
+#define CRUISE_SPEED ( 12.0 )
+#endif // RLT_PITCH_DOWN
+
+#ifndef INVERTED_NEUTRAL_PITCH
+#define INVERTED_NEUTRAL_PITCH ( 0.0 )
+#endif
+
 #define RTLKICK ((int32_t)(RTL_PITCH_DOWN*(RMAX/57.3)))
 #define INVNPITCH ((int32_t)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
+#define AOA_NORMAL ((int16_t)(ANGLE_OF_ATTACK_NORMAL*(RMAX/57.3)))
+#define AOA_INVERTED ((int16_t)(ANGLE_OF_ATTACK_INVERTED*(RMAX/57.3)))
+#define ELEV_TRIM_NORMAL ((int16_t) SERVORANGE*ELEVATOR_TRIM_NORMAL )
+#define ELEV_TRIM_INVERTED ((int16_t) SERVORANGE*ELEVATOR_TRIM_INVERTED )
+#define STALL_SPEED_CM_SEC ((uint16_t) CRUISE_SPEED*50.0 ) // assume stall speed approximately 1/2 of cruise speed
+
+#define AOA_OFFSET ( (int16_t) (( AOA_NORMAL + AOA_INVERTED )/2 )) // offset is the average of the two values
+#define AOA_SLOPE ( (int16_t) (  ( AOA_NORMAL - AOA_INVERTED ) * 4 )) // multiply by 4 because base speed is 1/2 of cruise
+#define ELEVATOR_TRIM_OFFSET ( (int16_t) (( ELEV_TRIM_NORMAL + ELEV_TRIM_INVERTED )/2 )) // offset is the average of the two values
+#define ELEVATOR_TRIM_SLOPE ( (int16_t) (  ( ELEV_TRIM_NORMAL - ELEV_TRIM_INVERTED ) * 4 )) // multiply by 4 because base speed is 1/2 of cruise
+
 #define GRAVITYCMSECSEC ( 981 )
 #define RADSTOGYRO ( ( uint16_t ) 48*SCALEGYRO ) // used in the conversion from radians per second to raw gyro units
 
@@ -40,7 +83,104 @@
 
 int16_t tiltError[3] ;
 int16_t desiredRotationRateRadians[3] ;
-int16_t rotationRateError[3] ;
+int16_t rotationRateError[3] ;
+int16_t angleOfAttack ;
+int16_t estimatedLift ;
+int16_t relativeLoading ;
+
+// Compute estimated wing lift based on orientation.
+// This information can be determined directly from the accelerometers,
+// but this creates an unstable feedback loop through the elevator.
+// It is better to compute the lift as a feed forward term.
+// It can be shown that wing lift divided by mass times gravity during a helical turn is
+// equal to (Z + X * (X/Z) ), where X, Y, and Z are the 3 elements
+// of the bottom row of the direction cosine matrix, in real (floating point) values.
+// Note: In principle, X/Z can be computed from X and Z, but since X, Z, and X/Z are already available
+// in the helical turn control computations, it is more efficient to supply X/Z rather than recompute it.
+// The computation of lift can use a mix of actual and desired values of X, Z and X/Z.
+// The selection of the mix of actual and desired values for X, Z and X/Z is done when the routine is called.
+// The following routine computes 1/16 of the ratio of wing loading divided by mass*gravity.
+// The scale factor of 1/16 was selected to handle a fractional representation of a maximum lift/mg of more than 4.
+
+int16_t wingLift( int16_t X, int16_t Z, int16_t XoverZ )
+{
+	// compute (1/16*(Z + X * (X/Z)))*2^16
+	union longww lift ;
+	union longww accum ;
+
+	// compute the first term. X is already scaled by 1/4, so apply another 1/4:
+
+	accum._.W1 = Z ;
+	accum._.W0 = 0 ;
+	accum.WW = accum.WW >> 2 ; // divide by 4
+	lift.WW = accum.WW ; // Z/16
+
+	// compute the second term in result, X * ( X/Z )
+	// X has been divided by 4
+	// X/Z has been divided by 8
+	// so we need to multiply by 2
+	accum.WW = __builtin_mulss( X , XoverZ ) ; 
+	accum.WW += accum.WW  ; // multiply by 2
+
+	// add the two terms
+	lift.WW += accum.WW ;
+
+	return lift._.W1 ;
+}
+
+// Compute relative wing loading, 2**15*(Load/(mass*Gravity))*(V0/V)**2
+// This number ranges from -2**15 to +2**15. Either extreme represents stall conditions.
+// Typical values for relative wing loading under normal conditions are around 1/8 to 1/4 of the stall value.
+// V0 is stall speed in centimeters per second during level flight, V is airspeed in centimeters per second.
+// Load is wing loading in acceleration units, G is gravity.
+// Relative wing loading is 2**15 when airspeed is equal to stall speed during level, unaccelerated flight
+//
+// Implement as 8*((2**16)*(a/(16g))*(V0/V)**2
+//
+
+int16_t relativeWingLoading( int16_t wingLoad ,  uint16_t airSpeed )
+{
+	// wingLoad is (2**16)*( ( wing_load / mass*gravity ) / 16 )
+	// stallSpeed is the stall speed in centimeters per second
+	// airSpeed is the air speed in centimeters per second
+
+	uint16_t stallSpeed = STALL_SPEED_CM_SEC ;
+	int16_t result = 0 ;
+	uint32_t long_unsigned_accum ;
+	union longww long_signed_accum ;
+	uint16_t unsigned_accum ;
+
+	// if airspeed is less than or equal to stall speed, return zero
+	if ( airSpeed <= stallSpeed )
+	{
+		return 0 ;
+	}
+
+	long_unsigned_accum = ( uint32_t ) stallSpeed ;
+	long_unsigned_accum = long_unsigned_accum << 16 ; // (2**16)*V0, 32 bits unsigned
+	unsigned_accum = __builtin_divud( long_unsigned_accum , airSpeed ) ; // (2**16)*(V0/V), 16 bits unsigned
+	long_unsigned_accum = __builtin_muluu( unsigned_accum , unsigned_accum ) ; // (2**32)*(V0/V)**2, 32 bits unsigned
+	unsigned_accum = long_unsigned_accum >> 16 ; // (2**16)*(V0/V)**2, 16 bits unsigned
+	long_signed_accum.WW = __builtin_mulus( unsigned_accum , wingLoad ) ; // (2**32)*(a/16g)*(V0/V)**2, 32 bits unsigned
+	if ( abs ( long_signed_accum._.W1 ) < 4095 )
+	{
+		long_signed_accum.WW = long_signed_accum.WW << 3 ; // multiply by 8
+		result = long_signed_accum._.W1 ; 
+	}
+	else
+	{
+		if ( wingLoad > 0 )
+		{
+			result = 32767 ;
+		}
+		else
+		{
+			result = -32767 ;
+		}
+	}	
+	return result ;
+}
+
 // helicalTurnCntrl determines the values of the elements of the bottom row of rmat
 // as well as the required rotation rates in the body frame that are required to make a coordinated turn.
 // The required values for the bottom row of rmat are placed in the vector desiredTilt.
@@ -53,6 +193,7 @@ int16_t rotationRateError[3] ;
 void helicalTurnCntrl( void )
 {
 	union longww accum ;
+	int16_t pitchAdjustAngleOfAttack ;
 	int16_t rollErrorVector[3] ;
 	int16_t rtlkick ;
 	int16_t desiredPitch ;
@@ -68,7 +209,7 @@ void helicalTurnCntrl( void )
 	int16_t pitchDot ;
 	int16_t pitchCross ;
 	int16_t pitchError ;
-	int16_t pitchErrorBody[2] ;	
+	int16_t pitchEarthBodyProjection[2] ;	
 #ifdef TestGains
 	flags._.GPS_steering = 0; // turn off navigation
 	flags._.pitch_feedback = 1; // turn on stabilization
@@ -77,6 +218,8 @@ void helicalTurnCntrl( void )
 	airSpeed = air_speed_3DIMU ;
 	if ( airSpeed < MINIMUM_AIRSPEED ) airSpeed = MINIMUM_AIRSPEED ;
 #endif
+
+
 
 	// determine the desired turn rate as the sum of navigation and fly by wire.
 	// this allows the pilot to override navigation if needed.
@@ -147,8 +290,50 @@ void helicalTurnCntrl( void )
 		accum.WW = __builtin_mulsu( desiredTilt._.W0 , GRAVITYCMSECSEC ) ;
 		accum.WW /= airSpeed ;
 		desiredTurnRateRadians = accum._.W0 ;
-	}	
+	}
 
+	// Compute the amount of lift needed to perform the desired turn
+	// Tests show that the best estimate of lift is obtained using
+	// actual values of rmat[6] and rmat[8], and the commanded value of their ratio
+	estimatedLift = wingLift( rmat[6] , rmat[8] , desiredTilt._.W0 ) ;
+
+	// compute angle of attack and elevator trim based on relative wing loading.
+	// relative wing loading is the ratio of wing loading divided by the stall wing loading, as a function of air speed
+	// both angle of attack and trim are computed by a linear approximation as a function of relative loading:
+	// y = (2m)*(x/2) + b, y is either angle of attack or elevator trim.
+	// x is relative wing loading. (x/2 is computed instead of x)
+	// 2m and b are determined from values of angle of attack and trim at stall speed, normal and inverted.
+	// b = ( y_normal + y_inverted ) / 2.
+	// 2m = ( y_normal - y_inverted ) .
+
+	// If airspeed is greater than stall speed, compute angle of attack and elevator trim,
+	// otherwise set AoA and trim to zero.
+
+	if ( air_speed_3DIMU > STALL_SPEED_CM_SEC )
+	{
+		// compute "x/2", the relative wing loading
+		relativeLoading = relativeWingLoading( estimatedLift , air_speed_3DIMU ) ;
+
+		// multiply x/2 by 2m for angle of attack
+		accum.WW = __builtin_mulss( AOA_SLOPE , relativeLoading ) ;
+		// add mx to b
+		angleOfAttack = AOA_OFFSET + accum._.W1 ;
+
+		// project angle of attack into the earth frame
+		accum.WW = ( __builtin_mulss( angleOfAttack , rmat[8] ) ) << 2 ;
+		pitchAdjustAngleOfAttack = accum._.W1 ;	
+
+		// similarly, compute elevator trim
+		accum.WW = __builtin_mulss( ELEVATOR_TRIM_SLOPE , relativeLoading ) ;
+		elevatorLoadingTrim = ELEVATOR_TRIM_OFFSET + accum._.W1 ;
+	}
+	else
+	{
+		angleOfAttack = 0 ;
+		pitchAdjustAngleOfAttack = 0 ;
+		elevatorLoadingTrim = 0 ;
+	}
+	
 	// convert desired turn rate from radians/second to gyro units
 
 	accum.WW = ( ( ( int32_t ) desiredTurnRateRadians ) << 4 );  // desired turn rate in radians times 16 to provide resolution for the divide to follow
@@ -197,14 +382,13 @@ void helicalTurnCntrl( void )
 	if (!canStabilizeInverted() || !desired_behavior._.inverted )
 	{
 		// normal flight
-		desiredTiltVector[1] =  - desiredPitch ;
+		desiredTiltVector[1] =  - desiredPitch - pitchAdjustAngleOfAttack ;
 	}
 	else
 	{
-		desiredPitch += INVNPITCH ;
-		// inverted flight, flip the desired tilt vector
+		// inverted flight
 		desiredTiltVector[0] = - desiredTiltVector[0] ;
-		desiredTiltVector[1] = - desiredPitch  ;
+		desiredTiltVector[1] = - desiredPitch - pitchAdjustAngleOfAttack - INVNPITCH ; // only one of the adjustments is not zero
 		desiredTiltVector[2] = - desiredTiltVector[2] ;
 	}
 
@@ -224,12 +408,12 @@ void helicalTurnCntrl( void )
 
 	// start by computing the projection of earth frame pitch error to body frame
 
-	pitchErrorBody[0] = rmat[6] ;
-	pitchErrorBody[1] = rmat[8] ;
+	pitchEarthBodyProjection[0] = rmat[6] ;
+	pitchEarthBodyProjection[1] = rmat[8] ;
 
 	// normalize the projection vector and compute the cosine of the actual pitch as a side effect 
 
-	actualPitchVector[1] = ( int16_t ) vector2_normalize( pitchErrorBody , pitchErrorBody ) ;
+	actualPitchVector[1] = ( int16_t ) vector2_normalize( pitchEarthBodyProjection , pitchEarthBodyProjection ) ;
 
 	// complete the actual pitch vector
 
@@ -273,10 +457,10 @@ void helicalTurnCntrl( void )
 
 	// multiply the normalized rmat[6] , rmat[8] vector by the pitch error
 
-	VectorScale( 2 , pitchErrorBody , pitchErrorBody , pitchError ) ;
+	VectorScale( 2 , pitchEarthBodyProjection , pitchEarthBodyProjection , pitchError ) ;
 
-	tiltError[0] = 2*pitchErrorBody[1] ;
-	tiltError[2] = - 2*pitchErrorBody[0] ;
+	tiltError[0] = 2*pitchEarthBodyProjection[1] ;
+	tiltError[2] = - 2*pitchEarthBodyProjection[0] ;
 
 	// compute the rotation rate error vector
 

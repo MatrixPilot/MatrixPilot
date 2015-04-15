@@ -121,6 +121,8 @@ state according to the definition in the USB specification.
 #ifndef __USB_DESCRIPTORS_C
 #define __USB_DESCRIPTORS_C
 
+#if defined(__dsPIC33E__)
+
 /** INCLUDES *******************************************************/
 #include "./USB/usb.h"
 #include "./USB/usb_function_msd.h"
@@ -325,5 +327,7 @@ ROM BYTE *ROM USB_SD_Ptr[]=
 };
 
 
-#endif
+#endif // defined(__dsPIC33E__)
+
+#endif // __USB_DESCRIPTORS_C
 /** EOF usb_descriptors.c ***************************************************/

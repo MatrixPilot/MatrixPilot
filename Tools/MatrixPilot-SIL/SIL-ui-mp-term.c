@@ -9,22 +9,22 @@
 #if (WIN == 1 || NIX == 1)
 
 #include "SIL-udb.h"
-#include "defines.h"
-#include "flightplan-waypoints.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/flightplan-waypoints.h"
 #include <stdio.h>
 
 #define BUFLEN 512
 
-UDBSocket stdioSocket;
-uint8_t lastLedBits = 0;
-boolean showLEDs = 0;
-uint8_t inputState = 0;
-int hasShownInitStates = 0;
+static UDBSocket stdioSocket = NULL;
+static uint8_t lastLedBits = 0;
+static boolean showLEDs = 0;
+static uint8_t inputState = 0;
+static int hasShownInitStates = 0;
 
-void sil_handle_key_input(char c);
-void sil_checkForLedUpdates(void);
+static int sil_handle_key_input(char c);
+static void sil_checkForLedUpdates(void);
 
-void print_help(void)
+static void print_help(void)
 {
 	printf("1/2/3/4 = mode manual/stabilized/waypoint/signal-lost\n");
 	printf("w/s     = throttle up/down\n");
@@ -33,7 +33,7 @@ void print_help(void)
 	printf("j/l     = aileron left/right\n");
 	printf("\n");
 	printf("z       = zero the sticks\n");
-	printf("L       = toggle LEDs\n");
+	printf(";       = toggle LEDs\n");
 	printf("0       = toggle RC Radio connection on/off\n");
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	printf("xN      = execute LOGO subroutine N(0-9)\n");
@@ -85,7 +85,7 @@ void sil_ui_update(void)
 	}
 }
 
-void print_LED_status(void)
+static void print_LED_status(void)
 {
 	printf("LEDs: %c %c %c %c\r",
 	    (leds[0] == LED_ON) ? 'R' : '-',
@@ -94,7 +94,7 @@ void print_LED_status(void)
 	    (leds[3] == LED_ON) ? 'B' : '-');
 }
 
-void sil_checkForLedUpdates(void)
+static void sil_checkForLedUpdates(void)
 {
 	uint8_t newLedBits = 0;
 
@@ -111,14 +111,14 @@ void sil_checkForLedUpdates(void)
 	}
 }
 
-void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
+static void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 {
 	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
 	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
-		printf("\n%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
+		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
 	}
 	else {
-		printf("\n%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
+		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
 	}
 }
 
@@ -126,7 +126,7 @@ void save_config(void);
 
 #define KEYPRESS_INPUT_DELTA 50
 
-void sil_handle_key_input(char c)
+static int sil_handle_key_input(char c)
 {
 	switch (inputState) {
 		case 0:
@@ -177,19 +177,19 @@ void sil_handle_key_input(char c)
 					printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
 					break;
 
-				case '1':
+				case '1': // switch mode to manual
 					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
 					break;
 
-				case '2':
+				case '2': // switch mode to stabilised
 					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
 					break;
 
-				case '3':
+				case '3': // switch mode to guided
 					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
 					break;
 
-				case '4':
+				case '4': // switch mode to failsafe
 					udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
 					break;
 
@@ -198,7 +198,7 @@ void sil_handle_key_input(char c)
 					printf("\nRadio %s\n", (sil_radio_on) ? "On" : "Off");
 					break;
 
-				case 'L':
+				case ';':
 					showLEDs = !showLEDs;
 					if (showLEDs) {
 						printf("\n");
@@ -224,7 +224,7 @@ void sil_handle_key_input(char c)
 					break;
 					
 				default:
-					break;
+					return 0;
 			}
 			break;
 		}
@@ -252,8 +252,10 @@ void sil_handle_key_input(char c)
 				sil_reset();
 			}
 			inputState = 0;
+			break;
 		}
 	}
+	return 1;
 }
 
 #endif // (WIN == 1 || NIX == 1)

@@ -1,13 +1,15 @@
+# -*- coding: utf-8 -*-
 import re
 import sys
 import os
+import math
 
 
 try:
-    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink', 'pymavlink'))
+    sys.path.insert(0, os.path.join(os.getcwd(), '..', 'MAVLink', 'mavlink'))
     os.environ['MAVLINK10'] = '1'
-    import mavlinkv10 as mavlink
-    import mavutil
+    import pymavlink.dialects.v10.matrixpilot as mavlink
+    import pymavlink.mavutil as mavutil
 except:
     print "Not able to find Python MAVlink libraries"
 
@@ -19,21 +21,25 @@ class raw_mavlink_telemetry_file:
     """Model a mavlink file (one without local time stamps inserted)"""
     def __init__(self, filename, type_of_mavlink):
         if (type_of_mavlink == "SERIAL_MAVLINK_RAW"):
-            self.m = mavutil.mavlink_connection(filename, notimestamps = True)
+            self.m = mavutil.mavlink_connection(filename, notimestamps = True,dialect='matrixpilot')
         elif (type_of_mavlink == "SERIAL_MAVLINK_TIMESTAMPS"):
-            self.m = mavutil.mavlink_connection(filename, notimestamps = False)    
+            self.m = mavutil.mavlink_connection(filename, notimestamps = False, dialect='matrixpilot')    
         else:
             print "Error: Unknown Mavlink file type (not raw or timestamp)."
         self.total_mavlink_packets_received = 0
         self.dropped_mavlink_packets = 0
         self.first_packet_flag = True
         self.SUE_F2_A_needs_printing = False
+        self.last_aero_force_x = 0
+        self.last_aero_force_y = 0
+        self.last_aero_force_z = 0
+        
         
     def __iter__(self):
         return(self)
         
     def next(self):
-        """return the next good SERIAL UDB EXTRA (SUE) Binary MAVLink record"""
+        """return the next good Binary MAVLink record of interest (e.g. SUE)"""
         while True :
             self.msg = self.m.recv_match(blocking=False)
             if not self.msg:
@@ -42,15 +48,18 @@ class raw_mavlink_telemetry_file:
                     print "Packets dropped in transmission:",  self.dropped_mavlink_packets
                     raise StopIteration
             elif self.msg.get_type() == "BAD_DATA":
+                print "Bad Data Packet"
                 pass
             else :  # We have a good mavlink packet
                 self.track_dropped_packets(self.msg.get_seq())
-                #print self.msg.get_seq()
+                #print self.msg
                 if self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_A":
+                        #print self.msg
                         self.last_F2_A_msg = self.msg
                         self.SUE_F2_A_needs_printing = True
                         continue
                 elif self.msg.get_type() == "SERIAL_UDB_EXTRA_F2_B":
+                        #print self.msg
                         try:
                             if self.msg.sue_time >= (self.last_F2_A_msg.sue_time - 250) : #A and B halves of message are a pair
                                 # Note for above: -250 is because time can go backwards by 1/4 of a second in MP when GPS updates.
@@ -74,7 +83,13 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
                             #print self.msg.get_seq(),"DEBUG: ", self.msg.get_type()
-                            return self.msg                
+                            return self.msg
+                elif self.msg.get_type() == 'FORCE':
+                        self.last_aero_force_x = self.msg.aero_x # hang onto message until we process F2_B message later
+                        self.last_aero_force_y = self.msg.aero_y
+                        self.last_aero_force_z = self.msg.aero_z
+                        #print self.msg
+                        continue
                 else :
                         #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                         pass
@@ -220,6 +235,29 @@ class base_telemetry :
         self.flags = 0
         self.sonar_direct = 0 # Direct distance in cm to sonar target
         self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
+        # The following variables added for the Helical Turns method of fly by wire and auto  flight
+        self.aero_force_x = 0
+        self.aero_force_y = 0
+        self.aero_force_z = 0
+        self.feed_forward = 0
+        self.navigation_max_earth_vertical_axis_rotation_rate = 0
+        self.fly_by_wire_max_earth_vertical_axis_rotation_rate = 0
+        self.angle_of_attack_normal = 0
+        self.angle_of_attack_inverted = 0
+        self.elevator_trim_normal = 0
+        self.elevator_trim_inverted = 0
+        self.nominal_cruise_speed = 0
+        # End of new variables for Helical Turns
+        self.aileron_output_channel  = 0
+        self.elevator_output_channel = 0
+        self.throttle_output_channel = 0
+        self.rudder_output_channel   = 0
+        self.aileron_output_reversed  = 0
+        self.elevator_output_reversed = 0
+        self.throttle_output_reversed = 0
+        self.rudder_output_reversed   = 0
+        self.number_of_input_channels = 0
+        self.channel_trim_values = [0]
        
 
 class mavlink_telemetry(base_telemetry):
@@ -273,6 +311,12 @@ class mavlink_telemetry(base_telemetry):
                 self.svs = int(telemetry_file.last_F2_A_msg.sue_svs)
                 self.hdop = int(telemetry_file.last_F2_A_msg.sue_hdop)
 
+                # Storing the last aero force message received before
+                # the F2 SUE message, with the F2 Sue message. 
+                self.aero_force_x = int(telemetry_file.last_aero_force_x)
+                self.aero_force_y = int(telemetry_file.last_aero_force_y)
+                self.aero_force_z = int(telemetry_file.last_aero_force_z)           
+
                 self.pwm_input[1] = int(telemetry_file.msg.sue_pwm_input_1)
                 self.pwm_input[2] = int(telemetry_file.msg.sue_pwm_input_2)
                 self.pwm_input[3] = int(telemetry_file.msg.sue_pwm_input_3)
@@ -298,12 +342,12 @@ class mavlink_telemetry(base_telemetry):
                 self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
                 self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
                 self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
-                self.sue_flags = int(telemetry_file.msg.sue_flags)
+                self.flags = int(telemetry_file.msg.sue_flags)
 
-                self.sue_osc_fails = int(telemetry_file.msg.sue_osc_fails)
-                self.sue_imu_velocity_x = int(telemetry_file.msg.sue_imu_velocity_x)
-                self.sue_imu_velocity_y = int(telemetry_file.msg.sue_imu_velocity_y)
-                self.sue_imu_velocity_z = int(telemetry_file.msg.sue_imu_velocity_z)
+                self.osc_fails = int(telemetry_file.msg.sue_osc_fails)
+                self.IMUvelocityx = int(telemetry_file.msg.sue_imu_velocity_x)
+                self.IMUvelocityy = int(telemetry_file.msg.sue_imu_velocity_y)
+                self.IMUvelocityz = int(telemetry_file.msg.sue_imu_velocity_z)
                 self.inline_waypoint_x = int(telemetry_file.msg.sue_waypoint_goal_x)
                 self.inline_waypoint_y = int(telemetry_file.msg.sue_waypoint_goal_y)
                 self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
@@ -402,7 +446,7 @@ class mavlink_telemetry(base_telemetry):
             self.id_diy_drones_url = telemetry_file.msg.sue_ID_DIY_DRONES_URL
 
             return("F16")
-
+        
         else :
             err_message = "Warn:" + telemetry_file.msg.get_type()
             return(err_message)
@@ -1146,7 +1190,6 @@ class ascii_telemetry(base_telemetry):
                     return "Error"
             else :
                 pass
-
             match = re.match(".*:fgs([-0-9]*?):",line) # flags from defines.h 
             if match :
                 try:
@@ -1175,6 +1218,16 @@ class ascii_telemetry(base_telemetry):
                 except:
                     print "Corrupt F2: sonar value in line", line_no
                     pass
+            match = re.match(".*:AF([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) # Next waypoint X,Y,Z in meters from origin
+            if match :
+                try:
+                    self.aero_force_x = int(match.group(1))
+                    self.aero_force_y = int(match.group(2))
+                    self.aero_force_z = int(match.group(3))
+                except:
+                    print "Corrupt F2: Aero Force value in line", line_no
+                    pass
+            
             
              # line was parsed without major errors
             return "F2"
@@ -1285,7 +1338,7 @@ class ascii_telemetry(base_telemetry):
             
             match = re.match(".*:A_BOOST=(.*?):",line) # AILERON_BOOST
             if match :
-                self.aileron_boost = float(match.group(1))
+                self.aileron_boost = match.group(1)
             else :
                 print "Failure parsing AILERON_BOOST at line", line_no
                 return "Error"
@@ -1314,14 +1367,14 @@ class ascii_telemetry(base_telemetry):
                 return "Error"
             match = re.match(".*:RUD_E_MIX=(.*?):",line) # RUDDER_ELEV_MIX
             if match :
-                self.rudder_elev_mix = float(match.group(1))
+                self.rudder_elev_mix = match.group(1)
             else :
                 print "Failure parsing RUDDER_ELEV_MIX at line", line_no
                 return "Error"
             
             match = re.match(".*:ROL_E_MIX=(.*?):",line) # ROLL_ELEV_MIX
             if match :
-                self.roll_elev_mix = float (match.group(1))
+                self.roll_elev_mix = match.group(1)
             else :
                 print "Failure parsing ROLL_ELEV_MIX at line", line_no
                 return "Error"
@@ -1643,7 +1696,113 @@ class ascii_telemetry(base_telemetry):
             else :
                 print "Failure parsing ID_DIY_DRONES_URL at line", line_no
             return "F16"
- 
+        
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F17:",line) # If line starts with F17
+        if match :
+            # Parse the line for options.h values
+           
+            match = re.match(".*:FD_FWD=(.*?):",line) # FEED FORWARD for Helical Turns
+            if match :
+                self.feed_forward = float(match.group(1))
+            else :
+                print "Failure parsing FEED FORWARD at line", line_no
+            match = re.match(".*:TR_NAV=(.*?):",line) # TR_NAV
+            if match :
+                self.navigation_max_earth_vertical_axis_rotation_rate = float(match.group(1))
+            else :
+                print "Failure parsing TURN_RATE_NAV at line", line_no
+            match = re.match(".*:TR_FBW=(.*?):",line) # TR_FBW
+            if match :
+                self.fly_by_wire_max_earth_vertical_axis_rotation_rate = float(match.group(1))
+            else :
+                print "Failure parsing TURN_RATE_FBW  at line", line_no
+            return "F17"
+
+        #################################################################
+        # Try Another format of telemetry
+        
+        match = re.match("^F18:",line) # If line starts with F18
+        if match :
+            # Parse the line for options.h values
+           
+            match = re.match(".*:AOA_NRM=(.*?):",line) # ANGLE_OF_ATTACK_NORMAL 
+            if match :
+                self.angle_of_attack_normal = float(match.group(1))
+            else :
+                print "Failure parsing ANGLE_OF_ATTACK_NORMAL  at line", line_no
+            match = re.match(".*:AOA_INV=(.*?):",line) # ANGLE_OF_ATTACK_INVERTED
+            if match :
+                self.angle_of_attack_inverted = float(match.group(1))
+            else :
+                print "Failure parsing ANGLE_OF_ATTACK_INVERTED at line", line_no
+            match = re.match(".*:EL_TRIM_NRM=(.*?):",line) # ELEVTOR_TRIM_NORMAL
+            if match :
+                self.elevator_trim_normal = float(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR_TRIM_NORMAL at line", line_no
+            match = re.match(".*:EL_TRIM_INV=(.*?):",line) # ELEVTOR_TRIM_INVERTED
+            if match :
+                self.elevator_trim_inverted = float(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR_TRIM_INVERTED at line", line_no
+            match = re.match(".*:CRUISE_SPD=(.*?):",line) # Nominal CRUISE_SPEED
+            if match :
+                self.nominal_cruise_speed = float(match.group(1))
+            else :
+                print "Failure parsing nominal CRUISE_SPEED at line", line_no
+            return "F18"
+        
+        #################################################################
+        # Try Another format of telemetry
+
+        match = re.match("^F19:",line) # If line starts with F19
+        if match :
+            # Parse the line for options.h values
+            match = re.match(".*:AIL=([0-9]*?),([0-9]*?):",line)   # Aileron Channel, and reversal 
+            if match :
+                self.aileron_output_channel  = int(match.group(1))
+                self.aileron_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing AILERON CHANNEL at line", line_no
+            match = re.match(".*:ELEV=([0-9]*?),([0-9]*?):",line)  # Elevator Channel, and reversal 
+            if match :
+                self.elevator_output_channel   = int(match.group(1))
+                self.elevator_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing ELEVATOR CHANNEL at line", line_no
+            match = re.match(".*:THROT=([0-9]*?),([0-9]*?):",line) # Throttle Channel, and reversal 
+            if match :
+                self.throttle_output_channel  = int(match.group(1))
+                self.throttle_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing THROTTLE CHANNEL at line", line_no
+            match = re.match(".*:RUDD=([0-9]*?),([0-9]*?):",line) # Rudder Channel, and reversal 
+            if match :
+                self.rudder_output_channel  = int(match.group(1))
+                self.rudder_output_reversed = int(match.group(2))
+            else :
+                print "Failure parsing RUDDER CHANNEL at line", line_no
+            return "F19"
+        
+        #################################################################
+        # Try Another format of telemetry
+        match = re.match("^F20:",line) # If line starts with F20
+        if match :
+            # Parse the line for options.h values
+            match = re.match(".*:NUM_IN=([0-9]*?):",line)   # Number of Input Channels
+            if match :
+                self.number_of_input_channels  = int(match.group(1))
+            else :
+                print "Failure parsing NUMBER OF INPUT CHANNELS at line", line_no
+            # Only Trim values will match in the follwoing iterative line. Here is an example:
+            # F20:NUM_IN=5:TRIM=2992,3000,2057,2989,2043,:
+            for match in re.finditer('([0-9]*?),',line):
+                self.channel_trim_values.append(int(match.group(1)))
+            return "F20"
+        
         #################################################################
         # Try Another format of telemetry
         
@@ -1868,6 +2027,32 @@ def matrix_transpose(a) :
     b[7] = a[5]
     b[8] = a[8]
     return b
+
+def normalize_vector_3x1(a) :
+    """ Make an arbitary 3x1 vector to have a unit length of 1"""
+    scalar_length = math.sqrt( a[0]**2 + a[1]**2 + a[2]**2 )
+    if scalar_length > 0 :
+        a[0] = a[0] / scalar_length
+        a[1] = a[1] / scalar_length
+        a[2] = a[2] / scalar_length
+    else :
+        a[0] = 0
+        a[1] = 0
+        a[2] = 0
+    return(a)
+
+def matrix_dot_product_vector_3x1(a,b) :
+    """ Perform a dot product operation on two vectors of dimensions 3x1"""
+    return(a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
+
+def matrix_cross_product_vector_3x1(a,b) :
+    """ Performa a cross product operation on two vectors of dimensions 3x1"""
+    #   a  × b = a2b3 − a3b2, a3b1 − a1b3, a1b2 − a2b1
+    c = [0,0,0]
+    c[0] = (a[1]*b[2]) - (a[2]*b[1])
+    c[1] = (a[2]*b[0]) - (a[0]*b[2])
+    c[2] = (a[0]*b[1]) - (a[1]*b[0])
+    return(c)
 
 def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filename, telemetry_type):
     """Filter out all the SERIAL_UDB_EXTRA messages from a MAVLink log file, and print them to

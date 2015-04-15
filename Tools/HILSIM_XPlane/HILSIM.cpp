@@ -18,6 +18,10 @@ int MyOrbitPlaneFunc(XPLMCameraPosition_t* outCameraPosition,
 int	MyDrawCallback(XPLMDrawingPhase inPhase,
                    int              inIsBefore,
                    void*            inRefcon);
+int MyKeySniffer(char         inChar,
+                 XPLMKeyFlags inFlags,
+                 char         inVirtualKey,
+                 void*        inRefcon);
 
 // Here are the variables for implementing the file based control of the setup
 Channels ControlSurfaces;               // The list of control surfaces
@@ -46,13 +50,13 @@ int msgServos(unsigned char rxChar);
 int msgCheckSum(unsigned char rxChar);
 int msgVarSize(unsigned char rxChar);   // Parser for variable count data byte
 int msgVarServos(unsigned char rxChar); // Receive channel data of variable length
-int msgSync2(unsigned char rxChar );    // Parser for second byte of variable channel count message
+int msgSync2(unsigned char rxChar);     // Parser for second byte of variable channel count message
 
 unsigned char var_channel_count;        // Number of channels to be recieved
 unsigned char ck_in_a, ck_in_b, ck_calc_a, ck_calc_b;
 
 void SetupDefaultServoZeros(void);
-void ServosToControls();
+void ServosToControls(void);
 
 int GPSCount = 0;
 int store_index = 0;
@@ -84,6 +88,14 @@ unsigned char NAV_BODYRATES[] = {
             0x00, 0x00,     // gravity minus acceleration, UDBx
             0x00, 0x00,     // gravity minus acceleration, UDBy
             0x00, 0x00,     // gravity minus acceleration, UDBz
+            0x00, 0x00      // Checksum
+            };
+
+unsigned char NAV_KEYSTROKE[] = {
+            0xB5, 0x62,     // Header
+            0x01, 0xAC,     // ID
+            0x02, 0x00,     // Payload Length
+            0x00, 0x00,     // KeySniffer keystroke data, ckey, vkey
             0x00, 0x00      // Checksum
             };
 
@@ -293,9 +305,69 @@ PLUGIN_API int XPluginStart(char* outName,
 	    0,                      // After objects
 	    NULL);                  // No refcon needed
 
+	XPLMRegisterKeySniffer(
+		MyKeySniffer,           // Our callback
+		1,                      // Receive input before plugin windows
+		0);                     // Refcon - not used
+
 	memset(&CamPath, 0, sizeof(float) * 3 * CamPathLength);
 	return 1;
 }
+
+/*
+ * MyKeySniffer
+ *
+ * This routnine receives keystrokes from the simulator as they are pressed.
+ * A separate message is received for each key press and release as well as
+ * keys being held down.
+ *
+ */
+int MyKeySniffer(char         inChar,
+                 XPLMKeyFlags inFlags,
+                 char         inVirtualKey,
+                 void*        inRefcon)
+{
+	if ((inVirtualKey >= 33 && inVirtualKey <= 40) || (inVirtualKey >= 96 && inVirtualKey <= 111))
+	{
+		NAV_KEYSTROKE[6] = (unsigned char)inFlags;
+		NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
+		CalculateChecksum(NAV_KEYSTROKE);
+		SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
+		return 0;   // Returning 0 consumes the keystroke
+	}
+	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane
+}
+/*
+Page Up    0 | 33
+Page Down  0 | 34
+End        0 | 35
+Home       0 | 36
+Left      28 | 37
+Up        30 | 38
+Right     29 | 39
+Down      31 | 40
+
+x        120 | 88
+z        122 | 90
+
+Numpad-0  48 | 96
+Numpad-1  49 | 97
+Numpad-2  50 | 98
+Numpad-3  51 | 99
+Numpad-4  52 | 100
+Numpad-5  53 | 101
+Numpad-6  54 | 102
+Numpad-7  55 | 103
+Numpad-8  56 | 104
+Numpad-9  57 | 105
+Numpad-*  42 | 106
+Numpad-+  43 | 107
+Numpad--  45 | 109
+Numpad-/  47 | 111
+
+,         44 | 183
+.         46 | 185
+ */
 
 int DrawStrings(XPLMDrawingPhase inPhase, int inIsBefore, void* inRefcon)
 {
@@ -397,7 +469,12 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void* refcon)
 	alpha = XPLMGetDataf(drAlpha) / 180 * PI;
 	beta = XPLMGetDataf(drBeta)   / 180 * PI;
 
-	FLIGHTtoBCBF(P_flight, Q_flight, R_flight, alpha, beta);
+	
+    // On 25th Jan 2015, Bill Premerlani confirmed with Austin Meyer, author of X-Plane
+    // that P, Q and R are rotations in the body frame. So they do not need to be rotated into
+    // any other frame of reference, other than a small sign correction for the UDB frame conventions.
+    // Austin Meyer said: "now, i CAN say that P is roll, Q is pitch, and R is yaw, all in degrees per second
+    //about the aircraft axis,..... (i just looked at the code to confirm this)"
 
 	P_plane = P_flight;
 	Q_plane = -Q_flight;   // convert from NED to UDB
