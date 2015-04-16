@@ -24,9 +24,13 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
+#include "servoPrepare.h"
+#include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
+#include "sonarCntrl.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libUDB/servoOut.h"
 #if (USE_CONFIGFILE == 1)
 #include "config.h"
 #include "redef.h"
@@ -108,9 +112,9 @@ void init_altitudeCntrlVariable(void)
 	speed_control = SPEED_CONTROL;
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_altitudeCntrlVariable(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.HeightTargetMax = height_target_max;
 	gains.HeightTargetMin = height_target_min;
 //	height_margin;
@@ -122,8 +126,8 @@ void save_altitudeCntrlVariable(void)
 //	rtl_pitch_down;
 //	desiredSpeed / 10;
 //	speed_control;
-}
 #endif // USE_CONFIGFILE
+}
 
 static int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
 {

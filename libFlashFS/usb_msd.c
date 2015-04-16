@@ -71,6 +71,19 @@ LUN_FUNCTIONS LUN[MAX_LUN + 1] =
 		&MDD_SDSPI_SectorWrite
 	}
 };
+#elif defined USE_EEPROM_FLASH
+LUN_FUNCTIONS LUN[MAX_LUN + 1] = 
+{
+	{
+		&MDD_EEPROM_MediaInitialize,
+		&MDD_EEPROM_ReadCapacity,
+		&MDD_EEPROM_ReadSectorSize,
+		&MDD_EEPROM_MediaDetect,
+		&MDD_EEPROM_SectorRead,
+		&MDD_EEPROM_WriteProtectState,
+		&MDD_EEPROM_SectorWrite
+	}
+};
 #else
 #error here
 #endif // USE_AT45D_FLASH

@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
+#include "states.h"
 #include "cameraCntrl.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/rmat.h"
 
 // servo_ratios are used to convert degrees of rotation into servo pulse code lengths
 // This code is configured for the full throw of the servo to be achieved by a range of

@@ -30,5 +30,7 @@ extern int16_t pitchAltitudeAdjust;
 extern int16_t desiredSpeed; // Stored in 10ths of meters per second
 //#endif
 
+void setTargetAltitude(int16_t targetAlt);
+
 
 #endif // ALTITUDECNTRL_H
