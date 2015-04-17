@@ -187,6 +187,7 @@
 //
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
+// Check on radioIn.c different type of PPM_INPUT to assign to USE_PPM_INPUT
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //

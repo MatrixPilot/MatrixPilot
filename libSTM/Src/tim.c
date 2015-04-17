@@ -67,7 +67,7 @@ void MX_TIM5_Init(void)
 {
     TIM_ClockConfigTypeDef sClockSourceConfig;
     TIM_MasterConfigTypeDef sMasterConfig;
-    TIM_IC_InitTypeDef sConfigIC;
+
 
     htim5.Instance = TIM5;
 //    htim5.Init.Prescaler = (uint16_t) (((SystemCoreClock / 1000000) / 2) - 1);    //500KHz
@@ -85,22 +85,6 @@ void MX_TIM5_Init(void)
     sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig);
-
-    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
-    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-    sConfigIC.ICFilter = 0;
-
-    //ToDo: Enable as many as NUM_INPUTS Channels
-    //	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
-#if (USE_PPM_INPUT == 0)
-	if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);};
-	if (NUM_INPUTS > 1)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
-#else
-    //ToDo: I need to work on it after finish parallel decode!!!!! Transform PPM_IC to TIM_CHANNELx
-    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
-//	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
-#endif // USE_PPM_INPUT
 
 }
 
@@ -312,6 +296,29 @@ void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* htim_ic)
 }
 /* USER CODE BEGIN 1 */
 
+
+void start_ic(void)
+{
+    TIM_IC_InitTypeDef sConfigIC;
+
+    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+    sConfigIC.ICFilter = 0;
+
+#if (USE_PPM_INPUT == 0)
+//NOTE: When using parallel input we need to measure Ton of each channel, so we need to look at Rising and Falling edge
+    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
+    //TODO: Enable as many as NUM_INPUTS Channels
+	if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);};
+	if (NUM_INPUTS > 1)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
+#else   //We are using PPM SIGNAL
+//NOTE: I would like to change the way to measure pw. When I use PPM I have to get time between each rising edge
+    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+    //TODO: Transform PPM_IC to TIM_CHANNELx: (4*PPM_IC)) -> PPM_IC=0 -> IC CH1, PPM_IC=1 -> IC CH2 -> already tested
+    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, 4*PPM_IC); HAL_TIM_IC_Start_IT(&htim5, 4*PPM_IC);};
+//    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
+#endif // USE_PPM_INPUT
+}
 /* USER CODE END 1 */
 
 /**

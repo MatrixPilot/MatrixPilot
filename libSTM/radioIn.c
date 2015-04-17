@@ -57,7 +57,10 @@
 //#error Invalid MIPS Configuration
 //#endif // MIPS
 
-//ToDo: What TMR_FACTOR will be needed by our uC?
+//TODO: What TMR_FACTOR will be needed by our uC?
+//ANSW: TMR_FACTOR depends on Fcore and time base of each timer.
+//In this case I have Fcore 84mhz and timer 5 is configured at 2MHz, so TMR_FACTOR
+//have to be 4
 #define TMR_FACTOR 4
 
 
@@ -74,8 +77,11 @@
 // The pulse width inputs can be directly converted to units of pulse width outputs to control
 // the servos by simply dividing by 2. (need to check validity of this statement - RobD)
 
-int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
-int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
+//why we are using NUM_INPUTS+1? this would be 8+1=9, but in fact it reserve 8 positions
+//int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
+//int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
+int16_t udb_pwIn[NUM_INPUTS];       // pulse widths of radio inputs
+int16_t udb_pwTrim[NUM_INPUTS];     // initial pulse widths for trimming
 
 static int16_t failSafePulses = 0;
 static int16_t noisePulses = 0;
@@ -93,11 +99,13 @@ uint8_t radioIn_getInput(int16_t* ppm, uint8_t channels)
 
 	for (c = 0; c < channels; c++)
 	{
-		ppm[c+1] = udb_pwIn[c+1];
+//		ppm[c+1] = udb_pwIn[c+1];   //TODO: it is ok c+1 or i need to use c?
+		ppm[c] = udb_pwIn[c];
 	}
 	return MODE_SWITCH_INPUT_CHANNEL; // make this define specific to each ppm input device
 }
 
+// udb_servo_record_trims is implemented on libSTM. Where is the correct place to put it?
 //void udb_servo_record_trims(void)
 //{
 //	int16_t i;
@@ -115,7 +123,8 @@ void radioIn_init(void) // was called udb_init_capture(void)
 //	if (udb_skip_flags.skip_radio_trim == 0)
 //#endif
 //	{
-		for (i = 0; i <= NUM_INPUTS; i++)
+		for (i = 0; i < NUM_INPUTS; i++)
+		    //TODO: Find where FIXED_TRIMPOINT were defined on other versions
 //	#if (FIXED_TRIMPOINT == 1)
 //			if (i == THROTTLE_OUTPUT_CHANNEL)
 //				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
@@ -125,8 +134,9 @@ void radioIn_init(void) // was called udb_init_capture(void)
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
 //	#endif
 //	}
-	MX_TIM5_Init();     //Input Capture CH1 and CH2 timer base
-//	MX_TIM4_Init();     //Input Capture CH3 to CH6 timer base
+
+    //Configure and Start the Input Capture module
+    start_ic();
 }
 
 // called from heartbeat pulse at 20Hz
@@ -326,9 +336,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	#endif
 
 /*
-elgarbe: On my receiver I've PPM1 signal, but Toff is the part that change and Ton is fixd at 0.5mSeg
-is it PPM1 with PPM_PULSE_VALUE = 1 I think not
-PPM_3
+PPM_3: PPM1 with PPM_PULSE_VALUE = 1
 
        1     2       3        4      5       6      7
    ___   ___   ___       ___    ___     ___     ___
@@ -373,66 +381,61 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
 		{
 			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-#if (USE_PPM_INPUT == 1)
-			// ToDo: Use PPM_IC to get IC_PINx
-            if ((IC_PIN2) == PPM_PULSE_VALUE)
-			{
-				uint16_t pulse = time - rise_ppm;
-				rise_ppm = time;
+            //TODO: Check that time is > than rise_ppm
+			uint16_t pulse = time - rise_ppm;
+			rise_ppm = time;
 
-				if (pulse > MIN_SYNC_PULSE_WIDTH)
-				{
-		//			if (one_hertz_flag)
-		//			{
-		//				one_hertz_flag = 0;
-		//				DPRINT("**: %u %u\r\n", pulse, MIN_SYNC_PULSE_WIDTH);
-		//			}
-					ppm_ch = 1;
-				}
-				else
-				{
-		//			if (one_hertz_flag)
-		//			{
-		//				one_hertz_flag = 0;
-		//				DPRINT("--: %u\r\n", pulse);
-		//			}
-					if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
-					{
-						if (ppm_ch <= NUM_INPUTS)
-						{
-							set_udb_pwIn(pulse, ppm_ch);
-						}
-						ppm_ch++;
-					}
-				}
-			}
-			else
-			{
+#if (USE_PPM_INPUT == 1)    //Type 1. The only one that I'd tested
+            if (pulse > MIN_SYNC_PULSE_WIDTH)   //Looking for long pulse time to get synchronized with CH1
+            {
+    //			if (one_hertz_flag)
+    //			{
+    //				one_hertz_flag = 0;
+    //				DPRINT("**: %u %u\r\n", pulse, MIN_SYNC_PULSE_WIDTH);
+    //			}
+                ppm_ch = 0;
+            }
+            else
+            {
+    //			if (one_hertz_flag)
+    //			{
+    //				one_hertz_flag = 0;
+    //				DPRINT("--: %u\r\n", pulse);
+    //			}
+                if (ppm_ch >= 0 && ppm_ch < PPM_NUMBER_OF_CHANNELS)
+                {
+                    if (ppm_ch < NUM_INPUTS)
+                    {
+                        set_udb_pwIn(pulse, ppm_ch);
+                    }
+                    ppm_ch++;
+                }
+            }
 		//		if (one_hertz_flag)
 		//		{
 		//			one_hertz_flag = 0;
 		//			DPRINT("DIS %u\r\n", time);
 		//		}
-			}
+//			}
         }
-#elif (USE_PPM_INPUT == 2)
+#elif (USE_PPM_INPUT == 2)      //Type 2.
 
-
-			uint16_t pulse = time - rise_ppm;
-			rise_ppm = time;
-			//ToDo: Use PPM_IC to get IC_PINx
-			if ((IC_PIN2) == PPM_PULSE_VALUE)
-			{
-				if (pulse > MIN_SYNC_PULSE_WIDTH)   //Looking for long pulse time to get synchronized with CH1
+			//TODO: Use PPM_IC to get IC_PINx
+//			if ((IC_PIN2) == PPM_PULSE_VALUE)
+//			{
+				if (pulse > MIN_SYNC_PULSE_WIDTH)
 				{
-					ppm_ch = 1;
+				    ppm_ch = 0;
+//					ppm_ch = 1;     //We are loosing ch0 with it
 				}
-			}
+//			}
 			else
 			{
-				if (ppm_ch > 0 && ppm_ch <= PPM_NUMBER_OF_CHANNELS)
+			    //NOTE: Why check this?
+				if (ppm_ch >= 0 && ppm_ch < PPM_NUMBER_OF_CHANNELS)
 				{
-					if (ppm_ch <= NUM_INPUTS)
+				    //NOTE: Why check this?
+					if (ppm_ch < NUM_INPUTS)
 					{
 						set_udb_pwIn(pulse, ppm_ch);
 					}

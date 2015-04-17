@@ -50,6 +50,8 @@ void MX_TIM10_Init(void);
 void MX_TIM5_Init(void);
 void MX_TIM4_Init(void);
 
+void start_ic(void);
+
 #ifdef __cplusplus
 }
 #endif

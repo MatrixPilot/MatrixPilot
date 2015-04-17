@@ -100,6 +100,8 @@
 // For UDB4 boards: Set to 1-8
 #define NUM_INPUTS                          0
 
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_UNUSED
+
 // NUM_OUTPUTS:
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4/5 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)

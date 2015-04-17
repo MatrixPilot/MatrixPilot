@@ -40,8 +40,10 @@
 
 uint16_t udb_heartbeat_counter;
 
-int16_t udb_pwIn[MAX_INPUTS];   // pulse widths of radio inputs
-int16_t udb_pwTrim[MAX_INPUTS]; // initial pulse widths for trimming
+//This is already defined on radioIn.c
+//TODO: Where is the correct place to define this?
+//int16_t udb_pwIn[MAX_INPUTS];   // pulse widths of radio inputs
+//int16_t udb_pwTrim[MAX_INPUTS]; // initial pulse widths for trimming
 int16_t udb_pwOut[MAX_OUTPUTS]; // pulse widths for servo outputs
 
 union udb_fbts_byte udb_flags;
@@ -204,6 +206,7 @@ int16_t FindFirstBitFromLeft(int16_t val)
 	return i;
 }
 
+//ToTo: Use parameter x and remove fixed GPIO_PIN_5
 void udb_led_toggle(uint8_t x)
 {
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
