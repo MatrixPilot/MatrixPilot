@@ -21,7 +21,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // mavlink_options.h
-//p
+//
+
+#define USE_MAVLINK                         0
+
+// MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
+// Each aircraft in the sky will need a unique I.D. in the range from 0-255
+#define MAVLINK_SYSID                       1
 
 // Common data rates
 #define MAVLINK_RATE_RC_CHAN                0   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |

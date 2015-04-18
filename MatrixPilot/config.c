@@ -46,12 +46,10 @@ static const char* strHover = "HOVER";
 
 static const char* strNetwork = "NETWORK";
 union network_module_word nw_mod;
-
 char address[16];
 char gateway[16];
 char subnet[16];
 char dhcp = 55;
-
 
 static void load_network(void)
 {
@@ -142,6 +140,26 @@ stabilised = 1
 waypoint = 1
  */
 
+
+/*
+
+new for helicalTurns:
+
+#define FEED_FORWARD						1.0
+#define TURN_RATE_NAV						30.0
+#define TURN_RATE_FBW						60.0
+#define CRUISE_SPEED                        12.0
+#define ANGLE_OF_ATTACK_NORMAL              -0.8
+#define ANGLE_OF_ATTACK_INVERTED            -7.2
+#define ELEVATOR_TRIM_NORMAL                -0.03
+#define ELEVATOR_TRIM_INVERTED              -0.67
+
+and we remove the following:
+#define AILERON_BOOST                       0.8
+#define RUDDER_ELEV_MIX                     0.2
+#define ROLL_ELEV_MIX                       0.35
+
+ */
 static void load_gains(void)
 {
 // Aileron/Roll Control Gains
