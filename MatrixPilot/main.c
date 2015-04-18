@@ -27,8 +27,6 @@
 #include "states.h"
 #include "console.h"
 #include "flightplan-waypoints.h"
-//#include "ports_config.h"
-//#include "telemetry_config.h"
 #include "mavlink_options.h"
 #include <setjmp.h>
 

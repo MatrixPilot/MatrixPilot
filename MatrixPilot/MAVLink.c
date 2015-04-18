@@ -99,8 +99,8 @@ mavlink_status_t r_mavlink_status;
 
 mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 
-#define	SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
-#define	BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Convert 16 bit byte circular to radians
+#define SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
+#define BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Convert 16 bit byte circular to radians
 
 mavlink_flags_t mavlink_flags;
 mavlink_system_t mavlink_system;
@@ -1012,7 +1012,7 @@ void mavlink_output_40hz(void)
 		    (int16_t)   0,                (int16_t)   0,                (int16_t)   0); // zero as mag not connected.
 #endif
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
-		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
+		//     int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}
 
 	// POSITION SENSOR DATA - Using STREAM_EXTRA2

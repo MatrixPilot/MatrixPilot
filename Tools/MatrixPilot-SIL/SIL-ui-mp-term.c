@@ -10,11 +10,11 @@
 
 #include "SIL-udb.h"
 #include "UDBSocket.h"
-#include "../MatrixPilot/defines.h"
-#include "../MatrixPilot/states.h"
-#include "../MatrixPilot/config.h"
-#include "../MatrixPilot/flightplan.h"
-#include "../libUDB/servoOut.h"
+#include "../../MatrixPilot/defines.h"
+#include "../../MatrixPilot/states.h"
+#include "../../MatrixPilot/config.h"
+#include "../../MatrixPilot/flightplan.h"
+#include "../../libUDB/servoOut.h"
 #include <stdio.h>
 
 #define BUFLEN 512

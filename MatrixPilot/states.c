@@ -40,6 +40,8 @@ static uint8_t counter = 0;
 #define CALIB_PAUSE (10.5 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
 #define STANDBY_PAUSE (48 * FSM_CLK)    // pause for 48 seconds of runs through the state machine
                                         // This used to be 24 seconds, but that was not long enough
+                                        // Standby pause was raised from 24 seconds to 48 seconds by BillP
+                                        // to improve the accuracy of the origin during a fast warm start
 #endif
 
 #define NUM_WAGGLES 4                   // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)

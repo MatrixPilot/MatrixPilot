@@ -31,7 +31,6 @@
 #include "MAVLink.h"
 #include "telemetry.h"
 #include "flightplan-waypoints.h"
-#include "libCntrl.h"
 #include "airspeedCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"

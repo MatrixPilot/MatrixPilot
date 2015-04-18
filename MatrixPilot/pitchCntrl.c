@@ -171,7 +171,7 @@ static void hoverPitchCntrl(void)
 	if (state_flags._.pitch_feedback)
 	{
 		pitchAccum.WW = (__builtin_mulss(-rmat[7], omegagyro[0])
-		               - __builtin_mulss(rmat[6], omegagyro[1])) << 1;
+		               - __builtin_mulss( rmat[6], omegagyro[1])) << 1;
 		pitchrate = pitchAccum._.W1;
 		elevInput = (udb_flags._.radio_on == 1) ?
 		    REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0;

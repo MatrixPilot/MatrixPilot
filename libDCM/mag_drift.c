@@ -21,10 +21,7 @@
 
 #include "libDCM.h"
 #include "mathlibNAV.h"
-//#include "deadReckoning.h"
-//#include "gpsParseCommon.h"
 #include "../libUDB/heartbeat.h"
-//#include "../libUDB/ADchannel.h"
 #include "../libUDB/magnetometer.h"
 #include "magnetometerOptions.h"
 #include "rmat.h"

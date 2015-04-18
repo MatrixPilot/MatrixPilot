@@ -102,8 +102,8 @@ void normalRollCntrl(void)
 #endif
 	if (ROLL_STABILIZATION_AILERONS && state_flags._.pitch_feedback)
 	{
-		gyroRollFeedback.WW = __builtin_mulus(rollkd , omegaAccum[1]);
-		rollAccum.WW += __builtin_mulsu(rmat6 , rollkp);
+		gyroRollFeedback.WW = __builtin_mulus(rollkd, omegaAccum[1]);
+		rollAccum.WW += __builtin_mulsu(rmat6, rollkp);
 	}
 	else
 	{
