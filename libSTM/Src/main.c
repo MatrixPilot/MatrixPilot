@@ -45,6 +45,9 @@
 #include "usart.h"
 #include "gpio.h"
 
+//#include "radioIn.h"
+
+
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -99,7 +102,7 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
     radioIn_init();     //elgarbe**************************************************
-
+    start_pwm_outputs();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

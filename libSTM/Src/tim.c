@@ -70,9 +70,9 @@ void MX_TIM3_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = (uint16_t) ((SystemCoreClock / 1000000) - 1);    //1MHz;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 0;
+  htim3.Init.Period = 19999;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   HAL_TIM_Base_Init(&htim3);
 
@@ -86,15 +86,19 @@ void MX_TIM3_Init(void)
   HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig);
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+
+  sConfigOC.Pulse = 0;
   HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
 
+  sConfigOC.Pulse = 1000;
   HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2);
 
+  sConfigOC.Pulse = 1000;
   HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3);
 
+  sConfigOC.Pulse = 10000;
   HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4);
 
 }
@@ -469,6 +473,7 @@ void start_ic(void)
     if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
 #endif // USE_PPM_INPUT
 }
+
 /* USER CODE END 1 */
 
 /**

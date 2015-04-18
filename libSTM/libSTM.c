@@ -99,12 +99,13 @@ uint8_t udb_cpu_load(void)
 	return 5; // sounds reasonable for a fake cpu%
 }
 
-int16_t udb_servo_pulsesat(int32_t pw)
-{
-	if (pw > SERVOMAX) pw = SERVOMAX;
-	if (pw < SERVOMIN) pw = SERVOMIN;
-	return (int16_t)pw;
-}
+//NOTE: This is implemented on servoOut
+//int16_t udb_servo_pulsesat(int32_t pw)
+//{
+//	if (pw > SERVOMAX) pw = SERVOMAX;
+//	if (pw < SERVOMIN) pw = SERVOMIN;
+//	return (int16_t)pw;
+//}
 
 void udb_servo_record_trims(void)
 {
@@ -117,11 +118,12 @@ void udb_servo_record_trims(void)
 	}
 }
 
-void udb_set_action_state(boolean newValue)
-{
-	// not simulated
-	(void)newValue;   // unused parameter
-}
+//NOTE: This is implemented on servoOut
+//void udb_set_action_state(boolean newValue)
+//{
+//	// not simulated
+//	(void)newValue;   // unused parameter
+//}
 
 void udb_a2d_record_offsets(void)
 {
