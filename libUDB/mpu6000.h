@@ -144,7 +144,10 @@
 
 
 void MPU6000_print(void);
-void MPU6000_read(void);            // read raw data
+
+typedef void (*callback_fptr_t)(void);
+
+void MPU6000_init16(callback_fptr_t fptr);
 
 extern struct ADchannel mpu_temp;
 

@@ -19,9 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
+#include "mavlink_options.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVFlexiFunctions.h"
@@ -118,4 +119,4 @@ void MAVFlexiFunctionsOutput_40hz(void)
 #endif // (USE_FLEXIFUNCTION_MIXING == 1)
 }
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)

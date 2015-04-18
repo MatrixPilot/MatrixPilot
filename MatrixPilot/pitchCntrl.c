@@ -23,8 +23,12 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
+#include "helicalTurnCntrl.h"
+#include "../libUDB/servoOut.h"
+#include "../libDCM/rmat.h"
 
 #define HOVERPOFFSET ((int32_t)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
 #define HOVERPTOWP ((int32_t)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
@@ -58,17 +62,17 @@ void init_pitchCntrl(void)
 	hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_pitchCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.Pitchgain      = (float)pitchgain         / (RMAX);
 	gains.PitchKD        = (float)pitchkd           / (SCALEGYRO*RMAX);
 	gains.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
 	gains.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
 //	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
 	gains.RollElevMix    = (float)rollElevMixGain   / (RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 void pitchCntrl(void)
 {
@@ -89,20 +93,20 @@ static void normalPitchCntrl(void)
 //	fractional aspd_err, aspd_diff;
 
 #ifdef TestGains
-	flags._.GPS_steering = 0; // turn navigation off
-	flags._.pitch_feedback = 1; // turn stabilization on
+	state_flags._.GPS_steering = 0; // turn navigation off
+	state_flags._.pitch_feedback = 1; // turn stabilization on
 #endif
 
-	if (PITCH_STABILIZATION && flags._.pitch_feedback)
+	if (PITCH_STABILIZATION && state_flags._.pitch_feedback)
 	{
 		pitchAccum.WW = __builtin_mulsu(tiltError[0], pitchgain) 
-					  - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd)
+		              - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd)
 		              + __builtin_mulsu(rotationRateError[0], pitchkd );
-		pitch_control = (int32_t)pitchAccum._.W1 + (int32_t) elevatorLoadingTrim ;
+		pitch_control = (int32_t)pitchAccum._.W1 + (int32_t) elevatorLoadingTrim;
 	}
 	else
 	{
-		pitch_control = 0 ;
+		pitch_control = 0;
 	}
 }
 
@@ -113,15 +117,15 @@ static void hoverPitchCntrl(void)
 	int16_t manualPitchOffset;
 	int32_t pitchToWP;
 
-	if (flags._.pitch_feedback)
+	if (state_flags._.pitch_feedback)
 	{
 		pitchAccum.WW = (__builtin_mulss(-rmat[7], omegagyro[0])
-		               - __builtin_mulss(rmat[6], omegagyro[1])) << 1;
+		               - __builtin_mulss( rmat[6], omegagyro[1])) << 1;
 		pitchrate = pitchAccum._.W1;
 		elevInput = (udb_flags._.radio_on == 1) ?
 		    REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) : 0;
 		manualPitchOffset = elevInput * (int16_t)(RMAX/600);
-		if (flags._.GPS_steering)
+		if (state_flags._.GPS_steering)
 		{
 			pitchToWP = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS) ?
 			    HOVERPTOWP : (HOVERPTOWP / HOVER_NAV_MAX_PITCH_RADIUS * tofinish_line);

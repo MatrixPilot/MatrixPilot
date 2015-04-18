@@ -19,9 +19,13 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
-#include "gpsParseCommon.h"
+#include "libDCM.h"
 #include "mathlibNAV.h"
+#include "gpsData.h"
+#include "estWind.h"
+#include "rmat.h"
+
+#include "../MatrixPilot/helicalTurnCntrl.h"
 
 int16_t estimatedWind[3] = { 0, 0, 0 };
 
@@ -32,7 +36,7 @@ static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
 #define MINROTATION ((int16_t)(0.2 * RMAX))
 
-void estimateWind(void)
+void estWind(void)
 {
 	int16_t index;
 	int16_t groundVelocity[3];
@@ -63,12 +67,12 @@ void estimateWind(void)
 	fuselageDirection[2] = -rmat[7];
 
 	// adjust "fuselage direction" for angle of attack
-	longaccum.WW = ( __builtin_mulss( - rmat[2] , angleOfAttack ) ) << 2 ;
-	fuselageDirection[0] += longaccum._.W1 ;
-	longaccum.WW = ( __builtin_mulss(  rmat[5] , angleOfAttack ) ) << 2 ;
-	fuselageDirection[1] += longaccum._.W1 ;
-	longaccum.WW = ( __builtin_mulss( - rmat[8] , angleOfAttack ) ) << 2 ;
-	fuselageDirection[2] += longaccum._.W1 ;
+	longaccum.WW = (__builtin_mulss(- rmat[2], angleOfAttack)) << 2;
+	fuselageDirection[0] += longaccum._.W1;
+	longaccum.WW = (__builtin_mulss(  rmat[5], angleOfAttack)) << 2;
+	fuselageDirection[1] += longaccum._.W1;
+	longaccum.WW = (__builtin_mulss(- rmat[8], angleOfAttack)) << 2;
+	fuselageDirection[2] += longaccum._.W1;
 
 	for (index = 0; index < 3; index++)
 	{
@@ -135,7 +139,7 @@ void estimateWind(void)
 
 #else
 
-void estimateWind(void)
+void estWind(void)
 {
 }
 

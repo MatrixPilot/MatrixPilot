@@ -31,7 +31,6 @@
 #include "MAVLink.h"
 #include "telemetry.h"
 #include "flightplan-waypoints.h"
-#include "libCntrl.h"
 #include "airspeedCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
@@ -46,8 +45,6 @@ int16_t roll_control;
 int16_t yaw_control;
 int16_t throttle_control;
 uint16_t wind_gain;
-
-void manualPassthrough(void);
 
 void init_servoPrepare(void) // initialize the PWM
 {
@@ -82,62 +79,80 @@ void init_servoPrepare(void) // initialize the PWM
 #endif
 }
 
+static void flight_controller(void)
+{
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+	{
+		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
+	}
+#if (DEADRECKONING == 1)
+	navigate_process_flightplan();
+#endif
+#if (ALTITUDE_GAINS_VARIABLE == 1)
+	airspeedCntrl();
+#endif // ALTITUDE_GAINS_VARIABLE
+	updateBehavior();
+	wind_gain = wind_gain_adjustment();
+	helicalTurnCntrl();
+	rollCntrl();
+	yawCntrl();
+	altitudeCntrl();
+	pitchCntrl();
+	servoMix();
+	cameraCntrl();
+	cameraServoMix();
+	updateTriggerAction();
+}
+
+static void manualPassthrough(void)
+{
+	roll_control = pitch_control = yaw_control = throttle_control = 0;
+	servoMix();
+}
+
 // Called at HEARTBEAT_HZ
 //void dcm_servo_callback_prepare_outputs(void)
 void dcm_heartbeat_callback(void)
 {
 	if (dcm_flags._.calib_finished)
 	{
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
-		}
-#if (DEADRECKONING == 1)
-		process_flightplan();
-#endif
-#if (ALTITUDE_GAINS_VARIABLE == 1)
-		airspeedCntrl();
-#endif // ALTITUDE_GAINS_VARIABLE
-		updateBehavior();
-		wind_gain = wind_gain_adjustment();
-		helicalTurnCntrl();
-		rollCntrl();
-		yawCntrl();
-		altitudeCntrl();
-		pitchCntrl();
-		servoMix();
-		cameraCntrl();
-		cameraServoMix();
-		updateTriggerAction();
+		flight_controller();
 	}
 	else
 	{
 		// otherwise, there is not anything to do
 		manualPassthrough();                // Allow manual control while starting up
 	}
-	
+	// TODO: move this block into the end of flight_controller or after it's called
 	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 	{
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
+		// Poll the MAVLink subsystem at 40hz
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 		{
 			mavlink_output_40hz();
 		}
 #else
-		// This is a simple check to send telemetry at 8hz
+		// Send telemetry updates at 8hz
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
 // RobD			flight_state_8hz();
-			serial_output_8hz();
+			telemetry_output_8hz();
 		}
-#endif // SERIAL_OUTPUT_FORMAT
+#endif // (USE_MAVLINK == 1)
 	}
 
-	osd_run_step();
-}
-
-void manualPassthrough(void)
-{
-	roll_control = pitch_control = yaw_control = throttle_control = 0;
-	servoMix();
+	// Poll the OSD subsystem at 8hz
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
+	{
+#if (USE_OSD == OSD_NATIVE)
+		mp_osd_run_step(udb_heartbeat_counter); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
+#elif (USE_OSD == OSD_REMZIBI)
+void remzibi_osd_8hz(void);
+		remzibi_osd_8hz();
+#elif (USE_OSD == OSD_MINIM)
+void minim_osd_8hz(void);
+		minim_osd_8hz();
+#endif // USE_OSD
+	}
 }

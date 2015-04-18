@@ -19,22 +19,31 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
+#include "mavlink_options.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVUDBExtra.h"
 #include "navigate.h"
 #include "flightplan-waypoints.h"
+#include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/rmat.h"
 #if (SILSIM != 1)
-#include "../libUDB/libUDB_internal.h" // Needed for access to RCON
+#include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 
-union intbb voltage_milis = {0};
+#include "../libUDB/mcu.h"
+#include "../libUDB/servoOut.h"
+
+extern uint16_t maxstack;
+
+static union intbb voltage_milis = {0};
 int16_t mavlink_sue_telemetry_counter = 8; // Countdown counter, for use with SERIAL_UDB_EXTRA compatibility
 boolean mavlink_sue_telemetry_f2_a = true;
 
@@ -107,15 +116,15 @@ void MAVUDBExtraOutput_40hz(void)
 					// It is not changed for now, to preserve close compatibility with origin SERIAL_UDB_EXTRA code.
 					if (tow.WW > 0) tow.WW += 250;
 
-					if (flags._.f13_print_req == 1)
+					if (state_flags._.f13_print_req == 1)
 					{
 						// The F13 line of telemetry is printed just once  when origin has been captured after GPS lock
 						mavlink_msg_serial_udb_extra_f13_send(MAVLINK_COMM_0, week_no.BB, lat_origin.WW, lon_origin.WW, alt_origin.WW);
-						flags._.f13_print_req = 0;
+						state_flags._.f13_print_req = 0;
 					}
 #if (MAG_YAW_DRIFT == 1)
 					mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW,
-					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + state_flags._.GPS_steering),
 					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 					    rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 					    (uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
@@ -124,7 +133,7 @@ void MAVUDBExtraOutput_40hz(void)
 					    svs, hdop);
 #else
 					mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, tow.WW,
-					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + flags._.GPS_steering),
+					    ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + state_flags._.GPS_steering),
 					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 					    rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 					    (uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
@@ -140,25 +149,29 @@ void MAVUDBExtraOutput_40hz(void)
 					}
 					else
 					{
+						vect3_16t goal;
 						int16_t stack_free = 0;
 						mavlink_sue_telemetry_f2_a = true;
 #if (RECORD_FREE_STACK_SPACE == 1)
 						stack_free = (int16_t)(4096-maxstack); // This is actually wrong for the UDB4, but currently left the same as for telemetry.c
 #endif // (RECORD_FREE_STACK_SPACE == 1)
 
+//void navigate_get_goal(vect3_16t* goal);
+						navigate_get_goal(&goal);
+
 						mavlink_msg_serial_udb_extra_f2_b_send(MAVLINK_COMM_0, tow.WW,
 						    pwIn_save[1], pwIn_save[2], pwIn_save[3], pwIn_save[4], pwIn_save[5],
 						    pwIn_save[6], pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10],
 						    pwOut_save[1], pwOut_save[2], pwOut_save[3], pwOut_save[4], pwOut_save[5],
 						    pwOut_save[6], pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10],
-						    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1, flags.WW,
+						    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1, state_flags.WW,
 #if (SILSIM != 1)
 						    osc_fail_count,
 #else
 						    0,
 #endif // (SILSIM != 1)
 						    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-						    goal.x, goal.y, goal.height, stack_free);
+						    goal.x, goal.y, goal.z, stack_free);
 					}
 				}
 		}
@@ -166,4 +179,4 @@ void MAVUDBExtraOutput_40hz(void)
 }
 
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)

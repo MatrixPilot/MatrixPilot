@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
@@ -41,7 +41,7 @@ inline uint8_t udb_cpu_load(void)
 	return (uint8_t)(__builtin_muluu(cpu_timer, CPU_LOAD_PERCENT) >> 16);
 }
 
-inline void init_heartbeat(void)
+static inline void init_heartbeat(void)
 {
 //#ifdef USE_MPU_HEARTBEAT
 //#if (HEARTBEAT_HZ != 200)
@@ -60,7 +60,11 @@ inline void init_heartbeat(void)
 	_T1IF = 0;              // clear the interrupt
 	_T1IE = 1;              // enable the interrupt
 
-#else // use Timer1 as the HEARTBEAT source
+	// TODO: can we use timer1 to determine the error between the mcu and the mpu 200Hz?
+
+#else // BOARD_TYPE && HEARTBEAT_HZ
+
+	// use Timer1 as the HEARTBEAT source
 
 #if (HEARTBEAT_HZ < 150)
 #define TMR1_PRESCALE 64
@@ -174,8 +178,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 	_T6IF = 0;              // clear the interrupt
-//	pulse();
-	if (callback_fptr_1) callback_fptr_1();
+	if (callback_fptr_1) callback_fptr_1(); // was called pulse() / heartbeat_pulse()
 	interrupt_restore_corcon;
 }
 

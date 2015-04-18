@@ -19,8 +19,10 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
+#include "gpsData.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 
 #if (GPS_TYPE == GPS_NMEA || GPS_TYPE == GPS_ALL)
 
@@ -124,7 +126,6 @@ static union uintbb cog_gps_;
 static uint8_t svs_;
 static uint8_t data_valid_, NS_, EW_;
 //static uint8_t hdop_;
-//static uint8_t day_of_week;
 
 //union longbbbb tow_;
 //union longbbbb date_gps_, time_gps_;
@@ -316,7 +317,7 @@ static void gps_comma(uint8_t gpschar)
 //	if (rmc_counter > 11)
 //	{
 //#ifdef DEBUG_NMEA
-//	LED_RED = LED_ON;
+//		led_on(LED_RED);
 //#endif
 //		rmc_counter = 0;
 //		msg_parse = &msg_start;
@@ -324,7 +325,7 @@ static void gps_comma(uint8_t gpschar)
 //	if (gga_counter > 14)
 //	{
 //#ifdef DEBUG_NMEA
-//	LED_RED = LED_ON;
+//		led_on(LED_RED);
 //#endif
 //		gga_counter = 0;
 //		msg_parse = &msg_start;
@@ -645,13 +646,14 @@ static void gps_checksum(uint8_t gpschar)   // checksum calculation
 		}
 	}
 #ifdef DEBUG_NMEA
-LED_RED = LED_OFF;
+	led_off(LED_RED);
 #endif
 }
 
 void gps_commit_data(void)
 {
 	static union longbbbb last_alt = { 0 } ;
+
 	if (week_no.BB == 0)
 	{
 		week_no.BB = calculate_week_num(date_gps_.WW);

@@ -57,5 +57,10 @@ void dcm_init_rmat(void);
 void dcm_run_imu_step(void);
 void yaw_drift_reset(void);
 
+// Calibrate the sensors
+// Call this function once, soon after booting up, after a few seconds of
+// holding the UDB very still.
+void udb_callback_read_sensors(void);       // Callback
+
 
 #endif // RMAT_H

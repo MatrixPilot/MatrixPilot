@@ -28,19 +28,20 @@
 #include "../libDCM/gpsParseCommon.h"
 #include <stdio.h>
 
-union fbts_int flags;
+union state_flags_int state_flags;
 int16_t waggle = 0;
-uint8_t counter = 0;
+static uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
-#if (SILSIM == 1)
+#if (HILSIM == 1) // implied when SILSIM == 1
 #define CALIB_PAUSE   (2  * FSM_CLK)    // wait for 2 seconds of runs through the state machine
-#define STANDBY_PAUSE (24 * FSM_CLK)    // pause for 24 seconds of runs through the state machine
+#define STANDBY_PAUSE (5 * FSM_CLK)     // pause for 5 seconds of runs through the state machine
 #else
 #define CALIB_PAUSE (10.5 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine
 #define STANDBY_PAUSE (48 * FSM_CLK)    // pause for 48 seconds of runs through the state machine
-										// Standby pause was raised from 24 seconds to 48 seconds by BillP
-										// to improve the accuracy of the origin during a fast warm start
+                                        // This used to be 24 seconds, but that was not long enough
+                                        // Standby pause was raised from 24 seconds to 48 seconds by BillP
+                                        // to improve the accuracy of the origin during a fast warm start
 #endif
 
 #define NUM_WAGGLES 4                   // waggle 4 times during the end of the standby pause (this number must be less than STANDBY_PAUSE)
@@ -74,17 +75,17 @@ static void (*stateS)(void) = &startS;
 void init_states(void)
 {
 	DPRINT("init_states()\r\n");
-	flags.WW = 0;
+	state_flags.WW = 0;
 	waggle = 0;
 	gps_data_age = GPS_DATA_MAX_AGE+1;
 	dcm_flags._.dead_reckon_enable = 0;
-	flags._.update_autopilot_state_asap = 0;
+	state_flags._.update_autopilot_state_asap = 0;
 	stateS = &startS;
 }
 
 void udb_callback_radio_did_turn_off(void)
 {
-	flags._.update_autopilot_state_asap = 1;
+	state_flags._.update_autopilot_state_asap = 1;
 }
 
 #ifdef CATAPULT_LAUNCH_ENABLE
@@ -97,25 +98,25 @@ void udb_heartbeat_40hz_callback(void)
 
 	delayCheck++;
 
-	// read flight mode switch (sets flags bits) at 40Hz
+	// read flight mode switch (sets state_flags bits) at 40Hz
 	flight_mode_switch_check_set();
 
 	// respond immediately to change in manual mode or launch detection
-	if ((flags._.man_req != manualMode)
+	if ((state_flags._.man_req != manualMode)
 #ifdef CATAPULT_LAUNCH_ENABLE
 	    || ((dcm_flags._.launch_detected == 1) && (stateS == &cat_armedS))
 	    || (stateS == &cat_delayS)
 #endif
 	    )
 	{
-		manualMode = flags._.man_req;
-		flags._.update_autopilot_state_asap = 1;
+		manualMode = state_flags._.man_req;
+		state_flags._.update_autopilot_state_asap = 1;
 	}
 
 	if (counter++ >= 20) // 2Hz FSM clock
 	{
 		counter = 0;
-		flags._.update_autopilot_state_asap = 0;
+		state_flags._.update_autopilot_state_asap = 0;
 		// Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 		// For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
 #if (AIRFRAME_TYPE != AIRFRAME_HELI)
@@ -128,10 +129,10 @@ void udb_heartbeat_40hz_callback(void)
 #endif
 		(*stateS)();        // Execute the activities for the current state.
 	}
-	else if (flags._.update_autopilot_state_asap == 1)   // async FSM clock
+	else if (state_flags._.update_autopilot_state_asap == 1)   // async FSM clock
 	{
 //		DPRINT(":");
-		flags._.update_autopilot_state_asap = 0;
+		state_flags._.update_autopilot_state_asap = 0;
 		// reset 2Hz counter so that next synchronous clock pulse occurs in 0.5 seconds
 		counter = 0;
 
@@ -154,14 +155,15 @@ void udb_heartbeat_40hz_callback(void)
 		gps_nav_capable_check_set();
 		(*stateS)();        // Execute the activities for the current state.
 	}
-	else if (flags._.update_autopilot_state_asap == 1)
+	else if (state_flags._.update_autopilot_state_asap == 1)
 	{
 		(*stateS)();
 	}
-	flags._.update_autopilot_state_asap = 0;
+	state_flags._.update_autopilot_state_asap = 0;
 }
 #endif // CATAPULT_LAUNCH_ENABLE
 
+////////////////////////////////////////////////////////////////////////////////
 //	Functions that are executed upon first entrance into a state.
 
 //	Calibrate state is used to wait for the filters to settle before recording A/D offsets.
@@ -169,14 +171,14 @@ static void ent_calibrateS(void)
 {
 	DPRINT("ent_calibrateS\r");
 
-	flags._.GPS_steering = 0;
-	flags._.pitch_feedback = 0;
-	flags._.altitude_hold_throttle = 0;
-	flags._.altitude_hold_pitch = 0;
+	state_flags._.GPS_steering = 0;
+	state_flags._.pitch_feedback = 0;
+	state_flags._.altitude_hold_throttle = 0;
+	state_flags._.altitude_hold_pitch = 0;
 	waggle = 0;
 	stateS = &calibrateS;
 	calib_timer = CALIB_PAUSE;
-	LED_RED = LED_ON; // turn on mode led
+	led_on(LED_RED); // turn on mode led
 }
 
 // Acquire state is used to wait for the GPS to achieve lock.
@@ -184,10 +186,10 @@ static void ent_acquiringS(void)
 {
 	DPRINT("\r\nent_acquiringS\r\n");
 
-	flags._.GPS_steering = 0;
-	flags._.pitch_feedback = 0;
-	flags._.altitude_hold_throttle = 0;
-	flags._.altitude_hold_pitch = 0;
+	state_flags._.GPS_steering = 0;
+	state_flags._.pitch_feedback = 0;
+	state_flags._.altitude_hold_throttle = 0;
+	state_flags._.altitude_hold_pitch = 0;
 
 	// almost ready to turn the control on, save the trims and sensor offsets
 #if (FIXED_TRIMPOINT != 1)	// Do not alter trims from preset when they are fixed
@@ -206,7 +208,7 @@ static void ent_acquiringS(void)
 	throttleFiltered._.W1 = 0;
 	stateS = &acquiringS;
 	standby_timer = STANDBY_PAUSE;
-	LED_RED = LED_OFF;
+	led_off(LED_RED);
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
@@ -214,13 +216,13 @@ static void ent_manualS(void)
 {
 	DPRINT("ent_manualS\r\n");
 
-	flags._.GPS_steering = 0;
-	flags._.pitch_feedback = 0;
-	flags._.altitude_hold_throttle = 0;
-	flags._.altitude_hold_pitch = 0;
-	flags._.disable_throttle = 0;
+	state_flags._.GPS_steering = 0;
+	state_flags._.pitch_feedback = 0;
+	state_flags._.altitude_hold_throttle = 0;
+	state_flags._.altitude_hold_pitch = 0;
+	state_flags._.disable_throttle = 0;
 	waggle = 0;
-	LED_RED = LED_OFF;
+	led_off(LED_RED);
 	stateS = &manualS;
 }
 
@@ -235,12 +237,12 @@ static void ent_stabilizedS(void)
 	setTargetAltitude(IMUlocationz._.W1);
 #endif
 
-	flags._.GPS_steering = 0;
-	flags._.pitch_feedback = 1;
-	flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL);
-	flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY);
+	state_flags._.GPS_steering = 0;
+	state_flags._.pitch_feedback = 1;
+	state_flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL);
+	state_flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY);
 	waggle = 0;
-	LED_RED = LED_ON;
+	led_on(LED_RED);
 	stateS = &stabilizedS;
 }
 
@@ -256,9 +258,9 @@ static void ent_cat_armedS(void)
 	dcm_flags._.launch_detected = 0;
 
 	// must suppress throttle in cat_armed state
-	flags._.disable_throttle = 1;
+	state_flags._.disable_throttle = 1;
 
-	LED_ORANGE = LED_ON;
+	led_on(LED_ORANGE);
 
 	stateS = &cat_armedS;
 }
@@ -281,19 +283,20 @@ static void ent_waypointS(void)
 {
 	DPRINT("ent_waypointS\r\n");
 
-	flags._.GPS_steering = 1;
-	flags._.pitch_feedback = 1;
-	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL);
-	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
-	flags._.disable_throttle = 0;
+	state_flags._.GPS_steering = 1;
+	state_flags._.pitch_feedback = 1;
+	state_flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL);
+	state_flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
+	state_flags._.disable_throttle = 0;
 
 	if (!(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS))
 	{
-		init_flightplan(0); // Only reset non-rtl waypoints if not already following waypoints
+		//init_flightplan(0); // Only reset non-rtl waypoints if not already following waypoints
+		flightplan_begin(0); // Only reset non-rtl waypoints if not already following waypoints
 	}
 
 	waggle = 0;
-	LED_RED = LED_ON;
+	led_on(LED_RED);
 	stateS = &waypointS;
 }
 
@@ -302,15 +305,15 @@ static void ent_returnS(void)
 {
 	DPRINT("ent_returnS\r\n");
 
-	flags._.GPS_steering = 1;
-	flags._.pitch_feedback = 1;
-	flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL);
-	flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
+	state_flags._.GPS_steering = 1;
+	state_flags._.pitch_feedback = 1;
+	state_flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL);
+	state_flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
 #if (FAILSAFE_HOLD == 1)
-	flags._.rtl_hold = 1;
+	state_flags._.rtl_hold = 1;
 #endif
 #if (FAILSAFE_TYPE == FAILSAFE_RTL)
-	init_flightplan(1);
+	flightplan_begin(1); // init_flightplan(1);
 #elif (FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN)
 	if (stateS != &waypointS)
 	{
@@ -319,9 +322,12 @@ static void ent_returnS(void)
 #endif
 
 	waggle = 0;
-	LED_RED = LED_ON;
+	led_on(LED_RED);
 	stateS = &returnS;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// State handlers - these are polled
 
 static void startS(void)
 {
@@ -376,7 +382,7 @@ static void acquiringS(void)
 			DPRINT("standby_timer %u  \r", standby_timer);
 			if (standby_timer == 6)
 			{
-				flags._.save_origin = 1;
+				state_flags._.save_origin = 1;
 			}
 			else if (standby_timer == 2)
 			{
@@ -405,19 +411,19 @@ boolean launch_enabled(void)
 }
 
 //  State: catapult launch armed
-//  entered only from manualS iff (radio_on and gear_up and nav_capable and switch_home)
+//  entered only from manualS if (radio_on and gear_up and nav_capable and switch_home)
 static void cat_armedS(void)
 {
 	// transition to manual if flight_mode_switch no longer in waypoint mode
 	// or link lost or gps lost
 	if (flight_mode_switch_manual() | !udb_flags._.radio_on | !dcm_flags._.nav_capable) {
-		LED_ORANGE = LED_OFF;
+		led_off(LED_ORANGE);
 		ent_manualS();
 	}
 
 	// transition to waypointS iff launch detected
 	else if (dcm_flags._.launch_detected) {
-		LED_ORANGE = LED_OFF;
+		led_off(LED_ORANGE);
 		ent_cat_delayS();
 	}
 }
@@ -430,7 +436,7 @@ static void cat_delayS(void)
 	// or link lost or gps lost
 	if (flight_mode_switch_manual() | !udb_flags._.radio_on | !dcm_flags._.nav_capable)
 	{
-		LED_ORANGE = LED_OFF;
+		led_off(LED_ORANGE);
 		ent_manualS();
 	}
 	else if (--launch_timer == 0)
@@ -458,9 +464,14 @@ static void manualS(void)
 	else
 	{
 		if (dcm_flags._.nav_capable)
+		{
+			DPRINT("manualS() calling ent_returnS()\r\n");
 			ent_returnS();
+		}
 		else
+		{
 			ent_stabilizedS();
+		}
 	}
 }
 
@@ -481,7 +492,10 @@ static void stabilizedS(void)
 	else
 	{
 		if (dcm_flags._.nav_capable)
+		{
+			DPRINT("stabilizedS() calling ent_returnS()\r\n");
 			ent_returnS();
+		}
 	}
 }
 
@@ -498,6 +512,7 @@ static void waypointS(void)
 	}
 	else
 	{
+		DPRINT("waypointS() calling ent_returnS()\r\n");
 		ent_returnS();
 	}
 }
@@ -516,7 +531,7 @@ static void returnS(void)
 	else
 	{
 #if (FAILSAFE_HOLD == 1)
-		flags._.rtl_hold = 1;
+		state_flags._.rtl_hold = 1;
 #endif
 	}
 }

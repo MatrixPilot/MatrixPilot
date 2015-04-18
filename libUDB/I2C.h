@@ -40,7 +40,6 @@
 // Read will send the address as a write followed by the read
 //
 
-#include "libUDB_internal.h"
 
 // callback type for I2C user
 typedef void (*I2C_callbackFunc)(boolean);
@@ -60,9 +59,9 @@ typedef enum
 // txSize = size of transmited data in bytes
 // rxSize = size of received data in bytes
 // pCallback = pointer to callback function for finish or error.
-boolean I2C1_Write(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* ptxData, uint16_t txSize, I2C_callbackFunc pCallback);
+boolean I2C1_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback);
 
-boolean I2C1_Read(uint8_t address, uint8_t* pcommandData, uint8_t commandDataSize, uint8_t* prxData, uint16_t rxSize, I2C_callbackFunc pCallback, uint16_t I2C_mode);
+boolean I2C1_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode);
 
 // Check for I2C Acknowledge on command
 boolean I2C1_CheckAck(uint8_t addr, I2C_callbackFunc pCallback);

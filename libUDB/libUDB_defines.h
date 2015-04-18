@@ -25,8 +25,8 @@
 
 #include "udbTypes.h"
 
-//#if SILSIM
-#if (SILSIM == 1)
+//#ifdef USE_SILSIM // may move to this style of USE_xxx macro in the future..
+#if (SILSIM == 1 || PX4 == 1)
 #define NUM_POINTERS_IN(x)      (sizeof(x)/sizeof(char*))
 #else
 #define NUM_POINTERS_IN(x)      (sizeof(x)>>1)
@@ -43,6 +43,7 @@
 #define UDB5_BOARD              8   // board with dsPIC33 and MPU6000
 #define AUAV3_BOARD             9   // Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
 #define AUAV4_BOARD             10  // AUAV4 with PIC32MX
+#define PX4_BOARD               11  // PX4 with STM32F4xx
 
 #if (SILSIM == 0)
 
@@ -53,6 +54,8 @@
 #include "ConfigUDB5.h"
 #elif (BOARD_TYPE == AUAV3_BOARD)
 #include "ConfigAUAV3.h"
+#elif (BOARD_TYPE == PX4_BOARD)
+#include "ConfigPX4.h"
 #elif (BOARD_TYPE == CAN_INTERFACE)
 #include "../CANInterface/ConfigCANInterface.h"
 #else
@@ -124,14 +127,6 @@ typedef uint8_t boolean;
 //#endif
 #define true                    1
 #define false                   0
-
-struct ADchannel {
-	int16_t input;  // raw input
-	int16_t value;  // average of the sum of inputs between report outs
-	int16_t offset; // baseline at power up 
-	int32_t sum;    // used as an integrator
-}; // variables for processing an AD channel
-
 
 struct udb_flag_bits {
 	uint16_t unused                 : 12;

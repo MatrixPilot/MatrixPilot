@@ -30,16 +30,16 @@
 #undef ALTITUDEHOLD_WAYPOINT
 #undef RACING_MODE
 
-#define ROLL_STABILIZATION_AILERONS config._.RollStabilizaionAilerons
-#define ROLL_STABILIZATION_RUDDER config._.RollStabilizationRudder
-#define PITCH_STABILIZATION config._.PitchStabilization
-#define YAW_STABILIZATION_RUDDER config._.YawStabilizationRudder
-#define YAW_STABILIZATION_AILERON config._.YawStabilizationAileron
-#define AILERON_NAVIGATION config._.AileronNavigation
-#define RUDDER_NAVIGATION config._.RudderNavigation
-#define ALTITUDEHOLD_STABILIZED config._.AltitudeholdStabilized
-#define ALTITUDEHOLD_WAYPOINT config._.AltitudeholdWaypoint
-#define RACING_MODE config._.RacingMode
+#define ROLL_STABILIZATION_AILERONS settings._.RollStabilizaionAilerons
+#define ROLL_STABILIZATION_RUDDER settings._.RollStabilizationRudder
+#define PITCH_STABILIZATION settings._.PitchStabilization
+#define YAW_STABILIZATION_RUDDER settings._.YawStabilizationRudder
+#define YAW_STABILIZATION_AILERON settings._.YawStabilizationAileron
+#define AILERON_NAVIGATION settings._.AileronNavigation
+#define RUDDER_NAVIGATION settings._.RudderNavigation
+#define ALTITUDEHOLD_STABILIZED settings._.AltitudeholdStabilized
+#define ALTITUDEHOLD_WAYPOINT settings._.AltitudeholdWaypoint
+#define RACING_MODE settings._.RacingMode
 
 
 

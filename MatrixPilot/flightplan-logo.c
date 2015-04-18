@@ -33,7 +33,7 @@
 #include "../libDCM/gpsParseCommon.h"
 #include <stdlib.h>
 
-#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#if (FLIGHT_PLAN_TYPE == FP_LOGO)
 
 
 struct logoInstructionDef {
@@ -245,7 +245,7 @@ enum {
 #define NUM_INSTRUCTIONS ((sizeof instructions) / sizeof (struct logoInstructionDef))
 #define NUM_RTL_INSTRUCTIONS ((sizeof rtlInstructions) / sizeof (struct logoInstructionDef))
 static int16_t instructionIndex = 0;
-int16_t waypointIndex = 0; // used for telemetry
+//int16_t waypointIndex = 0; // used for telemetry
 static int16_t absoluteHighWord = 0;
 static union longww absoluteXLong;
 
@@ -386,6 +386,9 @@ static boolean logo_goal_has_moved(void)
 static void update_goal_from(struct relative3D old_goal)
 {
 	struct relative3D new_goal;
+#ifdef USE_EXTENDED_NAV
+	struct relative3D_32 old_goal_32, new_goal_32;
+#endif
 
 	lastGoal.x = new_goal.x = (turtleLocations[PLANE].x._.W1);
 	lastGoal.y = new_goal.y = (turtleLocations[PLANE].y._.W1);
@@ -398,7 +401,18 @@ static void update_goal_from(struct relative3D old_goal)
 		old_goal.z = IMUlocationz._.W1;
 	}
 
-	set_goal(old_goal, new_goal);
+#ifdef USE_EXTENDED_NAV
+	// TODO: RobD - review this change implemented to restore build, but not runtime tested
+	old_goal_32.x = old_goal.x;
+	old_goal_32.y = old_goal.y;
+	old_goal_32.z = old_goal.z;
+	new_goal_32.x = new_goal.x;
+	new_goal_32.y = new_goal.y;
+	new_goal_32.z = new_goal.z;
+	navigate_set_goal(old_goal_32, new_goal_32);
+#else
+	navigate_set_goal(old_goal, new_goal);
+#endif // USE_EXTENDED_NAV
 
 	new_goal.x = (turtleLocations[CAMERA].x._.W1);
 	new_goal.y = (turtleLocations[CAMERA].y._.W1);
@@ -406,7 +420,7 @@ static void update_goal_from(struct relative3D old_goal)
 	set_camera_view(new_goal);
 }
 
-void run_flightplan(void)
+void flightplan_logo_update(void)
 {
 	// first run any injected instruction from the serial port
 	if (logo_inject_pos == LOGO_INJECT_READY)
@@ -422,7 +436,7 @@ void run_flightplan(void)
 			if (logo_goal_has_moved())
 			{
 				update_goal_from(lastGoal);
-				compute_bearing_to_goal();
+				navigate_compute_bearing_to_goal();
 			}
 		}
 		logo_inject_pos = 0;
@@ -441,7 +455,7 @@ void run_flightplan(void)
 			instructionIndex = interruptIndex+1;
 			interruptStackBase = logoStackIndex;
 			process_instructions();
-			update_goal_alt(turtleLocations[PLANE].z);
+			navigate_set_goal_height(turtleLocations[PLANE].z);
 			lastGoal.z = turtleLocations[PLANE].z;
 		}
 	}
@@ -452,7 +466,7 @@ void run_flightplan(void)
 
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - goal.height) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
+		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t) HEIGHT_MARGIN)) // reached altitude goal
 		{
 			process_instructions();
 		}
@@ -1016,18 +1030,18 @@ static void process_instructions(void)
 	if (logo_goal_has_moved())
 	{
 		update_goal_from(lastGoal);
-		compute_bearing_to_goal();
+		navigate_compute_bearing_to_goal();
 	}
 }
 
-void flightplan_live_begin(void)
+void flightplan_logo_live_begin(void)
 {
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
 	logo_inject_pos = 0;
 }
 
-void flightplan_live_received_byte(uint8_t inbyte)
+void flightplan_logo_live_received_byte(uint8_t inbyte)
 {
 	if (logo_inject_pos == LOGO_INJECT_READY)
 		return;
@@ -1043,7 +1057,7 @@ void flightplan_live_received_byte(uint8_t inbyte)
 			break;
 
 		case 2:
-			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F);
+			logo_inject_instr.do_fly = ((inbyte >> 8) & 0x0F); // TODO: WARNING, right shift by too large amount, data loss
 			logo_inject_instr.use_param = (inbyte & 0x0F);
 			break;
 
@@ -1067,7 +1081,7 @@ void flightplan_live_received_byte(uint8_t inbyte)
 	logo_inject_pos++;
 }
 
-void flightplan_live_commit(void)
+void flightplan_logo_live_commit(void)
 {
 	// The cmd=1 commands (REPEAT, END, TO) are not allowed
 	// to be injected.
@@ -1081,4 +1095,4 @@ void flightplan_live_commit(void)
 	}
 }
 
-#endif
+//#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)

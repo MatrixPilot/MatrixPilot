@@ -20,10 +20,11 @@
 
 //	routines to drive the PWM pins for the servos,
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "../libDCM/libDCM.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "servoOut.h"
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 
@@ -75,7 +76,8 @@ int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 static volatile int16_t outputNum;
 
 
-void udb_init_pwm(void) // initialize the PWM
+// initialize the PWM
+void servoOut_init(void) // was called udb_init_pwm()
 {
 	int16_t i;
 	for (i = 0; i <= NUM_OUTPUTS; i++)
@@ -125,6 +127,16 @@ void udb_init_pwm(void) // initialize the PWM
 #else // Classic board
 #error Invalid BOARD_TYPE
 #endif
+}
+
+// saturation logic to maintain pulse width within bounds
+// This takes a servo out value, and clips it to be within
+// 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
+int16_t udb_servo_pulsesat(int32_t pw)
+{
+	if (pw > SERVOMAX) pw = SERVOMAX;
+	if (pw < SERVOMIN) pw = SERVOMIN;
+	return (int16_t)pw;
 }
 
 void udb_set_action_state(boolean newValue)

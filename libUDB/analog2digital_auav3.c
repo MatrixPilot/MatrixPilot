@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
@@ -45,7 +45,7 @@ struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo
 struct ADchannel udb_vcc;
 struct ADchannel udb_5v;
 struct ADchannel udb_rssi;
-struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
+//struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
 
 // Align the buffer. This is needed for peripheral indirect mode
 #define NUM_AD_CHAN 7
@@ -120,11 +120,11 @@ const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
 void udb_init_ADC(void)
 {
-	DPRINT("ADCLK_DIV_N_MINUS_1 = %li\r\n", (int32_t)ADCLK_DIV_N_MINUS_1);
-	DPRINT("ADC_CLK = %li\r\n", (int32_t)ADC_CLK);
-	DPRINT("ADC_RATE = %li\r\n", (int32_t)ADC_RATE);
-	DPRINT("ADSAMP_TIME_N = %li\r\n", (int32_t)ADSAMP_TIME_N);
-	DPRINT("ALMOST_ENOUGH_SAMPLES = %li\r\n", (int32_t)ALMOST_ENOUGH_SAMPLES);
+//	DPRINT("ADCLK_DIV_N_MINUS_1 = %li\r\n", (int32_t)ADCLK_DIV_N_MINUS_1);
+//	DPRINT("ADC_CLK = %li\r\n", (int32_t)ADC_CLK);
+//	DPRINT("ADC_RATE = %li\r\n", (int32_t)ADC_RATE);
+//	DPRINT("ADSAMP_TIME_N = %li\r\n", (int32_t)ADSAMP_TIME_N);
+//	DPRINT("ALMOST_ENOUGH_SAMPLES = %li\r\n", (int32_t)ALMOST_ENOUGH_SAMPLES);
 /*
 MatrixPilot 10:37:23 Aug 17 2013 @ 16 mips
 ADCLK_DIV_N_MINUS_1 = 13
@@ -250,6 +250,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA0Interrupt(void)
 //		if (i++ > HEARTBEAT_HZ) {
 //			i = 0;
 //			printf("sc %u %u        \r\n", sample_count, ALMOST_ENOUGH_SAMPLES);
+//			printf("sc %u %lu        \r\n", sample_count, almost_enough);
 //		}
 //
 		sample_count = 0;

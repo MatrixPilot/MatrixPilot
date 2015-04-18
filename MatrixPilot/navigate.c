@@ -24,12 +24,18 @@
 #include "behaviour.h"
 #include "cameraCntrl.h"
 #include "servoPrepare.h"
+#include "states.h"
+#include "flightplan.h"
 #include "flightplan-waypoints.h"
+#include "../libUDB/libUDB.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../libUDB/libUDB.h"
+#include "../libDCM/mathlib.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/rmat.h"
 #include <stdlib.h>
 
 // Compute actual and desired courses.
@@ -49,18 +55,39 @@ uint16_t yawkprud; // only exported for parameter_table
 uint16_t turngainfbw; // fly by wire turn gain
 uint16_t turngainnav; // waypoints turn gain
 
-struct waypointparameters goal;
-struct relative2D togoal = { 0, 0 };
 int16_t tofinish_line = 0;
 int16_t progress_to_goal = 0;
 int8_t desired_dir = 0;
 int8_t extended_range = 0;
 
-int8_t desired_bearing_over_ground;
-int16_t desired_bearing_over_ground_vector[2];
 
-extern union longww IMUintegralAccelerationx;
-extern union longww IMUintegralAccelerationy;
+struct waypointparameters {
+	int16_t x;
+	int16_t y;
+	int16_t cosphi;
+	int16_t sinphi;
+	int8_t  phi;
+	int16_t height;
+	int16_t fromHeight;
+	int16_t legDist;
+};
+
+static struct waypointparameters navgoal;
+static int16_t desired_bearing_over_ground_vector[2];
+
+struct relative2D togoal = { 0, 0 };
+int8_t desired_bearing_over_ground;
+
+int16_t navigate_get_goal(vect3_16t* _goal)
+{
+	if (_goal != NULL)
+	{
+		_goal->x = navgoal.x;
+		_goal->y = navgoal.y;
+		_goal->z = navgoal.height;
+	}
+	return navgoal.height;
+}
 
 void init_navigation(void)
 {
@@ -70,13 +97,13 @@ void init_navigation(void)
 	turngainfbw = (uint16_t)((TURN_RATE_FBW/57.3)*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_navigation(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKPAileron = (float)yawkpail / (RMAX);
 	gains.YawKPRudder  = (float)yawkprud / (RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 static void setup_origin(void)
 {
@@ -89,17 +116,17 @@ static void setup_origin(void)
 	{
 		dcm_set_origin_location(lon_gps.WW, lat_gps.WW, alt_sl_gps.WW);
 	}
-	flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
+	state_flags._.f13_print_req = 1; // Flag telemetry output that the origin can now be printed.
 }
 
 void dcm_callback_gps_location_updated(void)
 {
-	if (flags._.save_origin)
+	if (state_flags._.save_origin)
 	{
 		// capture origin information during power up. much of this is not
 		// actually used for anything, but is saved in case you decide to
 		// extend this code.
-		flags._.save_origin = 0;
+		state_flags._.save_origin = 0;
 		setup_origin();
 #if (BAROMETER_ALTITUDE == 1)
 		altimeter_calibrate();
@@ -116,9 +143,9 @@ void dcm_callback_gps_location_updated(void)
 }
 
 #ifdef USE_EXTENDED_NAV
-void set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
+void navigate_set_goal(struct relative3D_32 fromPoint, struct relative3D_32 toPoint)
 #else
-void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
+void navigate_set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 #endif // USE_EXTENDED_NAV
 {
 	struct relative2D courseLeg;
@@ -166,10 +193,10 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 	}
 #endif // USE_EXTENDED_NAV
 
-	goal.x = toPoint.x;
-	goal.y = toPoint.y;
-	goal.height = toPoint.z;
-	goal.fromHeight = fromPoint.z;
+	navgoal.x = toPoint.x;
+	navgoal.y = toPoint.y;
+	navgoal.height = toPoint.z;
+	navgoal.fromHeight = fromPoint.z;
 
 	courseLeg.x = toPoint.x - fromPoint.x;
 	courseLeg.y = toPoint.y - fromPoint.y;
@@ -182,60 +209,87 @@ void set_goal(struct relative3D fromPoint, struct relative3D toPoint)
 //  an angle, and also the leg distance is required.
 //  But leg distance is produced as a by product of vector2_normalize.
 //  TODO: revise the following two lines.
-	goal.phi = rect_to_polar(&courseLeg);
-	goal.legDist = courseLeg.x;
+	navgoal.phi = rect_to_polar(&courseLeg); // binary angle (0 - 256 = 360 degrees)
+	navgoal.legDist = courseLeg.x;
 
 //struct waypointparameters { int16_t x; int16_t y; int16_t cosphi; int16_t sinphi; int8_t phi; int16_t height; int16_t fromHeight; int16_t legDist; };
-//extern struct waypointparameters goal;
-//	DPRINT("set_goal(..) x %i y %i phi %i height %i dist %i\r\n", goal.x, goal.y, goal.phi, goal.height, goal.legDist);
+//extern struct waypointparameters navgoal;
+//	DPRINT("navigate_set_goal(..) x %i y %i phi %i height %i dist %i\r\n", navgoal.x, navgoal.y, navgoal.phi, navgoal.height, navgoal.legDist);
 
 //  New method for computing cosine and sine of course direction
 	vector2_normalize(&courseDirection[0], &courseDirection[0]);
-	goal.cosphi = courseDirection[0];
-	goal.sinphi = courseDirection[1];
+	navgoal.cosphi = courseDirection[0];
+	navgoal.sinphi = courseDirection[1];
 }
 
-void update_goal_alt(int16_t z)
+void navigate_set_goal_height(int16_t z)
 {
-	goal.height = z;
+	navgoal.height = z;
 }
 
-void process_flightplan(void)
+void navigate_process_flightplan(void)
 {
-	if (gps_nav_valid() && flags._.GPS_steering)
+	if (gps_nav_valid() && state_flags._.GPS_steering)
 	{
-		compute_bearing_to_goal();
-		run_flightplan();
+		navigate_compute_bearing_to_goal();
+		flightplan_update(); // was called run_flightplan();
 		compute_camera_view();
 	}
 }
 
-void compute_bearing_to_goal(void)
+///////////////////////////////////////////////////////////////////////////////
+
+static int16_t compute_progress_to_goal(int16_t totalDist, int16_t remainingDist)
 {
-	union longww temporary;
+	// progress is the fraction of the distance from the start to the finish of
+	// the current waypoint leg, that is still remaining. it ranges from 0 - 1<<12 (4096).
+	int16_t progress;
 
-	// compute the goal vector from present position to waypoint target in meters:
-#if (DEADRECKONING == 1)
-	togoal.x = goal.x - IMUlocationx._.W1;
-	togoal.y = goal.y - IMUlocationy._.W1;
-#else
-	togoal.x = goal.x - GPSlocation.x;
-	togoal.y = goal.y - GPSlocation.y;
-#endif
-
-	// project the goal vector onto the direction vector between waypoints
-	// to get the distance to the "finish" line:
-	temporary.WW = (__builtin_mulss(togoal.x, goal.cosphi)
-	              + __builtin_mulss(togoal.y, goal.sinphi))<<2;
-	tofinish_line = temporary._.W1;
-
-	// Determine if aircraft is making forward progress.
-	// If not, do not apply cross track correction.
-	// This is done to prevent "waggles" during a 180 degree turn.
-	temporary.WW = (__builtin_mulss(IMUintegralAccelerationx._.W1, goal.cosphi)
-	              + __builtin_mulss(IMUintegralAccelerationy._.W1, goal.sinphi));
-	if ((desired_behavior._.cross_track) && (temporary._.W1 > 0))
+	if (totalDist > 0)
 	{
+		progress = (((int32_t)totalDist - remainingDist) << 12) / totalDist;
+		if (progress < 0)
+		{
+			progress = 0;
+		}
+		if (progress > (int32_t)1 << 12)
+		{
+			progress = (int32_t)1 << 12;
+		}
+	}
+	else
+	{
+		progress = (int32_t)1 << 12;
+	}
+	return progress;
+}
+
+int16_t navigate_desired_height(void)
+{
+	int16_t height;
+
+	if (desired_behavior._.takeoff || desired_behavior._.altitude)
+	{
+		height = navgoal.height;
+	}
+	else
+	{
+		int16_t progress_to_goal; // Fraction of the way to the goal in the range 0-4096 (2^12)
+		progress_to_goal = compute_progress_to_goal(navgoal.legDist, tofinish_line);
+		height = navgoal.fromHeight + (((navgoal.height - navgoal.fromHeight) * (int32_t)progress_to_goal) >> 12);
+	}
+	return height;
+}
+
+static void cross_track(void)
+{
+// INPUTS: navgoal, IMUlocation, IMUintegralAcceleration
+// OUTPUT: desired_bearing_over_ground_vector
+//
+
+//struct ww   { int16_t W0; int16_t W1; };
+//union longww     { int32_t WW;  struct ww _; };
+
 		// Using Cross Tracking
 		// CROSS_TRACK_MARGIN is the value of cross track error in meters
 		// beyond which cross tracking correction saturates at 45 degrees 
@@ -247,15 +301,15 @@ void compute_bearing_to_goal(void)
 		int16_t crosstrack;
 
 		// cross_rotate is a vector parallel to the desired course track
-		cross_rotate[0] =  goal.cosphi;
-		cross_rotate[1] = -goal.sinphi;
+	cross_rotate[0] =  navgoal.cosphi;
+	cross_rotate[1] = -navgoal.sinphi;
 
 		// cross_vector is a weighted sum of cross track distance error and cross velocity.
 		// IMU velocity is in centimeters per second, so right shifting by 4 produces
 		// about 6 times the IMU velocity in meters per second.
 		// This sets the time constant of the exponential decay to about 6 seconds
-		crossVector[0]._.W1 = goal.x;
-		crossVector[1]._.W1 = goal.y;
+	crossVector[0]._.W1 = navgoal.x;
+	crossVector[1]._.W1 = navgoal.y;
 		crossVector[0].WW -= IMUlocationx.WW + ((IMUintegralAccelerationx.WW) >> 4);
 		crossVector[1].WW -= IMUlocationy.WW + ((IMUintegralAccelerationy.WW) >> 4);
 
@@ -266,33 +320,63 @@ void compute_bearing_to_goal(void)
 
 		// Compute the adjusted desired bearing over ground.
 		// Start with the straight line between waypoints.
-		desired_bearing_over_ground_vector[0] = goal.cosphi;
-		desired_bearing_over_ground_vector[1] = goal.sinphi;
+	desired_bearing_over_ground_vector[0] = navgoal.cosphi;
+	desired_bearing_over_ground_vector[1] = navgoal.sinphi;
 
-		// Determine if the crosstrack error is within saturation limit.
-		// If so, then multiply by 64 to pick up an extra 6 bits of resolution.
-		if (abs(crosstrack) < ((uint16_t)(CROSS_TRACK_MARGIN)))
+	// Determine if the crosstrack error is within saturation limit.
+	// If so, then multiply by 64 to pick up an extra 6 bits of resolution.
+	if (abs(crosstrack) < ((uint16_t)(CROSS_TRACK_MARGIN)))
+	{
+		crossVector[1].WW <<= 6;
+		cross_rotate[1] = crossVector[1]._.W1;
+		cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN));
+		vector2_normalize(cross_rotate, cross_rotate);
+		// At this point, the implicit angle of the cross correction rotation
+		// is atan of (the cross error divided by the cross margin).
+		// Rotate the base course by the cross correction
+		rotate_2D_vector_by_vector(desired_bearing_over_ground_vector, cross_rotate);
+	}
+	else
+	{
+		if (crosstrack > 0)
 		{
-			crossVector[1].WW <<= 6;
-			cross_rotate[1] = crossVector[1]._.W1;
-			cross_rotate[0] = 64*((uint16_t)(CROSS_TRACK_MARGIN));
-			vector2_normalize(cross_rotate, cross_rotate);
-			// At this point, the implicit angle of the cross correction rotation
-			// is atan of (the cross error divided by the cross margin).
-			// Rotate the base course by the cross correction
-			rotate_2D_vector_by_vector(desired_bearing_over_ground_vector, cross_rotate);
+			rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (32));
 		}
 		else
 		{
-			if (crosstrack > 0)
-			{
-				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (32));
-			}
-			else
-			{
-				rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (- 32));
-			}
+			rotate_2D_vector_by_angle(desired_bearing_over_ground_vector, (int8_t) (- 32));
 		}
+	}
+}
+
+void navigate_compute_bearing_to_goal(void)
+{
+	struct relative2D togoal;
+	union longww temporary;
+
+	// compute the goal vector from present position to waypoint target in meters:
+#if (DEADRECKONING == 1)
+	togoal.x = navgoal.x - IMUlocationx._.W1;
+	togoal.y = navgoal.y - IMUlocationy._.W1;
+#else
+	togoal.x = navgoal.x - GPSlocation.x;
+	togoal.y = navgoal.y - GPSlocation.y;
+#endif
+
+	// project the goal vector onto the direction vector between waypoints
+	// to get the distance to the "finish" line:
+	temporary.WW = (__builtin_mulss(togoal.x, navgoal.cosphi)
+	              + __builtin_mulss(togoal.y, navgoal.sinphi))<<2;
+	tofinish_line = temporary._.W1;
+
+	// Determine if aircraft is making forward progress.
+	// If not, do not apply cross track correction.
+	// This is done to prevent "waggles" during a 180 degree turn.
+	temporary.WW = (__builtin_mulss(IMUintegralAccelerationx._.W1, navgoal.cosphi)
+	              + __builtin_mulss(IMUintegralAccelerationy._.W1, navgoal.sinphi));
+	if ((desired_behavior._.cross_track) && (temporary._.W1 > 0))
+	{
+		cross_track();
 	}
 	else
 	{
@@ -302,27 +386,9 @@ void compute_bearing_to_goal(void)
 			desired_bearing_over_ground_vector[1] = togoal.y;
 			vector2_normalize(desired_bearing_over_ground_vector, desired_bearing_over_ground_vector);
 	}
-	if (flags._.GPS_steering)   // return to home or waypoints state
+	if (state_flags._.GPS_steering)   // return to home or waypoints state
 	{
-		desired_dir = goal.phi;
-		if (goal.legDist > 0)
-		{
-			// progress_to_goal is the fraction of the distance from the start to the finish of
-			// the current waypoint leg, that is still remaining.  it ranges from 0 - 1<<12.
-			progress_to_goal = (((int32_t)goal.legDist - tofinish_line) << 12) / goal.legDist;
-			if (progress_to_goal < 0)
-			{
-				progress_to_goal = 0;
-			}
-			if (progress_to_goal > (int32_t)1 << 12)
-			{
-				progress_to_goal = (int32_t)1 << 12;
-			}
-		}
-		else
-		{
-			progress_to_goal = (int32_t)1 << 12;
-		}
+		desired_dir = navgoal.phi;
 	}
 	else
 	{
@@ -376,7 +442,7 @@ uint16_t wind_gain_adjustment(void)
 
 // Values for navType:
 // 'y' = yaw/rudder, 'a' = aileron/roll, 'h' = aileron/hovering
-int16_t determine_navigation_deflection(char navType)
+int16_t navigate_determine_deflection(char navType)
 {
 	union longww deflectionAccum;
 	union longww dotprod;

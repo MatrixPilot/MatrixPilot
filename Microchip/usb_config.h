@@ -111,17 +111,17 @@
 //#define USB_ENABLE_TRANSFER_COMPLETE_HANDLER
 
 /** DEVICE CLASS USAGE *********************************************/
-#if (USE_USB == 1)
+//#if (USE_USB == 1)
 
-#if (USE_MSD == 1)
+//#if (USE_MSD == 1)
 #define USB_USE_MSD
-#endif // (USE_MSD == 1)
+//#endif // (USE_MSD == 1)
 
-#if (USE_CDC == 1)
+//#if (USE_CDC == 1)
 #define USB_USE_CDC
-#endif // (USE_CDC == 1)
+//#endif // (USE_CDC == 1)
 
-#endif // (USE_USB == 1)
+//#endif // (USE_USB == 1)
 
 /** ENDPOINTS ALLOCATION *******************************************/
 

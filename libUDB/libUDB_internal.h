@@ -21,27 +21,3 @@
 
 #include "libUDB.h"
 
-extern volatile uint16_t trap_flags;
-extern volatile uint32_t trap_source;
-extern volatile uint16_t osc_fail_count;
-
-// Get flags telling the reason for the last reset (RCON)
-uint16_t get_reset_flags(void);
-
-inline void udb_init_leds(void);
-inline void udb_init_ADC(void);
-inline void udb_init_clock(void);
-inline void udb_init_capture(void);
-inline void udb_init_GPS(void);
-inline void udb_init_USART(void);
-inline void udb_init_pwm(void);
-inline void udb_eeprom_init(void);
-
-inline void MPU6000_init16(void);
-
-inline void start_pwm_outputs(void);
-
-inline void calculate_analog_sensor_values(void);
-
-inline void radioIn_failsafe_check(void);
-inline void radioIn_failsafe_reset(void);

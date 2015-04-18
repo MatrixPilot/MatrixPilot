@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2012 MatrixPilot Team
+// Copyright 2009-2014 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -167,24 +167,21 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
+#ifndef NORADIO
 #define NORADIO                             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
-// For classic UDB boards:
-// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
-// This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
-// If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
-// following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
-// With it set to 1, the RC outputs will be in this alternate configuration:
-// Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
-//
-// For UDB4 boards:
-// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 1.
-// The 8 standard output channels remain unaffected.  2 additional output channels are available
-// on pins RA4 and RA1.
+// For setups with an external Rx device:
+//   Use a single PPM input connection from the RC receiver to the UDB on RC input channel PPM_IC.
+//   The 8 standard output channels remain unaffected.
+//   For UDB4 and UDB5 boards:
+//     2 additional output channels are available on pins RA4 and RA1.
+//   For AUAV3 boards:
+//     support for additional output channels may be developed upon request
 //
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
@@ -196,11 +193,17 @@
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
 
+// Select which Input Capture pin the PPM device is connected to
+// changing this can be useful when using PPM and fitting a UDB into
+// very tight airframes, as it allows alternative input pins to be
+// assigned for connection to the receiver.
+// If not using PPM, then this must be left set to '1'
+#define PPM_IC                              1
+
 // NUM_INPUTS:
-// For classic boards: Set to 1-5 (or 1-8 when using PPM input)
-//   1-4 enables only the first 1-4 of the 4 standard input channels
-//   5 also enables E8 as the 5th input channel
-// For UDB4 boards: Set to 1-8
+// If using PWM inputs (parallel Rx connections), set to the number of cables connected, 1-8
+// If using PPM inputs (serial Rx connection), set to the number of Rx channels, up to PPM_NUMBER_OF_CHANNELS
+// If using LRS library (integrated SPI tranceiver), set to the number of Rx channels, up to 16
 #define NUM_INPUTS                          5
 
 // Channel numbers for each input.
@@ -343,7 +346,8 @@
 // SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
+//#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE    // TODO: this will have missing dependencies
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink

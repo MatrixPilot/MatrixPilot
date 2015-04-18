@@ -36,9 +36,12 @@
 //    MAV_DATA_STREAM_EXTRA2 = Scaled position sensor messages (ALTITUDES / AIRSPEEDS)
 //    MAV_DATA_STREAM_EXTRA3 not assigned yet
 
-#include "defines.h"
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#include "../MatrixPilot/defines.h"
+#include "../MatrixPilot/states.h"
+#include "mavlink_options.h"
+
+#if (USE_MAVLINK == 1)
 
 #include "MAVLink.h"
 #include "MAVParams.h"
@@ -103,22 +106,22 @@ mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 mavlink_flags_t mavlink_flags;
 mavlink_system_t mavlink_system;
 
-uint16_t mavlink_process_message_handle = INVALID_HANDLE;
+static uint16_t mavlink_process_message_handle = INVALID_HANDLE;
 boolean handling_of_message_completed = true;
 
-uint8_t mavlink_counter_40hz = 0;
-uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
-uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+static uint8_t mavlink_counter_40hz = 0;
+static uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+static uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 
 int16_t sb_index = 0;
 int16_t end_index = 0;
 char serial_interrupt_stopped = 1;
 uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
 
-uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
-uint16_t mavlink_command_ack_command = 0;
-boolean mavlink_send_command_ack = false;
-uint16_t mavlink_command_ack_result = 0;
+static uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
+static uint16_t mavlink_command_ack_command = 0;
+static boolean mavlink_send_command_ack = false;
+static uint16_t mavlink_command_ack_result = 0;
 
 static void handleMessage(void);
 #if (USE_NV_MEMORY == 1)
@@ -157,7 +160,7 @@ void init_serial(void)
 	init_mavlink();
 }
 
-void restart_telemetry(void)
+void telemetry_restart(void)
 {
 }
 
@@ -311,9 +314,9 @@ void send_text(uint8_t text[])
 // MAIN MATRIXPILOT MAVLINK CODE FOR RECEIVING COMMANDS FROM THE GROUND CONTROL STATION
 //
 
-mavlink_message_t msg[2];
-uint8_t mavlink_message_index = 0;
-mavlink_status_t r_mavlink_status;
+static mavlink_message_t msg[2];
+static uint8_t mavlink_message_index = 0;
+static mavlink_status_t r_mavlink_status;
 
 void udb_serial_callback_received_byte(uint8_t rxchar)
 {
@@ -360,7 +363,7 @@ static void command_ack(uint16_t command, uint16_t result)
 	}
 }
 
-void MAVLinkRequestDataStream(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_REQUEST_DATA_STREAM
+static void MAVLinkRequestDataStream(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_REQUEST_DATA_STREAM
 {
 	int16_t freq = 0; // packet frequency
 	mavlink_request_data_stream_t packet;
@@ -789,22 +792,22 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 1;
 	if (mavlink_frequency_send(MAVLINK_RATE_HEARTBEAT, mavlink_counter_40hz + spread_transmission_load))
 	{
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+		if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 0)
 		{
 			mavlink_base_mode = MAV_MODE_MANUAL_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_MANUAL;
 		}
-		else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+		else if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 1)
 		{
 			mavlink_base_mode = MAV_MODE_GUIDED_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_STABILIZE;
 		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
+		else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		{
 			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_AUTONOMOUS;
 		}
-		else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
+		else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		{
 			mavlink_base_mode = MAV_MODE_AUTO_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED; // Return to Landing (lost contact with transmitter)
 			mavlink_custom_mode = MAV_CUSTOM_UDB_MODE_RTL;
@@ -990,9 +993,8 @@ void mavlink_output_40hz(void)
 
 	spread_transmission_load = 30;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
-
-        {
-#if (HILSIM !=1 )
+	{
+#if (HILSIM !=1)
 #if (MAG_YAW_DRIFT == 1)    // Magnetometer is connected
 		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
@@ -1007,7 +1009,7 @@ void mavlink_output_40hz(void)
 #endif //(MAG_YAW_DRIFT == 1)
 #else  // HILSIM bypasses use of uxb_xaccel etc, and uses gplane[] directly; similarly udb_xrate is sent straight to omega
        // However gplane[] may be modified by further calculations. So MAVLink uses aero_force which is the negative of gplane[]
-        	extern int16_t magFieldRaw[];
+		    extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
 		    (int16_t) - aero_force[0], (int16_t) - aero_force[1], (int16_t) - aero_force[2],
 		    (int16_t) omegagyro[0],  (int16_t) omegagyro[1],  (int16_t) omegagyro[2],
@@ -1062,4 +1064,4 @@ void mavlink_output_40hz(void)
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
-#endif // (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (USE_MAVLINK == 1)

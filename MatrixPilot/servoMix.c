@@ -23,7 +23,6 @@
 #include "servoMix.h"
 #include "servoPrepare.h"
 #include "states.h"
-#include "libCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/servoOut.h"
 
@@ -51,7 +50,7 @@ void servoMix(void)
 	}
 
 	// Apply boosts if in a stabilized mode
-	if (udb_flags._.radio_on && flags._.pitch_feedback)
+	if (udb_flags._.radio_on && state_flags._.pitch_feedback)
 	{
 		pwManual[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] ; // in fly by wire or navigate mode, manual input is calculated as part of turn control
 		pwManual[ELEVATOR_INPUT_CHANNEL] += ((pwManual[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) * elevatorbgain) >> 3;

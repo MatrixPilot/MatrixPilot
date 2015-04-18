@@ -19,12 +19,20 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
+#include "serialIO.h"
+#include "servoOut.h"
+#include "radioIn.h"
+#include "eeprom_udb4.h"
+#include "ADchannel.h"
+#include "mpu6000.h"
 #include "analogs.h"
 #include "events.h"
 #include "osd.h"
+#include "ports_config.h"
 
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
@@ -80,7 +88,7 @@ void udb_init(void)
 	flexiFunctionServiceInit();
 #endif
 	udb_init_clock();
-	udb_init_capture();
+	radioIn_init(); // was udb_init_capture();
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
@@ -90,7 +98,7 @@ void udb_init(void)
 #if (CONSOLE_UART != 2)
 	udb_init_USART();
 #endif
-	udb_init_pwm();
+	servoOut_init(); // was udb_init_pwm()
 	osd_init();
 
 //FIXME: add AUAV3 support
@@ -99,7 +107,7 @@ void udb_init(void)
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
-	MPU6000_init16();
+	MPU6000_init16(&heartbeat);
 #endif
 
 	SRbits.IPL = 0; // turn on all interrupt priorities
@@ -114,7 +122,7 @@ void udb_run(void)
 	indicate_loading_main;
 #endif
 }
-
+#if 0
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 void udb_a2d_record_offsets(void)
 {
@@ -172,3 +180,4 @@ int16_t udb_servo_pulsesat(int32_t pw)
 	if (pw < SERVOMIN) pw = SERVOMIN;
 	return (int16_t)pw;
 }
+#endif

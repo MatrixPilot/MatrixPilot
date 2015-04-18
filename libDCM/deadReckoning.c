@@ -19,10 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsParseCommon.h"
 #include "deadReckoning.h"
 #include "mathlibNAV.h"
+#include "estWind.h"
+#include "gpsData.h"
 #include "rmat.h"
 #include "../libUDB/heartbeat.h"
 

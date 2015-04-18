@@ -19,8 +19,9 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "interrupt.h"
+#include "sonarIn.h"
 
 #if (USE_SONAR_INPUT != 0)
 

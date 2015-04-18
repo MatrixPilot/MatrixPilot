@@ -44,7 +44,7 @@ enable=0
 transport=0
 format=0
 [CUSTOM_BUILD]
-Pre-Build=cscript "..\libUDB\fixDeps.vbs" "..\MatrixPilot\options.h" "..\libUDB\fixDeps.h"
+Pre-Build=cscript "..\libUDB\fixDeps.vbs" "%%CONFIG%%\options.h" "..\libUDB\fixDeps.h"
 Pre-BuildEnabled=1
 Post-Build=
 Post-BuildEnabled=1

@@ -19,9 +19,11 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "radioIn.h"
+#include "../MatrixPilot/states.h"
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -77,7 +79,7 @@ void udb_servo_record_trims(void)
 	}
 }
 
-void udb_init_capture(void)
+void radioIn_init(void) // was called udb_init_capture(void)
 {
 	int16_t i;
 
@@ -142,6 +144,8 @@ void udb_init_capture(void)
 #endif // NORADIO
 }
 
+// called from heartbeat pulse at 20Hz
+
 void radioIn_failsafe_check(void)
 {
 	// check to see if at least one valid pulse has been received,
@@ -153,13 +157,13 @@ void radioIn_failsafe_check(void)
 			udb_flags._.radio_on = 0;
 			udb_callback_radio_did_turn_off();
 		}
-		LED_GREEN = LED_OFF;
+		led_off(LED_GREEN);
 		noisePulses = 0; // reset count of noise pulses
 	}
 	else
 	{
 		udb_flags._.radio_on = 1;
-		LED_GREEN = LED_ON;
+		led_on(LED_GREEN);
 	}
 	failSafePulses = 0;
 }
@@ -169,9 +173,10 @@ void radioIn_failsafe_reset(void)
 	noisePulses = 0;
 }
 
+#if (NORADIO != 1)
+
 static void set_udb_pwIn(int pwm, int index)
 {
-#if (NORADIO != 1)
 	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
 
 	if (FAILSAFE_INPUT_CHANNEL == index)
@@ -220,10 +225,8 @@ static void set_udb_pwIn(int pwm, int index)
 	}
 	udb_pwIn[index] = pwm;
 #endif // FLY_BY_DATALINK_ENABLED
-#endif // NOARADIO !=1
 }
 
-#if (NORADIO != 1)
 #if (USE_PPM_INPUT == 0)
 
 #define _IC_HANDLER(x, y, z) \

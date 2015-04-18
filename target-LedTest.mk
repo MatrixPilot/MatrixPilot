@@ -2,4 +2,4 @@
 
 modules := Tools/LedTest
 incpath :=
-cfgpath := Tools/LedTest
+cfgpath := Tools/LedTest/Config

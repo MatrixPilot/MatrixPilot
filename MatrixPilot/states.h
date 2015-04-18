@@ -19,13 +19,26 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// USE_OSD enables the OSD system
-#define USE_OSD         OSD_NONE
-//#define USE_OSD         OSD_NATIVE
-//#define USE_OSD         OSD_REMZIBI
+struct state_flags_bits {
+	uint16_t unused                     : 4;
+	uint16_t save_origin                : 1;
+	uint16_t GPS_steering               : 1;
+	uint16_t pitch_feedback             : 1;
+	uint16_t altitude_hold_throttle     : 1;
+	uint16_t altitude_hold_pitch        : 1;
+	uint16_t man_req                    : 1;
+	uint16_t auto_req                   : 1;
+	uint16_t home_req                   : 1;
+	uint16_t rtl_hold                   : 1;
+	uint16_t f13_print_req              : 1;
+	uint16_t disable_throttle           : 1;
+	uint16_t update_autopilot_state_asap: 1;
+};
 
-#define USE_OSD_SPI     0   // set this to 1 to use the SPI peripheral, 0 to bit-bash
-#define OSD_SF          5   // scale factor for SPI delays - TODO: get rid of
+union state_flags_int { struct state_flags_bits _; int16_t WW; };
+extern union state_flags_int state_flags;
 
-#define OSD_NTSC        0
-#define OSD_PAL         1
+extern int16_t waggle;
+//extern uint8_t counter;
+
+void init_states(void);

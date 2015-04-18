@@ -45,6 +45,8 @@ union longlongLL { int64_t LL;  struct LL _; struct wwww __; };
 #include <xc.h>
 #elif defined(__C30__)
 #include "Compiler.h"
+#else
+#include "builtins.h"
 #endif // __XC16__
 
 #endif // UDB_TYPES_H

@@ -29,7 +29,7 @@
 #define PARAMETER_TABLE_H
 
 // we include these here as the source module is generated
-#include "../libDCM/libDCM_internal.h"  // Needed for access to internal DCM valueconst struct mavlink_parameter mavlink_parameters_list[] =
+#include "../libDCM/libDCM_internal.h"  // Needed for access to internal DCM value
 #include "../libDCM/rmat.h"
 #include "../MAVLink/include/mavlink_types.h"
 #include "parameter_datatypes.h"

@@ -49,8 +49,8 @@ const int16_t pitch_servo_pwm_min      = ((CAM_PITCH_SERVO_MIN - CAM_PITCH_OFFSE
 const int16_t yaw_servo_pwm_max        = ((CAM_YAW_SERVO_MAX   - CAM_YAW_OFFSET_CENTRED  ) * 65536.0 / 360.0) * YAW_SERVO_RATIO;
 const int16_t yaw_servo_pwm_min        = ((CAM_YAW_SERVO_MIN   - CAM_YAW_OFFSET_CENTRED  ) * 65536.0 / 360.0) * YAW_SERVO_RATIO;
 
-struct relative3D view_location = { 0, 20, 0 };
-struct relative3D camera_view   = { 0,  0, 0 };
+static struct relative3D view_location = { 0, 20, 0 };
+static struct relative3D camera_view   = { 0,  0, 0 };
 
 #if (CAM_TESTING_OVERIDE == 1)  // Used to test that Camera swings by correct angles when camera control gains.
 #define CAM_TEST_TIMER 200      // e.g. value of 200 means 5 seconds (200 decremented 40 times / second until zero).
@@ -115,7 +115,7 @@ void cameraCntrl(void)
 
 	// In Manual Mode
 #if (CAMERA_MODE_INPUT_CHANNEL == CHANNEL_UNUSED)
-	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+	if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 0)
 #else
 	if (udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] < CAMERA_MODE_THRESHOLD_LOW)
 #endif
@@ -128,7 +128,7 @@ void cameraCntrl(void)
 	{
 		// Stabilised Mode
 #if (CAMERA_MODE_INPUT_CHANNEL ==	CHANNEL_UNUSED)
-		if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+		if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 1)
 #else
 		if ((udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] > CAMERA_MODE_THRESHOLD_LOW) &&
 		    (udb_pwIn[CAMERA_MODE_INPUT_CHANNEL] < MODE_SWITCH_THRESHOLD_HIGH))

@@ -19,10 +19,12 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "uart.h"
+#include "mcu.h"
+#include "ports_config.h"
 #include <stdio.h>
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
@@ -129,8 +131,17 @@ uint16_t get_reset_flags(void)
 }
 
 #if (BOARD_TYPE == AUAV3_BOARD)
-// This method assigns all PPS registers
-void configurePPS(void)
+static void configureANS(void) // disable all analog inputs
+{
+	ANSELA = 0x0000;
+	ANSELB = 0x0000;
+	ANSELC = 0x0000;
+	ANSELD = 0x0000;
+	ANSELE = 0x0000;
+	ANSELG = 0x0000;
+}
+
+static void configurePPS(void)  // This method assigns all PPS registers
 {
 	// Unlock Registers
 	__builtin_write_OSCCONL(OSCCON & ~(1 << 6));
@@ -202,12 +213,18 @@ void configurePPS(void)
 		UART_TO_PORT(CONSOLE_UART, DBG_PORT)
 	#endif // CONSOLE_UART
 
+	#ifdef AUAV3
+		#if (OSD_UART != 0)
+			UART_TO_PORT(OSD_UART, OSD_PORT)
+		#endif // OSD_UART
+	#endif // AUAV3
+
 	// Lock Registers
 	__builtin_write_OSCCONL(OSCCON | (1 << 6));
 }
 
 // This method configures TRISx for the digital IOs
-void configureDigitalIO(void)   // AUAV3 board
+static void configureDigitalIO(void)   // AUAV3 board
 {
 	// TRIS registers have no effect on pins mapped to peripherals
 	// TRIS assignments are made in the initialization methods for each function
@@ -277,7 +294,7 @@ void configureDigitalIO(void)   // AUAV3 board
 	CNPUEbits.CNPUE1  = 1;          // DIG0
 }
 #else
-void configureDigitalIO(void) // UDB4 and UDB5 boards
+static void configureDigitalIO(void) // UDB4 and UDB5 boards
 {
 	// TODO: this needs to be updated to support PPM input on user defined input channel
 	_TRISD8 = 1;
@@ -288,7 +305,7 @@ void configureDigitalIO(void) // UDB4 and UDB5 boards
 }
 #endif // BOARD_TYPE
 
-void init_leds(void)
+static void init_leds(void)
 {
 #if (BOARD_TYPE == AUAV3_BOARD)
 	_LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
@@ -301,18 +318,8 @@ void init_leds(void)
 #endif // BOARD_TYPE
 }
 
-void mcu_init(void)
+static void init_pll(void)
 {
-	defaultCorcon = CORCON;
-
-	if (_SWR == 0)
-	{
-		// if there was not a software reset (trap error) clear the trap data
-		trap_flags = 0;
-		trap_source = 0;
-		osc_fail_count = 0;
-	}
-
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #if (MIPS == 16)
 #warning 16 MIPS selected
@@ -365,15 +372,6 @@ void mcu_init(void)
 	__builtin_write_OSCCONH(0x03);
 	__builtin_write_OSCCONL(0x01);
 	while (OSCCONbits.COSC != 0x3);     // Wait for the Primary PLL to lock
-
-	// disable all analog inputs
-	ANSELA = 0x0000;
-	ANSELB = 0x0000;
-	ANSELC = 0x0000;
-	ANSELD = 0x0000;
-	ANSELE = 0x0000;
-	ANSELG = 0x0000;
-
 #if (USE_USB == 1)
 	// Configuring the auxiliary PLL.
 	// Since the primary oscillator provides the source clock to the
@@ -385,9 +383,24 @@ void mcu_init(void)
 	ACLKCON3bits.ENAPLL = 1;
 	while (ACLKCON3bits.APLLCK != 1);   // Wait till the AUX PLL locks.
 #endif // USE_USB
+#endif // BOARD_TYPE
+}
+
+void mcu_init(void)
+{
+	defaultCorcon = CORCON;
+
+	if (_SWR == 0)  // if there was not a software reset (trap error) clear the trap data
+	{
+		trap_flags = 0;
+		trap_source = 0;
+		osc_fail_count = 0;
+	}
+	init_pll();
+#if (BOARD_TYPE == AUAV3_BOARD)
+	configureANS();
 	configurePPS();
 #endif // BOARD_TYPE
-
 	configureDigitalIO();
 	init_leds();
 #if (CONSOLE_UART != 0)

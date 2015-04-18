@@ -25,7 +25,7 @@
 #ifndef NV_MEMORY_H
 #define NV_MEMORY_H
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 
 typedef void (*NVMemory_callbackFunc)(boolean);
 

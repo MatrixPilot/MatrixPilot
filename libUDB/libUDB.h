@@ -27,6 +27,11 @@
 #include <stdio.h>
 
 #include "options.h"
+//#include "options_quad.h"
+
+#ifdef PX4
+#include "../libSTM/libSTM.h"
+#endif
 
 #if (SIL == 1)
 #define SILSIM                              1
@@ -78,7 +83,11 @@
 #endif
 #ifdef AUAV3
 #define BOARD_TYPE                          AUAV3_BOARD
-//#include "options_auav3.h"
+#include "options_auav3.h"
+#endif
+#ifdef PX4
+#define BOARD_TYPE                          PX4_BOARD
+#include "libSTM.h"
 #endif
 
 #ifndef BOARD_TYPE
@@ -188,10 +197,6 @@ extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
 // whether the receiver is currently receiving values from the transmitter.
 extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
 
-// This takes a servo out value, and clips it to be within
-// 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int16_t udb_servo_pulsesat(int32_t pw);
-
 // Call this funtion once at some point soon after
 // the UDB has booted up and the radio is on.
 void udb_servo_record_trims(void);
@@ -222,10 +227,10 @@ extern UDB_SKIP_FLAGS udb_skip_flags;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Raw Accelerometer and Gyroscope(rate) Values
-extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
-extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
-extern struct ADchannel udb_vref;                          // reference voltage
-extern struct ADchannel udb_analogInputs[];
+//extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
+//extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
+//extern struct ADchannel udb_vref;                          // reference voltage
+//extern struct ADchannel udb_analogInputs[];
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;        // battery_current._.W1 is in tenths of Amps
@@ -241,57 +246,21 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 #endif
 
 
-// Calibrate the sensors
-// Call this function once, soon after booting up, after a few seconds of
-// holding the UDB very still.
-void udb_a2d_record_offsets(void);
-void udb_callback_read_sensors(void);       // Callback
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
+#ifdef PX4
+void udb_led_toggle(uint8_t x);
+void led_on(uint8_t x);
+void led_off(uint8_t x);
+#else
 #define udb_led_toggle(x)               ((x) = !(x))
-#define led_on(x)                       ((x) = 0)
-#define led_off(x)                      ((x) = 1)
-
-
-////////////////////////////////////////////////////////////////////////////////
-// GPS IO
-
-// Set the GPS serial data rate.
-void udb_gps_set_rate(int32_t rate);
-boolean udb_gps_check_rate(int32_t rate);  // returns true if the rate arg is the current rate
-
-// Call this function to initiate sending a data to the GPS
-void udb_gps_start_sending_data(void);
-
-// Implement this callback to tell the UDB what byte is next to send on the GPS.
-// Return -1 to stop sending data.
-int16_t udb_gps_callback_get_byte_to_send(void);        // Callback
-
-// Implement this callback to handle receiving a byte from the GPS
-void udb_gps_callback_received_byte(uint8_t rxchar);    // Callback
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Serial IO
-
-// Set the serial port data rate.  Use the UDB_BAUD_* constants defined in the Config*.h
-// files.
-void udb_serial_set_rate(int32_t rate);
-boolean udb_serial_check_rate(int32_t rate);// returns true if the rate arg is the current rate
-
-// Call this function to initiate sending a data to the serial port
-void udb_serial_start_sending_data(void);
-
-// Implement this callback to tell the UDB what byte is next to send on the serial port.
-// Return -1 to stop sending data.
-int16_t udb_serial_callback_get_byte_to_send(void);     // Callback
-
-// Implement this callback to handle receiving a byte from the serial port
-void udb_serial_callback_received_byte(uint8_t rxchar); // Callback
+//#define led_on(x)                       ((x) = 0)
+//#define led_off(x)                      ((x) = 1)
+#define led_on(x)                       ((x) = LED_ON)
+#define led_off(x)                      ((x) = LED_OFF)
+#endif
 
 
 #endif // LIB_UDB_H

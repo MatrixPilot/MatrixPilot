@@ -22,7 +22,7 @@
 // X axis pointing to right, Y axis pointing forward and Z axis pointing up
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
@@ -33,22 +33,25 @@
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
-#include <stdbool.h>
 #include <spi.h>
 
 //Sensor variables
 uint16_t mpu_data[8], mpuCnt = 0;
 boolean mpuDAV = false;
 
-struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
-struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
+//struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
+//struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
 struct ADchannel mpu_temp;
 int16_t vref_adj;
 
 // MPU6000 Initialization and configuration
 
-void MPU6000_init16(void)
+static callback_fptr_t callback = NULL;
+
+void MPU6000_init16(callback_fptr_t fptr)
 {
+	callback = fptr;
+
 // MPU-6000 maximum SPI clock is specified as 1 MHz for all registers
 //    however the datasheet states that the sensor and interrupt registers
 //    may be read using an SPI clock of 20 Mhz
@@ -170,7 +173,7 @@ void MPU6000_init16(void)
 #endif
 }
 
-void process_MPU_data(void)
+static void process_MPU_data(void)
 {
 	mpuDAV = true;
 
@@ -192,27 +195,15 @@ void process_MPU_data(void)
 //	}
 //}
 
-//  Initial version of the MPU interface writes and reads gyro and accelerometer values asynchronously.
-//  This was the fastest way to revise the software.
-//  MPU data was being read at 200 Hz, IMU and control loop ran at 40 Hz.
-//  4 out of 5 samples were being ignored. IMU got the most recent set of samples.
-
-//  Now, we want to run write-read synchronously, and run the IMU at 200 Hz, using every sample.
-//  to run the IMU at 200 Hz, turn the following back on
-
-/*
-	if (dcm_flags._.calib_finished) {
-		dcm_run_imu_step();
-	}
- */
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
-//	_T1IF = 1;              // trigger the heartbeat interrupt
-	heartbeat();
+	if (callback) callback();   // was directly calling heartbeat()
+#else
+#warning mpu6000: no callback mechanism defined
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 
-void MPU6000_read(void)
+static void MPU6000_read(void)
 {
 	// burst read guarantees that all registers represent the same sample interval
 	mpuCnt++;

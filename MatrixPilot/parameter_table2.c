@@ -2,10 +2,13 @@
 
 #include "defines.h" 
 
-#if (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#include "mavlink_options.h"
+
+#if (SILSIM == 1 && USE_MAVLINK == 1)
 
 #include "parameter_table.h"
 #include "data_storage.h"
+#include "altitudeCntrl.h"
 #include "../libUDB/ADchannel.h"
 
 
@@ -151,4 +154,4 @@ const mavlink_parameter mavlink_parameters_list[] = {
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);
 
 
-#endif // (SILSIM == 1 && SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)
+#endif // (SILSIM == 1 && USE_MAVLINK == 1)

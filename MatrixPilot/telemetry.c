@@ -23,6 +23,7 @@
 #include "states.h"
 #include "navigate.h"
 #include "cameraCntrl.h"
+#include "flightplan.h"
 #include "flightplan-waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -42,10 +43,11 @@
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/rmat.h"
 #include <string.h>
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK) // All MAVLink telemetry code is in MAVLink.c
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -54,31 +56,31 @@
 #include <stdarg.h>
 
 
-union intbb voltage_milis = {0};
-union intbb voltage_temp;
+static union intbb voltage_milis = {0};
+static union intbb voltage_temp;
 
-void sio_newMsg(uint8_t);
-void sio_voltage_low(uint8_t inchar);
-void sio_voltage_high(uint8_t inchar);
+static void sio_newMsg(uint8_t);
+static void sio_voltage_low(uint8_t inchar);
+static void sio_voltage_high(uint8_t inchar);
 
-void sio_fp_data(uint8_t inchar);
-void sio_fp_checksum(uint8_t inchar);
+static void sio_fp_data(uint8_t inchar);
+static void sio_fp_checksum(uint8_t inchar);
 
-void sio_cam_data(uint8_t inchar);
-void sio_cam_checksum(uint8_t inchar);
+static void sio_cam_data(uint8_t inchar);
+static void sio_cam_checksum(uint8_t inchar);
 
-void sio_fbdl_data(unsigned char inchar);
+static void sio_fbdl_data(unsigned char inchar);
 
-char fp_high_byte;
-uint8_t fp_checksum;
+static char fp_high_byte;
+static uint8_t fp_checksum;
 
-void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
+static void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
 
 
 #define SERIAL_BUFFER_SIZE 256
-char serial_buffer[SERIAL_BUFFER_SIZE+1];
-int16_t sb_index = 0;
-int16_t end_index = 0;
+static char serial_buffer[SERIAL_BUFFER_SIZE+1];
+static int16_t sb_index = 0;
+static int16_t end_index = 0;
 
 void init_serial(void)
 {
@@ -104,7 +106,7 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 	(*sio_parse)(rxchar); // parse the input byte
 }
 
-void sio_newMsg(uint8_t inchar)
+static void sio_newMsg(uint8_t inchar)
 {
 	switch (inchar)
 	{
@@ -146,14 +148,14 @@ void sio_newMsg(uint8_t inchar)
 	} // switch
 }
 
-void sio_voltage_high(uint8_t inchar)
+static void sio_voltage_high(uint8_t inchar)
 {
 	voltage_temp.BB = 0; // initialize our temp variable
 	voltage_temp._.B1 = inchar;
 	sio_parse = &sio_voltage_low;
 }
 
-void sio_voltage_low(uint8_t inchar)
+static void sio_voltage_low(uint8_t inchar)
 {
 	voltage_temp._.B0 = inchar;
 	voltage_temp.BB = voltage_temp.BB * 2; // convert to voltage
@@ -161,7 +163,7 @@ void sio_voltage_low(uint8_t inchar)
 	sio_parse = &sio_newMsg;
 }
 
-int8_t hex_char_val(uint8_t inchar)
+static int8_t hex_char_val(uint8_t inchar)
 {
 	if (inchar >= '0' && inchar <= '9')
 	{
@@ -206,7 +208,7 @@ int8_t hex_char_val(uint8_t inchar)
 // the waypoint { {100, 50, 15}, F_INVERTED, {0, 0, 0} }
 //
 
-void sio_fp_data(uint8_t inchar)
+static void sio_fp_data(uint8_t inchar)
 {
 	if (inchar == '*')
 	{
@@ -234,7 +236,7 @@ void sio_fp_data(uint8_t inchar)
 	}
 }
 
-void sio_fp_checksum(uint8_t inchar)
+static void sio_fp_checksum(uint8_t inchar)
 {
 	int8_t hexVal = hex_char_val(inchar);
 
@@ -259,7 +261,7 @@ void sio_fp_checksum(uint8_t inchar)
 
 #if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 
-void sio_cam_data(uint8_t inchar)
+static void sio_cam_data(uint8_t inchar)
 {
 	if (inchar == '*')
 	{
@@ -288,7 +290,7 @@ void sio_cam_data(uint8_t inchar)
 	}
 }
 
-void sio_cam_checksum(uint8_t inchar)
+static void sio_cam_checksum(uint8_t inchar)
 {
 	int8_t hexVal = hex_char_val(inchar);
 
@@ -313,7 +315,7 @@ void sio_cam_checksum(uint8_t inchar)
 #endif // CAM_USE_EXTERNAL_TARGET_DATA
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
-void sio_fbdl_data(unsigned char inchar)
+static void sio_fbdl_data(unsigned char inchar)
 {
 	if (get_fbdl_pos() < LENGTH_OF_PACKET)
 	{
@@ -348,7 +350,7 @@ void sio_fbdl_data(unsigned char inchar)
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t len;
 	int16_t start_index;
@@ -387,7 +389,7 @@ void serial_output(char* format, ...)
 }
 #else
 // add this text to the output buffer
-void serial_output(char* format, ...)
+static void serial_output(const char* format, ...)
 {
 	int16_t start_index;
 	int16_t remaining;
@@ -431,14 +433,14 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 
 static int16_t telemetry_counter = 12;
 
-void restart_telemetry(void)
+void telemetry_restart(void)
 {
 	telemetry_counter = 11;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	serial_output("lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n",
 	    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW,
@@ -451,7 +453,7 @@ void serial_output_8hz(void)
 
 extern int16_t desiredHeight;
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	uint16_t mode;
 	struct relative2D matrix_accum;
@@ -466,13 +468,13 @@ void serial_output_8hz(void)
 	desired_dir_deg  = accum._.W1 - 90; // "Convert UAV DevBoad Earth" to Compass Bearing
 	if (desired_dir_deg < 0) desired_dir_deg += 360; 
 
-	if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 0)
+	if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 0)
 		mode = 1;
-	else if (flags._.GPS_steering == 0 && flags._.pitch_feedback == 1)
+	else if (state_flags._.GPS_steering == 0 && state_flags._.pitch_feedback == 1)
 		mode = 2;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
+	else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 1)
 		mode = 3;
-	else if (flags._.GPS_steering == 1 && flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
+	else if (state_flags._.GPS_steering == 1 && state_flags._.pitch_feedback == 1 && udb_flags._.radio_on == 0)
 		mode = 0;
 	else
 		mode = 99; // Unknown
@@ -524,7 +526,7 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	int16_t i;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
@@ -609,7 +611,7 @@ void serial_output_8hz(void)
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)
 			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
 			              "as%i:wvx%i:wvy%i:wvz%i:\r\n",
-			    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+			    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
 			    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 			    rmat[0], rmat[1], rmat[2],
 			    rmat[3], rmat[4], rmat[5],
@@ -633,7 +635,7 @@ void serial_output_8hz(void)
 				              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
 				              "c%u:s%i:cpu%u:bmv%i:"
 				              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-				    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, flags._.GPS_steering,
+				    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
 				    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 				    rmat[0], rmat[1], rmat[2],
 				    rmat[3], rmat[4], rmat[5],
@@ -661,14 +663,16 @@ void serial_output_8hz(void)
 			else
 			{
 				int16_t i;
+				vect3_16t goal;
+				navigate_get_goal(&goal);
 				for (i= 1; i <= NUM_INPUTS; i++)
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
 				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:AF%i,%i,%i:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
 				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
-				    flags.WW, osc_fail_count,
-				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.height, aero_force[0], aero_force[1], aero_force[2]);
+				    state_flags.WW, osc_fail_count,
+				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z);
 //				serial_output("tmp%i:prs%li:alt%li:agl%li:",
 //				    get_barometer_temperature(), get_barometer_pressure(), 
 //				    get_barometer_alt(), get_barometer_agl());
@@ -689,20 +693,20 @@ extern int16_t udb_magOffset[3];
 			    serial_output("\r\n");
 
 #endif // SERIAL_OUTPUT_FORMAT
-			if (flags._.f13_print_req == 1)
+			if (state_flags._.f13_print_req == 1)
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 				if (toggle) return;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
-                                serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
-                                for (i = 1; i <= NUM_INPUTS; i++)
-                                {
-                                        serial_output("%i,",udb_pwTrim[i]);
-                                }
-                                serial_output(":\r\n");
-				flags._.f13_print_req = 0;
+				serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
+				for (i = 1; i <= NUM_INPUTS; i++)
+				{
+					serial_output("%i,",udb_pwTrim[i]);
+				}
+				serial_output(":\r\n");
+				state_flags._.f13_print_req = 0;
 			}
 			break;
 		}
@@ -720,7 +724,7 @@ extern int16_t udb_magOffset[3];
 
 #warning SERIAL_OSD_REMZIBI undergoing merge to trunk
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	// TODO: Output interesting information for OSD.
 	// But first we'll have to implement a buffer for passthrough characters to avoid
@@ -750,7 +754,7 @@ extern int16_t I2interrupts;
 #define I2CSTATREG I2CSTAT
 #endif
 /*
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	serial_output("MagMessage: %i\r\nI2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\nMessages: %i\r\nInterrupts: %i\r\n\r\n",
 	    magMessage,
@@ -759,7 +763,7 @@ void serial_output_8hz(void)
 }
  */
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
@@ -785,7 +789,7 @@ void serial_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_CAM_TRACK)
 
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 	uint8_t checksum = 0;
 	checksum += ((union intbb)(IMUlocationx._.W1))._.B0 + ((union intbb)(IMUlocationx._.W1))._.B1;
@@ -808,10 +812,10 @@ void serial_output_8hz(void)
 #else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
 
 #if (USE_OSD != OSD_MINIM) && (USE_OSD != OSD_REMZIBI)
-void serial_output_8hz(void)
+void telemetry_output_8hz(void)
 {
 }
 #endif // USE_OSD
 
 #endif
-#endif // (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+#endif // SERIAL_OUTPUT_FORMAT

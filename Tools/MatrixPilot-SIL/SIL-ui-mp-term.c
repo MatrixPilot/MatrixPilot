@@ -126,8 +126,6 @@ static void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int del
 	}
 }
 
-void save_config(void);
-
 #define KEYPRESS_INPUT_DELTA 50
 
 static int sil_handle_key_input(char c)
@@ -224,7 +222,7 @@ static int sil_handle_key_input(char c)
 					
 				case '9':
 					printf("Saving Params to ini file\r\n");
-					save_config();
+					config_save();
 					break;
 					
 				default:

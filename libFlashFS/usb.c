@@ -313,8 +313,12 @@ void USBCBInitEP(void)
 		USBEnableEndpoint(MSD_DATA_OUT_EP,USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
 	#endif
 
+#ifdef USB_USE_MSD
 	USBMSDInit();
+#endif
+#ifdef USB_USE_CDC
 	CDCInitEP();
+#endif
 }
 
 /********************************************************************

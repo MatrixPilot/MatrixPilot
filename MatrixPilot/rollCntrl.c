@@ -24,6 +24,7 @@
 #include "behaviour.h"
 #include "servoPrepare.h"
 #include "states.h"
+#include "helicalTurnCntrl.h"
 #include "../libDCM/rmat.h"
 
 #if (USE_CONFIGFILE == 1)
@@ -51,16 +52,16 @@ void init_rollCntrl(void)
 	hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX);
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_rollCntrl(void)
 {
+#if (USE_CONFIGFILE == 1)
 	gains.YawKDAileron = (float)yawkdail    / (SCALEGYRO*RMAX);
 	gains.RollKP       = (float)rollkp      / (RMAX);
 	gains.RollKD       = (float)rollkd      / (SCALEGYRO*RMAX);
 	gains.HoverRollKP  = (float)hoverrollkp / (SCALEGYRO*RMAX);
 	gains.HoverRollKD  = (float)hoverrollkd / (SCALEGYRO*RMAX);
-}
 #endif // USE_CONFIGFILE
+}
 
 void rollCntrl(void)
 {
@@ -91,9 +92,9 @@ void normalRollCntrl(void)
 	}
 
 #ifdef TestGains
-	flags._.pitch_feedback = 1;
+	state_flags._.pitch_feedback = 1;
 #endif
-	if (ROLL_STABILIZATION_AILERONS && flags._.pitch_feedback)
+	if (ROLL_STABILIZATION_AILERONS && state_flags._.pitch_feedback)
 	{
 		gyroRollFeedback.WW = - __builtin_mulus(rollkd, rotationRateError[1]);
 		rollAccum.WW -= __builtin_mulsu(tiltError[1], rollkp);
@@ -103,7 +104,7 @@ void normalRollCntrl(void)
 	{
 		gyroRollFeedback.WW = 0;
 	}
-	if (YAW_STABILIZATION_AILERON && flags._.pitch_feedback)
+	if (YAW_STABILIZATION_AILERON && state_flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW = - __builtin_mulus(yawkdail, omegaAccum2);
 	}
@@ -120,11 +121,11 @@ void hoverRollCntrl(void)
 	int16_t rollNavDeflection;
 	union longww gyroRollFeedback;
 
-	if (flags._.pitch_feedback)
+	if (state_flags._.pitch_feedback)
 	{
-		if (AILERON_NAVIGATION && flags._.GPS_steering)
+		if (AILERON_NAVIGATION && state_flags._.GPS_steering)
 		{
-			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? determine_navigation_deflection('h') : 0;
+			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? navigate_determine_deflection('h') : 0;
 		}
 		else
 		{

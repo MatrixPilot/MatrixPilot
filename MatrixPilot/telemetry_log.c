@@ -18,12 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#if (AUAV3 == 1)
 
 #include "defines.h"
 #include "../libUDB/heartbeat.h"
+#include "telemetry.h"
 #include "telemetry_log.h"
-#if (WIN == 1 || NIX == 1)
+#if (WIN == 1 || NIX == 1 || PX4 == 1)
 #include <stdio.h>
 #include "../Tools/MatrixPilot-SIL/SIL-filesystem.h"
 #else
@@ -36,7 +36,7 @@ extern void restart_telemetry(void);
 extern boolean inflight_state(void);
 
 
-#if (WIN == 1 || NIX == 1)
+#if (WIN == 1 || NIX == 1 || PX4 == 1)
 #define FSFILE    FILE
 #define FSfopen   fopen
 #define FSfclose  fclose
@@ -82,7 +82,7 @@ static int16_t log_append(char* logbuf, int index, const char* data, int len)
 }
 
 // called from telemetry module at interrupt level to buffer new log data
-void log_telemetry(char* data, int len)
+void log_telemetry(const char* data, int len)
 {
 	if (lb_in_use == 1)
 	{
@@ -128,27 +128,6 @@ static int fs_nextlog(char* filename)
 	return 0;
 }
 
-// called at startup to initialise the telemetry log system
-void log_init(void)
-{
-//	init_dataflash(); // this should now be getting device specific called from lower layers via FSInit()
-	if (!FSInit())
-	{
-#ifdef USE_AT45D_FLASH
-		AT45D_FormatFS();
-#elif (WIN == 1) || (NIX == 1)
-#else
-#warning No Mass Storage Device Format Function Defined
-#endif // USE_AT45D_FLASH
-		if (!FSInit())
-		{
-			printf("File system initialisation failed\r\n");
-			return;
-		}
-	}
-	printf("File system initalised\r\n");
-}
-
 static void log_open(void)
 {
 	static uint8_t log_error = 0;
@@ -165,7 +144,7 @@ static void log_open(void)
 	{
 		lb1_end_index = 0;  // empty the logfile ping-pong buffers
 		lb2_end_index = 0;
-		restart_telemetry();// signal telemetry to send startup data again
+		telemetry_restart();// signal telemetry to send startup data again
 		printf("%s opened\r\n", logfile_name);
 	}
 	else
@@ -219,7 +198,7 @@ static void log_write(const char* str, int len)
 {
 	if (fsp)
 	{
-		LED_BLUE = LED_ON;
+		led_on(LED_BLUE);
 		if (FSfwrite(str, 1, len, fsp) != len)
 		{
 			DPRINT("ERROR: FSfwrite\r\n");
@@ -249,5 +228,3 @@ void telemetry_log(void)
 	}
 	log_check();
 }
-
-#endif // (AUAV3 == 1)

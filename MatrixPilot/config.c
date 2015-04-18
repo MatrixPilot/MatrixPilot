@@ -26,8 +26,6 @@
 #include "navigate.h"
 #include "airspeedCntrl.h"
 
-#if (USE_CONFIGFILE == 1)
-
 #include "minIni.h"
 
 union settings_word settings;
@@ -135,6 +133,7 @@ static void load_settings(void)
 static void save_settings(void)
 {
 }
+
 /*
 [ALTITUDE]
 # NONE = 0, FULL = 1, PITCH = 2
@@ -150,13 +149,13 @@ static void load_gains(void)
 	gains.RollKD = ini_getf(strRoll, "rollkd", ROLLKD, strConfigFile);
 	gains.YawKPAileron = ini_getf(strRoll, "yawkp", YAWKP_AILERON, strConfigFile);
 	gains.YawKDAileron = ini_getf(strRoll, "yawkd", YAWKD_AILERON, strConfigFile);
-	gains.AileronBoost = ini_getf(strRoll, "boost", AILERON_BOOST, strConfigFile);
+//	gains.AileronBoost = ini_getf(strRoll, "boost", AILERON_BOOST, strConfigFile);
 
 // Elevator/Pitch Control Gains
 	gains.Pitchgain = ini_getf(strPitch, "gain", PITCHGAIN, strConfigFile);
 	gains.PitchKD = ini_getf(strPitch, "pitchkd", PITCHKD, strConfigFile);
-	gains.RudderElevMix = ini_getf(strPitch, "rudder", RUDDER_ELEV_MIX, strConfigFile);
-	gains.RollElevMix = ini_getf(strPitch, "roll", ROLL_ELEV_MIX, strConfigFile);
+//	gains.RudderElevMix = ini_getf(strPitch, "rudder", RUDDER_ELEV_MIX, strConfigFile);
+//	gains.RollElevMix = ini_getf(strPitch, "roll", ROLL_ELEV_MIX, strConfigFile);
 	gains.ElevatorBoost = ini_getf(strPitch, "boost", ELEVATOR_BOOST, strConfigFile);
 	// = ini_getf(strPitch, "invert", INVERTED_NEUTRAL_PITCH, strConfigFile);
 
@@ -193,7 +192,6 @@ static void load_gains(void)
     gains.HoverPitchTowardsWP = ini_getf(strHover, "wp", HOVER_PITCH_TOWARDS_WP, strConfigFile);
     gains.HoverNavMaxPitchRadius = ini_getf(strHover, "radius", HOVER_NAV_MAX_PITCH_RADIUS, strConfigFile);
 }
-
 
 static void save_gains(void)
 {
@@ -245,8 +243,6 @@ static void save_gains(void)
 	ini_putf(strHover, "wp", gains.HoverPitchTowardsWP, strConfigFile);
 	ini_putf(strHover, "radius", gains.HoverNavMaxPitchRadius, strConfigFile);
 }
-
-//#endif // USE_CONFIGFILE
 
 void config_load(void)
 {

@@ -19,10 +19,14 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB_internal.h"
+#include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "heartbeat.h"
+#include "servoOut.h"
+#include "analogs.h"
+#include "radioIn.h"
+#include "../libDCM/rmat.h"
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif
@@ -34,7 +38,7 @@ int one_hertz_flag = 0;
 uint16_t udb_heartbeat_counter = 0;
 #define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
-static void pulse(void);    // forward declaration
+static void heartbeat_pulse(void);    // forward declaration
 
 //#define HEARTBEAT_FREQ(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
 //#define HEARTBEAT_CHK(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
@@ -50,6 +54,8 @@ inline uint16_t heartbeat_cnt(void)
 	return udb_heartbeat_counter;
 }
 
+// NOTE: RobD - udb_heartbeat_counter is not being used at the libUDB layer
+//              outside of this module, so it could be moved up.
 inline void heartbeat(void) // called from ISR
 {
 	// Start the sequential servo pulses at frequency SERVO_HZ
@@ -66,24 +72,30 @@ inline void heartbeat(void) // called from ISR
 	}
 
 	// TODO: determine why this is called from the high priority interrupt handler? is it req?
+	// This calls the state machine implemented in MatrixPilot/states.c
+	// it is called at high priority to ensure manual control takeover can
+	// occur, even if the lower priority tasks hang
 	// Call the periodic callback at 40 Hz
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
 	{
+		// by default runs the MatrixPilot state machine in states.c
 		udb_heartbeat_40hz_callback(); // this was called udb_background_callback_periodic()
 	}
 
 	// Trigger the HEARTBEAT_HZ calculations, but at a lower priority
 //	_T6IF = 1;
-	udb_background_trigger_pulse(&pulse);
-
+	udb_background_trigger_pulse(&heartbeat_pulse);
+	// TODO: RobD - potential inversion issue here with incrementing the counter
+	//              before versus after the pulse occurs, depending on the
+	//              trigger implementation..
 	udb_heartbeat_counter = (udb_heartbeat_counter+1) % HEARTBEAT_MAX;
 }
 
 // Executes whatever lower priority calculation needs to be done every heartbeat (default: 25 milliseconds)
 // This is a good place to eventually compute pulse widths for servos.
-static void pulse(void)
+static void heartbeat_pulse(void)
 {
-	LED_BLUE = LED_OFF;     // indicates logfile activity
+	led_off(LED_BLUE);  // indicates logfile activity
 
 #if (NORADIO != 1)
 	// 20Hz testing of radio link

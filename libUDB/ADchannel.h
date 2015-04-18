@@ -23,4 +23,26 @@
 #define AD_CHANNEL_H
 
 
+struct ADchannel {
+	int16_t input;  // raw input
+	int16_t value;  // average of the sum of inputs between report outs
+	int16_t offset; // baseline at power up 
+	int32_t sum;    // used as an integrator
+}; // variables for processing an AD channel
+
+
+extern struct ADchannel udb_xaccel;
+extern struct ADchannel udb_yaccel;
+extern struct ADchannel udb_zaccel;
+extern struct ADchannel udb_xrate;
+extern struct ADchannel udb_yrate;
+extern struct ADchannel udb_zrate;
+
+extern struct ADchannel udb_vref;
+
+extern struct ADchannel udb_analogInputs[];
+
+void udb_a2d_record_offsets(void);
+
+
 #endif // AD_CHANNEL_H

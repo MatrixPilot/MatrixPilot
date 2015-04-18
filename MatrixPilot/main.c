@@ -27,7 +27,10 @@
 #include "states.h"
 #include "console.h"
 #include "flightplan-waypoints.h"
+#include "mavlink_options.h"
 #include <setjmp.h>
+
+//#include "../libFlashFS/filesys.h"
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -41,11 +44,52 @@
 #include "console.h"
 #endif
 
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
+#if (USE_MAVLINK == 1)
 void parameter_table_init(void);
 #endif
 
 static jmp_buf buf;
+
+int matrixpilot_init(void)
+{
+#if (USE_USB == 1)
+	preflight();    // perhaps this would be better called usb_init()
+#endif
+	gps_init();     // this sets function pointers so i'm calling it early for now
+	udb_init();     // configure clocks and enables global interrupts
+//	filesys_init(); // attempts to mount a file system
+	config_init();  // reads .ini files otherwise initialises with defaults
+	dcm_init();
+#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
+//	init_waypoints();
+#endif
+	init_servoPrepare();
+	init_states();
+	init_behavior();
+	init_serial();
+
+#ifdef _MSC_VER
+#if (USE_MAVLINK == 1)
+	parameter_table_init();
+#endif // (USE_MAVLINK == 1)
+#endif // _MSC_VER
+	return 0;
+}
+
+int matrixpilot_loop(void)
+{
+#if (USE_TELELOG == 1)
+	telemetry_log();
+#endif
+#if (USE_USB == 1)
+	USBPollingService();
+#endif
+#if (CONSOLE_UART != 0 && SILSIM == 0)
+	console();
+#endif
+	udb_run();
+	return 0;
+}
 
 #if (SILSIM == 1)
 int mp_argc;
@@ -60,48 +104,16 @@ int main(void)
 {
 	mcu_init();     // initialise the processor specific registers
 #endif
-#if (USE_TELELOG == 1)
-	log_init();
-#endif
-#if (USE_USB == 1)
-	preflight();    // perhaps this would be better called usb_init()
-#endif
-	gps_init();     // this sets function pointers so i'm calling it early for now
-	udb_init();
-	dcm_init();
-	init_config();  // this will need to be moved up in order to support runtime hardware options
-#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
-	init_waypoints();
-#endif
-	init_servoPrepare();
-	init_states();
-	init_behavior();
-	init_serial();
+	matrixpilot_init();
 
 	if (setjmp(buf))
 	{
-		// a processor exception occurred and we're resuming execution here 
+		// a processor exception occurred and we're resuming execution here
 		DPRINT("longjmp'd\r\n");
 	}
-
-#ifdef _MSC_VER
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK) 
-	parameter_table_init();
-#endif // SERIAL_OUTPUT_FORMAT
-#endif // _MSC_VER
-
 	while (1)
 	{
-#if (USE_TELELOG == 1)
-		telemetry_log();
-#endif
-#if (USE_USB == 1)
-		USBPollingService();
-#endif
-#if (CONSOLE_UART != 0 && SILSIM == 0)
-		console();
-#endif
-		udb_run();
+		matrixpilot_loop();
 	}
 	return 0;
 }

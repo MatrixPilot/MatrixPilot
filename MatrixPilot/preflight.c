@@ -20,6 +20,9 @@
 
 
 #include "defines.h"
+
+#if (USE_USB == 1)
+
 #include "../libUDB/oscillator.h"
 #if (CONSOLE_UART != 0)
 #include "console.h"
@@ -34,7 +37,7 @@
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
 #include <stdio.h>
-#include "usb_cdc.h"
+#include "../libFlashFS/usb_cdc.h"
 
 #if (HILSIM_USB != 1) && (CONSOLE_UART != 9)
 
@@ -70,20 +73,22 @@ void preflight(void)
 		if ((USBDeviceState < CONFIGURED_STATE)||(USBSuspendControl==1)) {
 			// do nothing
 		} else {
-#if (USE_MSD != 0)
+#if (USE_MSD == 1)
 			MSDTasks();
 #endif
+#if (USE_CDC == 1)
 			CDCTasks();
+#endif
 		}
 #if (CONSOLE_UART != 0)
 		console();
 #endif
 	}
 
-	LED_RED = LED_OFF;
-	LED_BLUE = LED_OFF;
-	LED_GREEN = LED_OFF;
-	LED_ORANGE = LED_OFF;
+	led_off(LED_RED);
+	led_off(LED_BLUE);
+	led_off(LED_GREEN);
+	led_off(LED_ORANGE);
 
 	printf("Preflight complete\r\n");
 }
@@ -133,12 +138,15 @@ void USBPollingService(void)
 		}
 		else
 		{
-#if (USE_MSD != 0)
+#if (USE_MSD == 1)
 			MSDTasks();
 #endif
+#if (USE_CDC == 1)
 			CDCTasks();
+#endif
 		}
 	}
 }
 
 #endif // (BOARD_TYPE == AUAV3_BOARD)
+#endif // (USE_USB == 1)

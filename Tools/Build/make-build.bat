@@ -1,16 +1,16 @@
 @echo off
 
-pyProjectCreator.py -t SIL   -r ../..
-pyProjectCreator.py -t UDB4  -r ../..
-pyProjectCreator.py -t UDB5  -r ../..
-pyProjectCreator.py -t AUAV3 -r ../..
+pyProjectCreator.py -r ../.. -t SIL
+pyProjectCreator.py -r ../.. -t UDB4
+pyProjectCreator.py -r ../.. -t UDB5
+pyProjectCreator.py -r ../.. -t AUAV3
 
-pyProjectCreator.py -n RollPitchYaw -t UDB4  -r ../..
-pyProjectCreator.py -n RollPitchYaw -t UDB5  -r ../..
-pyProjectCreator.py -n RollPitchYaw -t AUAV3 -r ../..
+pyProjectCreator.py -r ../.. -n RollPitchYaw -t UDB4
+pyProjectCreator.py -r ../.. -n RollPitchYaw -t UDB5
+pyProjectCreator.py -r ../.. -n RollPitchYaw -t AUAV3
 
-pyProjectCreator.py -n LedTest -t UDB4   -r ../..
-pyProjectCreator.py -n LedTest -t UDB5   -r ../..
-pyProjectCreator.py -n LedTest -t AUAV3  -r ../..
+pyProjectCreator.py -r ../.. -n LedTest -t UDB4
+pyProjectCreator.py -r ../.. -n LedTest -t UDB5
+pyProjectCreator.py -r ../.. -n LedTest -t AUAV3
 
 pause

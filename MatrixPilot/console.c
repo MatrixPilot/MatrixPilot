@@ -289,6 +289,12 @@ static void cmd_close(char* arg)
 #endif
 }
 
+//void navigate_print(void);
+static void cmd_nav(char* arg)
+{
+//	navigate_print();
+}
+
 const cmds_t cmdslist[] = {
 	{ 0, cmd_help,   "help" },
 	{ 0, cmd_ver,    "ver" },
@@ -303,6 +309,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_barom,  "bar" },
 	{ 0, cmd_cpuload,"cpu" },
 	{ 0, cmd_magno,  "mag" },
+	{ 0, cmd_magno,  "nav" },
 	{ 0, cmd_crash,  "crash" },
 	{ 0, cmd_gains,  "gains" },
 	{ 0, cmd_options,"options" },
