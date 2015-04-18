@@ -45,10 +45,12 @@
 
 extern TIM_HandleTypeDef htim10;
 extern TIM_HandleTypeDef htim5;
+extern TIM_HandleTypeDef htim3;
 
 void MX_TIM10_Init(void);
 void MX_TIM5_Init(void);
-void MX_TIM4_Init(void);
+void MX_TIM3_Init(void);
+//void MX_TIM4_Init(void);
 
 void start_ic(void);
 

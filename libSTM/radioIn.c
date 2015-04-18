@@ -59,7 +59,7 @@
 
 //TODO: What TMR_FACTOR will be needed by our uC?
 //ANSW: TMR_FACTOR depends on Fcore and time base of each timer.
-//In this case I have Fcore 84mhz and timer 5 is configured at 2MHz, so TMR_FACTOR
+//In this case I have Fcore 84mhz and timer 5 is configured at 1MHz, so TMR_FACTOR
 //have to be 4
 #define TMR_FACTOR 4
 
@@ -77,9 +77,6 @@
 // The pulse width inputs can be directly converted to units of pulse width outputs to control
 // the servos by simply dividing by 2. (need to check validity of this statement - RobD)
 
-//why we are using NUM_INPUTS+1? this would be 8+1=9, but in fact it reserve 8 positions
-//int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
-//int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 int16_t udb_pwIn[NUM_INPUTS];       // pulse widths of radio inputs
 int16_t udb_pwTrim[NUM_INPUTS];     // initial pulse widths for trimming
 
@@ -99,7 +96,6 @@ uint8_t radioIn_getInput(int16_t* ppm, uint8_t channels)
 
 	for (c = 0; c < channels; c++)
 	{
-//		ppm[c+1] = udb_pwIn[c+1];   //TODO: it is ok c+1 or i need to use c?
 		ppm[c] = udb_pwIn[c];
 	}
 	return MODE_SWITCH_INPUT_CHANNEL; // make this define specific to each ppm input device
@@ -226,117 +222,120 @@ static void set_udb_pwIn(int pwm, int index)
 
 /* In global HAL ISR for TIMER, before check the source of Interrupt, it call this function */
 // There is just one IC_HANDLER callback for any IC
+
+// USE_PPM_INPUT will always be 1 or 2 because we always use PPM signal
 #if (USE_PPM_INPUT == 0)
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
-
-	uint16_t time = 0;
-	static uint16_t rise=0;
-
-    if( htim->Instance == TIM5 )
-	{
-		/* CHANNEL 1 called ISR */
-		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-		{
-			// Get the Captured timer
-		//	time = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_1);
-			// Is it ok? I remove a warning passing htim instead of &htim, but it is ok?
-			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-			if (IC_PIN1) //Rising edge?
-			{
-				// There is a problem with this approach. if previous capture were 65000 and current capture is 23 so
-				// 23-65000 -> overflow. I think that this is filtered out by noise filter function
+//void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 //
-// NOTE: i hope not! if this condition can exist then we should detect the counter rollover
-//       and perform the arithmatic appropriately.. (RobD)
+//	uint16_t time = 0;
+//	static uint16_t rise=0;
 //
-				rise = time;
-			}
-			else // falling edge
-			{
-				set_udb_pwIn(rise-time, 1); // Return captured timer
-			}
-		}
-		/* CHANNEL 2 called ISR */
-		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
-		{
-			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-			if (IC_PIN2)
-			{
-				rise = time;
-			}
-			else
-			{
-				set_udb_pwIn(rise-time, 2);
-			}
-		}
-	}
-	else if (htim->Instance == TIM4)
-	{
-		/* CHANNEL 1 called ISR */
-		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-		{
-			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-			if (IC_PIN3)
-			{
-				rise = time;
-			}
-			else
-			{
-				set_udb_pwIn(rise-time, 3);
-			}
-		}
-		/* CHANNEL 2 called ISR */
-		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
-		{
-			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-			if (IC_PIN4)
-			{
-				rise = time;
-			}
-			else
-			{
-				set_udb_pwIn(rise-time, 4);
-			}
-		}
-			/* CHANNEL 3 called ISR */
-		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
-		{
-			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-			if (IC_PIN5)
-			{
-				rise = time;
-			}
-			else
-			{
-				set_udb_pwIn(rise-time, 5);
-			}
-		}
-		/* CHANNEL 4 called ISR */
-		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4)
-		{
-			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
-			if (IC_PIN6)
-			{
-				rise = time;
-			}
-			else
-			{
-				set_udb_pwIn(rise-time, 6);
-			}
-		}
-	}
-}
+//    if( htim->Instance == TIM5 )
+//	{
+//		/* CHANNEL 1 called ISR */
+//		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+//		{
+//			// Get the Captured timer
+//		//	time = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_1);
+//			// Is it ok? I remove a warning passing htim instead of &htim, but it is ok?
+//			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+//			if (IC_PIN1) //Rising edge?
+//			{
+//				// There is a problem with this approach. if previous capture were 65000 and current capture is 23 so
+//				// 23-65000 -> overflow. I think that this is filtered out by noise filter function
+////
+//// NOTE: i hope not! if this condition can exist then we should detect the counter rollover
+////       and perform the arithmatic appropriately.. (RobD)
+////
+//				rise = time;
+//			}
+//			else // falling edge
+//			{
+//				set_udb_pwIn(rise-time, 1); // Return captured timer
+//			}
+//		}
+//		/* CHANNEL 2 called ISR */
+//		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+//		{
+//			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+//			if (IC_PIN2)
+//			{
+//				rise = time;
+//			}
+//			else
+//			{
+//				set_udb_pwIn(rise-time, 2);
+//			}
+//		}
+//	}
+//	else if (htim->Instance == TIM4)
+//	{
+//		/* CHANNEL 1 called ISR */
+//		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+//		{
+//			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+//			if (IC_PIN3)
+//			{
+//				rise = time;
+//			}
+//			else
+//			{
+//				set_udb_pwIn(rise-time, 3);
+//			}
+//		}
+//		/* CHANNEL 2 called ISR */
+//		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+//		{
+//			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+//			if (IC_PIN4)
+//			{
+//				rise = time;
+//			}
+//			else
+//			{
+//				set_udb_pwIn(rise-time, 4);
+//			}
+//		}
+//			/* CHANNEL 3 called ISR */
+//		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
+//		{
+//			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+//			if (IC_PIN5)
+//			{
+//				rise = time;
+//			}
+//			else
+//			{
+//				set_udb_pwIn(rise-time, 5);
+//			}
+//		}
+//		/* CHANNEL 4 called ISR */
+//		else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4)
+//		{
+//			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
+//			if (IC_PIN6)
+//			{
+//				rise = time;
+//			}
+//			else
+//			{
+//				set_udb_pwIn(rise-time, 6);
+//			}
+//		}
+//	}
+//}
 #else // (USE_PPM_INPUT != 0)
 
-	#if (PPM_SIGNAL_INVERTED == 1)
-	#define PPM_PULSE_VALUE 0
-	#else
-	#define PPM_PULSE_VALUE 1
-	#endif
+//I'm not using this, because I check signal on one edge.
+#if (PPM_SIGNAL_INVERTED == 1)
+#define PPM_PULSE_VALUE 0
+#else
+#define PPM_PULSE_VALUE 1
+#endif
 
 /*
-PPM_3: PPM1 with PPM_PULSE_VALUE = 1
+PPM_3: Similar to PPM1. PW is time between 2 Rising edge
 
        1     2       3        4      5       6      7
    ___   ___   ___       ___    ___     ___     ___
@@ -345,7 +344,7 @@ PPM_3: PPM1 with PPM_PULSE_VALUE = 1
 __|   |_|   |_|   |_____|   |__|   |___|   |___|   |____
 
 
-PPM_2
+PPM_2: PW is time between Rising and falling edge
 
     1   2  3  4   5  6  7
    ___     _     ___   ___
@@ -365,20 +364,13 @@ __|   |_|   |_| |___|   |_|   |_| |___|   |____
  */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 
-//	extern int one_hertz_flag;
-
-//	indicate_loading_inter;
-//	interrupt_save_set_corcon;
-
 	static uint16_t rise_ppm = 0;
 	static uint8_t ppm_ch = 0;
 	uint16_t time = 0;
 
-	if (htim->Instance == TIM5)
+	if (htim->Instance == TIM5)     //We use TIMER5 for PPM decode
 	{
-
-		/* CHANNEL 1 called ISR */
-		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)  //We use CHANNEL_2 -> PA1
 		{
 			time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
             //TODO: Check that time is > than rise_ppm
@@ -388,20 +380,10 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 #if (USE_PPM_INPUT == 1)    //Type 1. The only one that I'd tested
             if (pulse > MIN_SYNC_PULSE_WIDTH)   //Looking for long pulse time to get synchronized with CH1
             {
-    //			if (one_hertz_flag)
-    //			{
-    //				one_hertz_flag = 0;
-    //				DPRINT("**: %u %u\r\n", pulse, MIN_SYNC_PULSE_WIDTH);
-    //			}
                 ppm_ch = 0;
             }
             else
             {
-    //			if (one_hertz_flag)
-    //			{
-    //				one_hertz_flag = 0;
-    //				DPRINT("--: %u\r\n", pulse);
-    //			}
                 if (ppm_ch >= 0 && ppm_ch < PPM_NUMBER_OF_CHANNELS)
                 {
                     if (ppm_ch < NUM_INPUTS)
@@ -411,24 +393,13 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
                     ppm_ch++;
                 }
             }
-		//		if (one_hertz_flag)
-		//		{
-		//			one_hertz_flag = 0;
-		//			DPRINT("DIS %u\r\n", time);
-		//		}
-//			}
-        }
-#elif (USE_PPM_INPUT == 2)      //Type 2.
 
-			//TODO: Use PPM_IC to get IC_PINx
-//			if ((IC_PIN2) == PPM_PULSE_VALUE)
-//			{
-				if (pulse > MIN_SYNC_PULSE_WIDTH)
-				{
-				    ppm_ch = 0;
-//					ppm_ch = 1;     //We are loosing ch0 with it
-				}
-//			}
+        }
+#elif (USE_PPM_INPUT == 2)      //TODO: I need to rewrite this. I will need to config IC on both edge....
+            if (pulse > MIN_SYNC_PULSE_WIDTH)
+            {
+                ppm_ch = 0;
+            }
 			else
 			{
 			    //NOTE: Why check this?
@@ -450,7 +421,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 #error Invalid USE_PPM_INPUT setting
 #endif // USE_PPM_INPUT
 	}
-//	interrupt_restore_corcon;
 }
 #endif
 

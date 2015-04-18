@@ -95,7 +95,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART6_UART_Init();
   MX_TIM5_Init();     //Input Capture CH1 and CH2 timer base
-//	MX_TIM4_Init();     //Input Capture CH3 to CH6 timer base
+  MX_TIM3_Init();       //PWM Output CH1 to CH4
 
   /* USER CODE BEGIN 2 */
     radioIn_init();     //elgarbe**************************************************
