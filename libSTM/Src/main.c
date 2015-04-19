@@ -165,7 +165,7 @@ void StartDefaultTask(void const * argument)
   /*## FatFS: Link the SD driver ###########################*/
   retSD = FATFS_LinkDriver(&SD_Driver, SD_Path);
 
-int16_t pw[9];
+int16_t pw[8];
 
   /* USER CODE BEGIN 5 */
 
@@ -184,10 +184,13 @@ int16_t pw[9];
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 		HAL_Delay(25); // should give us very roughly 40Hz
 
-		if (++i > 40){
-            radioIn_getInput(pw, 8);
-            i=0;
-		}
+//		if (++i > 5){
+        // Read the inputs
+        radioIn_getInput(pw, 8);
+        // Update the servos
+        set_pwm_outputs(pw);
+//        i=0;
+//		}
 
 		if (tsirq)
 		{

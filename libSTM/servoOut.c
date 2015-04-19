@@ -129,3 +129,30 @@ void start_pwm_outputs(void)
 }
 
 
+// Call this to start sending out pulses to all the PWM output channels sequentially
+void set_pwm_outputs(uint16_t* pw)
+{
+    TIM_OC_InitTypeDef sConfigOC;
+
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+
+    //TODO: I need to check pw measurement because I need to divide by 2 again here
+    //NOTE: I don't be sure that this is the correct way to update duty cycle.
+    sConfigOC.Pulse = pw[0]/2;
+    HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+
+    sConfigOC.Pulse = pw[1]/2;
+    HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+
+    sConfigOC.Pulse = pw[2]/2;
+    HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+
+    sConfigOC.Pulse = pw[3]/2;
+    HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4);
+    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
+}
