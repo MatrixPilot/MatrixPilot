@@ -38,22 +38,13 @@ def redef(defines, sep):
 # configuration from makefile scripts
 #
 def parse_options_file(filename, option):
-	str = ''
+	str = ""
 	with open (filename, "r") as file:
 		data = file.read()
 		match = re.search(r"(^" + option + " .= )(.*$)", data, re.MULTILINE)
 		if match:
 			str = match.group(2)
 	return str
-#	return str.split(' ')
-
-def parse_mk_file(filename, option, list):
-	with open (filename, "r") as file:
-		data = file.read()
-		match = re.search(r"(^" + option + " .= )(.*$)", data, re.MULTILINE)
-		if match:
-			list.extend(match.group(2).split())
-	return list
 
 #
 # EXAMPLE MAKEFILE/OPTIONS FILE:
@@ -96,8 +87,17 @@ def mplab8_project(mcu_type, target_board, root_sep, config_dir, includes, proje
 #	config = ''
 #	for e in config_dir.split():
 #		config = config + root_sep + e + ';'
-	if not defines == '':
-		defines = ';' + defines
+
+#	extra_defs = ''
+#	for d in defines:
+#		if not d == '':
+#			extra_defs = extra_defs + " -D" + d
+#	extra_defs = extra_defs.strip()
+
+#	extra_defs = redef(defines, " -D").strip()
+
+#	extra_defs = defines.replace(";", " -D").strip()
+#	print "8extra_defs: ", extra_defs
 
 	with open (script_path + "mplab8-template.txt", "r") as file:
 		data = file.read()
@@ -109,6 +109,7 @@ def mplab8_project(mcu_type, target_board, root_sep, config_dir, includes, proje
 		data = data.replace("%%GENERATED_FILES%%", other_files)
 		data = data.replace("%%OTHER_FILES%%", other_files)
 		data = data.replace("%%FILE_INFO%%", file_info)
+#		data = data.replace("%%EXTRA_DEFS%%", extra_defs)
 		data = data.replace("%%EXTRA_DEFS%%", defines.replace(";", " -D").strip())
 	mkdirnotex(project_output_file)
 	with open (project_output_file, "w") as file:
@@ -170,12 +171,23 @@ def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, heade
 	for e in config_dir.split():
 		config = config + root_sep + e + ';'
 
+#	extra_defs = ""
+#	for d in defines:
+#		if not d == '':
+#			extra_defs = extra_defs + d + ";" 
+##			extra_defs = extra_defs + ";" + d
+#	extra_defs = extra_defs.strip(";")
+
+#	extra_defs = redef(defines, ";").strip(";")
+#	print "Vextra_defs: ", extra_defs
+
 	with open (script_path + "template.vcxproj", "r") as file:
 		data = file.read()
 		data = data.replace("%%CONFIG%%", config)
 		data = data.replace("%%INCLUDES%%", includes)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
 		data = data.replace("%%HEADER_FILES%%", header_files)
+#		data = data.replace("%%EXTRA_DEFS%%", extra_defs)
 		data = data.replace("%%EXTRA_DEFS%%", defines.strip(";"))
 	mkdirnotex(project_output_file)
 	with open (project_output_file, "w") as file:
@@ -247,6 +259,15 @@ def mplabX_project(mcu_type, name, target_board, root_sep, config_dir, includes,
 	for e in config_dir.split():
 		config = config + root_sep + e + ';'
 
+#	extra_defs = ''
+#	for d in defines:
+#		if not d == '':
+#			extra_defs = extra_defs + ";" + d
+#	extra_defs = extra_defs.strip(";")
+
+#	extra_defs = redef(defines, ";").strip(";")
+#	print "Xextra_defs: ", extra_defs
+
 	with open (script_path + "configurations.xml", "r") as file:
 		data = file.read()
 		data = data.replace("%%NAME%%", name)
@@ -256,6 +277,7 @@ def mplabX_project(mcu_type, name, target_board, root_sep, config_dir, includes,
 		data = data.replace("%%TARGET_BOARD%%", target_board)
 		data = data.replace("%%HEADER_FILES%%", header_files)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
+#		data = data.replace("%%EXTRA_DEFS%%", extra_defs)
 		data = data.replace("%%EXTRA_DEFS%%", defines.strip(";"))
 	with open (os.path.join(project_path, "configurations.xml"), "w") as file:
 		file.write(data)
@@ -280,13 +302,12 @@ if __name__ == '__main__':
 	parser.add_option("-d", "--def",    dest="defines",  help="additional preprocessor defines",         default=[], action='append')
 	parser.add_option("-i", "--inc",    dest="includes", help="additional include files directory",      default=[], action='append')
 	parser.add_option("-c", "--cfg",    dest="config",   help="specify configuration files directory",   default="")
-	parser.add_option("-o", "--out",    dest="out",      help="project files output path",               default="build")
+	parser.add_option("-o", "--out",    dest="out",      help="project files output path",               default="output")
 	parser.add_option("-r", "--root",   dest="root",     help="project root path",                       default=".")
 	parser.add_option("-f", "--file",   dest="file",     help="configuration file",                      default="")
 	(opts, args) = parser.parse_args()
 
 	rootdir = opts.root
-	opts.out = opts.root + "/" + opts.out
 
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/"
 	work = os.getcwd()
@@ -300,37 +321,27 @@ if __name__ == '__main__':
 	else:
 		arch = ""
 
-#	print "1opts.defines = ", opts.defines
-#
+#	print "defines: ", opts.defines
+
 # Parse options from the 'target-*.mk' specific makefile
 	target_mk_path = opts.root + "/target-" + opts.name + ".mk"
-#	opts.modules  = opts.modules  + parse_options_file(target_mk_path, "modules").split(' ')
-#	opts.defines  = opts.defines  + parse_options_file(target_mk_path, "defines").split(' ')
-#	opts.includes = opts.includes + parse_options_file(target_mk_path, "incpath").split(' ')
-#	opts.config   = opts.config   + parse_options_file(target_mk_path, "cfgpath")
+	opts.modules  = opts.modules  + parse_options_file(target_mk_path, "modules").split(' ')
+	opts.defines  = opts.includes + parse_options_file(target_mk_path, "defines").split(' ')
+	opts.includes = opts.includes + parse_options_file(target_mk_path, "incpath").split(' ')
+	opts.config   = opts.config   + parse_options_file(target_mk_path, "cfgpath")
 
-	opts.modules  = parse_mk_file(target_mk_path, "modules", opts.modules)
-	opts.defines  = parse_mk_file(target_mk_path, "defines", opts.defines)
-	opts.includes = parse_mk_file(target_mk_path, "incpath", opts.includes)
-	opts.config   = ''.join(parse_mk_file(target_mk_path, "cfgpath", [opts.config]))
+	opts.out = opts.root + "/build"
 
-#	print "2opts.defines = ", opts.defines
-#	print "opts.config = ", opts.config
-#
 # Parse extra options from the 'device-*.mk' specific makefile
 	opts.file = opts.root + "/device-" + opts.target + ".mk"
+
 	if opts.file != "":
-#		opts.modules  = opts.modules  + parse_options_file(opts.file, "modules").split(' ')
-#		opts.includes = opts.includes + parse_options_file(opts.file, "incpath").split(' ')
-#		opts.defines  = opts.defines  + parse_options_file(opts.file, "defines").split(' ')
+		opts.modules = opts.modules + parse_options_file(opts.file, "modules").split(' ')
+		opts.includes = opts.includes + parse_options_file(opts.file, "incpath").split(' ')
+		opts.defines = opts.defines + parse_options_file(opts.file, "defines").split(' ')
 		arch = "dsPIC" + parse_options_file(opts.file, "CPU")
 
-		opts.modules  = parse_mk_file(opts.file, "modules", opts.modules)
-		opts.includes = parse_mk_file(opts.file, "incpath", opts.includes)
-		opts.defines  = parse_mk_file(opts.file, "defines", opts.defines)
-		arch = ''.join(parse_mk_file(opts.file, "CPU", ["dsPIC"]))
-
-#	print "3opts.defines = ", opts.defines
+#	print "defines: ", opts.defines
 
 # TODO: perhaps we want to check that the modules list (etc) is not empty..
 
@@ -338,7 +349,15 @@ if __name__ == '__main__':
 	inc_list = [rootsep + str(x) for x in opts.includes]
 	includes = ';'.join(inc_list)
 
-	opts.defines = ";".join(opts.defines)
+#	extra_defs = opts.defines
+#	extra_defs = ''
+#	for d in opts.defines:
+#		if not d == '':
+#			extra_defs = extra_defs + ";" + d
+#	print "##extra_defs: ", extra_defs
+
+#	opts.defines = redef(opts.defines, ";").strip(";")
+	opts.defines = redef(opts.defines, ";")
 
 	filters = ""
 	project = os.path.join(opts.out, opts.name + "-" + opts.target)
@@ -360,6 +379,7 @@ if __name__ == '__main__':
 		mplab8_scan_dirs("*.h", opts.config.split() + opts.modules)
 		project_path = project + ".mcp"
 		print "writing: " + project_path
+#		mplab8_project(arch, opts.target, rootsep, opts.config, includes, project_path, extra_defs)
 		mplab8_project(arch, opts.target, rootsep, opts.config, includes, project_path, opts.defines)
 		headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.config.split() + opts.modules)
 		sources = mplabX_scan_dirs(["*.c", "*.s"], opts.modules)

@@ -11,7 +11,9 @@
 #include <stdio.h>
 #include "SIL-udb.h"
 #include "../../libUDB/libUDB.h"
-#include "../../libUDB/serialIO.h"
+//#include "../../libUDB/serialIO.h"
+#include "../../libDCM/gpsParseCommon.h"
+#include "../../MatrixPilot/MAVLink.h"
 #include "UDBSocket.h"
 
 UDBSocket gpsSocket;
@@ -84,7 +86,8 @@ void udb_serial_start_sending_data(void)
 
 	if (!telemetrySocket) return;
 
-	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
+//	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
+	while (pos < BUFLEN && (c = mavlink_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
 	}
 	bytesWritten = UDBSocket_write(telemetrySocket, (uint8_t*)buffer, pos);

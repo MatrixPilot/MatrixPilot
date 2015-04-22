@@ -199,9 +199,9 @@ static inline void read_accel(void)
 	gplane[0] = XACCEL_VALUE;
 	gplane[1] = YACCEL_VALUE;
 	gplane[2] = ZACCEL_VALUE;
-	aero_force[0] = - gplane[0] ;
-	aero_force[1] = - gplane[1] ;
-	aero_force[2] = - gplane[2] ;
+	aero_force[0] = - gplane[0];
+	aero_force[1] = - gplane[1];
+	aero_force[2] = - gplane[2];
 #endif
 
 #ifdef CATAPULT_LAUNCH_ENABLE

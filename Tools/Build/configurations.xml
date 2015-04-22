@@ -96,7 +96,7 @@
         <property key="pre-instruction-scheduling"
         value="default" />
         <property key="preprocessor-macros"
-        value="%%TARGET_BOARD%%" />
+        value="%%TARGET_BOARD%%=1;%%EXTRA_DEFS%%" />
         <property key="scalar-model" value="default" />
         <property key="use-cci" value="false" />
       </C30>

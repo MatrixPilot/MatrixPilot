@@ -130,7 +130,7 @@ inline void preflight_storage_complete_callback(boolean success);
 #endif // (USE_NV_MEMORY == 1)
 
 
-void init_mavlink(void)
+void mavlink_init(void)
 {
 	int16_t index;
 
@@ -148,23 +148,30 @@ void init_mavlink(void)
 	streamRates[MAV_DATA_STREAM_POSITION]    = MAVLINK_RATE_POSITION;
 	streamRates[MAV_DATA_STREAM_EXTRA1]      = MAVLINK_RATE_SUE;
 	streamRates[MAV_DATA_STREAM_EXTRA2]      = MAVLINK_RATE_POSITION_SENSORS;
-}
 
-void init_serial(void)
-{
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
 //#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
-	init_mavlink();
 }
 
-void telemetry_restart(void)
-{
-}
+//void init_serial(void)
+//{
+//#ifndef SERIAL_BAUDRATE
+//#define SERIAL_BAUDRATE 57600 // default
+////#pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
+//#endif
+//	udb_serial_set_rate(SERIAL_BAUDRATE);
+//	mavlink_init();
+//}
 
-int16_t udb_serial_callback_get_byte_to_send(void)
+//void telemetry_restart(void)
+//{
+//
+//}
+
+int16_t mavlink_callback_get_byte_to_send(void)
 {
 	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
 	{
@@ -318,7 +325,8 @@ static mavlink_message_t msg[2];
 static uint8_t mavlink_message_index = 0;
 static mavlink_status_t r_mavlink_status;
 
-void udb_serial_callback_received_byte(uint8_t rxchar)
+//void udb_serial_callback_received_byte(uint8_t rxchar)
+void mavlink_callback_received_byte(uint8_t rxchar)
 {
 //	DPRINT("%u \r\n", rxchar);
 
@@ -1041,12 +1049,12 @@ void mavlink_output_40hz(void)
 	{
 		MAVUDBExtraOutput_40hz();
 	}
-        // Send FORCE information
-        spread_transmission_load = 15;
+	// Send FORCE information
+	spread_transmission_load = 15;
 	if (mavlink_frequency_send(MAVLINK_RATE_FORCE, mavlink_counter_40hz + spread_transmission_load))
 	{
-                mavlink_msg_force_send(MAVLINK_COMM_0, msec, aero_force[0], aero_force[1], aero_force[2]);
-                //static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t aero_x, int16_t aero_y, int16_t aero_z)
+		mavlink_msg_force_send(MAVLINK_COMM_0, msec, aero_force[0], aero_force[1], aero_force[2]);
+//static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t aero_x, int16_t aero_y, int16_t aero_z)
 	}
 	MAVParamsOutput_40hz();
 	MAVMissionOutput_40hz();

@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "behaviour.h"
+#include "telemetry.h"
 #include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "config.h"
@@ -66,7 +67,8 @@ int matrixpilot_init(void)
 	init_servoPrepare();
 	init_states();
 	init_behavior();
-	init_serial();
+	telemetry_init();
+	mavlink_init();
 
 #ifdef _MSC_VER
 #if (USE_MAVLINK == 1)

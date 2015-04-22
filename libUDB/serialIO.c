@@ -36,8 +36,14 @@
 //
 // GPS
 
-void udb_init_GPS(void)
+static int16_callback_fptr_t gps_callback_get_byte_to_send_fptr = NULL;
+static callback_uint8_fptr_t gps_callback_received_byte_fptr = NULL;
+
+void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 {
+	gps_callback_get_byte_to_send_fptr = tx_fptr;
+	gps_callback_received_byte_fptr = rx_fptr;
+
 	// configure U1MODE
 	U1MODEbits.UARTEN = 0;      // Bit15 TX, RX DISABLED, ENABLE at end of func
 	//                          // Bit14
@@ -106,10 +112,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-#if (HILSIM_USB != 1)
-	int16_t txchar = udb_gps_callback_get_byte_to_send();
-#else
 	int16_t txchar = -1;
+
+#if (HILSIM_USB != 1)
+//	int16_t txchar = udb_gps_callback_get_byte_to_send();
+	if (gps_callback_get_byte_to_send_fptr)
+	{
+		txchar = gps_callback_get_byte_to_send_fptr();
+	}
 #endif // HILSIM_USB
 	if (txchar != -1)
 	{
@@ -128,7 +138,11 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 	{
 		uint8_t rxchar = U1RXREG;
 #if (HILSIM_USB != 1)
-		udb_gps_callback_received_byte(rxchar);
+//		udb_gps_callback_received_byte(rxchar);
+		if (gps_callback_received_byte_fptr)
+		{
+			gps_callback_received_byte_fptr(rxchar);
+		}
 #endif // HILSIM_USB
 	}
 	U1STAbits.OERR = 0;
@@ -139,8 +153,14 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
 
-void udb_init_USART(void)
+static int16_callback_fptr_t serial_callback_get_byte_to_send = NULL;
+static callback_uint8_fptr_t serial_callback_received_byte = NULL;
+
+void udb_init_USART(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 {
+	serial_callback_get_byte_to_send = tx_fptr;
+	serial_callback_received_byte = rx_fptr;
+
 	// configure U2MODE
 	U2MODEbits.UARTEN = 0;      // Bit15 TX, RX DISABLED, ENABLE at end of func
 	//                          // Bit14
@@ -207,7 +227,12 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 	indicate_loading_inter;
 	interrupt_save_set_corcon;
 
-	int16_t txchar = udb_serial_callback_get_byte_to_send();
+//	int16_t txchar = udb_serial_callback_get_byte_to_send();
+	int16_t txchar = -1;
+	if (serial_callback_get_byte_to_send)
+	{
+		txchar = serial_callback_get_byte_to_send();
+	}
 	if (txchar != -1)
 	{
 		U2TXREG = (uint8_t)txchar;
@@ -224,7 +249,11 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 	while (U2STAbits.URXDA)
 	{
 		uint8_t rxchar = U2RXREG;
-		udb_serial_callback_received_byte(rxchar);
+//		udb_serial_callback_received_byte(rxchar);
+		if (serial_callback_received_byte)
+		{
+			serial_callback_received_byte(rxchar);
+		}
 	}
 	U2STAbits.OERR = 0;
 	interrupt_restore_corcon;

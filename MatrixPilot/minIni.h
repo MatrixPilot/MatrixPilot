@@ -19,7 +19,7 @@
 #ifndef MININI_H
 #define MININI_H
 
-#if (WIN == 1 || NIX == 1 || PX4 == 1)
+#if (WIN == 1 || NIX == 1 || PX4 == 1 || USE_FILESYS == 0)
 #include "minGlue.h"
 #else
 #include "minGlue-mdd.h"

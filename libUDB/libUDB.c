@@ -50,6 +50,8 @@
 #include "../libflexifunctions/flexifunctionservices.h"
 #endif
 
+#include "../MatrixPilot/telemetry.h"
+#include "../libDCM/gpsParseCommon.h"
 
 union udb_fbts_byte udb_flags;
 
@@ -93,10 +95,10 @@ void udb_init(void)
 //	udb_init_I2C();
 #endif
 #if (CONSOLE_UART != 1)
-	udb_init_GPS();
+	udb_init_GPS(&udb_gps_callback_get_byte_to_send, &udb_gps_callback_received_byte);
 #endif
 #if (CONSOLE_UART != 2)
-	udb_init_USART();
+	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
 #endif
 	servoOut_init(); // was udb_init_pwm()
 	osd_init();
@@ -122,62 +124,3 @@ void udb_run(void)
 	indicate_loading_main;
 #endif
 }
-#if 0
-#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
-	udb_yrate.offset = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-	udb_zrate.offset = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset = udb_vref.value;
-#endif
-}
-#else  // horizontal initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
-#ifdef CUSTOM_OFFSETS
-	// offsets have been measured manually and entered into the options.h file
-	udb_xaccel.offset = XACCEL_OFFSET ;
-	udb_yaccel.offset = YACCEL_OFFSET ;
-	udb_zaccel.offset = ZACCEL_OFFSET ;
-	udb_xrate.offset = XRATE_OFFSET ;
-	udb_yrate.offset = YRATE_OFFSET ;
-	udb_zrate.offset = ZRATE_OFFSET ;
-#else
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset  = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value;
-	udb_yrate.offset  = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
-	udb_zrate.offset  = udb_zrate.value;
-#endif	// CUSTOM_OFFSETS
-#ifdef VREF
-	udb_vref.offset   = udb_vref.value;
-#endif
-}
-#endif // INITIALIZE_VERTICAL
-
-// saturation logic to maintain pulse width within bounds
-int16_t udb_servo_pulsesat(int32_t pw)
-{
-	if (pw > SERVOMAX) pw = SERVOMAX;
-	if (pw < SERVOMIN) pw = SERVOMIN;
-	return (int16_t)pw;
-}
-#endif

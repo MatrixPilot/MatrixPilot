@@ -19,10 +19,20 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// define the OSD types
+#define OSD_NONE            0   // OSD disabled
+#define OSD_NATIVE          1   // native OSD
+#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
+#define OSD_MINIM           3   // Output data formatted for minim OSD
 
-void telemetry_init(void);
-void telemetry_restart(void);
-void telemetry_output_8hz(void);
 
-int16_t udb_serial_callback_get_byte_to_send(void);
-void udb_serial_callback_received_byte(uint8_t rxchar);
+// define USE_OSD to one of the types above to enables that system
+#define USE_OSD         OSD_NONE
+//#define USE_OSD         OSD_NATIVE
+//#define USE_OSD         OSD_REMZIBI
+//#define USE_OSD         OSD_MINIM
+
+
+// OSD_NATIVE development options:
+#define USE_OSD_SPI     0   // set this to 1 to use the SPI peripheral, 0 to bit-bash
+#define OSD_SF          5   // scale factor for SPI delays - TODO: get rid of

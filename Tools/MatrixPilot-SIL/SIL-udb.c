@@ -17,6 +17,7 @@
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/serialIO.h"
 #include "../../libDCM/rmat.h"
+#include "../../MatrixPilot/MAVLink.h"
 #include "SIL-config.h"
 
 #ifdef WIN
@@ -407,7 +408,8 @@ boolean handleUDBSockets(void)
 			telemetrySocket = NULL;
 		} else {
 			for (i = 0; i < bytesRead; i++) {
-				udb_serial_callback_received_byte(buffer[i]);
+//				udb_serial_callback_received_byte(buffer[i]);
+				mavlink_callback_received_byte(buffer[i]);
 			}
 			if (bytesRead>0) didRead = true;
 		}
