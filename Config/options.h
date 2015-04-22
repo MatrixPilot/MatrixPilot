@@ -334,38 +334,10 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
-// This determines the format of the output sent out the spare serial port.
-// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
-// SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
-// SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
-// SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
-// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
-// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
-// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
-// Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
-
-//#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE    // TODO: this will have missing dependencies
-#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
-
-////////////////////////////////////////////////////////////////////////////////
-// Serial Output BAUD rate for either standard telemetry streams or MAVLink
-//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
-//#define SERIAL_BAUDRATE                     19200
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID                       1
 
-
-////////////////////////////////////////////////////////////////////////////////
-// On Screen Display
-// USE_OSD enables the OSD system.  Customize the OSD Layout in the osd_layout.h file.
-//#define USE_OSD                             0   // moved to osd.h
 
 // NUM_ANALOG_INPUTS:
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
@@ -739,7 +711,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE                        1
+//#define USE_MCU_IDLE                        1 // moved to interrupt.h
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -775,7 +747,7 @@
 #define CONSOLE_UART                        0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
-//#define USE_DEBUG_IO
+#define USE_DEBUG_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -811,14 +783,27 @@
 #define TLM_PORT                            3
 #define DBG_PORT                            1
 
-// Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG                         0
+// Set this to 1 to enable filesystem support
+#ifndef USE_FILESYS
+//#define USE_FILESYS                         0
+#endif
 
-// Set this to 1 to enable loading options settings from a config file on AUAV3
+// Set this to 1 to enable logging telemetry to filesystem
+#ifndef USE_TELELOG
+#define USE_TELELOG                         0
+#endif
+
+// Set this to 1 to enable loading options settings from an initialisation (ini) file
+#ifndef USE_CONFIGFILE
 #define USE_CONFIGFILE                      0
+#endif
 
 // Set this to 1 to enable the USB stack on AUAV3
+#ifndef USE_USB
 #define USE_USB                             0
+#endif
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#ifndef USE_MSD
 #define USE_MSD                             0
+#endif

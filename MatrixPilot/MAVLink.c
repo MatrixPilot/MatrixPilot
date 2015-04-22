@@ -1072,4 +1072,16 @@ void mavlink_output_40hz(void)
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
 
+#else
+
+void mavlink_init(void)
+{
+}
+int16_t mavlink_callback_get_byte_to_send(void)
+{
+	return -1;
+}
+void mavlink_callback_received_byte(uint8_t rxchar)
+{
+}
 #endif // (USE_MAVLINK == 1)
