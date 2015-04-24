@@ -57,6 +57,9 @@
 uint8_t retSD;    /* Return value for SD */
 char SD_Path[4];  /* SD logical drive path */
 
+FATFS SDFatFs;  /* File system object for SD card logical drive */
+FIL MyFile;     /* File object */
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -162,8 +165,33 @@ extern int tsirq;
 
 void StartDefaultTask(void const * argument)
 {
-  /*## FatFS: Link the SD driver ###########################*/
-  retSD = FATFS_LinkDriver(&SD_Driver, SD_Path);
+    FRESULT res;                                            /* FatFs function common result code */
+	uint8_t wtext[] = "Matrix Pilot with FatFs support";    /* File write buffer */
+    uint32_t byteswritten;                                  /* File write counts */
+    /*## FatFS: Link the SD driver ###########################*/
+    //  retSD = FATFS_LinkDriver(&SD_Driver, SD_Path);
+    if(FATFS_LinkDriver(&SD_Driver, SD_Path) == 0)
+    {
+        /*##-2- Register the file system object to the FatFs module ##############*/
+        res=f_mount(&SDFatFs, (TCHAR const*)SD_Path, 0);
+        if(res == FR_OK)
+        {
+            /*##-4- Create and Open a new text file object with write access #####*/
+            res=f_open(&MyFile, "MP_Nucleo.TXT", FA_CREATE_ALWAYS | FA_WRITE);
+            if(res == FR_OK)
+            {
+                /*##-5- Write data to the text file ################################*/
+                res = f_write(&MyFile, wtext, sizeof(wtext), (void *)&byteswritten);
+                if((byteswritten == 0) || (res == FR_OK))
+                {
+                    /*##-6- Close the open text file #################################*/
+                    f_close(&MyFile);
+                }
+            }
+        }
+    }
+    /*##-11- Unlink the micro SD disk I/O driver ###############################*/
+    FATFS_UnLinkDriver(SD_Path);
 
 int16_t pw[8];
 
