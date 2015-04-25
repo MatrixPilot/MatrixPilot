@@ -3,7 +3,6 @@
 #ifdef _MSC_VER
 
 #include "defines.h" 
-
 #include "mavlink_options.h"
 
 #if (USE_MAVLINK == 1)
