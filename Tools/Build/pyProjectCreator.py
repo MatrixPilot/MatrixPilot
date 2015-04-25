@@ -94,6 +94,9 @@ def mplab8_project(mcu_type, target_board, root_sep, config_dir, includes, proje
 	for e in config_dir:
 		config = config + root_sep + e + ';'
 
+	fixdeps = root_sep + config_dir[0]
+#	print "fixdeps: ", fixdeps
+
 	if not defines == '':
 		defines = ';' + defines
 
@@ -108,6 +111,8 @@ def mplab8_project(mcu_type, target_board, root_sep, config_dir, includes, proje
 		data = data.replace("%%OTHER_FILES%%", other_files)
 		data = data.replace("%%FILE_INFO%%", file_info)
 		data = data.replace("%%EXTRA_DEFS%%", defines.replace(";", " -D").strip())
+		data = data.replace("%%FIXDEPS%%", fixdeps)
+		
 	mkdirnotex(project_output_file)
 	with open (project_output_file, "w") as file:
 		file.write(data)
@@ -121,9 +126,6 @@ header_folders = []
 
 def vs2010_scan_dirs(masks, sources, directories):
 	str = ""
-	
-	print "vs2010_scan_dirs: ", directories
-
 	for dir in directories:
 		path = os.path.join(rootdir, dir)
 		for mask in masks:
