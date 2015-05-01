@@ -121,7 +121,7 @@
 #define MAG_Z_SIGN -
 #endif
 
-#ifdef MAG_INVERTED 
+#ifdef MAG_INVERTED
 #define MAG_X_AXIS 1
 #define MAG_Y_AXIS 0
 #define MAG_Z_AXIS 2
