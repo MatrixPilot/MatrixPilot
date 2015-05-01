@@ -22,6 +22,7 @@
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/mpu6000.h"
+#include "../../libUDB/ADchannel.h"
 #include <libpic30.h>
 
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -244,5 +245,5 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 
 void udb_serial_callback_received_byte(uint8_t rxchar) { }
 void udb_callback_radio_did_turn_off() { }
-void init_events(void) { }
-void osd_init(void) { }
+//void init_events(void) { }
+//void osd_init(void) { }

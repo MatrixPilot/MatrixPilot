@@ -14,7 +14,7 @@
     <ProjectGuid>{81C72BCE-FAF2-423A-B311-50BA1F7A010D}</ProjectGuid>
     <RootNamespace>XP-netdata</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>MatrixPilot-SIL</ProjectName>
+    <ProjectName>%%PROJECT%%</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

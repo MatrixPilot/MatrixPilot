@@ -23,9 +23,12 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes most of the user-configuration for this firmware,
-// one of the exceptions being waypoints, which live in the waypoints.h file.
+// This file includes all of the user-configuration for this firmware,
+// with the exception of waypoints, which live in the waypoints.h file.
 //
+// Note that there is a small but growing library of preset options.h files for
+// specific planes located in the MatrixPilot/example-options-files directory.
+// You can use one of those files by replacing this file with that one.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +67,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
-#define GPS_TYPE                            GPS_STD
+#define GPS_TYPE                            GPS_MTEK
 //#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
 
 
@@ -164,9 +167,7 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#ifndef NORADIO
 #define NORADIO                             0
-#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +186,7 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT                       0
+#define USE_PPM_INPUT                       2
 #define PPM_NUMBER_OF_CHANNELS              8
 #define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
@@ -210,8 +211,8 @@
 #define THROTTLE_INPUT_CHANNEL              CHANNEL_3
 #define AILERON_INPUT_CHANNEL               CHANNEL_1
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
-#define RUDDER_INPUT_CHANNEL                CHANNEL_5
-#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_4
+#define RUDDER_INPUT_CHANNEL                CHANNEL_4
+#define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -257,9 +258,9 @@
 // Servo Reversing Configuration
 // For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-#define AILERON_CHANNEL_REVERSED            0
-#define ELEVATOR_CHANNEL_REVERSED           0
-#define RUDDER_CHANNEL_REVERSED             0
+#define AILERON_CHANNEL_REVERSED            1
+#define ELEVATOR_CHANNEL_REVERSED           1
+#define RUDDER_CHANNEL_REVERSED             1
 #define AILERON_SECONDARY_CHANNEL_REVERSED  0
 #define THROTTLE_CHANNEL_REVERSED           0
 #define CAMERA_PITCH_CHANNEL_REVERSED       0
@@ -286,7 +287,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
-#define MODE_SWITCH_TWO_POSITION            0
+#define MODE_SWITCH_TWO_POSITION            1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -302,7 +303,7 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-#define FAILSAFE_INPUT_MIN                  1500
+#define FAILSAFE_INPUT_MIN                  2005
 #define FAILSAFE_INPUT_MAX                  4500
 
 // FAILSAFE_TYPE controls the UDB's behavior when in failsafe mode due to loss of transmitter
@@ -331,6 +332,29 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
+// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
+// This determines the format of the output sent out the spare serial port.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
+// SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
+// SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
+// SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
+// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
+// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
+// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
+// Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
+
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for either standard telemetry streams or MAVLink
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+//#define SERIAL_BAUDRATE                     19200 // default
+#define SERIAL_BAUDRATE                     115200
+
+
+////////////////////////////////////////////////////////////////////////////////
+
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
 #define MAVLINK_SYSID                       1
@@ -359,7 +383,7 @@
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
 // you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
-// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
+// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
 #define ANALOG_CURRENT_INPUT_CHANNEL        CHANNEL_UNUSED
@@ -382,7 +406,7 @@
 // Designed for use with the following device:-
 // http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
 // Can be used on INPUT 8 of the UDB4/5 if that is not used for a channel input.
-// Will return distance to ground in meters and compensate for roll subject to 
+// Will return distance to ground in meters and compensate for roll subject to
 // receiving a returned sonar signal.
 // This option is designed to be used with Logo Flight Planning.
 // Logo allows the user to Interrupt a Landing and flare, or Go Around,
@@ -567,7 +591,7 @@
 
 // Setup and configuration of camera targetting at installation of camera servos:-
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
-// when in stabilized mode. This should be expressed in 2:14 format. 
+// when in stabilized mode. This should be expressed in 2:14 format.
 // Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
 // Paste the following line into a google search box (without the //)
 // tan((( 15 /180 )* 3.1416 ))* 16384
@@ -578,17 +602,17 @@
 #define CAM_YAW_IN_STABILIZED_MODE          0       // in degrees relative to the plane's yaw axis.    Example: 0
 
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW               95      // Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
-#define CAM_PITCH_SERVO_MAX                 85      // Max pitch up that plane can tilt and keep camera level, in degrees.  
-#define CAM_PITCH_SERVO_MIN                -22      // Max pitch down that plane can tilt and keep camera level, in degrees. 
-#define CAM_PITCH_OFFSET_CENTRED            38      // Offset in degrees of servo that results in a level camera.           
+#define CAM_PITCH_SERVO_THROW               95      // Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.
+#define CAM_PITCH_SERVO_MAX                 85      // Max pitch up that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_SERVO_MIN                -22      // Max pitch down that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_OFFSET_CENTRED            38      // Offset in degrees of servo that results in a level camera.
                                                     // Example: 30 would mean that a centered pitch servo points the camera
                                                     // 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW                 350     // Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
-#define CAM_YAW_SERVO_MAX                   130     // Max positive yaw of camera relative to front of plane in Degrees.              
-#define CAM_YAW_SERVO_MIN                  -130     // Min reverse  yaw of camera relative to front of plane in Degrees.   
-#define CAM_YAW_OFFSET_CENTRED              11      // Yaw offset in degrees that results in camera pointing forward. 
+#define CAM_YAW_SERVO_THROW                 350     // Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees.
+#define CAM_YAW_SERVO_MAX                   130     // Max positive yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_SERVO_MIN                  -130     // Min reverse  yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_OFFSET_CENTRED              11      // Yaw offset in degrees that results in camera pointing forward.
 
 // Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
 // That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
@@ -683,9 +707,9 @@
 //#define ID_VEHICLE_REGISTRATION "TW2-PDH-UK"
 //#define ID_LEAD_PILOT "Pete Hollands"
 //#define ID_DIY_DRONES_URL "http://www.diydrones.com/profile/PeterHollands"
-#define ID_VEHICLE_MODEL_NAME               "Not Defined"
-#define ID_VEHICLE_REGISTRATION             "Not Defined"
-#define ID_LEAD_PILOT                       "Not Defined"
+#define ID_VEHICLE_MODEL_NAME               "Clouds Fly"
+#define ID_VEHICLE_REGISTRATION             "UDB-005"
+#define ID_LEAD_PILOT                       "Ansuz"
 #define ID_DIY_DRONES_URL                   "http://www.diydrones.com"
 
 
@@ -730,18 +754,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // The UDB4/5 has two UART's, while the AUAV3 has four UART's.
-// Three MatrixPilot features are currently defined for using a UART. 
+// Three MatrixPilot features are currently defined for using a UART.
 // These being the GPS, Telemetry and a 'debug' console.
 // Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
 //
 // CONSOLE_UART specfies which UART is used for stdio support, aka the console.
 // Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
 // Setting CONSOLE_UART to 0 disables console support.
-// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
+// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
+// Set to 9 in order to use the USB for the console connection (under development)
 #define CONSOLE_UART                        0
+//#define CONSOLE_UART                        6
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO
@@ -772,13 +798,13 @@
 // On the AUAV3, the external UART connections are known as ports 1 through 4.
 // The definitions below specifies which feature maps to an external port.
 //
-// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
+// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the
 // external port assignment.
 // Assign the console to an internal UART with CONSOLE_UART, map this console to
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
 #define TLM_PORT                            3
-#define DBG_PORT                            1
+#define DBG_PORT                            2
 
 // Set this to 1 to enable filesystem support
 #ifndef USE_FILESYS

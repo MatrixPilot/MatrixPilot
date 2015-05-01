@@ -787,17 +787,17 @@
 
 // Set this to 1 to enable filesystem support
 #ifndef USE_FILESYS
-//#define USE_FILESYS                         0
+#define USE_FILESYS                         1
 #endif
 
 // Set this to 1 to enable logging telemetry to filesystem
 #ifndef USE_TELELOG
-#define USE_TELELOG                         0
+#define USE_TELELOG                         1
 #endif
 
 // Set this to 1 to enable loading options settings from an initialisation (ini) file
 #ifndef USE_CONFIGFILE
-#define USE_CONFIGFILE                      0
+#define USE_CONFIGFILE                      1
 #endif
 
 // Set this to 1 to enable the USB stack on AUAV3

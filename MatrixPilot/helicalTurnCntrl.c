@@ -255,7 +255,7 @@ void helicalTurnCntrl(void)
 
 	if ((AILERON_NAVIGATION||RUDDER_NAVIGATION) && state_flags._.GPS_steering)
 	{
-		accum.WW +=(int32_t) navigate_determine_deflection('t');		
+		accum.WW +=(int32_t) navigate_determine_deflection('t');
 	}
 
 	if (accum.WW >(int32_t) 2*(int32_t) RMAX - 1) accum.WW =(int32_t) 2*(int32_t) RMAX - 1;
@@ -279,16 +279,16 @@ void helicalTurnCntrl(void)
 
 	// limit the lateral acceleration to +- 4 times gravity, total wing loading approximately 4.12 times gravity
 
-	if (desiredTilt.WW >(int32_t) 2*(int32_t) RMAX - 1)
+	if (desiredTilt.WW > (int32_t)2 * (int32_t)RMAX - 1)
 	{
-		desiredTilt.WW =(int32_t) 2*(int32_t) RMAX - 1;
+		desiredTilt.WW = (int32_t)2 * (int32_t)RMAX - 1;
 		accum.WW = __builtin_mulsu(desiredTilt._.W0, GRAVITYCMSECSEC);
 		accum.WW /= airSpeed;
 		desiredTurnRateRadians = accum._.W0;
 	}
-	else if (desiredTilt.WW < -(int32_t) 2*(int32_t) RMAX + 1)
+	else if (desiredTilt.WW < -(int32_t)2 * (int32_t)RMAX + 1)
 	{
-		desiredTilt.WW = -(int32_t) 2*(int32_t) RMAX + 1;
+		desiredTilt.WW = -(int32_t)2 * (int32_t)RMAX + 1;
 		accum.WW = __builtin_mulsu(desiredTilt._.W0, GRAVITYCMSECSEC);
 		accum.WW /= airSpeed;
 		desiredTurnRateRadians = accum._.W0;
@@ -323,7 +323,7 @@ void helicalTurnCntrl(void)
 
 		// project angle of attack into the earth frame
 		accum.WW =(__builtin_mulss(angleOfAttack, rmat[8])) << 2;
-		pitchAdjustAngleOfAttack = accum._.W1;	
+		pitchAdjustAngleOfAttack = accum._.W1;
 
 		// similarly, compute elevator trim
 		accum.WW = __builtin_mulss(ELEVATOR_TRIM_SLOPE, relativeLoading);

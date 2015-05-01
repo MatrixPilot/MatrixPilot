@@ -28,6 +28,7 @@
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/serialIO.h"
 #include "../libUDB/servoOut.h"
+#include "../libUDB/ADchannel.h"
 
 // Used for serial debug output
 #include <stdio.h>
@@ -59,10 +60,6 @@ int main(void)
 	}
 
 	return 0;
-}
-
-void init_events(void)
-{
 }
 
 // Called every 1/40 second at high priority
@@ -134,7 +131,9 @@ void send_debug_line(void)
 	{
 		int16_t gravity2x = (int16_t)2*GRAVITY;
 		sprintf(debug_buffer, "%i, %i, %i, %i, %i, %i, %i\r\n", 
-		    gravity2x, udb_xaccel.value, udb_yaccel.value, udb_zaccel.value, udb_xrate.value, udb_yrate.value, udb_zrate.value);
+		    gravity2x, 
+		    udb_xaccel.value, udb_yaccel.value, udb_zaccel.value, 
+		    udb_xrate.value,  udb_yrate.value,  udb_zrate.value);
 	}
 	else
 	{
@@ -167,6 +166,5 @@ void udb_callback_radio_did_turn_off(void)
 {
 }
 
-void osd_init(void)
-{
-}
+//void init_events(void) {}
+//void osd_init(void) {}

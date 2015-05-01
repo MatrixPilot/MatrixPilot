@@ -8,6 +8,8 @@ modules += libUDB libVectorMatrix
 incpath += Microchip Microchip/Include libVectorMatrix
 #cfgpath := Config
 
+defines += NOFS=1
+
 # mod_list
 # inc_list
 # def_list

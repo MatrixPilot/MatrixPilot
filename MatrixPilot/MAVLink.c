@@ -828,7 +828,7 @@ void mavlink_output_40hz(void)
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE);
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
-        // GPS RAW INT - Data from GPS Sensor sent as raw integers.
+	// GPS RAW INT - Data from GPS Sensor sent as raw integers.
 	spread_transmission_load = 4;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
@@ -866,7 +866,7 @@ void mavlink_output_40hz(void)
 		mavlink_heading = get_geo_heading_angle() * 100;    // mavlink global position expects heading value x 100
 		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon, alt, relative_alt,
 		    IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity upper word gives V in cm / second
-                    // MAVLink is using North,East,Down Frame (NED). MatrixPilot IMUVelocity is in earth frame (X is East, Y is North, Z is Up)
+		    // MAVLink is using North,East,Down Frame (NED). MatrixPilot IMUVelocity is in earth frame (X is East, Y is North, Z is Up)
 		    mavlink_heading); // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
 		// mavlink_msg_global_position_int_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t lat, int32_t lon, int32_t alt,
 		//   int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg)
@@ -1017,11 +1017,11 @@ void mavlink_output_40hz(void)
 #endif //(MAG_YAW_DRIFT == 1)
 #else  // HILSIM bypasses use of uxb_xaccel etc, and uses gplane[] directly; similarly udb_xrate is sent straight to omega
        // However gplane[] may be modified by further calculations. So MAVLink uses aero_force which is the negative of gplane[]
-		    extern int16_t magFieldRaw[];
+		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
 		    (int16_t) - aero_force[0], (int16_t) - aero_force[1], (int16_t) - aero_force[2],
 		    (int16_t) omegagyro[0],  (int16_t) omegagyro[1],  (int16_t) omegagyro[2],
-		    (int16_t)   0,   (int16_t)   0,   (int16_t)   0 );
+		    (int16_t)   0,   (int16_t)   0,   (int16_t)   0);
 #endif  // (HILSIM !=1 )
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)

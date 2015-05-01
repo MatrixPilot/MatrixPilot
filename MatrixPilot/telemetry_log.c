@@ -37,10 +37,6 @@ extern boolean inflight_state(void);
 
 
 #if (WIN == 1 || NIX == 1 || PX4 == 1)
-#define FSFILE    FILE
-//#define FSfopen   fopen
-//#define FSfclose  fclose
-//#define FSfwrite  fwrite
 #define LOGFILE_ENABLE_PIN 0
 #else
 //#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD

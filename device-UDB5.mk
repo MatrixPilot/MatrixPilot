@@ -7,3 +7,5 @@ CPU := 33FJ256GP710A
 modules += libUDB libVectorMatrix
 incpath += Microchip Microchip/Include libVectorMatrix
 #cfgpath := Config
+
+defines += NOFS=1

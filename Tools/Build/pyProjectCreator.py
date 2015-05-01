@@ -89,7 +89,7 @@ def mplab8_scan_dirs(masks, directories):
 			file_info = file_info + "file_" + str.format('{:0>3}', file_cnt) + "=" + filename + '\n'
 			file_cnt = file_cnt + 1
 
-def mplab8_project(mcu_type, target_board, root_sep, config_dir, includes, project_output_file, defines):
+def mplab8_project(mcu_type, target_board, root_sep, config_dir, includes, project, defines):
 	config = ''
 	for e in config_dir:
 		config = config + root_sep + e + ';'
@@ -112,9 +112,10 @@ def mplab8_project(mcu_type, target_board, root_sep, config_dir, includes, proje
 		data = data.replace("%%FILE_INFO%%", file_info)
 		data = data.replace("%%EXTRA_DEFS%%", defines.replace(";", " -D").strip())
 		data = data.replace("%%FIXDEPS%%", fixdeps)
-		
-	mkdirnotex(project_output_file)
-	with open (project_output_file, "w") as file:
+
+	mkdirnotex(project + ".mcp")
+	with open (project + ".mcp", "w") as file:
+		print "writing: " + project + ".mcp"
 		file.write(data)
 
 #
@@ -167,7 +168,7 @@ def vs2010_make_filter_dirs(prefix, folders):
 		s = s + "    </Filter>\n"
 	return s
 
-def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, header_files, source_files, project_output_file, defines):
+def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, header_files, source_files, project, defines, prjname):
 
 	config = ''
 	for e in config_dir:
@@ -176,22 +177,24 @@ def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, heade
 	with open (script_path + "template.vcxproj", "r") as file:
 		data = file.read()
 		data = data.replace("%%CONFIG%%", config)
+		data = data.replace("%%PROJECT%%", prjname)
 		data = data.replace("%%INCLUDES%%", includes)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
 		data = data.replace("%%HEADER_FILES%%", header_files)
 		data = data.replace("%%EXTRA_DEFS%%", defines.strip(";"))
-	mkdirnotex(project_output_file)
-	with open (project_output_file, "w") as file:
+	mkdirnotex(project + ".vcxproj")
+	with open (project + ".vcxproj", "w") as file:
+		print "writing: " + project + ".vcxproj"
 		file.write(data)
 
-def vs2010_filters(mcu_type, target_board, root_sep, config_dir, filters, header_files, source_files, project_output_file):
+def vs2010_filters(mcu_type, target_board, root_sep, config_dir, filters, header_files, source_files, project):
 	with open (script_path + "template.vcxproj.filters", "r") as file:
 		data = file.read()
 		data = data.replace("%%FILTERS%%", filters)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
 		data = data.replace("%%HEADER_FILES%%", header_files)
-	mkdirnotex(project_output_file)
-	with open (project_output_file, "w") as file:
+	mkdirnotex(project + ".vcxproj.filters")
+	with open (project + ".vcxproj.filters", "w") as file:
 		file.write(data)
 
 #
@@ -239,6 +242,7 @@ def mplabX_scan_dirs(masks, directories):
 	return str
 
 def mplabX_project(mcu_type, name, target_board, root_sep, config_dir, includes, header_files, source_files, project_path, defines):
+	print "writing: " + project_path
 	mkdirnotex(os.path.join(project_path, "Makefile"))
 	with open (script_path + "Makefile", "r") as file:
 		data = file.read()
@@ -290,7 +294,7 @@ def emBlocks_scan_dirs(masks, sources, directories):
 					str = str + "\t\t<Unit filename=\"" + filename.replace("/", "\\") + "\" />\n"
 	return str
 
-def emBlocks_project(mcu_type, target_board, root_sep, config_dir, includes, header_files, source_files, project_output_file):
+def emBlocks_project(mcu_type, target_board, root_sep, config_dir, includes, header_files, source_files, project):
 	with open (script_path + "template.ebp", "r") as file:
 		data = file.read()
 		data = data.replace("%%PROJECT%%", "MatrixPilot-PX4")
@@ -298,8 +302,9 @@ def emBlocks_project(mcu_type, target_board, root_sep, config_dir, includes, hea
 		data = data.replace("%%TARGET_BOARD%%", target_board)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
 		data = data.replace("%%HEADER_FILES%%", header_files)
-	mkdirnotex(project_output_file)
-	with open (project_output_file, "w") as file:
+	mkdirnotex(project + ".ebp")
+	with open (project + ".ebp", "w") as file:
+		print "writing: " + project + ".ebp"
 		file.write(data)
 
 
@@ -364,39 +369,50 @@ if __name__ == '__main__':
 	includes = ';'.join(inc_list)
 	opts.defines = ";".join(opts.defines)
 	filters = ""
-	project = os.path.join(opts.out, opts.name + "-" + opts.target)
+	
+	
+#	cfgname = opts.config[0].replace("/", " ").split(" ")
+#	prjname = opts.name + "-" + opts.target + "-" + cfgname[-1]
+
+	prjname = opts.name + "-" + opts.target + "-" + opts.config[0].replace("/", " ").split(" ")[-1]
+
+#	prjname = opts.name + "-" + opts.target + "-" + opts.config[0].replace("/", "-")
+#	project = os.path.join(opts.out, opts.name + "-" + opts.target + "-" + opts.config[0].replace("/", "-"))
+	project = os.path.join(opts.out, prjname)
+#	print "output directory: " + opts.out
+	print "project: " + prjname
 
 	if opts.target == "PX4":
 		sources  = emBlocks_scan_dirs(["*.c", "*.s"], 1, opts.modules)
 		headers  = emBlocks_scan_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"])
-		project_path = project + ".ebp"
 		includes = ""
 		for inc in inc_list:
 			includes = includes + "\t\t\t<Add directory=\"" + inc + "\" />\n"
-		print "writing: " + project_path
-		emBlocks_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project_path)
+#		project_path = project + ".ebp"
+#		print "writing: " + project + ".ebp"
+		emBlocks_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project)
 	elif opts.target == "SIL":
 		sources = vs2010_scan_dirs(["*.c"], 1, opts.modules)
 		headers = vs2010_scan_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"])
-		project_path = project + ".vcxproj"
-		print "writing: " + project_path
-		vs2010_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project_path, opts.defines)
+#		project_path = project + ".vcxproj"
+#		print "writing: " + project + ".vcxproj"
+		vs2010_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project, opts.defines, prjname)
 		sources = vs2010_scan_filter_dirs(["*.c"], 1, opts.modules, "Source Files\\")
 		headers = vs2010_scan_filter_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"], "Header Files\\")
 		filters = filters + vs2010_make_filter_dirs("Source", source_folders)
 		filters = filters + vs2010_make_filter_dirs("Header", header_folders)
-		project_path = project + ".vcxproj.filters"
-		vs2010_filters(arch, opts.target, rootsep, opts.config, filters, headers, sources, project_path)
+#		project_path = project + ".vcxproj.filters"
+		vs2010_filters(arch, opts.target, rootsep, opts.config, filters, headers, sources, project)
 	else:
 		mplab8_scan_dirs("*.c", opts.modules)
 		mplab8_scan_dirs("*.s", opts.modules)
 		mplab8_scan_dirs("*.h", opts.config + opts.modules)
-		project_path = project + ".mcp"
-		print "writing: " + project_path
-		mplab8_project(arch, opts.target, rootsep, opts.config, includes, project_path, opts.defines)
+#		project_path = project + ".mcp"
+#		print "writing: " + project + ".mcp"
+		mplab8_project(arch, opts.target, rootsep, opts.config, includes, project, opts.defines)
 		headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.config + opts.modules)
 		sources = mplabX_scan_dirs(["*.c", "*.s"], opts.modules)
-		project_path = project + ".X"
-		print "writing: " + project_path
+#		project_path = project + ".X"
+#		print "writing: " + project + ".X"
 		includes = ';'.join(["../" + str(x) for x in inc_list])
-		mplabX_project(arch, opts.name, opts.target, "../" + rootsep, opts.config, includes, headers, sources, project_path, opts.defines)
+		mplabX_project(arch, opts.name, opts.target, "../" + rootsep, opts.config, includes, headers, sources, project + ".X", opts.defines)

@@ -20,18 +20,18 @@ Set recentFile = Nothing
 Set objFSO = Createobject ("Scripting.FileSystemObject")
 
 For Each file in objFSO.GetFolder(srcPath).Files
-  WScript.Echo file
-  If (recentFile is Nothing) Then
-    Set recentFile = file
-  ElseIf (file.DateLastModified > recentFile.DateLastModified) Then
-    Set recentFile = file
-  End If
+	WScript.Echo file
+	If (recentFile is Nothing) Then
+		Set recentFile = file
+	ElseIf (file.DateLastModified > recentFile.DateLastModified) Then
+		Set recentFile = file
+	End If
 Next
 
 If recentFile is Nothing Then
-  WScript.Echo "no recent files"
+	WScript.Echo "no recent files"
 Else
-  WScript.Echo "Recent file is " & recentFile.Name & " " & recentFile.DateLastModified
+	WScript.Echo "Recent file is " & recentFile.Name & " " & recentFile.DateLastModified
 End If
 
 If (Not objFSO.FileExists(destPath)) Then
