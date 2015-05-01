@@ -896,7 +896,7 @@ static void commit_bodyrate_data(void)
 	r_sim = r_sim_;
 }
 
-void HILSIM_saturate( uint16_t size , int16_t vector[3] )
+void HILSIM_saturate(int16_t size, int16_t vector[3])
 {
 	// hardware 16 bit signed integer gyro and accelerometer data and offsets
 	// are divided by 2 prior to subtracting offsets from values.
@@ -904,16 +904,16 @@ void HILSIM_saturate( uint16_t size , int16_t vector[3] )
 	// However, it limits range to approximately +- RMAX.
 	// Data coming in from Xplane is in 16 bit signed integer format with range +-2*RMAX,
 	// so it needs to be passed through a saturation computation that limits to +-RMAX.
-	uint16_t index ;
-	for ( index = 0 ; index < size ; index ++ )
+	uint16_t index;
+	for (index = 0; index < size; index ++)
 	{
-		if ( vector[index ] > RMAX )
+		if (vector[index ] > RMAX)
 		{
-			vector[index] = RMAX ;
+			vector[index] = RMAX;
 		}
-		if ( vector[index] < -RMAX )
+		if (vector[index] < -RMAX)
 		{
-			vector[index] = -RMAX ;
+			vector[index] = -RMAX;
 		}
 	}
 }
