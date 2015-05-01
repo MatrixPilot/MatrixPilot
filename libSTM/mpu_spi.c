@@ -28,51 +28,9 @@
 #include "mpu_spi.h"
 //#include <delay.h>
 //#include <spi.h>
+//#include "stm32f4xx_hal_spi.h"
 
-#if (MPU_SPI == 1)
-
-#define MPU_SS       SPI1_SS
-#define MPU_SS_TRIS  SPI1_TRIS
-#define _SPIRBF      SPI1STATbits.SPIRBF
-#define _SPIROV      SPI1STATbits.SPIROV
-#define _SRXMPT      SPI1STATbits.SRXMPT
-#define _SPIBEC      SPI1STATbits.SPIBEC
-#define _SRMPT       SPI1STATbits.SRMPT
-#define _SPIIF       _SPI1IF
-#define _SPIIP       _SPI1IP
-#define _SPIIE       _SPI1IE
-#define SPIBUF       SPI1BUF
-#define SPISTAT      SPI1STAT
-#define OpenSPI      OpenSPI1
-#define CloseSPI     CloseSPI1
-#define ConfigIntSPI ConfigIntSPI1
-#define SPIInterrupt _SPI1Interrupt
-
-#elif (MPU_SPI == 2)
-
-#define MPU_SS       SPI2_SS
-#define MPU_SS_TRIS  SPI2_TRIS
-#undef  _SPIRBF
-#define _SPIRBF      SPI2STATbits.SPIRBF
-#undef  _SPIROV
-#define _SPIROV      SPI2STATbits.SPIROV
-#define _SRXMPT      SPI2STATbits.SRXMPT
-#define _SPIBEC      SPI2STATbits.SPIBEC
-#define _SRMPT       SPI2STATbits.SRMPT
-#define _SPIIF       _SPI2IF
-#define _SPIIP       _SPI2IP
-#define _SPIIE       _SPI2IE
-#define SPIBUF       SPI2BUF
-#define SPISTAT      SPI2STAT
-#define OpenSPI      OpenSPI2
-#define CloseSPI     CloseSPI2
-#define ConfigIntSPI ConfigIntSPI2
-#define SPIInterrupt _SPI2Interrupt
-
-#else
-#error "Select either 1 or 2 for MPU SPI."
-#endif
-
+extern SPI_HandleTypeDef hspi2;
 
 static void no_call_back(void);
 
@@ -140,8 +98,25 @@ void initMPUSPI_master16(uint16_t priPre, uint16_t secPre)
  }
 
 // Blocking 16 bit write to SPI
-void writeMPUSPIreg16(uint16_t addr, uint16_t data)
+HAL_StatusTypeDef writeMPUSPIreg16(uint8_t addr, uint8_t cmd)
 {
+	HAL_StatusTypeDef err;
+	//HAL_SPI_Transmit expect 8 bit pointer on pData parameter, so
+	//I have to do this:
+	uint8_t dato[2] = {0,0};
+	dato[0] = addr;
+	dato[1] = cmd;
+	//I would like to do this:
+//	uint16_t dato = (addr<<8)|cmd;
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+	err = HAL_SPI_Transmit(&hspi2, dato, 2, 10);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+	// this delay is necessary; it appears that SS must be deasserted for one or
+	// more SPI clock cycles between writes.
+    // NOTE: From original MP code.
+    // TODO: It's 1 mseg delay, it would be 2useg. Check on MPU6000 data sheet this issue
+    HAL_Delay(1);
+    return err;
 /*
 	int16_t k;
 
@@ -163,7 +138,7 @@ void writeMPUSPIreg16(uint16_t addr, uint16_t data)
 //	delayUs(1);
 	delay_us(1);
  */
- }
+}
 
 static void no_call_back(void)
 {
@@ -174,21 +149,34 @@ static void no_call_back(void)
 // SPI module has 8 word FIFOs
 // burst read 2n bytes starting at addr;
 // Since first byte is address, max of 15 data bytes may be transferred with n=7
-void readMPUSPI_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
+void readMPUSPI_burst16n(uint8_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
 {
-	uint16_t i;
-
-	MPU_SS = 0;                 // assert chip select
-	mpu_call_back = call_back;  // store the address of the call back routine
-	SPI_data = &data[0];        // store address of data buffer
-	i = SPIBUF;                 // empty read buffer
-	addr |= 0x80;               // write address-1 in high byte + n-1 dummy words to TX FIFO
-	SPIBUF = addr << 8;         // issue read command
-	for (i = 0; i < n; i++) {
-		SPIBUF = 0;             // queue 'n' null words into the SPI transmit buffer
+	HAL_StatusTypeDef err;
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+    //TODO: The problem here is SPI_Receive need address on data[0]. It will call
+    //HAL_SPI_TransmitReceive_IT->SPI_TxISR->SPI_TxColseIRQHandler->HAL_SPI_TxCpltCallback
+    //wWe should implement HAL_SPI_TxCpltCallback to do what we need to do.
+    data[0] = addr;
+	err = HAL_SPI_Receive_IT(&hspi2, data, 2*n);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+	if(err != HAL_OK){
+		//TODO: Do something with posible error here
+		while(1);
 	}
-	_SPIIE = 1;                 // turn on SPI interrupts
+//	uint16_t i;
+//
+//	MPU_SS = 0;                 // assert chip select
+//	mpu_call_back = call_back;  // store the address of the call back routine
+//	SPI_data = &data[0];        // store address of data buffer
+//	i = SPIBUF;                 // empty read buffer
+//	addr |= 0x80;               // write address-1 in high byte + n-1 dummy words to TX FIFO
+//	SPIBUF = addr << 8;         // issue read command
+//	for (i = 0; i < n; i++) {
+//		SPIBUF = 0;             // queue 'n' null words into the SPI transmit buffer
+//	}
+//	_SPIIE = 1;                 // turn on SPI interrupts
 }
+
 
 // this ISR empties the RX FIFO into the SPI_data buffer
 // no possibility of overrun if buffer length is at least 8 words

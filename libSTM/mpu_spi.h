@@ -55,17 +55,19 @@
 #define _TRISMPUINT _TRISG12
 
 #elif (BOARD_TYPE == PX4_BOARD)
-#define MPU_SPI 1
+#define MPU_SPI 2   //I'm using SPI2. But I don't think that I will use MPU_SPI definition
 #else
 #error "Only BOARD_TYPEs UDB5, UDB4 and AUAV3 supported"
 #endif
 
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_spi.h"
 
 // initialize SPI in master mode, 16 bit
 void initMPUSPI_master16(uint16_t, uint16_t);
 
 // 16 bit SPI blocking write
-void writeMPUSPIreg16(uint16_t addr, uint16_t data);
+HAL_StatusTypeDef writeMPUSPIreg16(uint8_t addr, uint8_t data);
 
 // 16 bit SPI blocking read
 uint16_t readMPUSPIreg16(uint16_t addr);

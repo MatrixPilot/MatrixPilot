@@ -61,7 +61,15 @@ FATFS SDFatFs;  /* File system object for SD card logical drive */
 FIL MyFile;     /* File object */
 
 /* USER CODE BEGIN PV */
+#define LED1	GPIO_PIN_4
+#define LED2	GPIO_PIN_5
+#define LED3	GPIO_PIN_10
+#define LED4	GPIO_PIN_2
 
+#define LED1_Port	GPIOC
+#define LED2_Port	GPIOC
+#define LED3_Port	GPIOC
+#define LED4_Port	GPIOB
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,9 +111,22 @@ int main(void)
   MX_TIM5_Init();     //Input Capture CH1 and CH2 timer base
   MX_TIM3_Init();       //PWM Output CH1 to CH4
 
+// Led Test. Turn On
+  HAL_GPIO_WritePin(LED1_Port, LED1, RESET);
+  HAL_GPIO_WritePin(LED2_Port, LED2, RESET);
+  HAL_GPIO_WritePin(LED3_Port, LED3, RESET);
+  HAL_GPIO_WritePin(LED4_Port, LED4, RESET);
+  HAL_Delay(1000);
+  //Turn Off
+  HAL_GPIO_WritePin(LED1_Port, LED1, SET);
+  HAL_GPIO_WritePin(LED2_Port, LED2, SET);
+  HAL_GPIO_WritePin(LED3_Port, LED3, SET);
+  HAL_GPIO_WritePin(LED4_Port, LED4, SET);
+
   /* USER CODE BEGIN 2 */
     radioIn_init();     //elgarbe**************************************************
     start_pwm_outputs();
+      MPU6000_init16();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
