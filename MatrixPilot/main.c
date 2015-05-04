@@ -28,6 +28,7 @@
 #include "states.h"
 #include "console.h"
 #include "flightplan-waypoints.h"
+#include "MAVLink.h"
 #include "mavlink_options.h"
 #include <setjmp.h>
 
@@ -64,6 +65,7 @@ int matrixpilot_init(void)
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 //	init_waypoints();
 #endif
+	servoMix_init();
 	init_servoPrepare();
 	init_states();
 	init_behavior();

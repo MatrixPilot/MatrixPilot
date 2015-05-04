@@ -190,9 +190,9 @@ include $(addsuffix /module.mk,$(modules))
 
 $(warning library: $(subst $(SOURCE_DIR)/,,$(libraries)))
 
-$(warning incpath: $(incpath))
+#$(warning incpath: $(incpath))
 #INCPATH += $(incpath)
-#$(warning INCPATH: $(INCPATH))
+$(warning INCPATH: $(INCPATH))
 INCLUDES += $(addprefix -I,$(INCPATH))
 #$(warning INCLUDES: $(subst -I$(SOURCE_DIR)/,,$(INCLUDES)))
 #$(warning INCLUDES: $(INCLUDES))
