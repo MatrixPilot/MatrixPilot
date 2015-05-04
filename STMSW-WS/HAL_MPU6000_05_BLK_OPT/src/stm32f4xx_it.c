@@ -36,6 +36,7 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
 #include "spi.h"
+#include "gpio.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -43,11 +44,10 @@
 
 /* External variables --------------------------------------------------------*/
 extern SPI_HandleTypeDef hspi2;
-extern DMA_HandleTypeDef hdma_spi2_tx;
-extern DMA_HandleTypeDef hdma_spi2_rx;
 extern double tempC;
 extern double X_accel, Y_accel, Z_accel;
-uint8_t data[17]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+extern uint8_t data[16];
+
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
@@ -70,34 +70,32 @@ void SysTick_Handler(void)
 
 /**
 * @brief This function handles EXTI Line0 interrupt.
-* This interrupt is fire by MPU data ready
 */
 void EXTI0_IRQHandler(void)
 {
+	int16_t tmp=0;
+	uint8_t addr=0;
+	/* EXTI line interrupt detected */
 	if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_0) != RESET)
 	{
 		__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);
-		//CS goes LOW
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-		//Put first address to read
-		data[0]=MPUREG_ACCEL_XOUT_H|0x80;
-		//Receive with DMA 16 byte + address byte
-		HAL_SPI_Receive_DMA(&hspi2, data, 17);
+		udb_MPU_CS_clr();		// CS goes LOW
+		addr = MPUREG_ACCEL_XOUT_H|0x80;
+		readMPUSPI_burst16n(&hspi2, &addr, data, 16, 0x10);
+		udb_MPU_CS_set();		// CS goes HIGH
+
+		//Process register data
+		tmp=(data[7]<<8) | data[8];
+		tempC = (double)(tmp)/340.0 + 36.53;
+		X_accel = (int16_t)((data[1]<<8) | data[2])/16384.0;
+		Y_accel = (int16_t)((data[3]<<8) | data[4])/16384.0;
+		Z_accel = (int16_t)((data[5]<<8) | data[6])/16384.0;
+		//Togle blue LED
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 	}
+
 }
-// DMA Receive Complete ISR Callback
-void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-	//CS goes LOW
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
-	//Process MPU register data
-	int16_t tmp=0;
-    tmp=(data[7]<<8) | data[8];
-    tempC = (double)(tmp)/340.0 + 36.53;
-    X_accel = (int16_t)((data[1]<<8) | data[2])/16384.0;
-    Y_accel = (int16_t)((data[3]<<8) | data[4])/16384.0;
-    Z_accel = (int16_t)((data[5]<<8) | data[6])/16384.0;
-}
+
 /**
 * @brief This function handles SPI2 global interrupt.
 */
@@ -105,21 +103,29 @@ void SPI2_IRQHandler(void)
 {
   HAL_SPI_IRQHandler(&hspi2);
 }
-/**
-* @brief This function handles DMA1 Stream3 global interrupt.
-*/
-void DMA1_Stream3_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_spi2_rx);
-}
-/**
-* @brief This function handles DMA1 Stream4 global interrupt.
-*/
-void DMA1_Stream4_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_spi2_tx);
-}
 
+/* USER CODE BEGIN 1 */
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin: Specifies the pins connected EXTI line
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	uint8_t data[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
+	int16_t tmp=0;
+
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+    data[1]=0x3B|0x80;
+    HAL_SPI_Receive(&hspi2, data, 8, 0x10);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+    tmp=(data[6]<<8) | data[7];
+    tempC = (double)(tmp)/340.0 + 36.53;
+    X_accel = (int16_t)((data[0]<<8) | data[1])/16384.0;
+    Y_accel = (int16_t)((data[2]<<8) | data[3])/16384.0;
+    Z_accel = (int16_t)((data[4]<<8) | data[5])/16384.0;
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
