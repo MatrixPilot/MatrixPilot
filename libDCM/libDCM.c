@@ -47,25 +47,33 @@ void dcm_init(void)
 	dcm_init_rmat();
 }
 
-void dcm_run_init_step(uint16_t count)
+#if (CALIB_COUNT > GPS_COUNT)
+#error here
+#endif
+
+static boolean dcm_run_calib_step(uint16_t count)
 {
 	if (count == CALIB_COUNT)
 	{
-		// Finish calibration
 		DPRINT("calib_finished\r\n");
-		dcm_flags._.calib_finished = 1;
-		dcm_calibrate();
+		dcm_calibrate();    // Finish calibration
+		return true;        // indicate that we are done
 	}
+	return false;
+}
 
+static boolean gps_run_init_step(uint16_t count)
+{
 	if (count <= GPS_COUNT)
 	{
 		gps_startup_sequence(GPS_COUNT - count); // Counts down from GPS_COUNT to 0
-		if (count == GPS_COUNT)
-		{
-			DPRINT("init_finished\r\n");
-			dcm_flags._.init_finished = 1;
-		}
 	}
+	else
+	{
+		DPRINT("init_finished\r\n");
+		return true;    // indicate that we are done
+	}
+	return false;
 }
 
 #if (BAROMETER_ALTITUDE == 1)
@@ -129,11 +137,23 @@ void udb_heartbeat_callback(void)
 
 	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();
 
-	if (!dcm_flags._.init_finished)
+//	if (!dcm_flags._.init_finished)
+//	{
+//		if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+//		{
+//			dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+//		}
+//	}
+
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
-		if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+		if (!dcm_flags._.calib_finished)
 		{
-			dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_flags._.calib_finished = dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+		}
+		if (!dcm_flags._.init_finished)
+		{
+			dcm_flags._.init_finished = gps_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
 		}
 	}
 
