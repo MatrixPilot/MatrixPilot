@@ -72,7 +72,7 @@ void gps_init(void);
 void gps_parse_common(void);
 void gps_update_basic_data(void);
 boolean gps_nav_capable_check_set(void);
-void HILSIM_set_gplane(void);
+void HILSIM_set_gplane(fractional gplane[]);
 void HILSIM_set_omegagyro(void);
 
 int32_t get_gps_date(void);

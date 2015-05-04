@@ -116,10 +116,10 @@ fractional omegaAccum[] = { 0, 0, 0 };
 
 // gravity, as measured in plane coordinate system
 #ifdef INITIALIZE_VERTICAL // VTOL vertical initialization
-fractional gplane[] = { 0, -GRAVITY, 0 };
+static fractional gplane[] = { 0, -GRAVITY, 0 };
 int16_t aero_force[] = { 0 , GRAVITY , 0 };
 #else  // horizontal initialization 
-fractional gplane[] = { 0, 0, GRAVITY };
+static fractional gplane[] = { 0, 0, GRAVITY };
 int16_t aero_force[] = { 0 , 0 , -GRAVITY };
 #endif
 
@@ -191,7 +191,7 @@ static inline void read_gyros(void)
 static inline void read_accel(void)
 {
 #if (HILSIM == 1)
-	HILSIM_set_gplane();
+	HILSIM_set_gplane(gplane);
 //	gplane[0] = g_a_x_sim.BB;
 //	gplane[1] = g_a_y_sim.BB;
 //	gplane[2] = g_a_z_sim.BB;
@@ -199,10 +199,10 @@ static inline void read_accel(void)
 	gplane[0] = XACCEL_VALUE;
 	gplane[1] = YACCEL_VALUE;
 	gplane[2] = ZACCEL_VALUE;
+#endif
 	aero_force[0] = - gplane[0];
 	aero_force[1] = - gplane[1];
 	aero_force[2] = - gplane[2];
-#endif
 
 #ifdef CATAPULT_LAUNCH_ENABLE
 	if (gplane[1] < -(GRAVITY/2))
