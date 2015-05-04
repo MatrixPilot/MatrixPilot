@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "config.h"
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
@@ -27,11 +28,6 @@
 #include "ports_config.h"
 #include <string.h>
 #include <stdio.h>
-
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
 
 #if (CONSOLE_UART != 0)
 
@@ -134,32 +130,29 @@ static void cmd_magno(char* arg)
 
 static void cmd_options(char* arg)
 {
-#if (USE_CONFIGFILE == 1)
-	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", ROLL_STABILIZATION_AILERONS);
-	printf("ROLL_STABILIZATION_RUDDER: %u\r\n", ROLL_STABILIZATION_RUDDER);
-	printf("PITCH_STABILIZATION: %u\r\n", PITCH_STABILIZATION);
-	printf("YAW_STABILIZATION_RUDDER: %u\r\n", YAW_STABILIZATION_RUDDER);
-	printf("YAW_STABILIZATION_AILERON: %u\r\n", YAW_STABILIZATION_AILERON);
-	printf("AILERON_NAVIGATION: %u\r\n", AILERON_NAVIGATION);
-	printf("RUDDER_NAVIGATION: %u\r\n", RUDDER_NAVIGATION);
-	printf("ALTITUDEHOLD_STABILIZED: %u\r\n", ALTITUDEHOLD_STABILIZED);
-	printf("ALTITUDEHOLD_WAYPOINT: %u\r\n", ALTITUDEHOLD_WAYPOINT);
-	printf("RACING_MODE: %u\r\n", RACING_MODE);
-#endif
+	printf("ROLL_STABILIZATION_AILERONS: %u\r\n", settings._.RollStabilizaionAilerons);
+	printf("ROLL_STABILIZATION_RUDDER: %u\r\n", settings._.RollStabilizationRudder);
+	printf("PITCH_STABILIZATION: %u\r\n", settings._.PitchStabilization);
+	printf("YAW_STABILIZATION_RUDDER: %u\r\n", settings._.YawStabilizationRudder);
+	printf("YAW_STABILIZATION_AILERON: %u\r\n", settings._.YawStabilizationAileron);
+	printf("AILERON_NAVIGATION: %u\r\n", settings._.AileronNavigation);
+	printf("RUDDER_NAVIGATION: %u\r\n", settings._.RudderNavigation);
+	printf("ALTITUDEHOLD_STABILIZED: %u\r\n", settings._.AltitudeholdStabilized);
+	printf("ALTITUDEHOLD_WAYPOINT: %u\r\n", settings._.AltitudeholdWaypoint);
+	printf("RACING_MODE: %u\r\n", settings._.RacingMode);
 }
 
 static void cmd_gains(char* arg)
 {
-#if (USE_CONFIGFILE == 1)
 	printf("YAWKP_AILERON: %f\r\n", (double)gains.YawKPAileron);
 	printf("YAWKD_AILERON: %f\r\n", (double)gains.YawKDAileron);
 	printf("ROLLKP: %f\r\n", (double)gains.RollKP);
 	printf("ROLLKD: %f\r\n", (double)gains.RollKD);
-	printf("AILERON_BOOST: %f\r\n", (double)gains.AileronBoost);
+//	printf("AILERON_BOOST: %f\r\n", (double)gains.AileronBoost);
 	printf("PITCHGAIN: %f\r\n", (double)gains.Pitchgain);
 	printf("PITCHKD: %f\r\n", (double)gains.PitchKD);
-	printf("RUDDER_ELEV_MIX: %f\r\n", (double)gains.RudderElevMix);
-	printf("ROLL_ELEV_MIX: %f\r\n", (double)gains.RollElevMix);
+//	printf("RUDDER_ELEV_MIX: %f\r\n", (double)gains.RudderElevMix);
+//	printf("ROLL_ELEV_MIX: %f\r\n", (double)gains.RollElevMix);
 	printf("ELEVATOR_BOOST: %f\r\n", (double)gains.ElevatorBoost);
 	printf("YAWKP_RUDDER: %f\r\n", (double)gains.YawKPRudder);
 	printf("YAWKD_RUDDER: %f\r\n", (double)gains.YawKDRudder);
@@ -174,7 +167,6 @@ static void cmd_gains(char* arg)
 	printf("ALT_HOLD_PITCH_MIN: %f\r\n", (double)gains.AltHoldPitchMin);
 	printf("ALT_HOLD_PITCH_MAX: %f\r\n", (double)gains.AltHoldPitchMax);
 	printf("ALT_HOLD_PITCH_HIGH: %f\r\n", (double)gains.AltHoldPitchHigh);
-#endif
 }
 
 static void printbin16(int a)

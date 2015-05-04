@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "config.h"
 #include "navigate.h"
 #include "behaviour.h"
 #include "flightplan.h"
@@ -378,7 +379,7 @@ void flightplan_waypoints_update(void)
 	
 	if (desired_behavior._.altitude)
 	{
-		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t)HEIGHT_MARGIN))
+		if (abs(IMUheight - navigate_get_goal(NULL)) < ((int16_t)altit.HeightMargin))
 		{
 			next_waypoint();
 		}

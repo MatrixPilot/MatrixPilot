@@ -201,6 +201,8 @@ int CamPathCount = 0;
 
 void GetGPSData(void);
 
+XPLMDataRef drTailNum, drDescrip;
+
 PLUGIN_API int XPluginStart(char* outName,
                             char* outSig,
                             char* outDesc)
@@ -209,6 +211,9 @@ PLUGIN_API int XPluginStart(char* outName,
 	strcpy(outName, "UDB HILSIM");
 	strcpy(outSig, "UDB.HardwareInLoop");
 	strcpy(outDesc, "UDB Hardware-In-Loop Simulator");
+
+	drTailNum = XPLMFindDataRef("sim/aircraft/view/acf_tailnum"); // TEXT 40 bytes
+	drDescrip = XPLMFindDataRef("sim/aircraft/view/acf_descrip"); // TEXT 260 bytes
 
 	// P, Q, and R are roll, pitch, and yaw rates, degrees per second,
 	// in the NED coordinate system, in "flight" (not body) frame of reference

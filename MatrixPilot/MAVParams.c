@@ -118,7 +118,7 @@ static boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16
 void mavlink_send_param_gyroscale_Q14(int16_t i)
 {
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
-	    (float)(*((int16_t*) mavlink_parameters_list[i].pparam) / (SCALEGYRO * 16384.0)),
+	    (float)(*((int16_t*)mavlink_parameters_list[i].pparam) / (SCALEGYRO * 16384.0)),
 	    MAVLINK_TYPE_FLOAT, count_of_parameters_list, i); // 16384.0 is RMAX defined as a float.
 }
 
@@ -129,6 +129,20 @@ void mavlink_set_param_gyroscale_Q14(mavlink_param_union_t setting, int16_t i)
 	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * (SCALEGYRO * 16384.0));
 }
 
+void mavlink_send_param_float(int16_t i)
+{
+	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
+	    *((float*)mavlink_parameters_list[i].pparam),
+	    MAVLINK_TYPE_FLOAT, count_of_parameters_list, i);
+}
+
+void mavlink_set_param_float(mavlink_param_union_t setting, int16_t i)
+{
+	if (setting.type != MAVLINK_TYPE_FLOAT) return;
+
+	*((float*)mavlink_parameters_list[i].pparam) = setting.param_float;
+}
+
 void mavlink_send_param_Q14(int16_t i)
 {
 #if (QGROUNDCTONROL_PID_COMPATIBILITY == 1) // see mavlink_options.h for details
@@ -137,7 +151,7 @@ void mavlink_send_param_Q14(int16_t i)
 	    MAVLINK_TYPE_FLOAT, count_of_parameters_list, i); // 16384.0 is RMAX defined as a float.
 #else
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
-	    (float)(*((int16_t*) mavlink_parameters_list[i].pparam) / 16384.0),
+	    (float)(*((int16_t*)mavlink_parameters_list[i].pparam) / 16384.0),
 	    MAVLINK_TYPE_FLOAT, count_of_parameters_list, i); // 16384.0 is RMAX defined as a float.
 #endif
 }
@@ -183,7 +197,7 @@ void mavlink_set_param_int16(mavlink_param_union_t setting, int16_t i)
 {
 	if (setting.type != MAVLINK_TYPE_INT32_T) return;
 
-	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t) setting.param_int32;
+	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)setting.param_int32;
 }
 
 void mavlink_send_param_null(int16_t UNUSED(i))
@@ -362,7 +376,7 @@ static int16_t get_param_index(const char* key)
 			return i;
 		}
 	}
-	DPRINT("unknown parameter name: %s\r\n", key);
+	//DPRINT("unknown parameter name: %s\r\n", key);
 	return -1;
 }
 
@@ -488,7 +502,6 @@ static void MAVParamsRequestRead(const mavlink_message_t* handle_msg)
 			DPRINT("Requested specific parameter %u %s\r\n", packet.param_index, (const char*)packet.param_id);
 			send_by_index = packet.param_index;
 			mavlink_flags.mavlink_send_specific_variable = 1;
-			DPRINT("Sending specific parameter\r\n");
 		}
 	}
 }
@@ -511,7 +524,6 @@ boolean MAVParamsHandleMessage(mavlink_message_t* handle_msg)
 		{
 			// decode
 			//send_text((uint8_t*)"Param Set\r\n");
-			//DPRINT("Param Set\r\n");
 			MAVParamsSet(handle_msg);
 			break;
 		}
@@ -542,6 +554,7 @@ void MAVParamsOutput_40hz(void)
 	if (mavlink_flags.mavlink_send_specific_variable == 1)
 	{
 		mavlink_parameter_parsers[mavlink_parameters_list[send_by_index].udb_param_type].send_param(send_by_index);
+		DPRINT("Sending specific parameter, value = %f\r\n", (float)(*((float*)mavlink_parameters_list[send_by_index].pparam)));
 		mavlink_flags.mavlink_send_specific_variable = 0;
 	}
 }

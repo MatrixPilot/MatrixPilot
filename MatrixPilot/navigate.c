@@ -24,6 +24,7 @@
 #include "behaviour.h"
 #include "cameraCntrl.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "flightplan.h"
 #include "flightplan-waypoints.h"
@@ -44,11 +45,6 @@
 // angle of the vector from the origin to the location of the plane.
 
 // The origin is recorded as the location of the plane during power up of the control.
-
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
 
 uint16_t yawkpail; // only exported for parameter_table
 uint16_t yawkprud; // only exported for parameter_table
@@ -91,18 +87,16 @@ int16_t navigate_get_goal(vect3_16t* _goal)
 
 void init_navigation(void)
 {
-	yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
-	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
-	turngainnav = (uint16_t)((TURN_RATE_NAV/57.3)*RMAX);
-	turngainfbw = (uint16_t)((TURN_RATE_FBW/57.3)*RMAX);
+	yawkpail = (uint16_t)(gains.YawKPAileron*RMAX);
+	yawkprud = (uint16_t)(gains.YawKPRudder*RMAX);
+	turngainnav = (uint16_t)((turns.TurnRateNav/57.3)*RMAX);
+	turngainfbw = (uint16_t)((turns.TurnRateFBW/57.3)*RMAX);
 }
 
 void save_navigation(void)
 {
-#if (USE_CONFIGFILE == 1)
 	gains.YawKPAileron = (float)yawkpail / (RMAX);
 	gains.YawKPRudder  = (float)yawkprud / (RMAX);
-#endif // USE_CONFIGFILE
 }
 
 static void setup_origin(void)

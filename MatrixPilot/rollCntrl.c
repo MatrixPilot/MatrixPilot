@@ -23,14 +23,10 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "helicalTurnCntrl.h"
 #include "../libDCM/rmat.h"
-
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
 
 uint16_t yawkdail;
 uint16_t rollkp;
@@ -44,23 +40,21 @@ void hoverRollCntrl(void);
 
 void init_rollCntrl(void)
 {
-	yawkdail    = (uint16_t)(YAWKD_AILERON*SCALEGYRO*RMAX);
-	rollkp      = (uint16_t)(ROLLKP*RMAX);
-	rollkpfdfwd = (uint16_t)(FEED_FORWARD*ROLLKP*RMAX);
-	rollkd      = (uint16_t)(ROLLKD*SCALEGYRO*RMAX);
-	hoverrollkp = (uint16_t)(HOVER_ROLLKP*SCALEGYRO*RMAX);
-	hoverrollkd = (uint16_t)(HOVER_ROLLKD*SCALEGYRO*RMAX);
+	yawkdail    = (uint16_t)(gains.YawKDAileron*SCALEGYRO*RMAX);
+	rollkp      = (uint16_t)(gains.RollKP*RMAX);
+	rollkpfdfwd = (uint16_t)(turns.FeedForward*gains.RollKP*RMAX);
+	rollkd      = (uint16_t)(gains.RollKD*SCALEGYRO*RMAX);
+	hoverrollkp = (uint16_t)(hover.HoverRollKP*SCALEGYRO*RMAX);
+	hoverrollkd = (uint16_t)(hover.HoverRollKD*SCALEGYRO*RMAX);
 }
 
 void save_rollCntrl(void)
 {
-#if (USE_CONFIGFILE == 1)
 	gains.YawKDAileron = (float)yawkdail    / (SCALEGYRO*RMAX);
 	gains.RollKP       = (float)rollkp      / (RMAX);
 	gains.RollKD       = (float)rollkd      / (SCALEGYRO*RMAX);
-	gains.HoverRollKP  = (float)hoverrollkp / (SCALEGYRO*RMAX);
-	gains.HoverRollKD  = (float)hoverrollkd / (SCALEGYRO*RMAX);
-#endif // USE_CONFIGFILE
+	hover.HoverRollKP  = (float)hoverrollkp / (SCALEGYRO*RMAX);
+	hover.HoverRollKD  = (float)hoverrollkd / (SCALEGYRO*RMAX);
 }
 
 void rollCntrl(void)
@@ -94,7 +88,7 @@ void normalRollCntrl(void)
 #ifdef TestGains
 	state_flags._.pitch_feedback = 1;
 #endif
-	if (ROLL_STABILIZATION_AILERONS && state_flags._.pitch_feedback)
+	if (settings._.RollStabilizaionAilerons && state_flags._.pitch_feedback)
 	{
 		gyroRollFeedback.WW = - __builtin_mulus(rollkd, rotationRateError[1]);
 		rollAccum.WW -= __builtin_mulsu(tiltError[1], rollkp);
@@ -104,7 +98,7 @@ void normalRollCntrl(void)
 	{
 		gyroRollFeedback.WW = 0;
 	}
-	if (YAW_STABILIZATION_AILERON && state_flags._.pitch_feedback)
+	if (settings._.YawStabilizationAileron && state_flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW = - __builtin_mulus(yawkdail, omegaAccum2);
 	}
@@ -123,9 +117,9 @@ void hoverRollCntrl(void)
 
 	if (state_flags._.pitch_feedback)
 	{
-		if (AILERON_NAVIGATION && state_flags._.GPS_steering)
+		if (settings._.AileronNavigation && state_flags._.GPS_steering)
 		{
-			rollNavDeflection = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS/2) ? navigate_determine_deflection('h') : 0;
+			rollNavDeflection = (tofinish_line > hover.HoverNavMaxPitchRadius/2) ? navigate_determine_deflection('h') : 0;
 		}
 		else
 		{

@@ -21,6 +21,7 @@
 
 #include "defines.h"
 #include "states.h"
+#include "config.h"
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
@@ -31,45 +32,41 @@
 #include "../libDCM/rmat.h"
 #include <math.h>
 
-#ifndef RTL_PITCH_DOWN
-#define RTL_PITCH_DOWN (0.0)
-#endif // RLT_PITCH_DOWN
+//#ifndef RTL_PITCH_DOWN
+//#define RTL_PITCH_DOWN (0.0)
+//#endif // RLT_PITCH_DOWN
 
-#ifndef INVERTED_NEUTRAL_PITCH
-#define INVERTED_NEUTRAL_PITCH (0.0)
-#endif // INVERTED_NEUTRAL_PITCH
+//#ifndef ANGLE_OF_ATTACK_NORMAL
+//#define ANGLE_OF_ATTACK_NORMAL (0.0)
+//#endif // ANGLE_OF_ATTACK_NORMAL
 
-#ifndef ANGLE_OF_ATTACK_NORMAL
-#define ANGLE_OF_ATTACK_NORMAL (0.0)
-#endif // ANGLE_OF_ATTACK_NORMAL
+//#ifndef ANGLE_OF_ATTACK_INVERTED
+//#define ANGLE_OF_ATTACK_INVERTED (0.0)
+//#endif // ANGLE_OF_ATTACK_INVERTED
 
-#ifndef ANGLE_OF_ATTACK_INVERTED
-#define ANGLE_OF_ATTACK_INVERTED (0.0)
-#endif // ANGLE_OF_ATTACK_INVERTED
+//#ifndef ELEVATOR_TRIM_NORMAL
+//#define ELEVATOR_TRIM_NORMAL (0.0)
+//#endif // ELEVATOR_TRIM_NORMAL
 
-#ifndef ELEVATOR_TRIM_NORMAL
-#define ELEVATOR_TRIM_NORMAL (0.0)
-#endif // ELEVATOR_TRIM_NORMAL
+//#ifndef ELEVATOR_TRIM_INVERTED
+//#define ELEVATOR_TRIM_INVERTED (0.0)
+//#endif // ELEVATOR_TRIM_INVERTED
 
-#ifndef ELEVATOR_TRIM_INVERTED
-#define ELEVATOR_TRIM_INVERTED (0.0)
-#endif // ELEVATOR_TRIM_INVERTED
-
-#ifndef CRUISE_SPEED
-#define CRUISE_SPEED (12.0)
-#endif // RLT_PITCH_DOWN
+//#ifndef CRUISE_SPEED
+//#define CRUISE_SPEED (12.0)
+//#endif // CRUISE_SPEED
 
 #ifndef INVERTED_NEUTRAL_PITCH
 #define INVERTED_NEUTRAL_PITCH (0.0)
 #endif
 
-#define RTLKICK            ((int32_t)(RTL_PITCH_DOWN*(RMAX/57.3)))
+#define RTLKICK            ((int32_t)(gains.RtlPitchDown*(RMAX/57.3)))
 #define INVNPITCH          ((int32_t)(INVERTED_NEUTRAL_PITCH*(RMAX/57.3)))
-#define AOA_NORMAL         ((int16_t)(ANGLE_OF_ATTACK_NORMAL*(RMAX/57.3)))
-#define AOA_INVERTED       ((int16_t)(ANGLE_OF_ATTACK_INVERTED*(RMAX/57.3)))
-#define ELEV_TRIM_NORMAL   ((int16_t)SERVORANGE*ELEVATOR_TRIM_NORMAL)
-#define ELEV_TRIM_INVERTED ((int16_t)SERVORANGE*ELEVATOR_TRIM_INVERTED)
-#define STALL_SPEED_CM_SEC ((uint16_t)CRUISE_SPEED*50.0) // assume stall speed approximately 1/2 of cruise speed
+#define AOA_NORMAL         ((int16_t)(turns.AngleOfAttackNormal*(RMAX/57.3)))
+#define AOA_INVERTED       ((int16_t)(turns.AngleOfAttackInverted*(RMAX/57.3)))
+#define ELEV_TRIM_NORMAL   ((int16_t)SERVORANGE*turns.ElevatorTrimNormal)
+#define ELEV_TRIM_INVERTED ((int16_t)SERVORANGE*turns.ElevatorTrimInverted)
+#define STALL_SPEED_CM_SEC ((uint16_t)turns.CruiseSpeed*50.0) // assume stall speed approximately 1/2 of cruise speed
 
 #define AOA_OFFSET           ((int16_t)((AOA_NORMAL + AOA_INVERTED)/2)) // offset is the average of the two values
 #define AOA_SLOPE            ((int16_t)((AOA_NORMAL - AOA_INVERTED) * 4)) // multiply by 4 because base speed is 1/2 of cruise
@@ -253,7 +250,7 @@ void helicalTurnCntrl(void)
 
 	accum.WW = __builtin_mulsu(steeringInput, turngainfbw) /(2*MAX_INPUT);
 
-	if ((AILERON_NAVIGATION||RUDDER_NAVIGATION) && state_flags._.GPS_steering)
+	if ((settings._.AileronNavigation || settings._.RudderNavigation) && state_flags._.GPS_steering)
 	{
 		accum.WW +=(int32_t) navigate_determine_deflection('t');
 	}

@@ -20,9 +20,11 @@
 
 #include "defines.h"
 
+#define USE_TELEMETRY
 #ifdef USE_TELEMETRY
 
 #include "states.h"
+#include "config.h"
 #include "navigate.h"
 #include "cameraCntrl.h"
 #include "flightplan.h"
@@ -61,9 +63,10 @@
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 // SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
 
+#ifndef SERIAL_OUTPUT_FORMAT
 //#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE    // TODO: this will have missing dependencies
-#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB
-
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
+#endif // SERIAL_OUTPUT_FORMAT
 
 ////////////////////////////////////////////////////////////////////////////////
 // MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations)
@@ -592,12 +595,12 @@ void telemetry_output_8hz(void)
 			break;
 		case 9:
 			serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
-			    FEED_FORWARD, TURN_RATE_NAV, TURN_RATE_FBW);
+			    turns.FeedForward, turns.TurnRateNav, turns.TurnRateFBW);
 			break;
 		case 8:
 			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
-			    ANGLE_OF_ATTACK_NORMAL, ANGLE_OF_ATTACK_INVERTED, ELEVATOR_TRIM_NORMAL,
-			    ELEVATOR_TRIM_INVERTED, CRUISE_SPEED);
+			    turns.AngleOfAttackNormal, turns.AngleOfAttackInverted, turns.ElevatorTrimNormal,
+			    turns.ElevatorTrimInverted, turns.CruiseSpeed);
 			break;
 		case 7:
 			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",
@@ -614,25 +617,25 @@ void telemetry_output_8hz(void)
 			break;
 		case 5:
 			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
-			    ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
-			    AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE);
+			    settings._.RollStabilizaionAilerons, settings._.RollStabilizationRudder, settings._.PitchStabilization, settings._.YawStabilizationRudder, settings._.YawStabilizationAileron,
+			    settings._.AileronNavigation, settings._.RudderNavigation, settings._.AltitudeholdStabilized, settings._.AltitudeholdWaypoint, settings._.RacingMode);
 			break;
 		case 4:
 			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%5.3f:A_BOOST=NULL\r\n",
-			    YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD);
+			    gains.YawKPAileron, gains.YawKDAileron, gains.RollKP, gains.RollKD);
 			break;
 		case 3:
 			serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=NULL:ROL_E_MIX=NULL:E_BOOST=%3.1f:\r\n",
-			    PITCHGAIN, PITCHKD, ELEVATOR_BOOST);
+			    gains.Pitchgain, gains.PitchKD, gains.ElevatorBoost);
 			break;
 		case 2:
 			serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",
-			    YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER, ROLLKD_RUDDER, RUDDER_BOOST, RTL_PITCH_DOWN);
+			    gains.YawKPRudder, gains.YawKDRudder, gains.RollKPRudder, gains.RollKDRudder, gains.RudderBoost, gains.RtlPitchDown);
 			break;
 		case 1:
 			serial_output("F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n",
-			    HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
-			    ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH);
+			    altit.HeightTargetMax, altit.HeightTargetMin, altit.AltHoldThrottleMin, altit.AltHoldThrottleMax,
+			    altit.AltHoldPitchMin, altit.AltHoldPitchMax, altit.AltHoldPitchHigh);
 			break;
 		default:
 		{

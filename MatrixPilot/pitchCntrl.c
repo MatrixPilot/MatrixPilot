@@ -23,6 +23,7 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
@@ -30,13 +31,8 @@
 #include "../libUDB/servoOut.h"
 #include "../libDCM/rmat.h"
 
-#define HOVERPOFFSET ((int32_t)(HOVER_PITCH_OFFSET*(RMAX/57.3)))
-#define HOVERPTOWP ((int32_t)(HOVER_PITCH_TOWARDS_WP*(RMAX/57.3)))
-
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
+#define HOVERPOFFSET ((int32_t)(hover.HoverPitchOffset*(RMAX/57.3)))
+#define HOVERPTOWP ((int32_t)(hover.HoverPitchTowardsWP*(RMAX/57.3)))
 
 uint16_t pitchgain;
 uint16_t pitchfdfwd;
@@ -55,23 +51,21 @@ static void hoverPitchCntrl(void);
 
 void init_pitchCntrl(void)
 {
-	pitchgain = (uint16_t)(PITCHGAIN*RMAX);
-	pitchfdfwd = (uint16_t)(FEED_FORWARD*PITCHGAIN*RMAX);
-	pitchkd = (uint16_t) (PITCHKD*SCALEGYRO*RMAX);
-	hoverpitchgain = (uint16_t)(HOVER_PITCHGAIN*RMAX);
-	hoverpitchkd = (uint16_t) (HOVER_PITCHKD*SCALEGYRO*RMAX);
+	pitchgain = (uint16_t)(gains.Pitchgain*RMAX);
+	pitchfdfwd = (uint16_t)(turns.FeedForward*gains.Pitchgain*RMAX);
+	pitchkd = (uint16_t) (gains.PitchKD*SCALEGYRO*RMAX);
+	hoverpitchgain = (uint16_t)(hover.HoverPitchGain*RMAX);
+	hoverpitchkd = (uint16_t) (hover.HoverPitchKD*SCALEGYRO*RMAX);
 }
 
 void save_pitchCntrl(void)
 {
-#if (USE_CONFIGFILE == 1)
 	gains.Pitchgain      = (float)pitchgain         / (RMAX);
 	gains.PitchKD        = (float)pitchkd           / (SCALEGYRO*RMAX);
-	gains.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
-	gains.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
+	hover.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
+	hover.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
 //	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
 //	gains.RollElevMix    = (float)rollElevMixGain   / (RMAX);
-#endif // USE_CONFIGFILE
 }
 
 void pitchCntrl(void)
@@ -97,7 +91,7 @@ static void normalPitchCntrl(void)
 	state_flags._.pitch_feedback = 1; // turn stabilization on
 #endif
 
-	if (PITCH_STABILIZATION && state_flags._.pitch_feedback)
+	if (settings._.PitchStabilization && state_flags._.pitch_feedback)
 	{
 		pitchAccum.WW = __builtin_mulsu(tiltError[0], pitchgain) 
 		              - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd)
@@ -127,8 +121,8 @@ static void hoverPitchCntrl(void)
 		manualPitchOffset = elevInput * (int16_t)(RMAX/600);
 		if (state_flags._.GPS_steering)
 		{
-			pitchToWP = (tofinish_line > HOVER_NAV_MAX_PITCH_RADIUS) ?
-			    HOVERPTOWP : (HOVERPTOWP / HOVER_NAV_MAX_PITCH_RADIUS * tofinish_line);
+			pitchToWP = (tofinish_line > hover.HoverNavMaxPitchRadius) ?
+			    HOVERPTOWP : (HOVERPTOWP / hover.HoverNavMaxPitchRadius* tofinish_line);
 		}
 		else
 		{

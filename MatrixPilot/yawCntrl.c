@@ -23,16 +23,12 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "helicalTurnCntrl.h"
 #include "../libDCM/rmat.h"
 
-#define HOVERYOFFSET ((int32_t)(HOVER_YAW_OFFSET*(RMAX/57.3)))
-
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
+#define HOVERYOFFSET ((int32_t)(hover.HoverYawOffset*(RMAX/57.3)))
 
 uint16_t yawkdrud;
 uint16_t yawkpfdfwd;
@@ -46,23 +42,21 @@ void hoverYawCntrl(void);
 
 void init_yawCntrl(void)
 {
-	yawkdrud   = (uint16_t)(YAWKD_RUDDER*SCALEGYRO*RMAX);
-	yawkpfdfwd = (uint16_t)(FEED_FORWARD*YAWKP_RUDDER*RMAX);
-	rollkprud  = (uint16_t)(ROLLKP_RUDDER*RMAX);
-	rollkdrud  = (uint16_t)(ROLLKD_RUDDER*SCALEGYRO*RMAX);
-	hoveryawkp = (uint16_t)(HOVER_YAWKP*RMAX);
-	hoveryawkd = (uint16_t)(HOVER_YAWKD*SCALEGYRO*RMAX);
+	yawkdrud   = (uint16_t)(gains.YawKDRudder*SCALEGYRO*RMAX);
+	yawkpfdfwd = (uint16_t)(turns.FeedForward*gains.YawKPRudder*RMAX);
+	rollkprud  = (uint16_t)(gains.RollKPRudder*RMAX);
+	rollkdrud  = (uint16_t)(gains.RollKDRudder*SCALEGYRO*RMAX);
+	hoveryawkp = (uint16_t)(hover.HoverYawKP*RMAX);
+	hoveryawkd = (uint16_t)(hover.HoverYawKD*SCALEGYRO*RMAX);
 }
 
 void save_yawCntrl(void)
 {
-#if (USE_CONFIGFILE == 1)
 	gains.YawKDRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
 	gains.RollKPRudder = (float)rollkprud  / (RMAX);
 	gains.RollKDRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
-	gains.HoverYawKP   = (float)hoveryawkp / (RMAX);
-	gains.HoverYawKD   = (float)hoveryawkd / (SCALEGYRO*RMAX);
-#endif // USE_CONFIGFILE
+	hover.HoverYawKP   = (float)hoveryawkp / (RMAX);
+	hover.HoverYawKD   = (float)hoveryawkd / (SCALEGYRO*RMAX);
 }
 
 void yawCntrl(void)
@@ -89,7 +83,7 @@ void normalYawCntrl(void)
 	state_flags._.pitch_feedback = 1; // turn on stabilization
 #endif 
 
-	if (YAW_STABILIZATION_RUDDER && state_flags._.pitch_feedback)
+	if (settings._.YawStabilizationRudder && state_flags._.pitch_feedback)
 	{
 		gyroYawFeedback.WW =  - __builtin_mulsu(rotationRateError[2], yawkdrud);
 		yawStabilization.WW = - __builtin_mulsu(tiltError[2], yawkprud ) ;  // yaw orientation error in body frame
@@ -102,7 +96,7 @@ void normalYawCntrl(void)
 	}
 
 	rollStabilization.WW = 0; // default case is no roll rudder stabilization
-	if (ROLL_STABILIZATION_RUDDER && state_flags._.pitch_feedback)
+	if (settings._.RollStabilizationRudder && state_flags._.pitch_feedback)
 	{
 		rollStabilization.WW = - __builtin_mulsu(tiltError[1], rollkprud); // this works right side up or upside down
 	}

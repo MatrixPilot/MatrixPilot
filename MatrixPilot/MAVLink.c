@@ -194,7 +194,7 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 
 #if (USE_TELELOG == 1)
 //printf("calling log_telemetry with %u bytes\r\n", len);
-	log_telemetry(buf, len);
+//	log_telemetry(buf, len);
 #endif // USE_TELELOG
 
 	// Note at the moment, all channels lead to the one serial port
@@ -222,7 +222,11 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 	if (serial_interrupt_stopped == 1)
 	{
 		serial_interrupt_stopped = 0;
+#if (SILSIM == 1)
+		mavlink_start_sending_data();
+#else
 		udb_serial_start_sending_data();
+#endif
 	}
 	return (1);
 }
@@ -950,9 +954,9 @@ void mavlink_output_40hz(void)
 		    0,              // Sensors enabled
 		    0,              // Sensor health
 		    udb_cpu_load() * 10,
-		    0,              // Battery voltage in mV
-		    0,              // Current
-		    0,              // Percentage battery remaining 100 percent is 1000
+		    11100,          // Battery voltage in mV
+		    1200,           // Current
+		    78,             // Percentage battery remaining 100 percent is 1000
 		    r_mavlink_status.packet_rx_drop_count,
 		    0,              // errors_comm
 		    0,              // errors_count1

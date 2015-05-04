@@ -23,12 +23,9 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
+// This file includes most of the user-configuration for this firmware,
+// one of the exceptions being waypoints, which live in the waypoints.h file.
 //
-// Note that there is a small but growing library of preset options.h files for
-// specific planes located in the MatrixPilot/example-options-files directory.
-// You can use one of those files by replacing this file with that one.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -334,9 +331,31 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
+// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
+// This determines the format of the output sent out the spare serial port.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
+// SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
+// SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
+// SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
+// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
+// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
+// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
+// Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
+
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
+
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for either standard telemetry streams or MAVLink
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+//#define SERIAL_BAUDRATE                     19200 // default
+#define SERIAL_BAUDRATE                     115200
+
+
+////////////////////////////////////////////////////////////////////////////////
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       1
+//#define MAVLINK_SYSID                       1 // now defined in mavlink_options.h
 
 
 // NUM_ANALOG_INPUTS:
@@ -492,7 +511,8 @@
 // Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
 
 // The following are the values for HILSIM EasyStar2:
-#define CRUISE_SPEED                      ( 12.0 )
+//#define CRUISE_SPEED                      ( 12.0 )
+#define CRUISE_SPEED                      ( 36.0 )    // RobD: modified for XPlane-Cessna
 #define ANGLE_OF_ATTACK_NORMAL            ( -0.8 )
 #define ANGLE_OF_ATTACK_INVERTED          ( -7.2 )
 #define ELEVATOR_TRIM_NORMAL              ( -0.03 )
@@ -793,11 +813,6 @@
 // Set this to 1 to enable logging telemetry to filesystem
 #ifndef USE_TELELOG
 #define USE_TELELOG                         1
-#endif
-
-// Set this to 1 to enable loading options settings from an initialisation (ini) file
-#ifndef USE_CONFIGFILE
-#define USE_CONFIGFILE                      1
 #endif
 
 // Set this to 1 to enable the USB stack on AUAV3

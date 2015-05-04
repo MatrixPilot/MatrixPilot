@@ -95,7 +95,12 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	<setFunction>mavlink_set_dcm_angle</setFunction>
 	<mavlinkType>MAVLINK_TYPE_INT32_T</mavlinkType>
 	</udbType>
-
+	<udbType>
+	<typeName>UDB_TYPE_FLOAT</typeName>
+	<sendFunction>mavlink_send_param_float</sendFunction>
+	<setFunction>mavlink_set_param_float</setFunction>
+	<mavlinkType>MAVLINK_TYPE_FLOAT</mavlinkType>
+	</udbType>
 </udbTypes>
 
 <parameterBlocks>
@@ -146,7 +151,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
-
 			<parameter>
 				<parameterName>PID_PITCHGAIN</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
@@ -166,16 +170,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
-				<parameterName>PID_RUDELEVGAIN</parameterName>
-				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
-				<variable_name>rudderElevMixGain</variable_name>
-				<description>Roll differential gain</description>
-				<min>0.0</min>
-				<max>0.5</max>
-				<readonly>false</readonly>
-			</parameter>
-			
-			<parameter>
 				<parameterName>PID_ROLLKPRUD</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
 				<variable_name>rollkprud</variable_name>
@@ -184,7 +178,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
-
 			<parameter>
 				<parameterName>PID_YAWKPRUD</parameterName>
 				<udb_param_type>UDB_TYPE_Q14</udb_param_type>
@@ -221,7 +214,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>0.5</max>
 				<readonly>false</readonly>
 			</parameter>
-			
 		</parameters>
 		<description>PID Settings Block </description>
 	</parameterBlock>
@@ -235,6 +227,9 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 			<serialisationFlag>STORE_CALIB</serialisationFlag>
 		</serialisationFlags>
+		<includes>
+			<includeString>../libUDB/magnetometer.h</includeString>
+		</includes>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
 		<parameters>
@@ -247,7 +242,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-	
 			<parameter>
 				<parameterName>MAG_CAL_RAW1</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
@@ -257,7 +251,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-	
 			<parameter>
 				<parameterName>MAG_CAL_RAW2</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
@@ -276,7 +269,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-	
 			<parameter>
 				<parameterName>MAG_GAIN1</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
@@ -286,7 +278,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-	
 			<parameter>
 				<parameterName>MAG_GAIN2</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
@@ -305,7 +296,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-	
 			<parameter>
 				<parameterName>MAG_OFFSET1</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
@@ -315,7 +305,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-	
 			<parameter>
 				<parameterName>MAG_OFFSET2</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
@@ -325,7 +314,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-
 			<parameter>
 				<parameterName>MAG_DECLINATION</parameterName>
 				<udb_param_type>UDB_TYPE_INT_CIRCULAR</udb_param_type>
@@ -387,8 +375,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>2200.0</max>
 				<readonly>true</readonly>
 			</parameter>
-
-
 			<parameter>
 				<parameterName>PWTRIM_ROLL</parameterName>
 				<udb_param_type>UDB_TYPE_PWTRIM</udb_param_type>
@@ -493,7 +479,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	</parameterBlock>
 
 
-
 	<parameterBlock>
 		<blockName>IMU_CALIB</blockName>
 		<storage_area>IMU_CALIB</storage_area>
@@ -501,13 +486,10 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 			<serialisationFlag>STORE_CALIB</serialisationFlag>
 		</serialisationFlags>
+		<includes>
+			<includeString>../libUDB/ADchannel.h</includeString>
+		</includes>
 		<externs>
-			<externString>struct ADchannel udb_xaccel</externString>
-			<externString>struct ADchannel udb_yaccel</externString>
-			<externString>struct ADchannel udb_zaccel</externString>
-			<externString>struct ADchannel udb_xrate</externString>
-			<externString>struct ADchannel udb_yrate</externString>
-			<externString>struct ADchannel udb_zrate</externString>
 		</externs>
 		<load_callback>udb_skip_imu_calibration</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
@@ -539,9 +521,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>32767</max>
 				<readonly>true</readonly>
 			</parameter>
-			
-	
-		<parameter>
+			<parameter>
 				<parameterName>IMU_XGYRO_OFF</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
 				<variable_name>udb_xrate.offset</variable_name>
@@ -580,8 +560,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 	</parameters>
 		<description>Radio input pulse width offset calibration</description>
 	</parameterBlock>
-	
-	
+
+
 	<parameterBlock>
 		<blockName>THROTTLE_HEIGHT_OPTIONS</blockName>
 		<storage_area>THROTTLE_HEIGHT_OPTIONS</storage_area>
@@ -589,21 +569,9 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
-		<externs>
-			<externString>int16_t height_target_min</externString>
-			<externString>int16_t height_target_max</externString>
-			<externString>int16_t height_margin</externString>
-			<externString>fractional alt_hold_throttle_min</externString>
-			<externString>fractional alt_hold_throttle_max</externString>
-			<externString>int16_t alt_hold_pitch_min</externString>
-			<externString>int16_t alt_hold_pitch_max</externString>
-			<externString>int16_t alt_hold_pitch_high</externString>
-			<externString>int16_t rtl_pitch_down</externString>
-			<externString>int16_t minimum_groundspeed</externString>
-			<externString>int16_t maximum_airspeed</externString>
-			<externString>int16_t minimum_airspeed</externString>
-			<externString>int16_t desiredSpeed</externString>
-		</externs>
+		<includes>
+			<includeString>altitudeCntrl.h</includeString>
+		</includes>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
 		<parameters>
@@ -613,7 +581,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<variable_name>height_target_min</variable_name>
 				<description>Minimum taget height during stabilized flight</description>
 				<min>0</min>
-				<max>1</max>
+				<max>5000</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
@@ -622,7 +590,7 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<variable_name>height_target_max</variable_name>
 				<description>Maximum taget height during stabilized flight</description>
 				<min>0</min>
-				<max>1</max>
+				<max>5000</max>
 				<readonly>false</readonly>
 			</parameter>
 			<parameter>
@@ -670,7 +638,6 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>89</max>
 				<readonly>false</readonly>
 			</parameter>
-			
 			<parameter>
 				<parameterName>TH_P_HIGH</parameterName>
 				<udb_param_type>UDB_TYPE_INT</udb_param_type>
@@ -690,11 +657,8 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<readonly>false</readonly>
 			</parameter>
 		</parameters>
-	
 		<description>Throttle and height control gains and options</description>
 	</parameterBlock>
-
-
 
 
 	<parameterBlock>
@@ -704,18 +668,9 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
 			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
 		</serialisationFlags>
-		<externs>
-			<externString>int16_t minimum_groundspeed</externString>
-			<externString>int16_t maximum_airspeed</externString>
-			<externString>int16_t minimum_airspeed</externString>
-			<externString>int16_t cruise_airspeed</externString>
-			<externString>int16_t desiredSpeed</externString>
-			<externString>int16_t airspeed_pitch_min_aspd</externString>
-			<externString>int16_t airspeed_pitch_max_aspd</externString>
-			<externString>int16_t airspeed_pitch_adjust_rate</externString>
-			<externString>fractional airspeed_pitch_ki</externString>
-			<externString>int16_t airspeed_pitch_ki_limit</externString>
-		</externs>
+		<includes>
+			<includeString>airspeedCntrl.h</includeString>
+		</includes>
 		<load_callback>NULL</load_callback>
 		<in_mavlink_parameters>true</in_mavlink_parameters>
 		<parameters>
@@ -809,19 +764,99 @@ xsi:schemaLocation="ParameterDB ParameterDatabase.xsd">
 				<max>45.0</max>
 				<readonly>false</readonly>
 			</parameter>
-			
-			
 		</parameters>
-	
 		<description>Airspeed options</description>
 	</parameterBlock>
 
-
-
+	<parameterBlock>
+		<blockName>TURNS_OPTIONS</blockName>
+		<storage_area>TURNS_OPTIONS</storage_area>
+		<serialisationFlags>
+			<serialisationFlag>LOAD_AT_STARTUP</serialisationFlag>
+			<serialisationFlag>LOAD_AT_REBOOT</serialisationFlag>
+		</serialisationFlags>
+		<includes>
+			<includeString>config.h</includeString>
+		</includes>
+		<load_callback>NULL</load_callback>
+		<in_mavlink_parameters>true</in_mavlink_parameters>
+		<parameters>
+			<parameter>
+				<parameterName>TURN_ELE_TR_NRM</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.ElevatorTrimNormal</variable_name>
+				<description>Elevator Trim Normal</description>
+				<min>-1.0</min>
+				<max>1.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TURN_ELE_TR_INV</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.ElevatorTrimInverted</variable_name>
+				<description>Elevator Trim Inverted</description>
+				<min>-1.0</min>
+				<max>1.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TURN_CRUISE_SPD</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.CruiseSpeed</variable_name>
+				<description>CruiseSpeed</description>
+				<min>0.0</min>
+				<max>999.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TURN_AOA_NORMAL</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.AngleOfAttackNormal</variable_name>
+				<description>AngleOfAttackNormal</description>
+				<min>-90.0</min>
+				<max>90.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TURN_AOA_INV</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.AngleOfAttackInverted</variable_name>
+				<description>AngleOfAttackInverted</description>
+				<min>-90.0</min>
+				<max>90.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TURN_FEED_FWD</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.FeedForward</variable_name>
+				<description>Feed Forward</description>
+				<min>0.0</min>
+				<max>100.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TURN_RATE_NAV</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.TurnRateNav</variable_name>
+				<description>TurnRateNav</description>
+				<min>0.0</min>
+				<max>100.0</max>
+				<readonly>false</readonly>
+			</parameter>
+			<parameter>
+				<parameterName>TURN_RATE_FBW</parameterName>
+				<udb_param_type>UDB_TYPE_FLOAT</udb_param_type>
+				<variable_name>turns.TurnRateFBW</variable_name>
+				<description>TurnRateFBW</description>
+				<min>0.0</min>
+				<max>100.0</max>
+				<readonly>false</readonly>
+			</parameter>
+		</parameters>
+		<description>Turns options</description>
+	</parameterBlock>
 
 </parameterBlocks>
-
-
-
 
 </ParameterDatabase>

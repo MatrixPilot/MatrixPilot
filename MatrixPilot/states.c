@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "mode_switch.h"
 #include "flightplan.h"
+#include "config.h"
 #include "states.h"
 #include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
@@ -231,16 +232,17 @@ static void ent_stabilizedS(void)
 {
 	DPRINT("ent_stabilizedS\r\n");
 
-#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
-	// When using pitch_only in stabilized mode, maintain the altitude
-	// that the plane was at when entering stabilized mode.
-	setTargetAltitude(IMUlocationz._.W1);
-#endif
+	if (settings._.AltitudeholdStabilized == AH_PITCH_ONLY)
+	{
+		// When using pitch_only in stabilized mode, maintain the altitude
+		// that the plane was at when entering stabilized mode.
+		setTargetAltitude(IMUlocationz._.W1);
+	}
 
 	state_flags._.GPS_steering = 0;
 	state_flags._.pitch_feedback = 1;
-	state_flags._.altitude_hold_throttle = (ALTITUDEHOLD_STABILIZED == AH_FULL);
-	state_flags._.altitude_hold_pitch = (ALTITUDEHOLD_STABILIZED == AH_FULL || ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY);
+	state_flags._.altitude_hold_throttle = (settings._.AltitudeholdStabilized == AH_FULL);
+	state_flags._.altitude_hold_pitch = (settings._.AltitudeholdStabilized == AH_FULL || settings._.AltitudeholdStabilized == AH_PITCH_ONLY);
 	waggle = 0;
 	led_on(LED_RED);
 	stateS = &stabilizedS;
@@ -285,8 +287,8 @@ static void ent_waypointS(void)
 
 	state_flags._.GPS_steering = 1;
 	state_flags._.pitch_feedback = 1;
-	state_flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL);
-	state_flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
+	state_flags._.altitude_hold_throttle = (settings._.AltitudeholdWaypoint == AH_FULL);
+	state_flags._.altitude_hold_pitch = (settings._.AltitudeholdWaypoint == AH_FULL || settings._.AltitudeholdWaypoint == AH_PITCH_ONLY);
 	state_flags._.disable_throttle = 0;
 
 	if (!(FAILSAFE_TYPE == FAILSAFE_MAIN_FLIGHTPLAN && stateS == &returnS))
@@ -307,8 +309,8 @@ static void ent_returnS(void)
 
 	state_flags._.GPS_steering = 1;
 	state_flags._.pitch_feedback = 1;
-	state_flags._.altitude_hold_throttle = (ALTITUDEHOLD_WAYPOINT == AH_FULL);
-	state_flags._.altitude_hold_pitch = (ALTITUDEHOLD_WAYPOINT == AH_FULL || ALTITUDEHOLD_WAYPOINT == AH_PITCH_ONLY);
+	state_flags._.altitude_hold_throttle = (settings._.AltitudeholdWaypoint == AH_FULL);
+	state_flags._.altitude_hold_pitch = (settings._.AltitudeholdWaypoint == AH_FULL || settings._.AltitudeholdWaypoint == AH_PITCH_ONLY);
 #if (FAILSAFE_HOLD == 1)
 	state_flags._.rtl_hold = 1;
 #endif

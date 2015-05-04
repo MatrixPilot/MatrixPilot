@@ -478,7 +478,7 @@
 #define ELEVATOR_BOOST                      0.50
 
 // Parameters below are used in the computation of angle of attack and pitch trim.
-// ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.)
+// ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.) -- Note (RobD) yes it is?
 // If these parameters are not defined, angle of attack and pitch trim will be set to zero.
 // CRUISE_SPEED                         The nominal speed in meters per second at which the parameters are defined.
 // ANGLE_OF_ATTACK_NORMAL               Angle of attack in degrees in the body frame for normal straight and level flight at cruise speed.
@@ -788,11 +788,6 @@
 // Set this to 1 to enable logging telemetry to filesystem
 #ifndef USE_TELELOG
 #define USE_TELELOG                         0
-#endif
-
-// Set this to 1 to enable loading options settings from an initialisation (ini) file
-#ifndef USE_CONFIGFILE
-#define USE_CONFIGFILE                      0
 #endif
 
 // Set this to 1 to enable the USB stack on AUAV3

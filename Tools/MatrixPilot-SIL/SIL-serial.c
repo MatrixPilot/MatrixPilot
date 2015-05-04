@@ -84,7 +84,30 @@ void udb_serial_start_sending_data(void)
 	int16_t c;
 	int16_t pos = 0;
 
+//	if (!telemetrySocket) return;
+
+//#error here - this doesn't work when telemetry is UDB_EXTRA etc
+
+	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
+//		buffer[pos++] = c;
+	}
+//	bytesWritten = UDBSocket_write(telemetrySocket, (uint8_t*)buffer, pos);
+//	if (bytesWritten == -1) {
+//		UDBSocket_close(telemetrySocket);
+//		telemetrySocket = NULL;
+//	}
+}
+
+void mavlink_start_sending_data(void)
+{
+	uint8_t buffer[BUFLEN];
+	int16_t bytesWritten;
+	int16_t c;
+	int16_t pos = 0;
+
 	if (!telemetrySocket) return;
+
+//#error here - this doesn't work when telemetry is UDB_EXTRA etc
 
 //	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
 	while (pos < BUFLEN && (c = mavlink_callback_get_byte_to_send()) != -1) {

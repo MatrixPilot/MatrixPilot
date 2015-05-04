@@ -27,6 +27,7 @@
 
 #include "MAVLink.h"
 #include "MAVUDBExtra.h"
+#include "config.h"
 #include "navigate.h"
 #include "flightplan-waypoints.h"
 #include "../libDCM/gpsData.h"
@@ -75,30 +76,30 @@ void MAVUDBExtraOutput_40hz(void)
 				mavlink_sue_telemetry_counter--;
 				break;
 			case 5:
-				mavlink_msg_serial_udb_extra_f4_send(MAVLINK_COMM_0, ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION,
-				    YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON, AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED,
-				    ALTITUDEHOLD_WAYPOINT, RACING_MODE);
+				mavlink_msg_serial_udb_extra_f4_send(MAVLINK_COMM_0, settings._.RollStabilizaionAilerons, settings._.RollStabilizationRudder, settings._.PitchStabilization,
+				    settings._.YawStabilizationRudder, settings._.YawStabilizationAileron, settings._.AileronNavigation, settings._.RudderNavigation, settings._.AltitudeholdStabilized,
+				    settings._.AltitudeholdWaypoint, settings._.RacingMode);
 				mavlink_sue_telemetry_counter--;
 				break;
 			case 4:
-				mavlink_msg_serial_udb_extra_f5_send(MAVLINK_COMM_0, YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD,
-//				    YAW_STABILIZATION_AILERON, AILERON_BOOST);
-				    YAW_STABILIZATION_AILERON, 0);
+				mavlink_msg_serial_udb_extra_f5_send(MAVLINK_COMM_0, gains.YawKPAileron, gains.YawKDAileron, gains.RollKP, gains.RollKD,
+//				    settings._.YawStabilizationAileron, AILERON_BOOST);
+				    settings._.YawStabilizationAileron, 0);
 				mavlink_sue_telemetry_counter--;
 				break;
 			case 3:
 //				mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_0, PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST);
-				mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_0, PITCHGAIN, PITCHKD, 0, 0, ELEVATOR_BOOST);
+				mavlink_msg_serial_udb_extra_f6_send(MAVLINK_COMM_0, gains.Pitchgain, gains.PitchKD, 0, 0, gains.ElevatorBoost);
 				mavlink_sue_telemetry_counter--;
 				break;
 			case 2:
-				mavlink_msg_serial_udb_extra_f7_send(MAVLINK_COMM_0, YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER, ROLLKD_RUDDER,
-				    RUDDER_BOOST, RTL_PITCH_DOWN);
+				mavlink_msg_serial_udb_extra_f7_send(MAVLINK_COMM_0, gains.YawKPRudder, gains.YawKDRudder, gains.RollKPRudder, gains.RollKDRudder,
+				    gains.RudderBoost, gains.RtlPitchDown);
 				mavlink_sue_telemetry_counter--;
 				break;
 			case 1:
-				mavlink_msg_serial_udb_extra_f8_send(MAVLINK_COMM_0, HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN,
-				    ALT_HOLD_THROTTLE_MAX, ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH);
+				mavlink_msg_serial_udb_extra_f8_send(MAVLINK_COMM_0, altit.HeightTargetMax, altit.HeightTargetMin, altit.AltHoldThrottleMin,
+				    altit.AltHoldThrottleMax, altit.AltHoldPitchMin, altit.AltHoldPitchMax, altit.AltHoldPitchHigh);
 				mavlink_sue_telemetry_counter--;
 				break;
 			default:

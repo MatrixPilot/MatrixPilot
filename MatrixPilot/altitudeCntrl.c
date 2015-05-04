@@ -23,6 +23,7 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "altitudeCntrl.h"
 #include "sonarCntrl.h"
@@ -32,10 +33,6 @@
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/servoOut.h"
 #include "mavlink_options.h"
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
 
 #if (ALTITUDE_GAINS_VARIABLE != 1)
 
@@ -45,17 +42,17 @@ union longww throttleFiltered = { 0 };
 
 #define DEADBAND            150
 
-#define MAXTHROTTLE         (2.0*SERVORANGE*ALT_HOLD_THROTTLE_MAX)
+#define MAXTHROTTLE         (2.0*SERVORANGE*altit.AltHoldThrottleMax)
 #define FIXED_WP_THROTTLE   (2.0*SERVORANGE*RACING_MODE_WP_THROTTLE)
 
-#define THROTTLEHEIGHTGAIN  (((ALT_HOLD_THROTTLE_MAX - ALT_HOLD_THROTTLE_MIN)*2.0*SERVORANGE)/(HEIGHT_MARGIN*2.0))
+#define THROTTLEHEIGHTGAIN  (((altit.AltHoldThrottleMax - altit.AltHoldThrottleMin)*2.0*SERVORANGE)/(altit.HeightMargin*2.0))
 
-#define PITCHATMAX          (ALT_HOLD_PITCH_MAX*(RMAX/57.3))
-#define PITCHATMIN          (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
-#define PITCHATZERO         (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
-#define PITCHHEIGHTGAIN     ((PITCHATMAX - PITCHATMIN) / (HEIGHT_MARGIN*2.0))
+#define PITCHATMAX          (altit.AltHoldPitchMax*(RMAX/57.3))
+#define PITCHATMIN          (altit.AltHoldPitchMin*(RMAX/57.3))
+#define PITCHATZERO         (altit.AltHoldPitchHigh*(RMAX/57.3))
+#define PITCHHEIGHTGAIN     ((PITCHATMAX - PITCHATMIN) / (altit.HeightMargin*2.0))
 
-#define HEIGHTTHROTTLEGAIN  ((1.5*(HEIGHT_TARGET_MAX-HEIGHT_TARGET_MIN)* 1024.0) / (SERVORANGE*SERVOSAT))
+#define HEIGHTTHROTTLEGAIN  ((1.5*(altit.HeightTargetMax-altit.HeightTargetMin)* 1024.0) / (SERVORANGE*SERVOSAT))
 
 static void normalAltitudeCntrl(void);
 static void manualThrottle(int16_t throttleIn);
@@ -79,31 +76,29 @@ int16_t desiredSpeed;
 
 void init_altitudeCntrl(void)
 {
-	height_target_min     = HEIGHT_TARGET_MIN;
-	height_target_max     = HEIGHT_TARGET_MAX;
-	height_margin         = HEIGHT_MARGIN;
-	alt_hold_throttle_min = ALT_HOLD_THROTTLE_MIN * RMAX;
-	alt_hold_throttle_max = ALT_HOLD_THROTTLE_MAX * RMAX;
-	alt_hold_pitch_min    = ALT_HOLD_PITCH_MIN;
-	alt_hold_pitch_max    = ALT_HOLD_PITCH_MAX;
-	alt_hold_pitch_high   = ALT_HOLD_PITCH_HIGH;
-	rtl_pitch_down        = RTL_PITCH_DOWN;
-	desiredSpeed          = DESIRED_SPEED * 10; // Stored in 10ths of meters per second
+	height_target_min     = altit.HeightTargetMin;
+	height_target_max     = altit.HeightTargetMax;
+	height_margin         = altit.HeightMargin;
+	alt_hold_throttle_min = altit.AltHoldThrottleMin * RMAX;
+	alt_hold_throttle_max = altit.AltHoldThrottleMax * RMAX;
+	alt_hold_pitch_min    = altit.AltHoldPitchMin;
+	alt_hold_pitch_max    = altit.AltHoldPitchMax;
+	alt_hold_pitch_high   = altit.AltHoldPitchHigh;
+	rtl_pitch_down        = gains.RtlPitchDown;
+	desiredSpeed          = altit.DesiredSpeed * 10; // Stored in 10ths of meters per second
 }
 
 void save_altitudeCntrl(void)
 {
-#if (USE_CONFIGFILE == 1)
-//	gains.YawKDAileron = yawkdail / (SCALEGYRO*RMAX);
-	gains.HeightTargetMax = height_target_max;
-	gains.HeightTargetMin = height_target_min;
-	gains.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
-	gains.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
-	gains.AltHoldPitchMin = alt_hold_pitch_min;
-	gains.AltHoldPitchMax = alt_hold_pitch_max;
-	gains.AltHoldPitchHigh = alt_hold_pitch_high;
+//	altit.YawKDAileron = yawkdail / (SCALEGYRO*RMAX);
+	altit.HeightTargetMax = height_target_max;
+	altit.HeightTargetMin = height_target_min;
+	altit.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
+	altit.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
+	altit.AltHoldPitchMin = alt_hold_pitch_min;
+	altit.AltHoldPitchMax = alt_hold_pitch_max;
+	altit.AltHoldPitchHigh = alt_hold_pitch_high;
 //	desiredSpeed / 10;
-#endif // USE_CONFIGFILE
 }
 
 #if (SPEED_CONTROL == 1)  // speed control loop
@@ -261,18 +256,21 @@ static void normalAltitudeCntrl(void)
 		else
 		{
 //#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
-if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) {
-			// In stabilized mode using pitch-only altitude hold, use desiredHeight as
-			// set from the state machine upon entering stabilized mode in ent_stabilizedS().
+			if (settings._.AltitudeholdStabilized == AH_PITCH_ONLY)
+			{
+				// In stabilized mode using pitch-only altitude hold, use desiredHeight as
+				// set from the state machine upon entering stabilized mode in ent_stabilizedS().
 //#elif (ALTITUDEHOLD_STABILIZED == AH_FULL)
-} else if (ALTITUDEHOLD_STABILIZED == AH_FULL) {
-			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
-			desiredHeight = ((__builtin_mulss((int16_t)(HEIGHTTHROTTLEGAIN), throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
-			                + (int16_t)(HEIGHT_TARGET_MIN);
-}
+			}
+			else if (settings._.AltitudeholdStabilized == AH_FULL)
+			{
+				// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
+				desiredHeight = ((__builtin_mulss((int16_t)(HEIGHTTHROTTLEGAIN), throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
+				                + (int16_t)(altit.HeightTargetMin);
+			}
 //#endif
-			if (desiredHeight < (int16_t)(HEIGHT_TARGET_MIN)) desiredHeight = (int16_t)(HEIGHT_TARGET_MIN);
-			if (desiredHeight > (int16_t)(HEIGHT_TARGET_MAX)) desiredHeight = (int16_t)(HEIGHT_TARGET_MAX);
+			if (desiredHeight < (int16_t)(altit.HeightTargetMin)) desiredHeight = (int16_t)(altit.HeightTargetMin);
+			if (desiredHeight > (int16_t)(altit.HeightTargetMax)) desiredHeight = (int16_t)(altit.HeightTargetMax);
 		}
 		if (throttleInOffset < (int16_t)(DEADBAND) && udb_flags._.radio_on)
 		{
@@ -283,41 +281,42 @@ if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY) {
 		{
 			heightError._.W1 = -desiredHeight;
 			heightError.WW = (heightError.WW + IMUlocationz.WW + speed_height) >> 13;
-			if (heightError._.W0 < (-(int16_t)(HEIGHT_MARGIN*8.0)))
+			if (heightError._.W0 < (-(int16_t)(altit.HeightMargin*8.0)))
 			{
 				throttleAccum.WW = (int16_t)(MAXTHROTTLE);
 			}
-			else if (heightError._.W0 > (int16_t)(HEIGHT_MARGIN*8.0))
+			else if (heightError._.W0 > (int16_t)(altit.HeightMargin*8.0))
 			{
 				throttleAccum.WW = 0;
 			}
 			else
 			{
-				throttleAccum.WW = (int16_t)(MAXTHROTTLE) + (__builtin_mulss((int16_t)(THROTTLEHEIGHTGAIN), (-heightError._.W0 - (int16_t)(HEIGHT_MARGIN*8.0))) >> 3);
+				throttleAccum.WW = (int16_t)(MAXTHROTTLE) + (__builtin_mulss((int16_t)(THROTTLEHEIGHTGAIN), (-heightError._.W0 - (int16_t)(altit.HeightMargin*8.0))) >> 3);
 				if (throttleAccum.WW > (int16_t)(MAXTHROTTLE))throttleAccum.WW = (int16_t)(MAXTHROTTLE);
 			}
 			heightError._.W1 = - desiredHeight;
 			heightError.WW = (heightError.WW + IMUlocationz.WW - speed_height) >> 13;
-			if (heightError._.W0 < (- (int16_t)(HEIGHT_MARGIN*8.0)))
+			if (heightError._.W0 < (- (int16_t)(altit.HeightMargin*8.0)))
 			{
 				pitchAltitudeAdjust = (int16_t)(PITCHATMAX);
 			}
-			else if (heightError._.W0 > (int16_t)(HEIGHT_MARGIN*8.0))
+			else if (heightError._.W0 > (int16_t)(altit.HeightMargin*8.0))
 			{
 				pitchAltitudeAdjust = (int16_t)(PITCHATZERO);
 			}
 			else
 			{
-				pitchAccum.WW = __builtin_mulss((int16_t)(PITCHHEIGHTGAIN), - heightError._.W0 - (int16_t)(HEIGHT_MARGIN*8.0)) >> 3;
+				pitchAccum.WW = __builtin_mulss((int16_t)(PITCHHEIGHTGAIN), - heightError._.W0 - (int16_t)(altit.HeightMargin*8.0)) >> 3;
 				pitchAltitudeAdjust = (int16_t)(PITCHATMAX) + pitchAccum._.W0;
 			}
 //#if (RACING_MODE == 1)
-if (RACING_MODE == 1) {
-			if (state_flags._.GPS_steering)
+			if (settings._.RacingMode == 1)
 			{
-				throttleAccum.WW = (int32_t)(FIXED_WP_THROTTLE);
+				if (state_flags._.GPS_steering)
+				{
+					throttleAccum.WW = (int32_t)(FIXED_WP_THROTTLE);
+				}
 			}
-}
 //#endif
 		}
 		if (!state_flags._.altitude_hold_throttle)
