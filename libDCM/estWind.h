@@ -23,5 +23,5 @@
 
 extern int16_t estimatedWind[3];    // wind velocity vectors in cm / sec
 
-void estWind(void);
+void estWind(int16_t angleOfAttack);
 

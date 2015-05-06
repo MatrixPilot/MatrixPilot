@@ -1,9 +1,9 @@
 CC       = gcc
-#CC      = /usr/local/i386-mingw32-4.3.0/bin/i386-mingw32-gcc   # used when cross-compiling from a unix system
-CFLAGS   = -pipe -Wall -W -O0 -DWIN=1
-INCPATH  = -I. -I../../libUDB -I../../libDCM -I../../MatrixPilot
+INCPATH  = -I. -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
+FLAGS = -DWIN=1
 LFLAGS   = 
 LIBS     = -lws2_32
+CFLAGS = -pipe -Wall -W -O0 $(FLAGS)
 RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
@@ -12,7 +12,7 @@ OBJECTS_DIR = ./
 MPSIL_TARGET  = matrixpilot.exe
 
 MP_HEADERS = \
-../../MatrixPilot/options.h \
+../../Config/options.h \
 ../../MatrixPilot/waypoints.h \
 ../../MatrixPilot/flightplan-logo.h
 
@@ -27,13 +27,16 @@ SIL-events.o \
  \
 ../../libDCM/deadReckoning.o \
 ../../libDCM/estAltitude.o \
+../../libDCM/estLocation.o \
 ../../libDCM/estWind.o \
 ../../libDCM/estYawDrift.o \
 ../../libDCM/gpsParseCommon.o \
 ../../libDCM/gpsParseMTEK.o \
 ../../libDCM/gpsParseSTD.o \
 ../../libDCM/gpsParseUBX.o \
+../../libDCM/hilsim.o \
 ../../libDCM/libDCM.o \
+../../libDCM/mathlib.o \
 ../../libDCM/mathlibNAV.o \
 ../../libDCM/rmat.o \
  \

@@ -234,7 +234,6 @@
 // Set this to 1 to enable logging telemetry to filesystem
 #ifndef USE_TELELOG
 #define USE_TELELOG                         0
-
 #endif
 
 // Set this to 1 to enable loading options settings from an initialisation (ini) file

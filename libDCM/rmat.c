@@ -22,7 +22,6 @@
 #include "libDCM.h"
 #include "mathlibNAV.h"
 #include "deadReckoning.h"
-#include "../MatrixPilot/helicalTurnCntrl.h"
 #include "gpsParseCommon.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/ADchannel.h"
@@ -268,7 +267,7 @@ static int16_t omegaSOG(int16_t omega, int16_t speed)
 }
 
 #if (CENTRIFUGAL_WITHOUT_GPS == 1)
-static void adj_accel(void)
+static void adj_accel(int16_t angleOfAttack)
 {
 	// Performs centrifugal compensation without a GPS.
 	// Based on the fact that the magnitude of the
@@ -347,7 +346,7 @@ static void adj_accel(void)
 	gplane[0] = gplane[0] + accum._.W1;
 }
 #else
-static void adj_accel(void)
+static void adj_accel(int16_t angleOfAttack)
 {
 	union longww accum;
 	int16_t air_speed_z;
@@ -608,12 +607,12 @@ void output_IMUvelocity(void)
 
 extern void mag_drift(fractional errorYawplane[]);
 
-void dcm_run_imu_step(void)
+void dcm_run_imu_step(int16_t angleOfAttack)
 {
 	// update the matrix, renormalize it, adjust for roll and
 	// pitch drift, and send it to the servos.
 	dead_reckon();              // in libDCM:deadReconing.c
-	adj_accel();                // local
+	adj_accel(angleOfAttack);   // local
 	rupdate();                  // local
 	normalize();                // local
 	roll_pitch_drift();         // local

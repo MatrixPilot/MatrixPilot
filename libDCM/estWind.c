@@ -25,7 +25,6 @@
 #include "estWind.h"
 #include "rmat.h"
 
-#include "../MatrixPilot/helicalTurnCntrl.h"
 
 int16_t estimatedWind[3] = { 0, 0, 0 };
 
@@ -36,7 +35,7 @@ static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
 #define MINROTATION ((int16_t)(0.2 * RMAX))
 
-void estWind(void)
+void estWind(int16_t angleOfAttack)
 {
 	int16_t index;
 	int16_t groundVelocity[3];

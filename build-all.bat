@@ -44,6 +44,7 @@ popd
 
 popd
 
-dir build\*.hex build\*.exe build\*.map /B /S
+@rem dir build\*.hex build\*.exe build\*.map /B /S
+dir build\*.hex build\*.exe /B /S
 
 pause

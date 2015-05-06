@@ -22,6 +22,6 @@
 extern int16_t tiltError[3];
 extern int16_t desiredRotationRateRadians[3];
 extern int16_t rotationRateError[3];
-extern int16_t angleOfAttack;
+//extern int16_t angleOfAttack;
 
 void helicalTurnCntrl(void);

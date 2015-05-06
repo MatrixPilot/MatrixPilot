@@ -119,7 +119,6 @@ uint16_t mp_rcon = 3;                           // default RCON state at normal 
 extern int mp_argc;
 extern char **mp_argv;
 
-uint8_t leds[5] = {0, 0, 0, 0, 0};
 UDBSocket serialSocket;
 uint8_t sil_radio_on;
 
@@ -147,7 +146,7 @@ void udb_skip_imu_calibration(boolean b)
 
 void udb_init(void)
 {
-	int16_t i;
+//	int16_t i;
 
 	// If we were reset:
 	if (mp_argc >= 2 && strcmp(mp_argv[1], UDB_HW_RESET_ARG) == 0)
@@ -155,10 +154,10 @@ void udb_init(void)
 		mp_rcon = 128; // enable just the external/MCLR reset bit
 	}
 
-	for (i = 0; i < 4; i++)
-	{
-		leds[i] = LED_OFF;
-	}
+//	for (i = 0; i < 4; i++)
+//	{
+//		leds[i] = LED_OFF;
+//	}
 
 	udb_heartbeat_counter = 0;
 	udb_flags.B = 0;
@@ -196,6 +195,14 @@ void udb_init(void)
 
 int initialised = 0;
 
+void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
+{
+}
+
+void udb_init_USART(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
+{
+}
+
 void udb_run(void)
 {
 	uint16_t currentTime;
@@ -230,7 +237,15 @@ void udb_run(void)
 			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && 
 			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
 
-			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
+//			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
+			if (udb_flags._.radio_on)
+			{
+				led_on(LED_GREEN);
+			}
+			else
+			{
+				led_off(LED_GREEN);
+			}
 
 			udb_heartbeat_40hz_callback(); // Run at 40Hz
 			udb_heartbeat_callback(); // Run at HEARTBEAT_HZ
@@ -407,10 +422,11 @@ boolean handleUDBSockets(void)
 			UDBSocket_close(telemetrySocket);
 			telemetrySocket = NULL;
 		} else {
-			for (i = 0; i < bytesRead; i++) {
-//				udb_serial_callback_received_byte(buffer[i]);
-				mavlink_callback_received_byte(buffer[i]);
-			}
+			sil_telemetry_input(buffer, bytesRead);
+//			for (i = 0; i < bytesRead; i++) {
+////				udb_serial_callback_received_byte(buffer[i]);
+//				mavlink_callback_received_byte(buffer[i]);
+//			}
 			if (bytesRead>0) didRead = true;
 		}
 	}

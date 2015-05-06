@@ -26,7 +26,8 @@
 
 #include "MAVLink.h"
 #include "MAVParams.h"
-#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
+//#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
+#include "../libDCM/libDCM.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h"
 //#include <string.h>
 //#include <stdarg.h>

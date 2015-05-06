@@ -50,8 +50,8 @@
 #include "../libflexifunctions/flexifunctionservices.h"
 #endif
 
-#include "../MatrixPilot/telemetry.h"
-#include "../libDCM/gpsParseCommon.h"
+//#include "../MatrixPilot/telemetry.h"
+//#include "../libDCM/gpsParseCommon.h"
 
 union udb_fbts_byte udb_flags;
 
@@ -94,12 +94,12 @@ void udb_init(void)
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
-#if (CONSOLE_UART != 1)
-	udb_init_GPS(&udb_gps_callback_get_byte_to_send, &udb_gps_callback_received_byte);
-#endif
-#if (CONSOLE_UART != 2)
-	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
-#endif
+//#if (CONSOLE_UART != 1)
+//	udb_init_GPS(&udb_gps_callback_get_byte_to_send, &udb_gps_callback_received_byte);
+//#endif
+//#if (CONSOLE_UART != 2)
+//	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
+//#endif
 	servoOut_init(); // was udb_init_pwm()
 	osd_init();
 

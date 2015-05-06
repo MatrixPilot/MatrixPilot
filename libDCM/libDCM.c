@@ -32,6 +32,7 @@
 
 
 union dcm_fbts_word dcm_flags;
+int16_t angleOfAttack;
 
 // Calibrate for 10 seconds before moving servos
 #define CALIB_COUNT  400    // 10 seconds at 40 Hz
@@ -39,6 +40,15 @@ union dcm_fbts_word dcm_flags;
 
 void send_HILSIM_outputs(void);
 
+void SetAofA(int16_t AofA)
+{
+	angleOfAttack = AofA;
+}
+
+int16_t GetAofA(void)
+{
+	return angleOfAttack;
+}
 
 void dcm_init(void)
 {
@@ -132,7 +142,7 @@ void udb_heartbeat_callback(void)
 //  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
 	if (dcm_flags._.calib_finished)
 	{
-		dcm_run_imu_step();
+		dcm_run_imu_step(angleOfAttack);
 	}
 
 	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();

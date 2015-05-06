@@ -28,6 +28,8 @@
 #include "helicalTurnCntrl.h"
 #include "../libDCM/rmat.h"
 
+#include "gain_variables.h"
+
 #define HOVERYOFFSET ((int32_t)(hover.HoverYawOffset*(RMAX/57.3)))
 
 uint16_t yawkdrud;
@@ -75,7 +77,7 @@ void normalYawCntrl(void)
 {
 	union longww rollStabilization;
 	union longww gyroYawFeedback;
-	union longww yawStabilization ;
+	union longww yawStabilization;
 	int16_t ail_rud_mix;
 
 #ifdef TestGains
@@ -85,9 +87,9 @@ void normalYawCntrl(void)
 
 	if (settings._.YawStabilizationRudder && state_flags._.pitch_feedback)
 	{
-		gyroYawFeedback.WW =  - __builtin_mulsu(rotationRateError[2], yawkdrud);
-		yawStabilization.WW = - __builtin_mulsu(tiltError[2], yawkprud ) ;  // yaw orientation error in body frame
-		yawStabilization.WW += __builtin_mulsu(desiredRotationRateRadians[2], yawkpfdfwd ) ; // feed forward term
+		gyroYawFeedback.WW   = - __builtin_mulsu(rotationRateError[2], yawkdrud);
+		yawStabilization.WW  = - __builtin_mulsu(tiltError[2], yawkprud);  // yaw orientation error in body frame
+		yawStabilization.WW +=   __builtin_mulsu(desiredRotationRateRadians[2], yawkpfdfwd); // feed forward term
 	}
 	else
 	{

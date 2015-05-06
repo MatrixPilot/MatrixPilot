@@ -27,7 +27,6 @@
 #include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
-#include <stdio.h>
 
 union state_flags_int state_flags;
 int16_t waggle = 0;

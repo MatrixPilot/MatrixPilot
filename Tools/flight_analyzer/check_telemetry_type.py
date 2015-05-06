@@ -85,7 +85,6 @@ def check_type_of_telemetry_file(filename):
             if (parsing_index + payload_length + 7) < len(bytes) :
                 mycrc.accumulate(bytes[(parsing_index + 1 ):(parsing_index + payload_length + 6)])
                 msgId = bytes[parsing_index + 5]
-            
                 (fmt, type, order_map, len_map, crc_extra) = mavlink.mavlink_map[msgId]
                 mycrc.accumulate(struct.pack('B',crc_extra))
                 

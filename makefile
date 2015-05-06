@@ -125,7 +125,7 @@ endif
 INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath))
 INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
 
-$(warning INCPATH: $(INCPATH))
+#$(warning INCPATH: $(INCPATH))
 
 ################################################################################
 # Determine the full target names and include the toolchain specific makefile

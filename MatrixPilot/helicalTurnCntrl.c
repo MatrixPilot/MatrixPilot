@@ -84,7 +84,7 @@
 int16_t tiltError[3];
 int16_t desiredRotationRateRadians[3];
 int16_t rotationRateError[3];
-int16_t angleOfAttack;
+//int16_t angleOfAttack;
 
 static int16_t estimatedLift;
 static int16_t relativeLoading;
@@ -181,7 +181,8 @@ static int16_t relativeWingLoading(int16_t wingLoad, uint16_t airSpeed)
 	}	
 	return result;
 }
-
+
+
 // helicalTurnCntrl determines the values of the elements of the bottom row of rmat
 // as well as the required rotation rates in the body frame that are required to make a coordinated turn.
 // The required values for the bottom row of rmat are placed in the vector desiredTilt.
@@ -211,6 +212,7 @@ void helicalTurnCntrl(void)
 	int16_t pitchCross;
 	int16_t pitchError;
 	int16_t pitchEarthBodyProjection[2];
+	int16_t angleOfAttack;
 #ifdef TestGains
 	state_flags._.GPS_steering = 0;   // turn off navigation
 	state_flags._.pitch_feedback = 1; // turn on stabilization
@@ -332,7 +334,8 @@ void helicalTurnCntrl(void)
 		pitchAdjustAngleOfAttack = 0;
 		elevatorLoadingTrim = 0;
 	}
-	
+	SetAofA(angleOfAttack);
+
 	// convert desired turn rate from radians/second to gyro units
 
 	accum.WW = (((int32_t)desiredTurnRateRadians) << 4);  // desired turn rate in radians times 16 to provide resolution for the divide to follow

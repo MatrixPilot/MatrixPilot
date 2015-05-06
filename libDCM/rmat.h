@@ -54,7 +54,7 @@ extern fractional dirOverGndHrmat[];        //  horizontal direction over ground
 extern union intbb dcm_declination_angle;   //  Declination +-32767 = +-360deg
 
 void dcm_init_rmat(void);
-void dcm_run_imu_step(void);
+void dcm_run_imu_step(int16_t angleOfAttack);
 void yaw_drift_reset(void);
 
 // Calibrate the sensors

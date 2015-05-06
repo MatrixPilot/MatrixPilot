@@ -13,6 +13,7 @@
 #include "airspeedCntrl.h"
 #include "config.h"
 
+#include "gain_variables.h"
 
 const mavlink_parameter_parser mavlink_parameter_parsers[] = {
 	{ &mavlink_send_param_int16, &mavlink_set_param_int16, MAVLINK_TYPE_INT32_T},

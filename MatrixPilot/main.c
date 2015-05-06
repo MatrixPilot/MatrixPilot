@@ -18,12 +18,25 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+/*! \mainpage MatrixPilot Index Page
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation.
+ *
+ * \subsection step1 Step 1: Opening the box.
+ *
+ * etc..
+ */
 
 #include "defines.h"
 #include "behaviour.h"
 #include "telemetry.h"
 #include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 #include "config.h"
 #include "states.h"
 #include "console.h"
@@ -66,7 +79,7 @@ int matrixpilot_init(void)
 //	init_waypoints();
 #endif
 	servoMix_init();
-	init_servoPrepare();
+	servoPrepare_init();
 	init_states();
 	init_behavior();
 	telemetry_init();

@@ -25,7 +25,7 @@
 #include "minIni.h"
 #include "navigate.h"
 #include "airspeedCntrl.h"
-#include <stdio.h>
+
 
 union settings_word settings;
 struct gains_variables gains;

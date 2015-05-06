@@ -23,7 +23,6 @@
 //#include "../libUDB/barometer.h"
 //#include "estAirspeed.h"
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
  
 #define air_gas_constant 8.31432f

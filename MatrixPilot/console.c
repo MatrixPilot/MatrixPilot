@@ -27,7 +27,7 @@
 #include "../libUDB/uart.h"
 #include "ports_config.h"
 #include <string.h>
-#include <stdio.h>
+//#include <stdio.h>
 
 #if (CONSOLE_UART != 0)
 

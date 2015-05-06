@@ -42,7 +42,8 @@
 #include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 #include "../libUDB/mcu.h"
-#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+//#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+#include "../libDCM/libDCM.h" // Needed for access to internal DCM value
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
@@ -79,7 +80,6 @@
 //#define SERIAL_BAUDRATE                     19200
 
 
-
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
@@ -99,10 +99,14 @@ static void sio_voltage_high(uint8_t inchar);
 static void sio_fp_data(uint8_t inchar);
 static void sio_fp_checksum(uint8_t inchar);
 
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 static void sio_cam_data(uint8_t inchar);
 static void sio_cam_checksum(uint8_t inchar);
+#endif
 
+#if (FLY_BY_DATALINK_ENABLED == 1)
 static void sio_fbdl_data(unsigned char inchar);
+#endif
 
 static char fp_high_byte;
 static uint8_t fp_checksum;
@@ -115,6 +119,9 @@ static char serial_buffer[SERIAL_BUFFER_SIZE+1];
 static int16_t sb_index = 0;
 static int16_t end_index = 0;
 
+int16_t udb_serial_callback_get_byte_to_send(void);
+void udb_serial_callback_received_byte(uint8_t rxchar);
+
 void telemetry_init(void)
 {
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
@@ -126,6 +133,9 @@ void telemetry_init(void)
 #pragma warning SERIAL_BAUDRATE set to default value of 19200 bps
 #endif
 
+#if (CONSOLE_UART != 2)
+	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
+#endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 

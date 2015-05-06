@@ -37,8 +37,6 @@ char debug_buffer[128];
 int db_index = 0;
 void send_debug_line(void);
 
-int16_t angleOfAttack; // needed in rmat.c
-
 #define RECORD_OFFSETS ( 1 ) // set to 1 in order to record accelerometer and gyro offsets in telemetry
 
 int main(void)

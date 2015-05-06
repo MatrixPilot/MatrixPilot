@@ -22,7 +22,6 @@
 #ifndef LIB_UDB_H
 #define LIB_UDB_H
 
-#include <stdint.h>
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 
@@ -111,33 +110,33 @@ void mav_printf(const char * format, ...);
 #include "nv_memory_options.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// libUDB.h defines the API for accessing the UDB hardware through libUDB.
-// 
-// This is the lowest-level component of MatrixPilot, and should not reference
-// anything from the higher-level components.  This library is designed to be
-// useful in its own right, independent of libDCM or MatrixPilot.
-//
-// libUDB requires an options.h file be provided that defines at least the
-// following constants:
-// 
-// #define NUM_INPUTS
-// #define NUM_OUTPUTS
-// 
-// #define FAILSAFE_INPUT_CHANNEL
-// #define FAILSAFE_INPUT_MIN
-// #define FAILSAFE_INPUT_MAX
-// 
-// #define NORADIO
-// #define SERVOSAT
-
+/// libUDB.h defines the API for accessing the UDB hardware through libUDB.
+/// 
+/// This is the lowest-level component of MatrixPilot, and should not reference
+/// anything from the higher-level components.  This library is designed to be
+/// useful in its own right, independent of libDCM or MatrixPilot.
+///
+/// libUDB requires an options.h file be provided that defines at least the
+/// following constants:
+/// 
+/// #define NUM_INPUTS
+/// #define NUM_OUTPUTS
+/// 
+/// #define FAILSAFE_INPUT_CHANNEL
+/// #define FAILSAFE_INPUT_MIN
+/// #define FAILSAFE_INPUT_MAX
+/// 
+/// #define NORADIO
+/// #define SERVOSAT
+///
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the UDB
 
-// Call this first soon after the board boots up
+//! Call this first soon after the board boots up
 void mcu_init(void);
 
-// Call this once soon after the board boots up
+//! Call this once soon after the board boots up
 void udb_init(void);
 
 // Start the UDB running
@@ -152,21 +151,21 @@ void udb_run(void);
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks
 
-// Implement this callback to perform periodic background tasks (high priority).
-// It is called at 40 Hertz and must return quickly. (No printf!)
+//! Implement this callback to perform periodic background tasks (high priority).
+//! It is called at 40 Hertz and must return quickly. (No printf!)
 void udb_heartbeat_40hz_callback(void);
 
-// Implement this callback to prepare the pwOut values.
-// It is called at HEARTBEAT_HZ at a low priority.
+//! Implement this callback to prepare the pwOut values.
+//! It is called at HEARTBEAT_HZ at a low priority.
 void udb_heartbeat_callback(void);
 
 typedef void (*background_callback)(void);
 
-// Trigger the background_callback() functions from a low priority ISR.
+//! Trigger the background_callback() functions from a low priority ISR.
 void udb_background_trigger(background_callback callback);
 void udb_background_trigger_pulse(background_callback callback);
 
-// Return the current CPU load as an integer percentage value from 0-100.
+//! Return the current CPU load as an integer percentage value from 0-100.
 uint8_t udb_cpu_load(void);
 inline void cpu_load_calc(void);
 
@@ -174,37 +173,36 @@ inline void cpu_load_calc(void);
 ////////////////////////////////////////////////////////////////////////////////
 // Radio Inputs / Servo Outputs
 
-// These are the values of the radio input channels.  Each channel will be a
-// value between approximately 2000 and 4000, with 3000 being the center.
-// Treat udb_pwIn values as readonly.
+//! These are the values of the radio input channels.  Each channel will be a
+//! value between approximately 2000 and 4000, with 3000 being the center.
+//! Treat udb_pwIn values as readonly.
 extern int16_t udb_pwIn[];                  // pulse widths of radio inputs
 
-// These are the recorded trim values of the radio input channels.
-// These values are recorded when you call the udb_servo_record_trims()
-// function.
-// Each channel will be a value between approximately 2000 and 4000.
-// Treat udb_pwTrim values as readonly.
+//! These are the recorded trim values of the radio input channels.
+//! These values are recorded when you call the udb_servo_record_trims()
+//! function.
+//! Each channel will be a value between approximately 2000 and 4000.
+//! Treat udb_pwTrim values as readonly.
 extern int16_t udb_pwTrim[];                // initial pulse widths for trimming
 
-// These are the servo channel values that will be sent out to the servos.
-// Set these values in your implementation of the udb_heartbeat_callback()
-// Each channel should be set to a value between 2000 and 4000.
+//! These are the servo channel values that will be sent out to the servos.
+//! Set these values in your implementation of the udb_heartbeat_callback()
+//! Each channel should be set to a value between 2000 and 4000.
 extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
 
-// This read-only value holds flags that tell you, among other things,
-// whether the receiver is currently receiving values from the transmitter.
+//! This read-only value holds flags that tell you, among other things,
+//! whether the receiver is currently receiving values from the transmitter.
 extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
 
-// Call this funtion once at some point soon after
-// the UDB has booted up and the radio is on.
+//! Call this funtion once at some point soon after
+//! the UDB has booted up and the radio is on.
 void udb_servo_record_trims(void);
 
-// Called immediately whenever the radio_on flag is set to 0
+//! Called immediately whenever the radio_on flag is set to 0
 void udb_callback_radio_did_turn_off(void);     // Callback
 
-// Call this function to set the digital output to 0 or 1.
-// This can be used to do things like triggering cameras, turning on
-// lights, etc.
+//! Call this function to set the digital output to 0 or 1.
+//! This can be used to do things like triggering cameras, turning on lights, etc.
 void udb_set_action_state(boolean newValue);
 
 // Functions only included with nv memory.
@@ -248,7 +246,7 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
-#ifdef PX4
+#if (PX4 == 1 || SILSIM == 1)
 void udb_led_toggle(uint8_t x);
 void led_on(uint8_t x);
 void led_off(uint8_t x);

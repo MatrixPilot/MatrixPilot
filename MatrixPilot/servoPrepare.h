@@ -34,7 +34,7 @@ extern uint16_t wind_gain;
 //extern int16_t rotationRateError[3];
 //extern int16_t desiredRotationRateRadians[3];
 
-void init_servoPrepare(void);
+void servoPrepare_init(void);
 
 
 #endif // SERVOPREPARE_H

@@ -113,9 +113,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	interrupt_save_set_corcon;
 
 	int16_t txchar = -1;
-
 #if (HILSIM_USB != 1)
-//	int16_t txchar = udb_gps_callback_get_byte_to_send();
+//	txchar = udb_gps_callback_get_byte_to_send();
 	if (gps_callback_get_byte_to_send_fptr)
 	{
 		txchar = gps_callback_get_byte_to_send_fptr();

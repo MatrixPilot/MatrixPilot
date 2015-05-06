@@ -640,7 +640,7 @@ static void handleMessage(void)
 	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVFlexiFunctionsHandleMessage(handle_msg);
 
-	if (handling_of_message_completed == true)
+	if (handling_of_message_completed != false)
 	{
 		return;
 	}
@@ -1006,7 +1006,7 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 30;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
-#if (HILSIM !=1)
+#if (HILSIM != 1)
 #if (MAG_YAW_DRIFT == 1)    // Magnetometer is connected
 		extern int16_t magFieldRaw[];
 		mavlink_msg_raw_imu_send(MAVLINK_COMM_0, usec,
@@ -1088,4 +1088,5 @@ int16_t mavlink_callback_get_byte_to_send(void)
 void mavlink_callback_received_byte(uint8_t rxchar)
 {
 }
+
 #endif // (USE_MAVLINK == 1)
