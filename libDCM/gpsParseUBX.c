@@ -25,6 +25,7 @@
 #include "../libUDB/serialIO.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/magnetometer.h"
+#include "mag_drift.h"
 #include "rmat.h"
 
 
@@ -881,7 +882,7 @@ void gps_commit_data(void)
 	svs             = svs_;
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
-	HILSIM_MagData(udb_magnetometer_callback); // run the magnetometer computations
+	HILSIM_MagData(mag_drift_callback); // run the magnetometer computations
 #endif // HILSIM
 }
 

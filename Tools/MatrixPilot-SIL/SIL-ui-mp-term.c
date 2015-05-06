@@ -24,9 +24,25 @@ static uint8_t lastLedBits = 0;
 static boolean showLEDs = 0;
 static uint8_t inputState = 0;
 static int hasShownInitStates = 0;
+static uint8_t leds[5] = {0, 0, 0, 0, 0};
 
 static int sil_handle_key_input(char c);
 static void sil_checkForLedUpdates(void);
+
+void udb_led_toggle(uint8_t x)
+{
+	leds[x] = !leds[x];
+}
+
+void led_on(uint8_t x)
+{
+	leds[x] = LED_ON;
+}
+
+void led_off(uint8_t x)
+{
+	leds[x] = LED_OFF;
+}
 
 static void print_help(void)
 {

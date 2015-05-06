@@ -19,7 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
+//#include "../MatrixPilot/defines.h" // TODO: remove, temporarily here for options to work correctly
+#include "libDCM.h"
 #include "gpsData.h"
 
 // GPS MatrixPilot global variables (these are the GPS system outputs)

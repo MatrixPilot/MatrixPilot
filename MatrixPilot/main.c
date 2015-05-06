@@ -18,19 +18,35 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+/*! \mainpage MatrixPilot Index Page
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation.
+ *
+ * \subsection step1 Step 1: Opening the box.
+ *
+ * etc..
+ */
 
 #include "defines.h"
 #include "behaviour.h"
+#include "telemetry.h"
+#include "servoMix.h"
 #include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
+#include "../libUDB/serialIO.h"
 #include "config.h"
 #include "states.h"
 #include "console.h"
 #include "flightplan-waypoints.h"
+#include "MAVLink.h"
 #include "mavlink_options.h"
 #include <setjmp.h>
 
-#include "../libFlashFS/filesys.h"
+//#include "../libFlashFS/filesys.h"
 
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
@@ -57,16 +73,18 @@ int matrixpilot_init(void)
 #endif
 	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();     // configure clocks and enables global interrupts
-	filesys_init(); // attempts to mount a file system
+//	filesys_init(); // attempts to mount a file system
 	config_init();  // reads .ini files otherwise initialises with defaults
 	dcm_init();
 #if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 //	init_waypoints();
 #endif
-	init_servoPrepare();
+	servoMix_init();
+	servoPrepare_init();
 	init_states();
 	init_behavior();
-	init_serial();
+	telemetry_init();
+	mavlink_init();
 
 #ifdef _MSC_VER
 #if (USE_MAVLINK == 1)

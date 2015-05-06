@@ -44,6 +44,7 @@ typedef enum
 	UDB_TYPE_M_AIRSPEED_TO_CM,
 	UDB_TYPE_FRAME_ANGLERATE,
 	UDB_TYPE_DCM_ANGLE,
+	UDB_TYPE_FLOAT,
 	} udb_internal_type_e;
 
 extern void mavlink_send_param_int16(int16_t i);
@@ -75,5 +76,8 @@ extern void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i
 
 extern void mavlink_send_dcm_angle(int16_t i);
 extern void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i);
+
+extern void mavlink_send_param_float(int16_t i);
+extern void mavlink_set_param_float(mavlink_param_union_t setting, int16_t i);
 
 #endif // PARAMETER_DATATYPES_H

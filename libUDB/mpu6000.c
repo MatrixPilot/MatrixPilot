@@ -29,7 +29,6 @@
 #include "ADchannel.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
-#include "../libDCM/libDCM_internal.h"
 
 #if (BOARD_TYPE != UDB4_BOARD)
 

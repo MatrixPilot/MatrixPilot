@@ -21,9 +21,12 @@
 
 #include "defines.h"
 #include "states.h"
+#include "config.h"
 #include "navigate.h"
 #include "cameraCntrl.h"
+#include "flightplan.h"
 #include "flightplan-waypoints.h"
+#include "telemetry.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -37,15 +40,43 @@
 #include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 #include "../libUDB/mcu.h"
-#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+//#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+#include "../libDCM/libDCM.h" // Needed for access to internal DCM value
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/rmat.h"
 #include <string.h>
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
+// SERIAL_UDB_EXTRA, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
+// This determines the format of the output sent out the spare serial port.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
+// SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
+// SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
+// SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
+// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
+// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
+
+#ifndef SERIAL_OUTPUT_FORMAT
+//#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE    // TODO: this will have missing dependencies
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
+#endif // SERIAL_OUTPUT_FORMAT
+
+////////////////////////////////////////////////////////////////////////////////
+// MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations)
+// Note that MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
+// enable MAVLink support with USE_MAVLINK in mavlink_options.h
+
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for either standard telemetry streams or MAVLink
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+//#define SERIAL_BAUDRATE                     19200
+
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
@@ -66,10 +97,14 @@ static void sio_voltage_high(uint8_t inchar);
 static void sio_fp_data(uint8_t inchar);
 static void sio_fp_checksum(uint8_t inchar);
 
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 static void sio_cam_data(uint8_t inchar);
 static void sio_cam_checksum(uint8_t inchar);
+#endif
 
+#if (FLY_BY_DATALINK_ENABLED == 1)
 static void sio_fbdl_data(unsigned char inchar);
+#endif
 
 static char fp_high_byte;
 static uint8_t fp_checksum;
@@ -82,7 +117,7 @@ static char serial_buffer[SERIAL_BUFFER_SIZE+1];
 static int16_t sb_index = 0;
 static int16_t end_index = 0;
 
-void init_serial(void)
+void telemetry_init(void)
 {
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_OSD_REMZIBI)
 	dcm_flags._.nmea_passthrough = 1;
@@ -90,9 +125,12 @@ void init_serial(void)
 
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 19200 // default
-//#warning "SERIAL_BAUDRATE set to default value of 19200 bps for telemetry"
+#pragma warning SERIAL_BAUDRATE set to default value of 19200 bps
 #endif
 
+#if (CONSOLE_UART != 2)
+	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
+#endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 
@@ -431,11 +469,11 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 8;
+static int16_t telemetry_counter = 12;
 
 void telemetry_restart(void)
 {
-	telemetry_counter = 8;
+	telemetry_counter = 11;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
@@ -528,8 +566,8 @@ void telemetry_output_8hz(void)
 
 void telemetry_output_8hz(void)
 {
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	int16_t i;
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	static int toggle = 0;
 #endif
 //	static int16_t telemetry_counter = 8;
@@ -543,53 +581,66 @@ void telemetry_output_8hz(void)
 	// Saves CPU and XBee power.
 	if (udb_heartbeat_counter % 20 != 0) return;    // Every 4 runs (5 heartbeat counts per 8Hz)
 #endif // SERIAL_OUTPUT_FORMAT
-
 	switch (telemetry_counter)
 	{
 		// The first lines of telemetry contain info about the compile-time settings from the options.h file
-		case 8:
-			serial_output("\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
-			              "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
-			              "CLOCK=%i:FP=%d:\r\n",
-			    WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
-			    get_reset_flags(), trap_flags, trap_source, osc_fail_count,
-			    CLOCK_CONFIG, FLIGHT_PLAN_TYPE);
-			break;
-		case 7:
+		case 11:
 			serial_output("F15:IDA=");
 			serial_output(ID_VEHICLE_MODEL_NAME);
 			serial_output(":IDB=");
 			serial_output(ID_VEHICLE_REGISTRATION);
 			serial_output(":\r\n");
 			break;
-		case 6:
+		case 10:
 			serial_output("F16:IDC=");
 			serial_output(ID_LEAD_PILOT);
 			serial_output(":IDD=");
 			serial_output(ID_DIY_DRONES_URL);
 			serial_output(":\r\n");
 			break;
+		case 9:
+			serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
+			    turns.FeedForward, turns.TurnRateNav, turns.TurnRateFBW);
+			break;
+		case 8:
+			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
+			    turns.AngleOfAttackNormal, turns.AngleOfAttackInverted, turns.ElevatorTrimNormal,
+			    turns.ElevatorTrimInverted, turns.CruiseSpeed);
+			break;
+		case 7:
+			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",
+			    AILERON_OUTPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_OUTPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
+			    THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
+			break;
+		case 6:
+			serial_output("F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
+			              "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"
+			              "CLOCK=%i:FP=%d:\r\n",
+			    WIND_ESTIMATION, GPS_TYPE, DEADRECKONING, BOARD_TYPE, AIRFRAME_TYPE,
+			    get_reset_flags(), trap_flags, trap_source, osc_fail_count,
+			    CLOCK_CONFIG, FLIGHT_PLAN_TYPE);
+			break;
 		case 5:
 			serial_output("F4:R_STAB_A=%i:R_STAB_RD=%i:P_STAB=%i:Y_STAB_R=%i:Y_STAB_A=%i:AIL_NAV=%i:RUD_NAV=%i:AH_STAB=%i:AH_WP=%i:RACE=%i:\r\n",
-			    ROLL_STABILIZATION_AILERONS, ROLL_STABILIZATION_RUDDER, PITCH_STABILIZATION, YAW_STABILIZATION_RUDDER, YAW_STABILIZATION_AILERON,
-			    AILERON_NAVIGATION, RUDDER_NAVIGATION, ALTITUDEHOLD_STABILIZED, ALTITUDEHOLD_WAYPOINT, RACING_MODE);
+			    settings._.RollStabilizaionAilerons, settings._.RollStabilizationRudder, settings._.PitchStabilization, settings._.YawStabilizationRudder, settings._.YawStabilizationAileron,
+			    settings._.AileronNavigation, settings._.RudderNavigation, settings._.AltitudeholdStabilized, settings._.AltitudeholdWaypoint, settings._.RacingMode);
 			break;
 		case 4:
-			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n",
-			    YAWKP_AILERON, YAWKD_AILERON, ROLLKP, ROLLKD, AILERON_BOOST);
+			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%5.3f:A_BOOST=NULL\r\n",
+			    gains.YawKPAileron, gains.YawKDAileron, gains.RollKP, gains.RollKD);
 			break;
 		case 3:
-			serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n",
-			    PITCHGAIN, PITCHKD, RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST);
+			serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=NULL:ROL_E_MIX=NULL:E_BOOST=%3.1f:\r\n",
+			    gains.Pitchgain, gains.PitchKD, gains.ElevatorBoost);
 			break;
 		case 2:
 			serial_output("F7:Y_KP_R=%5.4f:Y_KD_R=%5.3f:RLKP_RUD=%5.3f:RLKD_RUD=%5.3f:RUD_BOOST=%5.3f:RTL_PITCH_DN=%5.3f:\r\n",
-			    YAWKP_RUDDER, YAWKD_RUDDER, ROLLKP_RUDDER, ROLLKD_RUDDER, RUDDER_BOOST, RTL_PITCH_DOWN);
+			    gains.YawKPRudder, gains.YawKDRudder, gains.RollKPRudder, gains.RollKDRudder, gains.RudderBoost, gains.RtlPitchDown);
 			break;
 		case 1:
 			serial_output("F8:H_MAX=%6.1f:H_MIN=%6.1f:MIN_THR=%3.2f:MAX_THR=%3.2f:PITCH_MIN_THR=%4.1f:PITCH_MAX_THR=%4.1f:PITCH_ZERO_THR=%4.1f:\r\n",
-			    HEIGHT_TARGET_MAX, HEIGHT_TARGET_MIN, ALT_HOLD_THROTTLE_MIN, ALT_HOLD_THROTTLE_MAX,
-			    ALT_HOLD_PITCH_MIN, ALT_HOLD_PITCH_MAX, ALT_HOLD_PITCH_HIGH);
+			    altit.HeightTargetMax, altit.HeightTargetMin, altit.AltHoldThrottleMin, altit.AltHoldThrottleMax,
+			    altit.AltHoldPitchMin, altit.AltHoldPitchMax, altit.AltHoldPitchHigh);
 			break;
 		default:
 		{
@@ -656,7 +707,7 @@ void telemetry_output_8hz(void)
 					serial_output("p%ii%i:",i,pwIn_save[i]);
 				for (i= 1; i <= NUM_OUTPUTS; i++)
 					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
+				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:AF%i,%i,%i:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
 				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
 				    state_flags.WW, osc_fail_count,
 				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z);
@@ -684,9 +735,15 @@ extern int16_t udb_magOffset[3];
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-				if (udb_heartbeat_counter % 10 != 0) return;
+				if (toggle) return;
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
+				serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
+				for (i = 1; i <= NUM_INPUTS; i++)
+				{
+					serial_output("%i,",udb_pwTrim[i]);
+				}
+				serial_output(":\r\n");
 				state_flags._.f13_print_req = 0;
 			}
 			break;
@@ -799,5 +856,21 @@ void telemetry_output_8hz(void)
 #endif // USE_OSD
 
 #endif
+#else
+int16_t udb_serial_callback_get_byte_to_send(void)
+{
+	return -1;
+}
+void udb_serial_callback_received_byte(uint8_t rxchar)
+{
+}
+void telemetry_restart(void)
+{
+}
+void telemetry_output_8hz(void)
+{
+}
+void telemetry_init(void)
+{
+}
 #endif // SERIAL_OUTPUT_FORMAT
-#endif // SERIAL_MAVLINK

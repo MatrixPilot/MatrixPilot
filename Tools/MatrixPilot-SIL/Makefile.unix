@@ -45,6 +45,7 @@ SIL-events.o \
 ../../MatrixPilot/euler_angles.o \
 ../../MatrixPilot/flightplan-logo.o \
 ../../MatrixPilot/flightplan-waypoints.o \
+../../MatrixPilot/helicalTurnCntrl.o \
 ../../MatrixPilot/main.o \
 ../../MatrixPilot/MAVLink.o \
 ../../MatrixPilot/MAVParams.o \

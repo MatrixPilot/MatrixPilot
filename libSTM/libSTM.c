@@ -24,8 +24,8 @@
 
 #if (BOARD_TYPE == PX4_BOARD)
 
-#include "stm32f4xx_hal.h"
-#include "usart.h"
+//#include "stm32f4xx_hal.h"
+//#include "usart.h"
 
 //#include "cmsis_os.h"
 //#include "ff.h"
@@ -206,16 +206,16 @@ int16_t FindFirstBitFromLeft(int16_t val)
 
 void udb_led_toggle(uint8_t x)
 {
-    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 }
 void led_on(uint8_t x)
 {
 //void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+//    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
 }
 void led_off(uint8_t x)
 {
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+//    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 }
 
 int32_t gps_baud_rate = 0;
@@ -272,7 +272,11 @@ void udb_init(void)
 {
 	udb_heartbeat_counter = 0;
 	udb_flags.B = 0;
-	MPU6000_init16(&heartbeat);
+//	MPU6000_init16(&heartbeat);
+}
+
+void mcu_init(void)
+{
 }
 
 void udb_run(void)
@@ -304,21 +308,20 @@ PUTCHAR_PROTOTYPE
 // CONSOLE_UART
   /* Place your implementation of fputc here */
   /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
-  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+//  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
 
   return ch;
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
   // we want to signal the process responsible for this uart
-}
+//}
 
 //void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-
-}
+//void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+//{
+//}
 /*
 void vApplicationIdleHook(void)
 {
@@ -347,7 +350,7 @@ uint8_t buffered_full = 0;
 
 char IsPressed(void)
 {
-	HAL_StatusTypeDef status;
+//	HAL_StatusTypeDef status;
 	uint8_t Data[2];
 
 // HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
@@ -357,8 +360,8 @@ char IsPressed(void)
 		return 1;
 	}
 
-	status = HAL_UART_Receive(&huart2, &Data[0], 1, 0);
-	if (status == HAL_OK)
+//	status = HAL_UART_Receive(&huart2, &Data[0], 1, 0);
+//	if (status == HAL_OK)
 	{
 		buffered_char = Data[0];
 		buffered_full = 1;
@@ -371,11 +374,12 @@ char IsPressed(void)
 
 char GetChar(void)
 {
-	HAL_StatusTypeDef status;
-	uint8_t Data[2];
-	char Temp;
 //	while (!IsPressed());
 //	Temp = U##x##RXREG;
+
+	char Temp;
+	uint8_t Data[2];
+//	HAL_StatusTypeDef status;
 
 	if (buffered_full == 1)
 	{
@@ -384,8 +388,8 @@ char GetChar(void)
 	}
 	else
 	{
-		status = HAL_UART_Receive(&huart6, &Data[0], 1, 0);
-		if (status == HAL_OK)
+//		status = HAL_UART_Receive(&huart6, &Data[0], 1, 0);
+//		if (status == HAL_OK)
 		{
 			Temp = Data[0];
 		}
@@ -396,14 +400,14 @@ char GetChar(void)
 
 void PutChar(char ch)
 {
-	HAL_StatusTypeDef status;
-
 //HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 
-	status = HAL_UART_Transmit(&huart6, &ch, 1, 0);
-	if (status == HAL_OK)
-	{
-	}
+//	HAL_StatusTypeDef status;
+
+//	status = HAL_UART_Transmit(&huart6, &ch, 1, 0);
+//	if (status == HAL_OK)
+//	{
+//	}
 
 //	U##x##TXREG = ch;
 //	while (U##x##STAbits.TRMT == 0);

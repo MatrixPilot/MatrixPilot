@@ -16,8 +16,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "stm32f4xx_hal.h"
-#include "usart.h"
+//#include "stm32f4xx_hal.h"
+//#include "usart.h"
 
 #undef errno
 extern int errno;
@@ -32,9 +32,6 @@ extern int __io_getchar(void) __attribute__((weak));
   register char * stack_ptr asm("sp");
 #endif
 
-
-
-
 caddr_t _sbrk(int incr)
 {
 	extern char end asm("end");
@@ -47,9 +44,9 @@ caddr_t _sbrk(int incr)
 	prev_heap_end = heap_end;
 
 #ifdef FreeRTOS
-	/* Use the NVIC offset register to locate the main stack pointer. */
+	// Use the NVIC offset register to locate the main stack pointer.
 	min_stack_ptr = (char*)(*(unsigned int *)*(unsigned int *)0xE000ED08);
-	/* Locate the STACK bottom address */
+	// Locate the STACK bottom address
 	min_stack_ptr -= MAX_STACK_SIZE;
 
 	if (heap_end + incr > min_stack_ptr)
@@ -68,12 +65,10 @@ caddr_t _sbrk(int incr)
 	return (caddr_t) prev_heap_end;
 }
 
-/*
- * _gettimeofday primitive (Stub function)
- * */
+// _gettimeofday primitive (Stub function)
 int _gettimeofday (struct timeval * tp, struct timezone * tzp)
 {
-  /* Return fixed data for the timezone.  */
+  // Return fixed data for the timezone.
   if (tzp)
     {
       tzp->tz_minuteswest = 0;
@@ -82,10 +77,6 @@ int _gettimeofday (struct timeval * tp, struct timezone * tzp)
 
   return 0;
 }
-
-//void initialise_monitor_handles()
-//{
-//}
 
 int _getpid(void)
 {
@@ -182,8 +173,7 @@ int _read(int file, char *ptr, int len)
 	{
 	  *ptr++ = __io_getchar();
 	}
-
-   return len;
+	return len;
 }
 
 int _open(char *path, int flags, ...)

@@ -46,7 +46,7 @@ int16_t yaw_control;
 int16_t throttle_control;
 uint16_t wind_gain;
 
-void init_servoPrepare(void) // initialize the PWM
+void servoPrepare_init(void) // initialize the PWM
 {
 	int16_t i;
 
@@ -93,6 +93,7 @@ static void flight_controller(void)
 #endif // ALTITUDE_GAINS_VARIABLE
 	updateBehavior();
 	wind_gain = wind_gain_adjustment();
+	helicalTurnCntrl();
 	rollCntrl();
 	yawCntrl();
 	altitudeCntrl();
@@ -131,14 +132,15 @@ void dcm_heartbeat_callback(void)
 		{
 			mavlink_output_40hz();
 		}
-#else
+#endif // (USE_MAVLINK == 1)
+#if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 		// Send telemetry updates at 8hz
 		if (udb_heartbeat_counter % (HEARTBEAT_HZ/8) == 0)
 		{
 // RobD			flight_state_8hz();
 			telemetry_output_8hz();
 		}
-#endif // (USE_MAVLINK == 1)
+#endif // (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 	}
 
 	// Poll the OSD subsystem at 8hz

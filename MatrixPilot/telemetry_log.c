@@ -37,10 +37,6 @@ extern boolean inflight_state(void);
 
 
 #if (WIN == 1 || NIX == 1 || PX4 == 1)
-#define FSFILE    FILE
-#define FSfopen   fopen
-#define FSfclose  fclose
-#define FSfwrite  fwrite
 #define LOGFILE_ENABLE_PIN 0
 #else
 //#define LOGFILE_ENABLE_PIN PORTBbits.RB0  // PGD
@@ -59,7 +55,7 @@ static volatile int lb1_end_index = 0;
 static volatile int lb2_end_index = 0;
 static volatile int lb_in_use = 1;
 static char logfile_name[13];
-static FSFILE* fsp = NULL;
+static FILE* fsp = NULL;
 
 
 static int16_t log_append(char* logbuf, int index, const char* data, int len)
@@ -109,16 +105,16 @@ void log_swapbuf(void)
 
 static int fs_nextlog(char* filename)
 {
-	FSFILE* fp;
+	FILE* fp;
 	int i;
 
 	for (i = 0; i < 99; i++)
 	{
 		sprintf(filename, "log%02u.txt", i);
-		fp = FSfopen(filename, "r");
+		fp = fopen(filename, "r");
 		if (fp != NULL)
 		{
-			FSfclose(fp);
+			fclose(fp);
 		}
 		else
 		{
@@ -139,7 +135,7 @@ static void log_open(void)
 	{
 		strcpy(logfile_name, "fp_log.txt");
 	}
-	fsp = FSfopen(logfile_name, "a");
+	fsp = fopen(logfile_name, "a");
 	if (fsp != NULL)
 	{
 		lb1_end_index = 0;  // empty the logfile ping-pong buffers
@@ -157,12 +153,12 @@ static void log_open(void)
 // this may be called at interrupt or background level
 void log_close(void)
 {
-	FSFILE* fp = fsp;   // make a copy of our file pointer
+	FILE* fp = fsp;   // make a copy of our file pointer
 
 	if (fsp)
 	{
 		fsp = NULL;     // close the door to any further writes
-		FSfclose(fp);   // and close up the file
+		fclose(fp);   // and close up the file
 		printf("%s closed\r\n", logfile_name);
 	}
 }
@@ -199,9 +195,9 @@ static void log_write(const char* str, int len)
 	if (fsp)
 	{
 		led_on(LED_BLUE);
-		if (FSfwrite(str, 1, len, fsp) != len)
+		if (fwrite(str, 1, len, fsp) != len)
 		{
-			DPRINT("ERROR: FSfwrite\r\n");
+			DPRINT("ERROR: fwrite\r\n");
 			log_close();
 		}
 	}

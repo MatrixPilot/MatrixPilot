@@ -222,10 +222,6 @@
 	#error("USE_TELELOG requires USE_FILESYS"
 #endif
 
-#if ((USE_CONFIGFILE == 1) && (USE_FILESYS == 0))
-	#error("USE_CONFIGFILE requires USE_FILESYS"
-#endif
-
 #if ((USE_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("USE_USB only supported on AUAV3 board"
 #endif

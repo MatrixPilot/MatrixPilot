@@ -29,7 +29,7 @@ extern int16_t roll_control;
 extern int16_t yaw_control;
 extern uint16_t wind_gain;
 
-void init_servoPrepare(void);
+void servoPrepare_init(void);
 
 
 #endif // SERVOPREPARE_H

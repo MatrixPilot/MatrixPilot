@@ -226,14 +226,27 @@
 #define DBG_PORT                            1
 
 
-// Set this to 1 to enable logging telemetry to dataflash on AUAV3
-#define USE_TELELOG                         0
+// Set this to 1 to enable filesystem support
+#ifndef USE_FILESYS
+#define USE_FILESYS                         0
+#endif
 
-// Set this to 1 to enable loading options settings from a config file on AUAV3
+// Set this to 1 to enable logging telemetry to filesystem
+#ifndef USE_TELELOG
+#define USE_TELELOG                         0
+#endif
+
+// Set this to 1 to enable loading options settings from an initialisation (ini) file
+#ifndef USE_CONFIGFILE
 #define USE_CONFIGFILE                      0
+#endif
 
 // Set this to 1 to enable the USB stack on AUAV3
+#ifndef USE_USB
 #define USE_USB                             0
+#endif
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#ifndef USE_MSD
 #define USE_MSD                             0
+#endif

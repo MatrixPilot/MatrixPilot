@@ -21,7 +21,6 @@
 //	routines to drive the PWM pins for the servos,
 
 #include "libUDB.h"
-#include "../libDCM/libDCM.h"
 #include "oscillator.h"
 #include "interrupt.h"
 #include "servoOut.h"

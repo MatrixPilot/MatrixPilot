@@ -27,6 +27,7 @@
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/magnetometer.h"
 #include "magnetometerOptions.h"
+#include "mag_drift.h"
 #include "rmat.h"
 
 // These are the routines for maintaining a direction cosine matrix

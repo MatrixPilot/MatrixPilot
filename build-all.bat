@@ -3,15 +3,15 @@
 mkdir build >nul 2>&1
 pushd build
 
-mkdir SILSIM >nul 2>&1
-pushd SILSIM
+mkdir SIL >nul 2>&1
+pushd SIL
 make -j 8 -f ../../makefile DEVICE=SIL
 popd
 
-mkdir PX4 >nul 2>&1
-pushd PX4
-make -j 8 -f ../../makefile DEVICE=PX4
-popd
+@rem mkdir PX4 >nul 2>&1
+@rem pushd PX4
+@rem make -j 8 -f ../../makefile DEVICE=PX4
+@rem popd
 
 mkdir AUAV3-C30 >nul 2>&1
 pushd AUAV3-C30
@@ -41,6 +41,7 @@ popd
 
 popd
 
-dir build\*.hex build\*.exe build\*.map /B /S
+@rem dir build\*.hex build\*.exe build\*.map /B /S
+dir build\*.hex build\*.exe /B /S
 
 pause

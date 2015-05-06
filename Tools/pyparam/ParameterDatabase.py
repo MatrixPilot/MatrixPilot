@@ -1,60 +1,36 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 #
-# Generated Tue Mar 20 05:27:18 2012 by generateDS.py version 2.7b.
+# Generated Sat May  2 11:00:31 2015 by generateDS.py version 2.15b.
+#
+# Command line options:
+#   ('-o', 'ParameterDatabase.py')
+#   ('-s', 'SubParameterDatabase.py')
+#
+# Command line arguments:
+#   ParameterDatabase.xsd
+#
+# Command line:
+#   /usr/local/bin/generateDS.py -o "ParameterDatabase.py" -s "SubParameterDatabase.py" ParameterDatabase.xsd
+#
+# Current working directory (os.getcwd()):
+#   pyparam
 #
 
 import sys
-import getopt
 import re as re_
+import base64
+import datetime as datetime_
+import warnings as warnings_
+from lxml import etree as etree_
 
-etree_ = None
-Verbose_import_ = False
-(   XMLParser_import_none, XMLParser_import_lxml,
-    XMLParser_import_elementtree
-    ) = range(3)
-XMLParser_import_library = None
-try:
-    # lxml
-    from lxml import etree as etree_
-    XMLParser_import_library = XMLParser_import_lxml
-    if Verbose_import_:
-        print("running with lxml.etree")
-except ImportError:
-    try:
-        # cElementTree from Python 2.5+
-        import xml.etree.cElementTree as etree_
-        XMLParser_import_library = XMLParser_import_elementtree
-        if Verbose_import_:
-            print("running with cElementTree on Python 2.5+")
-    except ImportError:
-        try:
-            # ElementTree from Python 2.5+
-            import xml.etree.ElementTree as etree_
-            XMLParser_import_library = XMLParser_import_elementtree
-            if Verbose_import_:
-                print("running with ElementTree on Python 2.5+")
-        except ImportError:
-            try:
-                # normal cElementTree install
-                import cElementTree as etree_
-                XMLParser_import_library = XMLParser_import_elementtree
-                if Verbose_import_:
-                    print("running with cElementTree")
-            except ImportError:
-                try:
-                    # normal ElementTree install
-                    import elementtree.ElementTree as etree_
-                    XMLParser_import_library = XMLParser_import_elementtree
-                    if Verbose_import_:
-                        print("running with ElementTree")
-                except ImportError:
-                    raise ImportError("Failed to import ElementTree from any known place")
+
+Validate_simpletypes_ = True
+
 
 def parsexml_(*args, **kwargs):
-    if (XMLParser_import_library == XMLParser_import_lxml and
-        'parser' not in kwargs):
+    if 'parser' not in kwargs:
         # Use the lxml ElementTree compatible parser so that, e.g.,
         #   we ignore comments.
         kwargs['parser'] = etree_.ETCompatXMLParser()
@@ -70,67 +46,272 @@ def parsexml_(*args, **kwargs):
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError, exp:
+except ImportError as exp:
 
     class GeneratedsSuper(object):
+        tzoff_pattern = re_.compile(r'(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$')
+        class _FixedOffsetTZ(datetime_.tzinfo):
+            def __init__(self, offset, name):
+                self.__offset = datetime_.timedelta(minutes=offset)
+                self.__name = name
+            def utcoffset(self, dt):
+                return self.__offset
+            def tzname(self, dt):
+                return self.__name
+            def dst(self, dt):
+                return None
         def gds_format_string(self, input_data, input_name=''):
             return input_data
-        def gds_validate_string(self, input_data, node, input_name=''):
+        def gds_validate_string(self, input_data, node=None, input_name=''):
+            if not input_data:
+                return ''
+            else:
+                return input_data
+        def gds_format_base64(self, input_data, input_name=''):
+            return base64.b64encode(input_data)
+        def gds_validate_base64(self, input_data, node=None, input_name=''):
             return input_data
         def gds_format_integer(self, input_data, input_name=''):
             return '%d' % input_data
-        def gds_validate_integer(self, input_data, node, input_name=''):
+        def gds_validate_integer(self, input_data, node=None, input_name=''):
             return input_data
         def gds_format_integer_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_integer_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_integer_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
-                    fvalue = float(value)
-                except (TypeError, ValueError), exp:
+                    int(value)
+                except (TypeError, ValueError):
                     raise_parse_error(node, 'Requires sequence of integers')
-            return input_data
+            return values
         def gds_format_float(self, input_data, input_name=''):
-            return '%f' % input_data
-        def gds_validate_float(self, input_data, node, input_name=''):
+            return ('%.15f' % input_data).rstrip('0')
+        def gds_validate_float(self, input_data, node=None, input_name=''):
             return input_data
         def gds_format_float_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_float_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_float_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
-                    fvalue = float(value)
-                except (TypeError, ValueError), exp:
+                    float(value)
+                except (TypeError, ValueError):
                     raise_parse_error(node, 'Requires sequence of floats')
-            return input_data
+            return values
         def gds_format_double(self, input_data, input_name=''):
             return '%e' % input_data
-        def gds_validate_double(self, input_data, node, input_name=''):
+        def gds_validate_double(self, input_data, node=None, input_name=''):
             return input_data
         def gds_format_double_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_double_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_double_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
-                    fvalue = float(value)
-                except (TypeError, ValueError), exp:
+                    float(value)
+                except (TypeError, ValueError):
                     raise_parse_error(node, 'Requires sequence of doubles')
-            return input_data
+            return values
         def gds_format_boolean(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_boolean(self, input_data, node, input_name=''):
+            return ('%s' % input_data).lower()
+        def gds_validate_boolean(self, input_data, node=None, input_name=''):
             return input_data
         def gds_format_boolean_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_boolean_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_boolean_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
                 if value not in ('true', '1', 'false', '0', ):
-                    raise_parse_error(node, 'Requires sequence of booleans ("true", "1", "false", "0")')
+                    raise_parse_error(
+                        node,
+                        'Requires sequence of booleans '
+                        '("true", "1", "false", "0")')
+            return values
+        def gds_validate_datetime(self, input_data, node=None, input_name=''):
             return input_data
+        def gds_format_datetime(self, input_data, input_name=''):
+            if input_data.microsecond == 0:
+                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d' % (
+                    input_data.year,
+                    input_data.month,
+                    input_data.day,
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                )
+            else:
+                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d.%s' % (
+                    input_data.year,
+                    input_data.month,
+                    input_data.day,
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                )
+            if input_data.tzinfo is not None:
+                tzoff = input_data.tzinfo.utcoffset(input_data)
+                if tzoff is not None:
+                    total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                    if total_seconds == 0:
+                        _svalue += 'Z'
+                    else:
+                        if total_seconds < 0:
+                            _svalue += '-'
+                            total_seconds *= -1
+                        else:
+                            _svalue += '+'
+                        hours = total_seconds // 3600
+                        minutes = (total_seconds - (hours * 3600)) // 60
+                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+            return _svalue
+        @classmethod
+        def gds_parse_datetime(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            time_parts = input_data.split('.')
+            if len(time_parts) > 1:
+                micro_seconds = int(float('0.' + time_parts[1]) * 1000000)
+                input_data = '%s.%s' % (time_parts[0], micro_seconds, )
+                dt = datetime_.datetime.strptime(
+                    input_data, '%Y-%m-%dT%H:%M:%S.%f')
+            else:
+                dt = datetime_.datetime.strptime(
+                    input_data, '%Y-%m-%dT%H:%M:%S')
+            dt = dt.replace(tzinfo=tz)
+            return dt
+        def gds_validate_date(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_date(self, input_data, input_name=''):
+            _svalue = '%04d-%02d-%02d' % (
+                input_data.year,
+                input_data.month,
+                input_data.day,
+            )
+            try:
+                if input_data.tzinfo is not None:
+                    tzoff = input_data.tzinfo.utcoffset(input_data)
+                    if tzoff is not None:
+                        total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                        if total_seconds == 0:
+                            _svalue += 'Z'
+                        else:
+                            if total_seconds < 0:
+                                _svalue += '-'
+                                total_seconds *= -1
+                            else:
+                                _svalue += '+'
+                            hours = total_seconds // 3600
+                            minutes = (total_seconds - (hours * 3600)) // 60
+                            _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+            except AttributeError:
+                pass
+            return _svalue
+        @classmethod
+        def gds_parse_date(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            dt = datetime_.datetime.strptime(input_data, '%Y-%m-%d')
+            dt = dt.replace(tzinfo=tz)
+            return dt.date()
+        def gds_validate_time(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_time(self, input_data, input_name=''):
+            if input_data.microsecond == 0:
+                _svalue = '%02d:%02d:%02d' % (
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                )
+            else:
+                _svalue = '%02d:%02d:%02d.%s' % (
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                )
+            if input_data.tzinfo is not None:
+                tzoff = input_data.tzinfo.utcoffset(input_data)
+                if tzoff is not None:
+                    total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                    if total_seconds == 0:
+                        _svalue += 'Z'
+                    else:
+                        if total_seconds < 0:
+                            _svalue += '-'
+                            total_seconds *= -1
+                        else:
+                            _svalue += '+'
+                        hours = total_seconds // 3600
+                        minutes = (total_seconds - (hours * 3600)) // 60
+                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+            return _svalue
+        def gds_validate_simple_patterns(self, patterns, target):
+            # pat is a list of lists of strings/patterns.  We should:
+            # - AND the outer elements
+            # - OR the inner elements
+            found1 = True
+            for patterns1 in patterns:
+                found2 = False
+                for patterns2 in patterns1:
+                    if re_.search(patterns2, target) is not None:
+                        found2 = True
+                        break
+                if not found2:
+                    found1 = False
+                    break
+            return found1
+        @classmethod
+        def gds_parse_time(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            if len(input_data.split('.')) > 1:
+                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S.%f')
+            else:
+                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S')
+            dt = dt.replace(tzinfo=tz)
+            return dt.time()
         def gds_str_lower(self, instring):
             return instring.lower()
         def get_path_(self, node):
@@ -161,6 +342,9 @@ except ImportError, exp:
             return class_obj1
         def gds_build_any(self, node, type_name=None):
             return None
+        @classmethod
+        def gds_reverse_node_mapping(cls, mapping):
+            return dict(((v, k) for k, v in mapping.iteritems()))
 
 
 #
@@ -186,24 +370,44 @@ ExternalEncoding = 'ascii'
 Tag_pattern_ = re_.compile(r'({.*})?(.*)')
 String_cleanup_pat_ = re_.compile(r"[\n\r\s]+")
 Namespace_extract_pat_ = re_.compile(r'{(.*)}(.*)')
+CDATA_pattern_ = re_.compile(r"<!\[CDATA\[.*?\]\]>", re_.DOTALL)
 
 #
 # Support/utility functions.
 #
 
-def showIndent(outfile, level):
-    for idx in range(level):
-        outfile.write('    ')
+
+def showIndent(outfile, level, pretty_print=True):
+    if pretty_print:
+        for idx in range(level):
+            outfile.write('    ')
+
 
 def quote_xml(inStr):
+    "Escape markup chars, but do not modify CDATA sections."
     if not inStr:
         return ''
     s1 = (isinstance(inStr, basestring) and inStr or
           '%s' % inStr)
-    s1 = s1.replace('&', '&amp;')
+    s2 = ''
+    pos = 0
+    matchobjects = CDATA_pattern_.finditer(s1)
+    for mo in matchobjects:
+        s3 = s1[pos:mo.start()]
+        s2 += quote_xml_aux(s3)
+        s2 += s1[mo.start():mo.end()]
+        pos = mo.end()
+    s3 = s1[pos:]
+    s2 += quote_xml_aux(s3)
+    return s2
+
+
+def quote_xml_aux(inStr):
+    s1 = inStr.replace('&', '&amp;')
     s1 = s1.replace('<', '&lt;')
     s1 = s1.replace('>', '&gt;')
     return s1
+
 
 def quote_attrib(inStr):
     s1 = (isinstance(inStr, basestring) and inStr or
@@ -220,6 +424,7 @@ def quote_attrib(inStr):
         s1 = '"%s"' % s1
     return s1
 
+
 def quote_python(inStr):
     s1 = inStr
     if s1.find("'") == -1:
@@ -235,6 +440,7 @@ def quote_python(inStr):
         else:
             return '"""%s"""' % s1
 
+
 def get_all_text_(node):
     if node.text is not None:
         text = node.text
@@ -244,6 +450,7 @@ def get_all_text_(node):
         if child.tail is not None:
             text += child.tail
     return text
+
 
 def find_attr_value_(attr_name, node):
     attrs = node.attrib
@@ -262,9 +469,11 @@ def find_attr_value_(attr_name, node):
 class GDSParseError(Exception):
     pass
 
+
 def raise_parse_error(node, msg):
     if XMLParser_import_library == XMLParser_import_lxml:
-        msg = '%s (element %s/line %d)' % (msg, node.tag, node.sourceline, )
+        msg = '%s (element %s/line %d)' % (
+            msg, node.tag, node.sourceline, )
     else:
         msg = '%s (element %s)' % (msg, node.tag, )
     raise GDSParseError(msg)
@@ -285,6 +494,7 @@ class MixedContainer:
     TypeDecimal = 5
     TypeDouble = 6
     TypeBoolean = 7
+    TypeBase64 = 8
     def __init__(self, category, content_type, name, value):
         self.category = category
         self.content_type = content_type
@@ -298,39 +508,82 @@ class MixedContainer:
         return self.value
     def getName(self):
         return self.name
-    def export(self, outfile, level, name, namespace):
+    def export(self, outfile, level, name, namespace, pretty_print=True):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
-            if self.value.strip(): 
+            if self.value.strip():
                 outfile.write(self.value)
         elif self.category == MixedContainer.CategorySimple:
             self.exportSimple(outfile, level, name)
         else:    # category == MixedContainer.CategoryComplex
-            self.value.export(outfile, level, namespace,name)
+            self.value.export(outfile, level, namespace, name, pretty_print)
     def exportSimple(self, outfile, level, name):
         if self.content_type == MixedContainer.TypeString:
-            outfile.write('<%s>%s</%s>' % (self.name, self.value, self.name))
+            outfile.write('<%s>%s</%s>' % (
+                self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeInteger or \
                 self.content_type == MixedContainer.TypeBoolean:
-            outfile.write('<%s>%d</%s>' % (self.name, self.value, self.name))
+            outfile.write('<%s>%d</%s>' % (
+                self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeFloat or \
                 self.content_type == MixedContainer.TypeDecimal:
-            outfile.write('<%s>%f</%s>' % (self.name, self.value, self.name))
+            outfile.write('<%s>%f</%s>' % (
+                self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeDouble:
-            outfile.write('<%s>%g</%s>' % (self.name, self.value, self.name))
+            outfile.write('<%s>%g</%s>' % (
+                self.name, self.value, self.name))
+        elif self.content_type == MixedContainer.TypeBase64:
+            outfile.write('<%s>%s</%s>' % (
+                self.name, base64.b64encode(self.value), self.name))
+    def to_etree(self, element):
+        if self.category == MixedContainer.CategoryText:
+            # Prevent exporting empty content as empty lines.
+            if self.value.strip():
+                if len(element) > 0:
+                    if element[-1].tail is None:
+                        element[-1].tail = self.value
+                    else:
+                        element[-1].tail += self.value
+                else:
+                    if element.text is None:
+                        element.text = self.value
+                    else:
+                        element.text += self.value
+        elif self.category == MixedContainer.CategorySimple:
+            subelement = etree_.SubElement(element, '%s' % self.name)
+            subelement.text = self.to_etree_simple()
+        else:    # category == MixedContainer.CategoryComplex
+            self.value.to_etree(element)
+    def to_etree_simple(self):
+        if self.content_type == MixedContainer.TypeString:
+            text = self.value
+        elif (self.content_type == MixedContainer.TypeInteger or
+                self.content_type == MixedContainer.TypeBoolean):
+            text = '%d' % self.value
+        elif (self.content_type == MixedContainer.TypeFloat or
+                self.content_type == MixedContainer.TypeDecimal):
+            text = '%f' % self.value
+        elif self.content_type == MixedContainer.TypeDouble:
+            text = '%g' % self.value
+        elif self.content_type == MixedContainer.TypeBase64:
+            text = '%s' % base64.b64encode(self.value)
+        return text
     def exportLiteral(self, outfile, level, name):
         if self.category == MixedContainer.CategoryText:
             showIndent(outfile, level)
-            outfile.write('model_.MixedContainer(%d, %d, "%s", "%s"),\n' % \
-                (self.category, self.content_type, self.name, self.value))
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s", "%s"),\n' % (
+                    self.category, self.content_type, self.name, self.value))
         elif self.category == MixedContainer.CategorySimple:
             showIndent(outfile, level)
-            outfile.write('model_.MixedContainer(%d, %d, "%s", "%s"),\n' % \
-                (self.category, self.content_type, self.name, self.value))
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s", "%s"),\n' % (
+                    self.category, self.content_type, self.name, self.value))
         else:    # category == MixedContainer.CategoryComplex
             showIndent(outfile, level)
-            outfile.write('model_.MixedContainer(%d, %d, "%s",\n' % \
-                (self.category, self.content_type, self.name,))
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s",\n' % (
+                    self.category, self.content_type, self.name,))
             self.value.exportLiteral(outfile, level + 1)
             showIndent(outfile, level)
             outfile.write(')\n')
@@ -356,6 +609,7 @@ class MemberSpec_(object):
     def set_container(self, container): self.container = container
     def get_container(self): return self.container
 
+
 def _cast(typ, value):
     if typ is None or value is None:
         return value
@@ -365,10 +619,12 @@ def _cast(typ, value):
 # Data representation classes.
 #
 
+
 class SerialisationFlags(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, serialisationFlag=None):
+        self.original_tagname_ = None
         if serialisationFlag is None:
             self.serialisationFlag = []
         else:
@@ -382,35 +638,47 @@ class SerialisationFlags(GeneratedsSuper):
     def get_serialisationFlag(self): return self.serialisationFlag
     def set_serialisationFlag(self, serialisationFlag): self.serialisationFlag = serialisationFlag
     def add_serialisationFlag(self, value): self.serialisationFlag.append(value)
-    def insert_serialisationFlag(self, index, value): self.serialisationFlag[index] = value
-    def export(self, outfile, level, namespace_='', name_='SerialisationFlags', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='SerialisationFlags')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='SerialisationFlags'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='SerialisationFlags', fromsubclass_=False):
-        for serialisationFlag_ in self.serialisationFlag:
-            showIndent(outfile, level)
-            outfile.write('<%sserialisationFlag>%s</%sserialisationFlag>\n' % (namespace_, self.gds_format_string(quote_xml(serialisationFlag_).encode(ExternalEncoding), input_name='serialisationFlag'), namespace_))
+    def insert_serialisationFlag_at(self, index, value): self.serialisationFlag.insert(index, value)
+    def replace_serialisationFlag_at(self, index, value): self.serialisationFlag[index] = value
     def hasContent_(self):
         if (
             self.serialisationFlag
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='SerialisationFlags', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='SerialisationFlags')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='SerialisationFlags', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='SerialisationFlags'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='SerialisationFlags', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for serialisationFlag_ in self.serialisationFlag:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sserialisationFlag>%s</%sserialisationFlag>%s' % (namespace_, self.gds_format_string(quote_xml(serialisationFlag_).encode(ExternalEncoding), input_name='serialisationFlag'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='SerialisationFlags'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -426,10 +694,12 @@ class SerialisationFlags(GeneratedsSuper):
         showIndent(outfile, level)
         outfile.write('],\n')
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -444,6 +714,7 @@ class UDBType(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, typeName=None, sendFunction=None, setFunction=None, mavlinkType=None):
+        self.original_tagname_ = None
         self.typeName = typeName
         self.sendFunction = sendFunction
         self.setFunction = setFunction
@@ -462,46 +733,57 @@ class UDBType(GeneratedsSuper):
     def set_setFunction(self, setFunction): self.setFunction = setFunction
     def get_mavlinkType(self): return self.mavlinkType
     def set_mavlinkType(self, mavlinkType): self.mavlinkType = mavlinkType
-    def export(self, outfile, level, namespace_='', name_='UDBType', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='UDBType')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='UDBType'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='UDBType', fromsubclass_=False):
-        if self.typeName is not None:
-            showIndent(outfile, level)
-            outfile.write('<%stypeName>%s</%stypeName>\n' % (namespace_, self.gds_format_string(quote_xml(self.typeName).encode(ExternalEncoding), input_name='typeName'), namespace_))
-        if self.sendFunction is not None:
-            showIndent(outfile, level)
-            outfile.write('<%ssendFunction>%s</%ssendFunction>\n' % (namespace_, self.gds_format_string(quote_xml(self.sendFunction).encode(ExternalEncoding), input_name='sendFunction'), namespace_))
-        if self.setFunction is not None:
-            showIndent(outfile, level)
-            outfile.write('<%ssetFunction>%s</%ssetFunction>\n' % (namespace_, self.gds_format_string(quote_xml(self.setFunction).encode(ExternalEncoding), input_name='setFunction'), namespace_))
-        if self.mavlinkType is not None:
-            showIndent(outfile, level)
-            outfile.write('<%smavlinkType>%s</%smavlinkType>\n' % (namespace_, self.gds_format_string(quote_xml(self.mavlinkType).encode(ExternalEncoding), input_name='mavlinkType'), namespace_))
     def hasContent_(self):
         if (
             self.typeName is not None or
             self.sendFunction is not None or
             self.setFunction is not None or
             self.mavlinkType is not None
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='UDBType', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='UDBType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='UDBType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='UDBType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='UDBType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.typeName is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%stypeName>%s</%stypeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.typeName).encode(ExternalEncoding), input_name='typeName'), namespace_, eol_))
+        if self.sendFunction is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssendFunction>%s</%ssendFunction>%s' % (namespace_, self.gds_format_string(quote_xml(self.sendFunction).encode(ExternalEncoding), input_name='sendFunction'), namespace_, eol_))
+        if self.setFunction is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssetFunction>%s</%ssetFunction>%s' % (namespace_, self.gds_format_string(quote_xml(self.setFunction).encode(ExternalEncoding), input_name='setFunction'), namespace_, eol_))
+        if self.mavlinkType is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%smavlinkType>%s</%smavlinkType>%s' % (namespace_, self.gds_format_string(quote_xml(self.mavlinkType).encode(ExternalEncoding), input_name='mavlinkType'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='UDBType'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -520,10 +802,12 @@ class UDBType(GeneratedsSuper):
             showIndent(outfile, level)
             outfile.write('mavlinkType=%s,\n' % quote_python(self.mavlinkType).encode(ExternalEncoding))
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -550,6 +834,7 @@ class UDBTypes(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, udbType=None):
+        self.original_tagname_ = None
         if udbType is None:
             self.udbType = []
         else:
@@ -563,34 +848,46 @@ class UDBTypes(GeneratedsSuper):
     def get_udbType(self): return self.udbType
     def set_udbType(self, udbType): self.udbType = udbType
     def add_udbType(self, value): self.udbType.append(value)
-    def insert_udbType(self, index, value): self.udbType[index] = value
-    def export(self, outfile, level, namespace_='', name_='UDBTypes', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='UDBTypes')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='UDBTypes'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='UDBTypes', fromsubclass_=False):
-        for udbType_ in self.udbType:
-            udbType_.export(outfile, level, namespace_, name_='udbType')
+    def insert_udbType_at(self, index, value): self.udbType.insert(index, value)
+    def replace_udbType_at(self, index, value): self.udbType[index] = value
     def hasContent_(self):
         if (
             self.udbType
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='UDBTypes', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='UDBTypes')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='UDBTypes', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='UDBTypes'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='UDBTypes', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for udbType_ in self.udbType:
+            udbType_.export(outfile, level, namespace_, name_='udbType', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='UDBTypes'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -609,10 +906,12 @@ class UDBTypes(GeneratedsSuper):
         showIndent(outfile, level)
         outfile.write('],\n')
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -620,6 +919,7 @@ class UDBTypes(GeneratedsSuper):
             obj_ = UDBType.factory()
             obj_.build(child_)
             self.udbType.append(obj_)
+            obj_.original_tagname_ = 'udbType'
 # end class UDBTypes
 
 
@@ -627,7 +927,9 @@ class Parameter(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, parameterName=None, udb_param_type=None, variable_name='NULL', description='no description', min='0.0', max='0.0', readonly=True):
+        self.original_tagname_ = None
         self.parameterName = parameterName
+        self.validate_ParamIdentifier(self.parameterName)
         self.udb_param_type = udb_param_type
         self.variable_name = variable_name
         self.description = description
@@ -642,9 +944,6 @@ class Parameter(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_parameterName(self): return self.parameterName
     def set_parameterName(self, parameterName): self.parameterName = parameterName
-    def validate_ParamIdentifier(self, value):
-        # Validate type ParamIdentifier, a restriction on xs:string.
-        pass
     def get_udb_param_type(self): return self.udb_param_type
     def set_udb_param_type(self, udb_param_type): self.udb_param_type = udb_param_type
     def get_variable_name(self): return self.variable_name
@@ -657,58 +956,76 @@ class Parameter(GeneratedsSuper):
     def set_max(self, max): self.max = max
     def get_readonly(self): return self.readonly
     def set_readonly(self, readonly): self.readonly = readonly
-    def export(self, outfile, level, namespace_='', name_='Parameter', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Parameter')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='Parameter'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='Parameter', fromsubclass_=False):
-        if self.parameterName is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sparameterName>%s</%sparameterName>\n' % (namespace_, self.gds_format_string(quote_xml(self.parameterName).encode(ExternalEncoding), input_name='parameterName'), namespace_))
-        if self.udb_param_type is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sudb_param_type>%s</%sudb_param_type>\n' % (namespace_, self.gds_format_string(quote_xml(self.udb_param_type).encode(ExternalEncoding), input_name='udb_param_type'), namespace_))
-        if self.variable_name is not None:
-            showIndent(outfile, level)
-            outfile.write('<%svariable_name>%s</%svariable_name>\n' % (namespace_, self.gds_format_string(quote_xml(self.variable_name).encode(ExternalEncoding), input_name='variable_name'), namespace_))
-        if self.description is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sdescription>%s</%sdescription>\n' % (namespace_, self.gds_format_string(quote_xml(self.description).encode(ExternalEncoding), input_name='description'), namespace_))
-        if self.min is not None:
-            showIndent(outfile, level)
-            outfile.write('<%smin>%s</%smin>\n' % (namespace_, self.gds_format_string(quote_xml(self.min).encode(ExternalEncoding), input_name='min'), namespace_))
-        if self.max is not None:
-            showIndent(outfile, level)
-            outfile.write('<%smax>%s</%smax>\n' % (namespace_, self.gds_format_string(quote_xml(self.max).encode(ExternalEncoding), input_name='max'), namespace_))
-        if self.readonly is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sreadonly>%s</%sreadonly>\n' % (namespace_, self.gds_format_boolean(self.gds_str_lower(str(self.readonly)), input_name='readonly'), namespace_))
+    def validate_ParamIdentifier(self, value):
+        # Validate type ParamIdentifier, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_:
+            if len(value) > 15:
+                warnings_.warn('Value "%(value)s" does not match xsd maxLength restriction on ParamIdentifier' % {"value" : value.encode("utf-8")} )
+            if len(value) < 1:
+                warnings_.warn('Value "%(value)s" does not match xsd minLength restriction on ParamIdentifier' % {"value" : value.encode("utf-8")} )
     def hasContent_(self):
         if (
             self.parameterName is not None or
             self.udb_param_type is not None or
-            self.variable_name is not None or
-            self.description is not None or
-            self.min is not None or
-            self.max is not None or
-            self.readonly is not None
-            ):
+            self.variable_name != "NULL" or
+            self.description != "no description" or
+            self.min != "0.0" or
+            self.max != "0.0" or
+            not self.readonly
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='Parameter', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Parameter')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='Parameter', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='Parameter'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='Parameter', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.parameterName is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sparameterName>%s</%sparameterName>%s' % (namespace_, self.gds_format_string(quote_xml(self.parameterName).encode(ExternalEncoding), input_name='parameterName'), namespace_, eol_))
+        if self.udb_param_type is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sudb_param_type>%s</%sudb_param_type>%s' % (namespace_, self.gds_format_string(quote_xml(self.udb_param_type).encode(ExternalEncoding), input_name='udb_param_type'), namespace_, eol_))
+        if self.variable_name != "NULL":
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%svariable_name>%s</%svariable_name>%s' % (namespace_, self.gds_format_string(quote_xml(self.variable_name).encode(ExternalEncoding), input_name='variable_name'), namespace_, eol_))
+        if self.description != "no description":
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdescription>%s</%sdescription>%s' % (namespace_, self.gds_format_string(quote_xml(self.description).encode(ExternalEncoding), input_name='description'), namespace_, eol_))
+        if self.min != "0.0":
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%smin>%s</%smin>%s' % (namespace_, self.gds_format_string(quote_xml(self.min).encode(ExternalEncoding), input_name='min'), namespace_, eol_))
+        if self.max != "0.0":
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%smax>%s</%smax>%s' % (namespace_, self.gds_format_string(quote_xml(self.max).encode(ExternalEncoding), input_name='max'), namespace_, eol_))
+        if not self.readonly:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sreadonly>%s</%sreadonly>%s' % (namespace_, self.gds_format_boolean(self.readonly, input_name='readonly'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='Parameter'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -736,10 +1053,12 @@ class Parameter(GeneratedsSuper):
             showIndent(outfile, level)
             outfile.write('readonly=%s,\n' % self.readonly)
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -747,7 +1066,8 @@ class Parameter(GeneratedsSuper):
             parameterName_ = child_.text
             parameterName_ = self.gds_validate_string(parameterName_, node, 'parameterName')
             self.parameterName = parameterName_
-            self.validate_ParamIdentifier(self.parameterName)    # validate type ParamIdentifier
+            # validate type ParamIdentifier
+            self.validate_ParamIdentifier(self.parameterName)
         elif nodeName_ == 'udb_param_type':
             udb_param_type_ = child_.text
             udb_param_type_ = self.gds_validate_string(udb_param_type_, node, 'udb_param_type')
@@ -785,6 +1105,7 @@ class Parameters(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, parameter=None):
+        self.original_tagname_ = None
         if parameter is None:
             self.parameter = []
         else:
@@ -798,34 +1119,46 @@ class Parameters(GeneratedsSuper):
     def get_parameter(self): return self.parameter
     def set_parameter(self, parameter): self.parameter = parameter
     def add_parameter(self, value): self.parameter.append(value)
-    def insert_parameter(self, index, value): self.parameter[index] = value
-    def export(self, outfile, level, namespace_='', name_='Parameters', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Parameters')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='Parameters'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='Parameters', fromsubclass_=False):
-        for parameter_ in self.parameter:
-            parameter_.export(outfile, level, namespace_, name_='parameter')
+    def insert_parameter_at(self, index, value): self.parameter.insert(index, value)
+    def replace_parameter_at(self, index, value): self.parameter[index] = value
     def hasContent_(self):
         if (
             self.parameter
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='Parameters', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Parameters')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='Parameters', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='Parameters'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='Parameters', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for parameter_ in self.parameter:
+            parameter_.export(outfile, level, namespace_, name_='parameter', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='Parameters'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -844,10 +1177,12 @@ class Parameters(GeneratedsSuper):
         showIndent(outfile, level)
         outfile.write('],\n')
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -855,17 +1190,20 @@ class Parameters(GeneratedsSuper):
             obj_ = Parameter.factory()
             obj_.build(child_)
             self.parameter.append(obj_)
+            obj_.original_tagname_ = 'parameter'
 # end class Parameters
 
 
 class ParameterBlock(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, blockName=None, storage_area='None', serialisationFlags=None, externs=None, load_callback=None, in_mavlink_parameters=None, parameters=None, description='no description'):
+    def __init__(self, blockName=None, storage_area='None', serialisationFlags=None, externs=None, includes=None, load_callback=None, in_mavlink_parameters=None, parameters=None, description='no description'):
+        self.original_tagname_ = None
         self.blockName = blockName
         self.storage_area = storage_area
         self.serialisationFlags = serialisationFlags
         self.externs = externs
+        self.includes = includes
         self.load_callback = load_callback
         self.in_mavlink_parameters = in_mavlink_parameters
         self.parameters = parameters
@@ -884,6 +1222,8 @@ class ParameterBlock(GeneratedsSuper):
     def set_serialisationFlags(self, serialisationFlags): self.serialisationFlags = serialisationFlags
     def get_externs(self): return self.externs
     def set_externs(self, externs): self.externs = externs
+    def get_includes(self): return self.includes
+    def set_includes(self, includes): self.includes = includes
     def get_load_callback(self): return self.load_callback
     def set_load_callback(self, load_callback): self.load_callback = load_callback
     def get_in_mavlink_parameters(self): return self.in_mavlink_parameters
@@ -892,59 +1232,73 @@ class ParameterBlock(GeneratedsSuper):
     def set_parameters(self, parameters): self.parameters = parameters
     def get_description(self): return self.description
     def set_description(self, description): self.description = description
-    def export(self, outfile, level, namespace_='', name_='ParameterBlock', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ParameterBlock')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ParameterBlock'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='ParameterBlock', fromsubclass_=False):
-        if self.blockName is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sblockName>%s</%sblockName>\n' % (namespace_, self.gds_format_string(quote_xml(self.blockName).encode(ExternalEncoding), input_name='blockName'), namespace_))
-        if self.storage_area is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sstorage_area>%s</%sstorage_area>\n' % (namespace_, self.gds_format_string(quote_xml(self.storage_area).encode(ExternalEncoding), input_name='storage_area'), namespace_))
-        if self.serialisationFlags is not None:
-            self.serialisationFlags.export(outfile, level, namespace_, name_='serialisationFlags', )
-        if self.externs is not None:
-            self.externs.export(outfile, level, namespace_, name_='externs')
-        if self.load_callback is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sload_callback>%s</%sload_callback>\n' % (namespace_, self.gds_format_string(quote_xml(self.load_callback).encode(ExternalEncoding), input_name='load_callback'), namespace_))
-        if self.in_mavlink_parameters is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sin_mavlink_parameters>%s</%sin_mavlink_parameters>\n' % (namespace_, self.gds_format_boolean(self.gds_str_lower(str(self.in_mavlink_parameters)), input_name='in_mavlink_parameters'), namespace_))
-        if self.parameters is not None:
-            self.parameters.export(outfile, level, namespace_, name_='parameters', )
-        if self.description is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sdescription>%s</%sdescription>\n' % (namespace_, self.gds_format_string(quote_xml(self.description).encode(ExternalEncoding), input_name='description'), namespace_))
     def hasContent_(self):
         if (
             self.blockName is not None or
-            self.storage_area is not None or
+            self.storage_area != "None" or
             self.serialisationFlags is not None or
             self.externs is not None or
+            self.includes is not None or
             self.load_callback is not None or
             self.in_mavlink_parameters is not None or
             self.parameters is not None or
-            self.description is not None
-            ):
+            self.description != "no description"
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='ParameterBlock', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ParameterBlock')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='ParameterBlock', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ParameterBlock'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='ParameterBlock', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.blockName is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sblockName>%s</%sblockName>%s' % (namespace_, self.gds_format_string(quote_xml(self.blockName).encode(ExternalEncoding), input_name='blockName'), namespace_, eol_))
+        if self.storage_area != "None":
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sstorage_area>%s</%sstorage_area>%s' % (namespace_, self.gds_format_string(quote_xml(self.storage_area).encode(ExternalEncoding), input_name='storage_area'), namespace_, eol_))
+        if self.serialisationFlags is not None:
+            self.serialisationFlags.export(outfile, level, namespace_, name_='serialisationFlags', pretty_print=pretty_print)
+        if self.externs is not None:
+            self.externs.export(outfile, level, namespace_, name_='externs', pretty_print=pretty_print)
+        if self.includes is not None:
+            self.includes.export(outfile, level, namespace_, name_='includes', pretty_print=pretty_print)
+        if self.load_callback is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sload_callback>%s</%sload_callback>%s' % (namespace_, self.gds_format_string(quote_xml(self.load_callback).encode(ExternalEncoding), input_name='load_callback'), namespace_, eol_))
+        if self.in_mavlink_parameters is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sin_mavlink_parameters>%s</%sin_mavlink_parameters>%s' % (namespace_, self.gds_format_boolean(self.in_mavlink_parameters, input_name='in_mavlink_parameters'), namespace_, eol_))
+        if self.parameters is not None:
+            self.parameters.export(outfile, level, namespace_, name_='parameters', pretty_print=pretty_print)
+        if self.description != "no description":
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdescription>%s</%sdescription>%s' % (namespace_, self.gds_format_string(quote_xml(self.description).encode(ExternalEncoding), input_name='description'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='ParameterBlock'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -968,6 +1322,12 @@ class ParameterBlock(GeneratedsSuper):
             self.externs.exportLiteral(outfile, level, name_='externs')
             showIndent(outfile, level)
             outfile.write('),\n')
+        if self.includes is not None:
+            showIndent(outfile, level)
+            outfile.write('includes=model_.Includes(\n')
+            self.includes.exportLiteral(outfile, level, name_='includes')
+            showIndent(outfile, level)
+            outfile.write('),\n')
         if self.load_callback is not None:
             showIndent(outfile, level)
             outfile.write('load_callback=%s,\n' % quote_python(self.load_callback).encode(ExternalEncoding))
@@ -984,10 +1344,12 @@ class ParameterBlock(GeneratedsSuper):
             showIndent(outfile, level)
             outfile.write('description=%s,\n' % quote_python(self.description).encode(ExternalEncoding))
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -1002,11 +1364,18 @@ class ParameterBlock(GeneratedsSuper):
         elif nodeName_ == 'serialisationFlags':
             obj_ = SerialisationFlags.factory()
             obj_.build(child_)
-            self.set_serialisationFlags(obj_)
+            self.serialisationFlags = obj_
+            obj_.original_tagname_ = 'serialisationFlags'
         elif nodeName_ == 'externs':
             obj_ = Externs.factory()
             obj_.build(child_)
-            self.set_externs(obj_)
+            self.externs = obj_
+            obj_.original_tagname_ = 'externs'
+        elif nodeName_ == 'includes':
+            obj_ = Includes.factory()
+            obj_.build(child_)
+            self.includes = obj_
+            obj_.original_tagname_ = 'includes'
         elif nodeName_ == 'load_callback':
             load_callback_ = child_.text
             load_callback_ = self.gds_validate_string(load_callback_, node, 'load_callback')
@@ -1024,7 +1393,8 @@ class ParameterBlock(GeneratedsSuper):
         elif nodeName_ == 'parameters':
             obj_ = Parameters.factory()
             obj_.build(child_)
-            self.set_parameters(obj_)
+            self.parameters = obj_
+            obj_.original_tagname_ = 'parameters'
         elif nodeName_ == 'description':
             description_ = child_.text
             description_ = self.gds_validate_string(description_, node, 'description')
@@ -1036,6 +1406,7 @@ class ParameterBlocks(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, parameterBlock=None):
+        self.original_tagname_ = None
         if parameterBlock is None:
             self.parameterBlock = []
         else:
@@ -1049,34 +1420,46 @@ class ParameterBlocks(GeneratedsSuper):
     def get_parameterBlock(self): return self.parameterBlock
     def set_parameterBlock(self, parameterBlock): self.parameterBlock = parameterBlock
     def add_parameterBlock(self, value): self.parameterBlock.append(value)
-    def insert_parameterBlock(self, index, value): self.parameterBlock[index] = value
-    def export(self, outfile, level, namespace_='', name_='ParameterBlocks', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ParameterBlocks')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ParameterBlocks'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='ParameterBlocks', fromsubclass_=False):
-        for parameterBlock_ in self.parameterBlock:
-            parameterBlock_.export(outfile, level, namespace_, name_='parameterBlock')
+    def insert_parameterBlock_at(self, index, value): self.parameterBlock.insert(index, value)
+    def replace_parameterBlock_at(self, index, value): self.parameterBlock[index] = value
     def hasContent_(self):
         if (
             self.parameterBlock
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='ParameterBlocks', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ParameterBlocks')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='ParameterBlocks', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ParameterBlocks'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='ParameterBlocks', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for parameterBlock_ in self.parameterBlock:
+            parameterBlock_.export(outfile, level, namespace_, name_='parameterBlock', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='ParameterBlocks'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -1095,10 +1478,12 @@ class ParameterBlocks(GeneratedsSuper):
         showIndent(outfile, level)
         outfile.write('],\n')
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -1106,6 +1491,7 @@ class ParameterBlocks(GeneratedsSuper):
             obj_ = ParameterBlock.factory()
             obj_.build(child_)
             self.parameterBlock.append(obj_)
+            obj_.original_tagname_ = 'parameterBlock'
 # end class ParameterBlocks
 
 
@@ -1113,6 +1499,7 @@ class ParameterDatabase(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, dataStorageAreas=None, serialisationFlags=None, udbTypes=None, parameterBlocks=None):
+        self.original_tagname_ = None
         self.dataStorageAreas = dataStorageAreas
         self.serialisationFlags = serialisationFlags
         self.udbTypes = udbTypes
@@ -1131,42 +1518,53 @@ class ParameterDatabase(GeneratedsSuper):
     def set_udbTypes(self, udbTypes): self.udbTypes = udbTypes
     def get_parameterBlocks(self): return self.parameterBlocks
     def set_parameterBlocks(self, parameterBlocks): self.parameterBlocks = parameterBlocks
-    def export(self, outfile, level, namespace_='', name_='ParameterDatabase', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ParameterDatabase')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ParameterDatabase'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='ParameterDatabase', fromsubclass_=False):
-        if self.dataStorageAreas is not None:
-            self.dataStorageAreas.export(outfile, level, namespace_, name_='dataStorageAreas', )
-        if self.serialisationFlags is not None:
-            self.serialisationFlags.export(outfile, level, namespace_, name_='serialisationFlags', )
-        if self.udbTypes is not None:
-            self.udbTypes.export(outfile, level, namespace_, name_='udbTypes', )
-        if self.parameterBlocks is not None:
-            self.parameterBlocks.export(outfile, level, namespace_, name_='parameterBlocks', )
     def hasContent_(self):
         if (
             self.dataStorageAreas is not None or
             self.serialisationFlags is not None or
             self.udbTypes is not None or
             self.parameterBlocks is not None
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='ParameterDatabase', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ParameterDatabase')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='ParameterDatabase', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ParameterDatabase'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='ParameterDatabase', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.dataStorageAreas is not None:
+            self.dataStorageAreas.export(outfile, level, namespace_, name_='dataStorageAreas', pretty_print=pretty_print)
+        if self.serialisationFlags is not None:
+            self.serialisationFlags.export(outfile, level, namespace_, name_='serialisationFlags', pretty_print=pretty_print)
+        if self.udbTypes is not None:
+            self.udbTypes.export(outfile, level, namespace_, name_='udbTypes', pretty_print=pretty_print)
+        if self.parameterBlocks is not None:
+            self.parameterBlocks.export(outfile, level, namespace_, name_='parameterBlocks', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='ParameterDatabase'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -1197,29 +1595,35 @@ class ParameterDatabase(GeneratedsSuper):
             showIndent(outfile, level)
             outfile.write('),\n')
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
         if nodeName_ == 'dataStorageAreas':
             obj_ = DataStorageAreas.factory()
             obj_.build(child_)
-            self.set_dataStorageAreas(obj_)
+            self.dataStorageAreas = obj_
+            obj_.original_tagname_ = 'dataStorageAreas'
         elif nodeName_ == 'serialisationFlags':
             obj_ = SerialisationFlags.factory()
             obj_.build(child_)
-            self.set_serialisationFlags(obj_)
+            self.serialisationFlags = obj_
+            obj_.original_tagname_ = 'serialisationFlags'
         elif nodeName_ == 'udbTypes':
             obj_ = UDBTypes.factory()
             obj_.build(child_)
-            self.set_udbTypes(obj_)
+            self.udbTypes = obj_
+            obj_.original_tagname_ = 'udbTypes'
         elif nodeName_ == 'parameterBlocks':
             obj_ = ParameterBlocks.factory()
             obj_.build(child_)
-            self.set_parameterBlocks(obj_)
+            self.parameterBlocks = obj_
+            obj_.original_tagname_ = 'parameterBlocks'
 # end class ParameterDatabase
 
 
@@ -1227,6 +1631,7 @@ class Externs(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, externString=None):
+        self.original_tagname_ = None
         if externString is None:
             self.externString = []
         else:
@@ -1240,35 +1645,47 @@ class Externs(GeneratedsSuper):
     def get_externString(self): return self.externString
     def set_externString(self, externString): self.externString = externString
     def add_externString(self, value): self.externString.append(value)
-    def insert_externString(self, index, value): self.externString[index] = value
-    def export(self, outfile, level, namespace_='', name_='Externs', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Externs')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='Externs'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='Externs', fromsubclass_=False):
-        for externString_ in self.externString:
-            showIndent(outfile, level)
-            outfile.write('<%sexternString>%s</%sexternString>\n' % (namespace_, self.gds_format_string(quote_xml(externString_).encode(ExternalEncoding), input_name='externString'), namespace_))
+    def insert_externString_at(self, index, value): self.externString.insert(index, value)
+    def replace_externString_at(self, index, value): self.externString[index] = value
     def hasContent_(self):
         if (
             self.externString
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='Externs', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Externs')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='Externs', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='Externs'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='Externs', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for externString_ in self.externString:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sexternString>%s</%sexternString>%s' % (namespace_, self.gds_format_string(quote_xml(externString_).encode(ExternalEncoding), input_name='externString'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='Externs'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -1284,10 +1701,12 @@ class Externs(GeneratedsSuper):
         showIndent(outfile, level)
         outfile.write('],\n')
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -1298,10 +1717,101 @@ class Externs(GeneratedsSuper):
 # end class Externs
 
 
+class Includes(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, includeString=None):
+        self.original_tagname_ = None
+        if includeString is None:
+            self.includeString = []
+        else:
+            self.includeString = includeString
+    def factory(*args_, **kwargs_):
+        if Includes.subclass:
+            return Includes.subclass(*args_, **kwargs_)
+        else:
+            return Includes(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_includeString(self): return self.includeString
+    def set_includeString(self, includeString): self.includeString = includeString
+    def add_includeString(self, value): self.includeString.append(value)
+    def insert_includeString_at(self, index, value): self.includeString.insert(index, value)
+    def replace_includeString_at(self, index, value): self.includeString[index] = value
+    def hasContent_(self):
+        if (
+            self.includeString
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='Includes', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Includes')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='Includes', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='Includes'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='Includes', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for includeString_ in self.includeString:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sincludeString>%s</%sincludeString>%s' % (namespace_, self.gds_format_string(quote_xml(includeString_).encode(ExternalEncoding), input_name='includeString'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='Includes'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('includeString=[\n')
+        level += 1
+        for includeString_ in self.includeString:
+            showIndent(outfile, level)
+            outfile.write('%s,\n' % quote_python(includeString_).encode(ExternalEncoding))
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'includeString':
+            includeString_ = child_.text
+            includeString_ = self.gds_validate_string(includeString_, node, 'includeString')
+            self.includeString.append(includeString_)
+# end class Includes
+
+
 class DataStorageAreas(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, dataStorageArea=None):
+        self.original_tagname_ = None
         if dataStorageArea is None:
             self.dataStorageArea = []
         else:
@@ -1315,35 +1825,47 @@ class DataStorageAreas(GeneratedsSuper):
     def get_dataStorageArea(self): return self.dataStorageArea
     def set_dataStorageArea(self, dataStorageArea): self.dataStorageArea = dataStorageArea
     def add_dataStorageArea(self, value): self.dataStorageArea.append(value)
-    def insert_dataStorageArea(self, index, value): self.dataStorageArea[index] = value
-    def export(self, outfile, level, namespace_='', name_='DataStorageAreas', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = []
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='DataStorageAreas')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write('/>\n')
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='DataStorageAreas'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='DataStorageAreas', fromsubclass_=False):
-        for dataStorageArea_ in self.dataStorageArea:
-            showIndent(outfile, level)
-            outfile.write('<%sdataStorageArea>%s</%sdataStorageArea>\n' % (namespace_, self.gds_format_string(quote_xml(dataStorageArea_).encode(ExternalEncoding), input_name='dataStorageArea'), namespace_))
+    def insert_dataStorageArea_at(self, index, value): self.dataStorageArea.insert(index, value)
+    def replace_dataStorageArea_at(self, index, value): self.dataStorageArea[index] = value
     def hasContent_(self):
         if (
             self.dataStorageArea
-            ):
+        ):
             return True
         else:
             return False
+    def export(self, outfile, level, namespace_='', name_='DataStorageAreas', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='DataStorageAreas')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='DataStorageAreas', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='DataStorageAreas'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='DataStorageAreas', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for dataStorageArea_ in self.dataStorageArea:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdataStorageArea>%s</%sdataStorageArea>%s' % (namespace_, self.gds_format_string(quote_xml(dataStorageArea_).encode(ExternalEncoding), input_name='dataStorageArea'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='DataStorageAreas'):
         level += 1
-        self.exportLiteralAttributes(outfile, level, [], name_)
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
@@ -1359,10 +1881,12 @@ class DataStorageAreas(GeneratedsSuper):
         showIndent(outfile, level)
         outfile.write('],\n')
     def build(self, node):
-        self.buildAttributes(node, node.attrib, [])
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
@@ -1373,72 +1897,118 @@ class DataStorageAreas(GeneratedsSuper):
 # end class DataStorageAreas
 
 
+GDSClassesMapping = {
+    'parameters': Parameters,
+    'udbType': UDBType,
+    'udbTypes': UDBTypes,
+    'externs': Externs,
+    'includes': Includes,
+    'serialisationFlags': SerialisationFlags,
+    'dataStorageAreas': DataStorageAreas,
+    'parameterBlock': ParameterBlock,
+    'parameterBlocks': ParameterBlocks,
+    'parameter': Parameter,
+}
+
+
 USAGE_TEXT = """
 Usage: python <Parser>.py [ -s ] <in_xml_file>
 """
 
+
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(1)
 
 
 def get_root_tag(node):
     tag = Tag_pattern_.match(node.tag).groups()[-1]
-    rootClass = globals().get(tag)
+    rootClass = GDSClassesMapping.get(tag)
+    if rootClass is None:
+        rootClass = globals().get(tag)
     return tag, rootClass
 
 
-def parse(inFileName):
+def parse(inFileName, silence=False):
     doc = parsexml_(inFileName)
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'ParameterDatabase'
-        rootClass = ParameterDatabase
+        rootTag = 'SerialisationFlags'
+        rootClass = SerialisationFlags
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
-    sys.stdout.write('<?xml version="1.0" ?>\n')
-    rootObj.export(sys.stdout, 0, name_=rootTag, 
-        namespacedef_='')
+    if not silence:
+        sys.stdout.write('<?xml version="1.0" ?>\n')
+        rootObj.export(
+            sys.stdout, 0, name_=rootTag,
+            namespacedef_='',
+            pretty_print=True)
     return rootObj
 
 
-def parseString(inString):
+def parseEtree(inFileName, silence=False):
+    doc = parsexml_(inFileName)
+    rootNode = doc.getroot()
+    rootTag, rootClass = get_root_tag(rootNode)
+    if rootClass is None:
+        rootTag = 'SerialisationFlags'
+        rootClass = SerialisationFlags
+    rootObj = rootClass.factory()
+    rootObj.build(rootNode)
+    # Enable Python to collect the space used by the DOM.
+    doc = None
+    mapping = {}
+    rootElement = rootObj.to_etree(None, name_=rootTag, mapping_=mapping)
+    reverse_mapping = rootObj.gds_reverse_node_mapping(mapping)
+    if not silence:
+        content = etree_.tostring(
+            rootElement, pretty_print=True,
+            xml_declaration=True, encoding="utf-8")
+        sys.stdout.write(content)
+        sys.stdout.write('\n')
+    return rootObj, rootElement, mapping, reverse_mapping
+
+
+def parseString(inString, silence=False):
     from StringIO import StringIO
     doc = parsexml_(StringIO(inString))
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'ParameterDatabase'
-        rootClass = ParameterDatabase
+        rootTag = 'SerialisationFlags'
+        rootClass = SerialisationFlags
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
-    sys.stdout.write('<?xml version="1.0" ?>\n')
-    rootObj.export(sys.stdout, 0, name_="ParameterDatabase",
-        namespacedef_='')
+    if not silence:
+        sys.stdout.write('<?xml version="1.0" ?>\n')
+        rootObj.export(
+            sys.stdout, 0, name_=rootTag,
+            namespacedef_='')
     return rootObj
 
 
-def parseLiteral(inFileName):
+def parseLiteral(inFileName, silence=False):
     doc = parsexml_(inFileName)
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'ParameterDatabase'
-        rootClass = ParameterDatabase
+        rootTag = 'SerialisationFlags'
+        rootClass = SerialisationFlags
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
-    sys.stdout.write('#from ParameterDatabase import *\n\n')
-    sys.stdout.write('import ParameterDatabase as model_\n\n')
-    sys.stdout.write('rootObj = model_.rootTag(\n')
-    rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
-    sys.stdout.write(')\n')
+    if not silence:
+        sys.stdout.write('#from ParameterDatabase import *\n\n')
+        sys.stdout.write('import ParameterDatabase as model_\n\n')
+        sys.stdout.write('rootObj = model_.rootClass(\n')
+        rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
+        sys.stdout.write(')\n')
     return rootObj
 
 
@@ -1458,6 +2028,7 @@ if __name__ == '__main__':
 __all__ = [
     "DataStorageAreas",
     "Externs",
+    "Includes",
     "Parameter",
     "ParameterBlock",
     "ParameterBlocks",
@@ -1466,4 +2037,4 @@ __all__ = [
     "SerialisationFlags",
     "UDBType",
     "UDBTypes"
-    ]
+]

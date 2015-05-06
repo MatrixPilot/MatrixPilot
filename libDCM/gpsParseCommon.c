@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libDCM_internal.h"
+#include "libDCM.h"
 #include "gpsData.h"
 #include "gpsParseCommon.h"
 #include "estLocation.h"
@@ -72,6 +72,10 @@ void gps_init(void)
 	init_gps_nmea();
 #elif (GPS_TYPE == GPS_NONE)
 	init_gps_none();
+#endif
+
+#if (CONSOLE_UART != 1)
+	udb_init_GPS(&udb_gps_callback_get_byte_to_send, &udb_gps_callback_received_byte);
 #endif
 }
 

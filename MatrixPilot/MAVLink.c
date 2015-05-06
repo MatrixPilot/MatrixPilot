@@ -129,7 +129,7 @@ inline void preflight_storage_complete_callback(boolean success);
 #endif // (USE_NV_MEMORY == 1)
 
 
-void init_mavlink(void)
+void mavlink_init(void)
 {
 	int16_t index;
 
@@ -149,22 +149,23 @@ void init_mavlink(void)
 	streamRates[MAV_DATA_STREAM_EXTRA2]      = MAVLINK_RATE_POSITION_SENSORS;
 }
 
-void init_serial(void)
-{
-#ifndef SERIAL_BAUDRATE
-#define SERIAL_BAUDRATE 57600 // default
-#pragma warning ("SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink") // VC warns 'unknown user warning type', arm-gnu-eabi warns, unknown pragma
-//#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink" // xc16 uses this syntax (but VC throws fatal error)
-#endif
-	udb_serial_set_rate(SERIAL_BAUDRATE);
-	init_mavlink();
-}
+//void init_serial(void)
+//{
+//#ifndef SERIAL_BAUDRATE
+//#define SERIAL_BAUDRATE 57600 // default
+//#pragma warning ("SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink") // VC warns 'unknown user warning type', arm-gnu-eabi warns, unknown pragma
+////#warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink" // xc16 uses this syntax (but VC throws fatal error)
+//#endif
+//	udb_serial_set_rate(SERIAL_BAUDRATE);
+//	mavlink_init();
+//}
 
-void telemetry_restart(void)
-{
-}
+//void telemetry_restart(void)
+//{
+//
+//}
 
-int16_t udb_serial_callback_get_byte_to_send(void)
+int16_t mavlink_callback_get_byte_to_send(void)
 {
 	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
 	{
@@ -215,7 +216,11 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 	if (serial_interrupt_stopped == 1)
 	{
 		serial_interrupt_stopped = 0;
+#if (SILSIM == 1)
+		mavlink_start_sending_data();
+#else
 		udb_serial_start_sending_data();
+#endif
 	}
 	return (1);
 }
@@ -318,7 +323,8 @@ static mavlink_message_t msg[2];
 static uint8_t mavlink_message_index = 0;
 static mavlink_status_t r_mavlink_status;
 
-void udb_serial_callback_received_byte(uint8_t rxchar)
+//void udb_serial_callback_received_byte(uint8_t rxchar)
+void mavlink_callback_received_byte(uint8_t rxchar)
 {
 //	DPRINT("%u \r\n", rxchar);
 
@@ -825,7 +831,7 @@ void mavlink_output_40hz(void)
 		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE);
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
-
+	// GPS RAW INT - Data from GPS Sensor sent as raw integers.
 	spread_transmission_load = 4;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
@@ -1010,7 +1016,7 @@ void mavlink_output_40hz(void)
 		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
 		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
 		    (int16_t)   0,                (int16_t)   0,                (int16_t)   0); // zero as mag not connected.
-#endif
+#endif //(MAG_YAW_DRIFT == 1)
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
 		//     int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}
@@ -1053,5 +1059,18 @@ void mavlink_output_40hz(void)
 #endif
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE == 1)
+
+#else
+
+void mavlink_init(void)
+{
+}
+int16_t mavlink_callback_get_byte_to_send(void)
+{
+	return -1;
+}
+void mavlink_callback_received_byte(uint8_t rxchar)
+{
+}
 
 #endif // (USE_MAVLINK == 1)
