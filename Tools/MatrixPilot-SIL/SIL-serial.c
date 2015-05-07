@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "SIL-udb.h"
 #include "../../libUDB/libUDB.h"
-//#include "../../libUDB/serialIO.h"
+#include "../../libUDB/serialIO.h"
 #include "../../libDCM/gpsParseCommon.h"
 #include "../../MatrixPilot/MAVLink.h"
 #include "../../MatrixPilot/telemetry.h"
@@ -28,7 +28,7 @@ int32_t serialRate = 0;
 
 
 //////////////////////////////////////////////////////////
-// GPS and Telemetry
+// GPS Serial input/output emulation
 //////////////////////////////////////////////////////////
 
 void udb_gps_set_rate(int32_t rate)
@@ -64,6 +64,9 @@ void udb_gps_start_sending_data(void)
 	}
 }
 
+//////////////////////////////////////////////////////////
+// Telemetry Serial input/output emulation
+//////////////////////////////////////////////////////////
 
 void udb_serial_set_rate(int32_t rate)
 {
@@ -121,4 +124,22 @@ void mavlink_start_sending_data(void)
 	}
 }
 
+static int16_callback_fptr_t serial_callback_get_byte_to_send = NULL;
+static callback_uint8_fptr_t serial_callback_received_byte = NULL;
+
+void udb_init_USART(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
+{
+	serial_callback_get_byte_to_send = tx_fptr;
+	serial_callback_received_byte = rx_fptr;
+}
+
+static int16_callback_fptr_t gps_callback_get_byte_to_send_fptr = NULL;
+static callback_uint8_fptr_t gps_callback_received_byte_fptr = NULL;
+
+void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
+{
+	gps_callback_get_byte_to_send_fptr = tx_fptr;
+	gps_callback_received_byte_fptr = rx_fptr;
+
+}
 #endif // (WIN == 1 || NIX == 1)
