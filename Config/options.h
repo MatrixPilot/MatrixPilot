@@ -23,12 +23,9 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
+// This file includes most of the user-configuration for this firmware,
+// one of the exceptions being waypoints, which live in the waypoints.h file.
 //
-// Note that there is a small but growing library of preset options.h files for
-// specific planes located in the MatrixPilot/example-options-files directory.
-// You can use one of those files by replacing this file with that one.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +164,9 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
+#ifndef NORADIO
 #define NORADIO                             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -356,7 +355,7 @@
 
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       1
+//#define MAVLINK_SYSID                       1 // now defined in mavlink_options.h
 
 
 // NUM_ANALOG_INPUTS:
@@ -776,16 +775,21 @@
 #define DBG_PORT                            1
 
 // Set this to 1 to enable filesystem support
+#ifndef USE_FILESYS
 #define USE_FILESYS                         1
+#endif
 
-// Set this to 1 to enable logging telemetry to dataflash on AUAV3
+// Set this to 1 to enable logging telemetry to filesystem
+#ifndef USE_TELELOG
 #define USE_TELELOG                         0
-
-// Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      0
+#endif
 
 // Set this to 1 to enable the USB stack on AUAV3
+#ifndef USE_USB
 #define USE_USB                             0
+#endif
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#ifndef USE_MSD
 #define USE_MSD                             0
+#endif
