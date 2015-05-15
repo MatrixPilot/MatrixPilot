@@ -9,7 +9,6 @@
 #ifndef _BUILTINS_H_
 #define _BUILTINS_H_
 
-//#ifdef SILSIM
 #if (WIN == 1 || NIX == 1)
 #else
 #include <dsp.h>

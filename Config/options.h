@@ -23,13 +23,8 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
-//
-// Note that there is a small but growing library of preset options.h files for
-// specific planes located in the MatrixPilot/example-options-files directory.
-// You can use one of those files by replacing this file with that one.
-
+// This file includes most of the user-configuration for this firmware,
+// one of the exceptions being waypoints, which live in the waypoints.h file.
 
 #define USE_FLEXIFUNCTION_MIXING 0
 

@@ -23,8 +23,6 @@
 #define AD_CHANNEL_H
 
 
-//#include "udbTypes.h"
-
 struct ADchannel {
 	int16_t input;  // raw input
 	int16_t value;  // average of the sum of inputs between report outs

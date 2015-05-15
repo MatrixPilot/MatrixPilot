@@ -20,10 +20,10 @@
 
 //	routines to drive the PWM pins for the servos,
 
-#include "libUDB.h"
+#include "../libUDB/libUDB.h"
 #include "../libDCM/libDCM.h"
-#include "oscillator.h"
-#include "interrupt.h"
+#include "../libUDB/oscillator.h"
+#include "../libUDB/interrupt.h"
 #include "servoOut.h"
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"

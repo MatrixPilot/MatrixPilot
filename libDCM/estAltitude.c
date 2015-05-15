@@ -24,7 +24,6 @@
 #include "../libUDB/barometer.h"
 #include "estAltitude.h"
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 //#define USE_DEBUG_IO

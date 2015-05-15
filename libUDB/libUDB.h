@@ -22,7 +22,6 @@
 #ifndef LIB_UDB_H
 #define LIB_UDB_H
 
-#include <stdint.h>
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 

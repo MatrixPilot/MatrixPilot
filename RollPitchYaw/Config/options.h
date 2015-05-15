@@ -75,6 +75,8 @@
 // NUM_INPUTS: Set to 0-5 
 #define NUM_INPUTS                          0
 
+#define THROTTLE_INPUT_CHANNEL              CHANNEL_3
+
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 #define NUM_OUTPUTS                         3
 

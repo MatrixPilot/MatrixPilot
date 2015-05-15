@@ -19,8 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "libUDB.h"
-#include "oscillator.h"
+#include "../libUDB/libUDB.h"
+#include "../libUDB/oscillator.h"
 //#include "interrupt.h"
 #include "radioIn.h"
 #include "../MatrixPilot/states.h"
