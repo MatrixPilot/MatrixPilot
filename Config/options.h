@@ -360,10 +360,9 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       1
+//#define MAVLINK_SYSID                       1 // now defined in mavlink_options.h
 
 
 // NUM_ANALOG_INPUTS:
@@ -727,7 +726,9 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
+#ifndef RECORD_FREE_STACK_SPACE
 #define RECORD_FREE_STACK_SPACE             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////

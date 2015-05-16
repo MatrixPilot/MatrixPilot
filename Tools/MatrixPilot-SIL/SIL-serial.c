@@ -12,7 +12,7 @@
 #include "SIL-udb.h"
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/serialIO.h"
-#include "../../libDCM/gpsParseCommon.h"
+//#include "../../libDCM/gpsParseCommon.h"
 #include "../../MatrixPilot/MAVLink.h"
 #include "../../MatrixPilot/telemetry.h"
 #include "UDBSocket.h"
