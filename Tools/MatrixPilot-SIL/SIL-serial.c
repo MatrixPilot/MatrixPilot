@@ -142,4 +142,5 @@ void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 	gps_callback_received_byte_fptr = rx_fptr;
 
 }
+
 #endif // (WIN == 1 || NIX == 1)

@@ -1,9 +1,9 @@
 '''
 Use mavgen.py matrixpilot.xml definitions to generate
 C and Python MAVLink routines for sending and parsing the protocol
-This python script is soley for MatrixPilot MAVLink impoementations
+This python script is soley for MatrixPilot MAVLink implementations
 
-Copyright Pete Hollands 2011, 2012
+Copyright Pete Hollands 2011, 2012, 2014
 Released under GNU GPL version 3 or later
 '''
 
@@ -18,11 +18,12 @@ sys.path.insert(0, os.path.join(os.getcwd(), '..'))
 
 class options:
     """ a class to simulate the options of mavgen OptionsParser"""
-    def __init__(self, lang, output, wire_protocol, error_limit):
+    def __init__(self, lang, output, wire_protocol, error_limit,validate):
         self.language = lang
         self.wire_protocol = wire_protocol
         self.output = output
         self.error_limit = error_limit
+        self.validate = validate
 
 def remove_include_files(target_directory):
     search_pattern = target_directory+'/*.h'
@@ -64,62 +65,63 @@ def copy_xml_files(source_directory,target_directory):
 
 
 ########### Generate MAVlink files for C and Python from XML definitions
-protocol = "1.0"
- 
+protocol = "1.0" #
 xml_directory = '../../message_definitions/v'+protocol
-print "xml_directory is", xml_directory
 
 xml_file_names = []
 xml_file_names.append(xml_directory+"/"+"common.xml")
 xml_file_names.append(xml_directory+"/"+"matrixpilot.xml")
 
-#Check to see if python directory exists ...
-directory = 'python'
-if not os.path.isdir(directory):
-    os.makedirs(directory)
+print "This script is intended to be used by MatrixPilot developers."
+print "Use it if if you have altered matrixpilot.xml and woudl like to regenerate mavlink messages."
+print "It will generate both the C header files and the Python the python parser."
+print ""
 
+#Check to see if python directory exists ...
 for xml_file in xml_file_names:
-    print "xml file is ", xml_file   
-    
+    print "xml file is to use for generation is", xml_file      
     xml_file_base = os.path.basename(xml_file)
     xml_file_base = re.sub("\.xml","", xml_file_base)
-    print "xml_file_base is", xml_file_base
     target_directory = "../../../../../MAVLink/include/"+xml_file_base
     source_directory = "C/include_v"+protocol+"/"+xml_file_base
 
-    print "About to remove all files in",source_directory
+    print "About to remove all old generated files in",source_directory
     print "OK to continue ?[Yes / No]: ",
     line = sys.stdin.readline()
     if line == "Yes\n" or line == "yes\n" \
        or line == "Y\n" or line == "y\n":
-        print "passed"
+        print "Proceeding"
         remove_include_files(source_directory)
         print "Finished removing C include files for", xml_file_base
     else :
         print "Your answer is No. Exiting Program"
         sys.exit()
+        
 
     opts = options(lang = "C", output = "C/include_v"+protocol, \
-                   wire_protocol=protocol, error_limit=200)
+                   wire_protocol=protocol, error_limit=200, validate=True)
     args = []
     args.append(xml_file)
     print "About to generate C include files"
     mavgen(opts, args)
-    opts = options(lang = "python", \
-                   output="python/mavlink_"+xml_file_base+"_v"+protocol+".py", \
-                   wire_protocol=protocol, error_limit=200)
-    print "About to generate python parsers"
-    mavgen(opts,args)
     
+    
+    opts = options(lang = "python", \
+                   output="../dialects/"+"v10/"+xml_file_base+".py", \
+                   wire_protocol=protocol, error_limit=200,validate=True)
+    print "About to generate python parsers and save them into ../dialects/v10/ directory"
+    mavgen(opts,args)
+
+    print "All C headers and Python parsers now generated within the Tools/MAVLink directories"
     if os.access(source_directory, os.R_OK):
         if os.access(target_directory, os.W_OK):
-            print "Preparing to copy over files..."
-            print "About to remove all files in",target_directory
+            print "Preparing to copy over files to main MatrixPilot codebase..."
+            print "About to remove all old files in MatrixPilot MAVLink firmware at ",target_directory
             print "OK to continue ?[Yes / No]: ",
             line = sys.stdin.readline()
             if line == "Yes\n" or line == "yes\n" \
                or line == "Y\n" or line == "y\n":
-                print "passed"
+                print "Proceeding"
                 remove_include_files(target_directory)
                 copy_include_files(source_directory,target_directory)
                 print "Finished copying over xml derived include files"
@@ -135,41 +137,22 @@ for xml_file in xml_file_names:
         sys.exit()
 
 # Copy newer versions of C header files 
-header_files = ['checksum.h','mavlink_helpers.h', 'mavlink_protobuf_manager.hpp', \
-                'mavlink_types.h', 'protocol.h' ]
+# Note have removed mavlink_helpers.h and mavlink_types.h from list below
+# as these are slightly altered for MatrixPilot from that which is generated.
+header_files = ['checksum.h', 'mavlink_protobuf_manager.hpp', \
+                  'protocol.h' ]
 target_directory = "../../../../../MAVLink/include/"
 source_directory = "C/include_v"+protocol+"/"
 print "Copying over upper level header files..."
 for filename in header_files :
   print "Copying ... ", filename
-  #print "About to copy source_file", source_directory+filename, "to",target_directory+filename
   if  os.access(source_directory+filename, os.R_OK):
-    #print "Can read source file", source_directory+filename
     if  os.access(source_directory+filename, os.W_OK):
       copy(source_directory+filename, target_directory+filename)
-      #print "Finished copying to", target_directory+filename
     else :
       print "Could not access", target_directory+filename, " for writing"
   else :
-    print "Could not access file to copy called ", source_directory+filename
-
-
-# Copy specific Mavlink wire protocol 1.0 python parsers for MatrixPilot
-source_file =  "./python/mavlink_matrixpilot_v1.0.py"
-target_files = "./mavlink.py" , "../mavlinkv10.py"
-for target_name in target_files:
-  print "About to copy source_file", source_file, "to",target_name
-  if  os.access(source_file, os.R_OK):
-    print "Can read source file", source_file
-    if  os.access(source_file, os.W_OK):
-      copy(source_file, target_name)
-      print "Finished copying to", target_name
-    else :
-      print "Could not access", target_name, " for writing"
-  else :
-    print "Could not access file to copy called ", source_file
-
-         
+    print "Could not access file to copy called ", source_directory+filename        
         
 ##### End of Main program to generate MAVLink C and Python files ####
 
@@ -178,7 +161,7 @@ source_directory = "../../message_definitions/V1.0"
 target_directory = "../../../../../MAVLink/message_definitions"
 if os.access(source_directory, os.R_OK):
     if os.access(target_directory, os.W_OK):
-        print "Preparing to copy over xml files ..."
+        print "Preparing to copy over xml message definitoin files to MatrixPilot main codebase..."
         print "About to remove files in ",target_directory
         print "OK to continue ?[Yes / No]: ",
         line = sys.stdin.readline()
@@ -192,7 +175,7 @@ if os.access(source_directory, os.R_OK):
                 print "error while trying to remove files in ", target_directory
             print "Copying xml files from ", source_directory
             copy_xml_files(source_directory, target_directory) 
-            print "Finished copying over python files"
+            print "Finished copying over xml files"
         else :
             print "Your answer is No. Exiting Program"
             sys.exit()
@@ -203,7 +186,6 @@ else:
     print "Could not find files to copy at", source_directory
     print "Exiting Program."
     sys.exit()
-print "Program has finished, please press Return Key to exit"
-line = sys.stdin.readline()
+print "MatrixPiklot MAVLink generation script has finished"
 
 

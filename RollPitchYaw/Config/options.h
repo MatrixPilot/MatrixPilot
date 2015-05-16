@@ -227,11 +227,6 @@
 #define USE_TELELOG                         0
 #endif
 
-// Set this to 1 to enable loading options settings from an initialisation (ini) file
-#ifndef USE_CONFIGFILE
-#define USE_CONFIGFILE                      0
-#endif
-
 // Set this to 1 to enable the USB stack on AUAV3
 #ifndef USE_USB
 #define USE_USB                             0
