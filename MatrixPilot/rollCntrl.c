@@ -23,7 +23,9 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
+#include "helicalTurnCntrl.h"
 #include "../libDCM/rmat.h"
 
 #if (USE_CONFIGFILE == 1)

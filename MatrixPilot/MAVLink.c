@@ -122,7 +122,7 @@ inline void preflight_storage_complete_callback(boolean success);
 #endif // (USE_NV_MEMORY == 1)
 
 
-static void mavlink_init(void)
+void mavlink_init(void)
 {
 	int16_t index;
 
@@ -145,20 +145,12 @@ static void mavlink_init(void)
 //	streamRates[MAV_DATA_STREAM_ALTITUDES]      = MAVLINK_RATE_ALTITUDES;
 	streamRates[MAV_DATA_STREAM_EXTRA1]         = MAVLINK_RATE_SUE;
 	streamRates[MAV_DATA_STREAM_EXTRA2]         = MAVLINK_RATE_POSITION_SENSORS;
-}
 
-void telemetry_init(void)
-{
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 57600 // default
 #pragma warning "SERIAL_BAUDRATE set to default value of 57600 bps for MAVLink"
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
-	mavlink_init();
-}
-
-void telemetry_restart(void)
-{
 }
 
 void mav_printf(const char* format, ...)
@@ -259,7 +251,6 @@ static mavlink_message_t msg[2];
 static uint8_t mavlink_message_index = 0;
 static mavlink_status_t r_mavlink_status;
 
-//void udb_serial_callback_received_byte(uint8_t byte)
 void mavlink_input_byte(uint8_t byte)
 {
 //	DPRINT("%u \r\n", byte);

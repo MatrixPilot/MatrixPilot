@@ -25,7 +25,7 @@ int32_t serialRate = 0;
 
 
 //////////////////////////////////////////////////////////
-// GPS and Telemetry
+// GPS Serial input/output emulation
 //////////////////////////////////////////////////////////
 
 void udb_gps_set_rate(int32_t rate)
@@ -61,6 +61,9 @@ void udb_gps_start_sending_data(void)
 	}
 }
 
+//////////////////////////////////////////////////////////
+// Telemetry Serial input/output emulation
+//////////////////////////////////////////////////////////
 
 void udb_serial_set_rate(int32_t rate)
 {
@@ -74,7 +77,7 @@ boolean udb_serial_check_rate(int32_t rate)
 }
 
 
-// Call this function to initiate sending a data to the serial port
+// Call this function to initiate sending data to the serial port
 void udb_serial_start_sending_data(void)
 {
 	uint8_t buffer[BUFLEN];
@@ -84,7 +87,8 @@ void udb_serial_start_sending_data(void)
 
 	if (!telemetrySocket) return;
 
-	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
+//	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
+	while (pos < BUFLEN && (c = mavlink_callback_get_byte_to_send()) != -1) {
 		buffer[pos++] = c;
 	}
 	bytesWritten = UDBSocket_write(telemetrySocket, (uint8_t*)buffer, pos);

@@ -42,7 +42,7 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 
 #else
 
-#define	SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
+#define SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
 
 static int16_t sb_index = 0;
 static int16_t end_index = 0;
@@ -50,12 +50,14 @@ static char serial_interrupt_stopped = 1;
 static uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
 
 
-void udb_serial_callback_received_byte(uint8_t rxchar)
+//void udb_serial_callback_received_byte(uint8_t rxchar)
+void mavlink_callback_received_byte(uint8_t rxchar)
 {
 	mavlink_input_byte(rxchar);
 }
 
-int16_t udb_serial_callback_get_byte_to_send(void)
+//int16_t udb_serial_callback_get_byte_to_send(void)
+int16_t mavlink_callback_get_byte_to_send(void)
 {
 	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
 	{

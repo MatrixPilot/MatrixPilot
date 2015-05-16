@@ -23,9 +23,11 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
+#include "helicalTurnCntrl.h"
 #include "../libUDB/servoOut.h"
 #include "../libDCM/rmat.h"
 

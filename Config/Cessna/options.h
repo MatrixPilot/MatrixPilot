@@ -25,8 +25,7 @@
 //
 // This file includes most of the user-configuration for this firmware,
 // one of the exceptions being waypoints, which live in the waypoints.h file.
-
-#define USE_FLEXIFUNCTION_MIXING 0
+//
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,12 +60,11 @@
 //    AIRFRAME_QUAD             Under development
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
 #define AIRFRAME_TYPE                       AIRFRAME_STANDARD
-//#define AIRFRAME_TYPE                       AIRFRAME_QUAD
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
-#define GPS_TYPE                            GPS_MTEK
+#define GPS_TYPE                            GPS_STD
 //#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
 
 
@@ -143,7 +141,7 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT                       0
+#define MAG_YAW_DRIFT                       1
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
@@ -184,13 +182,12 @@
 //
 // For all boards:
 // If you're not sure, leave USE_PPM_INPUT set to 0.
-// Check on radioIn.c different type of PPM_INPUT to assign to USE_PPM_INPUT
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT                       1
+#define USE_PPM_INPUT                       0
 #define PPM_NUMBER_OF_CHANNELS              8
-#define PPM_SIGNAL_INVERTED                 1
+#define PPM_SIGNAL_INVERTED                 0
 #define PPM_ALT_OUTPUT_PINS                 0
 
 // Select which Input Capture pin the PPM device is connected to
@@ -204,7 +201,7 @@
 // If using PWM inputs (parallel Rx connections), set to the number of cables connected, 1-8
 // If using PPM inputs (serial Rx connection), set to the number of Rx channels, up to PPM_NUMBER_OF_CHANNELS
 // If using LRS library (integrated SPI tranceiver), set to the number of Rx channels, up to 16
-#define NUM_INPUTS                          8
+#define NUM_INPUTS                          6
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -289,7 +286,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
-#define MODE_SWITCH_TWO_POSITION            1
+#define MODE_SWITCH_TWO_POSITION            0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -305,7 +302,6 @@
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
 #define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
-//#define FAILSAFE_INPUT_MIN                  2005
 #define FAILSAFE_INPUT_MIN                  1500
 #define FAILSAFE_INPUT_MAX                  4500
 
@@ -347,13 +343,12 @@
 // SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
 //#define SERIAL_BAUDRATE                     19200
-#define SERIAL_BAUDRATE                     115200
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -396,8 +391,7 @@
 #define MAX_CURRENT                         900 // 90.0 Amps max for the sensor from SparkFun (in tenths of Amps)
 #define CURRENT_SENSOR_OFFSET               10  // Add 1.0 Amp to whatever value we sense
 
-//#define MAX_VOLTAGE                         543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
-#define MAX_VOLTAGE                         365 // 36.5 Volts max for the ACP sensor with an AUAV3 board (in tenths of Volts)
+#define MAX_VOLTAGE                         543 // 54.3 Volts max for the sensor from SparkFun (in tenths of Volts)
 #define VOLTAGE_SENSOR_OFFSET               0   // Add 0.0 Volts to whatever value we sense
 
 // RSSI - RC Receiver signal strength
@@ -650,9 +644,10 @@
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
-#define HILSIM                              1
+#define HILSIM                              0
 #define HILSIM_USB                          0           // AUAV3 only (under development)
 #define HILSIM_BAUD                         38400
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Plan handling
@@ -662,7 +657,6 @@
 // The Waypoint definitions and options are located in the waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
 #define FLIGHT_PLAN_TYPE                    FP_WAYPOINTS
-//#define FLIGHT_PLAN_TYPE                    FP_LOGO
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -712,7 +706,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable experimental extended range navigation support (merged from ballon launch branch)
-#define USE_EXTENDED_NAV
+//#define USE_EXTENDED_NAV
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -724,7 +718,9 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
+#ifndef RECORD_FREE_STACK_SPACE
 #define RECORD_FREE_STACK_SPACE             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -741,13 +737,11 @@
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
 // Set to 9 in order to use the USB for the console connection
-//#define CONSOLE_UART                        3
 #define CONSOLE_UART                        1
-#define CONSOLE_USB                         0
+//#define CONSOLE_UART                        6
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
-#define USE_DEBUG_IO
-//#define USE_MAVLINK_IO
+//#define USE_DEBUG_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -780,17 +774,8 @@
 // Assign the console to an internal UART with CONSOLE_UART, map this console to
 // external port connection with DBG_PORT.
 #define GPS_PORT                            4
-
-#define USE_BLUETOOTH_UART
-
-#ifdef USE_BLUETOOTH_UART
-// Use this with BlueTooth dongle
-#define TLM_PORT                            2
-#define DBG_PORT                            3
-#else
 #define TLM_PORT                            3
-#define DBG_PORT                            2
-#endif
+#define DBG_PORT                            1
 
 // Set this to 1 to enable filesystem support
 #ifndef USE_FILESYS

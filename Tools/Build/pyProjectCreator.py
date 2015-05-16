@@ -361,7 +361,7 @@ if __name__ == '__main__':
 		arch = "dsPIC" + parse_options_file(opts.file, "CPU")
 #		print "arch =", arch
 
-	# TODO: prehaps we want to check that the modules list (etc) is not empty..
+	# TODO: perhaps we want to check that the modules list (etc) is not empty..
 #	print "modules = ", opts.modules
 #	print "defines = ", opts.defines
 
@@ -393,8 +393,8 @@ if __name__ == '__main__':
 		sources = emBlocks_scan_dirs(["*.c", "*.s"], 1, opts.modules)
 		headers = emBlocks_scan_dirs(["*.h"], 0, [opts.config] + opts.modules + ["libUDB"])
 		project_path = project + ".ebp"
-		defines = "\t\t\t<Add option=\"-D" + opts.target + "\" />\n"
 		includes = ""
+		defines = "\t\t\t<Add option=\"-D" + opts.target + "\" />\n"
 		for d in opts.defines:
 #			if not d == ['']:
 			if d:

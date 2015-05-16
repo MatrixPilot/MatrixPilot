@@ -30,7 +30,7 @@
 #include "servoPrepare.h"
 #include "MAVLink.h"
 #include "telemetry.h"
-#include "libCntrl.h"
+#include "flightplan-waypoints.h"
 #include "airspeedCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
@@ -46,7 +46,7 @@ int16_t yaw_control;
 int16_t throttle_control;
 uint16_t wind_gain;
 
-void init_servoPrepare(void) // initialize the PWM
+void servoPrepare_init(void) // initialize the PWM
 {
 	int16_t i;
 

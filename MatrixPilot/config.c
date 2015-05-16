@@ -21,15 +21,12 @@
 
 #include "defines.h"
 #include "config.h"
-#include <stdio.h>
-
+//#include "config-defaults.h"
+#include "minIni.h"
 #include "navigate.h"
 #include "libCntrl.h"
 #include "airspeedCntrl.h"
 
-//#if (USE_CONFIGFILE == 1)
-
-#include "minIni.h"
 
 union settings_word settings;
 struct gains_variables gains;
@@ -243,8 +240,6 @@ static void save_gains(void)
 	ini_putf(strHover, "wp", gains.HoverPitchTowardsWP, strConfigFile);
 	ini_putf(strHover, "radius", gains.HoverNavMaxPitchRadius, strConfigFile);
 }
-
-//#endif // USE_CONFIGFILE
 
 void config_load(void)
 {

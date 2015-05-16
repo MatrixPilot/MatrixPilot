@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "config.h"
 #include "../libUDB/libUDB.h"
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
@@ -92,6 +93,8 @@ typedef struct
  */
 static void cmd_dir(char* arg)
 {
+#if defined(__XC16__)
+#if (SILSIM == 0)
 #if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
 	SearchRec rec;
 	char* fileName = "*.*";
@@ -108,11 +111,15 @@ static void cmd_dir(char* arg)
 		} while (FindNext(&rec) != -1);
 	}
 #endif
+#endif // SILSIM
+#endif // __XC16__
 }
 
 //size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
 static void cmd_cat(char* arg)
 {
+#if defined(__XC16__)
+#if (SILSIM == 0)
 #if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
 	char buf[2];
 	FSFILE* fp;
@@ -127,6 +134,8 @@ static void cmd_cat(char* arg)
 		FSfclose(fp);
 	}
 #endif
+#endif // SILSIM
+#endif // __XC16__
 }
 
 static void cmd_start(char* arg)

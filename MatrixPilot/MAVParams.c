@@ -26,7 +26,7 @@
 
 #include "MAVLink.h"
 #include "MAVParams.h"
-#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
+#include "../libDCM/libDCM.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h"
 //#include <string.h>
 //#include <stdarg.h>
@@ -132,6 +132,20 @@ void mavlink_set_param_gyroscale_Q14(mavlink_param_union_t setting, int16_t i)
 	if (setting.type != MAVLINK_TYPE_FLOAT) return;
 
 	*((int16_t*)mavlink_parameters_list[i].pparam) = (int16_t)(setting.param_float * (SCALEGYRO * 16384.0));
+}
+
+void mavlink_send_param_float(int16_t i)
+{
+	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
+	    *((float*)mavlink_parameters_list[i].pparam),
+	    MAVLINK_TYPE_FLOAT, count_of_parameters_list, i);
+}
+
+void mavlink_set_param_float(mavlink_param_union_t setting, int16_t i)
+{
+	if (setting.type != MAVLINK_TYPE_FLOAT) return;
+
+	*((float*)mavlink_parameters_list[i].pparam) = setting.param_float;
 }
 
 void mavlink_send_param_Q14(int16_t i)

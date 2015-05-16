@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "servoMix.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "cameraCntrl.h"
 #include "../libUDB/servoOut.h"
@@ -35,6 +36,10 @@
 const int16_t aileronbgain  = (int16_t)(8.0*AILERON_BOOST);
 const int16_t elevatorbgain = (int16_t)(8.0*ELEVATOR_BOOST);
 const int16_t rudderbgain   = (int16_t)(8.0*RUDDER_BOOST);
+
+void servoMix_init(void)
+{
+}
 
 void servoMix(void)
 {
@@ -90,7 +95,9 @@ void servoMix(void)
 	// Mix roll_control and waggle into ailerons
 	// Mix pitch_control and yaw_control into both elevator and rudder
 #if (AIRFRAME_TYPE == AIRFRAME_VTAIL)
-		int32_t vtail_yaw_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, yaw_control);
+	{
+		int32_t vtail_yaw_control;
+		vtail_yaw_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, yaw_control);
 
 		temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
 		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
@@ -116,6 +123,7 @@ void servoMix(void)
 			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control);
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 		}
+	}
 #endif
 
 	// Delta-Wing airplane airframe

@@ -73,10 +73,12 @@ int matrixpilot_init(void)
 #error here
 	quad_init();
 #else // AIRFRAME_TYPE
-	init_servoPrepare();
+	servoMix_init();
+	servoPrepare_init();
 	init_states();
 	init_behavior();
 	telemetry_init();
+	mavlink_init();
 #endif // AIRFRAME_TYPE
 
 #ifdef _MSC_VER
@@ -90,7 +92,7 @@ int matrixpilot_init(void)
 int matrixpilot_loop(void)
 {
 #if (USE_TELELOG == 1)
-	telemetry_log();
+	telemetry_log_service();
 #endif
 #if (USE_USB == 1)
 	USBPollingService();

@@ -36,9 +36,6 @@
 #define MAVLINK_RATE_IMU_RAW                0   // ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. |
 #define MAVLINK_RATE_POSITION               8   // LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages. |
 #define MAVLINK_RATE_RAW_SENSORS            2   // IMU_RAW, GPS_RAW, GPS_STATUS packets.
-#define MAVLINK_RATE_NAV_CONTROLLER         2
-#define MAVLINK_RATE_AIRSPEEDS              2
-#define MAVLINK_RATE_ALTITUDES              2
 
 // Fixed data rates
 #define MAVLINK_RATE_HEARTBEAT              4
@@ -47,8 +44,7 @@
 // Matrixpilot specific data rates
 #define MAVLINK_RATE_SUE                    8   // SERIAL_UDB_EXTRA data rate on channel EXTRA1
 #define MAVLINK_RATE_FORCE                  4   // Send FORCE on plane (Aerodynamic force)
-//#define MAVLINK_RATE_POSITION_SENSORS       0   // Using channel EXTRA2
-#define MAVLINK_RATE_POSITION_SENSORS       4   // Using channel EXTRA2
+#define MAVLINK_RATE_POSITION_SENSORS       0   // Using channel EXTRA2
 
 // Send VFR_HUD message at position rate, 1=yes, 0=no.  Needed for correct mavproxy state
 #define MSG_VFR_HUD_WITH_POSITION           1

@@ -208,6 +208,19 @@ void log_telemetry(const uint8_t* data, int len)
 	}
 }
 
+// called from telemetry module at interrrupt level to manage the log data buffers
+void log_swapbuf(void)
+{
+	if (lb_in_use == 1)
+	{
+		lb_in_use = 2;
+	}
+	else
+	{
+		lb_in_use = 1;
+	}
+}
+
 static int fs_nextlog(char* filename)
 {
 	FSFILE* fp;

@@ -25,6 +25,7 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"

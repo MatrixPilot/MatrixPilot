@@ -466,7 +466,7 @@ boolean handleUDBSockets(void)
 			log_data(TELE_LOGFILE, buffer, bytesRead);
 #endif // LOG_TELE_DATA
 			for (i = 0; i < bytesRead; i++) {
-				udb_serial_callback_received_byte(buffer[i]);
+				mavlink_callback_received_byte(buffer[i]);
 			}
 			if (bytesRead > 0) didRead = true;
 		}

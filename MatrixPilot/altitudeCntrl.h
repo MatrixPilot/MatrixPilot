@@ -26,9 +26,7 @@
 extern union longww throttleFiltered;
 extern int16_t pitchAltitudeAdjust;
 
-//#if (SPEED_CONTROL == 1)
 extern int16_t desiredSpeed; // Stored in 10ths of meters per second
-//#endif
 
 void setTargetAltitude(int16_t targetAlt);
 

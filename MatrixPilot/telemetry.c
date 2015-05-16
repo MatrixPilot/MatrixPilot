@@ -46,7 +46,7 @@
 #include "../libDCM/rmat.h"
 #include <string.h>
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+//#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
@@ -67,10 +67,14 @@ static void sio_voltage_high(uint8_t inchar);
 static void sio_fp_data(uint8_t inchar);
 static void sio_fp_checksum(uint8_t inchar);
 
+#if (CAM_USE_EXTERNAL_TARGET_DATA == 1)
 static void sio_cam_data(uint8_t inchar);
 static void sio_cam_checksum(uint8_t inchar);
+#endif
 
+#if (FLY_BY_DATALINK_ENABLED == 1)
 static void sio_fbdl_data(unsigned char inchar);
+#endif
 
 static char fp_high_byte;
 static uint8_t fp_checksum;
@@ -796,4 +800,4 @@ void telemetry_output_8hz(void)
 
 #endif
 #endif // SERIAL_OUTPUT_FORMAT
-#endif // SERIAL_MAVLINK
+//#endif // SERIAL_MAVLINK

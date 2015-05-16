@@ -49,8 +49,6 @@
 #define MODE_SWITCH_TWO_POSITION            0
 //#undef  USE_TELELOG
 //#define USE_TELELOG                         0
-//#undef  USE_CONFIGFILE
-//#define USE_CONFIGFILE                      0
 #undef  USE_USB
 #define USE_USB                             0
 #undef  USE_MSD
@@ -117,7 +115,9 @@ void mav_printf(const char * format, ...);
 #define DPRINT(args, ...)
 #endif // USE_DEBUG_IO
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "fixDeps.h"
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 #include "libUDB_defines.h"
 #include "nv_memory_options.h"
 

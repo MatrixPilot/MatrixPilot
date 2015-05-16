@@ -19,20 +19,4 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "defines.h"
-#include "states.h"
-#include "config.h"
-#include "navigate.h"
-#include "behaviour.h"
-#include "servoPrepare.h"
-#include "altitudeCntrl.h"
-#include "helicalTurnCntrl.h"
-#include "../libDCM/deadReckoning.h"
-#include "../libDCM/mathlibNAV.h"
-#include "../libDCM/rmat.h"
-#include <math.h>
-
-
-void helicalTurnCntrl(void)
-{
-}
+void helicalTurnCntrl(void);
