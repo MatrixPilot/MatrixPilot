@@ -1,7 +1,13 @@
 #ifndef MAVLINK_TYPES_H_
 #define MAVLINK_TYPES_H_
 
+// Visual Studio versions before 2013 don't conform to C99.
+#if (defined _MSC_VER) && (_MSC_VER < 1800)
 #include <stdint.h>
+#else
+//#include <inttypes.h>
+#include <stdint.h> // MatrixPilot has standardised on using stdint.h 
+#endif
 
 #ifndef MAVLINK_MAX_PAYLOAD_LEN
 // it is possible to override this, but be careful!
@@ -28,7 +34,7 @@
 
 #define MAVLINK_MAX_EXTENDED_PAYLOAD_LEN (MAVLINK_MAX_EXTENDED_PACKET_LEN - MAVLINK_EXTENDED_HEADER_LEN - MAVLINK_NUM_NON_PAYLOAD_BYTES)
 
-//#pragma pack(push, 1)
+#pragma pack(push, 1)
 
 /**
  * Old-style 4 byte param union
@@ -53,6 +59,7 @@ typedef struct param_union {
 	uint8_t type;
 } mavlink_param_union_t;
 
+
 /**
  * New-style 8 byte param union
  * mavlink_param_union_double_t will be 8 bytes long, and treated as needing 8 byte alignment for the purposes of MAVLink 1.0 field ordering.
@@ -62,7 +69,7 @@ typedef struct param_union {
  * The intention is that by replacing the is_double bit with 0 the type can be directly used as a double (as the is_double bit corresponds to the
  * lowest mantissa bit of a double). If is_double is 0 then mavlink_type gives the type in the union.
  * The mavlink_types.h header will also need to have shifts/masks to define the bit boundaries in the above,
- * as bitfield ordering isn’t consistent between platforms. The above is intended to be for gcc on x86,
+ * as bitfield ordering isnâ€™t consistent between platforms. The above is intended to be for gcc on x86,
  * which should be the same as gcc on little-endian arm. When using shifts/masks the value will be treated as a 64 bit unsigned number,
  * and the bits pulled out using the shifts/masks.
 */
@@ -92,10 +99,6 @@ typedef union {
 typedef struct __mavlink_system {
     uint8_t sysid;   ///< Used by the MAVLink message_xx_send() convenience function
     uint8_t compid;  ///< Used by the MAVLink message_xx_send() convenience function
-    uint8_t type;    ///< Unused, can be used by user to store the system's type
-    uint8_t state;   ///< Unused, can be used by user to store the system's state
-    uint8_t mode;    ///< Unused, can be used by user to store the system's mode
-    uint32_t nav_mode;    ///< Unused, can be used by user to store the system's navigation mode
 } mavlink_system_t;
 
 typedef struct __mavlink_message {
@@ -114,7 +117,7 @@ typedef struct __mavlink_extended_message {
        int32_t extended_payload_len;   ///< Length of extended payload if any
        uint8_t extended_payload[MAVLINK_MAX_EXTENDED_PAYLOAD_LEN];
 } mavlink_extended_message_t;
-//#pragma pack(pop)
+#pragma pack(pop)
 
 typedef enum {
 	MAVLINK_TYPE_CHAR     = 0,
