@@ -54,12 +54,12 @@ int16_t  __builtin_divsd(int32_t num,  int16_t den);
 
 
 // There are no hardware toggle switches on the UDB4, so use values of 0
-#define HW_SWITCH_1     0
-#define HW_SWITCH_2     0
-#define HW_SWITCH_3     0
+//#define HW_SWITCH_1     0
+//#define HW_SWITCH_2     0
+//#define HW_SWITCH_3     0
 
-#define MAX_INPUTS      8
-#define MAX_OUTPUTS     8
+//#define MAX_INPUTS      8
+//#define MAX_OUTPUTS     8
 
 
 extern uint8_t sil_radio_on;

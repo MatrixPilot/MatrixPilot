@@ -23,7 +23,6 @@
 //#include "../libUDB/barometer.h"
 //#include "estAirspeed.h"
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
  
 #define air_gas_constant 8.31432f
@@ -42,7 +41,7 @@ float get_air_density(float static_pressure, float temperature_celsius)
  * lacks the air density compensation. Use the calc_true_airspeed functions to get
  * the true airspeed.
  *
- * @parem pressure_front pressure inside the pitot/prandl tube
+ * @param pressure_front pressure inside the pitot/prandl tube
  * @param pressure_ambient pressure at the side of the tube/airplane
  * @param temperature air temperature in degrees celcius
  * @return indicated airspeed in m/s
@@ -57,7 +56,7 @@ float calc_indicated_airspeed(float pressure_front, float pressure_ambient, floa
  *
  * Please note that the true airspeed is NOT the groundspeed, because of the effects of wind
  *
- * @parem speed current indicated airspeed
+ * @param speed current indicated airspeed
  * @param pressure_ambient pressure at the side of the tube/airplane
  * @param temperature air temperature in degrees celcius
  * @return true airspeed in m/s
@@ -72,7 +71,7 @@ float calc_true_airspeed_from_indicated(float speed, float pressure_ambient, flo
  *
  * Please note that the true airspeed is NOT the groundspeed, because of the effects of wind
  *
- * @parem pressure_front pressure inside the pitot/prandl tube
+ * @param pressure_front pressure inside the pitot/prandl tube
  * @param pressure_ambient pressure at the side of the tube/airplane
  * @param temperature air temperature in degrees celcius
  * @return true airspeed in m/s

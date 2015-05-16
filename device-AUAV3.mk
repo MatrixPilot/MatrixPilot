@@ -8,3 +8,5 @@ CPU := 33EP512MU810
 modules += libUDB libVectorMatrix libFlashFS Microchip
 incpath += Microchip Microchip/Include libVectorMatrix
 #cfgpath := Config
+
+#defines += USE_USB USE_CDC USE_MSD USE_FILESYS

@@ -41,7 +41,7 @@ void init_tasks(void)
 	while (1)
 	{
 #if (USE_TELELOG == 1)
-		telemetry_log();
+		telemetry_log_service();
 #endif
 #if (USE_USB == 1)
 		USBPollingService();

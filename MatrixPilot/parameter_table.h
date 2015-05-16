@@ -29,13 +29,14 @@
 #define PARAMETER_TABLE_H
 
 // we include these here as the source module is generated
-#include "../libDCM/libDCM_internal.h"  // Needed for access to internal DCM value const struct mavlink_parameter mavlink_parameters_list[] =
+//#include "../libDCM/libDCM_internal.h"  // Needed for access to internal DCM value
+#include "../libDCM/libDCM.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h"
 #include "../MAVLink/include/mavlink_types.h"
 #include "parameter_datatypes.h"
 
 // Includes of all the data references required to build the parameter table.
-#include "gain_variables.h"             // Needed for access to internal DCM value"
+//#include "gain_variables.h"             // Needed for access to internal DCM value"
 
 // callback type for data services user
 typedef void (*PT_callbackFunc)(boolean);

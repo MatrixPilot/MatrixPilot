@@ -22,21 +22,19 @@
 #include "defines.h"
 #include "mode_switch.h"
 #include "flightplan.h"
+#include "config.h"
 #include "states.h"
 #include "altitudeCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
-#include <stdio.h>
 
 union state_flags_int state_flags;
 int16_t waggle = 0;
-
 static uint8_t counter = 0;
 
 #define FSM_CLK 2                       // clock frequency for state machine
 #if (HILSIM == 1) // implied when SILSIM == 1
 #define CALIB_PAUSE   (2  * FSM_CLK)    // wait for 2 seconds of runs through the state machine
-//#define STANDBY_PAUSE (24 * FSM_CLK)    // pause for 24 seconds of runs through the state machine
 #define STANDBY_PAUSE (5 * FSM_CLK)    // pause for 5 seconds of runs through the state machine
 #else
 #define CALIB_PAUSE (10.5 * FSM_CLK)    // wait for 10.5 seconds of runs through the state machine

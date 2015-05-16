@@ -24,6 +24,7 @@
 
 
 void servoMix(void);
+void servoMix_init(void);
 void cameraServoMix(void);
 
 

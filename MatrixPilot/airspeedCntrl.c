@@ -52,7 +52,6 @@ void init_airspeedCntrl(void)
 	airspeed_pitch_max_aspd    = (AIRSPEED_PITCH_MAX_ASPD * (RMAX/57.3));
 }
 
-#if (USE_CONFIGFILE == 1)
 void save_airspeedCntrl(void)
 {
 /*
@@ -68,7 +67,6 @@ void save_airspeedCntrl(void)
 	= airspeed_pitch_max_aspd    / (AIRSPEED_PITCH_MAX_ASPD * (RMAX/57.3));
  */
 }
-#endif // USE_CONFIGFILE
 
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 

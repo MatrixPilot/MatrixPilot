@@ -22,7 +22,6 @@
 #ifndef LIB_UDB_H
 #define LIB_UDB_H
 
-#include <stdint.h>
 #define _ADDED_C_LIB 1 // Needed to get vsnprintf()
 #include <stdio.h>
 
@@ -50,8 +49,6 @@
 #define MODE_SWITCH_TWO_POSITION            0
 //#undef  USE_TELELOG
 //#define USE_TELELOG                         0
-//#undef  USE_CONFIGFILE
-//#define USE_CONFIGFILE                      0
 #undef  USE_USB
 #define USE_USB                             0
 #undef  USE_MSD
@@ -118,7 +115,9 @@ void mav_printf(const char * format, ...);
 #define DPRINT(args, ...)
 #endif // USE_DEBUG_IO
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "fixDeps.h"
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 #include "libUDB_defines.h"
 #include "nv_memory_options.h"
 
@@ -261,7 +260,7 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
-#ifdef PX4
+#if (PX4 == 1 || SILSIM == 1)
 void udb_led_toggle(uint8_t x);
 void led_on(uint8_t x);
 void led_off(uint8_t x);

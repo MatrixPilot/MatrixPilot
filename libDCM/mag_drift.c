@@ -21,12 +21,10 @@
 
 #include "libDCM.h"
 #include "mathlibNAV.h"
-//#include "deadReckoning.h"
-//#include "gpsParseCommon.h"
 #include "../libUDB/heartbeat.h"
-//#include "../libUDB/ADchannel.h"
 #include "../libUDB/magnetometer.h"
 #include "magnetometerOptions.h"
+#include "mag_drift.h"
 #include "rmat.h"
 
 // These are the routines for maintaining a direction cosine matrix
@@ -343,7 +341,7 @@ void mag_drift(fractional errorYawplane[])
 	}
 }
 
-void udb_magnetometer_callback(void)
+void mag_drift_callback(void)
 {
 	dcm_flags._.mag_drift_req = 1;
 //#define USE_DEBUG_IO

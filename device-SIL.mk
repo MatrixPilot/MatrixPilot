@@ -11,3 +11,5 @@ CPU :=
 modules += Tools/MatrixPilot-SIL
 incpath +=
 #cfgpath := Config
+
+#defines += USE_MAVLINK=1 USE_TELEMETRY=1

@@ -22,8 +22,8 @@
 #define NAVIGATE_H
 
 
-extern int8_t extended_range;
 extern int16_t tofinish_line;
+extern int8_t extended_range;
 extern int8_t desired_dir;
 
 void init_navigation(void);

@@ -130,7 +130,6 @@ endif
 INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath))
 INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
 
-#INCPATH = $(sort $(INC_PATH))
 #$(warning INCPATH: $(INCPATH))
 
 ################################################################################
@@ -203,14 +202,18 @@ include $(addsuffix /module.mk,$(modules))
 
 $(warning library: $(subst $(SOURCE_DIR)/,,$(libraries)))
 
-INCPATH += $(incpath)
+#$(warning incpath: $(incpath))
+#INCPATH += $(incpath)
 $(warning INCPATH: $(INCPATH))
 INCLUDES += $(addprefix -I,$(INCPATH))
 #$(warning INCLUDES: $(subst -I$(SOURCE_DIR)/,,$(INCLUDES)))
+#$(warning INCLUDES: $(INCLUDES))
 #$(warning objects = $(objects))
 
-DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
+#DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
+DEFINES += $(addprefix -D,$(DEVICE)=1 $(DEFS) $(defines))
 $(warning DEFINES: $(subst -D,,$(DEFINES)))
+
 #$(warning *******************************************************************************)
 
 ################################################################################

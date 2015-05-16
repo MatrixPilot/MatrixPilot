@@ -23,7 +23,9 @@
 // mavlink_options.h
 //
 
+#ifndef USE_MAVLINK
 #define USE_MAVLINK                         1
+#endif
 
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
@@ -44,6 +46,7 @@
 
 // Matrixpilot specific data rates
 #define MAVLINK_RATE_SUE                    8   // SERIAL_UDB_EXTRA data rate on channel EXTRA1
+#define MAVLINK_RATE_FORCE                  4   // Send FORCE on plane (Aerodynamic force)
 //#define MAVLINK_RATE_POSITION_SENSORS       0   // Using channel EXTRA2
 #define MAVLINK_RATE_POSITION_SENSORS       4   // Using channel EXTRA2
 

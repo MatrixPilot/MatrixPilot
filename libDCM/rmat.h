@@ -40,7 +40,6 @@
 
 #if (MAG_YAW_DRIFT == 1)
 extern fractional magFieldEarth[3];
-void udb_magnetometer_callback(void);
 #endif
 
 extern fractional rmat[];                   //  gyro rotation vector:

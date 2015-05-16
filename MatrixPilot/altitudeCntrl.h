@@ -23,12 +23,23 @@
 #define ALTITUDECNTRL_H
 
 
+extern boolean filterManual;
+extern int16_t desiredHeight;
+// Variables required for mavlink.  Used in AltitudeCntrlVariable and airspeedCntrl
+extern int16_t height_target_min;
+extern int16_t height_target_max;
+extern int16_t height_margin;
+extern fractional alt_hold_throttle_min;
+extern fractional alt_hold_throttle_max;
+extern int16_t alt_hold_pitch_min;
+extern int16_t alt_hold_pitch_max;
+extern int16_t alt_hold_pitch_high;
+extern int16_t rtl_pitch_down;
+
+
 extern union longww throttleFiltered;
 extern int16_t pitchAltitudeAdjust;
-
-//#if (SPEED_CONTROL == 1)
 extern int16_t desiredSpeed; // Stored in 10ths of meters per second
-//#endif
 
 void setTargetAltitude(int16_t targetAlt);
 

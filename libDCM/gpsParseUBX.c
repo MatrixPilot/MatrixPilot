@@ -26,6 +26,7 @@
 #include "../libUDB/servoOut.h"
 #include "../libUDB/magnetometer.h"
 #include "rmat.h"
+#include "mag_drift.h"
 
 
 #if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
@@ -881,7 +882,7 @@ void gps_commit_data(void)
 	svs             = svs_;
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
-	HILSIM_MagData(udb_magnetometer_callback); // run the magnetometer computations
+	HILSIM_MagData(mag_drift_callback); // run the magnetometer computations
 #endif // HILSIM
 }
 

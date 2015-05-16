@@ -23,13 +23,8 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
-//
-// Note that there is a small but growing library of preset options.h files for
-// specific planes located in the MatrixPilot/example-options-files directory.
-// You can use one of those files by replacing this file with that one.
-
+// This file includes most of the user-configuration for this firmware,
+// one of the exceptions being waypoints, which live in the waypoints.h file.
 
 #define USE_FLEXIFUNCTION_MIXING 0
 
@@ -148,7 +143,7 @@
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the magnetometerOptions.h file, including declination and magnetometer type.
-#define MAG_YAW_DRIFT                       0
+#define MAG_YAW_DRIFT                       1
 
 // Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
@@ -171,7 +166,9 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
+#ifndef NORADIO
 #define NORADIO                             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -291,7 +288,7 @@
 // switch state back in stabilized. The important design concept is that Manual position is always Manual state immediately.
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
-#define MODE_SWITCH_TWO_POSITION            1
+#define MODE_SWITCH_TWO_POSITION            0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -306,7 +303,8 @@
 //
 // FAILSAFE_INPUT_MIN and _MAX define the range within which we consider the radio on.
 // Normal signals should fall within about 2000 - 4000.
-#define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
+//#define FAILSAFE_INPUT_CHANNEL              THROTTLE_INPUT_CHANNEL
+#define FAILSAFE_INPUT_CHANNEL              CHANNEL_3
 //#define FAILSAFE_INPUT_MIN                  2005
 #define FAILSAFE_INPUT_MIN                  1500
 #define FAILSAFE_INPUT_MAX                  4500
@@ -345,11 +343,14 @@
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
-// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
+
+// 
+// SERIAL_MAVLINK has been deprecated. Define USE_MAVLINK to enable
+// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
@@ -652,7 +653,7 @@
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
-#define HILSIM                              1
+#define HILSIM                              0
 #define HILSIM_USB                          0           // AUAV3 only (under development)
 #define HILSIM_BAUD                         38400
 
@@ -795,17 +796,21 @@
 #endif
 
 // Set this to 1 to enable filesystem support
+#ifndef USE_FILESYS
 #define USE_FILESYS                         1
+#endif
 
 // Set this to 1 to enable logging telemetry to filesystem
-#define USE_TELELOG                         0
-
-// Set this to 1 to enable loading options settings from an initialisation (ini) file
-#define USE_CONFIGFILE                      0
+#ifndef USE_TELELOG
+#define USE_TELELOG                         1
+#endif
 
 // Set this to 1 to enable the USB stack on AUAV3
+#ifndef USE_USB
 #define USE_USB                             0
+#endif
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#ifndef USE_MSD
 #define USE_MSD                             0
-#define USE_YMODEM                          0
+#endif

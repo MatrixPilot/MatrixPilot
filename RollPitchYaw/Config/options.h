@@ -75,6 +75,8 @@
 // NUM_INPUTS: Set to 0-5 
 #define NUM_INPUTS                          0
 
+#define THROTTLE_INPUT_CHANNEL              CHANNEL_3  // added to support libSTM::radioIn.c during RPY builds
+
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
 #define NUM_OUTPUTS                         3
 
@@ -150,7 +152,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE                        1
+//#define USE_MCU_IDLE                        1 // moved to interrupt.h
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -217,18 +219,25 @@
 #define TLM_PORT                            3
 #define DBG_PORT                            1
 
+// Set this to 1 to enable filesystem support
+#ifndef USE_FILESYS
+#define USE_FILESYS                         0
+#endif
 
-// Set this to 1 to enable logging telemetry to dataflash on AUAV3
+// Set this to 1 to enable logging telemetry to filesystem
+#ifndef USE_TELELOG
 #define USE_TELELOG                         0
-
-// Set this to 1 to enable loading options settings from a config file on AUAV3
-#define USE_CONFIGFILE                      0
+#endif
 
 // Set this to 1 to enable the USB stack on AUAV3
+#ifndef USE_USB
 #define USE_USB                             0
+#endif
 
 // Set this to 1 to enable the Mass Storage Driver support over USB on AUAV3
+#ifndef USE_MSD
 #define USE_MSD                             0
+#endif
 
 // NEW STUFF
 #define MODE_SWITCH_INPUT_CHANNEL           3

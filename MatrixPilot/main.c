@@ -66,17 +66,18 @@ int matrixpilot_init(void)
 	config_init();  // reads .ini files otherwise initialises with defaults
 
 	dcm_init();
-//	init_config();  // this will need to be moved up in order to support runtime hardware options
 	flightplan_init();
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 #error here
 	quad_init();
 #else // AIRFRAME_TYPE
-	init_servoPrepare();
+	servoMix_init();
+	servoPrepare_init();
 	init_states();
 	init_behavior();
 	telemetry_init();
+	mavlink_init();
 #endif // AIRFRAME_TYPE
 
 #ifdef _MSC_VER
@@ -90,7 +91,7 @@ int matrixpilot_init(void)
 int matrixpilot_loop(void)
 {
 #if (USE_TELELOG == 1)
-	telemetry_log();
+	telemetry_log_service();
 #endif
 #if (USE_USB == 1)
 	USBPollingService();

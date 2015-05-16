@@ -22,13 +22,14 @@
 #include "libDCM.h"
 #include "gpsData.h"
 #include "gpsParseCommon.h"
-#include "../libUDB/heartbeat.h"
-#include "../libUDB/magnetometer.h"
-#include "../libUDB/barometer.h"
-#include "../libUDB/ADchannel.h"
 #include "estAltitude.h"
 #include "mathlibNAV.h"
 #include "rmat.h"
+#include "mag_drift.h"
+#include "../libUDB/barometer.h"
+#include "../libUDB/ADchannel.h"
+#include "../libUDB/heartbeat.h"
+#include "../libUDB/magnetometer.h"
 #include <math.h>
 
 
@@ -89,7 +90,7 @@ void do_I2C_stuff(void)
 //#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 #if (MAG_YAW_DRIFT == 1)
 //			printf("rxMag %u\r\n", udb_heartbeat_counter);
-			rxMagnetometer(udb_magnetometer_callback);
+			rxMagnetometer(mag_drift_callback);
 #endif
 			counter = 0;
 			toggle = 0;
@@ -119,7 +120,7 @@ void udb_heartbeat_callback(void)
 //	if (udb_heartbeat_counter % 10 == 0)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
 	{
-		rxMagnetometer(udb_magnetometer_callback);
+		rxMagnetometer(mag_drift_callback);
 	}
 #endif
 #endif // BAROMETER_ALTITUDE

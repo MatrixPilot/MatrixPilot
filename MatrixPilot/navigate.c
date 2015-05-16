@@ -22,14 +22,17 @@
 #include "defines.h"
 #include "navigate.h"
 #include "behaviour.h"
-#include "flightplan.h"
 #include "cameraCntrl.h"
 #include "servoPrepare.h"
+#include "config.h"
 #include "states.h"
+#include "flightplan.h"
+#include "flightplan-waypoints.h"
 #include "../libUDB/libUDB.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/mathlib.h"
 #include "../libDCM/gpsData.h"
@@ -42,11 +45,6 @@
 // angle of the vector from the origin to the location of the plane.
 
 // The origin is recorded as the location of the plane during power up of the control.
-
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
 
 uint16_t yawkpail; // only exported for parameter_table
 uint16_t yawkprud; // only exported for parameter_table

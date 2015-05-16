@@ -74,7 +74,6 @@ static const uint8_t heading_strings[16][4] = {
 static const uint8_t callsign[] = OSD_CALL_SIGN;
 
 static uint8_t osd_reset_cnt = 0;
-//static uint8_t osd_phase = 0;
 static boolean osd_was_on = 0;
 
 #if (OSD_SHOW_CONSOLE == 1)
