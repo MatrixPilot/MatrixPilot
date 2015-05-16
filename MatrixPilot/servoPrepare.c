@@ -33,6 +33,7 @@
 #include "flightplan-waypoints.h"
 #include "airspeedCntrl.h"
 #include "cameraCntrl.h"
+#include "libCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"

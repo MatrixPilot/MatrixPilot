@@ -21,10 +21,12 @@
 
 #include "defines.h"
 #include "states.h"
+#include "config.h"
 #include "navigate.h"
-#include "telemetry.h"
-#include "flightplan.h"
 #include "cameraCntrl.h"
+#include "flightplan.h"
+#include "flightplan-waypoints.h"
+#include "telemetry.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -38,15 +40,43 @@
 #include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 #include "../libUDB/mcu.h"
-#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+//#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
+#include "../libDCM/libDCM.h" // Needed for access to internal DCM value
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estAltitude.h"
+#include "../libDCM/estWind.h"
 #include "../libDCM/rmat.h"
 #include <string.h>
 
-//#if (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK)
+
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
+// SERIAL_UDB_EXTRA, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
+// This determines the format of the output sent out the spare serial port.
+// Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
+// SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
+// SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
+// SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
+// SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
+// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
+
+#ifndef SERIAL_OUTPUT_FORMAT
+//#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE    // TODO: this will have missing dependencies
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
+#endif // SERIAL_OUTPUT_FORMAT
+
+////////////////////////////////////////////////////////////////////////////////
+// MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations)
+// Note that MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
+// enable MAVLink support with USE_MAVLINK in mavlink_options.h
+
+////////////////////////////////////////////////////////////////////////////////
+// Serial Output BAUD rate for either standard telemetry streams or MAVLink
+//  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
+//#define SERIAL_BAUDRATE                     19200
+
 
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 
@@ -98,6 +128,10 @@ void telemetry_init(void)
 #warning SERIAL_BAUDRATE set to default value of 19200 bps
 #endif
 
+#if (CONSOLE_UART != 2)
+//	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
+//	udb_init_USART();
+#endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 
@@ -799,5 +833,14 @@ void telemetry_output_8hz(void)
 #endif // USE_OSD
 
 #endif
+#else
+void telemetry_restart(void)
+{
+}
+void telemetry_output_8hz(void)
+{
+}
+void telemetry_init(void)
+{
+}
 #endif // SERIAL_OUTPUT_FORMAT
-//#endif // SERIAL_MAVLINK
