@@ -66,7 +66,6 @@ int matrixpilot_init(void)
 	config_init();  // reads .ini files otherwise initialises with defaults
 
 	dcm_init();
-//	init_config();  // this will need to be moved up in order to support runtime hardware options
 	flightplan_init();
 
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)

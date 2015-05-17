@@ -62,7 +62,7 @@ void udb_init_GPS(void)
 
 void MP_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-	gps_out_buffer_reset();
+//	gps_out_buffer_reset();
 }
 
 void udb_gps_start_sending_data(void)

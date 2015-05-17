@@ -9,12 +9,12 @@
 #if (WIN == 1 || NIX == 1)
 
 #include "SIL-udb.h"
-#include "../MatrixPilot/defines.h"
-#include "../MatrixPilot/states.h"
-#include "../MatrixPilot/config.h"
-#include "../MatrixPilot/flightplan.h"
-#include "../MatrixPilot/flightplan-waypoints.h"
-#include "../libUDB/servoOut.h"
+#include "UDBSocket.h"
+#include "../../MatrixPilot/defines.h"
+#include "../../MatrixPilot/states.h"
+#include "../../MatrixPilot/config.h"
+#include "../../MatrixPilot/flightplan.h"
+#include "../../libUDB/servoOut.h"
 #include <stdio.h>
 
 #define BUFLEN 512
@@ -25,8 +25,23 @@ static boolean showLEDs = 0;
 static uint8_t inputState = 0;
 static int hasShownInitStates = 0;
 
-static void sil_handle_key_input(char c);
+static int sil_handle_key_input(char c);
 static void sil_checkForLedUpdates(void);
+
+void udb_led_toggle(uint8_t x)
+{
+	leds[x] = !leds[x];
+}
+
+void led_on(uint8_t x)
+{
+	leds[x] = LED_ON;
+}
+
+void led_off(uint8_t x)
+{
+	leds[x] = LED_OFF;
+}
 
 static void print_help(void)
 {
@@ -128,7 +143,7 @@ static void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int del
 
 #define KEYPRESS_INPUT_DELTA 50
 
-static void sil_handle_key_input(char c)
+static int sil_handle_key_input(char c)
 {
 	switch (inputState) {
 		case 0:
@@ -226,7 +241,7 @@ static void sil_handle_key_input(char c)
 					break;
 					
 				default:
-					break;
+					return 0;
 			}
 			break;
 		}
@@ -254,8 +269,10 @@ static void sil_handle_key_input(char c)
 				sil_reset();
 			}
 			inputState = 0;
+			break;
 		}
 	}
+	return 1;
 }
 
 #endif // (WIN == 1 || NIX == 1)

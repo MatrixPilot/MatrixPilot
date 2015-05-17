@@ -25,7 +25,7 @@
 #include "../../libUDB/ADchannel.h"
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/eeprom_udb4.h"
-#include <libpic30.h>
+//#include <libpic30.h>
 
 #if (BOARD_TYPE == UDB4_BOARD)
 #define RATE_THRESHOLD_LED      120
@@ -45,18 +45,29 @@ extern void IOTest(void);
 void udb_background_callback_triggered(void);
 
 
-int main(void)
+int matrixpilot_init(void)
 {
 	mcu_init();
 	IOTest();
 	udb_init();
-#if (BOARD_TYPE != AUAV3_BOARD)
+//#if (BOARD_TYPE != AUAV3_BOARD)
+#if ((BOARD_TYPE == AUAV4_BOARD) || (BOARD_TYPE == AUAV5_BOARD))
 	udb_eeprom_init();  // using legacy eeprom driver
 #endif
+}
+
+int matrixpilot_loop(void)
+{
+	udb_run();
+}
+
+int main(void)
+{
+	matrixpilot_init();
 	DPRINT("MatrixPilot LedTest\r\n");
 	while (1)
 	{
-		udb_run();
+		matrixpilot_loop();
 	}
 	return 0;
 }
@@ -141,6 +152,7 @@ void udb_heartbeat_40hz_callback(void)
 			LED_ORANGE = LED_OFF;
 			udb_a2d_record_offsets();
 			break;
+#elif (BOARD_TYPE == PX4_BOARD)
 #else
 #error "unsupported BOARD_TYPE"
 #endif

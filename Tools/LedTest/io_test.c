@@ -221,7 +221,7 @@ void delay(long d)
 {
 	for (; d>0; d--) {
 		Nop();
-	}	
+	}
 }
 
 void failPin(int pinIndex, char testNum)

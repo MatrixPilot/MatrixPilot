@@ -355,7 +355,7 @@
 
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       1
+//#define MAVLINK_SYSID                       1 // now defined in mavlink_options.h
 
 
 // NUM_ANALOG_INPUTS:
@@ -741,7 +741,7 @@
 //#define CONSOLE_UART                        6
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
-//#define USE_DEBUG_IO
+#define USE_DEBUG_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////

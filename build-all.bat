@@ -51,14 +51,12 @@ pushd UDB5-RPY
 make -j 8 -f ../../makefile TARGET_NAME=RollPitchYaw DEVICE=UDB5
 popd
 
-@REM goto END:
 
 mkdir AUAV3-C30 >nul 2>&1
 pushd AUAV3-C30
 make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=C30
 popd
 
-@REM goto LAST:
 
 mkdir UDB4-C30 >nul 2>&1
 pushd UDB4-C30
