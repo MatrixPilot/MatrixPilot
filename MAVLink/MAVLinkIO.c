@@ -108,7 +108,11 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 	if (serial_interrupt_stopped == 1)
 	{
 		serial_interrupt_stopped = 0;
+#if (SILSIM == 1)
+		mavlink_start_sending_data();
+#else
 		udb_serial_start_sending_data();
+#endif
 	}
 	return (1);
 }

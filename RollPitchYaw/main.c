@@ -43,7 +43,7 @@ void matrixpilot_init(void)
 
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 
-	LED_GREEN = LED_OFF;
+	led_off(LED_GREEN);
 }
 
 void matrixpilot_loop(void)
@@ -85,7 +85,7 @@ void udb_heartbeat_40hz_callback(void)
 	else
 	{
 		// No longer calibrating: solid RED and send debug output
-		LED_RED = LED_ON;
+		led_on(LED_RED);
 	}
 }
 

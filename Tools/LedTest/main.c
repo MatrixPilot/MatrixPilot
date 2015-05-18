@@ -238,15 +238,15 @@ void udb_heartbeat_callback(void)
 		udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 
 		if ((udb_heartbeat_counter / 600) % 2 == 0) {
-			LED_RED = LED_ON;
-			LED_ORANGE = ((abs(udb_pwOut[ROLL_OUTPUT_CHANNEL]  - 3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_BLUE   = ((abs(udb_pwOut[PITCH_OUTPUT_CHANNEL] - 3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_GREEN  = ((abs(udb_pwOut[YAW_OUTPUT_CHANNEL]   - 3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF);
+			led_on(LED_RED);
+			((abs(udb_pwOut[ROLL_OUTPUT_CHANNEL]  - 3000) > RATE_THRESHOLD_LED) ? led_on(LED_ORANGE) : led_off(LED_ORANGE));
+			((abs(udb_pwOut[PITCH_OUTPUT_CHANNEL] - 3000) > RATE_THRESHOLD_LED) ? led_on(LED_BLUE) : led_off(LED_BLUE));
+			((abs(udb_pwOut[YAW_OUTPUT_CHANNEL]   - 3000) > RATE_THRESHOLD_LED) ? led_on(LED_GREEN) : led_off(LED_GREEN));
 		} else {
-			LED_RED = LED_OFF;
-			LED_ORANGE = ((abs(udb_pwOut[X_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_BLUE   = ((abs(udb_pwOut[Y_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_GREEN  = ((abs(udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF);
+			led_off(LED_RED);
+			((abs(udb_pwOut[X_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? led_on(LED_ORANGE) : led_off(LED_ORANGE));
+			((abs(udb_pwOut[Y_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? led_on(LED_BLUE) : led_off(LED_BLUE));
+			((abs(udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? led_on(LED_GREEN) : led_off(LED_GREEN));
 		}
 	}
 }

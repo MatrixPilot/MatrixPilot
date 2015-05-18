@@ -129,8 +129,7 @@ void telemetry_init(void)
 #endif
 
 #if (CONSOLE_UART != 2)
-//	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
-//	udb_init_USART();
+	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
 #endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 }

@@ -10,8 +10,8 @@ make -f makefile.sm graph DEVICE=SIL
 "C:\Program Files (x86)\Graphviz2.38\bin\dot.exe" -T png -o FlightState_sm.png FlightState_sm.dot
 popd
 
-mkdir build >nul 2>&1
-pushd build
+mkdir _build >nul 2>&1
+pushd _build
 
 goto START:
 :START

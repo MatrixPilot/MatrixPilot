@@ -12,6 +12,9 @@
 #include "SIL-udb.h"
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/serialIO.h"
+//#include "../../libDCM/gpsParseCommon.h"
+//#include "../../MatrixPilot/MAVLink.h"
+//#include "../../MatrixPilot/telemetry.h"
 //#include "UDBSocket.h"
 
 UDBSocket gpsSocket;
@@ -92,12 +95,24 @@ void sil_telemetry_input(uint8_t* buffer, int32_t bytesRead)
 // Call this function to initiate sending data to the serial port
 void udb_serial_start_sending_data(void)
 {
+	int16_t c;
+	int16_t pos = 0;
+
+	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
+//		buffer[pos++] = c;
+	}
+}
+
+void mavlink_start_sending_data(void)
+{
 	uint8_t buffer[BUFLEN];
 	int16_t bytesWritten;
 	int16_t c;
 	int16_t pos = 0;
 
 	if (!telemetrySocket) return;
+
+//#error here - this doesn't work when telemetry is UDB_EXTRA etc
 
 //	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
 	while (pos < BUFLEN && (c = mavlink_callback_get_byte_to_send()) != -1) {

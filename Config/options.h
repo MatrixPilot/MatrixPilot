@@ -343,11 +343,14 @@
 // SERIAL_UDB_EXTRA can be used with the OpenLog without characters being dropped.
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
-// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
+
+// 
+// SERIAL_MAVLINK has been deprecated. Define USE_MAVLINK to enable
+// SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
+#define SERIAL_OUTPUT_FORMAT                SERIAL_UDB_EXTRA
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
@@ -723,7 +726,9 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
+#ifndef RECORD_FREE_STACK_SPACE
 #define RECORD_FREE_STACK_SPACE             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////

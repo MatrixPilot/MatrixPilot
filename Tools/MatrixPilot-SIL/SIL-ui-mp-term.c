@@ -24,6 +24,7 @@ static uint8_t lastLedBits = 0;
 static boolean showLEDs = 0;
 static uint8_t inputState = 0;
 static int hasShownInitStates = 0;
+static uint8_t leds[5] = {0, 0, 0, 0, 0};
 
 static int sil_handle_key_input(char c);
 static void sil_checkForLedUpdates(void);

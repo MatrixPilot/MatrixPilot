@@ -9,10 +9,10 @@
 #ifndef _BUILTINS_H_
 #define _BUILTINS_H_
 
-#if (WIN == 1 || NIX == 1)
-#else
-#include <dsp.h>
-#endif
+//#if (WIN == 1 || NIX == 1)
+//#else
+//#include <dsp.h>
+//#endif
 
 // Fake ASM calls
 #if 1
