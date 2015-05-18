@@ -62,8 +62,8 @@
 
 // Max inputs and output
 //ToDo: this is duplicated #define, the other one is on libSTM.h
-//#define MAX_INPUTS          6
-//#define MAX_OUTPUTS         6
+#define MAX_INPUTS          6
+#define MAX_OUTPUTS         6
 
 // LED pins
 //#define LED_BLUE            LATBbits.LATB2

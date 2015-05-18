@@ -27,7 +27,6 @@
 #include "../libUDB/uart.h"
 #include "ports_config.h"
 #include <string.h>
-#include <stdio.h>
 #include <math.h>
 
 #if (USE_CONFIGFILE == 1)
@@ -93,6 +92,7 @@ typedef struct
  */
 static void cmd_dir(char* arg)
 {
+/*
 #if defined(__XC16__)
 #if (SILSIM == 0)
 #if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
@@ -113,11 +113,13 @@ static void cmd_dir(char* arg)
 #endif
 #endif // SILSIM
 #endif // __XC16__
+ */
 }
 
 //size_t FSfread(void *ptr, size_t size, size_t n, FSFILE *stream);
 static void cmd_cat(char* arg)
 {
+/*
 #if defined(__XC16__)
 #if (SILSIM == 0)
 #if (USE_TELELOG == 1 || USE_CONFIGFILE == 1)
@@ -136,6 +138,7 @@ static void cmd_cat(char* arg)
 #endif
 #endif // SILSIM
 #endif // __XC16__
+ */
 }
 
 static void cmd_start(char* arg)

@@ -76,6 +76,18 @@ boolean udb_serial_check_rate(int32_t rate)
 	return (serialRate == rate);
 }
 
+void sil_telemetry_input(uint8_t* buffer, int32_t bytesRead)
+{
+	int16_t i;
+
+	if (1) {
+		for (i = 0; i < bytesRead; i++) {
+//			udb_serial_callback_received_byte(buffer[i]);
+			mavlink_callback_received_byte(buffer[i]);
+		}
+	}
+}
+
 
 // Call this function to initiate sending data to the serial port
 void udb_serial_start_sending_data(void)
@@ -96,6 +108,24 @@ void udb_serial_start_sending_data(void)
 		UDBSocket_close(telemetrySocket);
 		telemetrySocket = NULL;
 	}
+}
+
+static int16_callback_fptr_t serial_callback_get_byte_to_send = NULL;
+static callback_uint8_fptr_t serial_callback_received_byte = NULL;
+
+void udb_init_USART(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
+{
+	serial_callback_get_byte_to_send = tx_fptr;
+	serial_callback_received_byte = rx_fptr;
+}
+
+static int16_callback_fptr_t gps_callback_get_byte_to_send_fptr = NULL;
+static callback_uint8_fptr_t gps_callback_received_byte_fptr = NULL;
+
+void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
+{
+	gps_callback_get_byte_to_send_fptr = tx_fptr;
+	gps_callback_received_byte_fptr = rx_fptr;
 }
 
 #endif // (WIN == 1 || NIX == 1)

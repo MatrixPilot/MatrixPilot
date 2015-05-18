@@ -834,6 +834,13 @@ void telemetry_output_8hz(void)
 
 #endif
 #else
+int16_t udb_serial_callback_get_byte_to_send(void)
+{
+	return -1;
+}
+void udb_serial_callback_received_byte(uint8_t rxchar)
+{
+}
 void telemetry_restart(void)
 {
 }

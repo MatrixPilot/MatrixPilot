@@ -260,7 +260,7 @@ extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as pe
 // LEDs
 // Use this to toggle an LED.  Use the LED definition from the Config*.h files,
 // for example udb_led_toggle(LED_RED);
-#ifdef PX4
+#if (PX4 == 1 || SILSIM == 1)
 void udb_led_toggle(uint8_t x);
 void led_on(uint8_t x);
 void led_off(uint8_t x);

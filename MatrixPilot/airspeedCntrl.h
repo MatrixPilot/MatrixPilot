@@ -39,6 +39,12 @@ extern int16_t cruise_airspeed;
 extern int16_t airspeed_pitch_min_aspd;
 extern int16_t airspeed_pitch_max_aspd;
 
+extern int16_t minimum_groundspeed;
+extern int16_t airspeed_pitch_adjust_rate;
+extern int16_t airspeed_pitch_ki_limit;
+extern fractional airspeed_pitch_ki;
+
+
 void init_airspeedCntrl(void);
 
 // Run all airspeed control calculations and filters
