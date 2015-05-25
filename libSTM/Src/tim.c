@@ -35,6 +35,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
+//ToDo: Include interrupt.h to get INT_PRI_IC
+#define INT_PRI_IC 6
+//#include ".\libUDB\interrupts.h"
 #include "options.h"    // To get NUM_IMPUTS
 
 /* USER CODE BEGIN 0 */
@@ -44,6 +47,7 @@
 TIM_HandleTypeDef htim10;
 TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim3;    // TIM base for PWM CH1 to CH4
 
 /* TIM10 init function */
 void MX_TIM10_Init(void)
@@ -58,16 +62,58 @@ void MX_TIM10_Init(void)
 
 }
 
+/* TIM3 init function */
+void MX_TIM3_Init(void)
+{
+  TIM_ClockConfigTypeDef sClockSourceConfig;
+  TIM_MasterConfigTypeDef sMasterConfig;
+  TIM_OC_InitTypeDef sConfigOC;
+
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = (uint16_t) ((SystemCoreClock / 1000000) - 1);    //1MHz;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 19550;            //Calibrated for 50HZ, why? it would be 19.999
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  HAL_TIM_Base_Init(&htim3);
+
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig);
+
+  HAL_TIM_PWM_Init(&htim3);
+
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig);
+
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+
+  sConfigOC.Pulse = 1500;
+  HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+
+  sConfigOC.Pulse = 1500;
+  HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2);
+
+  sConfigOC.Pulse = 1500;
+  HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3);
+
+  sConfigOC.Pulse = 1500;
+  HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4);
+
+}
+
 /* TIM5 init function */
 // It is used as free runing timer for IC
 void MX_TIM5_Init(void)
 {
     TIM_ClockConfigTypeDef sClockSourceConfig;
     TIM_MasterConfigTypeDef sMasterConfig;
-    TIM_IC_InitTypeDef sConfigIC;
+
 
     htim5.Instance = TIM5;
-    htim5.Init.Prescaler = (uint16_t) (((SystemCoreClock / 1000000) / 2) - 1);    //500KHz
+    htim5.Init.Prescaler = (uint16_t) ((SystemCoreClock / 1000000) - 1);    //1MHz
+//    htim5.Init.Prescaler = 84-1;     //1MHz
     htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim5.Init.Period = 0xFFFF;
     htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -82,69 +128,55 @@ void MX_TIM5_Init(void)
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig);
 
-    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
-    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-    sConfigIC.ICFilter = 0;
-
-    //ToDo: Enable as many as NUM_INPUTS Channels
-    //	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
-#if (USE_PPM_INPUT == 0)
-	if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);};
-	if (NUM_INPUTS > 1)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
-#else
-    //ToDo: I need to work on it after finish parallel decode!!!!! Transform PPM_IC to TIM_CHANNELx
-    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);};
-//	if (NUM_INPUTS > 0) IC_INIT(PPM_IC, REGTOK1, REGTOK2);
-#endif // USE_PPM_INPUT
-
 }
 
+//We are not supporting parallel Input to uC, so we don't need this Inputs
 /* TIM4 init function */
 // It is used as free runing timer for IC
-void MX_TIM4_Init(void)
-{
-    TIM_ClockConfigTypeDef sClockSourceConfig;
-    TIM_MasterConfigTypeDef sMasterConfig;
-    TIM_IC_InitTypeDef sConfigIC;
-
-    htim4.Instance = TIM4;
-    htim4.Init.Prescaler = (uint16_t) (((SystemCoreClock / 1000000) / 2) - 1);    //500KHz
-    htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim4.Init.Period = 0xFFFF;
-    htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    HAL_TIM_Base_Init(&htim4);
-
-    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-    HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig);
-
-    HAL_TIM_IC_Init(&htim4);
-
-    //ToDo: This timer need to run synchronized with TIM5
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig);
-
-    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
-    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-    sConfigIC.ICFilter = 0;
-
-#if (USE_PPM_INPUT == 0)
-    // Config and start chanel acording with NUM_IMPUT
-	if (NUM_INPUTS > 2)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);};
-	if (NUM_INPUTS > 3)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);};
-	if (NUM_INPUTS > 4)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_3); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_3);};
-	if (NUM_INPUTS > 5)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_4); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_4);};
-//	if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
-//#if (USE_SONAR_INPUT != 8)
-//	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
-//#endif // USE_SONAR_INPUT
-#endif // USE_PPM_INPUT
-}
+//void MX_TIM4_Init(void)
+//{
+//    TIM_ClockConfigTypeDef sClockSourceConfig;
+//    TIM_MasterConfigTypeDef sMasterConfig;
+//    TIM_IC_InitTypeDef sConfigIC;
+//
+//    htim4.Instance = TIM4;
+//    htim4.Init.Prescaler = (uint16_t) (((SystemCoreClock / 1000000) / 2) - 1);    //500KHz
+//    htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+//    htim4.Init.Period = 0xFFFF;
+//    htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+//    HAL_TIM_Base_Init(&htim4);
+//
+//    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+//    HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig);
+//
+//    HAL_TIM_IC_Init(&htim4);
+//
+//    //ToDo: This timer need to run synchronized with TIM5
+//    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+//    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+//    HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig);
+//
+//    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
+//    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+//    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+//    sConfigIC.ICFilter = 0;
+//
+//#if (USE_PPM_INPUT == 0)
+//    // Config and start chanel acording with NUM_IMPUT
+//	if (NUM_INPUTS > 2)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);};
+//	if (NUM_INPUTS > 3)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);};
+//	if (NUM_INPUTS > 4)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_3); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_3);};
+//	if (NUM_INPUTS > 5)  {HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_4); HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_4);};
+////	if (NUM_INPUTS > 6) IC_INIT(7, REGTOK1, REGTOK2);
+////#if (USE_SONAR_INPUT != 8)
+////	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
+////#endif // USE_SONAR_INPUT
+//#endif // USE_PPM_INPUT
+//}
 
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
+  GPIO_InitTypeDef GPIO_InitStruct;
 
     if(htim_base->Instance==TIM10)
     {
@@ -152,26 +184,92 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         __TIM10_CLK_ENABLE();
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, INT_PRI_IC, 0);
         HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     }
     else if(htim_base->Instance==TIM5)
     {
         /* Peripheral clock enable */
         __TIM5_CLK_ENABLE();
+//This is the portion of code tha I deleted from my eclipse
+//work. I deleted becouse ther is same initialization on
+//HAL_TIM_IC_MspInit. But it seems to be necessary to be here.
+//I will investigate this issue
+        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+        GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM5_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM5_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(TIM5_IRQn);
     }
-    else if(htim_base->Instance==TIM4)
+    else if(htim_base->Instance==TIM3)
     {
-        /* Peripheral clock enable */
-        __TIM4_CLK_ENABLE();
+        /* USER CODE BEGIN TIM3_MspInit 0 */
 
-        /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
-        HAL_NVIC_EnableIRQ(TIM4_IRQn);
+        /* USER CODE END TIM3_MspInit 0 */
+        /* Peripheral clock enable */
+        __TIM3_CLK_ENABLE();
+
+        /**TIM3 GPIO Configuration
+        PB0     ------> TIM3_CH3
+        PB1     ------> TIM3_CH4
+        PB4     ------> TIM3_CH1
+        PB5     ------> TIM3_CH2
+        */
+        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+        GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+        /* USER CODE BEGIN TIM3_MspInit 1 */
+
+        /* USER CODE END TIM3_MspInit 1 */
+    }
+    //We are not supporting parallel Input to uC, so we don't need this Inputs
+//    else if(htim_base->Instance==TIM4)
+//    {
+//        /* Peripheral clock enable */
+//        __TIM4_CLK_ENABLE();
+//
+//        /* Peripheral interrupt init*/
+//        HAL_NVIC_SetPriority(TIM4_IRQn, INT_PRI_IC, 0);
+//        HAL_NVIC_EnableIRQ(TIM4_IRQn);
+//    }
+}
+
+void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
+{
+    GPIO_InitTypeDef GPIO_InitStruct;
+    if(htim_pwm->Instance==TIM3)
+    {
+        /* USER CODE BEGIN TIM3_MspInit 0 */
+
+        /* USER CODE END TIM3_MspInit 0 */
+        /* Peripheral clock enable */
+        __TIM3_CLK_ENABLE();
+
+        /**TIM3 GPIO Configuration
+        PB0     ------> TIM3_CH3
+        PB1     ------> TIM3_CH4
+        PB4     ------> TIM3_CH1
+        PB5     ------> TIM3_CH2
+        */
+        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+        GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+        /* USER CODE BEGIN TIM3_MspInit 1 */
+
+        /* USER CODE END TIM3_MspInit 1 */
     }
 }
 
@@ -187,10 +285,8 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* htim_ic)
         /**TIM5 GPIO Configuration
         PA0-WKUP     ------> TIM5_CH1
         PA1     ------> TIM5_CH2
-        PA2     ------> TIM5_CH3
-        PA3     ------> TIM5_CH4
         */
-        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3;
+        GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
@@ -198,31 +294,32 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* htim_ic)
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM5_IRQn, 5, 0);
+        HAL_NVIC_SetPriority(TIM5_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(TIM5_IRQn);
     }
-    else if(htim_ic->Instance==TIM4)
-    {
-        /* Peripheral clock enable */
-        __TIM4_CLK_ENABLE();
-
-        /**TIM4 GPIO Configuration
-        PB6     ------> TIM4_CH1
-        PB7     ------> TIM4_CH2
-        PB8     ------> TIM4_CH3
-        PB9     ------> TIM4_CH4
-        */
-        GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-        GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-        /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
-        HAL_NVIC_EnableIRQ(TIM4_IRQn);
-    }
+        //We are not supporting parallel Input to uC, so we don't need this Inputs
+//    else if(htim_ic->Instance==TIM4)
+//    {
+//        /* Peripheral clock enable */
+//        __TIM4_CLK_ENABLE();
+//
+//        /**TIM4 GPIO Configuration
+//        PB6     ------> TIM4_CH1
+//        PB7     ------> TIM4_CH2
+//        PB8     ------> TIM4_CH3
+//        PB9     ------> TIM4_CH4
+//        */
+//        GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9;
+//        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+//        GPIO_InitStruct.Pull = GPIO_NOPULL;
+//        GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+//        GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
+//        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//
+//        /* Peripheral interrupt init*/
+//        HAL_NVIC_SetPriority(TIM4_IRQn, INT_PRI_IC, 0);
+//        HAL_NVIC_EnableIRQ(TIM4_IRQn);
+//    }
 }
 
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
@@ -249,21 +346,42 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
         /* Peripheral interrupt Deinit*/
         HAL_NVIC_DisableIRQ(TIM5_IRQn);
     }
-    else if(htim_base->Instance==TIM4)
+    else if(htim_base->Instance==TIM3)
     {
-        /* Peripheral clock disable */
-        __TIM4_CLK_DISABLE();
+        /* USER CODE BEGIN TIM3_MspDeInit 0 */
 
-        /**TIM4 GPIO Configuration
-        PB6     ------> TIM4_CH1
-        PB7     ------> TIM4_CH2
-        PB8     ------> TIM4_CH3
-        PB9     ------> TIM4_CH4
+        /* USER CODE END TIM3_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __TIM3_CLK_DISABLE();
+
+        /**TIM3 GPIO Configuration
+        PB0     ------> TIM3_CH3
+        PB1     ------> TIM3_CH4
+        PB4     ------> TIM3_CH1
+        PB5     ------> TIM3_CH2
         */
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9);
-        /* Peripheral interrupt Deinit*/
-        HAL_NVIC_DisableIRQ(TIM4_IRQn);
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5);
+
+        /* USER CODE BEGIN TIM3_MspDeInit 1 */
+
+        /* USER CODE END TIM3_MspDeInit 1 */
     }
+    //We are not supporting parallel Input to uC, so we don't need this Inputs
+//    else if(htim_base->Instance==TIM4)
+//    {
+//        /* Peripheral clock disable */
+//        __TIM4_CLK_DISABLE();
+//
+//        /**TIM4 GPIO Configuration
+//        PB6     ------> TIM4_CH1
+//        PB7     ------> TIM4_CH2
+//        PB8     ------> TIM4_CH3
+//        PB9     ------> TIM4_CH4
+//        */
+//        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9);
+//        /* Peripheral interrupt Deinit*/
+//        HAL_NVIC_DisableIRQ(TIM4_IRQn);
+//    }
 }
 
 void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* htim_ic)
@@ -281,23 +399,80 @@ void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* htim_ic)
         /* Peripheral interrupt Deinit*/
         HAL_NVIC_DisableIRQ(TIM5_IRQn);
     }
-    else if(htim_ic->Instance==TIM4)
-    {
-        /* Peripheral clock disable */
-        __TIM4_CLK_DISABLE();
+      //We are not supporting parallel Input to uC, so we don't need this Inputs
+//    else if(htim_ic->Instance==TIM4)
+//    {
+//        /* Peripheral clock disable */
+//        __TIM4_CLK_DISABLE();
+//
+//        /**TIM4 GPIO Configuration
+//        PB6     ------> TIM4_CH1
+//        PB7     ------> TIM4_CH2
+//        PB8     ------> TIM4_CH3
+//        PB9     ------> TIM4_CH4
+//        */
+//        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9);
+//        /* Peripheral interrupt Deinit*/
+//        HAL_NVIC_DisableIRQ(TIM4_IRQn);
+//    }
+}
 
-        /**TIM4 GPIO Configuration
-        PB6     ------> TIM4_CH1
-        PB7     ------> TIM4_CH2
-        PB8     ------> TIM4_CH3
-        PB9     ------> TIM4_CH4
+void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
+{
+    if(htim_pwm->Instance==TIM3)
+    {
+        /* USER CODE BEGIN TIM3_MspDeInit 0 */
+
+        /* USER CODE END TIM3_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __TIM3_CLK_DISABLE();
+
+        /**TIM3 GPIO Configuration
+        PB0     ------> TIM3_CH3
+        PB1     ------> TIM3_CH4
+        PB4     ------> TIM3_CH1
+        PB5     ------> TIM3_CH2
         */
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9);
-        /* Peripheral interrupt Deinit*/
-        HAL_NVIC_DisableIRQ(TIM4_IRQn);
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5);
+
+        /* USER CODE BEGIN TIM3_MspDeInit 1 */
+
+        /* USER CODE END TIM3_MspDeInit 1 */
     }
 }
+
+
 /* USER CODE BEGIN 1 */
+
+
+void start_ic(void)
+{
+    TIM_IC_InitTypeDef sConfigIC;
+
+    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+    sConfigIC.ICFilter = 0;
+
+#if (USE_PPM_INPUT == 0)
+      //We are not supporting parallel Input to uC, so we don't need this Inputs
+//NOTE: When using parallel input we need to measure Ton of each channel, so we need to look at Rising and Falling edge
+//    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
+    //TODO: Enable as many as NUM_INPUTS Channels
+//	if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);};
+//	if (NUM_INPUTS > 1)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
+#elif (USE_PPM_INPUT == 1)   //We are using PPM SIGNAL type 1
+//NOTE: When I use PPM type 1 I have to get time between each rising edge
+    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+    //TODO: Transform PPM_IC to TIM_CHANNELx: (4*PPM_IC)) -> PPM_IC=0 -> IC CH1, PPM_IC=1 -> IC CH2 -> already tested
+    //if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, 4*PPM_IC); HAL_TIM_IC_Start_IT(&htim5, 4*PPM_IC);};
+//NOTE: We only support for PPM on CHANNEL 2
+    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
+#else                       //We are using PPM SIGNAL typo 2
+    // We need to compute time between Rising and falling edge
+    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
+    if (NUM_INPUTS > 0)  {HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_2); HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_2);};
+#endif // USE_PPM_INPUT
+}
 
 /* USER CODE END 1 */
 

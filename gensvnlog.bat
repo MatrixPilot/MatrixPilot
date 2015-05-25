@@ -1,1 +1,0 @@
-svn log https://gentlenav.googlecode.com/svn -r 1:HEAD --xml --verbose --quiet > mp_svn_log.xml

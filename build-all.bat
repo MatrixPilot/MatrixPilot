@@ -10,8 +10,8 @@ make -f makefile.sm graph DEVICE=SIL
 "C:\Program Files (x86)\Graphviz2.38\bin\dot.exe" -T png -o FlightState_sm.png FlightState_sm.dot
 popd
 
-mkdir build >nul 2>&1
-pushd build
+mkdir _build >nul 2>&1
+pushd _build
 
 goto START:
 :START
@@ -51,13 +51,10 @@ pushd UDB5-RPY
 make -j 8 -f ../../makefile TARGET_NAME=RollPitchYaw DEVICE=UDB5
 popd
 
-
 mkdir AUAV3-C30 >nul 2>&1
 pushd AUAV3-C30
 make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=C30
 popd
-
-
 mkdir UDB4-C30 >nul 2>&1
 pushd UDB4-C30
 make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=C30
@@ -75,9 +72,6 @@ mkdir UDB4-XC16 >nul 2>&1
 pushd UDB4-XC16
 make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
 popd
-
-:LAST
-
 mkdir UDB5-XC16 >nul 2>&1
 pushd UDB5-XC16
 make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
@@ -88,7 +82,7 @@ goto END:
 
 popd
 
-@rem dir build\*.hex build\*.exe build\*.map /B /S
-dir build\*.hex build\*.exe /B /S
+@rem dir _build\*.hex _build\*.exe _build\*.map /B /S
+dir _build\*.hex _build\*.exe /B /S
 
 pause

@@ -158,16 +158,14 @@ double gcdist(double lat1, double lon1, double lat2, double lon2) // Compute dis
  */
 void init_navigation(void)
 {
-	yawkpail = (uint16_t)(YAWKP_AILERON*RMAX);
-	yawkprud = (uint16_t)(YAWKP_RUDDER*RMAX);
+	yawkpail = (uint16_t)(gains.YawKPAileron*RMAX);
+	yawkprud = (uint16_t)(gains.YawKPRudder*RMAX);
 }
 
 void save_navigation(void)
 {
-#if (USE_CONFIGFILE == 1)
 	gains.YawKPAileron = (float)yawkpail / (RMAX);
 	gains.YawKPRudder  = (float)yawkprud / (RMAX);
-#endif // USE_CONFIGFILE
 }
 
 static void setup_origin(void)

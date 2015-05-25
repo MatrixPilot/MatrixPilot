@@ -189,4 +189,42 @@ void TIM4_IRQHandler(void)
     //Go to global HAL ISR
 	HAL_TIM_IRQHandler(&htim4);
 }
+
+/* USER CODE BEGIN 1 */
+/**
+* @brief This function handles EXTI Line0 interrupt.
+*/
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+
+  /* USER CODE END EXTI0_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+
+  /* USER CODE END EXTI0_IRQn 1 */
+}
+
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin: Specifies the pins connected EXTI line
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	uint8_t data[8]={0,0,0,0,0,0,0,0};
+	uint8_t dataIn[8]={0,0,0,0,0,0,0,0};
+	int16_t temp=0;
+	float   tempC=0;
+
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+    data[0]=0x41|0x80;
+    HAL_SPI_TransmitReceive(&hspi2, data,dataIn,3,0x1000);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+    temp = (dataIn[1]<<8) | dataIn[2];
+    tempC = (float)temp/340 + 36.53;
+}
+/* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

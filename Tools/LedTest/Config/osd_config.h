@@ -18,38 +18,21 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-#if (WIN == 1 || NIX == 1)
 
-#include "../../libUDB/libUDB.h"
-#include "../../libUDB/interrupt.h"
-#include "../../libUDB/I2C.h"
-#include "../../libUDB/events.h"
+// define the OSD types
+#define OSD_NONE            0   // OSD disabled
+#define OSD_NATIVE          1   // native OSD
+#define OSD_REMZIBI         2   // Output data formatted to use as input to a Remzibi OSD
+#define OSD_MINIM           3   // Output data formatted for minim OSD
 
-#if (USE_I2C1_DRIVER == 1)
 
-void I2C1_Init(void)
-{
-}
+// define USE_OSD to one of the types above to enables that system
+#define USE_OSD         OSD_NONE
+//#define USE_OSD         OSD_NATIVE
+//#define USE_OSD         OSD_REMZIBI
+//#define USE_OSD         OSD_MINIM
 
-// Trigger the I2C1 service routine to run at low priority
-void I2C1_Trigger(void)
-{
-}
 
-boolean I2C1_Write(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback)
-{
-	return true;
-}
-
-boolean I2C1_Read(uint8_t addr, const uint8_t* cmd, uint8_t cmd_len, uint8_t* data, uint16_t data_len, I2C_callbackFunc callback, uint16_t mode)
-{
-	return true;
-}
-// Only send command byte to check for ACK.
-boolean I2C1_CheckACK(uint8_t addr, I2C_callbackFunc pCallback)
-{
-	return true;
-}
-
-#endif // USE_I2C1_DRIVER
-#endif // (WIN == 1 || NIX == 1)
+// OSD_NATIVE development options:
+#define USE_OSD_SPI     0   // set this to 1 to use the SPI peripheral, 0 to bit-bash
+#define OSD_SF          5   // scale factor for SPI delays - TODO: get rid of

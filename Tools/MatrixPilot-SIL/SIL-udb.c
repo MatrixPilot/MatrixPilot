@@ -474,9 +474,10 @@ boolean handleUDBSockets(void)
 #ifdef LOG_TELE_DATA
 			log_data(TELE_LOGFILE, buffer, bytesRead);
 #endif // LOG_TELE_DATA
-			for (i = 0; i < bytesRead; i++) {
-				mavlink_callback_received_byte(buffer[i]);
-			}
+			sil_telemetry_input(buffer, bytesRead);
+//			for (i = 0; i < bytesRead; i++) {
+//				mavlink_callback_received_byte(buffer[i]);
+//			}
 			if (bytesRead > 0) didRead = true;
 		}
 	}

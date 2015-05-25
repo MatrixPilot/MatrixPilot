@@ -94,9 +94,13 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_USART6_UART_Init();
+  MX_TIM5_Init();     //Input Capture CH1 and CH2 timer base
+  MX_TIM3_Init();       //PWM Output CH1 to CH4
 
   /* USER CODE BEGIN 2 */
-
+    radioIn_init();     //elgarbe**************************************************
+    start_pwm_outputs();
+      MPU6000_init16();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -106,7 +110,6 @@ int main(void)
   osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
-
 
   /* USER CODE BEGIN 3 */
   /* Infinite loop */

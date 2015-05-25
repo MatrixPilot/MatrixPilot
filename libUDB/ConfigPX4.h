@@ -60,34 +60,26 @@
 #define YACCEL_SIGN         +
 #define ZACCEL_SIGN         +
 
-// Max inputs and output
+// Max inputs and outputs
 //ToDo: this is duplicated #define, the other one is on libSTM.h
 #define MAX_INPUTS          6
 #define MAX_OUTPUTS         6
 
 // LED pins
-//#define LED_BLUE            LATBbits.LATB2
-//#define LED_RED             LATBbits.LATB3
-//#define LED_GREEN           LATBbits.LATB4
-//#define LED_ORANGE          LATBbits.LATB5
-//#define DIG2                LATAbits.LATA6
-//#define DIG1                LATAbits.LATA7
-//#define DIG0                LATEbits.LATE1
-extern uint8_t leds[5];
-#define LED_RED         leds[0]
-#define LED_GREEN       leds[1]
-#define LED_ORANGE      leds[2]
-#define LED_BLUE        leds[3]
-#define LED_TAIL_LIGHT  leds[4]
+#define LED_RED             0
+#define LED_GREEN           1
+#define LED_ORANGE          2
+#define LED_BLUE            3
+#define LED_TAIL_LIGHT      4
 
 /* PX4 LED colour codes */
 /*
-#define LED_AMBER		1
-#define LED_RED			1	// some boards have red rather than amber
-#define LED_BLUE		0
-#define LED_GREEN		2
-#define LED_SAFETY		2
-#define LED_ORANGE		3
+#define LED_AMBER           1
+#define LED_RED             1   // some boards have red rather than amber
+#define LED_BLUE            0
+#define LED_GREEN           2
+#define LED_SAFETY          2
+#define LED_ORANGE          3
  */
 // SPI SS pin definitions
 #define SPI1_SS             _LATE4

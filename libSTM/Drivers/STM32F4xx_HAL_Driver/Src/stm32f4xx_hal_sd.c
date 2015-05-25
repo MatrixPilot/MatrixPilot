@@ -380,6 +380,9 @@ HAL_SD_ErrorTypedef HAL_SD_Init(SD_HandleTypeDef *hsd, HAL_SD_CardInfoTypedef *S
   }
   
   /* Configure SDIO peripheral interface */
+// NOTE: There is a little problem here. From the next line SDIO clk freq goes to 24MHz. My board can't
+// run at this freq, so I have to slow down. I put it to 400Khz but it could be increase to 10MHz
+  hsd->Init.ClockDiv = SDIO_INIT_CLK_DIV;
   SDIO_Init(hsd->Instance, hsd->Init);   
   
   return errorstate;

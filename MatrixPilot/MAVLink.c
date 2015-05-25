@@ -60,6 +60,7 @@
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libUDB/servoOut.h"
+#include "../libUDB/serialIO.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
 #include "../MatrixPilot/euler_angles.h"
@@ -98,6 +99,7 @@ mavlink_status_t r_mavlink_status;
 static uint8_t mavlink_system_status = MAV_STATE_UNINIT;
 mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
 
+//#define SERIAL_BUFFER_SIZE  MAVLINK_MAX_PACKET_LEN
 #define BYTE_CIR_16_TO_RAD  ((2.0 * 3.14159265) / 65536.0) // Convert 16 bit byte circular to radians
 
 mavlink_flags_t mavlink_flags;
@@ -109,6 +111,11 @@ static uint8_t handling_of_message_completed = true;
 static uint8_t mavlink_counter_40hz = 0;
 static uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 static uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
+
+//static int16_t sb_index = 0;
+//static int16_t end_index = 0;
+//static char serial_interrupt_stopped = 1;
+//static uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
 
 static uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
 static uint16_t mavlink_command_ack_command = 0;
@@ -153,6 +160,67 @@ void mavlink_init(void)
 	udb_serial_set_rate(SERIAL_BAUDRATE);
 }
 
+/*
+int16_t mavlink_callback_get_byte_to_send(void)
+{
+	if (sb_index < end_index && sb_index < SERIAL_BUFFER_SIZE) // ensure never end up racing thru memory.
+	{
+		uint8_t txchar = serial_buffer[sb_index++];
+		return txchar;
+	}
+	else
+	{
+		serial_interrupt_stopped = 1;
+	}
+	return -1;
+}
+
+//int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), uint8_t buf[], uint16_t len)
+int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[], uint16_t len) // RobD
+// Note: Channel Number, chan, is currently ignored.
+{
+	int16_t start_index;
+	int16_t remaining;
+
+#if (USE_TELELOG == 1)
+//printf("calling log_telemetry with %u bytes\r\n", len);
+	log_telemetry(buf, len);
+#endif // USE_TELELOG
+
+	// Note at the moment, all channels lead to the one serial port
+	if (serial_interrupt_stopped == 1)
+	{
+		sb_index = 0;
+		end_index = 0;
+	}
+	start_index = end_index;
+	remaining = SERIAL_BUFFER_SIZE - start_index;
+
+//	printf("%u\r\n", remaining);
+
+	if (len > remaining)
+	{
+		// Chuck away the entire packet, as sending partial packet
+		// will break MAVLink CRC checks, and so receiver will throw it away anyway.
+		return (-1);
+	}
+	if (remaining > 1)
+	{
+		memcpy(&serial_buffer[start_index], buf, len);
+		end_index = start_index + len;
+	}
+	if (serial_interrupt_stopped == 1)
+	{
+		serial_interrupt_stopped = 0;
+#if (SILSIM == 1)
+		mavlink_start_sending_data();
+#else
+		udb_serial_start_sending_data();
+#endif
+	}
+	return (1);
+}
+ */
 void mav_printf(const char* format, ...)
 {
 	char buf[200];
@@ -251,11 +319,12 @@ static mavlink_message_t msg[2];
 static uint8_t mavlink_message_index = 0;
 static mavlink_status_t r_mavlink_status;
 
-void mavlink_input_byte(uint8_t byte)
+void mavlink_input_byte(uint8_t rxchar)
+//void mavlink_callback_received_byte(uint8_t rxchar)
 {
-//	DPRINT("%u \r\n", byte);
+//	DPRINT("%u \r\n", rxchar);
 
-	if (mavlink_parse_char(0, byte, &msg[mavlink_message_index], &r_mavlink_status))
+	if (mavlink_parse_char(0, rxchar, &msg[mavlink_message_index], &r_mavlink_status))
 	{
 		// Check that handling of previous message has completed before calling again
 		if (handling_of_message_completed == true)
@@ -1036,7 +1105,7 @@ enum MAV_STATE
 		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
 		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
 		    (int16_t)   0,                (int16_t)   0,                (int16_t)   0); // zero as mag not connected.
-#endif
+#endif //(MAG_YAW_DRIFT == 1)
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}

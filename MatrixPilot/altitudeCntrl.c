@@ -258,8 +258,8 @@ static void normalAltitudeCntrl(void)
 			else if (settings._.AltitudeholdStabilized == AH_FULL)
 			{
 			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
-			desiredHeight = ((__builtin_mulss((int16_t)(HEIGHTTHROTTLEGAIN), throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
-				                + (int16_t)(altit.HeightTargetMin);
+				desiredHeight = ((__builtin_mulss((int16_t)(HEIGHTTHROTTLEGAIN), throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
+				              + (int16_t)(altit.HeightTargetMin);
 }
 //#endif
 			if (desiredHeight < (int16_t)(altit.HeightTargetMin)) desiredHeight = (int16_t)(altit.HeightTargetMin);

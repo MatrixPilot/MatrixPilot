@@ -46,7 +46,7 @@ def redef(defines, sep):
 #
 
 def parse_options_file(filename, option):
-	str = ""
+	str = ''
 	with open (filename, "r") as file:
 		data = file.read()
 		match = re.search(r"(^" + option + " .= )(.*$)", data, re.MULTILINE)
@@ -133,9 +133,7 @@ def mplab8_project(mcu_type, target_board, prjname, root_sep, config_dir, includ
 	defs = ""
 	for d in defines:
 		if d:
-#			print "d = ", d
 			defs = defs + "-D" + d + " "
-
 	with open (script_path + "mplab8-template.txt", "r") as file:
 		data = file.read()
 		data = data.replace("%%PROJECT%%", prjname)
@@ -150,7 +148,6 @@ def mplab8_project(mcu_type, target_board, prjname, root_sep, config_dir, includ
 #		data = data.replace("%%EXTRA_DEFS%%", defines.replace(";", " -D").strip())
 		data = data.replace("%%EXTRA_DEFS%%", defs)
 		data = data.replace("%%FIXDEPS%%", fixdeps)
-
 	mkdirnotex(project + ".mcp")
 	with open (project + ".mcp", "w") as file:
 		print "writing: " + project + ".mcp"
@@ -211,13 +208,10 @@ def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, heade
 	config = ''
 	for e in config_dir:
 		config = config + root_sep + e + ';'
-
 	defs = ""
 	for d in defines:
 		if d:
-#			print "d = ", d
 			defs = defs + d + " "
-
 	with open (script_path + "template.vcxproj", "r") as file:
 		data = file.read()
 		data = data.replace("%%CONFIG%%", config)
@@ -231,6 +225,13 @@ def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, heade
 	with open (project + ".vcxproj", "w") as file:
 		print "writing: " + project + ".vcxproj"
 		file.write(data)
+	with open (script_path + "template.sln", "r") as file:
+		data = file.read()
+		data = data.replace("%%PROJECT%%", prjname)
+	mkdirnotex(project + ".sln")
+	with open (project + ".sln", "w") as file:
+		print "writing: " + project + ".sln"
+		file.write(data)
 
 def vs2010_filters(mcu_type, target_board, root_sep, config_dir, filters, header_files, source_files, project):
 	with open (script_path + "template.vcxproj.filters", "r") as file:
@@ -240,6 +241,7 @@ def vs2010_filters(mcu_type, target_board, root_sep, config_dir, filters, header
 		data = data.replace("%%HEADER_FILES%%", header_files)
 	mkdirnotex(project + ".vcxproj.filters")
 	with open (project + ".vcxproj.filters", "w") as file:
+		print "writing: " + project + ".vcxproj.filters"
 		file.write(data)
 
 #
@@ -299,13 +301,10 @@ def mplabX_project(mcu_type, name, target_board, root_sep, config_dir, includes,
 	config = ''
 	for e in config_dir:
 		config = config + root_sep + e + ';'
-
 	defs = ""
 	for d in defines:
 		if d:
-#			print "d = ", d
 			defs = defs + d + " "
-
 	with open (script_path + "configurations.xml", "r") as file:
 		data = file.read()
 		data = data.replace("%%NAME%%", name)
@@ -369,6 +368,7 @@ if __name__ == '__main__':
 
 	from optparse import OptionParser
 	parser = OptionParser("pyProjectCreator.py [options]")
+	parser.add_option("-r", "--root",   dest="root",     help="project root path",                       default=".")
 	parser.add_option("-n", "--name",   dest="name",     help="specify the project name", type="string", default="MatrixPilot", metavar="MatrixPilot")
 	parser.add_option("-t", "--target", dest="target",   help="specify the target board", type="string", default="UDB5", metavar="UDB5")
 	parser.add_option("-m", "--mod",    dest="modules",  help="search path for module.mk file",          default=[], action='append')
@@ -376,8 +376,7 @@ if __name__ == '__main__':
 	parser.add_option("-i", "--inc",    dest="includes", help="additional include files directory",      default=[], action='append')
 	parser.add_option("-c", "--cfg",    dest="config",   help="specify configuration files directory",   default=[], action='append')
 #	parser.add_option("-c", "--cfg",    dest="config",   help="specify configuration files directory",   default="")
-	parser.add_option("-o", "--out",    dest="out",      help="project files output path",               default="build")
-	parser.add_option("-r", "--root",   dest="root",     help="project root path",                       default=".")
+	parser.add_option("-o", "--out",    dest="out",      help="project files output path",               default="_build")
 	parser.add_option("-f", "--file",   dest="file",     help="configuration file",                      default="")
 	(opts, args) = parser.parse_args()
 
@@ -436,7 +435,6 @@ if __name__ == '__main__':
 	includes = ';'.join(inc_list)
 #	opts.defines = ";".join(opts.defines)
 	filters = ""
-#	project = os.path.join(opts.out, opts.name + "-" + opts.target)
 
 	prjname = opts.name + "-" + opts.target + "-" + opts.config[0].replace("/", " ").split(" ")[-1]
 	project = os.path.join(opts.out, prjname)
@@ -450,7 +448,6 @@ if __name__ == '__main__':
 		defines = "\t\t\t<Add option=\"-D" + opts.target + "\" />\n"
 		for d in opts.defines:
 			if d:
-#				print "d = ", d
 				defines = defines + "\t\t\t<Add option=\"-D" + d + "\" />\n"
 		for inc in inc_list:
 			includes = includes + "\t\t\t<Add directory=\"" + inc + "\" />\n"

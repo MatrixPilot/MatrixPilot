@@ -36,7 +36,8 @@ int32_t gps_baud_rate = 0;
 void udb_gps_set_rate(int32_t rate) { gps_baud_rate = rate; }
 boolean udb_gps_check_rate(int32_t rate) { return (gps_baud_rate == rate); }
 
-void udb_init_GPS(void)
+//void udb_init_GPS(void)
+void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 {
 //	HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
     /* Process Locked */
@@ -420,7 +421,8 @@ int32_t serial_baud_rate = 0;
 void udb_serial_start_sending_data(void) {}
 void udb_serial_set_rate(int32_t rate) { serial_baud_rate = rate; }
 
-void udb_init_USART(void)
+//void udb_init_USART(void)
+void udb_init_USART(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 {
 }
 

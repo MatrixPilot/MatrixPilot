@@ -142,6 +142,24 @@
 // 
 // By default the only waypoint is defined to be 75 meters above the starting point.
 
+#if (HILSIM == 1)
+
+// Innsbruck inverted/reversed T3 course
+const struct waypointDef stdWaypoints_default[] = {
+		{ {  113236490, 472496320, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+		{ {  113236490, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+		{ {  113579820, 472496320, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+		{ {  113579820, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
+};
+
+#else
+
+const struct waypointDef stdWaypoints_default[] = {
+		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
+};
+
+#endif
+
 /*
 const struct waypointDef stdWaypoints_default[] = {
 		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
@@ -211,14 +229,6 @@ const struct waypointDef stdWaypoints_default[] = {
 //		{ {    CORNER  ,  - CORNER  , CLEARANCE } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 //};
  */
-
-// Innsbruck inverted/reversed T3 course
-const struct waypointDef stdWaypoints_default[] = {
-		{ {  113236490, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
-		{ {  113579820, 472496320, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
-		{ {  113579820, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
-		{ {  113236490, 472496320, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
-};
 
 /*
 #if 0
