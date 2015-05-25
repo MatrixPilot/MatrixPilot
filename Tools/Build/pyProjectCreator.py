@@ -380,6 +380,7 @@ if __name__ == '__main__':
 #	parser.add_option("-c", "--cfg",    dest="config",   help="specify configuration files directory",   default="")
 	parser.add_option("-o", "--out",    dest="out",      help="project files output path",               default="_build")
 	parser.add_option("-f", "--file",   dest="file",     help="configuration file",                      default="")
+	parser.add_option("-k", "--make",   dest="mkdir",    help="path to makefile includes",               default="/Tools/makefiles")
 	(opts, args) = parser.parse_args()
 
 	rootdir = opts.root
@@ -401,7 +402,7 @@ if __name__ == '__main__':
 
 #
 # Parse options from the 'target-*.mk' specific makefile
-	target_mk_path = opts.root + "/target-" + opts.name + ".mk"
+	target_mk_path = opts.root + opts.mkdir + "/target-" + opts.name + ".mk"
 	opts.modules  = parse_mk_file(target_mk_path, "modules", opts.modules)
 	opts.defines  = parse_mk_file(target_mk_path, "defines", opts.defines)
 	opts.includes = parse_mk_file(target_mk_path, "incpath", opts.includes)
@@ -409,7 +410,7 @@ if __name__ == '__main__':
 
 #
 # Parse extra options from the 'device-*.mk' specific makefile
-	opts.file = opts.root + "/device-" + opts.target + ".mk"
+	opts.file = opts.root + opts.mkdir + "/device-" + opts.target + ".mk"
 	if opts.file != "":
 		opts.modules  = parse_mk_file(opts.file, "modules", opts.modules)
 		opts.includes = parse_mk_file(opts.file, "incpath", opts.includes)

@@ -33,12 +33,19 @@
 //
 // Mix computed roll and pitch controls into the output channels for the compiled airframe type.
 
-const int16_t aileronbgain  = (int16_t)(8.0*AILERON_BOOST);
-const int16_t elevatorbgain = (int16_t)(8.0*ELEVATOR_BOOST);
-const int16_t rudderbgain   = (int16_t)(8.0*RUDDER_BOOST);
+//const int16_t aileronbgain  = (int16_t)(8.0*AILERON_BOOST);
+//const int16_t elevatorbgain = (int16_t)(8.0*ELEVATOR_BOOST);
+//const int16_t rudderbgain   = (int16_t)(8.0*RUDDER_BOOST);
+
+static int16_t aileronbgain  = 0;
+static int16_t elevatorbgain = 0;
+static int16_t rudderbgain   = 0;
 
 void servoMix_init(void)
 {
+	aileronbgain  = (int16_t)(8.0*gains.AileronBoost);
+	elevatorbgain = (int16_t)(8.0*gains.ElevatorBoost);
+	rudderbgain   = (int16_t)(8.0*gains.RudderBoost);
 }
 
 void servoMix(void)

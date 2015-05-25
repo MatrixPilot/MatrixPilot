@@ -142,20 +142,8 @@ void mav_printf(const char * format, ...);
 // #define SERVOSAT
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize the UDB
-
-// Call this first soon after the board boots up
 void mcu_init(void);
-
-// Call this once soon after the board boots up
 void udb_init(void);
-
-// Start the UDB running
-// Once you have everything else set up, call udb_run().
-// This function will not return.
-// From this point on, everything is event-driven.
-// Your code should respond to the Callbacks below.
 void udb_run(void);
 
 //int setjmp(void);

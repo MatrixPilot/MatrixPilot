@@ -42,6 +42,14 @@ uint16_t udb_heartbeat_counter;
 
 //This is already defined on radioIn.c
 //TODO: Where is the correct place to define this?
+//
+// mostly everything in the various libUDB/DCM/STM modules will
+// ideally be moved to functionality specific modules.
+//
+// in the beta branch development has started on abstracting
+// the various potential input control sources via module selectIn
+// which complicates the answer in this branch
+//
 //int16_t udb_pwIn[MAX_INPUTS];   // pulse widths of radio inputs
 //int16_t udb_pwTrim[MAX_INPUTS]; // initial pulse widths for trimming
 int16_t udb_pwOut[MAX_OUTPUTS]; // pulse widths for servo outputs

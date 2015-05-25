@@ -92,6 +92,11 @@ struct gains_variables {
 	float RollKDRudder;
 	float RudderBoost;
 	float RtlPitchDown;
+};
+	
+struct altit_variables {
+	float DesiredSpeed;
+	float HeightMargin;
 	float HeightTargetMax;
 	float HeightTargetMin;
 	float AltHoldThrottleMin;
@@ -99,6 +104,9 @@ struct gains_variables {
 	float AltHoldPitchMin;
 	float AltHoldPitchMax;
 	float AltHoldPitchHigh;
+};
+
+struct hover_variables {
 
 	float HoverRollKP;
 	float HoverRollKD;
@@ -113,6 +121,8 @@ struct gains_variables {
 };
 
 extern struct gains_variables gains;
+extern struct altit_variables altit;
+extern struct hover_variables hover;
 extern union settings_word settings;
 //extern union network_module_word network_modules;
 

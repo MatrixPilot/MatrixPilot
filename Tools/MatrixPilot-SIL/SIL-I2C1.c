@@ -23,7 +23,6 @@
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/interrupt.h"
 #include "../../libUDB/I2C.h"
-//#include "../../libUDB/NV_memory.h"
 #include "../../libUDB/events.h"
 
 #if (USE_I2C1_DRIVER == 1)

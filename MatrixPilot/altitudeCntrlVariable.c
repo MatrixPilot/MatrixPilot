@@ -32,24 +32,20 @@
 #include "sonarCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/servoOut.h"
-#if (USE_CONFIGFILE == 1)
-#include "config.h"
-#include "redef.h"
-#endif // USE_CONFIGFILE
 
 #if (ALTITUDE_GAINS_VARIABLE == 1)
 
 
 #define THROTTLEFILTSHIFT 12
 #define DEADBAND 150
-#define MAXTHROTTLE         (2.0*SERVORANGE*ALT_HOLD_THROTTLE_MAX)
+#define MAXTHROTTLE         (2.0*SERVORANGE*altit.AltHoldThrottleMax)
 #define FIXED_WP_THROTTLE   (2.0*SERVORANGE*RACING_MODE_WP_THROTTLE)
-#define THROTTLEHEIGHTGAIN (((ALT_HOLD_THROTTLE_MAX - ALT_HOLD_THROTTLE_MIN)*2.0*SERVORANGE)/(HEIGHT_MARGIN*2.0))
-#define PITCHATMAX (ALT_HOLD_PITCH_MAX*(RMAX/57.3))
-#define PITCHATMIN (ALT_HOLD_PITCH_MIN*(RMAX/57.3))
-#define PITCHATZERO (ALT_HOLD_PITCH_HIGH*(RMAX/57.3))
-#define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (HEIGHT_MARGIN*2.0))
-#define HEIGHTTHROTTLEGAIN ((1.5*(HEIGHT_TARGET_MAX-HEIGHT_TARGET_MIN)* 1024.0) / (SERVORANGE*SERVOSAT))
+#define THROTTLEHEIGHTGAIN (((altit.AltHoldThrottleMax - altit.AltHoldThrottleMin)*2.0*SERVORANGE)/(altit.HeightMargin*2.0))
+#define PITCHATMAX (altit.AltHoldPitchMax*(RMAX/57.3))
+#define PITCHATMIN (altit.AltHoldPitchMin*(RMAX/57.3))
+#define PITCHATZERO (altit.AltHoldPitchHigh*(RMAX/57.3))
+#define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (altit.HeightMargin*2.0))
+#define HEIGHTTHROTTLEGAIN ((1.5*(altit.HeightTargetMax-altit.HeightTargetMin)* 1024.0) / (SERVORANGE*SERVOSAT))
 
 union longww throttleFiltered = { 0 };
 int16_t pitchAltitudeAdjust = 0;
@@ -87,15 +83,15 @@ void init_altitudeCntrlVariable(void)
 {
 
 // External variables
-	height_target_min     = HEIGHT_TARGET_MIN;
-	height_target_max     = HEIGHT_TARGET_MAX;
-	height_margin         = HEIGHT_MARGIN;
-	alt_hold_throttle_min = ALT_HOLD_THROTTLE_MIN * RMAX;
-	alt_hold_throttle_max = ALT_HOLD_THROTTLE_MAX * RMAX;
-	alt_hold_pitch_min    = ALT_HOLD_PITCH_MIN;
-	alt_hold_pitch_max    = ALT_HOLD_PITCH_MAX;
-	alt_hold_pitch_high   = ALT_HOLD_PITCH_HIGH;
-	rtl_pitch_down        = RTL_PITCH_DOWN;
+	height_target_min     = altit.HeightTargetMin;
+	height_target_max     = altit.HeightTargetMax;
+	height_margin         = altit.HeightMargin;
+	alt_hold_throttle_min = altit.AltHoldThrottleMin * RMAX;
+	alt_hold_throttle_max = altit.AltHoldThrottleMax * RMAX;
+	alt_hold_pitch_min    = altit.AltHoldPitchMin;
+	alt_hold_pitch_max    = altit.AltHoldPitchMax;
+	alt_hold_pitch_high   = altit.AltHoldPitchHigh;
+	rtl_pitch_down        = gains.RtlPitchDown;
 
 // Internal computed variables.  Values defined above.
 	max_throttle          = MAXTHROTTLE;
@@ -108,13 +104,12 @@ void init_altitudeCntrlVariable(void)
 
 // Initialize to the value from options.h.  Allow updating this value from LOGO/MavLink/etc.
 // Stored in 10ths of meters per second
-	desiredSpeed = (DESIRED_SPEED*10);
+	desiredSpeed = (altit.DesiredSpeed*10);
 	speed_control = SPEED_CONTROL;
 }
 
 void save_altitudeCntrlVariable(void)
 {
-#if (USE_CONFIGFILE == 1)
 	gains.HeightTargetMax = height_target_max;
 	gains.HeightTargetMin = height_target_min;
 //	height_margin;
@@ -126,7 +121,6 @@ void save_altitudeCntrlVariable(void)
 //	rtl_pitch_down;
 //	desiredSpeed / 10;
 //	speed_control;
-#endif // USE_CONFIGFILE
 }
 
 static int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) // computes (1/2gravity)*(actual_speed^2 - desired_speed^2)
@@ -277,14 +271,17 @@ static void normalAltitudeCntrl(void)
 		}
 		else
 		{
-#if (ALTITUDEHOLD_STABILIZED == AH_PITCH_ONLY)
+			if (settings._.AltitudeholdStabilized == AH_PITCH_ONLY)
+			{
 			// In stabilized mode using pitch-only altitude hold, use desiredHeight as
 			// set from the state machine upon entering stabilized mode in ent_stabilizedS()
-#elif ((ALTITUDEHOLD_STABILIZED == AH_FULL) || (ALTITUDEHOLD_STABILIZED == AH_THROTTLE_ONLY))
+			}
+			else if ((settings._.AltitudeholdStabilized == AH_FULL) || (settings._.AltitudeholdStabilized == AH_THROTTLE_ONLY))
+			{
 			// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
-			desiredHeight = ((__builtin_mulss(height_throttle_gain, throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
-			                + height_target_min;
-#endif
+				desiredHeight = ((__builtin_mulss(height_throttle_gain, throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
+			                    + height_target_min;
+			}
 			if (desiredHeight < (int16_t)(height_target_min)) desiredHeight = (int16_t)(height_target_min);
 			if (desiredHeight > (int16_t)(height_target_max)) desiredHeight = (int16_t)(height_target_max);
 		}

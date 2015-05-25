@@ -251,11 +251,12 @@ static mavlink_message_t msg[2];
 static uint8_t mavlink_message_index = 0;
 static mavlink_status_t r_mavlink_status;
 
-void mavlink_input_byte(uint8_t byte)
+void mavlink_input_byte(uint8_t rxchar)
+//void mavlink_callback_received_byte(uint8_t rxchar)
 {
-//	DPRINT("%u \r\n", byte);
+//	DPRINT("%u \r\n", rxchar);
 
-	if (mavlink_parse_char(0, byte, &msg[mavlink_message_index], &r_mavlink_status))
+	if (mavlink_parse_char(0, rxchar, &msg[mavlink_message_index], &r_mavlink_status))
 	{
 		// Check that handling of previous message has completed before calling again
 		if (handling_of_message_completed == true)
@@ -1036,7 +1037,7 @@ enum MAV_STATE
 		    (int16_t)   udb_xaccel.value, (int16_t)   udb_yaccel.value, (int16_t) - udb_zaccel.value,
 		    (int16_t) - udb_xrate.value,  (int16_t) - udb_yrate.value,  (int16_t) - udb_zrate.value,
 		    (int16_t)   0,                (int16_t)   0,                (int16_t)   0); // zero as mag not connected.
-#endif
+#endif //(MAG_YAW_DRIFT == 1)
 		// mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc,
 		//		int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 	}

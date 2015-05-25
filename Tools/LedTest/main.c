@@ -81,75 +81,75 @@ void udb_heartbeat_40hz_callback(void)
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 		case 9:
 			udb_background_trigger(&udb_background_callback_triggered);
-			LED_RED = LED_ON;
+			led_on(LED_RED);
 			break;
 		case 8:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 7:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 6:
-			LED_ORANGE = LED_OFF;
-			LED_BLUE = LED_ON;
+			led_off(LED_ORANGE);
+			led_on(LED_BLUE);
 			break;
 		case 5:
-			LED_BLUE = LED_OFF;
-			LED_RED = LED_ON;
+			led_off(LED_BLUE);
+			led_on(LED_RED);
 			break;
 		case 4:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 3:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 2:
-			LED_BLUE = LED_ON;
-			LED_ORANGE = LED_OFF;
+			led_on(LED_BLUE);
+			led_off(LED_ORANGE);
 			break;
 		case 1:
-			LED_BLUE = LED_OFF;
+			led_off(LED_BLUE);
 			udb_a2d_record_offsets();
 			break;
 #elif (BOARD_TYPE == AUAV3_BOARD)
 		case 9:
 			udb_background_trigger(&udb_background_callback_triggered);
-			LED_BLUE = LED_ON;
+			led_on(LED_BLUE);
 			break;
 		case 8:
-			LED_BLUE = LED_OFF;
-			LED_RED = LED_ON;
+			led_off(LED_BLUE);
+			led_on(LED_RED);
 			break;
 		case 7:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 6:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 5:
-			LED_ORANGE = LED_OFF;
-			LED_BLUE = LED_ON;
+			led_off(LED_ORANGE);
+			led_on(LED_BLUE);
 			break;
 		case 4:
-			LED_BLUE = LED_OFF;
-			LED_RED = LED_ON;
+			led_off(LED_BLUE);
+			led_on(LED_RED);
 			break;
 		case 3:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 2:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 1:
-			LED_ORANGE = LED_OFF;
+			led_off(LED_ORANGE);
 			udb_a2d_record_offsets();
 			break;
 #elif (BOARD_TYPE == PX4_BOARD)
