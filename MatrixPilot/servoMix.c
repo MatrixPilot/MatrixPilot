@@ -45,19 +45,21 @@ void servoMix(void)
 			pwManual[temp] = udb_pwTrim[temp];
 	}
 
-	// Apply boosts if in a stabilized mode
-	if (udb_flags._.radio_on && flags._.pitch_feedback)
-	{
-		pwManual[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] ; // in fly by wire or navigate mode, manual input is calculated as part of turn control
-		pwManual[ELEVATOR_INPUT_CHANNEL] += ((pwManual[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) * elevatorbgain) >> 3;
-		pwManual[RUDDER_INPUT_CHANNEL] += ((pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) * rudderbgain) >> 3;
-	}
+
 
 	// Standard airplane airframe
 	// Mix roll_control into ailerons
 	// Mix pitch_control into elevators
 	// Mix yaw control and waggle into rudder
 #if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
+
+		// Apply boosts if in a stabilized mode
+		if (udb_flags._.radio_on && flags._.pitch_feedback)
+		{
+			pwManual[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL] ; // in fly by wire or navigate mode, manual input is calculated as part of turn control
+			pwManual[ELEVATOR_INPUT_CHANNEL] += ((pwManual[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) * elevatorbgain) >> 3;
+			pwManual[RUDDER_INPUT_CHANNEL] += ((pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) * rudderbgain) >> 3;
+		}
 		temp = pwManual[AILERON_INPUT_CHANNEL] + REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, roll_control + waggle);
 		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 		
@@ -117,18 +119,27 @@ void servoMix(void)
 	// Mix roll_control, pitch_control, and waggle into aileron and elevator
 	// Mix rudder_control into  rudder
 #if (AIRFRAME_TYPE == AIRFRAME_DELTA)
+	if (udb_flags._.radio_on && flags._.pitch_feedback)		
+	{
+
+		int16_t aileronInput  = REVERSE_IF_NEEDED( AILERON_CHANNEL_REVERSED , ( udb_pwIn[ AILERON_INPUT_CHANNEL ] - udb_pwTrim[ AILERON_INPUT_CHANNEL ])) ;
+		int16_t elevatorInput = REVERSE_IF_NEEDED( ELEVATOR_CHANNEL_REVERSED , ( udb_pwIn[ ELEVATOR_INPUT_CHANNEL ] - udb_pwTrim[ ELEVATOR_INPUT_CHANNEL ])) ;
+		int16_t pitchInput = (((elevatorInput+aileronInput)>>1)*elevatorbgain )>>3  ;
+	
 		int32_t delta_roll_control = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, roll_control);
 
-		temp = pwManual[AILERON_INPUT_CHANNEL] +
-			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, -delta_roll_control + pitch_control - waggle);
+		temp = udb_pwTrim[AILERON_INPUT_CHANNEL] +
+			REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, -delta_roll_control + pitchInput + pitch_control - waggle);
 		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
-		temp = pwManual[ELEVATOR_INPUT_CHANNEL] +
-			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, delta_roll_control + pitch_control + waggle);
+		temp = udb_pwTrim[ELEVATOR_INPUT_CHANNEL] +
+			REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, delta_roll_control + pitchInput + pitch_control + waggle);
 		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 
+		pwManual[RUDDER_INPUT_CHANNEL] += ((pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]) * rudderbgain) >> 3;
+
 		temp = pwManual[RUDDER_INPUT_CHANNEL] +
-		    REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control);
+		    REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, yaw_control - waggle);
 		udb_pwOut[RUDDER_OUTPUT_CHANNEL] =  udb_servo_pulsesat(temp);
 		
 		if (pwManual[THROTTLE_INPUT_CHANNEL] == 0)
@@ -140,6 +151,15 @@ void servoMix(void)
 			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control);
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 		}
+	}
+	else
+	{
+		udb_pwOut[AILERON_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[AILERON_INPUT_CHANNEL] - REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED , waggle ) );
+		udb_pwOut[RUDDER_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[RUDDER_INPUT_CHANNEL] - REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED , waggle ) );
+		udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = pwManual[THROTTLE_INPUT_CHANNEL] ;
+		udb_pwOut[ELEVATOR_OUTPUT_CHANNEL] = udb_servo_pulsesat( pwManual[ELEVATOR_INPUT_CHANNEL] + REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED , waggle ) ) ;
+
+	}
 #endif
 
 	// Helicopter airframe

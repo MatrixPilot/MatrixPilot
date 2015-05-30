@@ -223,9 +223,12 @@ void helicalTurnCntrl( void )
 
 	// determine the desired turn rate as the sum of navigation and fly by wire.
 	// this allows the pilot to override navigation if needed.
+	steeringInput = 0 ; // just in case no airframe type is specified or radio is off
 
 	if (udb_flags._.radio_on == 1)
 	{
+		
+#if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
 		if ( AILERON_INPUT_CHANNEL != CHANNEL_UNUSED )  // compiler is smart about this
 		{
 			steeringInput = udb_pwIn[ AILERON_INPUT_CHANNEL ] - udb_pwTrim[ AILERON_INPUT_CHANNEL ] ;
@@ -240,10 +243,16 @@ void helicalTurnCntrl( void )
 		{
 			steeringInput = 0 ;
 		}
-	}
-	else
-	{
-		steeringInput = 0 ;
+#endif // AIRFRAME_STANDARD
+
+#if (AIRFRAME_TYPE == AIRFRAME_VTAIL)
+#endif // AIRFRAME_VTAIL
+
+#if (AIRFRAME_TYPE == AIRFRAME_DELTA)
+		int16_t aileronInput  = REVERSE_IF_NEEDED( AILERON_CHANNEL_REVERSED , ( udb_pwIn[ AILERON_INPUT_CHANNEL ] - udb_pwTrim[ AILERON_INPUT_CHANNEL ])) ;
+		int16_t elevatorInput = REVERSE_IF_NEEDED( ELEVATOR_CHANNEL_REVERSED , ( udb_pwIn[ ELEVATOR_INPUT_CHANNEL ] - udb_pwTrim[ ELEVATOR_INPUT_CHANNEL ])) ;	
+		steeringInput = REVERSE_IF_NEEDED( ELEVON_VTAIL_SURFACES_REVERSED , ((elevatorInput-aileronInput)>>1)) ;
+#endif // AIRFRAME_DELTA
 	}
 
 	if ( steeringInput > MAX_INPUT ) steeringInput = MAX_INPUT ;

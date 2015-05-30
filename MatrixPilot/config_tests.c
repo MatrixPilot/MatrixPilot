@@ -243,7 +243,11 @@
 #endif // ANGLE_OF_ATTACK_INVERTED
 #endif // INVERTED_NEUTRAL_PITCH
 
-// at this time, the only airframe supported by helical turn controls is standard
-#if ( AIRFRAME_TYPE != AIRFRAME_STANDARD )
-	#error("At this time the only airframe supported by helical controls is AIRFRAME_STANDARD"
+// at this time, the only airframes supported by helical turn controls are standard and delta wing
+#if ( AIRFRAME_TYPE == AIRFRAME_VTAIL )
+	#error("Helical controls does not yet support AIRFRAME_VTAIL, it will soon."
+#endif
+
+#if ( AIRFRAME_TYPE == AIRFRAME_HELI )
+	#error("Helical controls does not support AIRFRAME_HELI."
 #endif
