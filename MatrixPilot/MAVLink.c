@@ -112,10 +112,10 @@ static uint8_t mavlink_counter_40hz = 0;
 static uint64_t usec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 static uint32_t msec = 0; // A measure of time in microseconds (should be from Unix Epoch).
 
-int16_t sb_index = 0;
-int16_t end_index = 0;
-char serial_interrupt_stopped = 1;
-uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
+static int16_t sb_index = 0;
+static int16_t end_index = 0;
+static char serial_interrupt_stopped = 1;
+static uint8_t serial_buffer[SERIAL_BUFFER_SIZE];
 
 static uint8_t streamRates[MAV_DATA_STREAM_ENUM_END];
 static uint16_t mavlink_command_ack_command = 0;
