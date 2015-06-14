@@ -2,4 +2,4 @@
 
 modules := MatrixPilot MAVLink libDCM
 incpath := MAVLink/include
-cfgpath := MatrixPilot libUDB libFlashFS
+cfgpath := Config

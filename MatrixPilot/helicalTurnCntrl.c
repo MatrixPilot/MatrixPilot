@@ -30,27 +30,27 @@
 
 #ifndef RTL_PITCH_DOWN
 #define RTL_PITCH_DOWN ( 0.0 )
-#endif // RLT_PITCH_DOWN 
+#endif // RLT_PITCH_DOWN
 
 #ifndef INVERTED_NEUTRAL_PITCH
 #define INVERTED_NEUTRAL_PITCH ( 0.0 )
-#endif // INVERTED_NEUTRAL_PITCH 
+#endif // INVERTED_NEUTRAL_PITCH
 
 #ifndef ANGLE_OF_ATTACK_NORMAL
 #define ANGLE_OF_ATTACK_NORMAL ( 0.0 )
-#endif // ANGLE_OF_ATTACK_NORMAL 
+#endif // ANGLE_OF_ATTACK_NORMAL
 
 #ifndef ANGLE_OF_ATTACK_INVERTED
 #define ANGLE_OF_ATTACK_INVERTED ( 0.0 )
-#endif // ANGLE_OF_ATTACK_INVERTED 
+#endif // ANGLE_OF_ATTACK_INVERTED
 
 #ifndef ELEVATOR_TRIM_NORMAL
 #define ELEVATOR_TRIM_NORMAL ( 0.0 )
-#endif // ELEVATOR_TRIM_NORMAL 
+#endif // ELEVATOR_TRIM_NORMAL
 
 #ifndef ELEVATOR_TRIM_INVERTED
 #define ELEVATOR_TRIM_INVERTED ( 0.0 )
-#endif // ELEVATOR_TRIM_INVERTED 
+#endif // ELEVATOR_TRIM_INVERTED
 
 #ifndef CRUISE_SPEED
 #define CRUISE_SPEED ( 12.0 )
@@ -81,12 +81,12 @@
 #define MINIMUM_AIRSPEED ( 500 ) // minimum value of airspeed in cm/sec to be used in tilt computation,
 								 // mainly used for ground testing of turning tilt, which would go to zero at zero airspeed
 
-int16_t tiltError[3] ;
-int16_t desiredRotationRateRadians[3] ;
-int16_t rotationRateError[3] ;
-int16_t angleOfAttack ;
-int16_t estimatedLift ;
-int16_t relativeLoading ;
+int16_t tiltError[3];
+int16_t desiredRotationRateRadians[3];
+int16_t rotationRateError[3];
+int16_t angleOfAttack;
+int16_t estimatedLift;
+int16_t relativeLoading;
 
 // Compute estimated wing lift based on orientation.
 // This information can be determined directly from the accelerometers,

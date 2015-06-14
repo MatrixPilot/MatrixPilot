@@ -54,7 +54,7 @@ extern uint16_t yawkdail;
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
 extern uint16_t pitchgain;
 extern uint16_t pitchkd;
-extern uint16_t rudderElevMixGain;
+//extern uint16_t rudderElevMixGain;
 extern uint16_t rollElevMixGain;
 //#define ELEVATOR_BOOST                    0.5
 
