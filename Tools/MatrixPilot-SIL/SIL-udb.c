@@ -471,7 +471,6 @@ void I2C_doneReadMagData(void)
 			(abs(udb_magFieldBody[1]) < MAGNETICMAXIMUM) &&
 			(abs(udb_magFieldBody[2]) < MAGNETICMAXIMUM))
 		{
-//			udb_magnetometer_callback();
 			if (magnetometer_callback != NULL)
 			{
 				magnetometer_callback();

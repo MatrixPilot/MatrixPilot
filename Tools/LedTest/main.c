@@ -20,9 +20,11 @@
 
 
 #include "../../libUDB/libUDB.h"
-#include "../../libUDB/heartbeat.h"
 #include "../../libUDB/mpu6000.h"
+#include "../../libUDB/servoOut.h"
 #include "../../libUDB/ADchannel.h"
+#include "../../libUDB/heartbeat.h"
+#include "../../libUDB/eeprom_udb4.h"
 #include <libpic30.h>
 
 #if (BOARD_TYPE == UDB4_BOARD)
@@ -51,6 +53,7 @@ int main(void)
 #if (BOARD_TYPE != AUAV3_BOARD)
 	udb_eeprom_init();  // using legacy eeprom driver
 #endif
+	DPRINT("MatrixPilot LedTest\r\n");
 	while (1)
 	{
 		udb_run();
@@ -67,77 +70,78 @@ void udb_heartbeat_40hz_callback(void)
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 		case 9:
 			udb_background_trigger(&udb_background_callback_triggered);
-			LED_RED = LED_ON;
+			led_on(LED_RED);
 			break;
 		case 8:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 7:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 6:
-			LED_ORANGE = LED_OFF;
-			LED_BLUE = LED_ON;
+			led_off(LED_ORANGE);
+			led_on(LED_BLUE);
 			break;
 		case 5:
-			LED_BLUE = LED_OFF;
-			LED_RED = LED_ON;
+			led_off(LED_BLUE);
+			led_on(LED_RED);
 			break;
 		case 4:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 3:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 2:
-			LED_BLUE = LED_ON;
-			LED_ORANGE = LED_OFF;
+			led_on(LED_BLUE);
+			led_off(LED_ORANGE);
 			break;
 		case 1:
-			LED_BLUE = LED_OFF;
+			led_off(LED_BLUE);
 			udb_a2d_record_offsets();
 			break;
 #elif (BOARD_TYPE == AUAV3_BOARD)
 		case 9:
 			udb_background_trigger(&udb_background_callback_triggered);
-			LED_BLUE = LED_ON;
+			led_on(LED_BLUE);
 			break;
 		case 8:
-			LED_BLUE = LED_OFF;
-			LED_RED = LED_ON;
+			led_off(LED_BLUE);
+			led_on(LED_RED);
 			break;
 		case 7:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 6:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 5:
-			LED_ORANGE = LED_OFF;
-			LED_BLUE = LED_ON;
+			led_off(LED_ORANGE);
+			led_on(LED_BLUE);
 			break;
 		case 4:
-			LED_BLUE = LED_OFF;
-			LED_RED = LED_ON;
+			led_off(LED_BLUE);
+			led_on(LED_RED);
 			break;
 		case 3:
-			LED_RED = LED_OFF;
-			LED_GREEN = LED_ON;
+			led_off(LED_RED);
+			led_on(LED_GREEN);
 			break;
 		case 2:
-			LED_GREEN = LED_OFF;
-			LED_ORANGE = LED_ON;
+			led_off(LED_GREEN);
+			led_on(LED_ORANGE);
 			break;
 		case 1:
-			LED_ORANGE = LED_OFF;
+			led_off(LED_ORANGE);
 			udb_a2d_record_offsets();
 			break;
+#elif (BOARD_TYPE == PX4_BOARD)
 #else
 #error "unsupported BOARD_TYPE"
 #endif
@@ -189,6 +193,7 @@ void udb_heartbeat_callback(void)
 		udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] = 3000;
 	} else if (eepromSuccess == 0 && eepromFailureFlashCount) {
 		// eeprom failure!
+		DPRINT("eeprom failure!\r\n");
 		if (udb_heartbeat_counter % 6 == 0) {
 			udb_led_toggle(LED_RED);
 			udb_led_toggle(LED_GREEN);
@@ -218,15 +223,15 @@ void udb_heartbeat_callback(void)
 		udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 
 		if ((udb_heartbeat_counter / 600) % 2 == 0) {
-			LED_RED = LED_ON;
-			LED_ORANGE = ((abs(udb_pwOut[ROLL_OUTPUT_CHANNEL]  - 3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_BLUE   = ((abs(udb_pwOut[PITCH_OUTPUT_CHANNEL] - 3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_GREEN  = ((abs(udb_pwOut[YAW_OUTPUT_CHANNEL]   - 3000) > RATE_THRESHOLD_LED) ? LED_ON : LED_OFF);
+			led_on(LED_RED);
+			((abs(udb_pwOut[ROLL_OUTPUT_CHANNEL]  - 3000) > RATE_THRESHOLD_LED) ? led_on(LED_ORANGE) : led_off(LED_ORANGE));
+			((abs(udb_pwOut[PITCH_OUTPUT_CHANNEL] - 3000) > RATE_THRESHOLD_LED) ? led_on(LED_BLUE) : led_off(LED_BLUE));
+			((abs(udb_pwOut[YAW_OUTPUT_CHANNEL]   - 3000) > RATE_THRESHOLD_LED) ? led_on(LED_GREEN) : led_off(LED_GREEN));
 		} else {
-			LED_RED = LED_OFF;
-			LED_ORANGE = ((abs(udb_pwOut[X_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_BLUE   = ((abs(udb_pwOut[Y_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF);
-			LED_GREEN  = ((abs(udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? LED_ON : LED_OFF);
+			led_off(LED_RED);
+			((abs(udb_pwOut[X_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? led_on(LED_ORANGE) : led_off(LED_ORANGE));
+			((abs(udb_pwOut[Y_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? led_on(LED_BLUE) : led_off(LED_BLUE));
+			((abs(udb_pwOut[Z_ACCEL_OUTPUT_CHANNEL] - 3000) > ACCEL_THRESHOLD_LED) ? led_on(LED_GREEN) : led_off(LED_GREEN));
 		}
 	}
 }

@@ -64,12 +64,12 @@ extern volatile uint16_t trap_flags;
 extern volatile uint32_t trap_source;
 extern volatile uint16_t osc_fail_count;
 
-void udb_magnetometer_callback(void);
 uint16_t get_reset_flags(void);
 void sil_reset(void);
 
 uint16_t get_current_milliseconds(void);
 void sleep_milliseconds(uint16_t ms);
 
+void sil_telemetry_input(uint8_t* buffer, int32_t bytesRead);
 
 #endif

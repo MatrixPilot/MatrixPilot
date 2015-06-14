@@ -93,7 +93,7 @@ Change History:
 
 ********************************************************************/
  
-#if defined(__dsPIC33E__) 
+#if defined(__dsPIC33E__)
 
 /** I N C L U D E S **************************************************/
 #include "USB/usb.h"
@@ -1234,22 +1234,22 @@ BYTE MSDReadHandler(void)
 /******************************************************************************
  	Function:
  		BYTE MSDWriteHandler(void)
- 		
+ 
  	Description:
  		This funtion processes a write command received through 
  		the MSD class driver
- 		
+ 
  	PreCondition:
  		None
- 		
+ 
  	Parameters:
  		None
- 		
+ 
  	Return Values:
  		BYTE - the current state of the MSDWriteHandler state
  		machine.  The valid values are defined in MSD.h under the 
  		MSDWriteHandler state machine declaration section
- 		
+ 
  	Remarks:
  		None
  
@@ -1330,20 +1330,20 @@ BYTE MSDWriteHandler(void)
           		//We finished receiving a sector worth of data from the host.
           		//Check if the media is write protected before deciding what
           		//to do with the data.
-          		if(LUNWriteProtectState()) 
+          		if(LUNWriteProtectState())
                 {
                     //The device appears to be write protected.
               	    //Let host know error occurred.  The bCSWStatus flag is also used by
               	    //the write handler, to know not to even attempt the write sequence.
-              	    msd_csw.bCSWStatus=0x01;    
-              	    
+              	    msd_csw.bCSWStatus=0x01;
+
                     //Set sense keys so the host knows what caused the error.
               	    gblSenseData[LUN_INDEX].SenseKey=S_NOT_READY;
               	    gblSenseData[LUN_INDEX].ASC=ASC_WRITE_PROTECTED;
               	    gblSenseData[LUN_INDEX].ASCQ=ASCQ_WRITE_PROTECTED;
               	}
-   			    MSDWriteState = MSD_WRITE10_SECTOR;     
-      			break;
+				MSDWriteState = MSD_WRITE10_SECTOR;
+				break;
           	}
         }
         //Fall through to MSD_WRITE10_RX_PACKET
@@ -1352,8 +1352,8 @@ BYTE MSDWriteHandler(void)
             {
                 break;
             }
-            
-        	gblCBW.dCBWDataTransferLength-=USBHandleGetLength(USBMSDOutHandle);		// 64B read
+
+        	gblCBW.dCBWDataTransferLength-=USBHandleGetLength(USBMSDOutHandle); // 64B read
         	msd_csw.dCSWDataResidue-=USBHandleGetLength(USBMSDOutHandle);
             ptrNextData += MSD_OUT_EP_SIZE;
             
@@ -1388,56 +1388,55 @@ BYTE MSDWriteHandler(void)
                         gblSenseData[LUN_INDEX].SenseKey=S_MEDIUM_ERROR;
     			        gblSenseData[LUN_INDEX].ASC=ASC_NO_ADDITIONAL_SENSE_INFORMATION;
     			        gblSenseData[LUN_INDEX].ASCQ=ASCQ_NO_ADDITIONAL_SENSE_INFORMATION;
-                    }              		
+                    }
           		}
       		}
-      
+
             //One LBA is written (unless an error occurred).  Advance state
             //variables so we can eventually finish handling the CBW request.
-      		LBA.Val++;				
-      		TransferLength.Val--;      
+      		LBA.Val++;
+      		TransferLength.Val--;
             MSDWriteState = MSD_WRITE10_BLOCK;
             break;
-        } 
-        
+        }
+
         default:
             //Illegal condition which should not occur.  If for some reason it
             //does, try to let the host know know an error has occurred.
             msd_csw.bCSWStatus=0x02;    //Phase Error
 			USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);
-            MSDWriteState = MSD_WRITE10_WAIT;            
+            MSDWriteState = MSD_WRITE10_WAIT;
     }
-    
     return MSDWriteState;
 }
 
 
 
 /******************************************************************************
- 	Function:
- 		void ResetSenseData(void)
- 		
- 	Description:
- 		This routine resets the Sense Data, initializing the
- 		structure RequestSenseResponse gblSenseData.
- 		
- 	PreCondition:
- 		None 
- 		
- 	Parameters:
- 		None
- 		
- 	Return Values:
- 		None
- 		
- 	Remarks:
- 		None
- 			
+	Function:
+		void ResetSenseData(void)
+
+	Description:
+		This routine resets the Sense Data, initializing the
+		structure RequestSenseResponse gblSenseData.
+
+	PreCondition:
+		None
+
+	Parameters:
+		None
+
+	Return Values:
+		None
+
+	Remarks:
+		None
+
   *****************************************************************************/
-void ResetSenseData(void) 
+void ResetSenseData(void)
 {
 	gblSenseData[LUN_INDEX].ResponseCode=S_CURRENT;
-	gblSenseData[LUN_INDEX].VALID=0;			// no data in the information field
+	gblSenseData[LUN_INDEX].VALID=0;    // no data in the information field
 	gblSenseData[LUN_INDEX].Obsolete=0x0;
 	gblSenseData[LUN_INDEX].SenseKey=S_NO_SENSE;
 	//gblSenseData.Resv;
@@ -1448,7 +1447,7 @@ void ResetSenseData(void)
 	gblSenseData[LUN_INDEX].InformationB1=0x00;
 	gblSenseData[LUN_INDEX].InformationB2=0x00;
 	gblSenseData[LUN_INDEX].InformationB3=0x00;
-	gblSenseData[LUN_INDEX].AddSenseLen=0x0a;	// n-7 (n=17 (0..17))
+	gblSenseData[LUN_INDEX].AddSenseLen=0x0a;   // n-7 (n=17 (0..17))
 	gblSenseData[LUN_INDEX].CmdSpecificInfo.Val=0x0;
 	gblSenseData[LUN_INDEX].ASC=0x0;
 	gblSenseData[LUN_INDEX].ASCQ=0x0;
@@ -1461,55 +1460,55 @@ void ResetSenseData(void)
 
 
 /******************************************************************************
- 	Function:
- 		BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
- 		
- 	Description:
- 	   This function can be called to check for various error cases, primarily 
- 	   the "Thirteen Cases" errors described in the MSD BOT v1.0 specs.  If an
- 	   error is detected, the function internally calls the MSDErrorHandler()
- 	   handler function, to take care of appropriately responding to the host, 
- 	   based on the error condition.
- 	PreCondition:
- 	    None
- 	     		
- 	Parameters:
- 		DWORD DeviceBytes - Input: This is the total number of bytes the MSD 
- 		            device firmware is expecting in the MSD transfer.  
- 	Return Values:
- 		BYTE - Returns a byte containing the error code.  The possible error
- 		    cases that can be detected and reported are:
+	Function:
+		BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
+
+	Description:
+	   This function can be called to check for various error cases, primarily 
+	   the "Thirteen Cases" errors described in the MSD BOT v1.0 specs.  If an
+	   error is detected, the function internally calls the MSDErrorHandler()
+	   handler function, to take care of appropriately responding to the host, 
+	   based on the error condition.
+	PreCondition:
+	    None
+
+	Parameters:
+		DWORD DeviceBytes - Input: This is the total number of bytes the MSD 
+		            device firmware is expecting in the MSD transfer.
+	Return Values:
+		BYTE - Returns a byte containing the error code.  The possible error
+		    cases that can be detected and reported are:
             MSD_ERROR_CASE_NO_ERROR - None of the "Thirteen cases" errors were detected
-            MSD_ERROR_CASE_2 	            
-            MSD_ERROR_CASE_3 	            
-            MSD_ERROR_CASE_4 	            
-            MSD_ERROR_CASE_5 	            
-            MSD_ERROR_CASE_7 	            
-            MSD_ERROR_CASE_8 	            
-            MSD_ERROR_CASE_9 	            
-            MSD_ERROR_CASE_11               
-            MSD_ERROR_CASE_10               
-            MSD_ERROR_CASE_13               
- 		
- 	Remarks:
- 		None
- 			
+            MSD_ERROR_CASE_2
+            MSD_ERROR_CASE_3
+            MSD_ERROR_CASE_4
+            MSD_ERROR_CASE_5
+            MSD_ERROR_CASE_7
+            MSD_ERROR_CASE_8
+            MSD_ERROR_CASE_9
+            MSD_ERROR_CASE_11
+            MSD_ERROR_CASE_10
+            MSD_ERROR_CASE_13
+
+	Remarks:
+		None
+
   *****************************************************************************/
 BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
 {
     BYTE MSDErrorCase;
     BOOL HostMoreDataThanDevice;
     BOOL DeviceNoData;
-  
+
     //Check if device is expecting no data (Dn)
     if(DeviceBytes == 0)
     {
         DeviceNoData = TRUE;
-    }    
+    }
     else
     {
         DeviceNoData = FALSE;
-    }     
+    }
     
     //First check for the three good/non-error cases
     
@@ -1517,7 +1516,7 @@ BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
     if((MSDHostNoData == TRUE) && (DeviceNoData == TRUE))
     {
         return MSD_ERROR_CASE_NO_ERROR;
-    }    
+    }
 
     //Check for good cases where the data sizes between host and device match
     if(gblCBW.dCBWDataTransferLength == DeviceBytes)
@@ -1529,18 +1528,18 @@ BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
             if(MSDCommandState != MSD_WRITE_10)
             {
                 return MSD_ERROR_CASE_NO_ERROR;
-            }    
+            }
         }
-        else //if(MSD_State == MSD_DATA_OUT)  
+        else //if(MSD_State == MSD_DATA_OUT)
         {
             //Check for good case: Ho = Do (Case 12)
             //Make sure Ho = Do, instead of Ho = Di
             if(MSDCommandState == MSD_WRITE_10)
             {
                 return MSD_ERROR_CASE_NO_ERROR;
-            }             
-        }      
-    }    
+            }
+        }
+    }
 
     //If we get to here, this implies some kind of error is occuring.  Do some
     //checks to find out which error occurred, so we know how to handle it.
@@ -1549,11 +1548,11 @@ BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
     if(gblCBW.dCBWDataTransferLength > DeviceBytes)
     {
         HostMoreDataThanDevice = TRUE;
-    }   
+    }
     else
     {
         HostMoreDataThanDevice = FALSE;
-    } 
+    }
  
     //Check host's expected data direction
 	if(MSD_State == MSD_DATA_OUT)
@@ -1561,7 +1560,7 @@ BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
     	//First check for Ho <> Di (Case 10)
     	if((MSDCommandState != MSD_WRITE_10) && (DeviceNoData == FALSE))
     	    MSDErrorCase = MSD_ERROR_CASE_10;
-   	   	//Check for Hn < Do  (Case 3)
+    	//Check for Hn < Do  (Case 3)
     	else if(MSDHostNoData == TRUE)  
     	    MSDErrorCase = MSD_ERROR_CASE_3;
     	//Check for Ho > Dn  (Case 9)
@@ -1578,7 +1577,7 @@ BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
     {
     	//First check for Hi <> Do (Case 8)
     	if(MSDCommandState == MSD_WRITE_10)
-    	    MSDErrorCase = MSD_ERROR_CASE_8;    	
+    	    MSDErrorCase = MSD_ERROR_CASE_8;
     	//Check for Hn < Di  (Case 2)
     	else if(MSDHostNoData == TRUE)  
     	    MSDErrorCase = MSD_ERROR_CASE_2;
@@ -1591,117 +1590,117 @@ BYTE MSDCheckForErrorCases(DWORD DeviceBytes)
         //Check for Hi < Di  (Case 7)
     	else //if(gblCBW.dCBWDataTransferLength < DeviceBytes)
     	    MSDErrorCase = MSD_ERROR_CASE_7;
-    }        
+    }
     //Now call the MSDErrorHandler(), based on the error that was detected.
     MSDErrorHandler(MSDErrorCase);
     return MSDErrorCase;
-}    
+}
 
 
 /******************************************************************************
- 	Function:
- 		void MSDErrorHandler(BYTE ErrorCase)
- 		
- 	Description:
- 	    Once an error condition has been detected, this function can be called
- 	    to set the proper states and perform the proper tasks needed to let the
- 	    host know about the error.
- 	PreCondition:
- 		Firmware should have already determined an error occurred, and it should
- 		know what the error code was before calling this handler.
- 		
- 	Parameters:
- 		BYTE ErrorCase - Input: This is the error code that the firmware 
- 		                    detected.  This error code will determine how the
- 		                    handler will behave (ex: what status to send to host,
- 		                    what endpoint(s) should be stalled, etc.).
- 		                    The implemented error case possibilities are (suffix
- 		                    numbers correspond to the "Thirteen cases" numbers 
- 		                    described in the MSD BOT specs v1.0):
- 		                    
-                            MSD_ERROR_CASE_2 	            
-                            MSD_ERROR_CASE_3 	            
-                            MSD_ERROR_CASE_4 	            
-                            MSD_ERROR_CASE_5 	            
-                            MSD_ERROR_CASE_7 	            
-                            MSD_ERROR_CASE_8 	            
-                            MSD_ERROR_CASE_9 	            
-                            MSD_ERROR_CASE_11               
-                            MSD_ERROR_CASE_10               
-                            MSD_ERROR_CASE_13               
-                            MSD_ERROR_UNSUPPORTED_COMMAND   
+	Function:
+	    void MSDErrorHandler(BYTE ErrorCase)
 
- 	Return Values:
- 		None
- 		
- 	Remarks:
- 		None
- 			
+	Description:
+	    Once an error condition has been detected, this function can be called
+	    to set the proper states and perform the proper tasks needed to let the
+	    host know about the error.
+	PreCondition:
+	    Firmware should have already determined an error occurred, and it should
+	    know what the error code was before calling this handler.
+
+	Parameters:
+	    BYTE ErrorCase - Input: This is the error code that the firmware 
+	                        detected.  This error code will determine how the
+	                        handler will behave (ex: what status to send to host,
+	                        what endpoint(s) should be stalled, etc.).
+	                        The implemented error case possibilities are (suffix
+	                        numbers correspond to the "Thirteen cases" numbers 
+	                        described in the MSD BOT specs v1.0):
+
+                            MSD_ERROR_CASE_2
+                            MSD_ERROR_CASE_3
+                            MSD_ERROR_CASE_4
+                            MSD_ERROR_CASE_5
+                            MSD_ERROR_CASE_7
+                            MSD_ERROR_CASE_8
+                            MSD_ERROR_CASE_9
+                            MSD_ERROR_CASE_1
+                            MSD_ERROR_CASE_10
+                            MSD_ERROR_CASE_13
+                            MSD_ERROR_UNSUPPORTED_COMMAND
+
+	Return Values:
+	    None
+
+	Remarks:
+	    None
+
   *****************************************************************************/
 void MSDErrorHandler(BYTE ErrorCase)
 {
-    BYTE OldMSD_State;
-    
+	BYTE OldMSD_State;
+
 	//Both MSD bulk IN and OUT endpoints should not be busy when these error cases are detected
 	//If for some reason this isn't true, then we should preserve the state machines states for now.
-    if((USBHandleBusy(USBMSDInHandle)) || (USBHandleBusy(USBMSDOutHandle)))
-    {
-    	return;	
-    }
+	if((USBHandleBusy(USBMSDInHandle)) || (USBHandleBusy(USBMSDOutHandle)))
+	{
+		return;
+	}
 
-    //Save the old state before we change it.  The old state is needed to determine
-    //the proper handling behavior in the case of receiving unsupported commands.
-    OldMSD_State = MSD_State;
+	//Save the old state before we change it.  The old state is needed to determine
+	//the proper handling behavior in the case of receiving unsupported commands.
+	OldMSD_State = MSD_State;
 
 	//Reset main state machines back to idle values.
 	MSDCommandState = MSD_COMMAND_WAIT;
 	MSDReadState = MSD_READ10_WAIT;
 	MSDWriteState = MSD_WRITE10_WAIT;
 	//After the conventional 13 test cases failures, the host still expects a valid CSW packet
-    msd_csw.dCSWDataResidue = gblCBW.dCBWDataTransferLength; //Indicate the unconsumed/unsent data
-   	msd_csw.bCSWStatus = MSD_CSW_COMMAND_FAILED;    //Gets changed later to phase error for errors that user phase error
-	MSD_State = MSD_SEND_CSW;	        
+	msd_csw.dCSWDataResidue = gblCBW.dCBWDataTransferLength; //Indicate the unconsumed/unsent data
+	msd_csw.bCSWStatus = MSD_CSW_COMMAND_FAILED;    //Gets changed later to phase error for errors that user phase error
+	MSD_State = MSD_SEND_CSW;
 
-    //Now do other error related handling tasks, which depend on the specific 
-    //error	type that was detected.
+	//Now do other error related handling tasks, which depend on the specific 
+	//error	type that was detected.
 	switch(ErrorCase)
 	{
 		case MSD_ERROR_CASE_2://Also CASE_3
-			msd_csw.bCSWStatus = MSD_CSW_PHASE_ERROR;	
-        	break;	
+			msd_csw.bCSWStatus = MSD_CSW_PHASE_ERROR;
+			break;
 		case MSD_ERROR_CASE_4://Also CASE_5
-       		USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);	//STALL the bulk IN MSD endpoint
+			USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);    // STALL the bulk IN MSD endpoint
 			break;
 		case MSD_ERROR_CASE_7://Also CASE_8
-       		msd_csw.bCSWStatus = MSD_CSW_PHASE_ERROR;	
-       		USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);	//STALL the bulk IN MSD endpoint
-       		break;		
+			msd_csw.bCSWStatus = MSD_CSW_PHASE_ERROR;
+			USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);   // STALL the bulk IN MSD endpoint
+			break;
 		case MSD_ERROR_CASE_9://Also CASE_11
 			USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST); //Stall the bulk OUT endpoint
 			break;
 		case MSD_ERROR_CASE_10://Also CASE_13
-	        msd_csw.bCSWStatus = MSD_CSW_PHASE_ERROR;	
+			msd_csw.bCSWStatus = MSD_CSW_PHASE_ERROR;
 			USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);
 			break;
 			
-        case MSD_ERROR_UNSUPPORTED_COMMAND:
-        	ResetSenseData();
+		case MSD_ERROR_UNSUPPORTED_COMMAND:
+			ResetSenseData();
 			gblSenseData[LUN_INDEX].SenseKey=S_ILLEGAL_REQUEST;
 			gblSenseData[LUN_INDEX].ASC=ASC_INVALID_COMMAND_OPCODE;
 			gblSenseData[LUN_INDEX].ASCQ=ASCQ_INVALID_COMMAND_OPCODE;
-            if((OldMSD_State == MSD_DATA_OUT) && (gblCBW.dCBWDataTransferLength != 0))
-            {
-			    USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST); 
+			if((OldMSD_State == MSD_DATA_OUT) && (gblCBW.dCBWDataTransferLength != 0))
+			{
+				USBStallEndpoint(MSD_DATA_OUT_EP, OUT_FROM_HOST);
 			}
 			else
 			{
-        	    USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);
-            }     	    
-            break;
-		default:	//Shouldn't get hit, don't call MSDErrorHandler() if there is no error
+				USBStallEndpoint(MSD_DATA_IN_EP, IN_TO_HOST);
+			}
 			break;
-	}//switch(ErrorCase)			
-}	
+		default: // Shouldn't get hit, don't call MSDErrorHandler() if there is no error
+			break;
+	}//switch(ErrorCase)
+}
 
 
 
@@ -1709,4 +1708,4 @@ void MSDErrorHandler(BYTE ErrorCase)
 #endif //end of #ifdef USB_USE_MSD
 //End of file usb_function_msd.c
 
-#endif // defined(__dsPIC33E__) 
+#endif // defined(__dsPIC33E__)

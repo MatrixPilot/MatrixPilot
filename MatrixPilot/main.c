@@ -34,6 +34,7 @@
 #include "defines.h"
 #include "behaviour.h"
 #include "telemetry.h"
+#include "servoMix.h"
 #include "servoPrepare.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libUDB/serialIO.h"

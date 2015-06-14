@@ -240,3 +240,6 @@
 #endif // ANGLE_OF_ATTACK_INVERTED
 #endif // INVERTED_NEUTRAL_PITCH
 
+#if ( AIRFRAME_TYPE == AIRFRAME_HELI )
+	#error("Helical controls does not support AIRFRAME_HELI."
+#endif // AIRFRAME_HELI

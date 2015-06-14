@@ -61,8 +61,8 @@
 #define ZACCEL_SIGN         +
 
 // Max inputs and outputs
-#define MAX_INPUTS          8
-#define MAX_OUTPUTS         8
+#define MAX_INPUTS          6
+#define MAX_OUTPUTS         6
 
 // LED pins
 #define LED_RED             0
@@ -89,22 +89,29 @@
 
 // Input Capture module input pins: PINX is the port pin, RPINX is used for PPS
 // PINX must match RPINX for radionIn_auav3 to work properly
-#define IC_PIN1  _RD0
-#define IC_RPIN1 64
-#define IC_PIN2  _RD8
-#define IC_RPIN2 72
-#define IC_PIN3  _RD11
-#define IC_RPIN3 75
-#define IC_PIN4  _RA15
-#define IC_RPIN4 31
-#define IC_PIN5  _RA5
-#define IC_RPIN5 21
-#define IC_PIN6  _RA14
-#define IC_RPIN6 30
-#define IC_PIN7  _RA4
-#define IC_RPIN7 20
-#define IC_PIN8  _RF8
-#define IC_RPIN8 104
+//#define IC_PIN1  _RD0
+//#define IC_RPIN1 64
+//#define IC_PIN2  _RD8
+//#define IC_RPIN2 72
+//#define IC_PIN3  _RD11
+//#define IC_RPIN3 75
+//#define IC_PIN4  _RA15
+//#define IC_RPIN4 31
+//#define IC_PIN5  _RA5
+//#define IC_RPIN5 21
+//#define IC_PIN6  _RA14
+//#define IC_RPIN6 30
+//#define IC_PIN7  _RA4
+//#define IC_RPIN7 20
+//#define IC_PIN8  _RF8
+//#define IC_RPIN8 104
+
+#define IC_PIN1  GPIOA->IDR & (1 << 0)      //PA0
+#define IC_PIN2  GPIOA->IDR & (1 << 1)      //PA1
+#define IC_PIN3  GPIOB->IDR & (1 << 6)      //PB6
+#define IC_PIN4  GPIOB->IDR & (1 << 7)      //PB7
+#define IC_PIN5  GPIOB->IDR & (1 << 8)      //PB8
+#define IC_PIN6  GPIOB->IDR & (1 << 9)      //PB9
 
 // OC1:8 PWM module output pins
 // PINX must match RPINX
