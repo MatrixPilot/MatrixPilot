@@ -99,6 +99,7 @@ endef
 $(foreach l,$(subst /, ,$(subst $(ROOT_DIR),,$(CURDIR))),$(eval $(call source-path-rel-dir,$l)))
 SOURCE_DIR ?= $(subst $(space),/,$(TMP_SRC_DIR))
 #$(warning SOURCE_DIR: $(SOURCE_DIR))
+MKFILES_DIR = $(SOURCE_DIR)/Tools/makefiles
 
 ################################################################################
 # Collect information from each module in the following variables.
@@ -114,8 +115,8 @@ SOURCE_DIR ?= $(subst $(space),/,$(TMP_SRC_DIR))
 ################################################################################
 # Include the target and device specific makefile to load our variables as above
 
-include $(SOURCE_DIR)/target-$(TARGET_NAME).mk
-include $(SOURCE_DIR)/device-$(DEVICE).mk
+include $(MKFILES_DIR)/target-$(TARGET_NAME).mk
+include $(MKFILES_DIR)/device-$(DEVICE).mk
 modules := $(addprefix $(SOURCE_DIR)/,$(modules))
 #INCPATH := $(addprefix $(SOURCE_DIR)/,$(cfgpath)) $(addprefix $(SOURCE_DIR)/,$(incpath))
 
@@ -134,7 +135,7 @@ TARGET_NAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
 TARGET_MAP := $(TARGET_NAME).map
 TARGET := $(TARGET_NAME).$(TARGET_TYPE)
 
-include $(SOURCE_DIR)/toolchain-$(TOOLCHAIN).mk
+include $(MKFILES_DIR)/toolchain-$(TOOLCHAIN).mk
 
 ################################################################################
 # Support routines/macros
