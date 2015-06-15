@@ -131,7 +131,7 @@ void servoMix(void)
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 		}
 	}
-#endif
+#endif // AIRFRAME_VTAIL
 
 	// Delta-Wing airplane airframe
 	// Mix roll_control, pitch_control, and waggle into aileron and elevator
@@ -160,7 +160,7 @@ void servoMix(void)
 			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control);
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 		}
-#endif
+#endif // AIRFRAME_DELTA
 
 	// Helicopter airframe
 	// Mix half of roll_control and half of pitch_control into aileron channels
@@ -191,7 +191,7 @@ void servoMix(void)
 			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control);
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 		}
-#endif
+#endif // AIRFRAME_HELI
 
 		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(pwManual[PASSTHROUGH_A_INPUT_CHANNEL]);
 		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat(pwManual[PASSTHROUGH_B_INPUT_CHANNEL]);

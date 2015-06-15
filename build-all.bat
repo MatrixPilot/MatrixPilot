@@ -1,11 +1,11 @@
 @echo off
 
-mkdir build >nul 2>&1
-pushd build
+mkdir _build >nul 2>&1
+pushd _build
 
 mkdir SIL >nul 2>&1
 pushd SIL
-make -j 8 -f ../../makefile DEVICE=SIL
+make -j 8 -f ../../makefile DEVICE=SIL CONFIG=Cessna
 popd
 
 @rem mkdir PX4 >nul 2>&1

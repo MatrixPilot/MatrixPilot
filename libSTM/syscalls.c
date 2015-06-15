@@ -95,34 +95,6 @@ void _exit (int status)
 	while (1) {}
 }
 
-#if 0
-UART_HandleTypeDef UartHandle;
-
-void init_uart_stdio(unsigned long baud)
-{
-	/*##-1- Configure the UART peripheral ######################################*/
-	/* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-	/* UARTx configured as follow:
-		- Word Length = 8 Bits
-		- Stop Bit = One Stop bit
-		- Parity = None
-		- BaudRate = 9600 baud
-		- Hardware flow control disabled (RTS and CTS signals) */
-	UartHandle.Instance        = UART2;
-	UartHandle.Init.BaudRate   = baud;
-	UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-	UartHandle.Init.StopBits   = UART_STOPBITS_1;
-	UartHandle.Init.Parity     = UART_PARITY_NONE;
-	UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-	UartHandle.Init.Mode       = UART_MODE_TX_RX;
-
-	if (HAL_UART_Init(&UartHandle) != HAL_OK)
-	{
-//		Error_Handler();
-	}
-}
-#endif
-
 int _write(int file, char *ptr, int len)
 {
 #if 0
@@ -222,66 +194,3 @@ int _execve(char *name, char **argv, char **env)
 	errno = ENOMEM;
 	return -1;
 }
-
-
-//void _init(void)
-//{
-//}
-
-#if 0
-/**
-  * @brief  Update FIFO configuration
-  * @param  hpcd: PCD handle
-  * @retval status
-  */
-HAL_StatusTypeDef HAL_PCDEx_SetTxFiFo(PCD_HandleTypeDef *hpcd, uint8_t fifo, uint16_t size)
-{
-  uint8_t i = 0;
-  uint32_t Tx_Offset = 0;
-
-
-  /*  TXn min size = 16 words. (n  : Transmit FIFO index)
-  *   When a TxFIFO is not used, the Configuration should be as follows:
-  *       case 1 :  n > m    and Txn is not used    (n,m  : Transmit FIFO indexes)
-  *       --> Txm can use the space allocated for Txn.
-  *       case2  :  n < m    and Txn is not used    (n,m  : Transmit FIFO indexes)
-  *       --> Txn should be configured with the minimum space of 16 words
-  *  The FIFO is used optimally when used TxFIFOs are allocated in the top
-  *       of the FIFO.Ex: use EP1 and EP2 as IN instead of EP1 and EP3 as IN ones.
-  *   When DMA is used 3n * FIFO locations should be reserved for internal DMA registers */
-
-  Tx_Offset = hpcd->Instance->GRXFSIZ;
-
-  if(fifo == 0)
-  {
-    hpcd->Instance->DIEPTXF0_HNPTXFSIZ = (size << 16) | Tx_Offset;
-  }
-  else
-  {
-    Tx_Offset += (hpcd->Instance->DIEPTXF0_HNPTXFSIZ) >> 16;
-    for (i = 0; i < (fifo - 1); i++)
-    {
-      Tx_Offset += (hpcd->Instance->DIEPTXF[i] >> 16);
-    }
-
-    /* Multiply Tx_Size by 2 to get higher performance */
-    hpcd->Instance->DIEPTXF[fifo - 1] = (size << 16) | Tx_Offset;
-
-  }
-
-  return HAL_OK;
-}
-
-/**
-  * @brief  Update FIFO configuration
-  * @param  hpcd: PCD handle
-  * @retval status
-  */
-HAL_StatusTypeDef HAL_PCDEx_SetRxFiFo(PCD_HandleTypeDef *hpcd, uint16_t size)
-{
-
-  hpcd->Instance->GRXFSIZ = size;
-
-  return HAL_OK;
-}
-#endif
