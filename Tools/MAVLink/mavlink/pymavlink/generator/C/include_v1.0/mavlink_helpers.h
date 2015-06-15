@@ -210,7 +210,7 @@ MAVLINK_HELPER void mavlink_update_checksum(mavlink_message_t* msg, uint8_t c)
  * ignored.
  *
  * Messages are parsed into an internal buffer (one for each channel). When a complete
- * message is received it is copies into *returnMsg and the channel's status is
+ * message is received it is copied into *returnMsg and the channel's status is
  * copied into *returnStats.
  *
  * @param chan     ID of the current channel. This allows to parse different channels with this function.

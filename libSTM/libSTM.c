@@ -415,4 +415,11 @@ void PutChar(char ch)
 
 //void _init(void) {}
 
+void udb_init_USART(void)
+{
+}
+
+void udb_init_GPS(void)
+{
+}
 #endif // (BOARD_TYPE == PX4_BOARD)
