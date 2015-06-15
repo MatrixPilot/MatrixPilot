@@ -19,6 +19,13 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
+// used for any board when HILSIM is defined, overrides many board specific defines
+
+#undef SCALEGYRO
+#undef SCALEACCEL
+#define SCALEGYRO       3.0
+#define SCALEACCEL      2.64
+
 #undef xrateBUFF
 #undef yrateBUFF
 #undef zrateBUFF
@@ -47,11 +54,6 @@
 #define YACCEL_SIGN     +
 #define ZACCEL_SIGN     +
 
-
-#undef SCALEGYRO
-#undef SCALEACCEL
-#define SCALEGYRO       3.0
-#define SCALEACCEL      2.64
 
 #undef GPS_TYPE
 #define GPS_TYPE        GPS_UBX_4HZ

@@ -30,7 +30,12 @@
 
 #define NUM_ANALOG_INPUTS   7
 
-// A/D channels:
+// External A/D channels:
+#define analogInput1BUFF    3
+#define analogInput2BUFF    4
+#define analogInput3BUFF    1
+#define analogInput4BUFF    2
+
 #define A_VOLT_BUFF         5       // V, pin label Bat Volt
 #define A_AMPS_BUFF         6       // I, pin label CS Curr
 #define A_RSSI_BUFF         7       // RS, pin label RSSI
@@ -39,10 +44,6 @@
 #define A_5V_BUFF           6       // I, pin label CS Curr
 #define A_RSSI_BUFF         7       // RS, pin label RSSI
 
-#define analogInput1BUFF    3
-#define analogInput2BUFF    4
-#define analogInput3BUFF    1
-#define analogInput4BUFF    2
 
 // MPU6000 configuration
 #define xrate_MPU_channel   5

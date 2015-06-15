@@ -485,14 +485,10 @@ void helicalTurnCntrl( void )
 	}
 
 	// multiply the normalized rmat[6] , rmat[8] vector by the pitch error
-
 	VectorScale( 2 , pitchEarthBodyProjection , pitchEarthBodyProjection , pitchError ) ;
-
 	tiltError[0] = 2*pitchEarthBodyProjection[1] ;
 	tiltError[2] = - 2*pitchEarthBodyProjection[0] ;
 
 	// compute the rotation rate error vector
-
 	VectorSubtract( 3 , rotationRateError , omegaAccum , desiredRotationRateGyro ) ;
-
 }

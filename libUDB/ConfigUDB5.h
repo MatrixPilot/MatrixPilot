@@ -32,7 +32,7 @@
 
 #define NUM_ANALOG_INPUTS   4
 
-// A/D channels:
+// External A/D channels:
 #define analogInput1BUFF    3
 #define analogInput2BUFF    4
 #define analogInput3BUFF    5
@@ -80,7 +80,7 @@
 #define SPI1_TRIS           _TRISB2
 #define SPI2_TRIS           _TRISG9
 
-// Input Capture pin difinitions
+// Input Capture pin definitions
 #define IC_PIN1             _RD8
 #define IC_PIN2             _RD9
 #define IC_PIN3             _RD10
