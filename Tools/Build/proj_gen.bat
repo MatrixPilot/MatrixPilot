@@ -1,5 +1,8 @@
 @echo off
 
+pyProjectCreator.py -r ../.. -n MatrixPilot -t JSB -c Config/Cessna
+
+goto END:
 
 pyProjectCreator.py -r ../.. -n MatrixPilot -t SIL -c Config/Cessna
 
@@ -19,7 +22,6 @@ pyProjectCreator.py -r ../.. -n LedTest -t UDB4
 pyProjectCreator.py -r ../.. -n LedTest -t UDB5
 pyProjectCreator.py -r ../.. -n LedTest -t AUAV3
 
-goto END:
 :END
 
 pause

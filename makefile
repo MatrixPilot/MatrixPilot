@@ -104,7 +104,7 @@ endef
 $(foreach l,$(subst /, ,$(subst $(ROOT_DIR),,$(CURDIR))),$(eval $(call source-path-rel-dir,$l)))
 SOURCE_DIR ?= $(subst $(space),/,$(TMP_SRC_DIR))
 #$(warning SOURCE_DIR: $(SOURCE_DIR))
-MKFILES_DIR = $(SOURCE_DIR)
+MKFILES_DIR = $(SOURCE_DIR)/Tools/makefiles
 
 ################################################################################
 # Collect information from each module in the following variables.

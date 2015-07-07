@@ -163,8 +163,10 @@ header_folders = []
 def vs2010_scan_dirs(masks, sources, directories):
 	str = ""
 	for dir in directories:
+#		print "dir = ", dir
 		path = os.path.join(rootdir, dir)
 		for mask in masks:
+#			print "mask = ", mask
 			files = find(mask, path)
 			for filename in files:
 				if sources == 1:
@@ -181,6 +183,7 @@ def vs2010_scan_filter_dirs(masks, sources, directories, prefix):
 			files = find(mask, path)
 			for filename in files:
 				fname = filename.replace("/", "\\")
+#				print "fname = ", prefix + os.path.dirname(fname.replace("..\\", ""))
 				if sources == 1:
 					source_folders.append(os.path.dirname(filename.replace("..\\", "")))
 					str = str + "    <ClCompile Include=\"" + fname + "\">\n"
@@ -203,7 +206,7 @@ def vs2010_make_filter_dirs(prefix, folders):
 		s = s + "    </Filter>\n"
 	return s
 
-def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, header_files, source_files, project, defines, prjname):
+def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, header_files, source_files, project, defines, prjname, addlibs):
 
 	config = ''
 	for e in config_dir:
@@ -217,6 +220,7 @@ def vs2010_project(mcu_type, target_board, root_sep, config_dir, includes, heade
 		data = data.replace("%%CONFIG%%", config)
 		data = data.replace("%%PROJECT%%", prjname)
 		data = data.replace("%%INCLUDES%%", includes)
+		data = data.replace("%%LINK_LIBS%%", addlibs)
 		data = data.replace("%%SOURCE_FILES%%", source_files)
 		data = data.replace("%%HEADER_FILES%%", header_files)
 #		data = data.replace("%%EXTRA_DEFS%%", defines.strip(";"))
@@ -397,6 +401,7 @@ if __name__ == '__main__':
 	else:
 		arch = ""
 
+	addlibs_list = []
 #
 # Parse options from the 'target-*.mk' specific makefile
 	target_mk_path = opts.root + "/target-" + opts.name + ".mk"
@@ -405,6 +410,7 @@ if __name__ == '__main__':
 	opts.includes = parse_mk_file(target_mk_path, "incpath", opts.includes)
 	opts.config   = parse_mk_file(target_mk_path, "cfgpath", opts.config)
 
+	print "target = ", opts.target
 #
 # Parse extra options from the 'device-*.mk' specific makefile
 	opts.file = opts.root + "/device-" + opts.target + ".mk"
@@ -412,12 +418,13 @@ if __name__ == '__main__':
 		opts.modules  = parse_mk_file(opts.file, "modules", opts.modules)
 		opts.includes = parse_mk_file(opts.file, "incpath", opts.includes)
 		opts.defines  = parse_mk_file(opts.file, "defines", opts.defines)
+		addlibs_list = parse_mk_file(opts.file, "addlibs", [])
 		arch = ''.join(parse_mk_file(opts.file, "CPU", ["dsPIC"]))
 
 # TODO: perhaps we want to check that the modules list (etc) is not empty..
 
-#	print "modules = ", opts.modules
-#	print "defines = ", opts.defines
+	print "modules = ", opts.modules
+	print "defines = ", opts.defines
 
 	for mod in opts.modules:
 		mod_incs = parse_options_file(opts.root + "/" + mod + "/module.mk", "local_inc").split(' ')
@@ -434,6 +441,7 @@ if __name__ == '__main__':
 	inc_list = [rootsep + str(x) for x in opts.includes]
 	includes = ';'.join(inc_list)
 #	opts.defines = ";".join(opts.defines)
+	addlibs = ';'.join(addlibs_list)
 	filters = ""
 
 	prjname = opts.name + "-" + opts.target + "-" + opts.config[0].replace("/", " ").split(" ")[-1]
@@ -453,10 +461,21 @@ if __name__ == '__main__':
 			includes = includes + "\t\t\t<Add directory=\"" + inc + "\" />\n"
 		emBlocks_project(arch, opts.name, opts.target, opts.config, defines, includes, headers, sources, project)
 	elif opts.target == "SIL":
-		sources = vs2010_scan_dirs(["*.c"], 1, opts.modules)
+		sources = vs2010_scan_dirs(["*.c", "*.cpp"], 1, opts.modules)
 		headers = vs2010_scan_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"])
-		vs2010_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project, opts.defines, prjname)
-		sources = vs2010_scan_filter_dirs(["*.c"], 1, opts.modules, "Source Files\\")
+		vs2010_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project, opts.defines, prjname, addlibs)
+		sources = vs2010_scan_filter_dirs(["*.c", "*.cpp"], 1, opts.modules, "Source Files\\")
+		headers = vs2010_scan_filter_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"], "Header Files\\")
+		filters = filters + vs2010_make_filter_dirs("Source", source_folders)
+		filters = filters + vs2010_make_filter_dirs("Header", header_folders)
+		vs2010_filters(arch, opts.target, rootsep, opts.config, filters, headers, sources, project)
+	elif opts.target == "JSB":
+		sources = vs2010_scan_dirs(["*.c", "*.cpp"], 1, opts.modules)
+		print "opts.config", opts.config
+		print "opts.modules", opts.modules
+		headers = vs2010_scan_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"])
+		vs2010_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project, opts.defines, prjname, addlibs)
+		sources = vs2010_scan_filter_dirs(["*.c", "*.cpp"], 1, opts.modules, "Source Files\\")
 		headers = vs2010_scan_filter_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"], "Header Files\\")
 		filters = filters + vs2010_make_filter_dirs("Source", source_folders)
 		filters = filters + vs2010_make_filter_dirs("Header", header_folders)
