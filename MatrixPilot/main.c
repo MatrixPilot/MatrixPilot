@@ -26,6 +26,10 @@
 #include "config.h"
 #include "states.h"
 #include "console.h"
+#include "MAVLink.h"
+#include "servoMix.h"
+#include "telemetry.h"
+#include "flightplan.h"
 #include "flightplan-waypoints.h"
 #include <setjmp.h>
 

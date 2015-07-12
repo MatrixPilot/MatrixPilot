@@ -51,6 +51,11 @@ int DataReceived(void);
 #define getch GetChar
 #define putch PutChar
 #endif
+#if (SILSIM == 1)
+#define kbhit _kbhit
+#define getch _getch
+#define putch _putch
+#endif
 
 
 #endif // _UART_H_

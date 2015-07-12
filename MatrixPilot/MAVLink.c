@@ -63,6 +63,7 @@
 #include "../libUDB/serialIO.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/events.h"
+#include "../MatrixPilot/telemetry_log.h"
 #include "../MatrixPilot/euler_angles.h"
 #include "../MatrixPilot/navigate.h"
 #include "../MatrixPilot/config.h"

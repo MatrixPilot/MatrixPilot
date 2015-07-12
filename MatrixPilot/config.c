@@ -25,6 +25,7 @@
 #include "minIni.h"
 #include "navigate.h"
 #include "airspeedCntrl.h"
+#include "libCntrl.h"
 
 
 union settings_word settings;

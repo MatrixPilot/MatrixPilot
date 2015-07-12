@@ -9,8 +9,13 @@ endif
 CPU :=
 
 modules += Tools/MatrixPilot-JSB Tools/JSB-SIL
-incpath += Tools/JSBSimLib/src
+
+incpath += Tools/JSBSim/src
+#incpath += ../jsbsim/src
+
 #cfgpath := Config
 addlibs := ../Tools/JSBSimLib/Debug/JSBSimLib.lib
 defines += JSB_SIL
-#defines += USE_MAVLINK=1 USE_TELEMETRY=1
+
+lflags := Tools/JSBSim
+libs := JSBSim

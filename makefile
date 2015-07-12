@@ -23,13 +23,13 @@
 #::= simply expanded variables (posix standard)
 # ?= conditional variable assignment operator, only has an effect if the variable is not yet defined
 #
-# DEFINE 'V' ENVIRONMENT VARIABLE IN ORDERR TO BE VERBOSE: (set V=1, set V= to unset (Windows)) 
+# DEFINE 'V' ENVIRONMENT VARIABLE IN ORDER TO BE VERBOSE: (set V=1, set V= to unset (Windows)) 
 Q := $(if $(V),,@)
 
 # Establish some sensible defaults for build system critical variables (if not already defined)
 TARGET_NAME ?= MatrixPilot
 #SOURCE_DIR ?= ..
-DEVICE ?= SILSIM
+DEVICE ?= SIL
 
 #$(if $(filter $(MAKE_VERSION),3.80 3.81 3.90 3.92),,\
 #  $(error This makefile requires one of GNU make version ….))
@@ -42,7 +42,7 @@ DEVICE ?= SILSIM
 
 # Fetch the makefile directory with a trailing /
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-#$(warning ROOT_DIR $(ROOT_DIR))
+$(warning ROOT_DIR $(ROOT_DIR))
 
 #################################################################
 # Do not build targets if make invoked from source tree root
@@ -103,7 +103,7 @@ define source-path-rel-dir
 endef
 $(foreach l,$(subst /, ,$(subst $(ROOT_DIR),,$(CURDIR))),$(eval $(call source-path-rel-dir,$l)))
 SOURCE_DIR ?= $(subst $(space),/,$(TMP_SRC_DIR))
-#$(warning SOURCE_DIR: $(SOURCE_DIR))
+$(warning SOURCE_DIR: $(SOURCE_DIR))
 MKFILES_DIR = $(SOURCE_DIR)/Tools/makefiles
 
 ################################################################################
@@ -136,9 +136,22 @@ INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
 ################################################################################
 # Determine the full target names and include the toolchain specific makefile
 
+ifeq ($(TARGET_TYPE),a) 
+TARGET_LNAME := lib$(TARGET_NAME)
+else
+TARGET_LNAME := $(TARGET_NAME)
+endif
+
 TARGET_NAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
 TARGET_MAP := $(TARGET_NAME).map
-TARGET := $(TARGET_NAME).$(TARGET_TYPE)
+TARGET := $(TARGET_LNAME).$(TARGET_TYPE)
+
+LIBS += $(addprefix -l,$(libs))
+LFLAGS += $(addprefix -L$(SOURCE_DIR)/,$(lflags))
+#$(warning libs: $(libs))
+#$(warning LIBS: $(LIBS))
+#$(warning lflags: $(lflags))
+#$(warning LFLAGS: $(LFLAGS))
 
 include $(MKFILES_DIR)/toolchain-$(TOOLCHAIN).mk
 
@@ -151,7 +164,9 @@ subdirectory = $(patsubst $(SOURCE_DIR)/%/module.mk,%, \
                    $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
 # $(call source-to-object, source-file-list)
-source-to-object = $(subst $(SOURCE_DIR)/,,$(subst .c,.o,$(filter %.c,$1))) \
+source-to-object = $(subst $(SOURCE_DIR)/,,$(subst .cpp,.o,$(filter %.cpp,$1))) \
+                   $(subst $(SOURCE_DIR)/,,$(subst .cxx,.o,$(filter %.cxx,$1))) \
+                   $(subst $(SOURCE_DIR)/,,$(subst .c,.o,$(filter %.c,$1))) \
                    $(subst $(SOURCE_DIR)/,,$(subst .s,.o,$(filter %.s,$1)))
 
 # $(call make-library, library-name, source-file-list)
@@ -182,6 +197,8 @@ endef
 vpath %.c $(SOURCE_DIR)
 vpath %.s $(SOURCE_DIR)
 vpath %.h $(INCPATH)
+vpath %.cpp $(SOURCE_DIR)
+vpath %.cxx $(SOURCE_DIR)
 vpath %.inc $(INCPATH)
 vpath %.dot $(SOURCE_DIR)
 vpath %.sm $(SOURCE_DIR)
@@ -285,6 +302,22 @@ endif
 ################################################################################
 # Dependency and Object generation rules
 
+%.d: %.cxx
+	$(Q) $(CPP) $(TARGET_ARCH) $(CPPFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
+	$(Q) $(MV) $@.tmp $@
+
+%.o: %.cxx
+	$(Q) $(CPP) $(TARGET_ARCH) -c $(CPPFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+
+%.d: %.cpp
+	$(Q) $(CPP) $(TARGET_ARCH) $(CPPFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
+	$(Q) $(MV) $@.tmp $@
+
+%.o: %.cpp
+	$(Q) $(CPP) $(TARGET_ARCH) -c $(CPPFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+
 %.d: %.c
 	$(Q) $(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
 	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
@@ -313,8 +346,11 @@ endif
 ################################################################################
 # Windows and *nix target rules
 
+%.a: $(objects) $(libraries)
+	$(Q) $(AR) $(ARFLAGS) $@ $(objects) $(libraries)
+
 %.exe: $(objects) $(libraries)
-	$(CC) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
+	$(CPP) -o $@ $(objects) $(libraries) $(LFLAGS) $(LIBS)
 
 %.out: %.exe
 	mv $< $@

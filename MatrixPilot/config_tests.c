@@ -147,7 +147,7 @@
 
 // Check HILSIM Settings
 #if (HILSIM == 1 && GPS_TYPE != GPS_UBX_4HZ)
-	#error("When using HILSIM, GPS_TYPE must be set to GPS_UBX_4HZ.")
+//	#error("When using HILSIM, GPS_TYPE must be set to GPS_UBX_4HZ.")
 #endif
 
 
