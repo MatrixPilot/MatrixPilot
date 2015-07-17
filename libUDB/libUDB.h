@@ -222,11 +222,6 @@ extern UDB_SKIP_FLAGS udb_skip_flags;
 #endif // (USE_NV_MEMORY == 1)
 
 ////////////////////////////////////////////////////////////////////////////////
-// Raw Accelerometer and Gyroscope(rate) Values
-//extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
-//extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
-//extern struct ADchannel udb_vref;                          // reference voltage
-//extern struct ADchannel udb_analogInputs[];
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;        // battery_current._.W1 is in tenths of Amps
