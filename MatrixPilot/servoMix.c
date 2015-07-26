@@ -20,6 +20,7 @@
 
 
 #include "defines.h"
+#include "servoMix.h"
 #include "servoPrepare.h"
 
 // Perform control based on the airframe type.
@@ -225,7 +226,7 @@ void servoMix(void)
 			temp = pwManual[THROTTLE_INPUT_CHANNEL] + REVERSE_IF_NEEDED(THROTTLE_CHANNEL_REVERSED, throttle_control);
 			udb_pwOut[THROTTLE_OUTPUT_CHANNEL] = udb_servo_pulsesat(temp);
 		}
-#endif
+#endif // AIRFRAME_HELI
 
 		udb_pwOut[PASSTHROUGH_A_OUTPUT_CHANNEL] = udb_servo_pulsesat(pwManual[PASSTHROUGH_A_INPUT_CHANNEL]);
 		udb_pwOut[PASSTHROUGH_B_OUTPUT_CHANNEL] = udb_servo_pulsesat(pwManual[PASSTHROUGH_B_INPUT_CHANNEL]);
