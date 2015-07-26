@@ -256,7 +256,7 @@ void helicalTurnCntrl(void)
 			// unmix the Vtail
 			int16_t rudderInput  = REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, (udb_pwIn[ RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]));
 			int16_t elevatorInput = REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, (udb_pwIn[ ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]));
-			steeringInput = (-rudderInput + elevatorInput) >> 1;
+			steeringInput = (-rudderInput + elevatorInput);
 		}
 		else
 		{
@@ -269,7 +269,7 @@ void helicalTurnCntrl(void)
 		// unmix the elevons
 		int16_t aileronInput  = REVERSE_IF_NEEDED(AILERON_CHANNEL_REVERSED, (udb_pwIn[AILERON_INPUT_CHANNEL] - udb_pwTrim[AILERON_INPUT_CHANNEL]));
 		int16_t elevatorInput = REVERSE_IF_NEEDED(ELEVATOR_CHANNEL_REVERSED, (udb_pwIn[ELEVATOR_INPUT_CHANNEL] - udb_pwTrim[ELEVATOR_INPUT_CHANNEL]));
-		steeringInput = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, ((elevatorInput - aileronInput) >> 1));
+		steeringInput = REVERSE_IF_NEEDED(ELEVON_VTAIL_SURFACES_REVERSED, ((elevatorInput - aileronInput)));
 #endif // AIRFRAME_DELTA
 	}
 
