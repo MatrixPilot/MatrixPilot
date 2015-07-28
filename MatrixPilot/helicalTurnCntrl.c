@@ -180,7 +180,8 @@ int16_t relativeWingLoading( int16_t wingLoad ,  uint16_t airSpeed )
 	}	
 	return result ;
 }
-
+
+
 // helicalTurnCntrl determines the values of the elements of the bottom row of rmat
 // as well as the required rotation rates in the body frame that are required to make a coordinated turn.
 // The required values for the bottom row of rmat are placed in the vector desiredTilt.

@@ -77,15 +77,15 @@
 // Roll, Pitch, and Yaw Stabilization
 // Set any of these to 0 to disable the stabilization in that axis.
 #define ROLL_STABILIZATION_AILERONS         1
-#define ROLL_STABILIZATION_RUDDER           0
+#define ROLL_STABILIZATION_RUDDER           1
 #define PITCH_STABILIZATION                 1
 #define YAW_STABILIZATION_RUDDER            1
-#define YAW_STABILIZATION_AILERON           0
+#define YAW_STABILIZATION_AILERON           1
 
 // Aileron and Rudder Navigation
-// Set either of these to 1 to enable helical turn control for navigation.
+// Set either of these to 0 to disable use of that control surface for navigation.
 #define AILERON_NAVIGATION                  1
-#define RUDDER_NAVIGATION                   1
+#define RUDDER_NAVIGATION                   0
 
 // Cross track margin, in meters
 // This is used when the cross track option is attached to a waypoint
@@ -114,15 +114,15 @@
 // altitude is determined by the position of the throttle stick on the transmitter.
 // NOTE: even when set to AH_NONE, MatrixPilot will still try to stabilize pitch as long
 // as PITCH_STABILIZATION is set to 1 above, but will not aim for any specific altitude.
-#define ALTITUDEHOLD_STABILIZED             AH_FULL
-#define ALTITUDEHOLD_WAYPOINT               AH_FULL
+#define ALTITUDEHOLD_STABILIZED             AH_PITCH_ONLY
+#define ALTITUDEHOLD_WAYPOINT               AH_PITCH_ONLY
 
 // Speed Control
 // If you define SPEED_CONTROL to be 1, MatrixPilot will take air speed into account
 // in the altitude controls, and will trim the throttle and pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL                       0
-#define DESIRED_SPEED                       10.0    // meters/second
+#define DESIRED_SPEED                       10.00  // meters/second
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -257,8 +257,8 @@
 // Servo Reversing Configuration
 // For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-#define AILERON_CHANNEL_REVERSED            0
-#define ELEVATOR_CHANNEL_REVERSED           0
+#define AILERON_CHANNEL_REVERSED            1
+#define ELEVATOR_CHANNEL_REVERSED           1
 #define RUDDER_CHANNEL_REVERSED             0
 #define AILERON_SECONDARY_CHANNEL_REVERSED  0
 #define THROTTLE_CHANNEL_REVERSED           0
@@ -343,7 +343,7 @@
 // SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
-#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
@@ -682,7 +682,23 @@
 #define HILSIM_USB                          0           // AUAV3 only (under development)
 #define HILSIM_BAUD                         38400
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Software In the Loop Simulation
+// Only set this to 1 when building for simulation directly on your computer instead of
+// running on a UDB.
+// See the MatrixPilot wiki for more info on using SILSIM.
+// Below are settings to configure the simulated UDB UARTs.
+// The SERIAL_RC_INPUT settings allow optionally talking over a serial port to a UDB
+// passing RC inputs through to the simulated UDB.
+//#define SILSIM                              0
+#define SILSIM_GPS_RUN_AS_SERVER            0
+#define SILSIM_GPS_PORT                     14551       // default port to connect to XPlane HILSIM plugin
+#define SILSIM_GPS_HOST                     "127.0.0.1"
+#define SILSIM_TELEMETRY_RUN_AS_SERVER      0
+#define SILSIM_TELEMETRY_PORT               14550       // default port to connect to QGroundControl
+#define SILSIM_TELEMETRY_HOST               "127.0.0.1"
+#define SILSIM_SERIAL_RC_INPUT_DEVICE       ""          // i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
+#define SILSIM_SERIAL_RC_INPUT_BAUD         38400
 ////////////////////////////////////////////////////////////////////////////////
 // Flight Plan handling
 //

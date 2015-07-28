@@ -48,6 +48,10 @@ static jmp_buf buf;
 #if (SILSIM == 1)
 int mp_argc;
 char **mp_argv;
+int16_t angleOfAttack;
+int16_t tiltError[3];
+int16_t rotationRateError[3];
+int16_t desiredRotationRateRadians[3];
 int main(int argc, char** argv)
 {
 	// keep these values available for later
