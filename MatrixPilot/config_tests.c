@@ -233,3 +233,13 @@
 #if ((HILSIM_USB == 1) && (BOARD_TYPE != AUAV3_BOARD))
 	#error("HILSIM_USB only supported on AUAV3 board"
 #endif
+
+#ifdef INVERTED_NEUTRAL_PITCH
+#ifdef ANGLE_OF_ATTACK_INVERTED
+#error ( "Both INVERTED_NEUTRAL_PITCH and ANGLE_OF_ATTACK_INVERTED are being used. Use only one or the other."
+#endif // ANGLE_OF_ATTACK_INVERTED
+#endif // INVERTED_NEUTRAL_PITCH
+
+#if ( AIRFRAME_TYPE == AIRFRAME_HELI )
+	#error("Helical controls does not support AIRFRAME_HELI."
+#endif // AIRFRAME_HELI

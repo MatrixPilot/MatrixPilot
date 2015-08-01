@@ -40,7 +40,6 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"PID_YAWKDAIL", {0.0}, {0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkdail, sizeof(yawkdail) },
 	{"PID_PITCHGAIN", {0.0}, {0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&pitchgain, sizeof(pitchgain) },
 	{"PID_PITCHKD", {0.0}, {0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&pitchkd, sizeof(pitchkd) },
-	{"PID_RUDELEVGAIN", {0.0}, {0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rudderElevMixGain, sizeof(rudderElevMixGain) },
 	{"PID_ROLLKPRUD", {0.0}, {0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rollkprud, sizeof(rollkprud) },
 	{"PID_YAWKPRUD", {0.0}, {0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&yawkprud, sizeof(yawkprud) },
 	{"PID_YAWKDRUD", {0.0}, {0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkdrud, sizeof(yawkdrud) },
@@ -58,51 +57,21 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"MAG_OFFSET2", {-32767}, {32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_magOffset[2], sizeof(udb_magOffset[2]) },
 	{"MAG_DECLINATION", {-180}, {180}, UDB_TYPE_INT_CIRCULAR, PARAMETER_READWRITE, (void*)&dcm_declination_angle.BB, sizeof(dcm_declination_angle.BB) },
 
-	{"PWTRIM_AILERON", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[AILERON_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[AILERON_INPUT_CHANNEL]) },
-	{"PWTRIM_ELEVATOR", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[ELEVATOR_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) },
-	{"PWTRIM_RUDDER", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[RUDDER_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[RUDDER_INPUT_CHANNEL]) },
-	{"PWTRIM_AILERON2", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[AILERON_SECONDARY_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[AILERON_SECONDARY_INPUT_CHANNEL]) },
-	{"PWTRIM_ROLL", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[ROLL_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[ROLL_INPUT_CHANNEL]) },
-	{"PWTRIM_PITCH", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[PITCH_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[PITCH_INPUT_CHANNEL]) },
-	{"PWTRIM_THROTTLE", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[THROTTLE_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[THROTTLE_INPUT_CHANNEL]) },
-	{"PWTRIM_YAW", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[YAW_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[YAW_INPUT_CHANNEL]) },
-	{"PWTRIM_FLAP", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[FLAP_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[FLAP_INPUT_CHANNEL]) },
-	{"PWTRIM_AIRBRAKE", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[BRAKE_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[BRAKE_INPUT_CHANNEL]) },
-	{"PWTRIM_SPOILER", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[SPOILER_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[SPOILER_INPUT_CHANNEL]) },
-	{"PWTRIM_CAMBER", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[CAMBER_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[CAMBER_INPUT_CHANNEL]) },
-	{"PWTRIM_CROW", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[CROW_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[CROW_INPUT_CHANNEL]) },
-	{"PWTRIM_CAMPITCH", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL]) },
-	{"PWTRIM_CAM_YAW", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&
-          udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL], sizeof(
-          udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL]) },
+	{"PWTRIM_AILERON", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[AILERON_INPUT_CHANNEL], sizeof(udb_pwTrim[AILERON_INPUT_CHANNEL]) },
+	{"PWTRIM_ELEVATOR", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[ELEVATOR_INPUT_CHANNEL], sizeof(udb_pwTrim[ELEVATOR_INPUT_CHANNEL]) },
+	{"PWTRIM_RUDDER", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[RUDDER_INPUT_CHANNEL], sizeof(udb_pwTrim[RUDDER_INPUT_CHANNEL]) },
+	{"PWTRIM_AILERON2", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[AILERON_SECONDARY_INPUT_CHANNEL], sizeof(udb_pwTrim[AILERON_SECONDARY_INPUT_CHANNEL]) },
+	{"PWTRIM_ROLL", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[ROLL_INPUT_CHANNEL], sizeof(udb_pwTrim[ROLL_INPUT_CHANNEL]) },
+	{"PWTRIM_PITCH", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[PITCH_INPUT_CHANNEL], sizeof(udb_pwTrim[PITCH_INPUT_CHANNEL]) },
+	{"PWTRIM_THROTTLE", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[THROTTLE_INPUT_CHANNEL], sizeof(udb_pwTrim[THROTTLE_INPUT_CHANNEL]) },
+	{"PWTRIM_YAW", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[YAW_INPUT_CHANNEL], sizeof(udb_pwTrim[YAW_INPUT_CHANNEL]) },
+	{"PWTRIM_FLAP", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[FLAP_INPUT_CHANNEL], sizeof(udb_pwTrim[FLAP_INPUT_CHANNEL]) },
+	{"PWTRIM_AIRBRAKE", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[BRAKE_INPUT_CHANNEL], sizeof(udb_pwTrim[BRAKE_INPUT_CHANNEL]) },
+	{"PWTRIM_SPOILER", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[SPOILER_INPUT_CHANNEL], sizeof(udb_pwTrim[SPOILER_INPUT_CHANNEL]) },
+	{"PWTRIM_CAMBER", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CAMBER_INPUT_CHANNEL], sizeof(udb_pwTrim[CAMBER_INPUT_CHANNEL]) },
+	{"PWTRIM_CROW", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CROW_INPUT_CHANNEL], sizeof(udb_pwTrim[CROW_INPUT_CHANNEL]) },
+	{"PWTRIM_CAMPITCH", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL], sizeof(udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL]) },
+	{"PWTRIM_CAM_YAW", {800.0}, {2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL], sizeof(udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL]) },
 
 	{"IMU_XACCEL_OFF", {-32767}, {32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_xaccel.offset, sizeof(udb_xaccel.offset) },
 	{"IMU_YACCEL_OFF", {-32767}, {32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_yaccel.offset, sizeof(udb_yaccel.offset) },
@@ -122,21 +91,25 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"TH_P_HIGH", {0}, {89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_high, sizeof(alt_hold_pitch_high) },
 	{"TH_P_RTL_DOWN", {0}, {89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&rtl_pitch_down, sizeof(rtl_pitch_down) },
 
-	{"ASPD_DESIRED", {0}, {300.0}, 
-          UDB_TYPE_M_AIRSPEED_TO_DM, PARAMETER_READWRITE, (void*)&desiredSpeed, sizeof(desiredSpeed) },
-	{"ASPD_MIN_GSPD", {0}, {20000}, 
-          UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&minimum_groundspeed, sizeof(minimum_groundspeed) },
-	{"ASPD_MIN", {0}, {300.0}, 
-          UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&minimum_airspeed, sizeof(minimum_airspeed) },
-	{"ASPD_MAX", {0}, {300.0}, 
-          UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&maximum_airspeed, sizeof(maximum_airspeed) },
-	{"ASPD_CRUISE", {0}, {300.0}, 
-          UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&cruise_airspeed, sizeof(cruise_airspeed) },
+	{"ASPD_DESIRED", {0}, {300.0}, UDB_TYPE_M_AIRSPEED_TO_DM, PARAMETER_READWRITE, (void*)&desiredSpeed, sizeof(desiredSpeed) },
+	{"ASPD_MIN_GSPD", {0}, {20000}, UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&minimum_groundspeed, sizeof(minimum_groundspeed) },
+	{"ASPD_MIN", {0}, {300.0}, UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&minimum_airspeed, sizeof(minimum_airspeed) },
+	{"ASPD_MAX", {0}, {300.0}, UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&maximum_airspeed, sizeof(maximum_airspeed) },
+	{"ASPD_CRUISE", {0}, {300.0}, UDB_TYPE_M_AIRSPEED_TO_CM, PARAMETER_READWRITE, (void*)&cruise_airspeed, sizeof(cruise_airspeed) },
 	{"ASPD_P_MIN_ASPD", {-90}, {90.0}, UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*)&airspeed_pitch_min_aspd, sizeof(airspeed_pitch_min_aspd) },
 	{"ASPD_P_MAX_ASPD", {-90}, {90.0}, UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*)&airspeed_pitch_max_aspd, sizeof(airspeed_pitch_max_aspd) },
 	{"ASPD_P_RATE_LIM", {1.0}, {720.0}, UDB_TYPE_FRAME_ANGLERATE, PARAMETER_READWRITE, (void*)&airspeed_pitch_adjust_rate, sizeof(airspeed_pitch_adjust_rate) },
 	{"ASPD_P_KI", {0.0}, {1.0}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&airspeed_pitch_ki, sizeof(airspeed_pitch_ki) },
 	{"ASPD_P_KI_LIMIT", {0.0}, {45.0}, UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*)&airspeed_pitch_ki_limit, sizeof(airspeed_pitch_ki_limit) },
+
+	{"TURN_ELE_TR_NRM", {-1.0}, {1.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.ElevatorTrimNormal, sizeof(turns.ElevatorTrimNormal) },
+	{"TURN_ELE_TR_INV", {-1.0}, {1.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.ElevatorTrimInverted, sizeof(turns.ElevatorTrimInverted) },
+	{"TURN_CRUISE_SPD", {0.0}, {999.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.CruiseSpeed, sizeof(turns.CruiseSpeed) },
+	{"TURN_AOA_NORMAL", {-90.0}, {90.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.AngleOfAttackNormal, sizeof(turns.AngleOfAttackNormal) },
+	{"TURN_AOA_INV", {-90.0}, {90.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.AngleOfAttackInverted, sizeof(turns.AngleOfAttackInverted) },
+	{"TURN_FEED_FWD", {0.0}, {100.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.FeedForward, sizeof(turns.FeedForward) },
+	{"TURN_RATE_NAV", {0.0}, {100.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.TurnRateNav, sizeof(turns.TurnRateNav) },
+	{"TURN_RATE_FBW", {0.0}, {100.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.TurnRateFBW, sizeof(turns.TurnRateFBW) },
 
 };
 

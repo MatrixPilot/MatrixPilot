@@ -29,8 +29,6 @@
 
 #ifdef USE_RING_BUFFER
 
-void udb_serial_start_sending_data(void);
-
 #include <xc.h>
 #include <stdint.h>
 #include <string.h>

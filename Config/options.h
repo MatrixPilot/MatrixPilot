@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2014 MatrixPilot Team
+// Copyright 2009-2015 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -77,10 +77,10 @@
 #define ROLL_STABILIZATION_RUDDER           0
 #define PITCH_STABILIZATION                 1
 #define YAW_STABILIZATION_RUDDER            1
-#define YAW_STABILIZATION_AILERON           1
+#define YAW_STABILIZATION_AILERON           0
 
 // Aileron and Rudder Navigation
-// Set either of these to 0 to disable use of that control surface for navigation.
+// Set either of these to 1 to enable helical turn control for navigation.
 #define AILERON_NAVIGATION                  1
 #define RUDDER_NAVIGATION                   1
 
@@ -351,13 +351,6 @@
 //#define SERIAL_BAUDRATE                     19200
 
 
-////////////////////////////////////////////////////////////////////////////////
-
-// MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
-// Each aircraft in the sky will need a unique I.D. in the range from 0-255
-//#define MAVLINK_SYSID                       1 // now defined in mavlink_options.h
-
-
 // NUM_ANALOG_INPUTS:
 // For UDB4 boards: Set to 0-4.  Analog pins are AN15 - AN18.
 //#define NUM_ANALOG_INPUTS                   0 // moved to board specific config files
@@ -381,7 +374,7 @@
 // UDB, in order to see the RC signal strength on your OSD.  Just plug RSSI and ground
 // from your Receiver to Input2's signal and ground on your UDB.  If you use this feature,
 // you'll also need to set up the RSSI_MIN_SIGNAL_VOLTAGE and RSSI_MAX_SIGNAL_VOLTAGE
-// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to 
+// to match your Receiver's RSSI format.  Note that some receivers use a higher voltage to
 // represent a lower signal strength, so you may need to set MIN higher than MAX.
 
 #define ANALOG_CURRENT_INPUT_CHANNEL        CHANNEL_UNUSED
@@ -404,7 +397,7 @@
 // Designed for use with the following device:-
 // http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
 // Can be used on INPUT 8 of the UDB4/5 if that is not used for a channel input.
-// Will return distance to ground in meters and compensate for roll subject to 
+// Will return distance to ground in meters and compensate for roll subject to
 // receiving a returned sonar signal.
 // This option is designed to be used with Logo Flight Planning.
 // Logo allows the user to Interrupt a Landing and flare, or Go Around,
@@ -454,8 +447,9 @@
 // All gains should be positive real numbers.
 // Proportional gains should be less than 4.0.
 // Rate gains should be less than 0.8.
-// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN,
-// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
+// With the new helical turn control, rate gains are not even needed, try setting them all to zero.
+// Proportional gains include ROLLKP, YAWKP_AILERON, PITCHGAIN,
+// ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
 // MANUAL_AILERON_RUDDER_MIX, RUDDER_BOOST, HOVER_ROLLKP, HOVER_PITCHGAIN, HOVER_YAWKP
 // Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER,
 // HOVER_ROLLKD, HOVER_PITCHKD, HOVER_YAWKD
@@ -464,50 +458,78 @@
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT                            1.0
 
+// FEED_FORWARD is a feed forward gain for deflecting control surfaces for turn rate.
+// The KP gains for each axis are multiplied by FEED_FORWARD to determine
+// the feed forward gain for that axis.
+// For each axis, a deflection term is added equal to the feed forward gain for that axis
+// times projection of the desired earth vertical rotation rate onto that axis
+#define FEED_FORWARD                        1.0
+
+// TURN_RATE_NAV and TURN_RATE_FBW set the gains of the helical turn control for
+// waypoint navigation mode and fly by wire mode respectively.
+// They are specified in terms of the maximum desired turning rate in degrees per second in each mode.
+// The largest possible value is 240 degrees per second, anything larger will be clipped to 240.
+#define TURN_RATE_NAV                       30.0
+#define TURN_RATE_FBW                       60.0
+
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
 // ROLLKD is the derivative (gyro) gain, approximately 0.125
-// YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
-// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
-// AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
+// YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error.
+// use it only if there is no rudder.
+// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation.
+// use it only if there is no rudder.
 #define ROLLKP                              0.20
 #define ROLLKD                              0.05
-#define YAWKP_AILERON                       0.10
-#define YAWKD_AILERON                       0.05
-#define AILERON_BOOST                       1.00
+#define YAWKP_AILERON                       0.00
+#define YAWKD_AILERON                       0.00
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
 // PITCHKD feedback gain for pitch damping, around 0.0625
-// RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
-// AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-#define PITCHGAIN                           0.10
-#define PITCHKD                             0.04
-#define RUDDER_ELEV_MIX                     0.20
-#define ROLL_ELEV_MIX                       0.05
+#define PITCHGAIN                           0.30
+#define PITCHKD                             0.00
 #define ELEVATOR_BOOST                      0.50
 
-// Neutral pitch angle of the plane (in degrees) when flying inverted
-// Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-#define INVERTED_NEUTRAL_PITCH              8.0
+// Parameters below are used in the computation of angle of attack and pitch trim.
+// ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.) -- Note (RobD) yes it is?
+// If these parameters are not defined, angle of attack and pitch trim will be set to zero.
+// CRUISE_SPEED                         The nominal speed in meters per second at which the parameters are defined.
+// ANGLE_OF_ATTACK_NORMAL               Angle of attack in degrees in the body frame for normal straight and level flight at cruise speed.
+// ANGLE_OF_ATTACK_INVERTED             Angle of attack in degrees in the body frame for inverted straight and level flight at cruise speed.
+// Note: ANGLE_OF_ATTACK_INVERTED is usually negative, with typical values in the -5 to -10 degree range.
+// ELEVATOR_TRIM_NORMAL                 Elevator trim in fractional servo units (-1.0 to 1.0 ) for normal straight and level flight at cruise speed.
+// ELEVATOR_TRIM_INVERTED               Elevator trim in fractional servo units (-1.0 to 1.0 ) for inverted straight and level flight at cruise speed.
+// Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
+
+// The following are the values for HILSIM EasyStar2:
+#define CRUISE_SPEED                      ( 12.0 )
+#define ANGLE_OF_ATTACK_NORMAL            ( -0.8 )
+#define ANGLE_OF_ATTACK_INVERTED          ( -7.2 )
+#define ELEVATOR_TRIM_NORMAL              ( -0.03 )
+#define ELEVATOR_TRIM_INVERTED            ( -0.67 )
 
 // Rudder/Yaw Control Gains
-// YAWKP_RUDDER is the proportional feedback gain for rudder navigation
-// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
-// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle
-// ROLLKD_RUDDER is the feedback gain for the rudder in response to the rate of change roll angle
+// YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.
+// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation.
+// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle,
+// use it only if there are no ailerons.
+// ROLLKD_RUDDER is the feedback gain for the rudder in response to the rate of change roll angle,
+// use it only if there are no ailerons.
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
+// MANUAL_AILERON_RUDDER_MIX is no longer needed with the new controls, it should be set to zero.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-#define YAWKP_RUDDER                        0.05
-#define YAWKD_RUDDER                        0.05
-#define ROLLKP_RUDDER                       0.06
-#define ROLLKD_RUDDER                       0.05
+#define YAWKP_RUDDER                        0.30
+#define YAWKD_RUDDER                        0.00
+#define ROLLKP_RUDDER                       0.00
+#define ROLLKD_RUDDER                       0.00
 #define MANUAL_AILERON_RUDDER_MIX           0.00
-#define RUDDER_BOOST                        1.00
+#define RUDDER_BOOST                        0.50
 
 // Gains for Hovering
+// These are still here from the previous version of the controls, because the new controls have not yet been set up for hovering.
 // Gains are named based on plane's frame of reference (roll means ailerons)
 // HOVER_ROLLKP is the roll-proportional feedback gain applied to the ailerons while navigating a hover
 // HOVER_ROLLKD is the roll gyro feedback gain applied to ailerons while stabilizing a hover
@@ -560,7 +582,7 @@
 
 // Setup and configuration of camera targetting at installation of camera servos:-
 // To save cpu cycles, you will need to pre-compute the tangent of the desired pitch of the camera
-// when in stabilized mode. This should be expressed in 2:14 format. 
+// when in stabilized mode. This should be expressed in 2:14 format.
 // Example: You require the camera to be pitched down by 15 degrees from the horizon in stabilized mode.
 // Paste the following line into a google search box (without the //)
 // tan((( 15 /180 )* 3.1416 ))* 16384
@@ -571,17 +593,17 @@
 #define CAM_YAW_IN_STABILIZED_MODE          0       // in degrees relative to the plane's yaw axis.    Example: 0
 
 // All number should be integers
-#define CAM_PITCH_SERVO_THROW               95      // Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.          
-#define CAM_PITCH_SERVO_MAX                 85      // Max pitch up that plane can tilt and keep camera level, in degrees.  
-#define CAM_PITCH_SERVO_MIN                -22      // Max pitch down that plane can tilt and keep camera level, in degrees. 
-#define CAM_PITCH_OFFSET_CENTRED            38      // Offset in degrees of servo that results in a level camera.           
+#define CAM_PITCH_SERVO_THROW               95      // Camera lens rotation at maximum PWM change (2000 to 4000), in degrees.
+#define CAM_PITCH_SERVO_MAX                 85      // Max pitch up that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_SERVO_MIN                -22      // Max pitch down that plane can tilt and keep camera level, in degrees.
+#define CAM_PITCH_OFFSET_CENTRED            38      // Offset in degrees of servo that results in a level camera.
                                                     // Example: 30 would mean that a centered pitch servo points the camera
                                                     // 30 degrees down from horizontal when looking to the front of the plane.
 
-#define CAM_YAW_SERVO_THROW                 350     // Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees. 
-#define CAM_YAW_SERVO_MAX                   130     // Max positive yaw of camera relative to front of plane in Degrees.              
-#define CAM_YAW_SERVO_MIN                  -130     // Min reverse  yaw of camera relative to front of plane in Degrees.   
-#define CAM_YAW_OFFSET_CENTRED              11      // Yaw offset in degrees that results in camera pointing forward. 
+#define CAM_YAW_SERVO_THROW                 350     // Camera yaw movement for maximum yaw PWM change (2000 to 4000) in Degrees.
+#define CAM_YAW_SERVO_MAX                   130     // Max positive yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_SERVO_MIN                  -130     // Min reverse  yaw of camera relative to front of plane in Degrees.
+#define CAM_YAW_OFFSET_CENTRED              11      // Yaw offset in degrees that results in camera pointing forward.
 
 // Camera test mode will move the yaw from + 90 degrees to + 90 degrees every 5 seconds. (180 degree turn around)
 // That will show whether the CAM_PITCH_SERVO_THROW value is set correctly for your servo.
@@ -700,11 +722,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Optionally enable the new power saving idle mode of the MCU during mainloop
-//#define USE_MCU_IDLE                        1 // moved to interrupt.h
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Optionally enable experimental extended range navigation support (merged from ballon launch branch)
 //#define USE_EXTENDED_NAV
 
@@ -718,24 +735,27 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
+#ifndef RECORD_FREE_STACK_SPACE
 #define RECORD_FREE_STACK_SPACE             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // The UDB4/5 has two UART's, while the AUAV3 has four UART's.
-// Three MatrixPilot features are currently defined for using a UART. 
+// Three MatrixPilot features are currently defined for using a UART.
 // These being the GPS, Telemetry and a 'debug' console.
 // Therefore UDB4/5 is one UART short, the AUAV3 has one UART extra.
 //
 // CONSOLE_UART specfies which UART is used for stdio support, aka the console.
 // Set CONSOLE_UART to 1, 2, 3 or 4 to enable the console on UART of that number.
 // Setting CONSOLE_UART to 0 disables console support.
-// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides 
+// On the UDB4/5, optionally specifying console support on UART 1 or 2 overrides
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
 // Set to 9 in order to use the USB for the console connection
 #define CONSOLE_UART                        0
+//#define CONSOLE_UART                        6
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 //#define USE_DEBUG_IO
@@ -766,7 +786,7 @@
 // On the AUAV3, the external UART connections are known as ports 1 through 4.
 // The definitions below specifies which feature maps to an external port.
 //
-// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the 
+// NOTE: on the AUAV3, do not confuse the CONSOLE_UART definition with the
 // external port assignment.
 // Assign the console to an internal UART with CONSOLE_UART, map this console to
 // external port connection with DBG_PORT.
@@ -776,10 +796,10 @@
 
 // Set this to 1 to enable filesystem support
 #ifndef USE_FILESYS
-#define USE_FILESYS                         1
+#define USE_FILESYS                         0
 #endif
 
-// Set this to 1 to enable logging telemetry to filesystem
+// Set this to 1 to enable logging telemetry to builtin filesystem
 #ifndef USE_TELELOG
 #define USE_TELELOG                         0
 #endif

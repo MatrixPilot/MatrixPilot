@@ -36,6 +36,9 @@
 // specifics of the MatrixPilot application.
 
 
+void SetAofA(int16_t AofA);
+int16_t GetAofA(void);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 void dcm_init(void);

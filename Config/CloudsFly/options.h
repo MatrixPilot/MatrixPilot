@@ -83,7 +83,7 @@
 #define YAW_STABILIZATION_AILERON           1
 
 // Aileron and Rudder Navigation
-// Set either of these to 0 to disable use of that control surface for navigation.
+// Set either of these to 1 to enable helical turn control for navigation.
 #define AILERON_NAVIGATION                  1
 #define RUDDER_NAVIGATION                   1
 
@@ -456,8 +456,9 @@
 // All gains should be positive real numbers.
 // Proportional gains should be less than 4.0.
 // Rate gains should be less than 0.8.
-// Proportional gains include ROLLKP, YAWKP_AILERON, AILERON_BOOST, PITCHGAIN,
-// RUDDER_ELEV_MIX, ROLL_ELEV_MIX, ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
+// With the new helical turn control, rate gains are not even needed, try setting them all to zero.
+// Proportional gains include ROLLKP, YAWKP_AILERON, PITCHGAIN,
+// ELEVATOR_BOOST, YAWKP_RUDDER, ROLLKP_RUDDER,
 // MANUAL_AILERON_RUDDER_MIX, RUDDER_BOOST, HOVER_ROLLKP, HOVER_PITCHGAIN, HOVER_YAWKP
 // Rate gains include ROLLKD, YAWKD_AILERON, PITCHKD, YAWKD_RUDDER, ROLLKD_RUDDER,
 // HOVER_ROLLKD, HOVER_PITCHKD, HOVER_YAWKD
@@ -466,52 +467,78 @@
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT                            1.0
 
+// FEED_FORWARD is a feed forward gain for deflecting control surfaces for turn rate.
+// The KP gains for each axis are multiplied by FEED_FORWARD to determine
+// the feed forward gain for that axis.
+// For each axis, a deflection term is added equal to the feed forward gain for that axis
+// times projection of the desired earth vertical rotation rate onto that axis
+#define FEED_FORWARD                        1.0
+
+// TURN_RATE_NAV and TURN_RATE_FBW set the gains of the helical turn control for
+// waypoint navigation mode and fly by wire mode respectively.
+// They are specified in terms of the maximum desired turning rate in degrees per second in each mode.
+// The largest possible value is 240 degrees per second, anything larger will be clipped to 240.
+#define TURN_RATE_NAV                       30.0
+#define TURN_RATE_FBW                       60.0
+
 // Aileron/Roll Control Gains
 // ROLLKP is the proportional gain, approximately 0.25
 // ROLLKD is the derivative (gyro) gain, approximately 0.125
-// YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error
-// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation
-// AILERON_BOOST is the additional gain multiplier for the manually commanded aileron deflection
+// YAWKP_AILERON is the proportional feedback gain for ailerons in response to yaw error.
+// use it only if there is no rudder.
+// YAWKD_AILERON is the derivative feedback gain for ailerons in response to yaw rotation.
+// use it only if there is no rudder.
 #define ROLLKP                              0.20
 #define ROLLKD                              0.05
-#define YAWKP_AILERON                       0.10
-#define YAWKD_AILERON                       0.05
-#define AILERON_BOOST                       1.00
+#define YAWKP_AILERON                       0.00
+#define YAWKD_AILERON                       0.00
 
 // Elevator/Pitch Control Gains
 // PITCHGAIN is the pitch stabilization gain, typically around 0.125
 // PITCHKD feedback gain for pitch damping, around 0.0625
-// RUDDER_ELEV_MIX is the degree of elevator adjustment for rudder and banking
-// AILERON_ELEV_MIX is the degree of elevator adjustment for aileron
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
-//#define PITCHGAIN                           0.10
-#define PITCHGAIN                           3.90
-#define PITCHKD                             0.04
-#define RUDDER_ELEV_MIX                     0.20
-#define ROLL_ELEV_MIX                       0.05
+#define PITCHGAIN                           0.30
+#define PITCHKD                             0.00
 #define ELEVATOR_BOOST                      0.50
 
-// Neutral pitch angle of the plane (in degrees) when flying inverted
-// Use this to add extra "up" elevator while the plane is inverted, to avoid losing altitude.
-#define INVERTED_NEUTRAL_PITCH              8.0
+// Parameters below are used in the computation of angle of attack and pitch trim.
+// ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.)
+// If these parameters are not defined, angle of attack and pitch trim will be set to zero.
+// CRUISE_SPEED                         The nominal speed in meters per second at which the parameters are defined.
+// ANGLE_OF_ATTACK_NORMAL               Angle of attack in degrees in the body frame for normal straight and level flight at cruise speed.
+// ANGLE_OF_ATTACK_INVERTED             Angle of attack in degrees in the body frame for inverted straight and level flight at cruise speed.
+// Note: ANGLE_OF_ATTACK_INVERTED is usually negative, with typical values in the -5 to -10 degree range.
+// ELEVATOR_TRIM_NORMAL                 Elevator trim in fractional servo units (-1.0 to 1.0 ) for normal straight and level flight at cruise speed.
+// ELEVATOR_TRIM_INVERTED               Elevator trim in fractional servo units (-1.0 to 1.0 ) for inverted straight and level flight at cruise speed.
+// Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
+
+// The following are the values for HILSIM EasyStar2:
+#define CRUISE_SPEED                      ( 12.0 )
+#define ANGLE_OF_ATTACK_NORMAL            ( -0.8 )
+#define ANGLE_OF_ATTACK_INVERTED          ( -7.2 )
+#define ELEVATOR_TRIM_NORMAL              ( -0.03 )
+#define ELEVATOR_TRIM_INVERTED            ( -0.67 )
 
 // Rudder/Yaw Control Gains
-// YAWKP_RUDDER is the proportional feedback gain for rudder navigation
-// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation
-// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle
-// ROLLKD_RUDDER is the feedback gain for the rudder in response to the rate of change roll angle
+// YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.
+// YAWKD_RUDDER is the yaw gyro feedback gain for the rudder in reponse to yaw rotation.
+// ROLLKP_RUDDER is the feedback gain for the rudder in response to the current roll angle,
+// use it only if there are no ailerons.
+// ROLLKD_RUDDER is the feedback gain for the rudder in response to the rate of change roll angle,
+// use it only if there are no ailerons.
 // MANUAL_AILERON_RUDDER_MIX is the fraction of manual aileron control to mix into the rudder when
 // in stabilized or waypoint mode.  This mainly helps aileron-initiated turning while in stabilized.
+// MANUAL_AILERON_RUDDER_MIX is no longer needed with the new controls, it should be set to zero.
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
-//#define YAWKP_RUDDER                        0.05
-#define YAWKP_RUDDER                        3.90
-#define YAWKD_RUDDER                        0.05
-#define ROLLKP_RUDDER                       0.06
-#define ROLLKD_RUDDER                       0.05
+#define YAWKP_RUDDER                        0.30
+#define YAWKD_RUDDER                        0.00
+#define ROLLKP_RUDDER                       0.00
+#define ROLLKD_RUDDER                       0.00
 #define MANUAL_AILERON_RUDDER_MIX           0.00
-#define RUDDER_BOOST                        1.00
+#define RUDDER_BOOST                        0.50
 
 // Gains for Hovering
+// These are still here from the previous version of the controls, because the new controls have not yet been set up for hovering.
 // Gains are named based on plane's frame of reference (roll means ailerons)
 // HOVER_ROLLKP is the roll-proportional feedback gain applied to the ailerons while navigating a hover
 // HOVER_ROLLKD is the roll gyro feedback gain applied to ailerons while stabilizing a hover

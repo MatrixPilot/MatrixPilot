@@ -116,9 +116,11 @@ fractional omegaAccum[] = { 0, 0, 0 };
 
 // gravity, as measured in plane coordinate system
 #ifdef INITIALIZE_VERTICAL // VTOL vertical initialization
-fractional gplane[] = { 0, -GRAVITY, 0 };
+static fractional gplane[] = { 0, -GRAVITY, 0 };
+int16_t aero_force[] = { 0 , GRAVITY , 0 };
 #else  // horizontal initialization
-fractional gplane[] = { 0, 0, GRAVITY };
+static fractional gplane[] = { 0, 0, GRAVITY };
+int16_t aero_force[] = { 0 , 0 , -GRAVITY };
 #endif
 
 // horizontal velocity over ground, as measured by GPS (Vz = 0)
@@ -189,7 +191,7 @@ static inline void read_gyros(void)
 static inline void read_accel(void)
 {
 #if (HILSIM == 1)
-	HILSIM_set_gplane();
+	HILSIM_set_gplane(gplane);
 //	gplane[0] = g_a_x_sim.BB;
 //	gplane[1] = g_a_y_sim.BB;
 //	gplane[2] = g_a_z_sim.BB;
@@ -198,6 +200,9 @@ static inline void read_accel(void)
 	gplane[1] = YACCEL_VALUE;
 	gplane[2] = ZACCEL_VALUE;
 #endif
+	aero_force[0] = - gplane[0];
+	aero_force[1] = - gplane[1];
+	aero_force[2] = - gplane[2];
 
 #ifdef CATAPULT_LAUNCH_ENABLE
 	if (gplane[1] < -(GRAVITY/2))
@@ -241,13 +246,13 @@ void udb_callback_read_sensors(void)
 	read_accel();
 }
 
-static int16_t omegaSOG(int16_t omega, uint16_t speed)
+static int16_t omegaSOG(int16_t omega, int16_t speed)
 {
 	// multiplies omega times speed, and scales appropriately
 	// omega in radians per second, speed in cm per second
 	union longww working;
 	speed = speed >> 3;
-	working.WW = __builtin_mulsu(omega, speed);
+	working.WW = __builtin_mulss(omega, speed);
 	if (((int16_t)working._.W1) > ((int16_t)CENTRIFSAT))
 	{
 		return RMAX;
@@ -265,13 +270,100 @@ static int16_t omegaSOG(int16_t omega, uint16_t speed)
 	}
 }
 
-static void adj_accel(void)
+#if (CENTRIFUGAL_WITHOUT_GPS == 1)
+static void adj_accel(int16_t angleOfAttack)
 {
-	// total (3D) airspeed in cm/sec is used to adjust for acceleration
-	gplane[0] = gplane[0] - omegaSOG(omegaAccum[2], air_speed_3DGPS);
-	gplane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
-	gplane[1] = gplane[1] + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
+	// Performs centrifugal compensation without a GPS.
+	// Based on the fact that the magnitude of the
+	// compensated gplane vector should be GRAVITY*GRAVITY.
+	// This produces another equation from which the
+	// product of airspeed time rotation rate can be reasonably estimated.
+	int16_t omega_times_velocity ; // it should be positive, but noise
+	                               // in the computations could produce neg
+	uint16_t radical;
+	union longww accum;
+	int16_t accelY;
+	int16_t vertical_cross_rotation_axis;
+	int16_t force_cross_rotation_axis;
+	int16_t rotation_axis[2];
+
+	// Compute the X-Z rotation axis
+	// by normalizing the X-Z gyro vector
+	rotation_axis[0] = omegagyro[0];
+	rotation_axis[1] = omegagyro[2];
+	vector2_normalize(rotation_axis, rotation_axis);
+
+	// compute force cross rotation axis:
+	accum.WW = (__builtin_mulss(gplane[0], rotation_axis[1]) - __builtin_mulss( gplane[2] , rotation_axis[0] ) ) << 2;
+	force_cross_rotation_axis = accum._.W1;
+
+	// compute vertical cross rotation axis:
+	accum.WW = (__builtin_mulss(rmat[6], rotation_axis[1]) - __builtin_mulss(rmat[8], rotation_axis[0] ) ) << 2;
+	vertical_cross_rotation_axis = accum._.W1;
+
+	// compute the square root of the sum of the square of the
+	// force cross rotation, minus the square of the magnitude of the accelerometer vector,
+	// plus the square of GRAVITY
+
+	// Start by using rmat for accelY instead of the measured value.
+	// It is less sensitive to forward acceleration, which cannot be compensated without GPS.
+	accum.WW = (__builtin_mulsu( rmat[7], GRAVITY ) ) << 2;
+	accelY = accum._.W1;
+
+	// form the sum
+	accum.WW = __builtin_mulss(force_cross_rotation_axis, force_cross_rotation_axis)
+	         + __builtin_muluu(GRAVITY, GRAVITY)
+	         - __builtin_mulss(gplane[0], gplane[0])
+	         - __builtin_mulss(gplane[2], gplane[2])
+	         - __builtin_mulss(accelY, accelY);
+	if (accum.WW < 0)
+	{
+		accum.WW = 0;
+	}
+	radical = sqrt_long((uint32_t)accum.WW);
+
+	// Now we are using the solution to quadratic equation in the theory,
+	// and there is some logic for selecting the positive or negative square root
+	if (force_cross_rotation_axis < 0)
+	{
+		omega_times_velocity = force_cross_rotation_axis + radical;
+	}
+	else
+	{
+		if (vertical_cross_rotation_axis < 0)
+		{
+			omega_times_velocity = force_cross_rotation_axis + radical;
+		}
+		else
+		{
+			omega_times_velocity = force_cross_rotation_axis - radical;
+		}
+	}
+	if (omega_times_velocity < 0)
+	{
+		omega_times_velocity = 0;
+	}
+	// now compute omega vector cross velocity vector and adjust
+	accum.WW = (__builtin_mulss(omega_times_velocity , rotation_axis[1] ) ) << 2;
+	gplane[0] = gplane[0] - accum._.W1;
+	accum.WW = (__builtin_mulss(omega_times_velocity , rotation_axis[0] ) ) << 2;
+	gplane[0] = gplane[0] + accum._.W1;
 }
+#else
+static void adj_accel(int16_t angleOfAttack)
+{
+	union longww accum;
+	int16_t air_speed_z;
+	// total (3D) airspeed in cm/sec is used to adjust for acceleration
+	// compute Z component of airspeed due to angle of attack
+	accum.WW = __builtin_mulsu(angleOfAttack, air_speed_3DGPS) << 2;
+	air_speed_z = accum._.W1;
+	// compute centrifugal and forward acceleration compensation
+	gplane[0] = gplane[0] - omegaSOG(omegaAccum[2], air_speed_3DGPS)+ omegaSOG(omegaAccum[1], air_speed_z);
+	gplane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
+	gplane[1] = gplane[1] - omegaSOG(omegaAccum[0], air_speed_z) + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
+}
+#endif // CENTRIFUGAL_WITHOUT_GPS
 
 // The update algorithm!!
 static void rupdate(void)
@@ -520,12 +612,12 @@ void output_IMUvelocity(void)
 
 extern void mag_drift(fractional errorYawplane[]);
 
-void dcm_run_imu_step(void)
+void dcm_run_imu_step(int16_t angleOfAttack)
 {
 	// update the matrix, renormalize it, adjust for roll and
 	// pitch drift, and send it to the servos.
 	dead_reckon();              // in libDCM:deadReconing.c
-	adj_accel();                // local
+	adj_accel(angleOfAttack);   // local
 	rupdate();                  // local
 	normalize();                // local
 	roll_pitch_drift();         // local

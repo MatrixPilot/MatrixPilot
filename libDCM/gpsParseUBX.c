@@ -897,6 +897,28 @@ static void commit_bodyrate_data(void)
 	r_sim = r_sim_;
 }
 
+void HILSIM_saturate(int16_t size, int16_t vector[3])
+{
+	// hardware 16 bit signed integer gyro and accelerometer data and offsets
+	// are divided by 2 prior to subtracting offsets from values.
+	// This is done to prevent overflow.
+	// However, it limits range to approximately +- RMAX.
+	// Data coming in from Xplane is in 16 bit signed integer format with range +-2*RMAX,
+	// so it needs to be passed through a saturation computation that limits to +-RMAX.
+	uint16_t index;
+	for (index = 0; index < size; index ++)
+	{
+		if (vector[index ] > RMAX)
+		{
+			vector[index] = RMAX;
+		}
+		if (vector[index] < -RMAX)
+		{
+			vector[index] = -RMAX;
+		}
+	}
+}
+
 void hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 {
 	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
@@ -978,11 +1000,12 @@ xplm_UpFlag         16  The key is being released
 	}
 }
 
-void HILSIM_set_gplane(void)
+void HILSIM_set_gplane(fractional gplane[])
 {
 	gplane[0] = g_a_x_sim.BB;
 	gplane[1] = g_a_y_sim.BB;
 	gplane[2] = g_a_z_sim.BB;
+	HILSIM_saturate(3, gplane);
 }
 
 void HILSIM_set_omegagyro(void)
@@ -990,6 +1013,7 @@ void HILSIM_set_omegagyro(void)
 	omegagyro[0] = q_sim.BB;
 	omegagyro[1] = p_sim.BB;
 	omegagyro[2] = r_sim.BB;
+	HILSIM_saturate(3, omegagyro);
 }
 #endif // HILSIM
 

@@ -437,6 +437,19 @@
 #define TRIGGER_PULSE_DURATION              250
 #define TRIGGER_REPEAT_PERIOD               4000
 
+// FEED_FORWARD is a feed forward gain for deflecting control surfaces for turn rate.
+// The KP gains for each axis are multiplied by FEED_FORWARD to determine
+// the feed forward gain for that axis.
+// For each axis, a deflection term is added equal to the feed forward gain for that axis
+// times projection of the desired earth vertical rotation rate onto that axis
+#define FEED_FORWARD                        1.0
+
+// TURN_RATE_NAV and TURN_RATE_FBW set the gains of the helical turn control for
+// waypoint navigation mode and fly by wire mode respectively.
+// They are specified in terms of the maximum desired turning rate in degrees per second in each mode.
+// The largest possible value is 240 degrees per second, anything larger will be clipped to 240.
+#define TURN_RATE_NAV                       30.0
+#define TURN_RATE_FBW                       60.0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Control gains.

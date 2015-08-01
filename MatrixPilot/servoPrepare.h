@@ -25,9 +25,14 @@
 
 extern int16_t throttle_control;
 extern int16_t pitch_control;
+extern int16_t elevatorLoadingTrim;
 extern int16_t roll_control;
 extern int16_t yaw_control;
 extern uint16_t wind_gain;
+
+//extern int16_t tiltError[3];
+//extern int16_t rotationRateError[3];
+//extern int16_t desiredRotationRateRadians[3];
 
 void servoPrepare_init(void);
 

@@ -147,7 +147,7 @@ static void gps_parse_common_callback(void)
 		dcm_callback_gps_location_updated();
 
 		estLocation();
-		estWind();
+		estWind(GetAofA());
 		estAltitude();
 		estYawDrift();
 

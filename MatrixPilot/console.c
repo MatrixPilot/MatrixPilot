@@ -147,11 +147,11 @@ static void cmd_gains(char* arg)
 	printf("YAWKD_AILERON: %f\r\n", (double)gains.YawKDAileron);
 	printf("ROLLKP: %f\r\n", (double)gains.RollKP);
 	printf("ROLLKD: %f\r\n", (double)gains.RollKD);
-	printf("AILERON_BOOST: %f\r\n", (double)gains.AileronBoost);
+//	printf("AILERON_BOOST: %f\r\n", (double)gains.AileronBoost);
 	printf("PITCHGAIN: %f\r\n", (double)gains.Pitchgain);
 	printf("PITCHKD: %f\r\n", (double)gains.PitchKD);
-	printf("RUDDER_ELEV_MIX: %f\r\n", (double)gains.RudderElevMix);
-	printf("ROLL_ELEV_MIX: %f\r\n", (double)gains.RollElevMix);
+//	printf("RUDDER_ELEV_MIX: %f\r\n", (double)gains.RudderElevMix);
+//	printf("ROLL_ELEV_MIX: %f\r\n", (double)gains.RollElevMix);
 	printf("ELEVATOR_BOOST: %f\r\n", (double)gains.ElevatorBoost);
 	printf("YAWKP_RUDDER: %f\r\n", (double)gains.YawKPRudder);
 	printf("YAWKD_RUDDER: %f\r\n", (double)gains.YawKDRudder);

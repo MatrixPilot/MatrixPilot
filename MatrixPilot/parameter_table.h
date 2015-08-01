@@ -107,9 +107,9 @@ extern const uint16_t mavlink_parameter_block_count;
 // Defines required to complete parameter table if these are not defined in
 // options.h
 
-extern fractional udb_magOffset[3]; // magnetic offset in the body frame of reference
-extern int16_t magGain[3];          // magnetometer calibration gains
-extern int16_t rawMagCalib[3];
+//extern fractional udb_magOffset[3]; // magnetic offset in the body frame of reference
+//extern int16_t magGain[3];          // magnetometer calibration gains
+//extern int16_t rawMagCalib[3];
 
 #ifndef AILERON_INPUT_CHANNEL
 #define AILERON_INPUT_CHANNEL 0

@@ -291,20 +291,7 @@ void udb_set_action_state(boolean newValue)
 	// not simulated
 	(void)newValue;   // unused parameter
 }
-/*
-Team,
-I figured out what is going on with offsets in HILSIM/SILSIM....I am sorry I did not spot it sooner....
-Offsets are not used in HILSIM/SILSIM, since they are not needed. So it does not matter how they are computed.
-We really did not need to compute them. The actual values of the offsets are bogus.
-Sorry for all the mud I may have stirred up.
-Best regards,
-Bill
- */
-void udb_a2d_record_offsets(void)
-{
-}
-/*
-#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
+
 void udb_a2d_record_offsets(void)
 {
 	// almost ready to turn the control on, save the input offsets
@@ -316,24 +303,6 @@ void udb_a2d_record_offsets(void)
 	udb_zrate.offset = udb_zrate.value;
 	udb_vref.offset = udb_vref.value;
 }
-#else  // horizontal initialization
-void udb_a2d_record_offsets(void)
-{
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset  = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value;
-	udb_yrate.offset  = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
-	udb_zrate.offset  = udb_zrate.value;
-	udb_vref.offset   = udb_vref.value;
-
-	DPRINT("udb_a2d_record_offsets() %u, %u, %u, %u, %u, %u\r\n",
-		UDB_XACCEL.offset, udb_xrate.offset, UDB_YACCEL.offset, udb_yrate.offset,
-		UDB_ZACCEL.offset, udb_zrate.offset);
-}
-#endif // INITIALIZE_VERTICAL
- */
 
 uint16_t get_reset_flags(void)
 {

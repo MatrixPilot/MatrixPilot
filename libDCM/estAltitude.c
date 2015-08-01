@@ -44,6 +44,9 @@ inline long get_barometer_pressure(void)     { return barometer_pressure; }
 inline long get_barometer_altitude(void)     { return barometer_altitude; }
 inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
+/**
+ * @brief Ascertain a reference ambient barometric pressure & temperature
+ */
 void altimeter_calibrate(void)
 {
 	int ground_altitude = alt_origin.WW / 100;    // meters
@@ -63,6 +66,11 @@ void udb_barometer_callback(long pressure, int16_t temperature, char status)
 }
 #endif
 
+/**
+ * @brief Calculate an altitude estimate using barometer data
+ * @param
+ * @return
+ */
 void estAltitude(void)
 {
 #if (BAROMETER_ALTITUDE == 1)

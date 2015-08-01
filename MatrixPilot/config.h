@@ -107,7 +107,6 @@ struct altit_variables {
 };
 
 struct hover_variables {
-
 	float HoverRollKP;
 	float HoverRollKD;
 	float HoverPitchGain;
@@ -120,9 +119,29 @@ struct hover_variables {
 	float HoverNavMaxPitchRadius;
 };
 
+struct turns_variables {
+//	float FeedFwd;
+//	float RateNav;
+//	float RateFbw;
+//	float CrseSpd;
+//	float AoANorm;
+//	float AoAInvt;
+//	float ElvNorm;
+//	float ElvInvt;
+	float FeedForward;
+	float TurnRateNav;
+	float TurnRateFBW;
+	float CruiseSpeed;
+	float AngleOfAttackNormal;
+	float AngleOfAttackInverted;
+	float ElevatorTrimNormal;
+	float ElevatorTrimInverted;
+};
+
 extern struct gains_variables gains;
 extern struct altit_variables altit;
 extern struct hover_variables hover;
+extern struct turns_variables turns;
 extern union settings_word settings;
 //extern union network_module_word network_modules;
 

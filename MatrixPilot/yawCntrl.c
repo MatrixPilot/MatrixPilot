@@ -28,9 +28,12 @@
 #include "helicalTurnCntrl.h"
 #include "../libDCM/rmat.h"
 
+#include "gain_variables.h"
+
 #define HOVERYOFFSET ((int32_t)(hover.HoverYawOffset*(RMAX/57.3)))
 
 uint16_t yawkdrud;
+uint16_t yawkpfdfwd;
 uint16_t rollkprud;
 uint16_t rollkdrud;
 uint16_t hoveryawkp;
@@ -42,6 +45,7 @@ void hoverYawCntrl(void);
 void init_yawCntrl(void)
 {
 	yawkdrud   = (uint16_t)(gains.YawKDRudder*SCALEGYRO*RMAX);
+	yawkpfdfwd = (uint16_t)(turns.FeedForward*gains.YawKPRudder*RMAX);
 	rollkprud  = (uint16_t)(gains.RollKPRudder*RMAX);
 	rollkdrud  = (uint16_t)(gains.RollKDRudder*SCALEGYRO*RMAX);
 	hoveryawkp = (uint16_t)(hover.HoverYawKP*RMAX);
@@ -71,9 +75,9 @@ void yawCntrl(void)
 
 void normalYawCntrl(void)
 {
-	int16_t yawNavDeflection;
 	union longww rollStabilization;
 	union longww gyroYawFeedback;
+	union longww yawStabilization;
 	int16_t ail_rud_mix;
 
 #ifdef TestGains
@@ -83,39 +87,20 @@ void normalYawCntrl(void)
 
 	if (settings._.YawStabilizationRudder && state_flags._.pitch_feedback)
 	{
-		yawNavDeflection = navigate_determine_deflection('y');
-		
-		if (canStabilizeInverted() && current_orientation == F_INVERTED)
-		{
-			yawNavDeflection = -yawNavDeflection;
-		}
-	}
-	else
-	{
-		yawNavDeflection = 0;
-	}
-
-	if (YAW_STABILIZATION_RUDDER && state_flags._.pitch_feedback)
-	{
-		gyroYawFeedback.WW = __builtin_mulus(yawkdrud, omegaAccum[2]);
+		gyroYawFeedback.WW   = - __builtin_mulsu(rotationRateError[2], yawkdrud);
+		yawStabilization.WW  = - __builtin_mulsu(tiltError[2], yawkprud);  // yaw orientation error in body frame
+		yawStabilization.WW +=   __builtin_mulsu(desiredRotationRateRadians[2], yawkpfdfwd); // feed forward term
 	}
 	else
 	{
 		gyroYawFeedback.WW = 0;
+		yawStabilization.WW = 0;
 	}
 
 	rollStabilization.WW = 0; // default case is no roll rudder stabilization
 	if (settings._.RollStabilizationRudder && state_flags._.pitch_feedback)
 	{
-		if (!desired_behavior._.inverted && !desired_behavior._.hover)  // normal
-		{
-			rollStabilization.WW = __builtin_mulsu(rmat[6], rollkprud);
-		}
-		else if (desired_behavior._.inverted) // inverted
-		{
-			rollStabilization.WW = - __builtin_mulsu(rmat[6], rollkprud);
-		}
-		rollStabilization.WW -= __builtin_mulus(rollkdrud, omegaAccum[1]);
+		rollStabilization.WW = - __builtin_mulsu(tiltError[1], rollkprud); // this works right side up or upside down
 	}
 
 	if (state_flags._.pitch_feedback)
@@ -129,9 +114,9 @@ void normalYawCntrl(void)
 		ail_rud_mix = 0;
 	}
 
-	yaw_control = (int32_t)yawNavDeflection 
-	            - (int32_t)gyroYawFeedback._.W1 
+	yaw_control = (int32_t)gyroYawFeedback._.W1 
 	            + (int32_t)rollStabilization._.W1 
+	            + (int32_t)yawStabilization._.W1 
 	            + ail_rud_mix;
 	// Servo reversing is handled in servoMix.c
 }

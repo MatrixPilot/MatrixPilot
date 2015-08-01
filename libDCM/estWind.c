@@ -35,7 +35,7 @@ static int16_t fuselageDirectionHistory[3] = { 0, 0, 0 };
 
 #define MINROTATION ((int16_t)(0.2 * RMAX))
 
-void estWind(void)
+void estWind(int16_t angleOfAttack)
 {
 	int16_t index;
 	int16_t groundVelocity[3];
@@ -64,6 +64,14 @@ void estWind(void)
 	fuselageDirection[0] = -rmat[1];
 	fuselageDirection[1] =  rmat[4];
 	fuselageDirection[2] = -rmat[7];
+
+	// adjust "fuselage direction" for angle of attack
+	longaccum.WW = (__builtin_mulss(- rmat[2], angleOfAttack)) << 2;
+	fuselageDirection[0] += longaccum._.W1;
+	longaccum.WW = (__builtin_mulss(  rmat[5], angleOfAttack)) << 2;
+	fuselageDirection[1] += longaccum._.W1;
+	longaccum.WW = (__builtin_mulss(- rmat[8], angleOfAttack)) << 2;
+	fuselageDirection[2] += longaccum._.W1;
 
 	for (index = 0; index < 3; index++)
 	{

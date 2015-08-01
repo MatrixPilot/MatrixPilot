@@ -112,33 +112,34 @@ void mav_printf(const char * format, ...);
 #include "nv_memory_options.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// libUDB.h defines the API for accessing the UDB hardware through libUDB.
-// 
-// This is the lowest-level component of MatrixPilot, and should not reference
-// anything from the higher-level components.  This library is designed to be
-// useful in its own right, independent of libDCM or MatrixPilot.
-//
-// libUDB requires an options.h file be provided that defines at least the
-// following constants:
-// 
-// #define NUM_INPUTS
-// #define NUM_OUTPUTS
-// 
-// #define FAILSAFE_INPUT_CHANNEL
-// #define FAILSAFE_INPUT_MIN
-// #define FAILSAFE_INPUT_MAX
-// 
-// #define NORADIO
-// #define SERVOSAT
+/// libUDB.h defines the API for accessing the UDB hardware through libUDB.
+/// 
+/// This is the lowest-level component of MatrixPilot, and should not reference
+/// anything from the higher-level components.  This library is designed to be
+/// useful in its own right, independent of libDCM or MatrixPilot.
+///
+/// libUDB requires an options.h file be provided that defines at least the
+/// following constants:
+/// 
+/// #define NUM_INPUTS
+/// #define NUM_OUTPUTS
+/// 
+/// #define FAILSAFE_INPUT_CHANNEL
+/// #define FAILSAFE_INPUT_MIN
+/// #define FAILSAFE_INPUT_MAX
+/// 
+/// #define NORADIO
+/// #define SERVOSAT
+///
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the UDB
 
-// Call this first soon after the board boots up
+//! Call this first soon after the board boots up
 void mcu_init(void);
 
-// Call this once soon after the board boots up
+//! Call this once soon after the board boots up
 void udb_init(void);
 
 // Start the UDB running
@@ -153,21 +154,21 @@ void udb_run(void);
 ////////////////////////////////////////////////////////////////////////////////
 // Run Background Tasks
 
-// Implement this callback to perform periodic background tasks (high priority).
-// It is called at 40 Hertz and must return quickly. (No printf!)
+//! Implement this callback to perform periodic background tasks (high priority).
+//! It is called at 40 Hertz and must return quickly. (No printf!)
 void udb_heartbeat_40hz_callback(void);
 
-// Implement this callback to prepare the pwOut values.
-// It is called at HEARTBEAT_HZ at a low priority.
+//! Implement this callback to prepare the pwOut values.
+//! It is called at HEARTBEAT_HZ at a low priority.
 void udb_heartbeat_callback(void);
 
 typedef void (*background_callback)(void);
 
-// Trigger the background_callback() functions from a low priority ISR.
+//! Trigger the background_callback() functions from a low priority ISR.
 void udb_background_trigger(background_callback callback);
 void udb_background_trigger_pulse(background_callback callback);
 
-// Return the current CPU load as an integer percentage value from 0-100.
+//! Return the current CPU load as an integer percentage value from 0-100.
 uint8_t udb_cpu_load(void);
 inline void cpu_load_calc(void);
 
@@ -175,37 +176,36 @@ inline void cpu_load_calc(void);
 ////////////////////////////////////////////////////////////////////////////////
 // Radio Inputs / Servo Outputs
 
-// These are the values of the radio input channels.  Each channel will be a
-// value between approximately 2000 and 4000, with 3000 being the center.
-// Treat udb_pwIn values as readonly.
+//! These are the values of the radio input channels.  Each channel will be a
+//! value between approximately 2000 and 4000, with 3000 being the center.
+//! Treat udb_pwIn values as readonly.
 extern int16_t udb_pwIn[];                  // pulse widths of radio inputs
 
-// These are the recorded trim values of the radio input channels.
-// These values are recorded when you call the udb_servo_record_trims()
-// function.
-// Each channel will be a value between approximately 2000 and 4000.
-// Treat udb_pwTrim values as readonly.
+//! These are the recorded trim values of the radio input channels.
+//! These values are recorded when you call the udb_servo_record_trims()
+//! function.
+//! Each channel will be a value between approximately 2000 and 4000.
+//! Treat udb_pwTrim values as readonly.
 extern int16_t udb_pwTrim[];                // initial pulse widths for trimming
 
-// These are the servo channel values that will be sent out to the servos.
-// Set these values in your implementation of the udb_heartbeat_callback()
-// Each channel should be set to a value between 2000 and 4000.
+//! These are the servo channel values that will be sent out to the servos.
+//! Set these values in your implementation of the udb_heartbeat_callback()
+//! Each channel should be set to a value between 2000 and 4000.
 extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
 
-// This read-only value holds flags that tell you, among other things,
-// whether the receiver is currently receiving values from the transmitter.
+//! This read-only value holds flags that tell you, among other things,
+//! whether the receiver is currently receiving values from the transmitter.
 extern union udb_fbts_byte { struct udb_flag_bits _; int8_t B; } udb_flags;
 
-// Call this funtion once at some point soon after
-// the UDB has booted up and the radio is on.
+//! Call this funtion once at some point soon after
+//! the UDB has booted up and the radio is on.
 void udb_servo_record_trims(void);
 
-// Called immediately whenever the radio_on flag is set to 0
+//! Called immediately whenever the radio_on flag is set to 0
 void udb_callback_radio_did_turn_off(void);     // Callback
 
-// Call this function to set the digital output to 0 or 1.
-// This can be used to do things like triggering cameras, turning on
-// lights, etc.
+//! Call this function to set the digital output to 0 or 1.
+//! This can be used to do things like triggering cameras, turning on lights, etc.
 void udb_set_action_state(boolean newValue);
 
 // Functions only included with nv memory.
@@ -225,11 +225,6 @@ extern UDB_SKIP_FLAGS udb_skip_flags;
 #endif // (USE_NV_MEMORY == 1)
 
 ////////////////////////////////////////////////////////////////////////////////
-// Raw Accelerometer and Gyroscope(rate) Values
-//extern struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel;// x, y, and z accelerometer channels
-//extern struct ADchannel udb_xrate,  udb_yrate,  udb_zrate; // x, y, and z gyro channels
-//extern struct ADchannel udb_vref;                          // reference voltage
-//extern struct ADchannel udb_analogInputs[];
 
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern union longww battery_current;        // battery_current._.W1 is in tenths of Amps

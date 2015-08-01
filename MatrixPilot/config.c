@@ -31,6 +31,7 @@ union settings_word settings;
 struct gains_variables gains;
 struct altit_variables altit;
 struct hover_variables hover;
+struct turns_variables turns;
 
 static const char* strConfigFile = "config.ini";
 //static const char* strNetwork = "NETWORK";
@@ -42,6 +43,7 @@ static const char* strYaw = "YAW";
 static const char* strAltitude = "ALTITUDE";
 static const char* strRTL = "RTL";
 static const char* strHover = "HOVER";
+static const char* strTurns = "TURNS";
 static const char* strMode = "MODE";
 
 #if (NETWORK_INTERFACE != NETWORK_INTERFACE_NONE)
@@ -142,6 +144,39 @@ stabilised = 1
 waypoint = 1
  */
 
+
+/*
+
+new for helicalTurns:
+
+#define FEED_FORWARD                         1.0
+#define TURN_RATE_NAV                       30.0
+#define TURN_RATE_FBW                       60.0
+#define CRUISE_SPEED                        12.0
+#define ANGLE_OF_ATTACK_NORMAL              -0.8
+#define ANGLE_OF_ATTACK_INVERTED            -7.2
+#define ELEVATOR_TRIM_NORMAL                -0.03
+#define ELEVATOR_TRIM_INVERTED              -0.67
+
+and we remove the following:
+#define AILERON_BOOST                       0.8
+#define RUDDER_ELEV_MIX                     0.2
+#define ROLL_ELEV_MIX                       0.35
+
+ */
+static void load_turns(void)
+{
+	turns.FeedForward = ini_getf(strTurns, "feedfwd", FEED_FORWARD, strConfigFile);
+	DPRINT("turns.FeedForward = %f\r\n", turns.FeedForward);
+	turns.TurnRateNav = ini_getf(strTurns, "ratenav", TURN_RATE_NAV, strConfigFile);
+	turns.TurnRateFBW = ini_getf(strTurns, "ratefbw", TURN_RATE_FBW, strConfigFile);
+	turns.CruiseSpeed = ini_getf(strTurns, "crsespd", CRUISE_SPEED, strConfigFile);
+	turns.AngleOfAttackNormal = ini_getf(strTurns, "aoanorm", ANGLE_OF_ATTACK_NORMAL, strConfigFile);
+	turns.AngleOfAttackInverted = ini_getf(strTurns, "aoainvt", ANGLE_OF_ATTACK_INVERTED, strConfigFile);
+	turns.ElevatorTrimNormal = ini_getf(strTurns, "elenorm", ELEVATOR_TRIM_NORMAL, strConfigFile);
+	turns.ElevatorTrimInverted = ini_getf(strTurns, "eleinvt", ELEVATOR_TRIM_INVERTED, strConfigFile);
+}
+
 static void load_gains(void)
 {
 // Aileron/Roll Control Gains
@@ -149,13 +184,13 @@ static void load_gains(void)
 	gains.RollKD = ini_getf(strRoll, "rollkd", ROLLKD, strConfigFile);
 	gains.YawKPAileron = ini_getf(strRoll, "yawkp", YAWKP_AILERON, strConfigFile);
 	gains.YawKDAileron = ini_getf(strRoll, "yawkd", YAWKD_AILERON, strConfigFile);
-	gains.AileronBoost = ini_getf(strRoll, "boost", AILERON_BOOST, strConfigFile);
+//	gains.AileronBoost = ini_getf(strRoll, "boost", AILERON_BOOST, strConfigFile);
 
 // Elevator/Pitch Control Gains
 	gains.Pitchgain = ini_getf(strPitch, "gain", PITCHGAIN, strConfigFile);
 	gains.PitchKD = ini_getf(strPitch, "pitchkd", PITCHKD, strConfigFile);
-	gains.RudderElevMix = ini_getf(strPitch, "rudder", RUDDER_ELEV_MIX, strConfigFile);
-	gains.RollElevMix = ini_getf(strPitch, "roll", ROLL_ELEV_MIX, strConfigFile);
+//	gains.RudderElevMix = ini_getf(strPitch, "rudder", RUDDER_ELEV_MIX, strConfigFile);
+//	gains.RollElevMix = ini_getf(strPitch, "roll", ROLL_ELEV_MIX, strConfigFile);
 	gains.ElevatorBoost = ini_getf(strPitch, "boost", ELEVATOR_BOOST, strConfigFile);
 	// = ini_getf(strPitch, "invert", INVERTED_NEUTRAL_PITCH, strConfigFile);
 
@@ -248,10 +283,23 @@ static void save_gains(void)
 	ini_putf(strHover, "radius", hover.HoverNavMaxPitchRadius, strConfigFile);
 }
 
+static void save_turns(void)
+{
+	ini_putf(strTurns, "feedfwd", turns.FeedForward, strConfigFile);
+	ini_putf(strTurns, "ratenav", turns.TurnRateNav, strConfigFile);
+	ini_putf(strTurns, "ratefbw", turns.TurnRateFBW, strConfigFile);
+	ini_putf(strTurns, "crsespd", turns.CruiseSpeed, strConfigFile);
+	ini_putf(strTurns, "aoanorm", turns.AngleOfAttackNormal, strConfigFile);
+	ini_putf(strTurns, "aoainvt", turns.AngleOfAttackInverted, strConfigFile);
+	ini_putf(strTurns, "elenorm", turns.ElevatorTrimNormal, strConfigFile);
+	ini_putf(strTurns, "eleinvt", turns.ElevatorTrimInverted, strConfigFile);
+}
+
 void config_load(void)
 {
 	load_settings();
 	load_gains();
+	load_turns();
 
 	init_yawCntrl();
 	init_rollCntrl();
@@ -279,6 +327,7 @@ void config_save(void)
 
 	save_settings();
 	save_gains();
+	save_turns();
 }
 
 void config_init(void)

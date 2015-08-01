@@ -54,7 +54,7 @@ static struct waypointDef WaypointSet[MAX_WAYPOINTS];
 static struct waypointDef* currentWaypointSet = (struct waypointDef*)WaypointSet;
 static int16_t numPointsInCurrentSet = 0;
 #else
-static struct waypointDef* currentWaypointSet = (struct waypointDef*)waypoints;
+static const struct waypointDef* currentWaypointSet = (struct waypointDef*)waypoints;
 static int16_t numPointsInCurrentSet = NUMBER_POINTS;
 #endif
 

@@ -18,15 +18,17 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include "defines.h"
+
+#define USE_TELEMETRY
+#ifdef USE_TELEMETRY
+
 #include "states.h"
 #include "config.h"
 #include "navigate.h"
 #include "cameraCntrl.h"
 #include "flightplan.h"
 #include "flightplan-waypoints.h"
-#include "telemetry.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -116,6 +118,9 @@ static void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
 static char serial_buffer[SERIAL_BUFFER_SIZE+1];
 static int16_t sb_index = 0;
 static int16_t end_index = 0;
+
+int16_t udb_serial_callback_get_byte_to_send(void);
+void udb_serial_callback_received_byte(uint8_t rxchar);
 
 void telemetry_init(void)
 {
@@ -874,3 +879,24 @@ void telemetry_init(void)
 {
 }
 #endif // SERIAL_OUTPUT_FORMAT
+
+#else // USE_TELEMETRY
+
+int16_t udb_serial_callback_get_byte_to_send(void)
+{
+	return -1;
+}
+void udb_serial_callback_received_byte(uint8_t rxchar)
+{
+}
+void telemetry_restart(void)
+{
+}
+void telemetry_output_8hz(void)
+{
+}
+void telemetry_init(void)
+{
+}
+
+#endif // USE_TELEMETRY

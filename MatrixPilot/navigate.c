@@ -48,8 +48,11 @@
 
 uint16_t yawkpail; // only exported for parameter_table
 uint16_t yawkprud; // only exported for parameter_table
+uint16_t turngainfbw; // fly by wire turn gain
+uint16_t turngainnav; // waypoints turn gain
 
 int16_t tofinish_line = 0;
+int16_t progress_to_goal = 0;
 int8_t desired_dir = 0;
 int8_t extended_range = 0;
 
@@ -68,6 +71,9 @@ struct waypointparameters {
 static struct waypointparameters navgoal;
 static int16_t desired_bearing_over_ground_vector[2];
 
+struct relative2D togoal = { 0, 0 };
+int8_t desired_bearing_over_ground;
+
 int16_t navigate_get_goal(vect3_16t* _goal)
 {
 	if (_goal != NULL)
@@ -83,6 +89,8 @@ void init_navigation(void)
 {
 	yawkpail = (uint16_t)(gains.YawKPAileron*RMAX);
 	yawkprud = (uint16_t)(gains.YawKPRudder*RMAX);
+	turngainnav = (uint16_t)((turns.TurnRateNav/57.3)*RMAX);
+	turngainfbw = (uint16_t)((turns.TurnRateFBW/57.3)*RMAX);
 }
 
 void save_navigation(void)
@@ -451,13 +459,9 @@ int16_t navigate_determine_deflection(char navType)
 		vector2_normalize(actualXY, actualXY);
 		actualX = actualXY[0];
 		actualY = actualXY[1];
-		if (navType == 'y')
+		if (navType == 't')
 		{
-			yawkp = yawkprud;
-		}
-		else if (navType == 'a')
-		{
-			yawkp = yawkpail;
+			yawkp = turngainnav;
 		}
 		else if (navType == 'h')
 		{
@@ -470,15 +474,9 @@ int16_t navigate_determine_deflection(char navType)
 	}
 	else
 	{
-		if (navType == 'y')
+		if (navType == 't')
 		{
-			yawkp = yawkprud ;
-			actualX = rmat[1];
-			actualY = rmat[4];
-		}
-		else if (navType == 'a')
-		{
-			yawkp = yawkpail;
+			yawkp = turngainnav;
 			actualX = rmat[1];
 			actualY = rmat[4];
 		}
@@ -523,7 +521,11 @@ int16_t navigate_determine_deflection(char navType)
 	{
 		deflectionAccum.WW = -deflectionAccum.WW;
 	}
-	// multiply by wind gain adjustment, and multiply by 2
-	deflectionAccum.WW = (__builtin_mulsu(deflectionAccum._.W1, wind_gain) << 1);
+
+#if (WIND_GAIN_ADJUSTMENT == 1)
+#error ( "wind gain adjustment is under construction and is not working at this time.")
+	deflectionAccum.WW = __builtin_mulsu(deflectionAccum._.W1, wind_gain);
+#endif // WIND_GAIN_ADJUSTMENT
+
 	return deflectionAccum._.W1;
 }
