@@ -1190,10 +1190,10 @@ class ascii_telemetry(base_telemetry):
                     return "Error"
             else :
                 pass
-            match = re.match(".*:fgs([-0-9]*?):",line) # flags from defines.h 
+            match = re.match(".*:fgs([A-F0-9]*?):",line) # flags from defines.h; Match hex letters
             if match :
                 try:
-                    self.flags = int(match.group(1))
+                    self.flags = int(match.group(1),16)  # Interpret as base 16 hex
                 except:
                     print "Corrupt flag values in line", line_no
                     return "Error"
