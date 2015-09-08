@@ -5,7 +5,7 @@
 #  Using the following format
 # 
 #  Comm,COMx,Speed (or on a mac, something like: Comm,/dev/cu.usbserial-A600akaF)
-#  Port,PortNumber will use a UDB port instead of a serial connection.  Use for SILSIM.
+#  Port,PortNumber will use a UDP port instead of a serial connection.  Use for SILSIM.
 #  Override,***Override path description****
 #  Control,Servo Channel,Xplane control surface path,Servo zero,Servo High Travel,Servo Low Travel,Surface Max travel,Surface Min Travel
 #  Engine,Servo Channel,Engine Mask,Servo Zero,Servo High Travel,Servo Low Travel,Engine Max,Engine Min

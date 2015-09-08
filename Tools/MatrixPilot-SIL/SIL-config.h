@@ -31,6 +31,6 @@
 #define SILSIM_GPS_HOST                     "127.0.0.1"
 #define SILSIM_TELEMETRY_RUN_AS_SERVER      0
 #define SILSIM_TELEMETRY_PORT               14550       // default port to connect to QGroundControl
-#define SILSIM_TELEMETRY_HOST               "127.0.0.1"
+#define SILSIM_TELEMETRY_HOST               "192.168.1.5"
 #define SILSIM_SERIAL_RC_INPUT_DEVICE       ""          // i.e. "COM4" or "/dev/cu.usbserial-A600dP4v", or "" to disable
 #define SILSIM_SERIAL_RC_INPUT_BAUD         38400
