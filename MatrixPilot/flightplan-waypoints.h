@@ -23,7 +23,7 @@
 #define FLIGHTPLAN_WAYPOINTS_H
 
 
-//#define USE_DYNAMIC_WAYPOINTS
+#define USE_DYNAMIC_WAYPOINTS
 #define MAX_WAYPOINTS 20
 
 //extern uint16_t number_of_waypoints;

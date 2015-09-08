@@ -1,4 +1,4 @@
-#if 0
+#if 1
 //
 //  SIL-udb.c
 //  MatrixPilot-SIL
@@ -11,10 +11,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+//#include <unistd.h>
 
-//#include <Windows.h>
-//#include <Time.h>
+#include <Windows.h>
+#include <Time.h>
 
 #include "../HILSIM_XPlane/UDBSocket.h"
 #include "options.h"
@@ -39,11 +39,11 @@ void printHelp(void)
 }
 
 //int __cdecl __MINGW_NOTHROW usleep(useconds_t useconds)
-////void usleep(int useconds)
-//{
-//	Sleep((useconds + 999) / 1000);
-//	return 0; // 0 on success, -1 on error. 
-//}
+void usleep(int useconds)
+{
+	Sleep((useconds + 999) / 1000);
+	return 0; // 0 on success, -1 on error. 
+}
 
 int main(int argc, char** argv)
 {

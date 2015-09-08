@@ -206,9 +206,9 @@ PLUGIN_API int XPluginStart(char* outName,
                             char* outDesc)
 {
 	szString[0] = '\0';
-	strcpy(outName, "UDB HILSIM");
-	strcpy(outSig, "UDB.HardwareInLoop");
-	strcpy(outDesc, "UDB Hardware-In-Loop Simulator");
+	strcpy(outName, "UDB HILSIM2");
+	strcpy(outSig, "UDB.HardwareInLoop2");
+	strcpy(outDesc, "UDB Hardware-In-Loop Simulator2");
 
 	// P, Q, and R are roll, pitch, and yaw rates, degrees per second,
 	// in the NED coordinate system, in "flight" (not body) frame of reference

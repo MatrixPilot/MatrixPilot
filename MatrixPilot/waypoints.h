@@ -137,9 +137,9 @@
 // 
 // By default the only waypoint is defined to be 75 meters above the starting point.
 
-const struct waypointDef waypoints[] = {
-		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
-};
+//const struct waypointDef waypoints[] = {
+//		{ {   0,   0, 75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,  // return to, and loiter 75 meters above the startup position
+//};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,15 +180,15 @@ const struct waypointDef rtlWaypoints[] = {
 // 
 // Note that this is not likely to be an especially smooth landing...
 
-/*
+
 const struct waypointDef waypoints[] = {
-		{ { 100,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
-		{ { 100, 100  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
-		{ {   0, 100  , 75 } , F_INVERTED, CAM_VIEW_LAUNCH } ,
-		{ {   0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
-		{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
+		{ { 0,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ { 0, -150  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+		{ { -100, -150, 75 } , F_NORMAL, CAM_VIEW_LAUNCH },
+		{ {  -100,   0  , 75 } , F_NORMAL,   CAM_VIEW_LAUNCH } ,
+//		{ {  50,  50  , 75 } , F_LOITER + F_TRIGGER + F_LAND, CAM_VIEW_LAUNCH } ,
 };
-*/
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

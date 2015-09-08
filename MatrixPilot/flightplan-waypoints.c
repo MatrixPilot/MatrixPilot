@@ -177,7 +177,7 @@ static void load_flightplan(const struct waypointDef* waypoints, int count)
 //struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D viewpoint; };
 
 	struct waypointDef* dst_wp;
-	const struct waypointDef* src_wp;
+	struct waypointDef* src_wp;
 
 
 	for (i = 0; i < count; i++)

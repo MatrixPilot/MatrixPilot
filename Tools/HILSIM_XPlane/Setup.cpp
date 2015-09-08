@@ -103,7 +103,7 @@ void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& Comm
 	string FileLine;
 
 	ChannelInfo.clear();
-	ifstream ChannelFile("HILSIMSetup.txt");
+	ifstream ChannelFile("HILSIMSetup2.txt");
 	if (ChannelFile.is_open())
 	{
 		string FoundLine = string("Found File Line: ");
@@ -393,7 +393,7 @@ void SetupFile::ParseOverideLine(string& ParseString, string& OverideStr)
 
 LogFile::LogFile()
 {
-	mLogFile.open("HILSIMLogFile.txt");
+	mLogFile.open("HILSIMLogFile2.txt");
 }
 
 LogFile::~LogFile()

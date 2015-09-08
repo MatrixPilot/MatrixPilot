@@ -212,6 +212,9 @@
     <ClCompile Include="..\..\libFlashFS\minIni.c">
       <Filter>Source Files\libFlashFS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\helicalTurnCntrl.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
