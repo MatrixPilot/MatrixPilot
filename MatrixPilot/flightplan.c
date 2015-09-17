@@ -54,14 +54,17 @@ void flightplan_init(void)
 {
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	flightplan_logo_active = true;
-#endif
 	flightplan_logo_init();
+#else	
 	flightplan_waypoints_init();
+#endif
 	DPRINT("flightplan_init() - %s\r\n", flightplan_logo_active ? "LOGO" : "WAYPOINTS");
 }
 
 void flightplan_begin(int16_t flightplanNum)
 {
+	flightplan_init();
+
 	DPRINT("flightplan_begin(%u)\r\n", flightplanNum);
 
 	if (flightplan_logo_active) {
