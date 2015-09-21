@@ -53,6 +53,10 @@
 //#include "../MatrixPilot/telemetry.h"
 //#include "../libDCM/gpsParseCommon.h"
 
+// TODO: do something about these declarations being here - RobD
+void udb_init_ADC(void);
+void udb_init_clock(void);
+
 union udb_fbts_byte udb_flags;
 
 // Functions only included with nv memory.
