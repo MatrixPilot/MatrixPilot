@@ -87,7 +87,7 @@ static inline void init_heartbeat(void)
 	_T1IP = INT_PRI_T1;     // set interrupt priority
 	_T1IF = 0;              // clear the interrupt
 	_T1IE = 1;              // enable the interrupt
-	T1CONbits.TON = 1;      // turn on timer 1
+	T1CONbits.TON = 0;      // turn on timer 1
 
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }

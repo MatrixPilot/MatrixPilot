@@ -59,7 +59,7 @@ uint8_t osd_spi_read(int8_t addr);
 #define SPIxCON2        SPI1CON2
 #define SPIxBUF         SPI1BUF
 #define SPIxSTATbits    SPI1STATbits
-#define SPIxCON1bits    SPI1CON1bits
+#define SPIxCON1bits    FAIL
 
 #define _SPIEN          SPI1STATbits.SPIEN
 

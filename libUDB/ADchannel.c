@@ -42,7 +42,7 @@ void udb_a2d_record_offsets(void)
 	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
 	udb_yrate.offset = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-	udb_zrate.offset = udb_zrate.value;
+	udb_zrate.offset = 1;
 #ifdef VREF
 	udb_vref.offset = udb_vref.value;
 #endif
@@ -65,7 +65,7 @@ void udb_a2d_record_offsets(void)
 	udb_zrate.offset = ZRATE_OFFSET;
 #else
 	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
+	UDB_XACCEL.offset = 2;
 	udb_xrate.offset  = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value;
 	udb_yrate.offset  = udb_yrate.value;
