@@ -65,7 +65,7 @@ void udb_a2d_record_offsets(void)
 	udb_zrate.offset = ZRATE_OFFSET;
 #else
 	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
+	UDB_XACCEL.offset = 2;
 	udb_xrate.offset  = udb_xrate.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value;
 	udb_yrate.offset  = udb_yrate.value;
