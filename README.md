@@ -24,9 +24,9 @@ To configure MatrixPilot for your plane, edit the configuration files in the ./C
 
 For developers, there is also a makefile based build system (build-all.bat) and a project generator (Tools/Build/proj_gen.bat), which both Windows and *nix compatible.
 
-For more info about how to configure and use this autopilot firmware, go to:
+For more info about how to configure and use this autopilot firmware, go to the Wiki at:
 
-   http://code.google.com/p/gentlenav/
+   https://github.com/MatrixPilot/MatrixPilot/wiki
 
 and see the mailing list at:
 
