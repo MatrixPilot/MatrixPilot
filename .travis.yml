@@ -1,2 +1,18 @@
+# Build and autotest script for MatrixPilot firmware
+# http://travis-ci.org
+
 language: c
-script: ./Inspirati/MatrixPilot/build-all.sh
+script: build-all.sh
+
+before_script:
+  - mkdir -p ~/build
+  - cd build
+  - mkdir -p SILSIM
+  - cd SILSIM
+
+script:
+  - make -f ../../makefile DEVICE=SILSIM
+
+after_success:
+  - cd ..
+  - cd ..
