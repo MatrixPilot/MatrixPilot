@@ -2,7 +2,6 @@
 # http://travis-ci.org
 
 language: c
-script: build-all.sh
 
 before_script:
   - mkdir -p ~/build
@@ -12,4 +11,4 @@ script:
   - make -f ../makefile DEVICE=SILSIM
 
 after_success:
-  - cd ..
+  - cd ~
