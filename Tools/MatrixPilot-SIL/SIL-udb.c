@@ -319,7 +319,11 @@ void sil_reset(void)
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket)    UDBSocket_close(serialSocket);
 
-	_execv(mp_argv[0], args); // this version keeps VC++ happy (along with <process.h> above)
+#ifdef _MSC_VER
+	_execv(mp_argv[0], args);
+#else
+	execv(mp_argv[0], args);
+#endif
 	fprintf(stderr, "Failed to reset UDB %s\n", mp_argv[0]);
 	exit(1);
 }
