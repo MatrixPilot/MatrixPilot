@@ -8,7 +8,7 @@ before_script:
   - mkdir -p ~/build
 
 script:
-  - cd build
+  - cd ~/build
   - make -f ../makefile DEVICE=SILSIM
 
 after_success:
