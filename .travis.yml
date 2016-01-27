@@ -6,12 +6,14 @@ language: c
 before_script:
   - pwd
   - ls -la
-  - mkdir -p ~/build
+  - mkdir -p ./build
 
 script:
-  - cd ~/build
+  - cd ./build
   - pwd
+  - ls -la
   - make -f ../makefile DEVICE=SILSIM
+  - ls -la
 
 after_success:
   - cd ~
