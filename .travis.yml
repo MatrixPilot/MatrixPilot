@@ -1,0 +1,18 @@
+# Build and autotest script for MatrixPilot firmware
+# http://travis-ci.org
+
+language: c
+
+before_script:
+  - pwd
+  - ls -la
+  - mkdir -p ./build
+
+script:
+  - cd ./build
+  - make -f ../makefile DEVICE=SILSIM
+  - ls -la
+
+after_success:
+  - cd ~
+  
