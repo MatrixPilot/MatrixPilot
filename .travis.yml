@@ -6,13 +6,10 @@ script: build-all.sh
 
 before_script:
   - mkdir -p ~/build
-  - cd build
-  - mkdir -p SILSIM
-  - cd SILSIM
 
 script:
-  - make -f ../../makefile DEVICE=SILSIM
+  - cd build
+  - make -f ../makefile DEVICE=SILSIM
 
 after_success:
-  - cd ..
   - cd ..
