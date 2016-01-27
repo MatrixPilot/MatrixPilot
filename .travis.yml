@@ -4,10 +4,13 @@
 language: c
 
 before_script:
+  - pwd
+  - ls -la
   - mkdir -p ~/build
 
 script:
   - cd ~/build
+  - pwd
   - make -f ../makefile DEVICE=SILSIM
 
 after_success:
