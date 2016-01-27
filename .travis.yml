@@ -10,8 +10,6 @@ before_script:
 
 script:
   - cd ./build
-  - pwd
-  - ls -la
   - make -f ../makefile DEVICE=SILSIM
   - ls -la
 
