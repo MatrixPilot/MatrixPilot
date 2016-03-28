@@ -21,17 +21,17 @@ before_install:
 # Install needed IDE and compiler
 install:
  - ./travis-install-dependencies.sh
- - export PATH=$PATH:/opt/microchip/xc16/v1.25/bin
+ - export PATH=$PATH:/opt/microchip/xc16/v1.26/bin
  - xc16-gcc --version
 
 before_script:
   - pwd
   - ls -la
-  - mkdir -p ./build2
 
 script:
-  - cd ./build2
-
+  - mkdir -p ./build-yml
+  - cd ./build-yml
+  
   - mkdir -p ./SIL
   - cd ./SIL
   - make -j 8 -f ../../makefile DEVICE=SIL
