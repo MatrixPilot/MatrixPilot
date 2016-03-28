@@ -27,11 +27,11 @@ install:
 before_script:
   - pwd
   - ls -la
+  - mkdir -p ./build2
 
 script:
-  - mkdir -p ./build-yml
-  - cd ./build-yml
-  
+  - cd ./build2
+
   - mkdir -p ./SIL
   - cd ./SIL
   - make -j 8 -f ../../makefile DEVICE=SIL

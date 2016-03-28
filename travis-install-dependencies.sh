@@ -28,7 +28,7 @@ pushd .
 mkdir ../install-dependencies
 cd ../install-dependencies
 
-#export XC16-VER=v1.24
+export XC16-VER=v1.24
 #echo "- Microchip XC16 Compiler" $XC16-VER " -"
 
 ### IDE
