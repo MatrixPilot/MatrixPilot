@@ -28,8 +28,7 @@ pushd .
 mkdir ../install-dependencies
 cd ../install-dependencies
 
-export XC16-VER=v1.24
-
+#export XC16-VER=v1.24
 #echo "- Microchip XC16 Compiler" $XC16-VER " -"
 
 ### IDE
@@ -55,43 +54,43 @@ export XC16-VER=v1.24
 
 ### Compiler
 # Install Microchip XC16 Compiler v1.25
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Downloading Microchip XC16 Compiler v1.25 -"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.25-full-install-linux-installer.run
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Download finished...        -"
-#echo "- Adding excecution rights... -"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#chmod +x xc16-v1.25-full-install-linux-installer.run
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-#echo "- Installing Microchip XC16 Compiler v1.25 +"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-#sudo ./xc16-v1.25-full-install-linux-installer.run --mode unattended --netservername dontknow
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Installation of Microchip XC16 Compiler v1.25 finished... -"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo 
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo "- Downloading Microchip XC16 Compiler v1.25 -"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.25-full-install-linux-installer.run
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo "- Download finished...        -"
+echo "- Adding excecution rights... -"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+chmod +x xc16-v1.25-full-install-linux-installer.run
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+echo "- Installing Microchip XC16 Compiler v1.25 +"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+sudo ./xc16-v1.25-full-install-linux-installer.run --mode unattended --netservername dontknow
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo "- Installation of Microchip XC16 Compiler v1.25 finished... -"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo 
 
-### Compiler
+### Microchip Libraries
 # Install Microchip Peripheral Libraries (PLIBS) v2.00
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Downloading Microchip PLIBS v2.00 -"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#wget http://ww1.microchip.com/downloads/en/DeviceDoc/peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Download finished...        -"
-#echo "- Adding excecution rights... -"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#chmod +x peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-#echo "- Installing Microchip PLIBS v2.00 +"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-#sudo ./peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run --mode unattended
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Installation of Microchip PLIBS v2.00 finished... -"
-#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo 
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo "- Downloading Microchip PLIBS v2.00 -"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+wget http://ww1.microchip.com/downloads/en/DeviceDoc/peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo "- Download finished...        -"
+echo "- Adding excecution rights... -"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+chmod +x peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+echo "- Installing Microchip PLIBS v2.00 +"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+sudo ./peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run --mode unattended
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo "- Installation of Microchip PLIBS v2.00 finished... -"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+echo 
 
 
 ### Compiler
