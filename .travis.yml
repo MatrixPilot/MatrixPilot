@@ -26,34 +26,8 @@ install:
 
 before_script:
   - pwd
-  - ls -la
-  - mkdir -p ./build
 
 script:
-  - cd ./build
-  - mkdir -p ./SIL
-  - cd ./SIL
-  - make -f ../../makefile DEVICE=SIL
-  - ls -la
-  - cd ..
-
-  - mkdir -p ./AUAV3
-  - cd ./AUAV3
-  -  make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
-  - ls -la
-  - cd ..
-
-  - mkdir -p ./UDB5
-  - cd ./UDB5
-  -  make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
-  - ls -la
-  - cd ..
-
-  - mkdir -p ./UDB4
-  - cd ./UDB4
-  -  make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
-  - ls -la *.hex
-  - cd ..
+  - ./build-all.sh
 
 after_success:
-  - cd ~
