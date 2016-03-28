@@ -29,7 +29,7 @@ mkdir ../install-dependencies
 cd ../install-dependencies
 
 export XC16-VER=v1.24
-#echo "- Microchip XC16 Compiler" $XC16-VER " -"
+echo "- Microchip XC16 Compiler " $XC16-VER " -"
 
 ### IDE
 # Install MPLAB X IDE v3.15
@@ -53,22 +53,22 @@ export XC16-VER=v1.24
 #echo 
 
 ### Compiler
-# Install Microchip XC16 Compiler v1.26
+# Install Microchip XC16 Compiler v1.25
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo "- Downloading Microchip XC16 Compiler v1.26 -"
+echo "- Downloading Microchip XC16 Compiler v1.25 -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.26-full-install-linux-installer.run
+wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.25-full-install-linux-installer.run
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo "- Download finished...        -"
 echo "- Adding excecution rights... -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-chmod +x xc16-v1.26-full-install-linux-installer.run
+chmod +x xc16-v1.25-full-install-linux-installer.run
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-echo "- Installing Microchip XC16 Compiler v1.26 +"
+echo "- Installing Microchip XC16 Compiler v1.25 +"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-sudo ./xc16-v1.26-full-install-linux-installer.run --mode unattended --netservername dontknow
+sudo ./xc16-v1.25-full-install-linux-installer.run --mode unattended --netservername dontknow
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo "- Installation of Microchip XC16 Compiler v1.26 finished... -"
+echo "- Installation of Microchip XC16 Compiler v1.25 finished... -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo 
 
