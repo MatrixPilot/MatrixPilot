@@ -30,24 +30,24 @@ cd ../install-dependencies
 
 ### IDE
 # Install MPLAB X IDE v3.15
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-echo "- Downloading MPLAB X IDE v3.15... +"
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-wget http://ww1.microchip.com/downloads/en/DeviceDoc/MPLABX-v3.15-linux-installer.tar
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo "- Download finished...                          -"
-echo "- Unpacking MPLABX-v3.15-linux-installer.tar... -"
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-tar -xvf MPLABX-v3.15-linux-installer.tar
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo "- Unpack finished...              -"
-echo "- Installing MPLAB X IDE v3.15... -"
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-sudo ./MPLABX-v3.15-linux-installer.sh -- --mode unattended
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo "- Installation of MPLAB X IDE v3.15 finished... -"
-echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo 
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+#echo "- Downloading MPLAB X IDE v3.15... +"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+#wget http://ww1.microchip.com/downloads/en/DeviceDoc/MPLABX-v3.15-linux-installer.tar
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Download finished...                          -"
+#echo "- Unpacking MPLABX-v3.15-linux-installer.tar... -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#tar -xvf MPLABX-v3.15-linux-installer.tar
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Unpack finished...              -"
+#echo "- Installing MPLAB X IDE v3.15... -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#sudo ./MPLABX-v3.15-linux-installer.sh -- --mode unattended
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Installation of MPLAB X IDE v3.15 finished... -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo 
 
 ### Compiler
 # Install MPLAB XC16 Compiler v1.25
