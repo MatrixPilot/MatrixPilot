@@ -54,16 +54,16 @@ cd ../install-dependencies
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo "- Downloading MPLAB XC16 Compiler v1.25 -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.25-full-install-linux-installer.run
+wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.24-full-install-linux-installer.run
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo "- Download finished...        -"
 echo "- Adding excecution rights... -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-chmod +x xc16-v1.25-full-install-linux-installer.run
+chmod +x xc16-v1.24-full-install-linux-installer.run
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 echo "- Installing MPLAB XC16 Compiler v1.25 +"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-sudo ./xc16-v1.25-full-install-linux-installer.run --mode unattended --netservername dontknow
+sudo ./xc16-v1.24-full-install-linux-installer.run --mode unattended --netservername dontknow
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo "- Installation of MPLAB XC16 Compiler v1.25 finished... -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"

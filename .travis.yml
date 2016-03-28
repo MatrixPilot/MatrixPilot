@@ -52,7 +52,7 @@ script:
   - mkdir -p ./UDB4
   - cd ./UDB4
   -  make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
-  - ls -la
+  - ls -la *.hex
   - cd ..
 
 after_success:
