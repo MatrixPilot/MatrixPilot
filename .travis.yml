@@ -21,7 +21,7 @@ before_install:
 # Install needed IDE and compiler
 install:
  - ./travis-install-dependencies.sh
- - export PATH=$PATH:/opt/microchip/xc16/v1.25/bin
+ - export PATH=$PATH:/opt/microchip/xc16/v1.24/bin
  - xc16-gcc --version
 
 before_script:
