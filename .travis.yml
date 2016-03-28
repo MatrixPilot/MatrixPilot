@@ -3,6 +3,26 @@
 
 language: c
 
+
+sudo: true
+
+addons:
+  apt:
+    packages:
+    - libc6:i386
+    - libx11-6:i386
+    - libxext6:i386
+    - libstdc++6:i386
+    - libexpat1:i386
+
+before_install: 
+ - chmod +x travis-install-dependencies.sh
+
+# Install needed IDE and compiler
+install:
+ - ./travis-install-dependencies.sh
+
+
 before_script:
   - pwd
   - ls -la
@@ -10,8 +30,17 @@ before_script:
 
 script:
   - cd ./build
-  - make -f ../makefile DEVICE=SILSIM
+  - mkdir -p ./SIL
+  - cd ./SIL
+  - make -f ../../makefile DEVICE=SIL
   - ls -la
+  - cd ~
+
+  - mkdir -p ./AUAV3
+  - cd ./AUAV3
+  -  make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
+  - ls -la
+  - cd ~
 
 after_success:
   - cd ~
