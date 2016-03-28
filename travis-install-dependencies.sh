@@ -54,9 +54,9 @@ export XC16-VER=v1.24
 #echo 
 
 ### Compiler
-# Install MPLAB XC16 Compiler v1.25
+# Install Microchip XC16 Compiler v1.25
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Downloading MPLAB XC16 Compiler v1.25 -"
+#echo "- Downloading Microchip XC16 Compiler v1.25 -"
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 #wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.25-full-install-linux-installer.run
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
@@ -65,13 +65,34 @@ export XC16-VER=v1.24
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 #chmod +x xc16-v1.25-full-install-linux-installer.run
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-#echo "- Installing MPLAB XC16 Compiler v1.25 +"
+#echo "- Installing Microchip XC16 Compiler v1.25 +"
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 #sudo ./xc16-v1.25-full-install-linux-installer.run --mode unattended --netservername dontknow
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-#echo "- Installation of MPLAB XC16 Compiler v1.25 finished... -"
+#echo "- Installation of Microchip XC16 Compiler v1.25 finished... -"
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 #echo 
+
+### Compiler
+# Install Microchip Peripheral Libraries (PLIBS) v2.00
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Downloading Microchip PLIBS v2.00 -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#wget http://ww1.microchip.com/downloads/en/DeviceDoc/peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Download finished...        -"
+#echo "- Adding excecution rights... -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#chmod +x peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+#echo "- Installing Microchip PLIBS v2.00 +"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+#sudo ./peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run --mode unattended
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Installation of Microchip PLIBS v2.00 finished... -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo 
+
 
 ### Compiler
 # Install MPLAB XC16 Compiler v1.24
@@ -100,6 +121,3 @@ popd
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 echo "- All installations finished +"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-
-export PATH=$PATH:/opt/microchip/xc16/v1.24/bin
-xc16-gcc --version
