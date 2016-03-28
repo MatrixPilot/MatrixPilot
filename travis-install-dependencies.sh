@@ -28,6 +28,10 @@ pushd .
 mkdir ../install-dependencies
 cd ../install-dependencies
 
+export XC16-VER=v1.24
+
+#echo "- Microchip XC16 Compiler" $XC16-VER " -"
+
 ### IDE
 # Install MPLAB X IDE v3.15
 #echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
@@ -51,8 +55,28 @@ cd ../install-dependencies
 
 ### Compiler
 # Install MPLAB XC16 Compiler v1.25
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Downloading MPLAB XC16 Compiler v1.25 -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.25-full-install-linux-installer.run
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Download finished...        -"
+#echo "- Adding excecution rights... -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#chmod +x xc16-v1.25-full-install-linux-installer.run
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+#echo "- Installing MPLAB XC16 Compiler v1.25 +"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+#sudo ./xc16-v1.25-full-install-linux-installer.run --mode unattended --netservername dontknow
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo "- Installation of MPLAB XC16 Compiler v1.25 finished... -"
+#echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#echo 
+
+### Compiler
+# Install MPLAB XC16 Compiler v1.24
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo "- Downloading MPLAB XC16 Compiler v1.25 -"
+echo "- Downloading MPLAB XC16 Compiler v1.24 -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.24-full-install-linux-installer.run
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
@@ -61,13 +85,14 @@ echo "- Adding excecution rights... -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 chmod +x xc16-v1.24-full-install-linux-installer.run
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-echo "- Installing MPLAB XC16 Compiler v1.25 +"
+echo "- Installing MPLAB XC16 Compiler v1.24 +"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 sudo ./xc16-v1.24-full-install-linux-installer.run --mode unattended --netservername dontknow
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-echo "- Installation of MPLAB XC16 Compiler v1.25 finished... -"
+echo "- Installation of MPLAB XC16 Compiler v1.24 finished... -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo 
+
 
 # Return to the saved working directory
 popd
@@ -75,3 +100,6 @@ popd
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 echo "- All installations finished +"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+
+ - export PATH=$PATH:/opt/microchip/xc16/v1.24/bin
+ - xc16-gcc --version
