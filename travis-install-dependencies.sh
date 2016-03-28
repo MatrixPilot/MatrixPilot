@@ -101,5 +101,5 @@ echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 echo "- All installations finished +"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 
- - export PATH=$PATH:/opt/microchip/xc16/v1.24/bin
- - xc16-gcc --version
+export PATH=$PATH:/opt/microchip/xc16/v1.24/bin
+xc16-gcc --version
