@@ -28,8 +28,9 @@ pushd .
 mkdir ../install-dependencies
 cd ../install-dependencies
 
-export XC16-VER=v1.24
-echo "- Microchip XC16 Compiler " $XC16-VER " -"
+export XC16VER=v1.24
+echo "- Microchip XC16 Compiler "$XC16VER" -"
+echo "- Microchip XC16 Compiler $XC16VER -"
 
 ### IDE
 # Install MPLAB X IDE v3.15
@@ -86,7 +87,7 @@ chmod +x peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 echo "- Installing Microchip PLIBS v2.00 +"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
-sudo ./peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run --mode unattended --prefix /opt/microchip/xc16/v1.26
+sudo ./peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run --mode unattended --prefix /opt/microchip/xc16/v1.25
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo "- Installation of Microchip PLIBS v2.00 finished... -"
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
