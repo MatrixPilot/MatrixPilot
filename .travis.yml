@@ -56,8 +56,11 @@ script:
   - ls -la *.hex *.map
   - cd ..
 
- - export PATH=/opt/microchip/xc16/v1.24/bin:$PATH
- - xc16-gcc --version
+  - cd ..
+
+  - pwd
+  - export PATH=/opt/microchip/xc16/v1.24/bin:$PATH
+  - xc16-gcc --version
   - ./build-all.sh
   
 after_success:
