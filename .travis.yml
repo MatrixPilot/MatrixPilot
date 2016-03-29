@@ -71,4 +71,4 @@ deploy:
   file: "./build-yml/MatrixPilot-SIL-GCC.out"
   skip_cleanup: true
   on:
-    tags: true
+    tags: false
