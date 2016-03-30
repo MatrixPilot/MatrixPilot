@@ -14,13 +14,10 @@
 #  Author: Peter Hollands, Copyright Peter Hollands 2009, 2010, 2011, 2012
 #
 
-from xml.dom import minidom
 from math  import *
 from Tkinter import *
 from tkMessageBox import *
 from zipfile import ZipFile,ZIP_DEFLATED
-from time import sleep
-from time import time
 from check_telemetry_type import check_type_of_telemetry_file
 import tkFileDialog
 import datetime
@@ -31,10 +28,13 @@ import sys
 import os
 import stat
 
-from matrixpilot_lib import ascii_telemetry
 from matrixpilot_lib import raw_mavlink_telemetry_file
 from matrixpilot_lib import ascii_telemetry_file
 from matrixpilot_lib import write_mavlink_to_serial_udb_extra
+from matrixpilot_lib import normalize_vector_3x1
+from matrixpilot_lib import matrix_cross_product_vector_3x1
+from matrixpilot_lib import matrix_transpose
+from matrixpilot_lib import matrix_multiply_3x3_3x1
 
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
@@ -713,7 +713,6 @@ def create_flown_waypoint_kml_using_telemetry(flight_origin,file_handle_kml,flig
     """Create a waypoint flown state machine; write KML to create lines in GE that represent Logo waypoints"""
     state_debug = False   # Set to True see state machine in operation if debugging
     list_debug  = False   # Set to True to see each waypoint structure after it is created
-    waypoint_log = []
     
     STATE_NONE = 1
     STATE_START = 2
@@ -1524,14 +1523,14 @@ class clock() :
         xml_time = time.strftime("%Y-%m-%dT%H:%M:%SZ")
         return (xml_time)
     
-    def synthesize(self,gps_time):
+    def synthesize(self,gps_time,record_no):
        """Create synthetic time between entries which have identical gps time"""
        assumed_telemetry_time_delta = 250     # expected time difference between telemetry entries in ms
        if gps_time == self.last_gps_time :
            self.identical_gps_time_count += 1
            if self.identical_gps_time_count > 4 :
                print "Warning: More than 4 identical telemetry entries with identical time stamps"
-               print "at gps time:", gps_time
+               print "at gps time:", gps_time,"record number:",record_no
            return(gps_time + assumed_telemetry_time_delta)
        else:
            self.last_gps_time = gps_time
@@ -1932,9 +1931,14 @@ class flight_log_book:
         self.F14 = "Empty"
         self.F15 = "Empty"
         self.F16 = "Empty"
+        self.F17 = "Empty"
+        self.F18 = "Empty"
+        self.F19 = "Empty"
+        self.F20 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
+        self.nominal_cruise_speed = 0
 
 def calc_average_wind_speed(log_book):
     if log_book.racing_mode == 0 :
@@ -2128,7 +2132,7 @@ def create_log_book(options) :
                     log_book.primary_locator = IMU
                 if ((log.inline_waypoint_x != 0) or (log.inline_waypoint_y != 0) or (log.inline_waypoint_z != 0)):
                     log_book.waypoints_in_telemetry = True
-                log.tm = flight_clock.synthesize(log.tm) # interpolate time between identical entries
+                log.tm = flight_clock.synthesize(log.tm,record_no) # interpolate time between identical entries
                 if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
                     log_book.entries.append(log)
                     miss_out_counter = 0
@@ -2199,6 +2203,34 @@ def create_log_book(options) :
             log_book.id_lead_pilot = log.id_lead_pilot
             log_book.id_diy_drones_url = log.id_diy_drones_url
             log_book.F16 = "Recorded"
+        elif log.log_format == "F17" : # We have Helical Turns related Control Gains
+            log_book.feed_forward = log.feed_forward
+            log_book.navigation_max_earth_vertical_axis_rotation_rate = \
+                    log.navigation_max_earth_vertical_axis_rotation_rate
+            log_book.fly_by_wire_max_earth_vertical_axis_rotation_rate = \
+                    log.fly_by_wire_max_earth_vertical_axis_rotation_rate
+            log_book.F17 = "Recorded"
+        elif log.log_format == "F18" : # We have Helical Turns related angle of attack and trim values
+            log_book.angle_of_attack_normal = log.angle_of_attack_normal
+            log_book.angle_of_attack_inverted = log.angle_of_attack_inverted
+            log_book.elevator_trim_normal = log.elevator_trim_normal
+            log_book.elevator_trim_inverted = log.elevator_trim_inverted
+            log_book.nominal_cruise_speed = log.nominal_cruise_speed
+            log_book.F18 = "Recorded"
+        elif log.log_format == "F19" : # Channels numbers and reversal of channels
+            log_book.aileron_output_channel = log.aileron_output_channel
+            log_book.aileron_output_reversed = log.aileron_output_reversed
+            log_book.elevator_output_channel = log.elevator_output_channel
+            log_book.elevator_output_reversed = log.elevator_output_reversed 
+            log_book.throttle_output_channel = log.throttle_output_channel
+            log_book.throttle_output_reversed = log.throttle_output_reversed
+            log_book.rudder_output_channel = log.rudder_output_channel
+            log_book.rudder_output_reversed = log.rudder_output_reversed
+            log_book.F19 = "Recorded"
+        elif log.log_format == "F20" : # Number of Input Channels and Trim Values
+            log_book.number_of_input_channels = log.number_of_input_channels
+            log_book.channel_trim_values = log.channel_trim_values
+            log_book.F20 = "Recorded"
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
@@ -2268,17 +2300,79 @@ def write_csv(options,log_book):
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
-    print >> f_csv, "Flags,Sonar Dst,ALT_SONAR"
+    print >> f_csv, "Flags Dec,Flags Hex,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA Pitch"
+    
+    counter = 0
+    total = 0
+    aoa_using_pitch_list = []
+    aoa_using_velocity_list = []
+    wing_loading_list = []
+    elevator_with_trim_removed = []
+    elevator_reversal_multiplier = 1 # 1 Meaning do not reverse; -1 to reverse
+    if log_book.F20 == "Empty" or log_book.F19 == "Empty" :
+        print ("Did not receive Elevator Trim Values: setting to default of 3000")
+        print "Reversal of Trim Channel may not be correct"
+        print log_book.F19, log_book.F20
+        elevator_trim_pwm_value = 3000
+    else :
+        elevator_trim_pwm_value = log_book.channel_trim_values[log_book.elevator_output_channel]
+        print "Elevator Trim Value set to ",elevator_trim_pwm_value, "(UDB PWM Units)"
+        if log_book.elevator_output_reversed == 1:
+            elevator_reversal_multiplier = -1
+        
+    if (log_book.nominal_cruise_speed > 0 ):
+        cruise_speed = log_book.nominal_cruise_speed
+        print "Using Nominal Cruise Speed from options.h of ", cruise_speed, " m/s"
+    else:
+        #Don't have a cruise speed from options.h so calculate one for ourselves
+        for entry in log_book.entries :
+            if ( entry.est_airspeed > 0):
+                counter += 1
+                total += entry.est_airspeed
+                
+        average_est_airspeed = int(float(total) / counter) # cm / second
+        cruise_speed = int( average_est_airspeed / 100)
+        print "Using calculated Cruise Speed (options.h CRUISE_SPEED not found)", cruise_speed, " m/s"
+    centimeter_cruise_speed = cruise_speed * 100
+    
+    print "Writing CSV file..."
     for entry in log_book.entries :
+        rmat = [entry.rmat0, entry.rmat1, entry.rmat2, \
+                entry.rmat3, entry.rmat4, entry.rmat5, \
+                entry.rmat6, entry.rmat7, entry.rmat8]
+        IMUvelocity =   [entry.IMUvelocityx, entry.IMUvelocityy, entry.IMUvelocityz]
+        EstimatedWind = [entry.est_wind_x,   entry.est_wind_y,   entry.est_wind_z  ]
+        VelocityThruAir = []
+        VelocityThruAir.append(IMUvelocity[0] - EstimatedWind[0])
+        VelocityThruAir.append(IMUvelocity[1] - EstimatedWind[1])
+        # For purposes of AoA calibration ignore vertical wind as that wind calculation effected by AoA settings
+        VelocityThruAir.append(IMUvelocity[2])
+        incidence = angle_of_incidence(rmat, VelocityThruAir)
+        aoa_using_velocity = angle_of_attack(rmat,VelocityThruAir)
+        if ( abs(entry.roll) > 90 ):
+            aoa_using_pitch = rmat[7] / 287.0     # creates degrees of pitch : plane is inverted
+        else :
+            aoa_using_pitch = - (rmat[7] / 287.0) # plane is right way up
+        relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
+        elevator_without_trim = elevator_reversal_multiplier * \
+                                (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value) 
+        
+        if is_level_flight_data(entry, centimeter_cruise_speed):
+            aoa_using_pitch_list.append(aoa_using_pitch)
+            aoa_using_velocity_list.append(aoa_using_velocity)
+            wing_loading_list.append(relative_wing_loading)
+            elevator_with_trim_removed.append(float(elevator_without_trim) / 1000)
+        
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
               entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
-              entry.waypointIndex, ",", int (entry.altitude / 100.0) , "," , \
+              entry.waypointIndex, ",", "{0:.2f}".format(entry.altitude / 100.0), "," , \
               entry.rmat0, "," , entry.rmat1, "," , entry.rmat2 , "," ,\
               entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
               entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
-              int(-entry.pitch), ",", int(-entry.roll), ",", int(entry.heading_degrees) , "," , \
+              "{0:.2f}".format(-entry.pitch), ",", "{0:.2f}".format(-entry.roll), \
+                              ",", "{0:.2f}".format(entry.heading_degrees), "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
               entry.est_airspeed, "," , entry.est_wind_x, "," , entry.est_wind_y, ",", entry.est_wind_z , "," , \
@@ -2291,12 +2385,130 @@ def write_csv(options,log_book):
               int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z), "," , \
               entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
               entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
-              entry.flags, ",", entry.sonar_direct, ",",  entry.alt_sonar
+              entry.flags, ",",hex(entry.flags),",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
+              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(incidence), \
+              ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa_using_pitch)
 
     f_csv.close()
+    if (options.graph == 1): graph_wing_loading(wing_loading_list, aoa_using_pitch_list,
+                                aoa_using_velocity_list,elevator_with_trim_removed, cruise_speed)
     return
-       
 
+def graph_wing_loading(wing_loading_list, aoa_using_pitch_list, aoa_using_velocity_list,
+                       elevator_with_trim_removed, nominal_cruise_speed):
+    """Graph Angle of Attack against Relative Wing Loading"""
+    try:
+            from pylab import polyfit, poly1d
+            from pylab import plot, show, xlabel,ylabel, title
+            from pylab import figure, subplot,subplots_adjust
+    except:
+            print "Not plotted: pylab library was not available."
+            return
+    print "Plotting AoA and Elevator Graph..."
+    print "Fitting linear lines to scatter plot..."
+    #print len(wing_loading_list), len(aoa_list)
+    fit = polyfit(wing_loading_list,aoa_using_pitch_list,1)
+    fit_function = poly1d(fit)
+    figure(1)
+    subplot(3,1,1)
+    title('Level flight: Angle of Attack (derived via Pitch) against Relative Wing Loading')
+    xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
+    ylabel('Angle of Attack\nIn Degrees')
+    plot(wing_loading_list, aoa_using_pitch_list, 'yo',wing_loading_list, fit_function(wing_loading_list), '--k')
+
+    fit = polyfit(wing_loading_list,aoa_using_velocity_list,1)
+    fit_function3 = poly1d(fit)
+    subplot(3,1,2)
+    title('Level flight: Angle of Attack (derived from Velocity) against Relative Wing Loading')
+    xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
+    ylabel('Angle of Attack\nin Degrees')
+    plot(wing_loading_list, aoa_using_velocity_list, 'yo',wing_loading_list, fit_function3(wing_loading_list), '--k')
+
+    #print len(wing_loading_list), len(elevator_with_trim_removed)
+    fit = polyfit(wing_loading_list,elevator_with_trim_removed,1)
+    fit_function2 = poly1d(fit)
+    
+    subplot(3,1,3)
+    xlabel('Relative Wing Loading (Nominal Cruise Speed '+str(nominal_cruise_speed)+ ' m/s)')
+    ylabel('Elevator difference from Trim\n(UDB PWM Units / 1000)')
+    title('Level flight: Elevator Deflection against Relative Wing Loading')
+    plot(wing_loading_list, elevator_with_trim_removed, 'yo',wing_loading_list, fit_function2(wing_loading_list), '--k')
+    
+    print "Angle of attack parameters usinging pitch:"
+    print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function(  1.0))
+    print "#define ANGLE_OF_ATTACK_INVERTED","{0:.2f}".format(fit_function( -1.0))
+    print "Angle of attack parameters using velocity:"
+    print "#define ANGLE_OF_ATTACK_NORMAL",  "{0:.2f}".format(fit_function3(  1.0))
+    print "#define ANGLE_OF_ATTACK_INVERTED","{0:.2f}".format(fit_function3( -1.0))
+    print "Trim parameters:"
+    print "#define ELEVATOR_TRIM_NORMAL",    "{0:.2f}".format(fit_function2( 1.0))
+    print "#define ELEVATOR_TRIM_INVERTED",  "{0:.2f}".format(fit_function2(-1.0))
+    
+    print "plotting"
+    subplots_adjust(hspace = 0.45)
+    show()
+    print "Plot finished."
+    return
+    
+def is_level_flight_data(entry, centimeter_cruise_speed):
+    allowed_pitch_error  = 5 # degrees: Note this is flight path pitch, not heading pitch
+    allowed_roll_error   = 5 # degrees
+    max_IMUvelocityz = entry.est_airspeed * sin(allowed_pitch_error * pi/180)
+    if ((abs(entry.IMUvelocityz) < max_IMUvelocityz ) and ((abs(entry.roll) < allowed_roll_error)  \
+            or (abs(entry.roll) > (180 - allowed_roll_error)) )\
+            and (entry.est_airspeed > (0.5 * centimeter_cruise_speed))) \
+            and (entry.IMUlocationz_W1 > 10): # Exclude data below 10m above boot location to remove non-flight runway data
+        return True
+    else:
+        return False
+
+def angle_of_incidence(rmat, VelocityThruAir):
+    """Calculate difference in heading vector from flight path vector for angle of attack"""
+    # rmat1,4,7 gives heading vector of plane but we want it in same earth reference as IMUVelocity
+    # rmat is using UDB aviation coordinates with rmat1: West as positive, rmat4: North Positive, rmat7 Down Positive
+    # IMUVelocity is using earth coordinates with X being East, Y being North, and Z being Up
+    a = [ - rmat[1], rmat[4], - rmat[7]]
+    b = VelocityThruAir
+    c = normalize_vector_3x1(a)
+    d = normalize_vector_3x1(b)
+    #e = matrix_dot_product_vector_3x1(c,d)
+    e = matrix_cross_product_vector_3x1(c,d)
+    magnitude_of_e = sqrt(e[0]**2+e[1]**2+e[2]**2)
+    #print c,d,e
+    angle_radians = asin(magnitude_of_e)
+    angle_degrees = 180 * angle_radians / pi
+    # Note: angle_degrees is Angle of Incidence (AoI) which is the same angle of attack in much of the flight.
+    # Please be aware that AoI includes also an aspect of side slip. So it is not exactlyaer
+    # Angle of Attack.
+    return(angle_degrees)
+
+def angle_of_attack(rmat,velocity):
+    """Calculate a true estimate of angle of attack"""
+    earth_to_body_matrix = matrix_transpose(rmat)
+    
+    # convert IMUVelocity from earth GPS frame to UDB Earth frame
+    velocity[0] = - velocity[0]
+    velocity[2] = - velocity[2]
+    # convert IMUVelocity from UDB Earth frame to the UDB Body Frame
+    velocity_in_body = matrix_multiply_3x3_3x1(earth_to_body_matrix, velocity)
+    # calculate an accurate angle of attack that excludes sideslip
+    if (velocity_in_body[1] == 0):
+        aoa = 0
+    else:
+        aoa = (180.0 / pi)* atan(float(velocity_in_body[2])/float(velocity_in_body[1])) 
+    return(aoa)
+
+def wing_loading(aero_force, air_speed, centimeter_cruise_speed):
+    """Calculate relative wing loading"""
+    # gravity = 2000 # MatrixPilot represents the force of gravity with 2000 units (this works only for HILSIM)
+    if (air_speed < (centimeter_cruise_speed / 10.0)):
+        relative_wing_loading = 0; # To prevent divide by zero and or reports of very large wing loading
+    else :
+        if ( aero_force < 0):
+            relative_wing_loading = ((float(centimeter_cruise_speed) / float(air_speed))**2)
+        else:
+            relative_wing_loading = -((float(centimeter_cruise_speed) / float(air_speed))**2)    
+    return(relative_wing_loading)
  
 ########## User Interface Routines, functions and classes ##########
 
@@ -2315,6 +2527,7 @@ class flan_options :
         self.loglevel = 0
         self.gps_delay_correction = 0
         self.relocate = 0
+        self.graph = 0
         pass
 
 def saveObject(filename, object_h) :
@@ -2369,6 +2582,7 @@ def process_telemetry():
     options.altitude_correction = myframe.scl.get()
     options.gps_delay_correction = 0 # now obsolete concept with HBDR: myframe.gps_scl.get()
     options.relocate = myframe.relocate_flag.get()
+    options.graph = myframe.graph_flag.get()
     options.telemetry_type = myframe.telemetry_type
     
     if (options.waypoint_selector == 1 and options.telemetry_selector == 0):
@@ -2435,7 +2649,6 @@ def process_telemetry():
             write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
                                               options.telemetry_type)
     if (options.CSV_selector == 1) and(kml_result == True ):
-        print "Writing CSV file"
         write_csv(options,log_book)
     message_text = "Flight Analyzer Processing Completed"
     showinfo(title  = "Processing Completed", message = message_text)
@@ -2517,6 +2730,12 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         self.CSV_FileShown = Label(self,text = cropped, anchor = W)
         self.CSV_FileShown.grid(row = 7, column = 3, sticky = W)
 
+        self.graph_flag = IntVar()
+        self.Graph = Checkbutton(self, text ="Graph Trim & AoA",variable = self.graph_flag,  \
+                          command = self.graph_selected, anchor=W)
+        if (options.graph == 1) : self.Graph.select()
+        else : self.Graph.deselect()
+        self.Graph.grid( row = 8 , column = 1, sticky = "NW")
         
         Label(self, text = "    ", anchor=W).grid(row = 9, column = 1, sticky=W)
         
@@ -2526,7 +2745,7 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
 
         self.relocate_flag = IntVar()
         Label(self, text = "Options", anchor=W).grid(row = 10, column = 2, sticky=W)
-        self.Relocate = Checkbutton(self, text ="Process\n as race\nin\nVenice",variable = self.relocate_flag,  \
+        self.Relocate = Checkbutton(self, text ="Process\n as race",variable = self.relocate_flag,  \
                                 anchor=W)
         if (options.relocate == 1) : self.Relocate.select()
         else : self.Relocate.deselect()
@@ -2534,7 +2753,6 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         #self.gps_scl = Scale(self, from_=15, to=0, tickinterval = 5, resolution = 1)
         #self.gps_scl.set(options.gps_delay_correction)
         #self.gps_scl.grid(row=11, column = 2, sticky=W)
-
 
         self.start_button = Button(self, text = 'Start', command = process_telemetry , state = "disabled")
         self.start_button.grid(row = 11,column = 3)
@@ -2544,7 +2762,25 @@ class  flan_frame(Frame) : # A window frame for the Flight Analyzer
         Label(self, text = "   ", anchor=W).grid(row = 11, column = 5, sticky=W) # add space to right
         Label(self, text = "   ", anchor=W).grid(row = 11, column =0, sticky=W)  # add space to left
         return
-
+    
+    def graph_selected(self):
+        """Check that graphing routines are available"""
+        try:
+            from pylab import plot
+            from pylab import show
+            from pylab import polyfit
+            from pylab import poly1d
+        except:
+            print "Not plotted: pylab library was not available"
+            showinfo(title='Routines for graphing are not available\n',  \
+                           message='Routines for graphing are not available.\n'+
+                                 'It would appear that the python "pylab" routines are not installed on this computer.\n'+
+                                 'It is best to download a pre-loaded version of python that includes these routines. '+
+                                 'The following site is recommended:-\n\n'+
+                                 'https://www.enthought.com/products/canopy/\n\n'+
+                                 'The free version of python in "Canopy Express" contains the necessary pylab library.')
+            self.Graph.deselect()
+        
     def crop_filename(self,filename):
         """Crop a filename for display pourposes"""
         max_length = 72
@@ -2845,6 +3081,10 @@ if __name__=="__main__":
                 options.relocate
             except:
                 options.relocate = 0
+            try :
+                options.graph
+            except:
+                options.graph = 0
         except:
             options = flan_options() # Assume we have not run the program before.
         root = Tk()
