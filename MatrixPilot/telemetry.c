@@ -676,14 +676,14 @@ void telemetry_output_8hz(void)
 			{
 				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
 				              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
-				              "c%u:s%i:cpu%u:bmv%i:"
+				              "c%u:s%i:cpu%u:"
 				              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
 				    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
 				    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 				    rmat[0], rmat[1], rmat[2],
 				    rmat[3], rmat[4], rmat[5],
 				    rmat[6], rmat[7], rmat[8],
-				    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
+				    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), 
 				    air_speed_3DIMU,
 				    estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
@@ -719,6 +719,17 @@ void telemetry_output_8hz(void)
 //				serial_output("tmp%i:prs%li:alt%li:agl%li:",
 //				    get_barometer_temperature(), get_barometer_pressure(), 
 //				    get_barometer_alt(), get_barometer_agl());
+				serial_output("bmv%i:mA%i:mAh%i:",
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+                battery_voltage._.W1,
+#else
+                (int16_t)0,
+#endif
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)                        
+				battery_current._.W1, battery_mAh_used._.W1);
+#else
+				(int16_t)0, (int16_t)0);                    
+#endif                            
 #if (RECORD_FREE_STACK_SPACE == 1)
 				extern uint16_t maxstack;
 				serial_output("stk%d:", (int16_t)(4096-maxstack));
