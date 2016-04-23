@@ -474,7 +474,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 12;
+static int16_t telemetry_counter = 11;
 
 void telemetry_restart(void)
 {
