@@ -2300,7 +2300,8 @@ def write_csv(options,log_book):
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
     print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
-    print >> f_csv, "Flags Dec,Flags Hex,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA Pitch"
+    print >> f_csv, "Flags Dec,Flags Hex,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA Pitch,",
+    print >> f_csv, "Volts,Amps,mAh"
     
     counter = 0
     total = 0
@@ -2387,7 +2388,9 @@ def write_csv(options,log_book):
               entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
               entry.flags, ",",hex(entry.flags),",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
               entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(incidence), \
-              ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa_using_pitch)
+              ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa_using_pitch), \
+              ",","{0:.3f}".format(entry.battery_voltage/10),",","{0:.3f}".format(entry.battery_ampage/10), \
+              ",","{0:.3f}".format(entry.battery_amphours)
 
     f_csv.close()
     if (options.graph == 1): graph_wing_loading(wing_loading_list, aoa_using_pitch_list,
