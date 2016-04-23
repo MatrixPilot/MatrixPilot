@@ -2183,11 +2183,11 @@ def create_log_book(options) :
             log_book.pitchatzerothrottle = log.pitchatzerothrottle
             log_book.F8 = "Recorded"
         elif (log.log_format == "F11") or (log.log_format == "F14") : # We have a type of options.h line
-            # All the F11 data variables need saving here ...
+            # All the F11  and F14 data variables need saving here ...
             log_book.dead_reckoning = log.dead_reckoning
-            if log.log_format == "F14" :
-                log_book.flight_plan_type = log.flight_plan_type
-                log_book.F14 = "Recorded"
+            log_book.airframe = log.airframe
+            log_book.flight_plan_type = log.flight_plan_type
+            log_book.F14 = "Recorded"
             log_book.F11 = "Recorded"
         elif log.log_format == "F13" : # We have origin information from telemetry
             log_book.gps_week = log.gps_week
@@ -2314,12 +2314,16 @@ def write_csv(options,log_book):
         print "Reversal of Trim Channel may not be correct"
         print log_book.F19, log_book.F20
         elevator_trim_pwm_value = 3000
+        aileron_trim_pwm_value = 3000
     else :
         elevator_trim_pwm_value = log_book.channel_trim_values[log_book.elevator_output_channel]
         print "Elevator Trim Value set to ",elevator_trim_pwm_value, "(UDB PWM Units)"
         if log_book.elevator_output_reversed == 1:
             elevator_reversal_multiplier = -1
-        
+        if log_book.airframe == 3: # Delta Aiframe e.g. Flying Wing
+            aileron_trim_pwm_value = log_book.channel_trim_values[log_book.aileron_output_channel]
+            if log_book.aileron_output_reversed == 1:
+                aileron_reversal_multiplier = -1
     if (log_book.nominal_cruise_speed > 0 ):
         cruise_speed = log_book.nominal_cruise_speed
         print "Using Nominal Cruise Speed from options.h of ", cruise_speed, " m/s"
@@ -2354,8 +2358,16 @@ def write_csv(options,log_book):
         else :
             aoa_using_pitch = - (rmat[7] / 287.0) # plane is right way up
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
-        elevator_without_trim = elevator_reversal_multiplier * \
-                                (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value) 
+        if log_book.airframe == 1: # Normal type of plane
+            elevator_without_trim = elevator_reversal_multiplier * \
+                   (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value)
+        elif log_book.airframe == 3: # Delta Wing, unmix elevator and aileron
+            elevator_without_trim = (( elevator_reversal_multiplier * \
+                   (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value)) + \
+                   (aileron_reversal_multiplier * \
+                   (entry.pwm_output[log_book.aileron_output_channel] - aileron_trim_pwm_value)) * 2)
+        else :
+            print "Warning using Airframe type that is not yet supported", log_book.airframe
         
         if is_level_flight_data(entry, centimeter_cruise_speed):
             aoa_using_pitch_list.append(aoa_using_pitch)
