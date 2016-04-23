@@ -2365,7 +2365,7 @@ def write_csv(options,log_book):
             elevator_without_trim = (( elevator_reversal_multiplier * \
                    (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value)) + \
                    (aileron_reversal_multiplier * \
-                   (entry.pwm_output[log_book.aileron_output_channel] - aileron_trim_pwm_value)) * 2)
+                   (entry.pwm_output[log_book.aileron_output_channel] - aileron_trim_pwm_value)) / 2)
         else :
             print "Warning using Airframe type that is not yet supported", log_book.airframe
         
