@@ -80,7 +80,7 @@
 //#define SERIAL_BAUDRATE                     19200
 
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
+#if ((SERIAL_OUTPUT_FORMAT != SERIAL_NONE) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
