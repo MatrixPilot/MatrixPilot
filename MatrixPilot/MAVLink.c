@@ -133,6 +133,8 @@ void mavlink_init(void)
 {
 	int16_t index;
 
+	udb_init_USART(&mavlink_callback_get_byte_to_send, &mavlink_callback_received_byte);
+	udb_serial_set_rate(MAVLINK_BAUD);
 	mavlink_process_message_handle = register_event_p(&handleMessage, EVENT_PRIORITY_MEDIUM);
 	mavlink_system.sysid = MAVLINK_SYSID; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1; // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
