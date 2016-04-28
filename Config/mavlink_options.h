@@ -30,12 +30,7 @@
 
 #ifndef USE_MAVLINK
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)             //support the current method for configuring Mavlink
-#ifndef SERIAL_BAUDRATE
-#define SERIAL_BAUDRATE 57600 // default
-#pragma warning SERIAL_BAUDRATE set to default value of 57600 bps
-#endif
 #define USE_MAVLINK                         1
-#define MAVLINK_BAUD                        SERIAL_BAUDRATE
 #endif
 #endif
 
