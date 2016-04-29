@@ -80,7 +80,7 @@
 //#define SERIAL_BAUDRATE                     19200
 
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
+#if ((SERIAL_OUTPUT_FORMAT != SERIAL_NONE) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -130,7 +130,7 @@ void telemetry_init(void)
 
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 19200 // default
-#pragma warning SERIAL_BAUDRATE set to default value of 19200 bps
+#warning SERIAL_BAUDRATE set to default value of 19200 bps
 #endif
 
 #if (CONSOLE_UART != 2)

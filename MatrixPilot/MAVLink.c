@@ -40,8 +40,18 @@
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
 #include "mavlink_options.h"
-
+                               
 #if (USE_MAVLINK == 1)
+
+#ifndef MAVLINK_BAUD
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)             //support the current method for configuring Mavlink
+#ifndef SERIAL_BAUDRATE
+#define SERIAL_BAUDRATE 57600 // default
+#warning SERIAL_BAUDRATE set to default value of 57600 bps
+#endif
+#define MAVLINK_BAUD                        SERIAL_BAUDRATE
+#endif
+#endif
 
 #include "MAVLink.h"
 #include "MAVParams.h"
@@ -133,6 +143,8 @@ void mavlink_init(void)
 {
 	int16_t index;
 
+	udb_init_USART(&mavlink_callback_get_byte_to_send, &mavlink_callback_received_byte);
+	udb_serial_set_rate(MAVLINK_BAUD);
 	mavlink_process_message_handle = register_event_p(&handleMessage, EVENT_PRIORITY_MEDIUM);
 	mavlink_system.sysid = MAVLINK_SYSID; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1; // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
