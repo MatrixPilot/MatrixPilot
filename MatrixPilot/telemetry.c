@@ -130,7 +130,7 @@ void telemetry_init(void)
 
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 19200 // default
-#pragma warning SERIAL_BAUDRATE set to default value of 19200 bps
+#warning SERIAL_BAUDRATE set to default value of 19200 bps
 #endif
 
 #if (CONSOLE_UART != 2)
