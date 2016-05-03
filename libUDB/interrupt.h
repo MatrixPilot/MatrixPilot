@@ -21,7 +21,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optionally enable the new power saving idle mode of the MCU during mainloop
-#define USE_MCU_IDLE    1
+#define USE_MCU_IDLE    0
 
 
 #define INT_PRI_T1      6   // background.c : high priority HEARTBEAT of libUDB
