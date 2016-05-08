@@ -97,7 +97,7 @@ void save_altitudeCntrlVariable(void);
 #define SERIAL_MAVLINK      9    // The Micro Air Vehicle Link protocol from the PixHawk Project
 
 
-//#include "gain_variables.h"
+#include "gain_variables.h"
 
 // GNU compiler specific macros for specifically marking variables as unused
 // If not using GNU, then these macros make no alteration to the code
