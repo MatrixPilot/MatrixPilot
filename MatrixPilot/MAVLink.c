@@ -965,9 +965,17 @@ void mavlink_output_40hz(void)
 		    0,              // Sensors enabled
 		    0,              // Sensor health
 		    udb_cpu_load() * 10,
-		    0,              // Battery voltage in mV
-		    0,              // Current
-		    0,              // Percentage battery remaining 100 percent is 1000
+            #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+                battery_voltage._.W1 * 100,     // Battery voltage, in millivolts (1 = 1 millivolt)
+            #else
+                (int16_t)0,
+            #endif
+		    #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)                        
+                battery_current._.W1 * 10,      // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
+            #else
+				(int16_t)0,                    
+            #endif
+		    0,                              // Percentage battery remaining 100 percent is 1000
 		    r_mavlink_status.packet_rx_drop_count,
 		    0,              // errors_comm
 		    0,              // errors_count1
