@@ -975,7 +975,7 @@ void mavlink_output_40hz(void)
             #else
 				(int16_t)0,                    
             #endif
-		    0,                              // Percentage battery remaining 100 percent is 1000
+		    100,                               // Remaining battery energy: (0%: 0, 100%: 100), -1: autopilot estimate the remaining battery
 		    r_mavlink_status.packet_rx_drop_count,
 		    0,              // errors_comm
 		    0,              // errors_count1
