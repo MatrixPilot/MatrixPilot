@@ -951,7 +951,6 @@ void mavlink_output_40hz(void)
 		    (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
 		    ((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
-		    (float) -IMUvelocityz._.W1 / 100.0);                                // Current climb rate in meters/second
 		    (float) IMUvelocityz._.W1 / 100.0);                                 // Current climb rate in meters/second
 		//void mavlink_msg_vfr_hud_send(mavlink_channel_t chan, float airspeed, float groundspeed, int16_t heading, uint16_t throttle, float alt, float climb)
 	}
