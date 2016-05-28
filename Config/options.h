@@ -760,6 +760,8 @@
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 //#define USE_DEBUG_IO
 
+// Enable support for external wing led, currently supported only by UDB4 and UDB5
+#define USE_WING_LED 1
 
 ////////////////////////////////////////////////////////////////////////////////
 // AUAV3 only options

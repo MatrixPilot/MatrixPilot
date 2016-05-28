@@ -139,4 +139,10 @@ static void heartbeat_pulse(void)
 		flexiFunctionServiceTrigger();
 #endif
 	}
+#if (USE_WING_LED == 1)    
+    if (udb_heartbeat_counter % (HEARTBEAT_HZ/20) == 0)
+	{
+        led_wing_heartbeat_callback();
+    }
+#endif
 }

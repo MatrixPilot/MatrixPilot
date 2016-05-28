@@ -311,9 +311,11 @@ static void init_leds(void)
 	_LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
 	_TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
 #elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	_LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
-	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
-#else
+	_LATE1  = LED_OFF;      _LATE2   = LED_OFF;  _LATE3  = LED_OFF;  _LATE4  = LED_OFF;
+	_TRISE1 = 0;            _TRISE2  = 0;        _TRISE3 = 0;        _TRISE4 = 0;
+    _LATA5  = LED_OFF_WING;  _LATA14  = LED_OFF_WING;
+    _TRISA5 = 0;            _TRISA14 = 0;
+#else   
 #error Invalid BOARD_TYPE
 #endif // BOARD_TYPE
 }

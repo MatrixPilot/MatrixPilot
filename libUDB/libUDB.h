@@ -254,6 +254,8 @@ void led_off(uint8_t x);
 //#define led_off(x)                      ((x) = 1)
 #define led_on(x)                       ((x) = LED_ON)
 #define led_off(x)                      ((x) = LED_OFF)
+#define led_on_wing(x)                   ((x) = LED_ON_WING)
+#define led_off_wing(x)                  ((x) = LED_OFF_WING)
 #endif
 
 
