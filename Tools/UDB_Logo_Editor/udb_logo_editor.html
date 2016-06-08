@@ -132,7 +132,7 @@
 	var oldPlanePointLng;
 	
     function setPlaneMarker(){
-	  var myImage = "http://gentlenav.googlecode.com/svn/trunk/Tools/UDB_Logo_Editor/plane.png";
+	  var myImage = "plane.png";
       planeMarker = new google.maps.Marker({position: planePoint, draggable: true, icon:myImage});
       google.maps.event.addListener(planeMarker, "dragstart", function() {
 		infoWindow.close();
@@ -143,7 +143,7 @@
 	}
 	
 	function setPlaneAngleMarker(){
-	  var myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/circular/greencirclemarker.png";
+	  var myImage = "https://raw.githubusercontent.com/googlemaps/js-v2-samples/gh-pages/markers/circular/greencirclemarker.png";
       planeAngleMarker = new google.maps.Marker({position: planeAnglePoint, draggable: true, icon:myImage});
       google.maps.event.addListener(planeAngleMarker, "dragend", planeAngleMarkerMoved);
     }
@@ -1003,10 +1003,10 @@ the overlay itself.
       var index = waypoints.length;
 	  var myImage;
 	  if (index < 99) {
-		myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker" + (index+1) + ".png"; // TODO: Set image based on flags
+		myImage = "https://raw.githubusercontent.com/googlemaps/js-v2-samples/gh-pages/markers/red/marker" + (index+1) + ".png"; // TODO: Set image based on flags
       }
 	  else {
-		myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png";
+		myImage = "https://raw.githubusercontent.com/googlemaps/js-v2-samples/gh-pages/markers/red/blank.png";
 	  }
 	  var latlng;
       if(flags.indexOf("F_ABSOLUTE") > -1) {
@@ -1051,7 +1051,7 @@ the overlay itself.
 //TODO: Make sure name is unique
       var index = cameras.length;
       var myIcon = new GIcon(baseIcon);
-      myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker" + index + ".png";
+      myIcon.image = "https://raw.githubusercontent.com/googlemaps/js-v2-samples/gh-pages/markers/blue/marker" + index + ".png";
       var latlng = new google.maps.LatLng(lat, lng);
       var marker = new google.maps.Marker({position: latlng, draggable: false, icon:myIcon});
       marker.UDBname = name;
@@ -1303,7 +1303,7 @@ function do_resize() {
 	<table border="0">
 	<tr>
 	<td valign="top">
-		<h2>UDB Logo Editor <a target="_blank" href="http://code.google.com/p/gentlenav/source/browse/trunk/MatrixPilot/flightplan-logo.h#69">[Reference]</a></h2>
+		<h2>UDB Logo Editor <a target="_blank" href="https://github.com/MatrixPilot/MatrixPilot/blob/master/MatrixPilot/flightplan-logo.h#69">[Reference]</a></h2>
         <textarea name="waypoints_h" id="waypoints_h" rows="60" cols="55" wrap="off" onBlur="reloadWaypointsHeader();" onkeydown="return catchTab(this,event)" style="font-family: monospace;">
 //////////////////////////////////////////////////
 // UDB Logo Simulation
