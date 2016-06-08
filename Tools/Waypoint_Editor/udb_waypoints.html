@@ -368,7 +368,7 @@ the overlay itself.
 			///alert("About to add waypoint " + index + " (" + letter + ") at (" + lat +", "+lng+", "+flags+", "+camView);
 			/////      var myIcon = new GIcon(baseIcon);
 			
-			var myImage = "http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker" + (index+1) + ".png"; // TODO: Set image based on flags
+			var myImage = "https://raw.githubusercontent.com/googlemaps/js-v2-samples/gh-pages/markers/red/marker" + (index+1) + ".png"; // TODO: Set image based on flags
 			
 			var latlng;
 			
@@ -410,7 +410,7 @@ the overlay itself.
 			//TODO: Make sure name is unique
 			var index = cameras.length;
 			var myIcon = new GIcon(baseIcon);
-			myIcon.image = "http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker" + index + ".png";
+			myIcon.image = "https://raw.githubusercontent.com/googlemaps/js-v2-samples/gh-pages/markers/red/marker" + index + ".png";
 			var latlng = new google.maps.LatLng(lat, lng);
 			var marker = new google.maps.Marker({position: latlng, draggable: true, icon:myIcon});
 			marker.UDBname = name;
@@ -782,7 +782,7 @@ function do_resize() {
 	<table border="0">
 	<tr>
 	<td valign="top">
-		<h2>UDB Waypoint Editor <a target="_blank" href="http://code.google.com/p/gentlenav/source/browse/trunk/MatrixPilot/waypoints.h#52">[Reference]</a></h2>
+		<h2>UDB Waypoint Editor <a target="_blank" href="https://github.com/MatrixPilot/MatrixPilot/blob/master/MatrixPilot/waypoints.h">[Reference]</a></h2>
         <textarea name="waypoints_h" id="waypoints_h" rows="60" cols="55" wrap="off" onFocus="waypointsDidFocus();" onBlur="waypointsDidBlur();" onkeydown="return catchTab(this,event)" style="font-family: monospace;">
 ////////////////////////////////////////////////////////////////////////////////
 // This is an example course that makes a 100 meter square, 75 meters above the starting point, and
