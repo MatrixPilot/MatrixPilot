@@ -65,13 +65,3 @@ script:
   
 after_success:
   - cd ~
-<<<<<<< HEAD
-
-deploy:
-  provider: releases
-  file: "./build-yml/MatrixPilot-SIL-GCC.out"
-  skip_cleanup: true
-  on:
-    tags: false
-=======
->>>>>>> upstream/master

@@ -318,10 +318,7 @@ void sil_reset(void)
 	if (gpsSocket)       UDBSocket_close(gpsSocket);
 	if (telemetrySocket) UDBSocket_close(telemetrySocket);
 	if (serialSocket)    UDBSocket_close(serialSocket);
-<<<<<<< HEAD
-=======
 
->>>>>>> upstream/master
 #ifdef _MSC_VER
 	_execv(mp_argv[0], args);
 #else
