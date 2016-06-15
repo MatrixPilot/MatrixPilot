@@ -59,12 +59,12 @@ script:
   - cd ..
 
   - pwd
-#  - export PATH=/opt/microchip/xc16/v1.24/bin:$PATH
+  - export PATH=/opt/microchip/xc16/v1.24/bin:$PATH
 #  - export PATH=/opt/microchip/xc16/v1.26/bin:$PATH
-#  - xc16-gcc --version
+  - xc16-gcc --version
 #  - elf-ld --version
 #  - cat ./opt/microchip/xc16/v1.26/support/dsPIC33E/gld/p33EP512MU810.gld
-#  - ./build-all.sh
+  - ./build-all.sh
   
 after_success:
   - cd ~
