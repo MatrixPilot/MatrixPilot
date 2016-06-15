@@ -2,18 +2,14 @@
 @for /f "usebackq" %%i in (`git symbolic-ref -q HEAD`) do @echo %%~ni
 
 goto START:
+:START
 
 .\Tools\Build\pyProjectCreator.py -n MatrixPilot -t SIL -c Config/Cessna
 .\Tools\Build\pyProjectCreator.py -n MatrixPilot -t SIL -c Config/CloudsFly
 
-:START
-
 .\Tools\Build\pyProjectCreator.py -n MatrixPilot -t PX4 -c Config/Cessna -d HILSIM
 
-goto END:
-
 .\Tools\Build\pyProjectCreator.py -n MatrixPilot -t AUAV3 -c Config/Cessna -d HILSIM
-
 
 .\Tools\Build\pyProjectCreator.py -n RollPitchYaw -t PX4
 .\Tools\Build\pyProjectCreator.py -n RollPitchYaw -t UDB4

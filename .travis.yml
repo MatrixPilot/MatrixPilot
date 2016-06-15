@@ -65,6 +65,7 @@ script:
   
 after_success:
   - cd ~
+<<<<<<< HEAD
 
 deploy:
   provider: releases
@@ -72,3 +73,5 @@ deploy:
   skip_cleanup: true
   on:
     tags: false
+=======
+>>>>>>> upstream/master

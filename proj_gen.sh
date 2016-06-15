@@ -4,7 +4,7 @@
 #python ./Tools/Build/pyProjectCreator.py -n MatrixPilot -t SIL -c Config/CloudsFly
 python ./Tools/Build/pyProjectCreator.py -n MatrixPilot -t PX4 -c Config/Cessna -d HILSIM
 
-exit 0
+#exit 0
 
 python ./Tools/Build/pyProjectCreator.py -n MatrixPilot -t UDB4
 python ./Tools/Build/pyProjectCreator.py -n MatrixPilot -t UDB5

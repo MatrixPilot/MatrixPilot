@@ -80,7 +80,7 @@
 //#define SERIAL_BAUDRATE                     19200
 
 
-#if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
+#if ((SERIAL_OUTPUT_FORMAT != SERIAL_NONE) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -130,7 +130,7 @@ void telemetry_init(void)
 
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 19200 // default
-#pragma warning SERIAL_BAUDRATE set to default value of 19200 bps
+#warning SERIAL_BAUDRATE set to default value of 19200 bps
 #endif
 
 #if (CONSOLE_UART != 2)
@@ -474,7 +474,7 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 12;
+static int16_t telemetry_counter = 11;
 
 void telemetry_restart(void)
 {
@@ -574,6 +574,7 @@ void telemetry_output_8hz(void)
 	int16_t i;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	static int toggle = 0;
+	static boolean f13_print_prepare = false;
 #endif
 //	static int16_t telemetry_counter = 8;
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
@@ -672,19 +673,29 @@ void telemetry_output_8hz(void)
 
 			toggle = !toggle;
 
-			if (toggle)
+			if (state_flags._.f13_print_req == 1)
 			{
-				serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
-				              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
-				              "c%u:s%i:cpu%u:bmv%i:"
-				              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-				    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
-				    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
-				    rmat[0], rmat[1], rmat[2],
-				    rmat[3], rmat[4], rmat[5],
-				    rmat[6], rmat[7], rmat[8],
-				    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
-				    air_speed_3DIMU,
+				if (toggle && !f13_print_prepare)
+				{
+					f13_print_prepare = true;
+					return;  //wait for next run
+				}
+ 			}
+			if (!f13_print_prepare)
+			{
+				if (toggle)
+				{
+					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
+					              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
+					              "c%u:s%i:cpu%u:"
+					              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+					    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
+					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
+					    rmat[0], rmat[1], rmat[2],
+					    rmat[3], rmat[4], rmat[5],
+					    rmat[6], rmat[7], rmat[8],
+					    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), 
+					    air_speed_3DIMU,
 				    estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
 				    magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
@@ -693,37 +704,49 @@ void telemetry_output_8hz(void)
 #endif // MAG_YAW_DRIFT
 				    svs, hdop);
 
-				// Approximate time passing between each telemetry line, even though
-				// we may not have new GPS time data each time through.
-				if (tow.WW > 0) tow.WW += 250; 
+					// Approximate time passing between each telemetry line, even though
+					// we may not have new GPS time data each time through.
+					if (tow.WW > 0) tow.WW += 250; 
 
-				// Save  pwIn and PwOut buffers for printing next time around
-				for (i = 0; i <= NUM_INPUTS; i++)
-					pwIn_save[i] = udb_pwIn[i];
-				for (i = 0; i <= NUM_OUTPUTS; i++)
-					pwOut_save[i] = udb_pwOut[i];
-			}
-			else
-			{
-				int16_t i;
-				vect3_16t goal;
-				navigate_get_goal(&goal);
-				for (i= 1; i <= NUM_INPUTS; i++)
-					serial_output("p%ii%i:",i,pwIn_save[i]);
-				for (i= 1; i <= NUM_OUTPUTS; i++)
-					serial_output("p%io%i:",i,pwOut_save[i]);
-				serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:AF%i,%i,%i:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
-				    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
-				    state_flags.WW, osc_fail_count,
-				    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z);
-//				serial_output("tmp%i:prs%li:alt%li:agl%li:",
-//				    get_barometer_temperature(), get_barometer_pressure(), 
-//				    get_barometer_alt(), get_barometer_agl());
+					// Save  pwIn and PwOut buffers for printing next time around
+					for (i = 0; i <= NUM_INPUTS; i++)
+						pwIn_save[i] = udb_pwIn[i];
+					for (i = 0; i <= NUM_OUTPUTS; i++)
+						pwOut_save[i] = udb_pwOut[i];
+				}
+				else
+				{
+					int16_t i;
+					vect3_16t goal;
+					navigate_get_goal(&goal);
+					for (i= 1; i <= NUM_INPUTS; i++)
+						serial_output("p%ii%i:",i,pwIn_save[i]);
+					for (i= 1; i <= NUM_OUTPUTS; i++)
+						serial_output("p%io%i:",i,pwOut_save[i]);
+					serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:AF%i,%i,%i:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
+					    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
+					    state_flags.WW, osc_fail_count,
+	                    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z, aero_force[0], aero_force[1], aero_force[2]);
+//					serial_output("tmp%i:prs%li:alt%li:agl%li:",
+//					    get_barometer_temperature(), get_barometer_pressure(), 
+//					    get_barometer_alt(), get_barometer_agl());
+					serial_output("bmv%i:mA%i:mAh%i:",
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+	                battery_voltage._.W1,
+#else
+	                (int16_t)0,
+#endif
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)                        
+					battery_current._.W1, battery_mAh_used._.W1);
+#else
+					(int16_t)0, (int16_t)0);                    
+#endif                            
 #if (RECORD_FREE_STACK_SPACE == 1)
-				extern uint16_t maxstack;
-				serial_output("stk%d:", (int16_t)(4096-maxstack));
+					extern uint16_t maxstack;
+					serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif // RECORD_FREE_STACK_SPACE
-				serial_output("\r\n");
+					serial_output("\r\n");
+				}
 			}
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
@@ -740,7 +763,15 @@ extern int16_t udb_magOffset[3];
 			{
 				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-				if (toggle) return;
+				if (!f13_print_prepare)
+				{
+					return;
+				}
+				else
+				{
+					f13_print_prepare = false;
+				}
+
 #endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
 				serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);

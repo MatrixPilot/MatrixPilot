@@ -258,6 +258,9 @@ class base_telemetry :
         self.rudder_output_reversed   = 0
         self.number_of_input_channels = 0
         self.channel_trim_values = [0]
+        self.battery_voltage = 0
+        self.battery_ampage = 0
+        self.battery_amphours = 0
        
 
 class mavlink_telemetry(base_telemetry):
@@ -1227,7 +1230,33 @@ class ascii_telemetry(base_telemetry):
                 except:
                     print "Corrupt F2: Aero Force value in line", line_no
                     pass
-            
+            match = re.match(".*:bmv([-0-9]*?):",line) # Battery Voltage
+            if match :
+                try:
+                    self.battery_voltage  = float(match.group(1))
+                except:
+                    print "Corrupt battery_voltage value in line", line_no
+                    return "Error"
+            else :
+                pass
+            match = re.match(".*:mA([-0-9]*?):",line) # Battery Ampage
+            if match :
+                try:
+                    self.battery_ampage  = float(match.group(1))
+                except:
+                    print "Corrupt battery_ampage value in line", line_no
+                    return "Error"
+            else :
+                pass
+            match = re.match(".*:mAh([-0-9]*?):",line) # Battery Amp Hours
+            if match :
+                try:
+                    self.battery_amphours  = float(match.group(1))
+                except:
+                    print "Corrupt battery_amphours value in line", line_no
+                    return "Error"
+            else :
+                pass
             
              # line was parsed without major errors
             return "F2"

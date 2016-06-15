@@ -40,8 +40,18 @@
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
 #include "mavlink_options.h"
-
+                               
 #if (USE_MAVLINK == 1)
+
+#ifndef MAVLINK_BAUD
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)             //support the current method for configuring Mavlink
+#ifndef SERIAL_BAUDRATE
+#define SERIAL_BAUDRATE 57600 // default
+#warning SERIAL_BAUDRATE set to default value of 57600 bps
+#endif
+#define MAVLINK_BAUD                        SERIAL_BAUDRATE
+#endif
+#endif
 
 #include "MAVLink.h"
 #include "MAVParams.h"
@@ -133,6 +143,8 @@ void mavlink_init(void)
 {
 	int16_t index;
 
+	udb_init_USART(&mavlink_callback_get_byte_to_send, &mavlink_callback_received_byte);
+	udb_serial_set_rate(MAVLINK_BAUD);
 	mavlink_process_message_handle = register_event_p(&handleMessage, EVENT_PRIORITY_MEDIUM);
 	mavlink_system.sysid = MAVLINK_SYSID; // System ID, 1-255, ID of your Plane for GCS
 	mavlink_system.compid = 1; // Component/Subsystem ID,  (1-255) MatrixPilot on UDB is component 1.
@@ -939,7 +951,7 @@ void mavlink_output_40hz(void)
 		    (int16_t)mavlink_heading,
 		    (uint16_t)(((float)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL]) - udb_pwTrim[THROTTLE_INPUT_CHANNEL]) * 100.0) / (float)(pwOut_max - udb_pwTrim[THROTTLE_INPUT_CHANNEL])),
 		    ((float)(IMUlocationz._.W1 + (alt_origin.WW / 100.0))),
-		    (float) -IMUvelocityz._.W1);
+		    (float) IMUvelocityz._.W1 / 100.0);                                 // Current climb rate in meters/second
 		//void mavlink_msg_vfr_hud_send(mavlink_channel_t chan, float airspeed, float groundspeed, int16_t heading, uint16_t throttle, float alt, float climb)
 	}
 #endif // (MSG_VFR_HUD_WITH_POSITION == 1)
@@ -953,9 +965,17 @@ void mavlink_output_40hz(void)
 		    0,              // Sensors enabled
 		    0,              // Sensor health
 		    udb_cpu_load() * 10,
-		    0,              // Battery voltage in mV
-		    0,              // Current
-		    0,              // Percentage battery remaining 100 percent is 1000
+            #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+                battery_voltage._.W1 * 100,     // Battery voltage, in millivolts (1 = 1 millivolt)
+            #else
+                (int16_t)0,
+            #endif
+		    #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)                        
+                battery_current._.W1 * 10,      // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
+            #else
+				(int16_t)0,                    
+            #endif
+		    100,                               // Remaining battery energy: (0%: 0, 100%: 100), -1: autopilot estimate the remaining battery
 		    r_mavlink_status.packet_rx_drop_count,
 		    0,              // errors_comm
 		    0,              // errors_count1

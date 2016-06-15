@@ -110,14 +110,14 @@ void init_altitudeCntrlVariable(void)
 
 void save_altitudeCntrlVariable(void)
 {
-	gains.HeightTargetMax = height_target_max;
-	gains.HeightTargetMin = height_target_min;
+	altit.HeightTargetMax = height_target_max;
+	altit.HeightTargetMin = height_target_min;
 //	height_margin;
-	gains.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
-	gains.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
-	gains.AltHoldPitchMin = alt_hold_pitch_min;
-	gains.AltHoldPitchMax = alt_hold_pitch_max;
-	gains.AltHoldPitchHigh = alt_hold_pitch_high;
+	altit.AltHoldThrottleMin = alt_hold_throttle_min / RMAX;
+	altit.AltHoldThrottleMax = alt_hold_throttle_max / RMAX;
+	altit.AltHoldPitchMin = alt_hold_pitch_min;
+	altit.AltHoldPitchMax = alt_hold_pitch_max;
+	altit.AltHoldPitchHigh = alt_hold_pitch_high;
 //	rtl_pitch_down;
 //	desiredSpeed / 10;
 //	speed_control;
@@ -284,7 +284,8 @@ static void normalAltitudeCntrl(void)
 				// In stabilized mode using pitch-only altitude hold, use desiredHeight as
 				// set from the state machine upon entering stabilized mode in ent_stabilizedS()
 			}
-			else if ((settings._.AltitudeholdStabilized == AH_FULL) || (settings._.AltitudeholdStabilized == AH_THROTTLE_ONLY))
+			//else if ((settings._.AltitudeholdStabilized == AH_FULL) ||/// (settings._.AltitudeholdStabilized == AH_THROTTLE_ONLY))
+			else if (settings._.AltitudeholdStabilized == AH_FULL)
 			{
 				// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
 				desiredHeight = ((__builtin_mulss(height_throttle_gain, throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
