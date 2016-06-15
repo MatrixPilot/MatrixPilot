@@ -52,10 +52,12 @@ static boolean flightplan_logo_active = false;
 
 void flightplan_init(void)
 {
+// TODO: investigate this as both flightplan options need to be 
+//       initialised to support runtime selection
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	flightplan_logo_active = true;
 	flightplan_logo_init();
-#else   
+#else
 	flightplan_waypoints_init();
 #endif
 	DPRINT("flightplan_init() - %s\r\n", flightplan_logo_active ? "LOGO" : "WAYPOINTS");
