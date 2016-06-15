@@ -40,7 +40,7 @@
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
 #include "mavlink_options.h"
-                               
+
 #if (USE_MAVLINK == 1)
 
 #ifndef MAVLINK_BAUD
@@ -965,16 +965,16 @@ void mavlink_output_40hz(void)
 		    0,              // Sensors enabled
 		    0,              // Sensor health
 		    udb_cpu_load() * 10,
-            #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
-                battery_voltage._.W1 * 100,     // Battery voltage, in millivolts (1 = 1 millivolt)
-            #else
-                (int16_t)0,
-            #endif
+		    #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+		        battery_voltage._.W1 * 100,     // Battery voltage, in millivolts (1 = 1 millivolt)
+		    #else
+		        (int16_t)0,
+			#endif
 		    #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)                        
-                battery_current._.W1 * 10,      // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
-            #else
-				(int16_t)0,                    
-            #endif
+		        battery_current._.W1 * 10,      // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
+		    #else
+		        (int16_t)0,
+		    #endif
 		    100,                               // Remaining battery energy: (0%: 0, 100%: 100), -1: autopilot estimate the remaining battery
 		    r_mavlink_status.packet_rx_drop_count,
 		    0,              // errors_comm

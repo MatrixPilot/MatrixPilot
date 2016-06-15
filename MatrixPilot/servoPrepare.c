@@ -86,23 +86,23 @@ static void flight_controller(void)
 		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
 	
 #if (DEADRECKONING == 1)
-        navigate_process_flightplan();
+		navigate_process_flightplan();
 #endif
 #if (ALTITUDE_GAINS_VARIABLE == 1)
         airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
-        updateBehavior();
-        wind_gain = wind_gain_adjustment();
-        helicalTurnCntrl();
-        rollCntrl();
-        yawCntrl();
-        altitudeCntrl();
-        pitchCntrl();
-        servoMix();
-        cameraCntrl();
-        cameraServoMix();
-        updateTriggerAction();
-    }
+		updateBehavior();
+		wind_gain = wind_gain_adjustment();
+		helicalTurnCntrl();
+		rollCntrl();
+		yawCntrl();
+		altitudeCntrl();
+		pitchCntrl();
+		servoMix();
+		cameraCntrl();
+		cameraServoMix();
+		updateTriggerAction();
+	}
 }
 
 static void manualPassthrough(void)
