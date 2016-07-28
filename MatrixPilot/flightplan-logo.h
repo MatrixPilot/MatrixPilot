@@ -542,6 +542,7 @@ END
 // (proving that it is not on the bench, not on the ground, and not in a tree) 
 // does the full flight plan to return home engage, and the motor start.
 
+ #define CIRCLE 1
  
  const struct logoInstructionDef rtlInstructions[] = {
 
