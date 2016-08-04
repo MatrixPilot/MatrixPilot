@@ -22,6 +22,7 @@
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/osd.h"
+#include "../../libUDB/ADchannel.h"
 #include "font_data.h"
 
 
@@ -136,7 +137,7 @@ void udb_callback_radio_did_turn_off(void) {}
 
 void init_analogs(void) {}
 void init_events(void) {}
-void udb_init_capture(void) {}
+void radioIn_init(void) {}
 void MPU6000_init16(void) {}
 
 int16_t failSafePulses = 0;
@@ -155,7 +156,7 @@ struct ADchannel udb_yrate;
 struct ADchannel udb_zrate;
 
 void start_pwm_outputs(void) {}
-void udb_init_pwm(void) {}
+void servoOut_init(void) {}
 
 void udb_init_GPS(void) {}
 void udb_init_USART(void) {}
