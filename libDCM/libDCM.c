@@ -62,15 +62,14 @@ void dcm_init(void)
 #error here
 #endif
 
-static boolean dcm_run_calib_step(uint16_t count)
+void dcm_run_calib_step(uint16_t count)
 {
 	if (count == CALIB_COUNT)
 	{
 		DPRINT("calib_finished\r\n");
-		dcm_calibrate();    // Finish calibration
-		return true;        // indicate that we are done
+		dcm_flags._.calib_finished = 1;
+        dcm_calibrate();    // Finish calibration
 	}
-	return false;
 }
 
 static boolean gps_run_init_step(uint16_t count)
@@ -160,7 +159,7 @@ void udb_heartbeat_callback(void)
 	{
 		if (!dcm_flags._.calib_finished)
 		{
-			dcm_flags._.calib_finished = dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
 		}
 		if (!dcm_flags._.init_finished)
 		{
@@ -180,11 +179,10 @@ void udb_heartbeat_callback(void)
 void dcm_calibrate(void)
 {
 	// Don't allow re/calibrating before the initial calibration period has finished
-	// This FIX ONLY Experimental for ROllPitchYaw, until the calling of dcm_calibrate is fully understood.
-    //if (dcm_flags._.calib_finished)
-	//{
+    if (dcm_flags._.calib_finished)
+	{
 		udb_a2d_record_offsets();
-	//}
+	}
 }
 
 void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)
