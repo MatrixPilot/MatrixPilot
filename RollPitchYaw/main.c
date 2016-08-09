@@ -24,6 +24,7 @@
 
 #include "../libDCM/libDCM.h"
 #include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/rmat.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/serialIO.h"
