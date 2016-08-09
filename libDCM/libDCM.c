@@ -180,10 +180,11 @@ void udb_heartbeat_callback(void)
 void dcm_calibrate(void)
 {
 	// Don't allow re/calibrating before the initial calibration period has finished
-	if (dcm_flags._.calib_finished)
-	{
+	// This FIX ONLY Experimental for ROllPitchYaw, until the calling of dcm_calibrate is fully understood.
+    //if (dcm_flags._.calib_finished)
+	//{
 		udb_a2d_record_offsets();
-	}
+	//}
 }
 
 void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)

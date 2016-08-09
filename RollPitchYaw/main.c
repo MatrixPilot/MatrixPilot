@@ -42,7 +42,7 @@ void send_debug_line(void);
 int main(void)
 {
 	mcu_init();
-
+    gps_init();     // this sets function pointers 
 	// Set up the libraries
 	udb_init();
 	dcm_init();
