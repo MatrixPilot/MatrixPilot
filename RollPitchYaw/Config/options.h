@@ -181,7 +181,7 @@
 #define CONSOLE_UART                        0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
-#define USE_DEBUG_IO
+//#define USE_DEBUG_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////
