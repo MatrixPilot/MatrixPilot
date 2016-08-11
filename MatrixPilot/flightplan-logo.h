@@ -532,3 +532,57 @@ TO (INT_HANDLER_LEFT)
 END
 };
 */
+
+
+/*
+// This Return to Landing Flight Plan is designed by Ben Levitt to reduce
+// the chance of the propellor turning on and causing an accident when the radio
+// transmitter is turned off. On Entering RTL the F_LAND flag is turned on, to
+// stop the motor switching on. Only once the plane has traveled some distance
+// (proving that it is not on the bench, not on the ground, and not in a tree) 
+// does the full flight plan to return home engage, and the motor start.
+
+ #define CIRCLE 1
+ 
+ const struct logoInstructionDef rtlInstructions[] = {
+
+	ALT_UP(100)
+
+	// For RTL only -- start with motor off
+	FLAG_ON(F_LAND)
+	FD(50)
+	FLAG_OFF(F_LAND)
+
+	// Line up to begin circling in front of the pilot
+	// about 1 radius left and 1 diameter back from the pilot
+	PEN_UP
+	HOME
+	USE_ANGLE_TO_GOAL
+	BK(170)
+	LT(90)
+	FD(85)
+	RT(90)
+	PEN_DOWN
+
+	// A few Circles powered, ~170m diameter
+	REPEAT(2)
+		DO_ARG(CIRCLE, 15)
+	END
+
+	// Then unpowered circles until landing, , ~170m diameter
+	FLAG_ON(F_LAND)
+	REPEAT_FOREVER
+		DO_ARG(CIRCLE, 15)
+	END
+
+	// Smooth right-hand circles
+	TO(CIRCLE)
+		RT(5)
+		REPEAT(36)
+			FD_PARAM
+			RT(10)
+		END
+		LT(5)
+	END
+};
+*/
