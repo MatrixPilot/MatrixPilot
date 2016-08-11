@@ -66,11 +66,13 @@ void servoPrepare_init(void) // initialize the PWM
 
 	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
+#if (THROTTLE_INPUT_CHANNEL != 0 )
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
 		// initialise the throttle channel to zero, all others to servo midpoint
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
+#endif
 #endif
 	}
 

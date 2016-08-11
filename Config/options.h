@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2015 MatrixPilot Team
+// Copyright 2009-2016 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -58,6 +58,7 @@
 //    AIRFRAME_DELTA            Aileron and Elevator as Elevons, and Rudder(optional)
 //    AIRFRAME_HELI             Not currently supported
 //    AIRFRAME_QUAD             Under development
+//    AIRFRAME_GLIDER           Under development. Elevator, Flaps, Ailerons and/or Rudder control, motor optional 
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
 #define AIRFRAME_TYPE                       AIRFRAME_STANDARD
 
@@ -212,6 +213,9 @@
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
 #define RUDDER_INPUT_CHANNEL                CHANNEL_5
 #define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_4
+#define BRAKE_THR_SEL_INPUT_CHANNEL         CHANNEL_UNUSED
+#define BRAKE_INPUT_CHANNEL                 CHANNEL_UNUSED
+#define FLAPS_INPUT_CHANNEL                 CHANNEL_UNUSED
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -241,9 +245,15 @@
 //
 #define THROTTLE_OUTPUT_CHANNEL             CHANNEL_3
 #define AILERON_OUTPUT_CHANNEL              CHANNEL_1
+#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
 #define ELEVATOR_OUTPUT_CHANNEL             CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL               CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
+#define AILERON_LEFT_OUTPUT_CHANNEL         CHANNEL_UNUSED
+#define FLAP_LEFT_OUTPUT_CHANNEL            CHANNEL_UNUSED
+#define FLAP_RIGHT_OUTPUT_CHANNEL           CHANNEL_UNUSED
+#define AILERON_RIGHT_OUTPUT_CHANNEL        CHANNEL_UNUSED
+#define BRAKE_OUTPUT_CHANNEL                CHANNEL_UNUSED
+#define FLAPS_OUTPUT_CHANNEL                CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL         CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL           CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL              CHANNEL_UNUSED
