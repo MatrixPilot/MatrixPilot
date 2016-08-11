@@ -26,6 +26,7 @@
 #include "servoOut.h"
 #include "analogs.h"
 #include "radioIn.h"
+#include "../libDCM/rmat.h"
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif
