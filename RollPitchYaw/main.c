@@ -24,6 +24,7 @@
 
 #include "../libDCM/libDCM.h"
 #include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/rmat.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/serialIO.h"
@@ -42,12 +43,19 @@ void send_debug_line(void);
 int main(void)
 {
 	mcu_init();
-
+	gps_init();     // this sets function pointers 
 	// Set up the libraries
 	udb_init();
 	dcm_init();
-
+#ifndef SERIAL_BAUDRATE
+#define SERIAL_BAUDRATE 19200 // default
+#warning SERIAL_BAUDRATE set to default value of 19200 bps
+#endif
 	udb_serial_set_rate(SERIAL_BAUDRATE);
+
+#if (CONSOLE_UART != 2)
+	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
+#endif
 
 	led_off(LED_GREEN);
 
