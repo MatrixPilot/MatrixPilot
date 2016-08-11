@@ -112,7 +112,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for status messages
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
-#define SERIAL_BAUDRATE                     19200 // default
+#define SERIAL_BAUDRATE                     57600 // default
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,10 +178,10 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-#define CONSOLE_UART                        1
+#define CONSOLE_UART                        0
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
-#define USE_DEBUG_IO
+//#define USE_DEBUG_IO
 
 
 ////////////////////////////////////////////////////////////////////////////////

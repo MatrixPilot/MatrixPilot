@@ -62,15 +62,14 @@ void dcm_init(void)
 #error here
 #endif
 
-static boolean dcm_run_calib_step(uint16_t count)
+void dcm_run_calib_step(uint16_t count)
 {
 	if (count == CALIB_COUNT)
 	{
 		DPRINT("calib_finished\r\n");
+		dcm_flags._.calib_finished = 1;
 		dcm_calibrate();    // Finish calibration
-		return true;        // indicate that we are done
 	}
-	return false;
 }
 
 static boolean gps_run_init_step(uint16_t count)
@@ -160,7 +159,7 @@ void udb_heartbeat_callback(void)
 	{
 		if (!dcm_flags._.calib_finished)
 		{
-			dcm_flags._.calib_finished = dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
 		}
 		if (!dcm_flags._.init_finished)
 		{
