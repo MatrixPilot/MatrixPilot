@@ -43,7 +43,7 @@ void send_debug_line(void);
 int main(void)
 {
 	mcu_init();
-    gps_init();     // this sets function pointers 
+	gps_init();     // this sets function pointers 
 	// Set up the libraries
 	udb_init();
 	dcm_init();
@@ -51,7 +51,7 @@ int main(void)
 #define SERIAL_BAUDRATE 19200 // default
 #warning SERIAL_BAUDRATE set to default value of 19200 bps
 #endif
-    udb_serial_set_rate(SERIAL_BAUDRATE);
+	udb_serial_set_rate(SERIAL_BAUDRATE);
 
 #if (CONSOLE_UART != 2)
 	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);

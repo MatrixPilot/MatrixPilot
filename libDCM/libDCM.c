@@ -68,7 +68,7 @@ void dcm_run_calib_step(uint16_t count)
 	{
 		DPRINT("calib_finished\r\n");
 		dcm_flags._.calib_finished = 1;
-        dcm_calibrate();    // Finish calibration
+		dcm_calibrate();    // Finish calibration
 	}
 }
 
@@ -179,7 +179,7 @@ void udb_heartbeat_callback(void)
 void dcm_calibrate(void)
 {
 	// Don't allow re/calibrating before the initial calibration period has finished
-    if (dcm_flags._.calib_finished)
+	if (dcm_flags._.calib_finished)
 	{
 		udb_a2d_record_offsets();
 	}
