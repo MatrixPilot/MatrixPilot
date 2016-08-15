@@ -40,6 +40,7 @@
 #include "osd_config.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
+#include "../libUDB/ADchannel.h"
 #endif
 #include "../libUDB/mcu.h"
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
@@ -474,11 +475,11 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 11;
+static int16_t telemetry_counter = 13;
 
 void telemetry_restart(void)
 {
-	telemetry_counter = 11;
+	telemetry_counter = 13;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
@@ -589,7 +590,17 @@ void telemetry_output_8hz(void)
 #endif // SERIAL_OUTPUT_FORMAT
 	switch (telemetry_counter)
 	{
-		// The first lines of telemetry contain info about the compile-time settings from the options.h file
+		case 13:
+			serial_output("F21:Sensors=%i,%i,%i,%i,%i,%i\n",
+				UDB_XACCEL.value, UDB_YACCEL.value,
+				UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))),
+				udb_xrate.value, udb_yrate.value, udb_zrate.value);
+			break;
+		case 12: 
+			serial_output("F20:Offsets=%i,%i,%i,%i,%i,%i\n",
+				UDB_XACCEL.offset, UDB_YACCEL.offset, UDB_ZACCEL.offset,
+				udb_xrate.offset, udb_yrate.offset, udb_zrate.offset);
+			break;
 		case 11:
 			serial_output("F15:IDA=");
 			serial_output(ID_VEHICLE_MODEL_NAME);
