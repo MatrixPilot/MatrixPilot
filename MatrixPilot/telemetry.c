@@ -591,13 +591,13 @@ void telemetry_output_8hz(void)
 	switch (telemetry_counter)
 	{
 		case 13:
-			serial_output("F21:Sensors=%i,%i,%i,%i,%i,%i\n",
+			serial_output("F22:Sensors=%i,%i,%i,%i,%i,%i\n",
 				UDB_XACCEL.value, UDB_YACCEL.value,
 				UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))),
 				udb_xrate.value, udb_yrate.value, udb_zrate.value);
 			break;
 		case 12: 
-			serial_output("F20:Offsets=%i,%i,%i,%i,%i,%i\n",
+			serial_output("F21:Offsets=%i,%i,%i,%i,%i,%i\n",
 				UDB_XACCEL.offset, UDB_YACCEL.offset, UDB_ZACCEL.offset,
 				udb_xrate.offset, udb_yrate.offset, udb_zrate.offset);
 			break;
