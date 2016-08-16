@@ -110,11 +110,25 @@ uint16_t maxstack = 0;
 #endif
 
 
+#define GYRO_POWER_UP_TIME		( 300) // No. of Milliseconds to wait for gyros to power up	
+#define AUTO_ZERO_LATCH_TIME		(  10) // No. of executable instructions to wait 4 microseconds
+#define AUTO_ZERO_SETTLE_TIME		(  20) // No. of executable instructions to wait 10 Milliseconds
+
+
 void udb_init_gyros(void)
 {
 	// turn off auto zeroing 
-	_TRISC4 = _TRISB14 = 0;
-	_LATC4 = _LATB14 = 0;
+	_TRISC4  = 0; //  C4 pin made into an output
+	_TRISB14 = 0; //  B14 pin made into an output
+	_LATC4 =   0; // Turn off auto-zeroing
+	_LATB14 =  0; // Turn off auto-zeroing
+	delay_ms(GYRO_POWER_UP_TIME);
+	_LATC4 =   1; // Turn on auto-zeroing
+	_LATB14 =  1; // Turn on auto-zeroing
+	delay_us(AUTO_ZERO_LATCH_TIME);         // z gyro spec says wait at least 2 microseconds
+	_LATC4 =   0; // Turn off auto-zeroing
+	_LATB14 =  0; // Turn off auto-zeroing
+	delay_ms(AUTO_ZERO_SETTLE_TIME);        // z gyro spec says wait at least 7 microseconds
 }
 
 void udb_init_accelerometer(void)
