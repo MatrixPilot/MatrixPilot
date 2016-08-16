@@ -120,8 +120,8 @@ void udb_init_gyros(void)
 	int i = 0;
 	int j = 0;
 	// turn off auto zeroing 
-	_TRISC4  = 0;
-	_TRISB14 = 0;
+	_TRISC4  = 0; //  C4 pin made into an output
+	_TRISB14 = 0; //  B14 pin made into an output
 	_LATC4 =   0; // Turn off auto-zeroing
 	_LATB14 =  0; // Turn off auto-zeroing
 	for (j = 0; j < 1000 * MIPS; j++)
@@ -130,7 +130,6 @@ void udb_init_gyros(void)
 	}
 	_LATC4 =   1; // Turn on auto-zeroing
 	_LATB14 =  1; // Turn on auto-zeroing
-	
 	for (i = 0; i < AUTO_ZERO_LATCH_TIME; i++ ); // z gyro spec says wait at least 2 microseconds
 	_LATC4 =   0; // Turn off auto-zeroing
 	_LATB14 =  0; // Turn off auto-zeroing
