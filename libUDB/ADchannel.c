@@ -27,53 +27,47 @@ struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z acceleromete
 struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channels
 struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
 
+#ifdef UDB4
+void udb_init_gyros(void);
+#endif
 
-#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
+
 void udb_a2d_record_offsets(void)
 {
+#ifdef UDB4
+	udb_init_gyros();
+#endif
 #if (USE_NV_MEMORY == 1)
 	if (udb_skip_flags.skip_imu_cal == 1)
 		return;
 #endif
-
-	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset = udb_xrate.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
-	udb_yrate.offset = udb_yrate.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-	udb_zrate.offset = udb_zrate.value;
-#ifdef VREF
-	udb_vref.offset = udb_vref.value;
-#endif
-}
-#else  // horizontal initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
 #ifdef CUSTOM_OFFSETS
-	// offsets have been measured manually and entered into the options.h file
+	// offsets have been measured manually and entered into the options.h file	
 	udb_xaccel.offset = XACCEL_OFFSET;
 	udb_yaccel.offset = YACCEL_OFFSET;
 	udb_zaccel.offset = ZACCEL_OFFSET;
-	udb_xrate.offset = XRATE_OFFSET;
-	udb_yrate.offset = YRATE_OFFSET;
-	udb_zrate.offset = ZRATE_OFFSET;
-#else
+	
+#else   // Measure offsets from sensor values now
+#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value;
-	udb_xrate.offset  = udb_xrate.value;
+	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
+	UDB_ZACCEL.offset = UDB_ZACCEL.value;
+#else	// horizontal initialization
+	// almost ready to turn the control on, save the input offsets
+	UDB_XACCEL.offset = UDB_XACCEL.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value;
-	udb_yrate.offset  = udb_yrate.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
-	udb_zrate.offset  = udb_zrate.value;
+#endif // INITIALIZE_VERTICAL	
+	
 #endif // CUSTOM_OFFSETS
+	
+	udb_xrate.offset  = udb_xrate.value;
+	udb_yrate.offset  = udb_yrate.value;
+	udb_zrate.offset  = udb_zrate.value;
+	
 #ifdef VREF
 	udb_vref.offset   = udb_vref.value;
 #endif
 }
-#endif // INITIALIZE_VERTICAL
+

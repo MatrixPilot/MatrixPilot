@@ -93,12 +93,6 @@ const uint32_t adc_rate = ADC_RATE;
 #define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
 const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
-#define _SELECTED_VALUE(l, v) #l#v
-#define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro, macro)
-#warning (SELECTED_VALUE(ADCLK_DIV_N_MINUS_1))
-#warning (SELECTED_VALUE(ADC_CLK))
-#warning (SELECTED_VALUE(ADC_RATE))
-#warning (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))
 #endif // 0/1
 
 int16_t vref_adj;
@@ -110,11 +104,24 @@ uint16_t maxstack = 0;
 #endif
 
 
+#define GYRO_POWER_UP_TIME	( 210 ) // No. of Milliseconds to wait for gyros to power up	
+#define AUTO_ZERO_LATCH_TIME	(   5 ) // No. of Microseconds to wait for Auto-Zero pin to Latch
+#define AUTO_ZERO_SETTLE_TIME	(  15 ) // No. of Microseconds for Auto-Zero to configure gyros
+
+
 void udb_init_gyros(void)
 {
-	// turn off auto zeroing 
-	_TRISC4 = _TRISB14 = 0;
-	_LATC4 = _LATB14 = 0;
+	_TRISC4  = 0;
+	_TRISB14 = 0;
+	_LATC4 =   0; // Turn off auto-zeroing
+	_LATB14 =  0; // Turn off auto-zeroing
+	delay_ms(GYRO_POWER_UP_TIME); //Gyros max spec of 200 milliseconds to start up
+	_LATC4 =   1; // Turn on auto-zeroing
+	_LATB14 =  1; // Turn on auto-zeroing
+	delay_us(AUTO_ZERO_LATCH_TIME); // z gyro spec says wait at least 2 microseconds
+	_LATC4 =   0; // Turn off auto-zeroing
+	_LATB14 =  0; // Turn off auto-zeroing
+	delay_us(AUTO_ZERO_SETTLE_TIME); // z gyro spec says wait at least 7 microseconds
 }
 
 void udb_init_accelerometer(void)
