@@ -167,7 +167,7 @@ void udb_init_ADC(void)
 	AD1PCFGH= 0xFFFF;
 	AD2PCFGL= 0xFFFF;
 
-// include the 500 degree/second scale, gyro
+// include the 110 degree/second scale, gyro
 /*
 	AD1CSSLbits.CSS0 = 1;
 	AD1CSSLbits.CSS3 = 1;
@@ -178,7 +178,7 @@ void udb_init_ADC(void)
 	AD1PCFGLbits.PCFG5 = 0;
  */
 
-// include the 110 degree/second scale, gyro
+// include the 500 degree/second scale, gyro
 	AD1CSSLbits.CSS1 = 1;
 	AD1CSSLbits.CSS4 = 1;
 	AD1CSSLbits.CSS6 = 1;
