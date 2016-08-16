@@ -28,7 +28,6 @@ struct ADchannel udb_xrate,  udb_yrate,  udb_zrate;  // x, y, and z gyro channel
 struct ADchannel udb_vref; // reference voltage (deprecated, here for MAVLink compatibility)
 
 
-#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 void udb_a2d_record_offsets(void)
 {
 #if (USE_NV_MEMORY == 1)
@@ -42,38 +41,17 @@ void udb_a2d_record_offsets(void)
 	udb_yaccel.offset = YACCEL_OFFSET;
 	udb_zaccel.offset = ZACCEL_OFFSET;
 #else
+#ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
-	UDB_ZACCEL.offset = UDB_ZACCEL.value;
-#endif // CUSTOM_OFFSETS
-	
-	udb_xrate.offset  = udb_xrate.value;
-	udb_yrate.offset  = udb_yrate.value;
-	udb_zrate.offset  = udb_zrate.value;	
-	
-#ifdef VREF
-	udb_vref.offset = udb_vref.value;
-#endif
-}
-#else  // horizontal initialization
-void udb_a2d_record_offsets(void)
-{
-#if (USE_NV_MEMORY == 1)
-	if (udb_skip_flags.skip_imu_cal == 1)
-		return;
-#endif
-
-#ifdef CUSTOM_OFFSETS
-	// offsets have been measured manually and entered into the options.h file
-	udb_xaccel.offset = XACCEL_OFFSET;
-	udb_yaccel.offset = YACCEL_OFFSET;
-	udb_zaccel.offset = ZACCEL_OFFSET;
+	UDB_ZACCEL.offset = UDB_ZACCEL.value;	
 #else
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value;
 	UDB_YACCEL.offset = UDB_YACCEL.value;
 	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
+#endif // INITIALIZE_VERTICAL
 #endif // CUSTOM_OFFSETS
 	
 	udb_xrate.offset  = udb_xrate.value;
@@ -84,4 +62,4 @@ void udb_a2d_record_offsets(void)
 	udb_vref.offset   = udb_vref.value;
 #endif
 }
-#endif // INITIALIZE_VERTICAL
+
