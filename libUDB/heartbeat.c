@@ -117,12 +117,9 @@ static void heartbeat_pulse(void)
 	vref_adj = 0;
 #endif // VREF
 
+	calculate_analog_sensor_values();
 	udb_callback_read_sensors();
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/40)) == 1)
-	{
-		calculate_analog_sensor_values();
-		udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
-	}
+	udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
 
 	// process sensor data, run flight controller, generate outputs. implemented in libDCM.c
 	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
