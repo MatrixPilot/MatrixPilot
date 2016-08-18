@@ -35,10 +35,6 @@
 union dcm_fbts_word dcm_flags;
 int16_t angleOfAttack;
 
-// Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT  400    // 10 seconds at 40 Hz
-#define GPS_COUNT    1000   // 25 seconds at 40 Hz
-
 void send_HILSIM_outputs(void);
 
 void SetAofA(int16_t AofA)
@@ -58,13 +54,13 @@ void dcm_init(void)
 	dcm_init_rmat();
 }
 
-#if (CALIB_COUNT > GPS_COUNT)
+#if (DCM_CALIB_COUNT > DCM_GPS_COUNT)
 #error here
 #endif
 
 void dcm_run_calib_step(uint16_t count)
 {
-	if (count == CALIB_COUNT)
+	if (count == DCM_CALIB_COUNT)
 	{
 		DPRINT("calib_finished\r\n");
 		dcm_flags._.calib_finished = 1;
@@ -74,9 +70,9 @@ void dcm_run_calib_step(uint16_t count)
 
 static boolean gps_run_init_step(uint16_t count)
 {
-	if (count <= GPS_COUNT)
+	if (count <= DCM_GPS_COUNT)
 	{
-		gps_startup_sequence(GPS_COUNT - count); // Counts down from GPS_COUNT to 0
+		gps_startup_sequence(DCM_GPS_COUNT - count); // Counts down from GPS_COUNT to 0
 	}
 	else
 	{
