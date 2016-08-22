@@ -24,7 +24,6 @@
         <itemPath>../../libFlashFS/AT45D.h</itemPath>
         <itemPath>../../libFlashFS/EEPROM.h</itemPath>
         <itemPath>../../libFlashFS/filesys.h</itemPath>
-        <itemPath>../../libFlashFS/FSconfig.h</itemPath>
         <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
         <itemPath>../../libFlashFS/MDD_EEPROM.h</itemPath>
       </logicalFolder>
@@ -97,13 +96,6 @@
         <itemPath>../../Microchip/Sockets.h</itemPath>
         <itemPath>../../Microchip/usb_cdc.h</itemPath>
         <itemPath>../../Microchip/usb_config.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="RollPitchYaw"
-                     displayName="RollPitchYaw"
-                     projectFiles="true">
-        <logicalFolder name="Config" displayName="Config" projectFiles="true">
-        </logicalFolder>
-        <itemPath>../../RollPitchYaw/options.h</itemPath>
       </logicalFolder>
       <logicalFolder name="RollPitchYaw/Config"
                      displayName="RollPitchYaw/Config"
@@ -262,7 +254,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <languageToolchainVersion>1.26</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -327,6 +319,7 @@
         <property key="use-cci" value="false"/>
       </C30>
       <C30-AR>
+        <property key="additional-options-chop-files" value="false"/>
       </C30-AR>
       <C30-AS>
         <property key="assembler-symbols" value="PSV_ERRATA=1"/>
@@ -394,8 +387,6 @@
         <property key="oXC16glb-macros" value=""/>
         <property key="output-file-format" value="elf"/>
       </C30Global>
-      <PICkit3PlatformTool>
-      </PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>
