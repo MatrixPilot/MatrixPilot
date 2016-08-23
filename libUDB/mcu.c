@@ -264,11 +264,14 @@ static void configureDigitalIO(void)   // AUAV3 board
 	TRISFbits.TRISF0  = INPUT_PIN;  // CAN_RX
 	TRISFbits.TRISF1  = OUTPUT_PIN; // CAN_TX
 
-	TRISFbits.TRISF2  = INPUT_PIN;  // U3_RX
-	TRISFbits.TRISF3  = OUTPUT_PIN; // U3_TX
-
-	TRISFbits.TRISF4  = INPUT_PIN;  // U2_RX
-	TRISFbits.TRISF5  = OUTPUT_PIN; // U2_TX
+	//The following UART specific lines are  commented out as the pins are best setup by the Peripheral Module.
+	// Pins are correctly enabled when the Peripheral Module is enabled, by the Peripheral Module
+	// Setting them here creates a pulse on the Output TX pins
+	// which creates a Null character at the start of the telemetry stream / OpenLog file.
+	//TRISFbits.TRISF2  = INPUT_PIN;  // U3_RX
+	//TRISFbits.TRISF3  = OUTPUT_PIN; // U3_TX
+	//TRISFbits.TRISF4  = INPUT_PIN;  // U2_RX
+	//TRISFbits.TRISF5  = OUTPUT_PIN; // U2_TX
 
 	TRISFbits.TRISF8  = INPUT_PIN;  // I8
 	TRISFbits.TRISF13 = OUTPUT_PIN; // O7
