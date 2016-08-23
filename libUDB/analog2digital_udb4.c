@@ -108,13 +108,28 @@ uint8_t DmaBuffer = 0;
 #if (RECORD_FREE_STACK_SPACE == 1)
 uint16_t maxstack = 0;
 #endif
-
+	
+#define AUTO_ZERO_LATCH_TIME		( 3 ) // No. of microseconds to wait for auto-zero to latch
 
 void udb_init_gyros(void)
 {
 	// turn off auto zeroing 
-	_TRISC4 = _TRISB14 = 0;
-	_LATC4 = _LATB14 = 0;
+	_TRISC4  = 0; //  C4 pin made into an output
+	_TRISB14 = 0; //  B14 pin made into an output
+	_LATC4 =   0; // Turn off auto-zeroing
+	_LATB14 =  0; // Turn off auto-zeroing
+}
+
+void udb_gyros_auto_zero_latch_up(void)
+{
+	_LATC4 =   1; // Turn on auto-zeroing
+	_LATB14 =  1; // Turn on auto-zeroing
+}
+
+void udb_gyros_auto_zero_latch_down(void)
+{
+	_LATC4 =   0; // Turn off auto-zeroing
+	_LATB14 =  0; // Turn off auto-zeroing
 }
 
 void udb_init_accelerometer(void)
