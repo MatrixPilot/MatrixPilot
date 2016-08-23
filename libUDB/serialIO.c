@@ -66,6 +66,11 @@ void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 	U1STAbits.UTXISEL0 = 1;     //Bit13 Other half of Bit15
 	//                          //Bit12
 	U1STAbits.UTXBRK = 0;       //Bit11 Disabled
+#if (BOARD_TYPE == AUAV3_BOARD)
+	// Prevent issue 17 of processor silicon errata
+	// Ensure that other STA register bits are not changed until BRK hardware has cleared
+	while(U2STAbits.UTXBRK == 1);
+#endif
 	//U1STAbits.UTXEN = 1;        //Bit10 TX pins controlled by periph (handled below)
 	//U1STAbits.UTXBF = 0;        //Bit9 *Read Only Bit*
 	//U1STAbits.TRMT = 0;         //Bit8 *Read Only bit*
@@ -182,6 +187,11 @@ void udb_init_USART(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr
 	U2STAbits.UTXISEL0 = 1;     //Bit13 Other half of Bit15
 	//                          //Bit12
 	U2STAbits.UTXBRK = 0;       //Bit11 Disabled
+#if (BOARD_TYPE == AUAV3_BOARD)
+	// Prevent issue 17 of processor silicon errata
+	// Ensure that other STA register bits are not changed until BRK hardware has cleared
+	while(U2STAbits.UTXBRK == 1);
+#endif
 	//U2STAbits.UTXEN = 1;        //Bit10 TX pins controlled by periph (handled below)
 	//U2STAbits.UTXBF = 0;        //Bit9 *Read Only Bit*
 	//U2STAbits.TRMT = 0;         //Bit8 *Read Only bit*
