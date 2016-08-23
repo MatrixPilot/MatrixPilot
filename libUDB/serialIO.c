@@ -122,6 +122,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 #endif // HILSIM_USB
 	if (txchar != -1)
 	{
+#if (BOARD_TYPE == AUAV3_BOARD)
+		// a recommended workaround for Silicon Errata #16 in dsPIC33EP512MU810
+		while(U2STAbits.TRMT==0); // wait for the transmit buffer to be empty
+#endif
 		U1TXREG = (uint8_t)txchar;
 	}
 	interrupt_restore_corcon;
@@ -234,6 +238,10 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 	}
 	if (txchar != -1)
 	{
+#if (BOARD_TYPE == AUAV3_BOARD)
+		// a recommended workaround for Silicon Errata #16 in dsPIC33EP512MU810
+		while(U2STAbits.TRMT==0); // wait for the transmit buffer to be empty
+#endif
 		U2TXREG = (uint8_t)txchar;
 	}
 	interrupt_restore_corcon;
