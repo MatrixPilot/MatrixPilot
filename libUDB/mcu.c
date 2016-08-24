@@ -263,13 +263,9 @@ static void configureDigitalIO(void)   // AUAV3 board
 	// port F
 	TRISFbits.TRISF0  = INPUT_PIN;  // CAN_RX
 	TRISFbits.TRISF1  = OUTPUT_PIN; // CAN_TX
-
-	TRISFbits.TRISF2  = INPUT_PIN;  // U3_RX
-	TRISFbits.TRISF3  = OUTPUT_PIN; // U3_TX
-
-	TRISFbits.TRISF4  = INPUT_PIN;  // U2_RX
-	TRISFbits.TRISF5  = OUTPUT_PIN; // U2_TX
-
+ 
+	// Pins F2, F3, F3, F4 are initialized by the Peripheral Module hardware when it is enabled.
+	
 	TRISFbits.TRISF8  = INPUT_PIN;  // I8
 	TRISFbits.TRISF13 = OUTPUT_PIN; // O7
 	TRISFbits.TRISF12 = OUTPUT_PIN; // O8
