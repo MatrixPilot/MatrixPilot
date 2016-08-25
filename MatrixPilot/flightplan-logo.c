@@ -75,6 +75,7 @@ enum {
 	WIND_SPEED_X,
 	WIND_SPEED_Y,
 	WIND_SPEED_Z,
+	WIND_FROM_ANGLE,
 	PARAM
 };
 
@@ -636,6 +637,14 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 
 		case WIND_SPEED_Z: // in cm/s
 			return estimatedWind[2];
+
+		case WIND_FROM_ANGLE: // wind from in degrees 0-359, 0 = North
+		{
+			int16_t angle = get_angle_to_point(estimatedWind[0], estimatedWind[1]);
+			while (angle < 0) angle += 360;
+			while (angle >= 360) angle -= 360;
+			return angle;
+		}
 
 		case PARAM:
 		{
