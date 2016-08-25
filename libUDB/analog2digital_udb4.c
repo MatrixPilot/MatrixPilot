@@ -93,12 +93,6 @@ const uint32_t adc_rate = ADC_RATE;
 #define ALMOST_ENOUGH_SAMPLES ((ADC_RATE / (NUM_AD_CHAN * HEARTBEAT_HZ)) - 2)
 const uint32_t almost_enough = ALMOST_ENOUGH_SAMPLES;
 
-#define _SELECTED_VALUE(l, v) #l#v
-#define SELECTED_VALUE(macro) _SELECTED_VALUE(#macro, macro)
-#warning (SELECTED_VALUE(ADCLK_DIV_N_MINUS_1))
-#warning (SELECTED_VALUE(ADC_CLK))
-#warning (SELECTED_VALUE(ADC_RATE))
-#warning (SELECTED_VALUE(ALMOST_ENOUGH_SAMPLES))
 #endif // 0/1
 
 int16_t vref_adj;
