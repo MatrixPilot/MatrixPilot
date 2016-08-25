@@ -217,6 +217,7 @@
 // WIND_SPEED_X         - in cm/s
 // WIND_SPEED_Y         - in cm/s
 // WIND_SPEED_Z         - in cm/s
+// WIND_FROM_ANGLE      - in degrees Wind from 0-359 (clockwise, 0=North)
 // PARAM                - current param value
 // XX_INPUT_CHANNEL     - channel value from 2000-4000 (any channel defined in options.h, e.g. THROTTLE_INPUT_CHANNEL)
 
