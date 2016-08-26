@@ -33,6 +33,11 @@
 //#define NDEBUG
 
 #define MININI_IMPLEMENTATION
+#if (WIN == 1 || NIX == 1 || PX4 == 1 || NOFS == 1)
+#include "minGlue.h"
+#else
+#include "minGlue-mdd.h"
+#endif
 #include "minIni.h"
 #if defined NDEBUG
   #define assert(e)
