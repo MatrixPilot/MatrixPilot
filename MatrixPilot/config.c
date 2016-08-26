@@ -22,6 +22,13 @@
 #include "defines.h"
 #include "config.h"
 //#include "config-defaults.h"
+#if ! (WIN == 1 || NIX == 1 || PX4 == 1 || NOFS == 1)
+/* for floating-point support, define additional types and functions */
+#define INI_REAL float
+#define ini_ftoa(string,value) sprintf((string),"%f",(value))
+#define ini_atof(string) (INI_REAL)strtod((string),NULL)
+#endif
+
 #include "minIni.h"
 #include "navigate.h"
 #include "airspeedCntrl.h"
