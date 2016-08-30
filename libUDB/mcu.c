@@ -28,6 +28,21 @@
 #include <stdio.h>
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#include <p33Fxxxx.h>
+#ifdef __XC16__
+#pragma config FNOSC = PRIPLL
+#pragma config FCKSM = CSDCMD
+#pragma config OSCIOFNC = OFF
+#pragma config POSCMD = XT
+#pragma config FWDTEN = OFF
+#pragma config WINDIS = OFF
+#pragma config GSS = OFF
+#pragma config GWRP = OFF
+#pragma config FPWRT = PWR1
+#pragma config JTAGEN = OFF
+#pragma config ICS = PGD2
+
+#else // Not __XC16__
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
 _FOSC(FCKSM_CSDCMD &
       OSCIOFNC_OFF &
@@ -45,6 +60,7 @@ _FGS(GSS_OFF &
 _FPOR(FPWRT_PWR1);
 _FICD(JTAGEN_OFF &
       ICS_PGD2);
+#endif // __XC16__
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
