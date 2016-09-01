@@ -67,7 +67,7 @@
 #define AOA_INVERTED       ((int16_t)(turns.AngleOfAttackInverted*(RMAX/57.3)))
 #define ELEV_TRIM_NORMAL   ((int16_t)SERVORANGE*turns.ElevatorTrimNormal)
 #define ELEV_TRIM_INVERTED ((int16_t)SERVORANGE*turns.ElevatorTrimInverted)
-#define STALL_SPEED_CM_SEC ((uint16_t)turns.CruiseSpeed*50.0) // assume stall speed approximately 1/2 of cruise speed
+#define STALL_SPEED_CM_SEC ((uint16_t)turns.RefSpeed*50.0) // assume stall speed approximately 1/2 of reference speed
 
 #define AOA_OFFSET           ((int16_t)((AOA_NORMAL + AOA_INVERTED)/2)) // offset is the average of the two values
 #define AOA_SLOPE            ((int16_t)((AOA_NORMAL - AOA_INVERTED) * 4)) // multiply by 4 because base speed is 1/2 of cruise
