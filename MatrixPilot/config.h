@@ -131,7 +131,7 @@ struct turns_variables {
 	float FeedForward;
 	float TurnRateNav;
 	float TurnRateFBW;
-	float CruiseSpeed;
+	float RefSpeed;
 	float AngleOfAttackNormal;
 	float AngleOfAttackInverted;
 	float ElevatorTrimNormal;

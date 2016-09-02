@@ -104,7 +104,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 
 	{"TURN_ELE_TR_NRM", {-1.0}, {1.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.ElevatorTrimNormal, sizeof(turns.ElevatorTrimNormal) },
 	{"TURN_ELE_TR_INV", {-1.0}, {1.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.ElevatorTrimInverted, sizeof(turns.ElevatorTrimInverted) },
-	{"TURN_CRUISE_SPD", {0.0}, {999.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.CruiseSpeed, sizeof(turns.CruiseSpeed) },
+	{"TURN_CRUISE_SPD", {0.0}, {999.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.RefSpeed, sizeof(turns.RefSpeed) },
 	{"TURN_AOA_NORMAL", {-90.0}, {90.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.AngleOfAttackNormal, sizeof(turns.AngleOfAttackNormal) },
 	{"TURN_AOA_INV", {-90.0}, {90.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.AngleOfAttackInverted, sizeof(turns.AngleOfAttackInverted) },
 	{"TURN_FEED_FWD", {0.0}, {100.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.FeedForward, sizeof(turns.FeedForward) },
