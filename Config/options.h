@@ -503,11 +503,27 @@
 // ELEVATOR_TRIM_INVERTED               Elevator trim in fractional servo units (-1.0 to 1.0 ) for inverted straight and level flight at cruise speed.
 // Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
 
-#define REFERENCE_SPEED                   ( 12.0 )
-#define ANGLE_OF_ATTACK_NORMAL            ( -0.8 )
-#define ANGLE_OF_ATTACK_INVERTED          ( -7.2 )
-#define ELEVATOR_TRIM_NORMAL              ( -0.03 )
-#define ELEVATOR_TRIM_INVERTED            ( -0.67 )
+#define REFERENCE_SPEED			    (  12.0 )
+#define ANGLE_OF_ATTACK_NORMAL		    (   0.0 )
+#define ANGLE_OF_ATTACK_INVERTED	    (   0.0 )
+#define ELEVATOR_TRIM_NORMAL		    (   0.0 )
+#define ELEVATOR_TRIM_INVERTED		    (   0.0 )
+
+// CUSTOM OFFSETS are recommended when using Angle of Attack and Trim Parameters
+// They ensure that the measured orientation of the plane, particularly in pitch,
+// are the same for each flight (they are not re-calibrated on bootup but are
+// pre-measured and fixed for all flights by the offsets below).
+// Note each offset is specific to one specific autopilot board.
+// Be careful not to use the offsets below with the wrong board.
+// Uncomment the line below to activate the CUSTOM_OFFSETS feature in MatrixPilot.
+
+//#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET (  000 ) 
+#define YACCEL_OFFSET (  000 )
+#define ZACCEL_OFFSET (  000 )
+#define XRATE_OFFSET  (  000 ) // not used by the UDB4
+#define YRATE_OFFSET  (  000 ) // not used by the UDB4
+#define ZRATE_OFFSET  (  000 ) // not used by the UDB4
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.
