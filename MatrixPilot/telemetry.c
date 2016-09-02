@@ -622,7 +622,7 @@ void telemetry_output_8hz(void)
 		case 8:
 			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
 			    turns.AngleOfAttackNormal, turns.AngleOfAttackInverted, turns.ElevatorTrimNormal,
-			    turns.ElevatorTrimInverted, turns.CruiseSpeed);
+			    turns.ElevatorTrimInverted, turns.RefSpeed);
 			break;
 		case 7:
 			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",

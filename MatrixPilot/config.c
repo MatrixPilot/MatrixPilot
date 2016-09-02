@@ -177,7 +177,7 @@ static void load_turns(void)
 	DPRINT("turns.FeedForward = %f\r\n", turns.FeedForward);
 	turns.TurnRateNav = ini_getf(strTurns, "ratenav", TURN_RATE_NAV, strConfigFile);
 	turns.TurnRateFBW = ini_getf(strTurns, "ratefbw", TURN_RATE_FBW, strConfigFile);
-	turns.CruiseSpeed = ini_getf(strTurns, "crsespd", CRUISE_SPEED, strConfigFile);
+	turns.RefSpeed = ini_getf(strTurns, "refspd", REFERENCE_SPEED, strConfigFile);
 	turns.AngleOfAttackNormal = ini_getf(strTurns, "aoanorm", ANGLE_OF_ATTACK_NORMAL, strConfigFile);
 	turns.AngleOfAttackInverted = ini_getf(strTurns, "aoainvt", ANGLE_OF_ATTACK_INVERTED, strConfigFile);
 	turns.ElevatorTrimNormal = ini_getf(strTurns, "elenorm", ELEVATOR_TRIM_NORMAL, strConfigFile);
@@ -295,7 +295,7 @@ static void save_turns(void)
 	ini_putf(strTurns, "feedfwd", turns.FeedForward, strConfigFile);
 	ini_putf(strTurns, "ratenav", turns.TurnRateNav, strConfigFile);
 	ini_putf(strTurns, "ratefbw", turns.TurnRateFBW, strConfigFile);
-	ini_putf(strTurns, "crsespd", turns.CruiseSpeed, strConfigFile);
+	ini_putf(strTurns, "refspd", turns.RefSpeed, strConfigFile);
 	ini_putf(strTurns, "aoanorm", turns.AngleOfAttackNormal, strConfigFile);
 	ini_putf(strTurns, "aoainvt", turns.AngleOfAttackInverted, strConfigFile);
 	ini_putf(strTurns, "elenorm", turns.ElevatorTrimNormal, strConfigFile);
