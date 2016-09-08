@@ -191,7 +191,9 @@ void servoMix(void)
 	static int16_t ailInRightPartFlapsSpeed=0;
 	static int16_t brakeSelectedTarget;   //resulting brake selection after checking switch/slider, throttle and flight modes, no brake == 0, full brake trottle == 1700
 	static int32_t brakeSelectedStep=0;
+#if (FLAPS_INPUT_CHANNEL != 0 )
 	static int16_t flapsSelectedTarget=0;   //resulting flap selection after checking switch/slider and flight modes, normal speed = 0, slow = -1000, high speed = 1000
+#endif
 	static int16_t flapsSelectedStep=0;
 	static int16_t autopilotThrottleSelected=0;	//used for elevator trim in motorclimb
 
