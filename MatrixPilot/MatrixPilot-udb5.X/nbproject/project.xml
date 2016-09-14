@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://www.netbeans.org/ns/project/1">
-  <type>com.microchip.mplab.nbide.embedded.makeproject</type>
-  <configuration>
-    <data xmlns="http://www.netbeans.org/ns/make-project/1">
-      <name>MatrixPilot-UDB5</name>
-      <creation-uuid>
+    <type>com.microchip.mplab.nbide.embedded.makeproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/make-project/1">
+            <name>MatrixPilot-UDB5</name>
+            <creation-uuid>
       b6924440-1a7d-493e-bb23-138d5b6f93ab</creation-uuid>
-      <make-project-type>0</make-project-type>
-      <c-extensions>c</c-extensions>
-      <cpp-extensions />
-      <header-extensions>h</header-extensions>
-      <sourceEncoding>ISO-8859-1</sourceEncoding>
-      <asminc-extensions>inc</asminc-extensions>
-      <make-dep-projects />
-    </data>
-  </configuration>
+            <make-project-type>0</make-project-type>
+            <c-extensions>c</c-extensions>
+            <cpp-extensions/>
+            <header-extensions>h</header-extensions>
+            <sourceEncoding>ISO-8859-1</sourceEncoding>
+            <asminc-extensions>inc</asminc-extensions>
+            <make-dep-projects/>
+        </data>
+    </configuration>
 </project>
