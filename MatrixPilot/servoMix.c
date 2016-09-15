@@ -70,6 +70,8 @@ static int16_t elevatorThrottleFactor;
 static int16_t rudderFromAileronFactor;
 static int16_t rudderFactor;
 
+static int16_t throttleFactor;
+
 static int32_t throttleSteps = 0;//range: 0..2000
 
 #endif //AIRFRAME_GLIDER
@@ -128,6 +130,9 @@ void servoMix_init(void)
 	
 	rudderFromAileronFactor = (signed int)(RUDDER_FROM_AILERON_FACTOR * 32.0);
 	rudderFactor = (signed int)(RUDDER_FACTOR * 32.0);
+	
+	throttleFactor = (signed int)(THROTTLE_FACTOR * 32.0);
+	
 #endif //AIRFRAME_GLIDER
 }
 
@@ -414,7 +419,7 @@ void servoMix(void)
 		else
 		{
 			throttleSteps = temp - SERVOMIN;
-	
+			throttleSteps = (throttleSteps * throttleFactor)>>5;
 			autopilotThrottleSelected = throttleSteps;// 0 = 0, full = 2000
 			throttleSteps += SERVOMIN;
 			temp = (signed int)throttleSteps;
