@@ -1312,7 +1312,7 @@ def write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primar
     first_waypoint = True
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphics clean
     max_waypoints_to_open = 9
-    max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
+    max_time_manual_entries = 5000 # time( milli secs)length of a manual route before starting new manual route
     log_book_index = 0
     for entry in log_book.entries :
         if log_book.ardustation_pos == "Recorded" :
