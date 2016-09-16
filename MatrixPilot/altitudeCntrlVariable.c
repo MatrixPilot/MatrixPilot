@@ -47,6 +47,11 @@
 #define PITCHHEIGHTGAIN ((PITCHATMAX - PITCHATMIN) / (altit.HeightMargin*2.0))
 #define HEIGHTTHROTTLEGAIN ((1.5*(altit.HeightTargetMax-altit.HeightTargetMin)* 1024.0) / (SERVORANGE*SERVOSAT))
 
+#if (AIRFRAME_TYPE == AIRFRAME_GLIDER)
+static int16_t autopilotBrake = 0; // braking by autopilot,   0 brake = 0, full brake == 1700
+inline int16_t get_autopilotBrake(void) {return autopilotBrake; };
+#endif //AIRFRAME_GLIDER
+
 union longww throttleFiltered = { 0 };
 int16_t pitchAltitudeAdjust = 0;
 boolean filterManual = false;
@@ -333,6 +338,10 @@ static void normalAltitudeCntrl(void)
 				pitchAccum.WW = __builtin_mulss((int16_t)(pitch_height_gain) , - heightError._.W0 - height_marginx8)>>3;
 				pitchAltitudeAdjust = (int16_t)(pitch_at_max) + pitchAccum._.W0;
 			}
+
+#if (AIRFRAME_TYPE == AIRFRAME_GLIDER)
+			//custom code for autopilotBrake goes here: apply brakes when too high or above glideslope
+#endif  //AIRFRAME_GLIDER
 
 #if (RACING_MODE == 1)
 			if (state_flags._.GPS_steering)
