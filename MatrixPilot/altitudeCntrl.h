@@ -43,5 +43,8 @@ extern int16_t desiredSpeed; // Stored in 10ths of meters per second
 
 void setTargetAltitude(int16_t targetAlt);
 
+#if (AIRFRAME_TYPE == AIRFRAME_GLIDER)
+inline int16_t get_autopilotBrake(void);
+#endif
 
 #endif // ALTITUDECNTRL_H

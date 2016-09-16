@@ -228,7 +228,7 @@ void helicalTurnCntrl(void)
 	steeringInput = 0 ; // just in case no airframe type is specified or radio is off
 	if (udb_flags._.radio_on == 1)
 	{
-#if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
+#if ( (AIRFRAME_TYPE == AIRFRAME_STANDARD) || (AIRFRAME_TYPE == AIRFRAME_GLIDER) )
 		if (AILERON_INPUT_CHANNEL != CHANNEL_UNUSED)  // compiler is smart about this
 		{
 			steeringInput = udb_pwIn[ AILERON_INPUT_CHANNEL ] - udb_pwTrim[ AILERON_INPUT_CHANNEL ];

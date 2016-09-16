@@ -74,6 +74,7 @@ void save_altitudeCntrlVariable(void);
 #define AIRFRAME_DELTA      3
 #define AIRFRAME_HELI       4    // Untested
 #define AIRFRAME_QUAD       5    // Under development
+#define AIRFRAME_GLIDER     6    // Under development
 
 // FAILSAFE_TYPE options
 #define FAILSAFE_RTL                1

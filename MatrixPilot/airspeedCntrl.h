@@ -46,6 +46,10 @@ extern fractional airspeed_pitch_ki;
 
 
 void init_airspeedCntrl(void);
+#if (AIRFRAME_TYPE == AIRFRAME_GLIDER)
+inline int16_t get_overspeedBrake(void);
+inline int16_t get_flapsSelected(void);
+#endif
 
 // Run all airspeed control calculations and filters
 void airspeedCntrl(void);

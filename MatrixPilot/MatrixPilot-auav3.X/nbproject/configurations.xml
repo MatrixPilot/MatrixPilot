@@ -28,6 +28,7 @@
         <itemPath>../../Config/options_auav3.h</itemPath>
         <itemPath>../../Config/osd_config.h</itemPath>
         <itemPath>../../Config/ports_config.h</itemPath>
+        <itemPath>../../Config/servoMix_options.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
@@ -543,6 +544,7 @@
     <Elem>../../libVectorMatrix</Elem>
     <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
+    <Elem>../../Config</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
