@@ -63,6 +63,8 @@
 #define LED_ORANGE          _LATE3
 #define LED_GREEN           _LATE2
 #define LED_RED             _LATE1
+#define LED_GREEN_EXT       _LATA5
+#define LED_RED_EXT         _LATA14
 
 // SPI SS pin definitions
 #define SPI1_SS             _LATB2

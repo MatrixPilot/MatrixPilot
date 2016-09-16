@@ -179,6 +179,7 @@ static void ent_calibrateS(void)
 	stateS = &calibrateS;
 	calib_timer = CALIB_PAUSE;
 	led_on(LED_RED); // turn on mode led
+    led_wing_set_mode(LED_ALL_WING, LED_MODE_ON, 0);
 }
 
 // Acquire state is used to wait for the GPS to achieve lock.
@@ -209,6 +210,7 @@ static void ent_acquiringS(void)
 	stateS = &acquiringS;
 	standby_timer = STANDBY_PAUSE;
 	led_off(LED_RED);
+    led_wing_set_mode(LED_LEFT_WING, LED_MODE_ON, 0);
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
@@ -223,6 +225,7 @@ static void ent_manualS(void)
 	state_flags._.disable_throttle = 0;
 	waggle = 0;
 	led_off(LED_RED);
+    led_wing_set_mode(LED_ALL_WING, LED_MODE_ON, 0);
 	stateS = &manualS;
 }
 
@@ -244,6 +247,7 @@ static void ent_stabilizedS(void)
 	state_flags._.altitude_hold_pitch = (settings._.AltitudeholdStabilized == AH_FULL || settings._.AltitudeholdStabilized == AH_PITCH_ONLY);
 	waggle = 0;
 	led_on(LED_RED);
+    led_wing_set_mode(LED_ALL_WING, LED_MODE_PATTERN_INV, 0);
 	stateS = &stabilizedS;
 }
 
@@ -298,6 +302,7 @@ static void ent_waypointS(void)
 
 	waggle = 0;
 	led_on(LED_RED);
+    led_wing_set_mode(LED_ALL_WING, LED_MODE_PATTERN, 0);
 	stateS = &waypointS;
 }
 
@@ -324,6 +329,7 @@ static void ent_returnS(void)
 
 	waggle = 0;
 	led_on(LED_RED);
+    led_wing_set_mode(LED_ALL_WING, LED_MODE_BLINK, 4);
 	stateS = &returnS;
 }
 
@@ -345,6 +351,7 @@ static void calibrateS(void)
 #endif
 	{
 		udb_led_toggle(LED_RED);
+        led_wing_set_mode(LED_ALL_WING, LED_MODE_BLINK, 1);     // Calling this one time would have been sufficient
 		calib_timer--;
 		DPRINT("calib_timer %u  \r", calib_timer);
 		if (calib_timer <= 0)
@@ -363,7 +370,7 @@ static void acquiringS(void)
 	ent_manualS();
 	return;
 #endif
-
+    
 	if (dcm_flags._.nav_capable && ((MAG_YAW_DRIFT == 0) || (magMessage == 7)))
 	{
 #if (NORADIO == 1)
@@ -378,7 +385,7 @@ static void acquiringS(void)
 				waggle = - waggle;
 			else
 				waggle = 0;
-
+            
 			standby_timer--;
 			DPRINT("standby_timer %u  \r", standby_timer);
 			if (standby_timer == 6)
@@ -484,7 +491,7 @@ static void stabilizedS(void)
 		if (launch_enabled() & flight_mode_switch_waypoints() & dcm_flags._.nav_capable)
 			ent_cat_armedS();
 		else
-#endif
+#endif           
 		if (flight_mode_switch_waypoints() & dcm_flags._.nav_capable)
 			ent_waypointS();
 		else if (flight_mode_switch_manual())
@@ -503,7 +510,7 @@ static void stabilizedS(void)
 static void waypointS(void)
 {
 	udb_led_toggle(LED_RED);
-
+    
 	if (udb_flags._.radio_on)
 	{
 		if (flight_mode_switch_manual())
@@ -521,7 +528,7 @@ static void waypointS(void)
 static void returnS(void)
 {
 	if (udb_flags._.radio_on)
-	{
+	{         
 		if (flight_mode_switch_manual())
 			ent_manualS();
 		else if (flight_mode_switch_stabilize())

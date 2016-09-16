@@ -140,7 +140,9 @@ struct udb_flag_bits {
 // LED states
 #define LED_ON                  0
 #define LED_OFF                 1
-
+#define LED_ON_WING             1
+#define LED_OFF_WING            0
+#include "led_wing.h"
 
 // Channel numbers on the board, mapped to positions in the pulse width arrays.
 #define CHANNEL_UNUSED          0   // udb_pwIn[0], udb_pwOut[0], etc. are not used, but allow lazy code everywhere else  :)
