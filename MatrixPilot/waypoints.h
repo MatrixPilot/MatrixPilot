@@ -22,10 +22,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint handling
 
-// Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS         25
+//NOTE: WAYPOINT_PROXIMITY_RADIUS, USE_FIXED_ORIGIN, FIXED_ORIGIN_LOCATION are defined in options.h
 
-#define CAM_VIEW_LAUNCH         { 0, 0, 0 }
+// Move on to the next waypoint when getting within this distance of the current goal (in meters)
+// e.g. in options.h you may find the following #define WAYPOINT_PROXIMITY_RADIUS	25
 
 // Origin Location
 // When using relative waypoints, the default is to interpret those waypoints as relative to the
@@ -47,9 +47,9 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-//#define USE_FIXED_ORIGIN        0
-//#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 30.0 }    // A point in Baylands Park in Sunnyvale, CA
-
+// For example in options.h you may find:-
+//      #define USE_FIXED_ORIGIN        0
+//      #define FIXED_ORIGIN_LOCATION   { 113480854, 472580108, 578 }    // Innsbruck
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint definitions
@@ -124,6 +124,9 @@
 // This is the same as a fixed or absolute waypoint.
 // Finally, do not mix relative waypoints and absolute camera viewpoint in the same line. A line should
 // either use both a fixed waypoint and fixed camera viewpoint, or both relative.
+
+#define CAM_VIEW_LAUNCH         { 0, 0, 0 }
+
 // 
 // 
 // You do not need to specify how many points you have, the compiler will count them for you.
