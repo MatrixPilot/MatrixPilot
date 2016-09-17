@@ -29,6 +29,8 @@
         <itemPath>../../Config/osd_config.h</itemPath>
         <itemPath>../../Config/ports_config.h</itemPath>
         <itemPath>../../Config/servoMix_options.h</itemPath>
+        <itemPath>../../Config/waypoints.h</itemPath>
+        <itemPath>../../Config/flightplan-logo.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
@@ -115,7 +117,6 @@
         <itemPath>../../MatrixPilot/data_storage.h</itemPath>
         <itemPath>../../MatrixPilot/defines.h</itemPath>
         <itemPath>../../MatrixPilot/euler_angles.h</itemPath>
-        <itemPath>../../MatrixPilot/flightplan-logo.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan-waypoints.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan_logo.h</itemPath>
@@ -148,7 +149,6 @@
         <itemPath>../../MatrixPilot/states.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.h</itemPath>
-        <itemPath>../../MatrixPilot/waypoints.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
