@@ -434,29 +434,8 @@ def waypoints_do_not_need_telemetry(waypoint_file) :
 def get_waypoints_list_in_absolute_lat_long(waypoint_file,flight_origin):
     """ Convert waypoint file with absolute and relative coordinates to all absolute"""
     WAYPOINT_TYPE = 1
-    code_w_comments = open(waypoint_file).read() # Code with comments
-    code_wo_star_comments = remove_comments(code_w_comments) # Code without star comments
-    code_wo_comments = remove_slash_comments(code_wo_star_comments) # Code without comments
-    origin_line = get_fixed_origin(code_wo_comments)
-    #### Setup the Origin for use by Relative Coordinates ####
-    for y in origin_line :
-        if debug: print y.group(1), y.group(2), y.group(3)
-        if (int(y.group(3)) == 1):  # We are using an absolute and specified origin
-            if debug: print "This file uses a fixed pre-defined origin for relative coordinates"
-            fixed_origin_line = get_fixed_origin_coords(code_wo_comments)
-            for z in fixed_origin_line :
-                origin_east = int(z.group(3))
-                origin_north = int(z.group(4))
-                if debug: print "origin east is ", origin_east
-                if debug: print "origin north is", origin_north
-        elif (int(y.group(3)) == 0) :# We are using the boot up spot as the origin
-            #print "Using plane's boot up location as origin"
-            origin_east = flight_origin.longitude
-            origin_north = flight_origin.latitude
-            #print "Origin: Lon: ",origin_east,"Lat: ",origin_north
-        else :
-            if debug: print "Error in deciding what origin to use", y.group(3)
-    #### Get the Actual Waypoint List, convert relative waypoints to absolute ###
+    origin_east = flight_origin.longitude
+    origin_north = flight_origin.latitude
     C_pre_processed_code = C_pre_processor(waypoint_file)    
     waypoints_list = get_waypoints(C_pre_processed_code)
     waypoints_geo = ([],[],[]) # An empty list of waypoints in degrees for Lat & Lon, and meters for Alt (three lists of waypoint lists)
