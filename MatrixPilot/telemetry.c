@@ -36,7 +36,7 @@
 #include "../libUDB/servoOut.h"
 #include "../libUDB/serialIO.h"
 #include "../libUDB/osd.h"
-#include "magnetometerOptions.h"
+#include "options_magnetometer.h"
 #include "osd_config.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON

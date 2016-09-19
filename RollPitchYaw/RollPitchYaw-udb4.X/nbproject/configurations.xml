@@ -101,11 +101,11 @@
                      displayName="RollPitchYaw/Config"
                      projectFiles="true">
         <itemPath>../../RollPitchYaw/Config/FSconfig.h</itemPath>
-        <itemPath>../../RollPitchYaw/Config/magnetometerOptions.h</itemPath>
         <itemPath>../../RollPitchYaw/Config/nv_memory_options.h</itemPath>
         <itemPath>../../RollPitchYaw/Config/options.h</itemPath>
         <itemPath>../../RollPitchYaw/Config/osd_config.h</itemPath>
         <itemPath>../../RollPitchYaw/Config/ports_config.h</itemPath>
+        <itemPath>../../Config/options_magnetometer.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -243,6 +243,7 @@
     <Elem>../../libVectorMatrix</Elem>
     <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
+    <Elem>../../Config</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
