@@ -19,7 +19,6 @@
         <logicalFolder name="CloudsFly" displayName="CloudsFly" projectFiles="true">
           <itemPath>../../Config/CloudsFly/options.h</itemPath>
         </logicalFolder>
-        <itemPath>../../Config/airspeed_options.h</itemPath>
         <itemPath>../../Config/FSconfig.h</itemPath>
         <itemPath>../../Config/mavlink_options.h</itemPath>
         <itemPath>../../Config/nv_memory_options.h</itemPath>
@@ -31,6 +30,7 @@
         <itemPath>../../Config/waypoints.h</itemPath>
         <itemPath>../../Config/flightplan-logo.h</itemPath>
         <itemPath>../../Config/options_magnetometer.h</itemPath>
+        <itemPath>../../Config/options_airspeed.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
