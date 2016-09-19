@@ -21,7 +21,7 @@
 
 #include "defines.h"
 #include "servoMix.h"
-#include "servoMix_options.h"
+#include "options_servo_mix.h"
 #include "servoPrepare.h"
 #include "config.h"
 #include "states.h"
