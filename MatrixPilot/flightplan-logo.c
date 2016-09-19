@@ -473,7 +473,7 @@ void flightplan_logo_update(void)
 	}
 	else
 	{
-		if (tofinish_line < WAYPOINT_RADIUS) // crossed the finish line
+		if (tofinish_line < WAYPOINT_PROXIMITY_RADIUS) // crossed the finish line
 		{
 			process_instructions();
 		}

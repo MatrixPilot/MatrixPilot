@@ -20,36 +20,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// UDB LOGO Waypoint handling
-
-// Move on to the next waypoint when getting within this distance of the current goal (in meters)
-#define WAYPOINT_RADIUS         25
-
-// Origin Location
-// When using relative waypoints, the default is to interpret those waypoints as relative to the
-// plane's power-up location.  Here you can choose to use any specific, fixed 3D location as the
-// origin point for your relative waypoints.
-//
-// USE_FIXED_ORIGIN should be 0 to use the power-up location as the origin for relative waypoints.
-// Set it to 1 to use a fixed location as the origin, no matter where you power up.
-// FIXED_ORIGIN_LOCATION is the location to use as the origin for relative waypoints.  It uses the
-// format { X, Y, Z } where:
-// X is Logitude in degrees * 10^7
-// Y is Latitude in degrees * 10^7
-// Z is altitude above sea level, in meters, as a floating point value.
-// 
-// If you are using waypoints for an autonomous landing, it is a good idea to set the altitude value
-// to be the altitude of the landing point, and then express the heights of all of the waypoints with
-// respect to the landing point.
-// If you are using OpenLog, an easy way to determine the altitude of your landing point is to
-// examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
-// altitude, expressed in meters.
-
-//#define USE_FIXED_ORIGIN        0
-//#define FIXED_ORIGIN_LOCATION   { -1219950467, 374124664, 2.00 }    // A point in Baylands Park in Sunnyvale, CA
-
-
-////////////////////////////////////////////////////////////////////////////////
 // UDB LOGO Flight Planning definitions
 // 
 // The UDB Logo flight plan language lets you use a language similar to Logo, aka Turtle graphics, to
@@ -71,7 +41,36 @@
 // 
 // To use UDB Logo, set FLIGHT_PLAN_TYPE to FP_LOGO in options.h.
 
+//NOTE: WAYPOINT_PROXIMITY_RADIUS, USE_FIXED_ORIGIN, FIXED_ORIGIN_LOCATION are now defined in options.h
+////////////////////////////////////////////////////////////////////////////////
+// Waypoint handling
 
+// Move on to the next waypoint when getting within this distance of the current goal (in meters)
+// e.g. in options.h you may find the following #define WAYPOINT_PROXIMITY_RADIUS	25
+
+// Origin Location
+// When using relative waypoints, the default is to interpret those waypoints as relative to the
+// plane's power-up location.  Here you can choose to use any specific, fixed 3D location as the
+// origin point for your relative waypoints.
+//
+// USE_FIXED_ORIGIN should be 0 to use the power-up location as the origin for relative waypoints.
+// Set it to 1 to use a fixed location as the origin, no matter where you power up.
+// FIXED_ORIGIN_LOCATION is the location to use as the origin for relative waypoints.  It uses the
+// format { X, Y, Z } where:
+// X is Longitude in degrees * 10^7
+// Y is Latitude in degrees * 10^7
+// Z is altitude above sea level, in meters, as a floating point value.
+// 
+// If you are using waypoints for an autonomous landing, it is a good idea to set the altitude value
+// to be the altitude of the landing point, and then express the heights of all of the waypoints with
+// respect to the landing point.
+// If you are using OpenLog, an easy way to determine the altitude of your landing point is to
+// examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
+// altitude, expressed in meters.
+
+// For example in options.h you may find:-
+//      #define USE_FIXED_ORIGIN        0
+//      #define FIXED_ORIGIN_LOCATION   { 113480854, 472580108, 578 }    // Innsbruck
 
 ////////////////////////////////////////////////////////////////////////////////
 // Commands
