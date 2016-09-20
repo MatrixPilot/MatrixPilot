@@ -101,11 +101,11 @@
                      displayName="RollPitchYaw/Config"
                      projectFiles="true">
         <itemPath>../../RollPitchYaw/Config/options.h</itemPath>
-        <itemPath>../../Config/options_magnetometer.h</itemPath>
         <itemPath>../Config/options_osd.h</itemPath>
         <itemPath>../Config/options_ports.h</itemPath>
         <itemPath>../Config/options_nv_memory.h</itemPath>
         <itemPath>../Config/options_file_system.h</itemPath>
+        <itemPath>../Config/options_magnetometer.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
