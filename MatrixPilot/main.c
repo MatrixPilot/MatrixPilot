@@ -43,7 +43,7 @@
 #include "console.h"
 #include "flightplan-waypoints.h"
 #include "MAVLink.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 #include <setjmp.h>
 
 //#include "../libFlashFS/filesys.h"

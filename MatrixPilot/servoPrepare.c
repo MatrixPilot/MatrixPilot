@@ -38,7 +38,7 @@
 #include "../libUDB/osd.h"
 #include "options_osd.h"
 #include "mp_osd.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 int16_t pitch_control;
 int16_t roll_control;

@@ -28,7 +28,7 @@
 #include "flightplan-waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsData.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 #include <stdlib.h>
 
 //#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)

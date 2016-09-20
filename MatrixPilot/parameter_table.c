@@ -1,7 +1,7 @@
 // pyparam generated file - DO NOT EDIT
 
 #include "defines.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 #if (SILSIM == 0 && USE_MAVLINK == 1)
 

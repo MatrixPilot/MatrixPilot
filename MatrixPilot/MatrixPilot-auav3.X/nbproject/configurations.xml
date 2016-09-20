@@ -19,7 +19,6 @@
         <logicalFolder name="CloudsFly" displayName="CloudsFly" projectFiles="true">
           <itemPath>../../Config/CloudsFly/options.h</itemPath>
         </logicalFolder>
-        <itemPath>../../Config/mavlink_options.h</itemPath>
         <itemPath>../../Config/options.h</itemPath>
         <itemPath>../../Config/options_auav3.h</itemPath>
         <itemPath>../../Config/flightplan-logo.h</itemPath>
@@ -31,6 +30,7 @@
         <itemPath>../../Config/options_osd.h</itemPath>
         <itemPath>../../Config/options_nv_memory.h</itemPath>
         <itemPath>../../Config/options_file_system.h</itemPath>
+        <itemPath>../../Config/options_mavlink.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
