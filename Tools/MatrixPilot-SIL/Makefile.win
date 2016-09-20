@@ -13,8 +13,8 @@ MPSIL_TARGET  = matrixpilot.exe
 
 MP_HEADERS = \
 ../../Config/options.h \
-../../MatrixPilot/waypoints.h \
-../../MatrixPilot/flightplan-logo.h
+../../Config/waypoints.h \
+../../Config/flightplan-logo.h
 
 MPSIL_OBJECTS = \
 SIL-udb.o \
