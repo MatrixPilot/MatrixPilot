@@ -22,7 +22,6 @@
         <itemPath>../../Config/options.h</itemPath>
         <itemPath>../../Config/options_auav3.h</itemPath>
         <itemPath>../../Config/flightplan-logo.h</itemPath>
-        <itemPath>../../Config/waypoints.h</itemPath>
         <itemPath>../../Config/options_magnetometer.h</itemPath>
         <itemPath>../../Config/options_airspeed.h</itemPath>
         <itemPath>../../Config/options_servo_mix.h</itemPath>
@@ -31,6 +30,7 @@
         <itemPath>../../Config/options_nv_memory.h</itemPath>
         <itemPath>../../Config/options_file_system.h</itemPath>
         <itemPath>../../Config/options_mavlink.h</itemPath>
+        <itemPath>../../Config/flightplan-waypoints.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>

@@ -22,7 +22,7 @@
 #include "defines.h"
 #include "flightplan.h"
 #include "flightplan_logo.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 
 int16_t waypointIndex = 0;
 

@@ -20,7 +20,7 @@
 
 
 #include "defines.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "../libDCM/rmat.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"

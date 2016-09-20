@@ -25,7 +25,7 @@
 #include "behaviour.h"
 #include "flightplan.h"
 #include "cameraCntrl.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsData.h"
 #include "options_mavlink.h"
@@ -41,7 +41,7 @@ struct relWaypointDef { struct relative3D loc; int16_t flags; struct relative3D 
 #endif // USE_EXTENDED_NAV
 struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D viewpoint; };
 
-#include "waypoints.h"
+#include "flightplan-waypoints.h"
 
 #define NUMBER_POINTS ((sizeof waypoints) / sizeof (struct waypointDef))
 #define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))

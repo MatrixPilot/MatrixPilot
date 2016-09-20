@@ -30,7 +30,7 @@
 #include "servoPrepare.h"
 #include "MAVLink.h"
 #include "telemetry.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "airspeedCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"

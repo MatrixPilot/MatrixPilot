@@ -28,7 +28,7 @@
 #include "navigate.h"
 #include "cameraCntrl.h"
 #include "flightplan.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
