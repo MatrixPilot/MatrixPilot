@@ -85,11 +85,11 @@
                      displayName="Tools/LedTest/Config"
                      projectFiles="true">
         <itemPath>../../../Tools/LedTest/Config/FSconfig.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/nv_memory_options.h</itemPath>
         <itemPath>../../../Tools/LedTest/Config/options.h</itemPath>
         <itemPath>../../../Config/options_magnetometer.h</itemPath>
         <itemPath>../Config/options_osd.h</itemPath>
         <itemPath>../Config/options_ports.h</itemPath>
+        <itemPath>../Config/options_nv_memory.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"

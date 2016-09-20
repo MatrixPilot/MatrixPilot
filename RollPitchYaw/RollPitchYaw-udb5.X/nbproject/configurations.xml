@@ -101,11 +101,11 @@
                      displayName="RollPitchYaw/Config"
                      projectFiles="true">
         <itemPath>../../RollPitchYaw/Config/FSconfig.h</itemPath>
-        <itemPath>../../RollPitchYaw/Config/nv_memory_options.h</itemPath>
         <itemPath>../../RollPitchYaw/Config/options.h</itemPath>
         <itemPath>../../Config/options_magnetometer.h</itemPath>
         <itemPath>../Config/options_osd.h</itemPath>
         <itemPath>../Config/options_ports.h</itemPath>
+        <itemPath>../Config/options_nv_memory.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"

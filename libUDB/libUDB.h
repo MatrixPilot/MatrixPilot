@@ -109,7 +109,7 @@ void mav_printf(const char * format, ...);
 #include "fixDeps.h"
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 #include "libUDB_defines.h"
-#include "nv_memory_options.h"
+#include "options_nv_memory.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// libUDB.h defines the API for accessing the UDB hardware through libUDB.
