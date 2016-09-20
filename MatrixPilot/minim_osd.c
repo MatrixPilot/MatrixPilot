@@ -20,7 +20,7 @@
 
 
 #include "defines.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "navigate.h"
 #include "states.h"
 #include "flightplan-waypoints.h"

@@ -20,7 +20,7 @@
 
 
 #include "libUDB.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "osd.h"
 
 #if (USE_OSD == OSD_NATIVE && USE_OSD_SPI == 1)

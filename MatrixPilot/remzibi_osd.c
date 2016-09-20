@@ -27,7 +27,7 @@
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/osd.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "navigate.h"
 
 #if (USE_OSD == OSD_REMZIBI)

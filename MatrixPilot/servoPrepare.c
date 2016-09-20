@@ -36,7 +36,7 @@
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "mp_osd.h"
 #include "mavlink_options.h"
 

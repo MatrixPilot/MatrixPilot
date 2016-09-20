@@ -24,13 +24,13 @@
         <itemPath>../../Config/nv_memory_options.h</itemPath>
         <itemPath>../../Config/options.h</itemPath>
         <itemPath>../../Config/options_auav3.h</itemPath>
-        <itemPath>../../Config/osd_config.h</itemPath>
         <itemPath>../../Config/ports_config.h</itemPath>
         <itemPath>../../Config/flightplan-logo.h</itemPath>
         <itemPath>../../Config/waypoints.h</itemPath>
         <itemPath>../../Config/options_magnetometer.h</itemPath>
         <itemPath>../../Config/options_airspeed.h</itemPath>
         <itemPath>../../Config/options_servo_mix.h</itemPath>
+        <itemPath>../../Config/options_osd.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
