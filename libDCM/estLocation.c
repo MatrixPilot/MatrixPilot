@@ -23,6 +23,7 @@
 #include "gpsData.h"
 #include "gpsParseCommon.h"
 #include "estLocation.h"
+#include "estAltitude.h"  //USE_PRESSURE_ALT
 #include "mathlibNAV.h"
 #include "estWind.h"
 
@@ -32,7 +33,15 @@ static void location_plane(int32_t* location)
 {
 	location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 	location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
+#ifdef USE_PRESSURE_ALT
+#warning "using pressure altitude instead of GPS altitude"
+	// division by 100 implies alt_origin is in centimeters; not documented elsewhere
+	// longword result = (longword/10 - longword)/100 : range
+	location[2] = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
+#else
 	location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
+#endif // USE_PRESSURE_ALT
+
 }
 #else // !USE_EXTENDED_NAV
 static void location_plane(int16_t* location)
