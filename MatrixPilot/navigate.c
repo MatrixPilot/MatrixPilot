@@ -27,7 +27,7 @@
 #include "config.h"
 #include "states.h"
 #include "flightplan.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "../libUDB/libUDB.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"

@@ -23,9 +23,13 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes most of the user-configuration for this firmware,
-// one of the exceptions being waypoints, which live in the waypoints.h file.
-//
+// This file includes the main user-configuration for this firmware.
+// Once an options is enabled, it may require further options, and these
+// are often in a further more detail options file. For example if you enable
+// mavlink, then you may also want to review the file options_mavlink.h. 
+// Autonomous flight plans are either specified in flightplan-waypoints.hi, which is 
+// a simple list of waypoints to follow, or in flightplan-logo.h which provides  
+// an interpreted language with more powerful features for dynamic flight planning.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,12 +323,12 @@
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
 //
 // When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
-// as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
+// as defined near the bottom of the flightplan-waypoints.h or flightplan-logo.h files.  By default, this
 // is set to return to a point above the location where the UDB was powered up, and to loiter there.
-// See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
+// See the flightplan-waypoints.h or flightplan-logo.h files for info on modifying this behavior.
 //
 // When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
-// defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
+// defined in either flightplan-waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
 // when it lost signal, the plane will just continue following the main flight plan without
 // starting them over.  And if the transmitter is still in waypoint mode when the UDB sees it
 // again, the UDB will still continue following the main flight plan without restarting.  If
@@ -434,7 +438,7 @@
 // The trigger action output is always either low or high.  In servo mode, low and high are servo
 // values set below.  In digital mode, low and high are 0V and 5V on pin RE4.
 // The action is triggered when starting on a waypoint leg that includes the F_TRIGGER flag (see the
-// waypoints.h file).
+// flightplan-waypoints.h file).
 // If set to TRIGGER_PULSE_HIGH or TRIGGER_PULSE_LOW, then the output will pulse high or low for the
 // number of milliseconds set by TRIGGER_PULSE_DURATION.
 // If set to TRIGGER_TOGGLE, the output will just switch from high to low, or low to high each time
@@ -600,7 +604,7 @@
 //  In UDB Manual Mode the camera is fixed straight ahead. (Camera mode 1)
 //  In UDB Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
 //     relative to the plane's frame of reference. (Camera mode 2).
-//  In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
+//  In Waypoint Mode, the direction of the camera is driven from a flight camera plan in flightplan-waypoints.h
 // In all three flight modes, if you set CAMERA_INPUT_CHANNEL then the transmitter camera controls
 // will be mixed into the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
 // during flight and point the camera at a specific target of interest.
@@ -701,7 +705,7 @@
 //
 // You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
 // Set this to either FP_WAYPOINTS or FP_LOGO
-// The Waypoint definitions and options are located in the waypoints.h file.
+// The Waypoint definitions and options are located in the flightplan-waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
 #define FLIGHT_PLAN_TYPE                    FP_WAYPOINTS
 

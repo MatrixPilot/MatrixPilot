@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "Compiler.h"
 #include "GenericTypeDefs.h"
-#include "FSconfig.h"
+#include "options_file_system.h"
 
 #ifdef USE_EEPROM_FLASH
 

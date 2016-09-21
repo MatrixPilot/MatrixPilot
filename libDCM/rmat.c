@@ -26,7 +26,7 @@
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/magnetometer.h"
-#include "magnetometerOptions.h"
+#include "options_magnetometer.h"
 #include "mag_drift.h"
 #include "rmat.h"
 

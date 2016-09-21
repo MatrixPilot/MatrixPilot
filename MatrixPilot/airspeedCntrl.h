@@ -23,7 +23,7 @@
 #define AIRSPEEDCNTRL_H
 
 
-#include "airspeed_options.h"
+#include "options_airspeed.h"
 
 extern int16_t airspeed;
 extern int16_t groundspeed;

@@ -19,18 +19,18 @@
         <logicalFolder name="CloudsFly" displayName="CloudsFly" projectFiles="true">
           <itemPath>../../Config/CloudsFly/options.h</itemPath>
         </logicalFolder>
-        <itemPath>../../Config/airspeed_options.h</itemPath>
-        <itemPath>../../Config/FSconfig.h</itemPath>
-        <itemPath>../../Config/magnetometerOptions.h</itemPath>
-        <itemPath>../../Config/mavlink_options.h</itemPath>
-        <itemPath>../../Config/nv_memory_options.h</itemPath>
         <itemPath>../../Config/options.h</itemPath>
         <itemPath>../../Config/options_auav3.h</itemPath>
-        <itemPath>../../Config/osd_config.h</itemPath>
-        <itemPath>../../Config/ports_config.h</itemPath>
-        <itemPath>../../Config/servoMix_options.h</itemPath>
         <itemPath>../../Config/flightplan-logo.h</itemPath>
-        <itemPath>../../Config/waypoints.h</itemPath>
+        <itemPath>../../Config/options_magnetometer.h</itemPath>
+        <itemPath>../../Config/options_airspeed.h</itemPath>
+        <itemPath>../../Config/options_servo_mix.h</itemPath>
+        <itemPath>../../Config/options_ports.h</itemPath>
+        <itemPath>../../Config/options_osd.h</itemPath>
+        <itemPath>../../Config/options_nv_memory.h</itemPath>
+        <itemPath>../../Config/options_file_system.h</itemPath>
+        <itemPath>../../Config/options_mavlink.h</itemPath>
+        <itemPath>../../Config/flightplan-waypoints.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
@@ -117,7 +117,6 @@
         <itemPath>../../MatrixPilot/data_storage.h</itemPath>
         <itemPath>../../MatrixPilot/defines.h</itemPath>
         <itemPath>../../MatrixPilot/euler_angles.h</itemPath>
-        <itemPath>../../MatrixPilot/flightplan-waypoints.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan_logo.h</itemPath>
         <itemPath>../../MatrixPilot/flightplan_waypoints.h</itemPath>
@@ -545,6 +544,7 @@
     <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
     <Elem>../../Config</Elem>
+    <Elem>../../Tools/LedTest/Config</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

@@ -20,7 +20,7 @@
 
 #include "defines.h"
 #include "behaviour.h"
-#include "ports_config.h"
+#include "options_ports.h"
 
 
 // This file should generate no code.

@@ -41,9 +41,9 @@
 #include "config.h"
 #include "states.h"
 #include "console.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "MAVLink.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 #include <setjmp.h>
 
 //#include "../libFlashFS/filesys.h"

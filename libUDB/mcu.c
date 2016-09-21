@@ -24,7 +24,7 @@
 #include "interrupt.h"
 #include "uart.h"
 #include "mcu.h"
-#include "ports_config.h"
+#include "options_ports.h"
 #include <stdio.h>
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)

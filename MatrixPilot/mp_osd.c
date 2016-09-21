@@ -20,7 +20,7 @@
 
 
 #include "defines.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "mp_osd.h"
 
 #if ((USE_OSD == OSD_NATIVE) && (SILSIM != 1))

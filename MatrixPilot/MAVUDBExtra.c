@@ -21,7 +21,7 @@
 
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 #if (USE_MAVLINK == 1)
 
@@ -29,7 +29,7 @@
 #include "MAVUDBExtra.h"
 #include "config.h"
 #include "navigate.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
