@@ -18,7 +18,7 @@
 
 
 #include "libUDB.h"
-#include "nv_memory_options.h"
+#include "options_nv_memory.h"
 
 #if (USE_NV_MEMORY == 1)
 

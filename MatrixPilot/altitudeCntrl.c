@@ -32,7 +32,7 @@
 #include "../libDCM/estWind.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/servoOut.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 #if (ALTITUDE_GAINS_VARIABLE != 1)
 

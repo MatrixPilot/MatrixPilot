@@ -23,15 +23,14 @@
 #define FLIGHTPLAN_WAYPOINTS_H
 
 
-#define USE_DYNAMIC_WAYPOINTS
-#define MAX_WAYPOINTS 50
+//#define USE_DYNAMIC_WAYPOINTS
+#define MAX_WAYPOINTS 20
 
-void init_waypoints(void);
+extern int16_t waypointIndex;
 
 vect3_32t getWaypoint3D(uint16_t wp);
 int16_t waypoint_count(void);
 void set_waypoint(int16_t index);
-
 void clear_flightplan(void);
 void add_waypoint(struct waypoint3D wp, int16_t flags);
 

@@ -25,7 +25,7 @@
 #include "../libUDB/interrupt.h"
 #include "../libDCM/estAltitude.h"
 #include "../libUDB/uart.h"
-#include "ports_config.h"
+#include "options_ports.h"
 #include <string.h>
 
 #if (CONSOLE_UART != 0)

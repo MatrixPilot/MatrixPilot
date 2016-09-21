@@ -84,12 +84,12 @@
       <logicalFolder name="Tools/LedTest/Config"
                      displayName="Tools/LedTest/Config"
                      projectFiles="true">
-        <itemPath>../../../Tools/LedTest/Config/FSconfig.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/magnetometerOptions.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/nv_memory_options.h</itemPath>
         <itemPath>../../../Tools/LedTest/Config/options.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/osd_config.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/ports_config.h</itemPath>
+        <itemPath>../Config/options_osd.h</itemPath>
+        <itemPath>../Config/options_ports.h</itemPath>
+        <itemPath>../Config/options_nv_memory.h</itemPath>
+        <itemPath>../Config/options_file_system.h</itemPath>
+        <itemPath>../Config/options_magnetometer.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -212,6 +212,9 @@
     <Elem>../../libVectorMatrix</Elem>
     <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
+    <Elem>../../../Config</Elem>
+    <Elem>../../../RollPitchYaw/Config</Elem>
+    <Elem>../Config</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

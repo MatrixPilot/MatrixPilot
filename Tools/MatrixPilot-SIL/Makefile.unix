@@ -10,7 +10,7 @@ OBJECTS_DIR = ./
 
 MPSIL_TARGET  = matrixpilot
 
-MP_HEADERS = ../../Config/options.h ../../Config/waypoints.h ../../Config/flightplan-logo.h
+MP_HEADERS = ../../Config/options.h ../../Config/flightplan-waypoints.h ../../Config/flightplan-logo.h
 
 MPSIL_OBJECTS = \
 SIL-udb.o \

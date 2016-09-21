@@ -22,7 +22,7 @@
 // Convert Row and Col to a location value for use in osd_spi_write_location()
 #define OSD_LOC(ROW, COL)               ((ROW)*30+(COL))
 
-// Enable or disable the whole OSD system by setting the value of USE_OSD in osd_config.h
+// Enable or disable the whole OSD system by setting the value of USE_OSD in options_osd.h
 #define OSD_LOC_DISABLED                -1
 
 // OSD_VIDEO_FORMAT can be set to either OSD_NTSC, or OSD_PAL

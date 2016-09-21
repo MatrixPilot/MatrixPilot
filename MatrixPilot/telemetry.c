@@ -28,7 +28,7 @@
 #include "navigate.h"
 #include "cameraCntrl.h"
 #include "flightplan.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -36,8 +36,8 @@
 #include "../libUDB/servoOut.h"
 #include "../libUDB/serialIO.h"
 #include "../libUDB/osd.h"
-#include "magnetometerOptions.h"
-#include "osd_config.h"
+#include "options_magnetometer.h"
+#include "options_osd.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
 #include "../libUDB/ADchannel.h"

@@ -21,7 +21,7 @@
 
 #include "libUDB.h"
 #include "oscillator.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "osd.h"
 
 //#define SF 2
