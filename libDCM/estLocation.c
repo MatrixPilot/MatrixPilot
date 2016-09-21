@@ -33,7 +33,6 @@ static void location_plane(int32_t* location)
 {
 	location[1] = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
 	location[0] = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
-//	location[2] = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
 #ifdef USE_PRESSURE_ALT
 #warning "using pressure altitude instead of GPS altitude"
 	// division by 100 implies alt_origin is in centimeters; not documented elsewhere

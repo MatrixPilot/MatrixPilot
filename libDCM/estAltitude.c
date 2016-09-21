@@ -74,7 +74,6 @@ void estAltitude(void)
 {
 #if (BAROMETER_ALTITUDE == 1)
 	float pressure_ambient = barometer_pressure;    // Pascals?
-//	float pressure_sea_level = barometer_pressure_gnd;
 	float barometer_alt;
 
 	if (barometer_pressure_gnd != 0)
@@ -84,10 +83,8 @@ void estAltitude(void)
 		if ((barometerInterval % GPS_RATE) == 0)
 		{
 			
-//			barometer_alt = 44330.0f * ((1-pow((pressure_ambient/pressure_sea_level),(1/5.255f)))); // Meters
 			barometer_alt = 44330.0f * ((1-pow((pressure_ambient/sea_level_pressure),(1/5.255f)))); // Meters
 			barometer_altitude = (long)(barometer_alt * 1000); // millimeters
-//			barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
 #ifdef USE_DEBUG_IO
 			// estimate sea level pressure assuming we're still on the ground
 			int ground_altitude = alt_origin.WW / 100; // meters
