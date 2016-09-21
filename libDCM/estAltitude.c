@@ -33,8 +33,7 @@
 long barometer_pressure_gnd = 0;
 int barometer_temperature_gnd = 0;
 
-long barometer_altitude;        // above sea level altitude - ASL (millimeters)
-long barometer_agl_altitude;    // above ground level altitude - AGL
+static long barometer_altitude;        // above sea level altitude - ASL (millimeters)
 long barometer_pressure;
 int16_t barometer_temperature;
 float sea_level_pressure;
@@ -42,8 +41,8 @@ float sea_level_pressure;
 inline int16_t get_barometer_temperature(void)   { return barometer_temperature; }
 inline long get_barometer_pressure(void)     { return barometer_pressure; }
 inline long get_barometer_altitude(void)     { return barometer_altitude; }
-inline long get_barometer_agl_altitude(void) { return barometer_agl_altitude; }
 
+int16_t barometerInterval = 0;
 /**
  * @brief Ascertain a reference ambient barometric pressure & temperature
  */
@@ -75,22 +74,25 @@ void estAltitude(void)
 {
 #if (BAROMETER_ALTITUDE == 1)
 	float pressure_ambient = barometer_pressure;    // Pascals?
-//	float pressure_sea_level = barometer_pressure_gnd;
 	float barometer_alt;
 
 	if (barometer_pressure_gnd != 0)
 	{
-//		barometer_alt = 44330.0f * ((1-pow((pressure_ambient/pressure_sea_level),(1/5.255f)))); // Meters
-		barometer_alt = 44330.0f * ((1-pow((pressure_ambient/sea_level_pressure),(1/5.255f)))); // Meters
-		barometer_altitude = (long)(barometer_alt * 1000); // millimeters
-//		barometer_altitude = (long)(44330.0f*((1-pow((((float)barometer_pressure)/((float)barometer_pressure_gnd)),(1/5.255f)))))*1000; // millimeters
+		
+		barometerInterval++;
+		if ((barometerInterval % GPS_RATE) == 0)
+		{
+			
+			barometer_alt = 44330.0f * ((1-pow((pressure_ambient/sea_level_pressure),(1/5.255f)))); // Meters
+			barometer_altitude = (long)(barometer_alt * 1000); // millimeters
 #ifdef USE_DEBUG_IO
-		// estimate sea level pressure assuming we're still on the ground
-		int ground_altitude = alt_origin.WW / 100; // meters
-		sea_level_pressure = ((float) barometer_pressure / powf((1 - (ground_altitude / 44330.0)), 5.255));
-		// print pressure altitude, pressure and current SLP estimate
-		printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
+			// estimate sea level pressure assuming we're still on the ground
+			int ground_altitude = alt_origin.WW / 100; // meters
+			sea_level_pressure = ((float) barometer_pressure / powf((1 - (ground_altitude / 44330.0)), 5.255));
+			// print pressure altitude, pressure and current SLP estimate
+			printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
 #endif
+		}
 	}
 #endif // BAROMETER_ALTITUDE
 }
