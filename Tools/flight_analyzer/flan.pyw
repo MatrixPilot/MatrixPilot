@@ -868,7 +868,7 @@ def calculate_headings_pitch_roll(log_book,flight_origin, options) :
             entry.heading_degrees = (heading_radians / (2 * pi)) * 360
             while (entry.heading_degrees < 0 ):
                entry.heading_degrees +=360
-            while (entry.heading_degrees > 359 ):
+            while (entry.heading_degrees >= 360 ):
                entry.heading_degrees -=360
         
 def write_style_urls(filename):
