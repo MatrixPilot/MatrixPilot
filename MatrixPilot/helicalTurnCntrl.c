@@ -25,6 +25,7 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
 #include "helicalTurnCntrl.h"
 #include "../libDCM/deadReckoning.h"
