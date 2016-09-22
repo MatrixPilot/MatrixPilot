@@ -866,6 +866,10 @@ def calculate_headings_pitch_roll(log_book,flight_origin, options) :
             # Calcuate our heading from Rmat readings.
             heading_radians = atan2(- entry.rmat1 , entry.rmat4)
             entry.heading_degrees = (heading_radians / (2 * pi)) * 360
+            while (entry.heading_degrees < 0 ):
+               entry.heading_degrees +=360
+            while (entry.heading_degrees >= 360 ):
+               entry.heading_degrees -=360
         
 def write_style_urls(filename):
     for acolor in mycolors.list2 :
