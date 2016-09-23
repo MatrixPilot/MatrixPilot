@@ -2342,7 +2342,7 @@ def write_csv(options,log_book):
         else :
             aoa_using_pitch = - (rmat[7] / 287.0) # plane is right way up
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
-        if log_book.airframe == 1: # Normal type of plane
+        if log_book.airframe == 1 or log_book.airframe == 6: # Normal type of plane or glider
             elevator_without_trim = elevator_reversal_multiplier * \
                    (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value)
         elif log_book.airframe == 3: # Delta Wing, unmix elevator and aileron
