@@ -114,11 +114,10 @@ static void cmd_adc(char* arg)
 static void cmd_barom(char* arg)
 {
 #if (SILSIM != 1 && PX4 != 1)
-	printf("Barometer temp %i, pres %u, alt %u, agl %u\r\n",
+	printf("Barometer temp %i, pres %u, alt %u\r\n",
 	       get_barometer_temperature(),
 	       (uint16_t)get_barometer_pressure(),
 	       (uint16_t)get_barometer_altitude(),
-	       (uint16_t)get_barometer_agl_altitude()
 	      );
 #endif
 }

@@ -23,7 +23,7 @@
 #include "I2C.h"
 #include "barometer.h"
 
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 
 #define BMP085_ADDRESS 0xEE  // I2C address of BMP085
 #define USE_BMP085_ON_I2C 2
@@ -274,4 +274,4 @@ void ReadBarPres_callback(boolean I2CtrxOK)
 	}
 }
 
-#endif // BAROMETER_ALTITUDE
+#endif // USE_BAROMETER_ALTITUDE
