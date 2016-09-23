@@ -63,3 +63,4 @@
 /Tools/LedTest/LedTest-auav3.X/dist/default/
 
 *.pyc
+/Tools/flight_analyzer/flan_config
