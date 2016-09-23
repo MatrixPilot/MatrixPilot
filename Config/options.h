@@ -148,15 +148,9 @@
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT                       0
 
-// Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Define USE_BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
-// If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
-// to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE                  0
-
-// Set your takeoff/launch/initialisation altitude in meters.
-#define LAUNCH_ALTITUDE                     300
-
+#define USE_BAROMETER_ALTITUDE              0
 
 // Racing Mode
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
