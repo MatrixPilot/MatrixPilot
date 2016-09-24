@@ -261,6 +261,7 @@ class base_telemetry :
         self.battery_voltage = 0
         self.battery_ampage = 0
         self.battery_amphours = 0
+        self.desired_height = 0
        
 
 class mavlink_telemetry(base_telemetry):
@@ -1254,6 +1255,15 @@ class ascii_telemetry(base_telemetry):
                     self.battery_amphours  = float(match.group(1))
                 except:
                     print "Corrupt battery_amphours value in line", line_no
+                    return "Error"
+            else :
+                pass
+            match = re.match(".*:DH([-0-9]*?):",line) # desiredHeight of plane
+            if match :
+                try:
+                    self.desired_height  = int(match.group(1))
+                except:
+                    print "Corrupt desired_height (DH:) in line", line_no
                     return "Error"
             else :
                 pass

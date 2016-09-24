@@ -29,6 +29,7 @@
 #include "cameraCntrl.h"
 #include "flightplan.h"
 #include "flightplan_waypoints.h"
+#include "altitudeCntrl.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -751,7 +752,8 @@ void telemetry_output_8hz(void)
 					battery_current._.W1, battery_mAh_used._.W1);
 #else
 					(int16_t)0, (int16_t)0);                    
-#endif                            
+#endif
+					serial_output("DH%i:",desiredHeight);
 #if (RECORD_FREE_STACK_SPACE == 1)
 					extern uint16_t maxstack;
 					serial_output("stk%d:", (int16_t)(4096-maxstack));
