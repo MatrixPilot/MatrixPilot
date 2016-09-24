@@ -57,7 +57,7 @@ void altimeter_calibrate(void)
 	DPRINT("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
 }
 
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 void udb_barometer_callback(long pressure, int16_t temperature, char status)
 {
 	barometer_temperature = temperature; // units of 0.1 deg C
@@ -72,7 +72,7 @@ void udb_barometer_callback(long pressure, int16_t temperature, char status)
  */
 void estAltitude(void)
 {
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 	float pressure_ambient = barometer_pressure;    // Pascals?
 	float barometer_alt;
 
@@ -94,11 +94,11 @@ void estAltitude(void)
 #endif
 		}
 	}
-#endif // BAROMETER_ALTITUDE
+#endif // USE_BAROMETER_ALTITUDE
 }
 
 /*  rough-in draft of new algorithm adaption pending verification and revision of barometer data & functions
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 	void udb_barometer_callback(long pressure, int temperature, char status)
 	{
 	#if (USE_PA_PRESSURE == 1)          // **** OPTION TO USE PRESSURE OR HOME POSITION ALTITUDE  in options.h   ****

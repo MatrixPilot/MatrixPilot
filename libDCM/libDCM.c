@@ -82,7 +82,7 @@ static boolean gps_run_init_step(uint16_t count)
 	return false;
 }
 
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 
 // We want to be reading both the magnetometer and the barometer at 4Hz
 // The magnetometer driver returns a new result via the callback on each call
@@ -113,12 +113,12 @@ void do_I2C_stuff(void)
 		}
 	}
 }
-#endif // BAROMETER_ALTITUDE
+#endif // USE_BAROMETER_ALTITUDE
 
 // Called at HEARTBEAT_HZ
 void udb_heartbeat_callback(void)
 {
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
 		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
@@ -133,7 +133,7 @@ void udb_heartbeat_callback(void)
 		rxMagnetometer(mag_drift_callback);
 	}
 #endif
-#endif // BAROMETER_ALTITUDE
+#endif // USE_BAROMETER_ALTITUDE
 
 //  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
 	if (dcm_flags._.calib_finished)
