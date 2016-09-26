@@ -1,3 +1,6 @@
 [submodule "Tools/MAVLink/mavlink"]
 	path = Tools/MAVLink/mavlink
 	url = https://github.com/MatrixPilot/mavlink
+[submodule "Tools/MAVLink/MAVProxy"]
+	path = Tools/MAVLink/MAVProxy
+	url = https://github.com/MatrixPilot/MAVProxy
