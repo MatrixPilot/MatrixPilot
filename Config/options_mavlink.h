@@ -73,4 +73,3 @@
 // 1 = Yes, 0 = No
 #define QGROUNDCTONROL_PID_COMPATIBILITY    1
 
-#define MAVLINK_EXTERNAL_RX_STATUS          1
