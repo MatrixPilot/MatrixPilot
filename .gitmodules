@@ -1,0 +1,3 @@
+[submodule "Tools/MAVLink/mavlink"]
+	path = Tools/MAVLink/mavlink
+	url = https://github.com/MatrixPilot/mavlink
