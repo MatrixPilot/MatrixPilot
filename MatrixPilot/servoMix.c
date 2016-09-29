@@ -236,14 +236,6 @@ void servoMix(void)
 		}
 	}
 #endif
-	if ( brakeSelectedTarget < 150 )  //remove offset from throttle channel
-	{
-		brakeSelectedTarget = 0;
-	}
-	if ( brakeSelectedTarget > 1700 ) //limit
-	{
-		brakeSelectedTarget = 1700;
-	}	
 
 	//braking by overspeed, defined in servoMix.c and set in airspeedCntrl.c 0 brake = 0, full brake == 1700
 	//overspeedBrake overrules normal brakes if more
@@ -253,7 +245,15 @@ void servoMix(void)
 			brakeSelectedTarget = get_overspeedBrake() ;
 		}
 	
- 	//slow down brake movement - full travel 1700 in ~3.5 sec @200Hz = 12
+	if ( brakeSelectedTarget < 150 )  //remove offset from throttle channel
+	{
+		brakeSelectedTarget = 0;
+	}
+	if ( brakeSelectedTarget > 1700 ) //limit
+	{
+		brakeSelectedTarget = 1700;
+	}
+	//slow down brake movement - full travel 1700 in ~3.5 sec @200Hz = 12
 	if ( brakeSelectedTarget <= ( brakeSelectedStep - 12 ) )
 	{
 		brakeSelectedStep = brakeSelectedStep - 12;
