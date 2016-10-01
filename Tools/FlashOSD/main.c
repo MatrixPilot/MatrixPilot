@@ -161,3 +161,6 @@ void servoOut_init(void) {}
 void udb_init_GPS(void) {}
 void udb_init_USART(void) {}
 void udb_eeprom_init(void) {}
+
+void udb_gyros_auto_zero_latch_up(void) {}
+void udb_gyros_auto_zero_latch_down(void) {}
