@@ -24,7 +24,9 @@
 #include "../../libUDB/osd.h"
 #include "../../libUDB/ADchannel.h"
 #include "font_data.h"
-
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+#include "../../libUDB/mpu6000.h" // required for UDB5 and AUAV3 for heartbeat
+#endif
 
 int charPosition = 0;
 boolean didDisplay = 0;
@@ -138,11 +140,15 @@ void udb_callback_radio_did_turn_off(void) {}
 void init_analogs(void) {}
 void init_events(void) {}
 void radioIn_init(void) {}
-void MPU6000_init16(void) {}
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+	void MPU6000_init16(callback_fptr_t fptr); // required for UDB5 and AUAV3 for heartbeat
+#else
+	void MPU6000_init16(void) {}
+	int16_t vref_adj;
+#endif
 
 int16_t failSafePulses = 0;
 int16_t noisePulses = 0;
-int16_t vref_adj;
 
 void init_gps(void) {}
 void udb_init_ADC(void) {}
