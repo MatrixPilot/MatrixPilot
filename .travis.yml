@@ -59,7 +59,7 @@ script:
   - cd ..
 
   - pwd
-  - export PATH=/opt/microchip/xc16/v1.24/bin:$PATH
+  - export PATH=/opt/microchip/xc16/v1.26/bin:$PATH
   - xc16-gcc --version
   - ./build-all.sh
   
