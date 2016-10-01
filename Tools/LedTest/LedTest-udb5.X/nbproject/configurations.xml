@@ -8,7 +8,6 @@
         <itemPath>../../../libFlashFS/AT45D.h</itemPath>
         <itemPath>../../../libFlashFS/EEPROM.h</itemPath>
         <itemPath>../../../libFlashFS/filesys.h</itemPath>
-        <itemPath>../../../libFlashFS/FSconfig.h</itemPath>
         <itemPath>../../../libFlashFS/MDD_AT45D.h</itemPath>
         <itemPath>../../../libFlashFS/MDD_EEPROM.h</itemPath>
       </logicalFolder>
@@ -82,23 +81,15 @@
         <itemPath>../../../Microchip/usb_cdc.h</itemPath>
         <itemPath>../../../Microchip/usb_config.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="Tools/LedTest"
-                     displayName="Tools/LedTest"
-                     projectFiles="true">
-        <logicalFolder name="Config" displayName="Config" projectFiles="true">
-        </logicalFolder>
-        <itemPath>../../../Tools/LedTest/nv_memory_options.h</itemPath>
-        <itemPath>../../../Tools/LedTest/options.h</itemPath>
-      </logicalFolder>
       <logicalFolder name="Tools/LedTest/Config"
                      displayName="Tools/LedTest/Config"
                      projectFiles="true">
-        <itemPath>../../../Tools/LedTest/Config/FSconfig.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/magnetometerOptions.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/nv_memory_options.h</itemPath>
         <itemPath>../../../Tools/LedTest/Config/options.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/osd_config.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/ports_config.h</itemPath>
+        <itemPath>../Config/options_osd.h</itemPath>
+        <itemPath>../Config/options_ports.h</itemPath>
+        <itemPath>../Config/options_nv_memory.h</itemPath>
+        <itemPath>../Config/options_file_system.h</itemPath>
+        <itemPath>../Config/options_magnetometer.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -221,6 +212,8 @@
     <Elem>../../libVectorMatrix</Elem>
     <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
+    <Elem>../../../Config</Elem>
+    <Elem>../Config</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -232,8 +225,8 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
-        <platform>3</platform>
+        <languageToolchainVersion>1.26</languageToolchainVersion>
+        <platform>4</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

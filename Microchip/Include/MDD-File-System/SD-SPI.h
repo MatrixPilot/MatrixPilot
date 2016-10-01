@@ -38,7 +38,7 @@
 #define SDMMC_H
 
 #include "GenericTypeDefs.h"
-#include "FSconfig.h"
+#include "options_file_system.h"
 #include "MDD-File-System/FSDefs.h"
 
 

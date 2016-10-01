@@ -26,6 +26,10 @@
 #include "servoOut.h"
 #include "analogs.h"
 #include "radioIn.h"
+#include "../libDCM/rmat.h"
+#if (BOARD_TYPE == UDB4_BOARD)
+#include "../libDCM/libDCM.h"
+#endif
 #if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
 #endif
@@ -41,6 +45,13 @@ static void heartbeat_pulse(void);    // forward declaration
 
 //#define HEARTBEAT_FREQ(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
 //#define HEARTBEAT_CHK(x) (udb_heartbeat_counter % (HEARTBEAT_HZ/x) == 0)
+
+#if (BOARD_TYPE == UDB4_BOARD)
+boolean udb_gyros_autozero_latched_up = false ;
+boolean udb_gyros_autozero_latched_down = false ;
+void udb_gyros_auto_zero_latch_up(void);
+void udb_gyros_auto_zero_latch_down(void);
+#endif
 
 inline boolean heartbeat_chk(uint16_t freq)
 {
@@ -95,7 +106,23 @@ inline void heartbeat(void) // called from ISR
 static void heartbeat_pulse(void)
 {
 	led_off(LED_BLUE);  // indicates logfile activity
-
+#if (BOARD_TYPE == UDB4_BOARD) 
+	// IDG500 and ISZ500 Gyros settle at least 200 milliseconds after startup
+	// Auto-zero the UDB4 gyros 1 second before calibration of offsets
+	if (((udb_heartbeat_counter / (HEARTBEAT_HZ / 40)) > ( DCM_CALIB_COUNT - 40 )) 
+		&& (udb_gyros_autozero_latched_up == false ))
+	{
+		udb_gyros_auto_zero_latch_up();
+		udb_gyros_autozero_latched_up = true;
+	}
+	if (((udb_heartbeat_counter / (HEARTBEAT_HZ / 40)) > (DCM_CALIB_COUNT - 39))  
+		&& (udb_gyros_autozero_latched_down == false ))
+	{
+		udb_gyros_auto_zero_latch_down();
+		udb_gyros_autozero_latched_down = true;
+	}
+	// Gyros need 20 milliseconds to settle after auto-zero, before being used by DCM
+#endif 
 #if (NORADIO != 1)
 	// 20Hz testing of radio link
 	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
@@ -116,9 +143,12 @@ static void heartbeat_pulse(void)
 	vref_adj = 0;
 #endif // VREF
 
-	calculate_analog_sensor_values();
 	udb_callback_read_sensors();
-	udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/40)) == 0)
+ 	{
+ 		calculate_analog_sensor_values();
+ 		udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
+ 	}
 
 	// process sensor data, run flight controller, generate outputs. implemented in libDCM.c
 	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()

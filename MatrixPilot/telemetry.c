@@ -28,7 +28,8 @@
 #include "navigate.h"
 #include "cameraCntrl.h"
 #include "flightplan.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
+#include "altitudeCntrl.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -36,10 +37,11 @@
 #include "../libUDB/servoOut.h"
 #include "../libUDB/serialIO.h"
 #include "../libUDB/osd.h"
-#include "magnetometerOptions.h"
-#include "osd_config.h"
+#include "options_magnetometer.h"
+#include "options_osd.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
+#include "../libUDB/ADchannel.h"
 #endif
 #include "../libUDB/mcu.h"
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM values
@@ -474,11 +476,11 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 11;
+static int16_t telemetry_counter = 13;
 
 void telemetry_restart(void)
 {
-	telemetry_counter = 11;
+	telemetry_counter = 13;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
@@ -589,7 +591,17 @@ void telemetry_output_8hz(void)
 #endif // SERIAL_OUTPUT_FORMAT
 	switch (telemetry_counter)
 	{
-		// The first lines of telemetry contain info about the compile-time settings from the options.h file
+		case 13:
+			serial_output("F22:Sensors=%i,%i,%i,%i,%i,%i\n",
+				UDB_XACCEL.value, UDB_YACCEL.value,
+				UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))),
+				udb_xrate.value, udb_yrate.value, udb_zrate.value);
+			break;
+		case 12: 
+			serial_output("F21:Offsets=%i,%i,%i,%i,%i,%i\n",
+				UDB_XACCEL.offset, UDB_YACCEL.offset, UDB_ZACCEL.offset,
+				udb_xrate.offset, udb_yrate.offset, udb_zrate.offset);
+			break;
 		case 11:
 			serial_output("F15:IDA=");
 			serial_output(ID_VEHICLE_MODEL_NAME);
@@ -611,7 +623,7 @@ void telemetry_output_8hz(void)
 		case 8:
 			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
 			    turns.AngleOfAttackNormal, turns.AngleOfAttackInverted, turns.ElevatorTrimNormal,
-			    turns.ElevatorTrimInverted, turns.CruiseSpeed);
+			    turns.ElevatorTrimInverted, turns.RefSpeed);
 			break;
 		case 7:
 			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",
@@ -726,10 +738,10 @@ void telemetry_output_8hz(void)
 					serial_output("imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:AF%i,%i,%i:",IMUlocationx._.W1,IMUlocationy._.W1,IMUlocationz._.W1,
 					    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
 					    state_flags.WW, osc_fail_count,
-	                    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z, aero_force[0], aero_force[1], aero_force[2]);
-//					serial_output("tmp%i:prs%li:alt%li:agl%li:",
+					    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z, aero_force[0], aero_force[1], aero_force[2]);
+//					serial_output("tmp%i:prs%li:alt%li:",
 //					    get_barometer_temperature(), get_barometer_pressure(), 
-//					    get_barometer_alt(), get_barometer_agl());
+//					    get_barometer_altitude());
 					serial_output("bmv%i:mA%i:mAh%i:",
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 	                battery_voltage._.W1,
@@ -740,7 +752,8 @@ void telemetry_output_8hz(void)
 					battery_current._.W1, battery_mAh_used._.W1);
 #else
 					(int16_t)0, (int16_t)0);                    
-#endif                            
+#endif
+					serial_output("DH%i:",desiredHeight);
 #if (RECORD_FREE_STACK_SPACE == 1)
 					extern uint16_t maxstack;
 					serial_output("stk%d:", (int16_t)(4096-maxstack));

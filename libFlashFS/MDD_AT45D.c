@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "FSconfig.h"
+#include "options_file_system.h"
 
 #ifdef USE_AT45D_FLASH
 

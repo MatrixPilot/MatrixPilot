@@ -27,7 +27,7 @@
 #include "config.h"
 #include "states.h"
 #include "flightplan.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "../libUDB/libUDB.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
@@ -122,7 +122,7 @@ void dcm_callback_gps_location_updated(void)
 		// extend this code.
 		state_flags._.save_origin = 0;
 		setup_origin();
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 		altimeter_calibrate();
 #endif
 	}

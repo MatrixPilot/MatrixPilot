@@ -25,13 +25,14 @@
 #include "navigate.h"
 #include "behaviour.h"
 #include "servoPrepare.h"
+#include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
 #include "helicalTurnCntrl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/rmat.h"
 #include <math.h>
-#include "airspeed_options.h" 
+#include "options_airspeed.h" 
 
 //#ifndef RTL_PITCH_DOWN
 //#define RTL_PITCH_DOWN (0.0)
@@ -67,7 +68,7 @@
 #define AOA_INVERTED       ((int16_t)(turns.AngleOfAttackInverted*(RMAX/57.3)))
 #define ELEV_TRIM_NORMAL   ((int16_t)SERVORANGE*turns.ElevatorTrimNormal)
 #define ELEV_TRIM_INVERTED ((int16_t)SERVORANGE*turns.ElevatorTrimInverted)
-#define STALL_SPEED_CM_SEC ((uint16_t)turns.CruiseSpeed*50.0) // assume stall speed approximately 1/2 of cruise speed
+#define STALL_SPEED_CM_SEC ((uint16_t)turns.RefSpeed*50.0) // assume stall speed approximately 1/2 of reference speed
 
 #define AOA_OFFSET           ((int16_t)((AOA_NORMAL + AOA_INVERTED)/2)) // offset is the average of the two values
 #define AOA_SLOPE            ((int16_t)((AOA_NORMAL - AOA_INVERTED) * 4)) // multiply by 4 because base speed is 1/2 of cruise
@@ -79,7 +80,7 @@
 
 #define MAX_INPUT            (1000) // maximum input in pwm units
 
-#define MINIMUM_AIRSPEED     (500) // minimum value of airspeed in cm/sec to be used in tilt computation,
+#define TURN_CALC_MINIMUM_AIRSPEED     (500) // minimum value of airspeed in cm/sec to be used in tilt computation,
                                    // mainly used for ground testing of turning tilt, which would go to zero at zero airspeed
 
 int16_t tiltError[3];
@@ -220,7 +221,7 @@ void helicalTurnCntrl(void)
 	airSpeed = 981; // for testing purposes, an airspeed is needed
 #else
 	airSpeed = air_speed_3DIMU;
-	if (airSpeed < MINIMUM_AIRSPEED) airSpeed = MINIMUM_AIRSPEED;
+	if (airSpeed < TURN_CALC_MINIMUM_AIRSPEED) airSpeed = TURN_CALC_MINIMUM_AIRSPEED;
 #endif
 
 	// determine the desired turn rate as the sum of navigation and fly by wire.
@@ -228,7 +229,7 @@ void helicalTurnCntrl(void)
 	steeringInput = 0 ; // just in case no airframe type is specified or radio is off
 	if (udb_flags._.radio_on == 1)
 	{
-#if (AIRFRAME_TYPE == AIRFRAME_STANDARD)
+#if ( (AIRFRAME_TYPE == AIRFRAME_STANDARD) || (AIRFRAME_TYPE == AIRFRAME_GLIDER) )
 		if (AILERON_INPUT_CHANNEL != CHANNEL_UNUSED)  // compiler is smart about this
 		{
 			steeringInput = udb_pwIn[ AILERON_INPUT_CHANNEL ] - udb_pwTrim[ AILERON_INPUT_CHANNEL ];

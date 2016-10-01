@@ -20,7 +20,7 @@
 
 #include "defines.h"
 #include "behaviour.h"
-#include "ports_config.h"
+#include "options_ports.h"
 
 
 // This file should generate no code.
@@ -243,3 +243,7 @@
 #if ( AIRFRAME_TYPE == AIRFRAME_HELI )
 	#error("Helical controls does not support AIRFRAME_HELI."
 #endif // AIRFRAME_HELI
+
+#if ( AIRFRAME_TYPE == AIRFRAME_GLIDER && ( GAINS_VARIABLE == 0 || ALTITUDE_GAINS_VARIABLE == 0 ) )
+	#warning("GAINS_VARIABLE and ALTITUDE_GAINS_VARIABLE in gain_variables.h recommended for AIRFRAME_GLIDER"
+#endif // AIRFRAME_GLIDER

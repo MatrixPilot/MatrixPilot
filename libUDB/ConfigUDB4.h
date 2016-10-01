@@ -33,7 +33,9 @@
 #define yaccelBUFF          6
 #define zaccelBUFF          4
 
+#ifndef NUM_ANALOG_INPUTS
 #define NUM_ANALOG_INPUTS   4
+#endif
 
 // External A/D channels:
 #define analogInput1BUFF    7

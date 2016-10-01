@@ -22,7 +22,7 @@
 #include "libUDB.h"
 #include "I2C.h"
 #include "magnetometer.h"
-#include "magnetometerOptions.h"
+#include "options_magnetometer.h"
 #include <stdio.h>
 #include <stdlib.h>
 

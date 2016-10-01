@@ -23,7 +23,7 @@
 #define _MAVLINK_H_
 
 
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 #include "../MAVLink/include/matrixpilot_mavlink_bridge_header.h"
 
 // Setting MAVLINK_TEST_ENCODE_DECODE to 1, will replace the normal code that sends MAVLink messages with

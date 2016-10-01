@@ -30,15 +30,15 @@
 #include "servoPrepare.h"
 #include "MAVLink.h"
 #include "telemetry.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "airspeedCntrl.h"
 #include "cameraCntrl.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/osd.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "mp_osd.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 int16_t pitch_control;
 int16_t roll_control;
@@ -66,11 +66,13 @@ void servoPrepare_init(void) // initialize the PWM
 
 	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
+#if (THROTTLE_INPUT_CHANNEL != 0 )
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
 		// initialise the throttle channel to zero, all others to servo midpoint
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
+#endif
 #endif
 	}
 

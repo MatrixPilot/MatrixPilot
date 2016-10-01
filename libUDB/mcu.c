@@ -24,10 +24,25 @@
 #include "interrupt.h"
 #include "uart.h"
 #include "mcu.h"
-#include "ports_config.h"
+#include "options_ports.h"
 #include <stdio.h>
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#include <p33Fxxxx.h>
+#ifdef __XC16__
+#pragma config FNOSC = PRIPLL
+#pragma config FCKSM = CSDCMD
+#pragma config OSCIOFNC = OFF
+#pragma config POSCMD = XT
+#pragma config FWDTEN = OFF
+#pragma config WINDIS = OFF
+#pragma config GSS = OFF
+#pragma config GWRP = OFF
+#pragma config FPWRT = PWR1
+#pragma config JTAGEN = OFF
+#pragma config ICS = PGD2
+
+#else // Not __XC16__
 _FOSCSEL(FNOSC_PRIPLL); // pri plus PLL (primary osc  w/ PLL)
 _FOSC(FCKSM_CSDCMD &
       OSCIOFNC_OFF &
@@ -45,6 +60,7 @@ _FGS(GSS_OFF &
 _FPOR(FPWRT_PWR1);
 _FICD(JTAGEN_OFF &
       ICS_PGD2);
+#endif // __XC16__
 
 #elif (BOARD_TYPE == AUAV3_BOARD)
 
@@ -59,14 +75,14 @@ _FICD(JTAGEN_OFF &
 #pragma config GSSK = OFF               // General Segment Key bits (General Segment Write Protection and Code Protection is Disabled)
 
 // FOSCSEL
-#pragma config FNOSC = PRIPLL           // Initial Oscillator Source Selection Bits (Primary Oscillator (XT, HS, EC) with PLL)
+#pragma config FNOSC = FRC              // Initial Oscillator Source Selection Bits (Internal Fast RC) )
 #pragma config IESO = OFF               // Two-speed Oscillator Start-up Enable bit (Start up with user-selected oscillator source)
 
 // FOSC
 #pragma config POSCMD = XT              // Primary Oscillator Mode Select bits (XT Crystal Oscillator Mode)
 #pragma config OSCIOFNC = OFF           // OSC2 Pin Function bit (OSC2 is clock output)
 #pragma config IOL1WAY = ON             // Peripheral pin select configuration (Allow only one reconfiguration)
-#pragma config FCKSM = CSDCMD           // Clock Switching Mode bits (Both Clock switching and Fail-safe Clock Monitor are disabled)
+#pragma config FCKSM = CSECMD           // Clock Switching Mode bits ( Clock enabled and Fail-safe Clock Monitor disabled)
 
 // FWDT
 #pragma config WDTPOST = PS32768        // Watchdog Timer Postscaler Bits (1:32,768)
@@ -263,13 +279,9 @@ static void configureDigitalIO(void)   // AUAV3 board
 	// port F
 	TRISFbits.TRISF0  = INPUT_PIN;  // CAN_RX
 	TRISFbits.TRISF1  = OUTPUT_PIN; // CAN_TX
-
-	TRISFbits.TRISF2  = INPUT_PIN;  // U3_RX
-	TRISFbits.TRISF3  = OUTPUT_PIN; // U3_TX
-
-	TRISFbits.TRISF4  = INPUT_PIN;  // U2_RX
-	TRISFbits.TRISF5  = OUTPUT_PIN; // U2_TX
-
+ 
+	// Pins F2, F3, F3, F4 are initialized by the Peripheral Module hardware when it is enabled.
+	
 	TRISFbits.TRISF8  = INPUT_PIN;  // I8
 	TRISFbits.TRISF13 = OUTPUT_PIN; // O7
 	TRISFbits.TRISF12 = OUTPUT_PIN; // O8
@@ -322,7 +334,7 @@ static void init_pll(void)
 {
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 #if (MIPS == 16)
-#warning 16 MIPS selected
+//No warning given for default MIPS speed
 	CLKDIVbits.PLLPRE = 0;  // PLL prescaler: N1 = 2 (default)
 	CLKDIVbits.PLLPOST = 1; // PLL postscaler: N2 = 4 (default)
 	PLLFBDbits.PLLDIV = 30; // FOSC = 32 MHz (XTAL=8MHz, N1=2, N2=4, M = 32)
@@ -359,7 +371,7 @@ static void init_pll(void)
 #warning 32 MIPS selected
 	PLLFBD = 30;                // M  = 32
 #elif (MIPS == 16)
-#warning 16 MIPS selected
+// No warning given for default MIPS speed
 	PLLFBD = 14;                // M  = 16
 #else
 #error Invalid MIPS Configuration

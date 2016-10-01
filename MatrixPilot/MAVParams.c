@@ -20,7 +20,7 @@
 
 
 #include "../MatrixPilot/defines.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 #if (USE_MAVLINK == 1)
 

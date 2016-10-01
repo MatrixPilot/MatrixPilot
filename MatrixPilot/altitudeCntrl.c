@@ -32,7 +32,7 @@
 #include "../libDCM/estWind.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/servoOut.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 #if (ALTITUDE_GAINS_VARIABLE != 1)
 
@@ -52,7 +52,7 @@ union longww throttleFiltered = { 0 };
 #define PITCHATZERO         (altit.AltHoldPitchHigh*(RMAX/57.3))
 #define PITCHHEIGHTGAIN     ((PITCHATMAX - PITCHATMIN) / (altit.HeightMargin*2.0))
 
-#define HEIGHTTHROTTLEGAIN  ((1.5*(altit.HeightTargetMax-altit.HeightTargetMin)* 1024.0) / (SERVORANGE*SERVOSAT))
+#define HEIGHTTHROTTLEGAIN  ((1.5*(altit.HeightTargetMax-altit.HeightTargetMin)* 1024.0) / SERVORANGE)
 
 static void normalAltitudeCntrl(void);
 static void manualThrottle(int16_t throttleIn);

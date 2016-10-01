@@ -38,6 +38,14 @@ fractional airspeed_pitch_ki;
 int16_t airspeed_pitch_min_aspd;
 int16_t airspeed_pitch_max_aspd;
 
+#if (AIRFRAME_TYPE == AIRFRAME_GLIDER)
+#include "states.h"
+static int16_t overspeedBrake = 0;   //braking in case of overspeed, defined and set in airspeedCntrl.c   0 brake = 0, full brake == 1700
+static int16_t flapsSelected = 0;   //resulting flap selection after checking slider and flight modes, normal speed = 0, slow = -1000, high speed = 1000
+inline int16_t get_overspeedBrake(void) {return overspeedBrake; };
+inline int16_t get_flapsSelected(void) {return flapsSelected; };
+#endif //AIRFRAME_GLIDER
+
 void init_airspeedCntrl(void)
 {
 	minimum_groundspeed = MINIMUM_GROUNDSPEED * 100;
@@ -219,6 +227,32 @@ fractional gliding_airspeed_pitch_adjust(void)
 
 void airspeedCntrl(void)
 {
+#if (AIRFRAME_TYPE == AIRFRAME_GLIDER)
+
+#if (FLAPS_INPUT_CHANNEL != 0 )
+	//set flaps to follow FLAPS_INPUT_CHANNEL proportionally
+	flapsSelected = ( ((signed int)udb_pwIn[FLAPS_INPUT_CHANNEL]) - SERVOCENTER ) ;
+#else
+	flapsSelected = 0;
+#endif // FLAPS_INPUT_CHANNEL
+	
+	//custom code to control flaps goes here
+	
+	//Overspeed protection (overrules normal brakes when airspeed too high)
+	//airspeed in cm/s ,  desiredSpeed stored in dm/s (10ths of meters per second)
+	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch)     //stab or auto, not manual
+	{
+		if ( ( air_speed_3DIMU / 10 ) > ( desiredSpeed * 1.5 ) )  // dm/s .. dm/s
+		{
+			overspeedBrake = ( ( air_speed_3DIMU / 10 ) - ( desiredSpeed * 1.5 ) ) * 30; // dm/s in excess of 150% => servo output (5.x => max)
+		}
+	}
+	else
+	{
+		overspeedBrake = 0;	
+	}	
+#endif //AIRFRAME_GLIDER
+
 	airspeed                   = calc_airspeed();
 	groundspeed                = calc_groundspeed();
 	target_airspeed            = calc_target_airspeed(desiredSpeed);

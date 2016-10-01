@@ -39,7 +39,7 @@
 
 #include "../MatrixPilot/defines.h"
 #include "../MatrixPilot/states.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 #if (USE_MAVLINK == 1)
 
@@ -969,7 +969,11 @@ void mavlink_output_40hz(void)
 		        battery_voltage._.W1 * 100,     // Battery voltage, in millivolts (1 = 1 millivolt)
 		    #else
 		        (int16_t)0,
+<<<<<<< HEAD
 			#endif
+=======
+		    #endif
+>>>>>>> upstream/master
 		    #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)                        
 		        battery_current._.W1 * 10,      // Battery current, in 10*milliamperes (1 = 10 milliampere), -1: autopilot does not measure the current
 		    #else

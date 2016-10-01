@@ -20,7 +20,7 @@
 
 
 #include "../MatrixPilot/defines.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 
 #if (USE_MAVLINK == 1)
 
@@ -28,7 +28,7 @@
 #include "MAVMission.h"
 #include "../MatrixPilot/behaviour.h"
 #include "../MatrixPilot/flightplan.h"
-#include "../MatrixPilot/flightplan-waypoints.h"
+#include "../MatrixPilot/flightplan_waypoints.h"
 #include "../libDCM/gpsParseCommon.h"
 
 uint16_t waypoint_request_i;

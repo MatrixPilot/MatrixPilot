@@ -434,29 +434,8 @@ def waypoints_do_not_need_telemetry(waypoint_file) :
 def get_waypoints_list_in_absolute_lat_long(waypoint_file,flight_origin):
     """ Convert waypoint file with absolute and relative coordinates to all absolute"""
     WAYPOINT_TYPE = 1
-    code_w_comments = open(waypoint_file).read() # Code with comments
-    code_wo_star_comments = remove_comments(code_w_comments) # Code without star comments
-    code_wo_comments = remove_slash_comments(code_wo_star_comments) # Code without comments
-    origin_line = get_fixed_origin(code_wo_comments)
-    #### Setup the Origin for use by Relative Coordinates ####
-    for y in origin_line :
-        if debug: print y.group(1), y.group(2), y.group(3)
-        if (int(y.group(3)) == 1):  # We are using an absolute and specified origin
-            if debug: print "This file uses a fixed pre-defined origin for relative coordinates"
-            fixed_origin_line = get_fixed_origin_coords(code_wo_comments)
-            for z in fixed_origin_line :
-                origin_east = int(z.group(3))
-                origin_north = int(z.group(4))
-                if debug: print "origin east is ", origin_east
-                if debug: print "origin north is", origin_north
-        elif (int(y.group(3)) == 0) :# We are using the boot up spot as the origin
-            #print "Using plane's boot up location as origin"
-            origin_east = flight_origin.longitude
-            origin_north = flight_origin.latitude
-            #print "Origin: Lon: ",origin_east,"Lat: ",origin_north
-        else :
-            if debug: print "Error in deciding what origin to use", y.group(3)
-    #### Get the Actual Waypoint List, convert relative waypoints to absolute ###
+    origin_east = flight_origin.longitude
+    origin_north = flight_origin.latitude
     C_pre_processed_code = C_pre_processor(waypoint_file)    
     waypoints_list = get_waypoints(C_pre_processed_code)
     waypoints_geo = ([],[],[]) # An empty list of waypoints in degrees for Lat & Lon, and meters for Alt (three lists of waypoint lists)
@@ -887,6 +866,10 @@ def calculate_headings_pitch_roll(log_book,flight_origin, options) :
             # Calcuate our heading from Rmat readings.
             heading_radians = atan2(- entry.rmat1 , entry.rmat4)
             entry.heading_degrees = (heading_radians / (2 * pi)) * 360
+            while (entry.heading_degrees < 0 ):
+               entry.heading_degrees +=360
+            while (entry.heading_degrees >= 360 ):
+               entry.heading_degrees -=360
         
 def write_style_urls(filename):
     for acolor in mycolors.list2 :
@@ -1312,7 +1295,7 @@ def write_flight_path_inner(log_book,flight_origin, filename,flight_clock,primar
     first_waypoint = True
     open_waypoint = True      # We only open the first few waypoints in GE - to keep graphics clean
     max_waypoints_to_open = 9
-    max_time_manual_entries = 25000 # time( milli secs)length of a manual route before starting new manual route
+    max_time_manual_entries = 5000 # time( milli secs)length of a manual route before starting new manual route
     log_book_index = 0
     for entry in log_book.entries :
         if log_book.ardustation_pos == "Recorded" :
@@ -2298,7 +2281,7 @@ def write_csv(options,log_book):
     print >> f_csv, "Pitch,Roll,Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,MAG W,MAG N,MAG Z,",
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,Desired Height,MAG W,MAG N,MAG Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
     print >> f_csv, "Flags Dec,Flags Hex,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA Pitch,",
     print >> f_csv, "Volts,Amps,mAh"
@@ -2359,7 +2342,7 @@ def write_csv(options,log_book):
         else :
             aoa_using_pitch = - (rmat[7] / 287.0) # plane is right way up
         relative_wing_loading = wing_loading(entry.aero_force_z, entry.est_airspeed, centimeter_cruise_speed)
-        if log_book.airframe == 1: # Normal type of plane
+        if log_book.airframe == 1 or log_book.airframe == 6: # Normal type of plane or glider
             elevator_without_trim = elevator_reversal_multiplier * \
                    (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value)
         elif log_book.airframe == 3: # Delta Wing, unmix elevator and aileron
@@ -2394,7 +2377,7 @@ def write_csv(options,log_book):
               entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
               entry.lex, "," , entry.ley , "," , entry.lez, ",", \
-              entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , \
+              entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , entry.desired_height, ",",\
               int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z), "," , \
               entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
               entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \

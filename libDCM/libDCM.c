@@ -35,10 +35,6 @@
 union dcm_fbts_word dcm_flags;
 int16_t angleOfAttack;
 
-// Calibrate for 10 seconds before moving servos
-#define CALIB_COUNT  400    // 10 seconds at 40 Hz
-#define GPS_COUNT    1000   // 25 seconds at 40 Hz
-
 void send_HILSIM_outputs(void);
 
 void SetAofA(int16_t AofA)
@@ -58,26 +54,25 @@ void dcm_init(void)
 	dcm_init_rmat();
 }
 
-#if (CALIB_COUNT > GPS_COUNT)
+#if (DCM_CALIB_COUNT > DCM_GPS_COUNT)
 #error here
 #endif
 
-static boolean dcm_run_calib_step(uint16_t count)
+void dcm_run_calib_step(uint16_t count)
 {
-	if (count == CALIB_COUNT)
+	if (count == DCM_CALIB_COUNT)
 	{
 		DPRINT("calib_finished\r\n");
+		dcm_flags._.calib_finished = 1;
 		dcm_calibrate();    // Finish calibration
-		return true;        // indicate that we are done
 	}
-	return false;
 }
 
 static boolean gps_run_init_step(uint16_t count)
 {
-	if (count <= GPS_COUNT)
+	if (count <= DCM_GPS_COUNT)
 	{
-		gps_startup_sequence(GPS_COUNT - count); // Counts down from GPS_COUNT to 0
+		gps_startup_sequence(DCM_GPS_COUNT - count); // Counts down from GPS_COUNT to 0
 	}
 	else
 	{
@@ -87,7 +82,7 @@ static boolean gps_run_init_step(uint16_t count)
 	return false;
 }
 
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 
 // We want to be reading both the magnetometer and the barometer at 4Hz
 // The magnetometer driver returns a new result via the callback on each call
@@ -118,12 +113,12 @@ void do_I2C_stuff(void)
 		}
 	}
 }
-#endif // BAROMETER_ALTITUDE
+#endif // USE_BAROMETER_ALTITUDE
 
 // Called at HEARTBEAT_HZ
 void udb_heartbeat_callback(void)
 {
-#if (BAROMETER_ALTITUDE == 1)
+#if (USE_BAROMETER_ALTITUDE == 1)
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
 		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
@@ -138,7 +133,7 @@ void udb_heartbeat_callback(void)
 		rxMagnetometer(mag_drift_callback);
 	}
 #endif
-#endif // BAROMETER_ALTITUDE
+#endif // USE_BAROMETER_ALTITUDE
 
 //  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
 	if (dcm_flags._.calib_finished)
@@ -160,7 +155,7 @@ void udb_heartbeat_callback(void)
 	{
 		if (!dcm_flags._.calib_finished)
 		{
-			dcm_flags._.calib_finished = dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
 		}
 		if (!dcm_flags._.init_finished)
 		{

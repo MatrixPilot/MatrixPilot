@@ -25,10 +25,10 @@
 #include "behaviour.h"
 #include "flightplan.h"
 #include "cameraCntrl.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsData.h"
-#include "mavlink_options.h"
+#include "options_mavlink.h"
 #include <stdlib.h>
 
 //#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
@@ -41,7 +41,7 @@ struct relWaypointDef { struct relative3D loc; int16_t flags; struct relative3D 
 #endif // USE_EXTENDED_NAV
 struct waypointDef { struct waypoint3D loc; int16_t flags; struct waypoint3D viewpoint; };
 
-#include "waypoints.h"
+#include "flightplan-waypoints.h"
 
 #define NUMBER_POINTS ((sizeof waypoints) / sizeof (struct waypointDef))
 #define NUMBER_RTL_POINTS ((sizeof rtlWaypoints) / sizeof (struct waypointDef))
@@ -386,7 +386,7 @@ void flightplan_waypoints_update(void)
 	}
 	else
 	{
-		if (tofinish_line < WAYPOINT_RADIUS) // crossed the finish line
+		if (tofinish_line < WAYPOINT_PROXIMITY_RADIUS) // crossed the finish line
 		{
 			if (desired_behavior._.loiter)
 			{

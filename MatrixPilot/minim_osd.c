@@ -20,10 +20,10 @@
 
 
 #include "defines.h"
-#include "osd_config.h"
+#include "options_osd.h"
 #include "navigate.h"
 #include "states.h"
-#include "flightplan-waypoints.h"
+#include "flightplan_waypoints.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/gpsData.h"
