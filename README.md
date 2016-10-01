@@ -1,26 +1,27 @@
-MatrixPilot - Firmware for Bill Premerlani's IMU based UAV Dev Board and its successors
+# MatrixPilot 
+## Firmware for Bill Premerlani's IMU based UAV Dev Board and its successors
 
-Welcome to the MatrixPilot codebase. This code currently supports three board types, the [UDB4] (https://www.sparkfun.com/products/retired/11115) and [UDB5] (https://www.sparkfun.com/products/11703) from SparkFun, and the [AUAV3] (http://arsovtech.com/?p=1257) from Arsov RC Technology.
+Welcome to the MatrixPilot codebase. Three board types are supported:-
+* the [UDB4] (https://www.sparkfun.com/products/retired/11115) 
+* the [UDB5] (https://www.sparkfun.com/products/11703) from SparkFun
+* the [AUAV3] (http://arsovtech.com/?p=1257) from Arsov RC Technology.
 
-Projects for the three boards are provided for both the traditional Microchip MPLAB-8 and and the new MPLAB-X Integrated Development Environments (IDE).
+Projects for the three boards are provided for the MPLAB-X Integrated Development Environment (IDE) and XC16 compiler. From October 2016, the master branch no longer supports the legacy MPLAB IDE.
 
-The main project files are in the MatrixPilot directory.
+There are 4 projects in the repository. They are listed here in order of increasing complexity:-
 
-MPLAB version 8:
-    MatrixPilot-udb4.mcp
-    MatrixPilot-udb5.mcp
-    MatrixPilot-auav3.mcp
+* ./Tools/FlashOSD updates the character set of the native On Screen Display (OSD). 
+* ./Tools/LedTest is used to test hardware including the accelerometers, gyros, Leds, and PWM outputs.It is factory installed for all 3 boards allowing users to test their boards on delivery.
+* ./RollPitchYaw creates an Inertial Measurement Unit (IMU). It  enables higher level testing of algorithms, firmware and hard hardware all combined together. 
+* ./MatrixPilot integrates the IMU with full automated flight control.
 
-MPLAB-X:
-    MatrixPilot-udb4.X
-    MatrixPilot-udb5.X
-    MatrixPilot-auav3.X
+There are two types of simulation avaiable:-
+* Software in the Loop (SIL) is provided in ./Tools/MatrixPilot-SIL. The autopilot is simulated as a software process in a host computer (Unix, MacOS, Windows) and that is then, in turn, connected to fly an aircraft in the X-Plane 10 flight simulator.
+* Hardware in the Loop (HIL) connects a physical board running MatrixPilot to a simulated aircraft in X-Plane 10. It is enabled for any board by setting a parameter in ./Config/options.h when compiling MatrixPilot. 
 
-Similarly, the RollPitchYaw directory contains project files for an IMU test and demonstration program.
+./Tools/HilSim provides the software plugin for X-Plane10 to link to the SIL or HIL versions of MatrixPilot. 
 
-The Tools directory contains numerous programs to support MatrixPilot setup and operation.
-
-To configure MatrixPilot for your plane, edit the configuration files in the ./Config directory.
+./Tools/flight_analyzer provides a python program that allows analysis and display of flights in GoogleEarth.
 
 For developers, there is also a makefile based build system (build-all.bat) and a project generator (Tools/Build/proj_gen.bat), which both Windows and *nix compatible.
 
