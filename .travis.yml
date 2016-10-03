@@ -21,7 +21,7 @@ before_install:
 # Install needed IDE and compiler
 install:
  - ./travis-install-dependencies.sh
- - export PATH=$PATH:/opt/microchip/xc16/v1.25/bin
+ - export PATH=$PATH:/opt/microchip/xc16/v1.26/bin
  - xc16-gcc --version
 
 before_script:
@@ -29,29 +29,24 @@ before_script:
   - ls -la
 
 script:
-  - mkdir -p ./build-yml
-  - cd ./build-yml
+  - mkdir -p ./build-yml; cd ./build-yml
   
-  - mkdir -p ./SIL
-  - cd ./SIL
-  - make -j 8 -f ../../makefile DEVICE=SIL
+  - mkdir -p ./SIL; cd ./SIL
+  -  make -j 8 -f ../../makefile DEVICE=SIL
   - ls -la *.out
   - cd ..
 
-  - mkdir -p ./AUAV3
-  - cd ./AUAV3
+  - mkdir -p ./AUAV3; cd ./AUAV3
   -  make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
   - ls -la *.hex *.map
   - cd ..
 
-  - mkdir -p ./UDB5
-  - cd ./UDB5
+  - mkdir -p ./UDB5; cd ./UDB5
   -  make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
   - ls -la *.hex *.map
   - cd ..
 
-  - mkdir -p ./UDB4
-  - cd ./UDB4
+  - mkdir -p ./UDB4; cd ./UDB4
   -  make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
   - ls -la *.hex *.map
   - cd ..
