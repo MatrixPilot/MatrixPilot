@@ -33,25 +33,26 @@ script:
   
   - mkdir -p ./SIL; cd ./SIL
   -  make -j 8 -f ../../makefile DEVICE=SIL
-  - ls -la *.out
-  - cd ..
+#  - ls -la *.out
+#  - cd ..
 
-  - mkdir -p ./AUAV3; cd ./AUAV3
+  - cd ..; mkdir -p ./AUAV3; cd ./AUAV3
   -  make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
-  - ls -la *.hex *.map
-  - cd ..
+#  - ls -la *.hex *.map
+#  - cd ..
 
-  - mkdir -p ./UDB5; cd ./UDB5
+  - cd ..; mkdir -p ./UDB5; cd ./UDB5
   -  make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
-  - ls -la *.hex *.map
-  - cd ..
+#  - ls -la *.hex *.map
+#  - cd ..
 
-  - mkdir -p ./UDB4; cd ./UDB4
+  - cd ..; mkdir -p ./UDB4; cd ./UDB4
   -  make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
-  - ls -la *.hex *.map
-  - cd ..
+#  - ls -la *.hex *.map
+#  - cd ..
 
-  - cd ..
+#  - cd ..
+  - cd ../..
 
   - pwd
   - export PATH=/opt/microchip/xc16/v1.26/bin:$PATH
@@ -59,4 +60,7 @@ script:
   - ./build-all.sh
   
 after_success:
+  - find build | grep hex
+  - find build | grep map
+  - find build | grep out
   - cd ~
