@@ -43,8 +43,9 @@ deploy:
   file: build/UDB5/MatrixPilot-UDB5-XC16.hex
   skip_cleanup: true
   on:
-    tags: true
+    tags: false
     all_branches: true
+    repo: Inspirati/MatrixPilot
   password:
     secure: SnO+wb7oKVDDH/gUemTEhqHqduSZt14ib2vmHoLeZpjYtpbzfZ5FA4qyCRihpAWaWcxWzXEBwe0viJlDVv4eQ/lvlmsY25lD5R3Bc/Dd+1lsRC+RQuREahkHNZZ04KpurbIIWJkBdCQin/55tXU1FhDmNfJS3M2/btZvmbd/mZfgd7DfEHdC2231YTBmhAhw3k9TKZO34JgBwo2BT5Qh/Sjjx+dhGbVTL4QU9hAEqKQGKK1H+zKIk1xgD+pJl0sfQXGUOOLDo90dNtoA+C/G9XRev7HQrKccbhRTgFATp5x7Dc2Vp596MHwIOp46uOsamPX3H6CP8C/tE0Zl8q3EAja+TzdBpVqPyzAA7tXntBc2aBV0eawXAg+N2gKYbjv00HZ4S4t+SFO3JQ9EOxavnVhfjdgT+Zk6rnZS9wtqHzTcWJmod6Qdn0L+rtD2sbhR6n7BxNnR56qXxC2K5gFDJbFImAg/hlPvF3d0xeDfCI/xCtM6ZPNB5k29eq9EQS4OMA0pIn2kU5WNmq2vfco8IQH0RvHF2KnUfS5oj5C1znGmkO98gOQa8SqYpuqw+uTtJPUFY7vD62zBWAVCCpDAVkjkfcATglhEhjYyo5RTPy/6RcvxSbJlJabMR4WKySunMITV4O/ogiLK+uWzLR/XnQ4Z4gQEvM8vDXo3m8qADL8=
 
