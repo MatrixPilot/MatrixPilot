@@ -80,6 +80,22 @@ boolean canStabilizeHover(void)
 
 void updateBehavior(void)
 {
+#if (MODE_INVERTED_CHANNEL != CHANNEL_UNUSED)
+#warning  "options.h has a channel for flipping the plane to Inverted flight"
+#warning "Hover options disabled"
+	if (udb_pwIn[MODE_INVERTED_CHANNEL] > 3500)
+	{
+		current_orientation = F_INVERTED;
+	}
+	else if (udb_pwIn[MODE_INVERTED_CHANNEL] < 2500)
+	{
+		current_orientation = F_NORMAL;
+	}
+	else 
+	{
+		// Inverted channel switch is in neutral position; do not enforce an override
+	}
+#else
 	if (current_orientation == F_INVERTED)
 	{
 		if (canStabilizeHover() && rmat[7] < -14000)
@@ -125,6 +141,7 @@ void updateBehavior(void)
 			current_orientation = F_NORMAL;
 		}
 	}
+#endif
 	if (state_flags._.pitch_feedback && !state_flags._.GPS_steering)
 	{
 		desired_behavior.W = current_orientation;
