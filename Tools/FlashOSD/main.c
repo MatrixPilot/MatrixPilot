@@ -23,7 +23,9 @@
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/osd.h"
 #include "../../libUDB/ADchannel.h"
+#include "../../MatrixPilot/osd_layout.h" // Defines whether using NTSC or PAL Video
 #include "font_data.h"
+
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 #include "../../libUDB/mpu6000.h" // required for UDB5 and AUAV3 for heartbeat
 #endif
@@ -90,7 +92,11 @@ void udb_heartbeat_40hz_callback(void)
 			LED_GREEN = LED_ON;
 
 			osd_spi_write(0x04, 0);     // DMM set to 0
-			osd_spi_write(0x0, 0x08);   // VM0: enable display of OSD image
+#if (OSD_VIDEO_FORMAT == OSD_NTSC)
+			osd_spi_write(0x0, 0x08);   // VM0: enable display of OSD image, NTSC
+#else
+			osd_spi_write(0x0, 0x48);   // VM0: enable display of OSD image, PAL
+#endif
 
 			int row;
 			for (row = 0; row < 11; row++)
