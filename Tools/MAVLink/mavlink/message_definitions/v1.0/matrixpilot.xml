@@ -279,12 +279,6 @@
                <field type="int16_t" name="aoa">Angle of attack sensor, degrees * 10</field>
                <field type="int16_t" name="aoy">Yaw angle sensor, degrees * 10</field>
      </message>
-     <message id="183" name="FORCE">
-         <description>The Forces acting on the aircraft</description>
-         <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
-         <field type="int16_t" name="aero_x">Aeroforce in UDB X Axis, in units of gravity * 2000</field>
-         <field type="int16_t" name="aero_y">Aeroforce in UDB Y Axis,  in units of gravity * 2000 </field>
-         <field type="int16_t" name="aero_z">Aeroforce in UDB Z axis (Wing loading), in units of gravity * 2000</field>
-     </message>
+    
    </messages>
 </mavlink>

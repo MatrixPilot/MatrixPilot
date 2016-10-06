@@ -5,26 +5,28 @@
 *   Official Website: http://mavlink.org
 *   Source: [Mavlink Generator](https://github.com/mavlink/mavlink)
 *   Binaries (always up-to-date from master):
-  * [C/C++ header-only library](https://github.com/mavlink/c_library)
+  * [C/C++ header-only library v1](https://github.com/mavlink/c_library_v1)
+  * [C/C++ header-only library v2](https://github.com/mavlink/c_library_v2)
 *   Mailing list: [Google Groups](http://groups.google.com/group/mavlink)
 
 MAVLink -- Micro Air Vehicle Message Marshalling Library.
 
-This is a library for lightweight communication between Micro Air Vehicles (swarm) and/or ground control stations. It allows for defining messages within XML files, which then are converted into appropriate source code for different languages. These XML files are called dialects, most of which build on the *common* dialect provided in `common.xml`.
+This is a library for lightweight communication between drones and/or ground control stations. It allows for defining messages within XML files, which then are converted into appropriate source code for different languages. These XML files are called dialects, most of which build on the *common* dialect provided in `common.xml`.
+
+The initial experimental MAVLink was created 2008 when the term drone was not used yet to describe small vehicles for consumer use.
 
 The MAVLink protocol performs byte-level serialization and so is appropriate for use with any type of radio modem.
 
 This repository is largely Python scripts that convert XML files into language-specific libraries. There are additional Python scripts providing examples and utilities for working with MAVLink data. These scripts, as well as the generated Python code for MAVLink dialects, require Python 2.7 or greater.
-
-Note that there are two incompatible versions of the MAVLink protocol: v0.9 and v1.0. Most programs, including [QGroundControl](https://github.com/mavlink/qgroundcontrol), have switched over to v1.0. The v0.9 protocol is **DEPRECATED** and should only be used to maintain backwards compatibility where necessary.
 
 ### Requirements ###
   * Python 2.7+
     * Tkinter (if GUI functionality is desired)
 
 ### Installation ###
-  1. Clone into a user-writable directory.
+  1. Clone into a user-writable directory. Make sure to use the git "--recursive" option since pymavlink is a submodule. Alternately, run "git submodule init" and "git submodule update" after cloning to get pymavlink.
   2. Add the repository directory to your `PYTHONPATH`
+  3. Generate MAVLink parser files following the instructions in the next section *AND/OR* run included helper scripts described in the Scripts/Examples secion.
 
 ### Generating Language-specific Source Files ###
 
@@ -49,7 +51,7 @@ mavgenerate.py is a header generation tool GUI written in Python. It requires Tk
 
 mavgen.py is a command-line interface for generating a language-specific MAVLink library. This is actually the backend used by `mavgenerate.py`. After the `mavlink` directory has been added to the Python path, it can be run by executing from the command line:
 
-    $ python -m pymavlink.generator.mavgen
+    $ python -m pymavlink.tools.mavgen
 
 ### Usage ###
 
@@ -59,7 +61,7 @@ Using the generated MAVLink dialect libraries varies depending on the language, 
 To use MAVLink, include the *mavlink.h* header file in your project:
 
     #include <mavlink.h>
-    
+
 Do not include the individual message files. In some cases you will have to add the main folder to the include search path as well. To be safe, we recommend these flags:
 
     $ gcc -I mavlink/include -I mavlink/include/<your message set, e.g. common>
@@ -75,22 +77,22 @@ Transmitting can be done by using the `mavlink_msg_*_pack()` function, where one
 It is possible to simplify the above by writing wrappers around the transmitting/receiving code. A multi-byte writing macro can be defined, `MAVLINK_SEND_UART_BYTES()`, or a single-byte function can be defined, `comm_send_ch()`, that wrap the low-level driver for transmitting the data. If this is done, `MAVLINK_USE_CONVENIENCE_FUNCTIONS` must be defined.
 
 ### Scripts/Examples ###
-This MAVLink library also comes with supporting libraries and scripts for using, manipulating, and parsing MAVLink streams within the pymavlink, pymavlink/tools, and pymavlink/examples directories.
+This MAVLink library also comes with supporting libraries and scripts for using, manipulating, and parsing MAVLink streams within the pymavlink, pymav
+link/tools, and pymavlink/examples directories.
 
-#### Requirements ####
-
+The scripts have the following requirements:
   * Python 2.7+
   * mavlink repository folder in `PYTHONPATH`
   * Write access to the entire `mavlink` folder.
   * Your dialect's XML file is in `message_definitions/*/`
 
-Running these scripts can be run by listing the folder hierarchy for the script. The following code runs `mavlogdump.py` in `/pymavlink/tools/` on the recorded MAVLink stream `test_run.mavlink`:
+Running these scripts can be done by running Python with the '-m' switch, which indicates that the given script exists on the PYTHONPATH. This is the proper way to run Python scripts that are part of a library as per PEP-328 (and the rejected PEP-3122). The following code runs `mavlogdump.py` in `/pymavlink/tools/` on the recorded MAVLink stream `test_run.mavlink` (other scripts in `/tools` and `/scripts` can be run in a similar fashion):
 
     $ python -m pymavlink.tools.mavlogdump test_run.mavlink
 
 ### License ###
 
-MAVLink is licensed under the terms of the Lesser General Public License (version 3) of the Free Software Foundation (LGPLv3). The C-language version of MAVLink is a header-only library, and as such compiling an application with it is considered "using the library", not a derived work. MAVLink can therefore be used without limits in any closed-source application without publishing the source code of the closed-source application.
+MAVLink is licensed under the terms of the Lesser General Public License (version 3) of the Free Software Foundation (LGPLv3). The C-language version of MAVLink is a header-only library which is generated as MIT-licensed code. MAVLink can therefore be used without limits in any closed-source application without publishing the source code of the closed-source application.
 
 See the *COPYING* file for more info.
 
