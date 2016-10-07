@@ -15,7 +15,6 @@ pymavlink/generator/python/
 apidocs/
 pymavlink/generator/message_definitions
 *.swp
-pymavlink/dialects/
 pymavlink/MANIFEST
 pymavlink/dist
 pymavlink.egg-info/
