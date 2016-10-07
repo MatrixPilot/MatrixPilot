@@ -20,9 +20,22 @@ The .git files for mavlink, pymavlink and MAVProxy were deleted,
 so that these files exist in their own right within 
 the MatrixPilot respository. 
 
+It is important to set the PYTHONPATH environment variable to to include
+mavlink/pymavlink/generator before running the generation script below.
+change working directory to
+Tools/MAVLink/mavlink/pymavlink/generator
+run "Python gen_MatrixPilot.py" to generate new C include files and a new python code for the MatrixPilot dialect.
+
+I then had to delete the following line from options_mavlink.h
+#define MAVLINK_EXTERNAL_RX_STATUS          1
+
 After testing, and mavlink generation, the files were then commited 
 to the master branch in th MatrixPilot git repository. 
+
 Submodules were initially used during development, but these proved 
 problematic, and so this simpler scheme has been adopted, 
-as MatrixPilot tends to only update the mavlink generator once per year.
+as the mavlink generator is only updated once per year.
+
+Peter Hollands 
+October 2016
 
