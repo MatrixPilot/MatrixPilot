@@ -3,7 +3,6 @@
 
 language: c
 
-
 sudo: true
 
 addons:
@@ -15,53 +14,36 @@ addons:
     - libstdc++6:i386
     - libexpat1:i386
 
-before_install: 
- - chmod +x travis-install-dependencies.sh
+before_install:
+- chmod +x travis-install-dependencies.sh
 
-# Install needed IDE and compiler
 install:
- - ./travis-install-dependencies.sh
- - export PATH=$PATH:/opt/microchip/xc16/v1.25/bin
- - xc16-gcc --version
+- ./travis-install-dependencies.sh
+- export PATH=$PATH:/opt/microchip/xc16/v1.26/bin
+- xc16-gcc --version
 
 before_script:
-  - pwd
-  - ls -la
+- pwd
+- ls -la
 
 script:
-  - mkdir -p ./build-yml
-  - cd ./build-yml
-  
-  - mkdir -p ./SIL
-  - cd ./SIL
-  - make -j 8 -f ../../makefile DEVICE=SIL
-  - ls -la *.out
-  - cd ..
+- mkdir -p ./build-yml; cd ./build-yml
+- mkdir -p ./SIL; cd ./SIL
+- make -j 8 -f ../../makefile DEVICE=SIL
+- cd ..; mkdir -p ./AUAV3; cd ./AUAV3
+- make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
+- cd ..; mkdir -p ./UDB5; cd ./UDB5
+- make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
+- cd ..; mkdir -p ./UDB4; cd ./UDB4
+- make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
+- cd ../..
+- pwd
+- export PATH=/opt/microchip/xc16/v1.26/bin:$PATH
+- xc16-gcc --version
+- ./build-all.sh
 
-  - mkdir -p ./AUAV3
-  - cd ./AUAV3
-  -  make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
-  - ls -la *.hex *.map
-  - cd ..
-
-  - mkdir -p ./UDB5
-  - cd ./UDB5
-  -  make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
-  - ls -la *.hex *.map
-  - cd ..
-
-  - mkdir -p ./UDB4
-  - cd ./UDB4
-  -  make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
-  - ls -la *.hex *.map
-  - cd ..
-
-  - cd ..
-
-  - pwd
-  - export PATH=/opt/microchip/xc16/v1.24/bin:$PATH
-  - xc16-gcc --version
-  - ./build-all.sh
-  
 after_success:
-  - cd ~
+- find build | grep hex
+- find build | grep map
+- find build | grep out
+- cd ~
