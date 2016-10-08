@@ -32,6 +32,7 @@
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/rmat.h"
 #include <math.h>
+#include <stdlib.h> // for declaration of function abs() under gcc
 #include "options_airspeed.h" 
 
 //#ifndef RTL_PITCH_DOWN
