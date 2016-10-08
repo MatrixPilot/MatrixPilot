@@ -22,6 +22,8 @@
         <itemPath>../../../libUDB/osd.h</itemPath>
         <itemPath>../../../libUDB/uart.h</itemPath>
         <itemPath>../../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../../libUDB/mpu_spi.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -45,6 +47,8 @@
         <itemPath>../../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../../libUDB/uart.c</itemPath>
         <itemPath>../../../libUDB/write.c</itemPath>
+        <itemPath>../../../libUDB/mpu6000.c</itemPath>
+        <itemPath>../../../libUDB/mpu_spi.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Tools/FlashOSD" projectFiles="true">
         <itemPath>../main.c</itemPath>
@@ -137,7 +141,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="UDB4=1"/>
+        <property key="preprocessor-macros" value="UDB5=1"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>

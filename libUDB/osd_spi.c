@@ -40,19 +40,36 @@ uint8_t osd_spi_read(int8_t addr);
 //  UDB4 uses SPI1 port
 // AUAV3 uses SPI3 port
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD) 
 
 #warning "OSD configured for SPI port 1"
 
-#define OSD_CS          _LATF7 // _LATB2
-#define OSD_SCK         _LATF8 // _LATF6
-#define OSD_MOSI        _LATF6 // _LATF7
-//#define OSD_MISO        0      // _LATF8
+#if ( OSD_LEGACY_SPI_PINOUT == 1)
+#warning "Using legacy OSD pinout:- UDB4/5 board labels do not match signals"
+
+#define OSD_CS          _LATF7 
+#define OSD_SCK         _LATF8 
+#define OSD_MOSI        _LATF6 
+// OSD_MISO was not defined in legacy pinout
 
 #define OSD_CS_TRIS     _TRISF7
 #define OSD_SCK_TRIS    _TRISF8
 #define OSD_MOSI_TRIS   _TRISF6
 #define OSD_MISO_TRIS   _TRISD12
+
+#else // OSD_LEGACY_SPI_PINOUT not being used
+#warning "Using OSD SPI pinout that matches labelling on UDB4 and UDB5 boards"
+#define OSD_CS          _LATB2
+#define OSD_SCK         _LATF6 
+#define OSD_MOSI        _LATF7 
+#define OSD_MISO        _LATF8
+
+#define OSD_CS_TRIS     _TRISB2
+#define OSD_SCK_TRIS    _TRISF6
+#define OSD_MOSI_TRIS   _TRISF7
+#define OSD_MISO_TRIS   _TRISF8
+
+#endif //( OSD_LEGACY_SPI_PINOUT == 1)
 
 #define SPIxSTAT        SPI1STAT
 #define SPIxCON1        SPI1CON1

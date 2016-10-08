@@ -7,6 +7,9 @@
       <logicalFolder name="Config" displayName="Config" projectFiles="true">
         <itemPath>../Config/options.h</itemPath>
         <itemPath>../Config/options_osd.h</itemPath>
+        <itemPath>../Config/options_auav3.h</itemPath>
+        <itemPath>../Config/options_nv_memory.h</itemPath>
+        <itemPath>../Config/options_ports.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../../libUDB/builtins.h</itemPath>
@@ -22,6 +25,8 @@
         <itemPath>../../../libUDB/osd.h</itemPath>
         <itemPath>../../../libUDB/uart.h</itemPath>
         <itemPath>../../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../../libUDB/mpu_spi.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -45,6 +50,8 @@
         <itemPath>../../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../../libUDB/uart.c</itemPath>
         <itemPath>../../../libUDB/write.c</itemPath>
+        <itemPath>../../../libUDB/mpu6000.c</itemPath>
+        <itemPath>../../../libUDB/mpu_spi.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Tools/FlashOSD" projectFiles="true">
         <itemPath>../main.c</itemPath>
@@ -71,7 +78,7 @@
     <conf name="default" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetDevice>dsPIC33EP512MU810</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
@@ -137,7 +144,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="UDB4=1"/>
+        <property key="preprocessor-macros" value="AUAV3=1"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
@@ -226,11 +233,20 @@
         <property key="ADC 1" value="true"/>
         <property key="ADC 2" value="true"/>
         <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="COMPARATOR" value="true"/>
+        <property key="CRC" value="true"/>
         <property key="DCI" value="true"/>
         <property key="Freeze All Other Peripherals" value="true"/>
         <property key="I2C1" value="true"/>
         <property key="I2C2" value="true"/>
         <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 10" value="true"/>
+        <property key="INPUT CAPTURE 11" value="true"/>
+        <property key="INPUT CAPTURE 12" value="true"/>
+        <property key="INPUT CAPTURE 13" value="true"/>
+        <property key="INPUT CAPTURE 14" value="true"/>
+        <property key="INPUT CAPTURE 15" value="true"/>
+        <property key="INPUT CAPTURE 16" value="true"/>
         <property key="INPUT CAPTURE 2" value="true"/>
         <property key="INPUT CAPTURE 3" value="true"/>
         <property key="INPUT CAPTURE 4" value="true"/>
@@ -238,7 +254,15 @@
         <property key="INPUT CAPTURE 6" value="true"/>
         <property key="INPUT CAPTURE 7" value="true"/>
         <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="INPUT CAPTURE 9" value="true"/>
         <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 10" value="true"/>
+        <property key="OUTPUT COMPARE 11" value="true"/>
+        <property key="OUTPUT COMPARE 12" value="true"/>
+        <property key="OUTPUT COMPARE 13" value="true"/>
+        <property key="OUTPUT COMPARE 14" value="true"/>
+        <property key="OUTPUT COMPARE 15" value="true"/>
+        <property key="OUTPUT COMPARE 16" value="true"/>
         <property key="OUTPUT COMPARE 2" value="true"/>
         <property key="OUTPUT COMPARE 3" value="true"/>
         <property key="OUTPUT COMPARE 4" value="true"/>
@@ -246,8 +270,14 @@
         <property key="OUTPUT COMPARE 6" value="true"/>
         <property key="OUTPUT COMPARE 7" value="true"/>
         <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="OUTPUT COMPARE 9" value="true"/>
+        <property key="PARALLEL MASTER/SLAVE PORT" value="true"/>
+        <property key="PWM" value="true"/>
+        <property key="REAL TIME CLOCK AND CALENDAR" value="true"/>
         <property key="SPI 1" value="true"/>
         <property key="SPI 2" value="true"/>
+        <property key="SPI 3" value="true"/>
+        <property key="SPI 4" value="true"/>
         <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
         <property key="TIMER1" value="true"/>
         <property key="TIMER2" value="true"/>
@@ -263,6 +293,9 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
+        <property key="UART 3" value="true"/>
+        <property key="UART 4" value="true"/>
+        <property key="USB" value="true"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
