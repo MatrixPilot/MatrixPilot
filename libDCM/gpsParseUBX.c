@@ -625,7 +625,7 @@ static void msg_PL1(uint8_t gpschar)
 					}
 					else
 					{
-						printf("NAV-KEYSTROKE, bad payloadlength %i != %i\r\n", payloadlength.BB, NUM_POINTERS_IN(msg_KEYSTROKE_parse));
+						printf("NAV-KEYSTROKE, bad payloadlength %i != %li\r\n", payloadlength.BB, NUM_POINTERS_IN(msg_KEYSTROKE_parse));
 						msg_parse = &msg_B3;    // error condition
 					}
 					break;
