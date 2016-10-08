@@ -1,5 +1,10 @@
+# Build and autotest script for MatrixPilot firmware
+# http://travis-ci.org
+
 language: c
+
 sudo: true
+
 addons:
   apt:
     packages:
@@ -8,15 +13,19 @@ addons:
     - libxext6:i386
     - libstdc++6:i386
     - libexpat1:i386
+
 before_install:
 - chmod +x travis-install-dependencies.sh
+
 install:
-- "./travis-install-dependencies.sh"
+- ./travis-install-dependencies.sh
 - export PATH=$PATH:/opt/microchip/xc16/v1.26/bin
 - xc16-gcc --version
+
 before_script:
 - pwd
 - ls -la
+
 script:
 - mkdir -p ./build-yml; cd ./build-yml
 - mkdir -p ./SIL; cd ./SIL
@@ -31,16 +40,21 @@ script:
 - pwd
 - export PATH=/opt/microchip/xc16/v1.26/bin:$PATH
 - xc16-gcc --version
-- "./build-all.sh"
+- ./build-all.sh
+
 after_success:
 - find build | grep hex
 - find build | grep map
 - find build | grep out
 - cd ~
+
 deploy:
   provider: releases
   api_key: GITHUB OAUTH TOKEN
-  file: build/UDB5/MatrixPilot-UDB5-XC16.hex
+  file:
+  - build/UDB3/MatrixPilot-UDB4-XC16.hex
+  - build/UDB5/MatrixPilot-UDB5-XC16.hex
+  - build/AUAV3/MatrixPilot-AUAV3-XC16.hex
   skip_cleanup: true
   on:
     tags: true

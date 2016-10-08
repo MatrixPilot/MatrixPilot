@@ -170,7 +170,7 @@ void udb_background_trigger_pulse(background_callback callback);
 
 //! Return the current CPU load as an integer percentage value from 0-100.
 uint8_t udb_cpu_load(void);
-inline void cpu_load_calc(void);
+void cpu_load_calc(void);
 
 
 ////////////////////////////////////////////////////////////////////////////////
