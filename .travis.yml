@@ -3,7 +3,6 @@
 
 language: c
 
-
 sudo: true
 
 addons:
@@ -15,61 +14,55 @@ addons:
     - libstdc++6:i386
     - libexpat1:i386
 
-before_install: 
- - chmod +x travis-install-dependencies.sh
+before_install:
+- chmod +x travis-install-dependencies.sh
 
-# Install needed IDE and compiler
 install:
- - ./travis-install-dependencies.sh
- - export PATH=$PATH:/opt/microchip/xc16/v1.26/bin
- - xc16-gcc --version
- - elf-ld --version
- - cat ./opt/microchip/xc16/v1.26/support/dsPIC33E/gld/p33EP512MU810.gld
+- ./travis-install-dependencies.sh
+- export PATH=$PATH:/opt/microchip/xc16/v1.26/bin
+- xc16-gcc --version
 
 before_script:
-  - pwd
-  - ls -la
+- pwd
+- ls -la
 
 script:
-  - mkdir -p ./build-yml; cd ./build-yml
-  
-  - mkdir -p ./SIL; cd ./SIL
-  -  make -j 8 -f ../../makefile DEVICE=SIL
-#  - ls -la *.out
-#  - cd ..
+- mkdir -p ./build-yml; cd ./build-yml
+- mkdir -p ./SIL; cd ./SIL
+- make -j 8 -f ../../makefile DEVICE=SIL
+- cd ..; mkdir -p ./AUAV3; cd ./AUAV3
+- make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
+- cd ..; mkdir -p ./UDB5; cd ./UDB5
+- make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
+- cd ..; mkdir -p ./UDB4; cd ./UDB4
+- make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
+- cd ../..
+- pwd
+- export PATH=/opt/microchip/xc16/v1.26/bin:$PATH
+- xc16-gcc --version
+- ./build-all.sh
 
-  - cd ..; mkdir -p ./AUAV3; cd ./AUAV3
-  -  make -j 8 -f ../../makefile DEVICE=AUAV3 TOOLCHAIN=XC16
-#  - ls -la *.hex *.map
-#  - cd ..
-
-  - cd ..; mkdir -p ./UDB5; cd ./UDB5
-  -  make -j 8 -f ../../makefile DEVICE=UDB5 TOOLCHAIN=XC16
-#  - ls -la *.hex *.map
-#  - cd ..
-
-  - cd ..; mkdir -p ./UDB4; cd ./UDB4
-  -  make -j 8 -f ../../makefile DEVICE=UDB4 TOOLCHAIN=XC16
-#  - ls -la *.hex *.map
-#  - cd ..
-
-#  - cd ..
-  - cd ../..
-
-  - pwd
-  - export PATH=/opt/microchip/xc16/v1.26/bin:$PATH
-  - xc16-gcc --version
-  - ./build-all.sh
-  
 after_success:
-  - find build | grep hex
-  - find build | grep map
-  - find build | grep out
-  - cd ~
+- find build | grep hex
+- find build | grep map
+- find build | grep out
+- cd ~
 
 deploy:
   provider: releases
-  file: "./build-yml/MatrixPilot-SIL-GCC.out"
+  api_key: GITHUB OAUTH TOKEN
+  file:
+  - build/UDB3/MatrixPilot-UDB4-XC16.hex
+  - build/UDB5/MatrixPilot-UDB5-XC16.hex
+  - build/AUAV3/MatrixPilot-AUAV3-XC16.hex
   skip_cleanup: true
   on:
-    tags: false
+    tags: true
+    all_branches: true
+    repo: Inspirati/MatrixPilot
+  password:
+    secure: SnO+wb7oKVDDH/gUemTEhqHqduSZt14ib2vmHoLeZpjYtpbzfZ5FA4qyCRihpAWaWcxWzXEBwe0viJlDVv4eQ/lvlmsY25lD5R3Bc/Dd+1lsRC+RQuREahkHNZZ04KpurbIIWJkBdCQin/55tXU1FhDmNfJS3M2/btZvmbd/mZfgd7DfEHdC2231YTBmhAhw3k9TKZO34JgBwo2BT5Qh/Sjjx+dhGbVTL4QU9hAEqKQGKK1H+zKIk1xgD+pJl0sfQXGUOOLDo90dNtoA+C/G9XRev7HQrKccbhRTgFATp5x7Dc2Vp596MHwIOp46uOsamPX3H6CP8C/tE0Zl8q3EAja+TzdBpVqPyzAA7tXntBc2aBV0eawXAg+N2gKYbjv00HZ4S4t+SFO3JQ9EOxavnVhfjdgT+Zk6rnZS9wtqHzTcWJmod6Qdn0L+rtD2sbhR6n7BxNnR56qXxC2K5gFDJbFImAg/hlPvF3d0xeDfCI/xCtM6ZPNB5k29eq9EQS4OMA0pIn2kU5WNmq2vfco8IQH0RvHF2KnUfS5oj5C1znGmkO98gOQa8SqYpuqw+uTtJPUFY7vD62zBWAVCCpDAVkjkfcATglhEhjYyo5RTPy/6RcvxSbJlJabMR4WKySunMITV4O/ogiLK+uWzLR/XnQ4Z4gQEvM8vDXo3m8qADL8=
+  branches:
+    only:
+    - master
+    - /v\d+\.\d+[a-z]/

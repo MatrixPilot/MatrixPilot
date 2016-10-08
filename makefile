@@ -87,7 +87,7 @@ SMC_FLAGS = -c -verbose
 endif
 
 # add or replace existing objects only if newer
-ARFLAGS := -ru
+ARFLAGS := -r
 
 
 ################################################################################
