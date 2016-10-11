@@ -146,7 +146,6 @@ void udb_heartbeat_40hz_callback(void)
 {
 	// Determine whether a flight mode switch is commanded.
 	flight_mode_switch_check_set();
-//	if (udb_heartbeat_counter % (HEARTBEAT_HZ/2) == 0)
 	if (counter++ >= 20)    // 2Hz
 	{
 		counter = 0;
