@@ -246,6 +246,10 @@ void airspeedCntrl(void)
 		{
 			overspeedBrake = ( ( air_speed_3DIMU / 10 ) - ( desiredSpeed * 1.5 ) ) * 30; // dm/s in excess of 150% => servo output (5.x => max)
 		}
+		else
+		{
+			overspeedBrake = 0;	
+		}	
 	}
 	else
 	{
