@@ -55,7 +55,7 @@ uint8_t osd_spi_read(int8_t addr);
 #define OSD_CS_TRIS     _TRISF7
 #define OSD_SCK_TRIS    _TRISF8
 #define OSD_MOSI_TRIS   _TRISF6
-#define OSD_MISO_TRIS   _TRISD12
+#define OSD_MISO_TRIS   _TRISB2
 
 #else // OSD_LEGACY_SPI_PINOUT not being used
 #warning "Using OSD SPI pinout that matches labelling on UDB4 and UDB5 boards"
