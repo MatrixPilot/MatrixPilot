@@ -84,6 +84,7 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 #include "SIL-eeprom.h"
 
 uint16_t udb_heartbeat_counter;
+uint16_t udb_pulse_counter;
 
 int16_t udb_pwIn[MAX_INPUTS];   // pulse widths of radio inputs
 int16_t udb_pwTrim[MAX_INPUTS]; // initial pulse widths for trimming
@@ -160,6 +161,7 @@ void udb_init(void)
 //	}
 
 	udb_heartbeat_counter = 0;
+	udb_pulse_counter = 0;
 	udb_flags.B = 0;
 	sil_radio_on = 1;
 
@@ -251,6 +253,7 @@ void udb_run(void)
 			}
 
 			udb_heartbeat_counter++;
+			udb_pulse_counter++;
 			nextHeartbeatTime = nextHeartbeatTime + UDB_STEP_TIME;
 			if (nextHeartbeatTime > UDB_WRAP_TIME) nextHeartbeatTime -= UDB_WRAP_TIME;
 		}

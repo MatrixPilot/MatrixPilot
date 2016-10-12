@@ -551,7 +551,7 @@ void telemetry_output_8hz(void)
 	// The Ardupilot GroundStation protocol is mostly documented here:
 	//    http://diydrones.com/profiles/blogs/ardupilot-telemetry-protocol
 
-	if (udb_heartbeat_counter % 40 == 0)        // Every 8 runs (5 heartbeat counts per 8Hz)
+	if (udb_pulse_counter % 40 == 0)        // Every 8 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("!!!LAT:%li,LON:%li,SPD:%.2f,CRT:%.2f,ALT:%li,ALH:%i,CRS:%.2f,BER:%i,WPN:%i,DST:%i,BTV:%.2f***\r\n"
 		              "+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
@@ -561,7 +561,7 @@ void telemetry_output_8hz(void)
 		    (int16_t)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
 		    earth_roll, earth_pitch, mode);
 	}
-	else if (udb_heartbeat_counter % 10 == 0)   // Every 2 runs (5 heartbeat counts per 8Hz)
+	else if (udb_pulse_counter % 10 == 0)   // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("+++THH:%i,RLL:%li,PCH:%li,STT:%i,***\r\n",
 		    (int16_t)((udb_pwOut[THROTTLE_OUTPUT_CHANNEL] - udb_pwTrim[THROTTLE_OUTPUT_CHANNEL])/20),
@@ -587,7 +587,7 @@ void telemetry_output_8hz(void)
 	static int16_t pwOut_save[NUM_OUTPUTS + 1];
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)          // Only run through this function twice per second, by skipping all but every 4 runs through it.
 	// Saves CPU and XBee power.
-	if (udb_heartbeat_counter % 20 != 0) return;    // Every 4 runs (5 heartbeat counts per 8Hz)
+	if (udb_pulse_counter % 20 != 0) return;    // Every 4 runs (5 heartbeat counts per 8Hz)
 #endif // SERIAL_OUTPUT_FORMAT
 	switch (telemetry_counter)
 	{
@@ -852,7 +852,7 @@ void telemetry_output_8hz(void)
 
 void telemetry_output_8hz(void)
 {
-	if (udb_heartbeat_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
+	if (udb_pulse_counter % 10 == 0) // Every 2 runs (5 heartbeat counts per 8Hz)
 	{
 		serial_output("MagOffset: %i, %i, %i\r\n"
 		              "MagBody: %i, %i, %i\r\n"

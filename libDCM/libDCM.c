@@ -119,7 +119,7 @@ void do_I2C_stuff(void)
 void udb_heartbeat_callback(void)
 {
 #if (USE_BAROMETER_ALTITUDE == 1)
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
 		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
 	}
@@ -128,7 +128,7 @@ void udb_heartbeat_callback(void)
 #if (MAG_YAW_DRIFT == 1)
 	// This is a simple counter to do stuff at 4hz
 //	if (udb_heartbeat_counter % 10 == 0)
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 4) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ / 4) == 0)
 	{
 		rxMagnetometer(mag_drift_callback);
 	}
@@ -151,15 +151,15 @@ void udb_heartbeat_callback(void)
 //		}
 //	}
 
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
 		if (!dcm_flags._.calib_finished)
 		{
-			dcm_run_calib_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_run_calib_step(udb_pulse_counter / (HEARTBEAT_HZ / 40));
 		}
 		if (!dcm_flags._.init_finished)
 		{
-			dcm_flags._.init_finished = gps_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
+			dcm_flags._.init_finished = gps_run_init_step(udb_pulse_counter / (HEARTBEAT_HZ / 40));
 		}
 	}
 

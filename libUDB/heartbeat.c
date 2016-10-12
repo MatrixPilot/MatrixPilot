@@ -39,6 +39,7 @@
 
 int one_hertz_flag = 0;
 uint16_t udb_heartbeat_counter = 0;
+uint16_t udb_pulse_counter = 0;
 #define HEARTBEAT_MAX 57600 // Evenly divisible by many common values: 2^8 * 3^2 * 5^2
 
 static void heartbeat_pulse(void);    // forward declaration
@@ -55,13 +56,13 @@ void udb_gyros_auto_zero_latch_down(void);
 
 inline boolean heartbeat_chk(uint16_t freq)
 {
-	return (udb_heartbeat_counter % (HEARTBEAT_HZ/freq) == 0);
+	return (udb_pulse_counter % (HEARTBEAT_HZ/freq) == 0);
 //	return HEARTBEAT_CHK(freq);
 }
 
 inline uint16_t heartbeat_cnt(void)
 {
-	return udb_heartbeat_counter;
+	return udb_pulse_counter;
 }
 
 // NOTE: RobD - udb_heartbeat_counter is not being used at the libUDB layer
@@ -109,13 +110,13 @@ static void heartbeat_pulse(void)
 #if (BOARD_TYPE == UDB4_BOARD) 
 	// IDG500 and ISZ500 Gyros settle at least 200 milliseconds after startup
 	// Auto-zero the UDB4 gyros 1 second before calibration of offsets
-	if (((udb_heartbeat_counter / (HEARTBEAT_HZ / 40)) > ( DCM_CALIB_COUNT - 40 )) 
+	if (((udb_pulse_counter / (HEARTBEAT_HZ / 40)) > ( DCM_CALIB_COUNT - 40 )) 
 		&& (udb_gyros_autozero_latched_up == false ))
 	{
 		udb_gyros_auto_zero_latch_up();
 		udb_gyros_autozero_latched_up = true;
 	}
-	if (((udb_heartbeat_counter / (HEARTBEAT_HZ / 40)) > (DCM_CALIB_COUNT - 39))  
+	if (((udb_pulse_counter / (HEARTBEAT_HZ / 40)) > (DCM_CALIB_COUNT - 39))  
 		&& (udb_gyros_autozero_latched_down == false ))
 	{
 		udb_gyros_auto_zero_latch_down();
@@ -125,13 +126,13 @@ static void heartbeat_pulse(void)
 #endif 
 #if (NORADIO != 1)
 	// 20Hz testing of radio link
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 1)
+	if ((udb_pulse_counter % (HEARTBEAT_HZ/20)) == 1)
 	{
 		radioIn_failsafe_check();
 	}
 	// Computation of noise rate
 	// Noise pulses are counted when they are detected, and reset once a second
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 1)
+	if (udb_pulse_counter % (HEARTBEAT_HZ/1) == 1)
 	{
 		radioIn_failsafe_reset();
 	}
@@ -144,7 +145,7 @@ static void heartbeat_pulse(void)
 #endif // VREF
 
 	udb_callback_read_sensors();
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/40)) == 0)
+	if ((udb_pulse_counter % (HEARTBEAT_HZ/40)) == 0)
  	{
  		calculate_analog_sensor_values();
  		udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
@@ -153,7 +154,7 @@ static void heartbeat_pulse(void)
 	// process sensor data, run flight controller, generate outputs. implemented in libDCM.c
 	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
 
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ/40) == 0)
 	{
 #if (USE_I2C1_DRIVER == 1)
 		I2C1_trigger_service();
@@ -169,4 +170,5 @@ static void heartbeat_pulse(void)
 		flexiFunctionServiceTrigger();
 #endif
 	}
+	udb_pulse_counter = (udb_pulse_counter+1) % HEARTBEAT_MAX;
 }
