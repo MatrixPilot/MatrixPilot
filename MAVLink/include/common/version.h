@@ -2,10 +2,12 @@
  *	@brief MAVLink comm protocol built from common.xml
  *	@see http://mavlink.org
  */
+#pragma once
+ 
 #ifndef MAVLINK_VERSION_H
 #define MAVLINK_VERSION_H
 
-#define MAVLINK_BUILD_DATE "Tue Feb 10 15:54:48 2015"
+#define MAVLINK_BUILD_DATE "Fri Oct 07 2016"
 #define MAVLINK_WIRE_PROTOCOL_VERSION "1.0"
 #define MAVLINK_MAX_DIALECT_PAYLOAD_SIZE 255
  

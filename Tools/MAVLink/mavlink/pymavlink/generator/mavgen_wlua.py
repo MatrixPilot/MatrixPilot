@@ -6,13 +6,13 @@ Copyright Holger Steinhaus 2012
 Released under GNU GPL version 3 or later
 
 Instructions for use: 
-1. ./mavgen --lang=wlua mymavlink.xml -o ~/.wireshark/plugins/mymavlink.lua 
-2. convert binary stream int .pcap file format (see examples/mavcap.py)
+1. python -m pymavlink.generator.mavgen --lang=wlua mymavlink.xml -o ~/.wireshark/plugins/mymavlink.lua
+2. convert binary stream int .pcap file format (see ../examples/mav2pcap.py)
 3. open the pcap file in Wireshark
 '''
 
 import sys, textwrap, os, re
-import mavparse, mavtemplate
+from . import mavparse, mavtemplate
 
 t = mavtemplate.MAVTemplate()
 
@@ -73,6 +73,8 @@ def generate_preamble(outf):
 
 mavlink_proto = Proto("mavlink_proto", "MAVLink protocol")
 f = mavlink_proto.fields
+
+payload_fns = {}
 
 """ )
     
@@ -171,10 +173,10 @@ def generate_payload_dissector(outf, msg):
     t.write(outf, 
 """
 -- dissect payload of message type ${msgname}
-function dissect_payload_${msgid}(buffer, tree, msgid, offset)
+function payload_fns.payload_${msgid}(buffer, tree, msgid, offset)
 """, {'msgid':msg.id, 'msgname':msg.name})
     
-    for f in msg.fields:
+    for f in msg.ordered_fields:
         generate_field_dissector(outf, msg, f)
 
 
@@ -210,20 +212,6 @@ function mavlink_proto.dissector(buffer,pinfo,tree)
 
     -- some Wireshark decoration
     pinfo.cols.protocol = protocolString
-    local ts = pinfo.abs_ts
-    local flags = math.floor(((ts - math.floor(ts))*1000000) + 0.5)
-    
-    local crc_error = bit.band(flags, 0x01)
-    local length_error = bit.band(flags, 0x02)
-    
-    if length_error > 0 then
-        pinfo.cols.info:append ("Invalid message length   ")
-        subtree:add_expert_info(PI_MALFORMED, PI_ERROR, "Invalid message length")
-    end
-    if crc_error > 0 then
-        pinfo.cols.info:append ("Invalid CRC   ")
-        subtree:add_expert_info(PI_CHECKSUM, PI_WARN, "Invalid message CRC")
-    end
 
     -- HEADER ----------------------------------------
     
@@ -267,22 +255,19 @@ function mavlink_proto.dissector(buffer,pinfo,tree)
     
     -- dynamically call the type-specific payload dissector    
     local msgnr = msgid:uint()
-    local dissect_payload_fn = "dissect_payload_"..tostring(msgnr)
-    local fn = _G[dissect_payload_fn]
+    local dissect_payload_fn = "payload_"..tostring(msgnr)
+    local fn = payload_fns[dissect_payload_fn]
     
     if (fn == nil) then
         pinfo.cols.info:append ("Unkown message type   ")
         subtree:add_expert_info(PI_MALFORMED, PI_ERROR, "Unkown message type")
-    end
-
-    -- do not stumble into exceptions while trying to parse junk
-    if (fn == nil) or (length_error ~= 0) then
         size = buffer:len() - 2 - offset
         subtree:add(f.rawpayload, buffer(offset,size))
         offset = offset + size
     else
         local payload = subtree:add(f.payload, msgid)
         pinfo.cols.dst:set(messageName[msgid:uint()])
+        pinfo.cols.info = messageName[msgid:uint()]
         offset = fn(buffer, payload, msgid, offset)
     end
 
@@ -299,13 +284,18 @@ end
 
 
 def generate_epilog(outf):
-    print ("Generating epilog")
+    print("Generating epilog")
     t.write(outf, 
 """   
 -- bind protocol dissector to USER0 linktype
 
 wtap_encap = DissectorTable.get("wtap_encap")
 wtap_encap:add(wtap.USER0, mavlink_proto)
+
+-- bind protocol dissector to port 14550
+
+local udp_dissector_table = DissectorTable.get("udp.port")
+udp_dissector_table:add(14550, mavlink_proto)
 """)
 
 def generate(basename, xml):

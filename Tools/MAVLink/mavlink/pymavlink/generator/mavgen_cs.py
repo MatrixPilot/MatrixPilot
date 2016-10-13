@@ -5,7 +5,7 @@ parse a MAVLink protocol XML file and generate a CSharp implementation
 
 '''
 import sys, textwrap, os, time, platform
-import mavparse, mavtemplate
+from . import mavparse, mavtemplate
 
 t = mavtemplate.MAVTemplate()
 
@@ -73,7 +73,7 @@ def generate_enums(outf, enums):
     for e in enums:
             #if len(e.description) > 0:
         generate_xmlDocSummary(outf, e.description, 1)
-        outf.write("\tpublic enum %s : ushort\n\t{\n" % e.name)
+        outf.write("\tpublic enum %s : uint\n\t{\n" % e.name)
 
         for entry in e.entry:
             if len(entry.description) > 0:
@@ -138,7 +138,7 @@ def generate_Deserialization(outf, messages):
         for f in m.ordered_fields:
             if (f.array_length):
                 outf.write("\t\t\t\t%s =  ByteArrayUtil.%s(bytes, offset + %s, %s),\n" % (mapFieldName.get(f.name, f.name), mapType[f.type][0], offset, f.array_length))
-                offset += f.array_length
+                offset += (f.array_length * mapType[f.type][1])
                 continue
           
             # mapping 'char' to byte here since there is no real equivalent in the CLR
@@ -254,23 +254,7 @@ namespace MavLink
 def generate(basename, xml):
     '''generate complete MAVLink CSharp implemenation'''
     structsfilename = basename + '.generated.cs'
-
-     # Some build commands depend on the platform - eg MS .NET Windows Vs Mono on Linux
-    if platform.system() == "Windows":
-        winpath=os.environ['WinDir']
-        cscCommand = winpath + "\\Microsoft.NET\\Framework\\v4.0.30319\\csc.exe"
-        
-        if (os.path.exists(cscCommand)==False):
-            print("\nError: CS compiler not found. .Net Assembly generation skipped")
-            return   
-    else:
-        print("Error:.Net Assembly generation not yet supported on non Windows platforms")
-        return
-        cscCommand = "csc"
-    
-    
-    
-    
+   
     msgs = []
     enums = []
     filelist = []
@@ -323,7 +307,18 @@ using System.Reflection;
     
     outf.close()
     
-   
+    # Some build commands depend on the platform - eg MS .NET Windows Vs Mono on Linux
+    if platform.system() == "Windows":
+        winpath=os.environ['WinDir']
+        cscCommand = winpath + "\\Microsoft.NET\\Framework\\v4.0.30319\\csc.exe"
+        
+        if (os.path.exists(cscCommand)==False):
+            print("\nError: CS compiler not found. .Net Assembly generation skipped")
+            return   
+    else:
+        print("Error:.Net Assembly generation not yet supported on non Windows platforms")
+        return
+        cscCommand = "csc"
 
     print("Compiling Assembly for .Net Framework 4.0")
     
@@ -335,7 +330,6 @@ using System.Reflection;
     
     compileCommand = "%s %s" % (cscCommand, "/target:library /debug /out:" + outputLibraryPath)
     compileCommand = compileCommand + " /doc:" + os.path.normpath(dir + "/mavlink.xml")  
-    
     
     for csFile in generatedCsFiles + includedCsFiles:
         compileCommand = compileCommand + " " + os.path.normpath(csFile)

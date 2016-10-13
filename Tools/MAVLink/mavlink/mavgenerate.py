@@ -39,10 +39,8 @@ except ImportError as ex:
     tkinter.messagebox = tkMessageBox
     del tkMessageBox
 
-sys.path.append(os.path.join('pymavlink','generator'))
-
-import mavgen
-import mavparse
+from pymavlink.generator import mavgen
+from pymavlink.generator import mavparse
 
 title = "MAVLink Generator"
 error_limit = 5
@@ -99,7 +97,7 @@ class Application(Frame):
         # Create the Protocol box
 
         self.protocol_value = StringVar()
-        self.protocol_choices = [mavparse.PROTOCOL_0_9, mavparse.PROTOCOL_1_0]
+        self.protocol_choices = [mavparse.PROTOCOL_1_0, mavparse.PROTOCOL_2_0]
         self.protocol_label = Label( self, text="Protocol")
         self.protocol_label.grid(row=3, column=0)
         self.protocol_menu = OptionMenu(self,self.protocol_value,*self.protocol_choices)

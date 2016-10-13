@@ -10,8 +10,14 @@ import os, sys
 from math import *
 
 try:
+    # in case numpy isn't installed
+    from .quaternion import Quaternion
+except:
+    pass
+
+try:
     # rotmat doesn't work on Python3.2 yet
-    from rotmat import Vector3, Matrix3
+    from .rotmat import Vector3, Matrix3
 except Exception:
     pass
 
@@ -22,7 +28,7 @@ def kmh(mps):
 
 def altitude(SCALED_PRESSURE, ground_pressure=None, ground_temp=None):
     '''calculate barometric altitude'''
-    from pymavlink import mavutil
+    from . import mavutil
     self = mavutil.mavfile_global
     if ground_pressure is None:
         if self.param('GND_ABS_PRESS', None) is None:
@@ -36,7 +42,7 @@ def altitude(SCALED_PRESSURE, ground_pressure=None, ground_temp=None):
 
 def altitude2(SCALED_PRESSURE, ground_pressure=None, ground_temp=None):
     '''calculate barometric altitude'''
-    from pymavlink import mavutil
+    from . import mavutil
     self = mavutil.mavfile_global
     if ground_pressure is None:
         if self.param('GND_ABS_PRESS', None) is None:
@@ -421,9 +427,14 @@ def expected_magz(RAW_IMU, ATTITUDE, inclination, declination):
 
 def gravity(RAW_IMU, SENSOR_OFFSETS=None, ofs=None, mul=None, smooth=0.7):
     '''estimate pitch from accelerometer'''
-    rx = RAW_IMU.xacc * 9.81 / 1000.0
-    ry = RAW_IMU.yacc * 9.81 / 1000.0
-    rz = RAW_IMU.zacc * 9.81 / 1000.0
+    if hasattr(RAW_IMU, 'xacc'):
+        rx = RAW_IMU.xacc * 9.81 / 1000.0
+        ry = RAW_IMU.yacc * 9.81 / 1000.0
+        rz = RAW_IMU.zacc * 9.81 / 1000.0
+    else:
+        rx = RAW_IMU.AccX
+        ry = RAW_IMU.AccY
+        rz = RAW_IMU.AccZ
     if SENSOR_OFFSETS is not None and ofs is not None:
         rx += SENSOR_OFFSETS.accel_cal_x
         ry += SENSOR_OFFSETS.accel_cal_y
@@ -435,7 +446,7 @@ def gravity(RAW_IMU, SENSOR_OFFSETS=None, ofs=None, mul=None, smooth=0.7):
             rx *= mul[0]
             ry *= mul[1]
             rz *= mul[2]
-    return lowpass(sqrt(rx**2+ry**2+rz**2),'_gravity',smooth)
+    return sqrt(rx**2+ry**2+rz**2)
 
 
 
@@ -450,29 +461,38 @@ def pitch_sim(SIMSTATE, GPS_RAW):
         return -0
     return degrees(-asin(xacc/zacc))
 
-def distance_two(GPS_RAW1, GPS_RAW2):
+def distance_two(GPS_RAW1, GPS_RAW2, horizontal=True):
     '''distance between two points'''
     if hasattr(GPS_RAW1, 'Lat'):
         lat1 = radians(GPS_RAW1.Lat)
         lat2 = radians(GPS_RAW2.Lat)
         lon1 = radians(GPS_RAW1.Lng)
         lon2 = radians(GPS_RAW2.Lng)
+        alt1 = GPS_RAW1.Alt
+        alt2 = GPS_RAW2.Alt
     elif hasattr(GPS_RAW1, 'cog'):
         lat1 = radians(GPS_RAW1.lat)*1.0e-7
         lat2 = radians(GPS_RAW2.lat)*1.0e-7
         lon1 = radians(GPS_RAW1.lon)*1.0e-7
         lon2 = radians(GPS_RAW2.lon)*1.0e-7
+        alt1 = GPS_RAW1.alt*0.001
+        alt2 = GPS_RAW2.alt*0.001
     else:
         lat1 = radians(GPS_RAW1.lat)
         lat2 = radians(GPS_RAW2.lat)
         lon1 = radians(GPS_RAW1.lon)
         lon2 = radians(GPS_RAW2.lon)
+        alt1 = GPS_RAW1.alt*0.001
+        alt2 = GPS_RAW2.alt*0.001
     dLat = lat2 - lat1
     dLon = lon2 - lon1
 
     a = sin(0.5*dLat)**2 + sin(0.5*dLon)**2 * cos(lat1) * cos(lat2)
     c = 2.0 * atan2(sqrt(a), sqrt(1.0-a))
-    return 6371 * 1000 * c
+    ground_dist = 6371 * 1000 * c
+    if horizontal:
+        return ground_dist
+    return sqrt(ground_dist**2 + (alt2-alt1)**2)
 
 
 first_fix = None
@@ -701,6 +721,39 @@ def demix2(servo1, servo2, gain=0.5):
     out2 = (s1-s2)*gain
     return out2+1500
 
+def mixer(servo1, servo2, mixtype=1, gain=0.5):
+    '''mix two servos'''
+    s1 = servo1 - 1500
+    s2 = servo2 - 1500
+    v1 = (s1-s2)*gain
+    v2 = (s1+s2)*gain
+    if mixtype == 2:
+        v2 = -v2
+    elif mixtype == 3:
+        v1 = -v1
+    elif mixtype == 4:
+        v1 = -v1
+        v2 = -v2
+    if v1 > 600:
+        v1 = 600
+    elif v1 < -600:
+        v1 = -600
+    if v2 > 600:
+        v2 = 600
+    elif v2 < -600:
+        v2 = -600
+    return (1500+v1,1500+v2)
+
+def mix1(servo1, servo2, mixtype=1, gain=0.5):
+    '''de-mix a mixed servo output'''
+    (v1,v2) = mixer(servo1, servo2, mixtype=mixtype, gain=gain)
+    return v1
+
+def mix2(servo1, servo2, mixtype=1, gain=0.5):
+    '''de-mix a mixed servo output'''
+    (v1,v2) = mixer(servo1, servo2, mixtype=mixtype, gain=gain)
+    return v2
+
 def wrap_180(angle):
     if angle > 180:
         angle -= 360.0
@@ -708,7 +761,7 @@ def wrap_180(angle):
         angle += 360.0
     return angle
 
-    
+
 def wrap_360(angle):
     if angle > 360:
         angle -= 360.0
@@ -741,7 +794,7 @@ class DCM_State(object):
         self.last_velocity = Vector3()
         (self.roll, self.pitch, self.yaw) = self.dcm.to_euler()
         (self.roll2, self.pitch2, self.yaw2) = self.dcm2.to_euler()
-        
+
     def update(self, gyro, accel, mag, GPS):
         if self.gyro != gyro or self.accel != accel:
             delta_angle = (gyro+self.omega_I) / self.rate
@@ -784,7 +837,7 @@ class PX4_State(object):
         self.accel = Vector3()
         self.timestamp = timestamp
         (self.roll, self.pitch, self.yaw) = self.dcm.to_euler()
-        
+
     def update(self, gyro, accel, timestamp):
         if self.gyro != gyro or self.accel != accel:
             delta_angle = gyro * (timestamp - self.timestamp)
@@ -818,7 +871,7 @@ def downsample(N):
 
 def armed(HEARTBEAT):
     '''return 1 if armed, 0 if not'''
-    from pymavlink import mavutil
+    from . import mavutil
     if HEARTBEAT.type == mavutil.mavlink.MAV_TYPE_GCS:
         self = mavutil.mavfile_global
         if self.motors_armed():
@@ -891,10 +944,10 @@ def gps_newpos(lat, lon, bearing, distance):
   lon1 = math.radians(lon)
   brng = math.radians(bearing)
   dr = distance/radius_of_earth
-  
+
   lat2 = math.asin(math.sin(lat1)*math.cos(dr) +
                    math.cos(lat1)*math.sin(dr)*math.cos(brng))
-  lon2 = lon1 + math.atan2(math.sin(brng)*math.sin(dr)*math.cos(lat1), 
+  lon2 = lon1 + math.atan2(math.sin(brng)*math.sin(dr)*math.cos(lat1),
                            math.cos(dr)-math.sin(lat1)*math.sin(lat2))
   return (math.degrees(lat2), wrap_valid_longitude(math.degrees(lon2)))
 
@@ -911,7 +964,7 @@ ekf_home = None
 def ekf1_pos(EKF1):
   '''calculate EKF position when EKF disabled'''
   global ekf_home
-  from pymavlink import mavutil
+  from . import mavutil
   self = mavutil.mavfile_global
   if ekf_home is None:
       if not 'GPS' in self.messages or self.messages['GPS'].Status != 3:
@@ -921,3 +974,35 @@ def ekf1_pos(EKF1):
   (lat,lon) = gps_offset(ekf_home.Lat, ekf_home.Lng, EKF1.PE, EKF1.PN)
   return (lat, lon)
 
+def quat_to_euler(q):
+  '''
+  Get Euler angles from a quaternion
+  :param q: quaternion [w, x, y , z]
+  :returns: euler angles [roll, pitch, yaw]
+  '''
+  quat = Quaternion(q)
+  return quat.euler
+
+def euler_to_quat(e):
+  '''
+  Get quaternion from euler angles
+  :param e: euler angles [roll, pitch, yaw]
+  :returns: quaternion [w, x, y , z]
+  '''
+  quat = Quaternion(e)
+  return quat.q
+
+def rotate_quat(attitude, roll, pitch, yaw):
+  '''
+  Returns rotated quaternion
+  :param attitude: quaternion [w, x, y , z]
+  :param roll: rotation in rad
+  :param pitch: rotation in rad
+  :param yaw: rotation in rad
+  :returns: quaternion [w, x, y , z]
+  '''
+  quat = Quaternion(attitude)
+  rotation = Quaternion([roll, pitch, yaw])
+  res = rotation * quat
+
+  return res.q

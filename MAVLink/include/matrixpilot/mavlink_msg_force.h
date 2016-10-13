@@ -1,23 +1,38 @@
+#pragma once
 // MESSAGE FORCE PACKING
 
 #define MAVLINK_MSG_ID_FORCE 183
 
-typedef struct __mavlink_force_t
-{
- uint32_t time_boot_ms; ///< Timestamp (milliseconds since system boot)
- int16_t aero_x; ///< Aeroforce in UDB X Axis, in units of gravity * 2000
- int16_t aero_y; ///< Aeroforce in UDB Y Axis,  in units of gravity * 2000 
- int16_t aero_z; ///< Aeroforce in UDB Z axis (Wing loading), in units of gravity * 2000
-} mavlink_force_t;
+MAVPACKED(
+typedef struct __mavlink_force_t {
+ uint32_t time_boot_ms; /*< Timestamp (milliseconds since system boot)*/
+ int16_t aero_x; /*< Aeroforce in UDB X Axis, in units of gravity * 2000*/
+ int16_t aero_y; /*< Aeroforce in UDB Y Axis,  in units of gravity * 2000 */
+ int16_t aero_z; /*< Aeroforce in UDB Z axis (Wing loading), in units of gravity * 2000*/
+}) mavlink_force_t;
 
 #define MAVLINK_MSG_ID_FORCE_LEN 10
+#define MAVLINK_MSG_ID_FORCE_MIN_LEN 10
 #define MAVLINK_MSG_ID_183_LEN 10
+#define MAVLINK_MSG_ID_183_MIN_LEN 10
 
 #define MAVLINK_MSG_ID_FORCE_CRC 221
 #define MAVLINK_MSG_ID_183_CRC 221
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_FORCE { \
+	183, \
+	"FORCE", \
+	4, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_force_t, time_boot_ms) }, \
+         { "aero_x", NULL, MAVLINK_TYPE_INT16_T, 0, 4, offsetof(mavlink_force_t, aero_x) }, \
+         { "aero_y", NULL, MAVLINK_TYPE_INT16_T, 0, 6, offsetof(mavlink_force_t, aero_y) }, \
+         { "aero_z", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_force_t, aero_z) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_FORCE { \
 	"FORCE", \
 	4, \
@@ -27,7 +42,7 @@ typedef struct __mavlink_force_t
          { "aero_z", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_force_t, aero_z) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a force message
@@ -63,11 +78,7 @@ static inline uint16_t mavlink_msg_force_pack(uint8_t system_id, uint8_t compone
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FORCE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_FORCE_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_FORCE_MIN_LEN, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
 }
 
 /**
@@ -105,11 +116,7 @@ static inline uint16_t mavlink_msg_force_pack_chan(uint8_t system_id, uint8_t co
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_FORCE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_FORCE_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_FORCE_MIN_LEN, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
 }
 
 /**
@@ -159,11 +166,7 @@ static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_
 	_mav_put_int16_t(buf, 6, aero_y);
 	_mav_put_int16_t(buf, 8, aero_z);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, buf, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, buf, MAVLINK_MSG_ID_FORCE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, buf, MAVLINK_MSG_ID_FORCE_MIN_LEN, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
 #else
 	mavlink_force_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -171,11 +174,21 @@ static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_
 	packet.aero_y = aero_y;
 	packet.aero_z = aero_z;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, (const char *)&packet, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, (const char *)&packet, MAVLINK_MSG_ID_FORCE_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, (const char *)&packet, MAVLINK_MSG_ID_FORCE_MIN_LEN, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
 #endif
+}
+
+/**
+ * @brief Send a force message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_force_send_struct(mavlink_channel_t chan, const mavlink_force_t* force)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_force_send(chan, force->time_boot_ms, force->aero_x, force->aero_y, force->aero_z);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, (const char *)force, MAVLINK_MSG_ID_FORCE_MIN_LEN, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
 #endif
 }
 
@@ -196,11 +209,7 @@ static inline void mavlink_msg_force_send_buf(mavlink_message_t *msgbuf, mavlink
 	_mav_put_int16_t(buf, 6, aero_y);
 	_mav_put_int16_t(buf, 8, aero_z);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, buf, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, buf, MAVLINK_MSG_ID_FORCE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, buf, MAVLINK_MSG_ID_FORCE_MIN_LEN, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
 #else
 	mavlink_force_t *packet = (mavlink_force_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -208,11 +217,7 @@ static inline void mavlink_msg_force_send_buf(mavlink_message_t *msgbuf, mavlink
 	packet->aero_y = aero_y;
 	packet->aero_z = aero_z;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, (const char *)packet, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, (const char *)packet, MAVLINK_MSG_ID_FORCE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FORCE, (const char *)packet, MAVLINK_MSG_ID_FORCE_MIN_LEN, MAVLINK_MSG_ID_FORCE_LEN, MAVLINK_MSG_ID_FORCE_CRC);
 #endif
 }
 #endif
@@ -270,12 +275,14 @@ static inline int16_t mavlink_msg_force_get_aero_z(const mavlink_message_t* msg)
  */
 static inline void mavlink_msg_force_decode(const mavlink_message_t* msg, mavlink_force_t* force)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	force->time_boot_ms = mavlink_msg_force_get_time_boot_ms(msg);
 	force->aero_x = mavlink_msg_force_get_aero_x(msg);
 	force->aero_y = mavlink_msg_force_get_aero_y(msg);
 	force->aero_z = mavlink_msg_force_get_aero_z(msg);
 #else
-	memcpy(force, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_FORCE_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_FORCE_LEN? msg->len : MAVLINK_MSG_ID_FORCE_LEN;
+        memset(force, 0, MAVLINK_MSG_ID_FORCE_LEN);
+	memcpy(force, _MAV_PAYLOAD(msg), len);
 #endif
 }
