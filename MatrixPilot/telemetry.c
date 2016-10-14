@@ -571,26 +571,18 @@ void telemetry_output_8hz(void)
 	}
 }
 
-#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA || SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
+#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 
 void telemetry_output_8hz(void)
 {
 	int16_t i;
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
 	static int toggle = 0;
 	static boolean f13_print_prepare = false;
-#endif
-//	static int16_t telemetry_counter = 8;
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-	// SERIAL_UDB_EXTRA expected to be used with the OpenLog which can take greater transfer speeds than Xbee
 	// F2: SERIAL_UDB_EXTRA format is printed out every other time, although it is being called at 8Hz, this
-	//     version will output four F2 lines every second (4Hz updates)
+	//     version will output at 4Hz.
 	static int16_t pwIn_save[NUM_INPUTS + 1];
 	static int16_t pwOut_save[NUM_OUTPUTS + 1];
-#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)          // Only run through this function twice per second, by skipping all but every 4 runs through it.
-	// Saves CPU and XBee power.
-	if (udb_pulse_counter % 20 != 0) return;    // Every 4 runs (5 heartbeat counts per 8Hz)
-#endif // SERIAL_OUTPUT_FORMAT
+	
 	switch (telemetry_counter)
 	{
 		case 13:
@@ -665,26 +657,7 @@ void telemetry_output_8hz(void)
 		default:
 		{
 			// F2 below means "Format Revision 2: and is used by a Telemetry parser to invoke the right pattern matching
-			// F2 is a compromise between easy reading of raw data in a file and not droppping chars in transmission.
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB)
-			serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:c%u:s%i:cpu%u:bmv%i:"
-			              "as%i:wvx%i:wvy%i:wvz%i:\r\n",
-			    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
-			    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
-			    rmat[0], rmat[1], rmat[2],
-			    rmat[3], rmat[4], rmat[5],
-			    rmat[6], rmat[7], rmat[8],
-			    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), voltage_milis.BB,
-			    air_speed_3DIMU, 
-			    estimatedWind[0], estimatedWind[1], estimatedWind[2]);
-			// Approximate time passing between each telemetry line, even though
-			// we may not have new GPS time data each time through.
-			if (tow.WW > 0) tow.WW += 500;
-
-#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
-//			if (udb_heartbeat_counter % 10 != 0)                // Every 2 runs (5 heartbeat counts per 8Hz)
-//			if (udb_heartbeat_counter % (HEARTBEAT_HZ/4) != 0)  // Every 2 runs (5 heartbeat counts per 8Hz)
-
+			// F2 is a compromise between easy reading of raw data in an ascii file and minimising extraneous data in the stream.
 			toggle = !toggle;
 
 			if (state_flags._.f13_print_req == 1)
@@ -763,21 +736,9 @@ void telemetry_output_8hz(void)
 					serial_output("\r\n");
 				}
 			}
-
-#elif (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_MAG)
-extern int16_t magFieldRaw[3];
-extern int16_t udb_magOffset[3];
-
-			serial_output("OFFx %i : OFFy %i : OFFz %i : RAWx %i : RAWy %i : RAWz %i :",
-			    udb_magOffset[0], udb_magOffset[1], udb_magOffset[2],
-			    magFieldRaw[0], magFieldRaw[1], magFieldRaw[2]);
-			    serial_output("\r\n");
-
-#endif // SERIAL_OUTPUT_FORMAT
 			if (state_flags._.f13_print_req == 1)
 			{
-				// The F13 line of telemetry is printed when origin has been captured and inbetween F2 lines in SERIAL_UDB_EXTRA
-#if (SERIAL_OUTPUT_FORMAT == SERIAL_UDB_EXTRA)
+				// The F13 line of telemetry is printed when origin has been captured and in between F2 lines in SERIAL_UDB_EXTRA
 				if (!f13_print_prepare)
 				{
 					return;
@@ -786,8 +747,6 @@ extern int16_t udb_magOffset[3];
 				{
 					f13_print_prepare = false;
 				}
-
-#endif
 				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
 				serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
 				for (i = 1; i <= NUM_INPUTS; i++)
@@ -893,8 +852,9 @@ void telemetry_output_8hz(void)
 	    IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
 	    checksum);
 }
+#endif //(SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
 
-#else // If SERIAL_OUTPUT_FORMAT is set to SERIAL_NONE, or is not set
+#else //((SERIAL_OUTPUT_FORMAT != SERIAL_NONE) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
 
 #if (USE_OSD != OSD_MINIM) && (USE_OSD != OSD_REMZIBI)
 void telemetry_output_8hz(void)
@@ -902,8 +862,6 @@ void telemetry_output_8hz(void)
 }
 #endif // USE_OSD
 
-#endif
-#else
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
 	return -1;
@@ -914,15 +872,11 @@ void udb_serial_callback_received_byte(uint8_t rxchar)
 void telemetry_restart(void)
 {
 }
-void telemetry_output_8hz(void)
-{
-}
 void telemetry_init(void)
 {
 }
-#endif // SERIAL_OUTPUT_FORMAT
-
-#else // USE_TELEMETRY
+#endif //((SERIAL_OUTPUT_FORMAT != SERIAL_NONE) && (SERIAL_OUTPUT_FORMAT != SERIAL_MAVLINK))
+#else  // USE_TELEMETRY
 
 int16_t udb_serial_callback_get_byte_to_send(void)
 {
