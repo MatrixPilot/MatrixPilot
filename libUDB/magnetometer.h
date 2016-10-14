@@ -28,7 +28,7 @@ extern int16_t udb_magOffset[];     // magnetic offset in the body frame of refe
 extern int16_t magGain[];           // magnetometer calibration gains
 extern int16_t rawMagCalib[];
 extern int16_t magFieldRaw[];
-extern int16_t magMessageb;         // message type
+extern int16_t magMessage;          // message type
 
 typedef void (*magnetometer_callback_funcptr)(void);
 
