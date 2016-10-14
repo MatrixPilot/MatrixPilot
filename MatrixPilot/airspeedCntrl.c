@@ -94,13 +94,13 @@ static int16_t calc_airspeed(void)
 	int16_t speed_component;
 	int32_t fwdaspd2;
 
-	speed_component = IMUvelocityx._.W1 - estimatedWind[0];
+	speed_component = IMUvelocityx._.W1 - estimatedWind.x;
 	fwdaspd2 = __builtin_mulss (speed_component, speed_component);
 
-	speed_component = IMUvelocityy._.W1 - estimatedWind[1];
+	speed_component = IMUvelocityy._.W1 - estimatedWind.y;
 	fwdaspd2 += __builtin_mulss (speed_component, speed_component);
 
-	speed_component = IMUvelocityz._.W1 - estimatedWind[2];
+	speed_component = IMUvelocityz._.W1 - estimatedWind.z;
 	fwdaspd2 += __builtin_mulss (speed_component, speed_component);
 
 	airspeed  = sqrt_long(fwdaspd2);

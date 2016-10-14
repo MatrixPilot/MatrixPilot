@@ -402,8 +402,8 @@ uint16_t wind_gain_adjustment(void)
 	uint16_t G_over_2A_sqr;
 	uint32_t temporary_long;
 
-	horizontal_air_speed = vector2_mag(IMUvelocityx._.W1 - estimatedWind[0],
-	                                   IMUvelocityy._.W1 - estimatedWind[1]);
+	horizontal_air_speed = vector2_mag(IMUvelocityx._.W1 - estimatedWind.x,
+	                                   IMUvelocityy._.W1 - estimatedWind.y);
 	horizontal_ground_speed_over_2 = vector2_mag(IMUvelocityx._.W1,
 	                                             IMUvelocityy._.W1) >> 1;
 	if (horizontal_ground_speed_over_2 >= horizontal_air_speed)

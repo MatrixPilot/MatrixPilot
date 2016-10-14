@@ -111,15 +111,15 @@ static int32_t excess_energy_height(void) // computes (1/2gravity)*(actual_speed
 	int16_t speed_component;
 	union longww accum;
 
-	speed_component = IMUvelocityx._.W1 - estimatedWind[0];
+	speed_component = IMUvelocityx._.W1 - estimatedWind.x;
 	accum.WW = __builtin_mulsu(speed_component, 37877);
 	equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
 
-	speed_component = IMUvelocityy._.W1 - estimatedWind[1];
+	speed_component = IMUvelocityy._.W1 - estimatedWind.y;
 	accum.WW = __builtin_mulsu(speed_component, 37877);
 	equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
 
-	speed_component = IMUvelocityz._.W1 - estimatedWind[2];
+	speed_component = IMUvelocityz._.W1 - estimatedWind.z;
 	accum.WW = __builtin_mulsu(speed_component, 37877);
 	equivalent_energy_air_speed += __builtin_mulss(accum._.W1, accum._.W1);
 
