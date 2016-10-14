@@ -24,6 +24,8 @@
         <itemPath>../../../libUDB/udbTypes.h</itemPath>
         <itemPath>../../../libUDB/mpu6000.h</itemPath>
         <itemPath>../../../libUDB/mpu_spi.h</itemPath>
+        <itemPath>../../../libUDB/ADchannel.h</itemPath>
+        <itemPath>../../../libUDB/events.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -49,6 +51,8 @@
         <itemPath>../../../libUDB/write.c</itemPath>
         <itemPath>../../../libUDB/mpu6000.c</itemPath>
         <itemPath>../../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../../libUDB/ADchannel.c</itemPath>
+        <itemPath>../../../libUDB/events.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Tools/FlashOSD" projectFiles="true">
         <itemPath>../main.c</itemPath>

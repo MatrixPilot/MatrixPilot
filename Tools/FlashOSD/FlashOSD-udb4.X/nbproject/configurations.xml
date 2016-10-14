@@ -22,6 +22,8 @@
         <itemPath>../../../libUDB/osd.h</itemPath>
         <itemPath>../../../libUDB/uart.h</itemPath>
         <itemPath>../../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../../libUDB/ADchannel.h</itemPath>
+        <itemPath>../../../libUDB/events.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -45,6 +47,8 @@
         <itemPath>../../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../../libUDB/uart.c</itemPath>
         <itemPath>../../../libUDB/write.c</itemPath>
+        <itemPath>../../../libUDB/ADchannel.c</itemPath>
+        <itemPath>../../../libUDB/events.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Tools/FlashOSD" projectFiles="true">
         <itemPath>../main.c</itemPath>
