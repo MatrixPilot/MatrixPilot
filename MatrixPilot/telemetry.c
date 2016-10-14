@@ -52,6 +52,7 @@
 #include "../libDCM/estAltitude.h"
 #include "../libDCM/estWind.h"
 #include "../libDCM/rmat.h"
+#include "../libUDB/magnetometer.h" // Needed for SERIAL_MAGNETOMETER 
 #include <string.h>
 
 
