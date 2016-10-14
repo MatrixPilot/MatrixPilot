@@ -75,7 +75,8 @@ static uint8_t magreg[6];       // magnetometer read-write buffer
 
 static int16_t mrindex;         // index into the read write buffer 
 static int16_t magCalibPause = 0;
-static int16_t I2messages = 0;
+
+int16_t I2messages = 0;
 
 // forward declarations
 static void I2C_callback(boolean I2CtrxOK);
