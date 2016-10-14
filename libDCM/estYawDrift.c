@@ -42,7 +42,7 @@ void estYawDrift(void)
 	// Don't update Yaw Drift while hovering, since that doesn't work right yet
 	if (gps_nav_valid() && !dcm_flags._.skip_yaw_drift)
 	{
-		if ((estimatedWind[0] == 0 && estimatedWind[1] == 0) ||
+		if ((estimatedWind.x == 0 && estimatedWind.y == 0) ||
 		    (air_speed_magnitudeXY < WIND_NAV_AIR_SPEED_MIN))
 		{
 			dirOverGndHGPS[0] = -cosine(actual_dir);

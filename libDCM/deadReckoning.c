@@ -164,9 +164,9 @@ void dead_reckon(void)
 		IMUlocationy.WW = 0;
 		IMUlocationz.WW = 0;
 	}
-	air_speed_x = IMUvelocityx._.W1 - estimatedWind[0];
-	air_speed_y = IMUvelocityy._.W1 - estimatedWind[1];
-	air_speed_z = IMUvelocityz._.W1 - estimatedWind[2];
+	air_speed_x = IMUvelocityx._.W1 - estimatedWind.x;
+	air_speed_y = IMUvelocityy._.W1 - estimatedWind.y;
+	air_speed_z = IMUvelocityz._.W1 - estimatedWind.z;
 
 	accum.WW = ((__builtin_mulss(-IMUintegralAccelerationx._.W1, rmat[1])
 	                          + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4])) << 2);

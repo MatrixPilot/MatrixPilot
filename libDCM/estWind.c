@@ -26,7 +26,7 @@
 #include "rmat.h"
 
 
-int16_t estimatedWind[3] = { 0, 0, 0 };
+vect3_16t estimatedWind = { 0, 0, 0 };
 
 #if (WIND_ESTIMATION == 1)
 
@@ -115,18 +115,18 @@ void estWind(int16_t angleOfAttack)
 		longaccum.WW = (__builtin_mulss(costhetaDiff, fuselageDirectionSum[0])
 		              - __builtin_mulss(sinthetaDiff, fuselageDirectionSum[1])) << 2;
 		longaccum.WW = (__builtin_mulus(estimatedAirspeed, longaccum._.W1)) << 2;
-		estimatedWind[0] = estimatedWind[0] + 
-		    ((groundVelocitySum[0] - longaccum._.W1 - estimatedWind[0]) >> 4);
+		estimatedWind.x = estimatedWind.x +
+		    ((groundVelocitySum[0] - longaccum._.W1 - estimatedWind.x) >> 4);
 
 		longaccum.WW = (__builtin_mulss(sinthetaDiff, fuselageDirectionSum[0])
 		              + __builtin_mulss(costhetaDiff, fuselageDirectionSum[1])) << 2;
 		longaccum.WW = (__builtin_mulus(estimatedAirspeed, longaccum._.W1)) << 2;
-		estimatedWind[1] = estimatedWind[1] +
-		    ((groundVelocitySum[1] - longaccum._.W1 - estimatedWind[1]) >> 4);
+		estimatedWind.y = estimatedWind.y +
+		    ((groundVelocitySum[1] - longaccum._.W1 - estimatedWind.y) >> 4);
 
 		longaccum.WW = (__builtin_mulus(estimatedAirspeed, fuselageDirectionSum[2])) << 2;
-		estimatedWind[2] = estimatedWind[2] +
-		((groundVelocitySum[2] - longaccum._.W1 - estimatedWind[2]) >> 4);
+		estimatedWind.z = estimatedWind.z +
+		    ((groundVelocitySum[2] - longaccum._.W1 - estimatedWind.z) >> 4);
 
 		for (index = 0; index < 3; index++)
 		{

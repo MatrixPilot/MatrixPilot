@@ -499,7 +499,7 @@ static void osd_update_values_phase_3(void)
 
 #if (OSD_LOC_VERTICAL_WIND_SPEED != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_VERTICAL_WIND_SPEED);
-	osd_spi_write_number(estimatedWind[2]/10, 4, 1, NUM_FLAG_SIGNED, 0, 0); // vertical wind speed in m/s
+	osd_spi_write_number(estimatedWind.z/10, 4, 1, NUM_FLAG_SIGNED, 0, 0); // vertical wind speed in m/s
 #endif
 
 #if (OSD_LOC_TOTAL_ENERGY != OSD_LOC_DISABLED)

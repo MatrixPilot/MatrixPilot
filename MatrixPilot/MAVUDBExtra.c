@@ -127,7 +127,7 @@ void MAVUDBExtraOutput_40hz(void)
 					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 					    rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 					    (uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
-					    air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
+					    air_speed_3DIMU, estimatedWind.x, estimatedWind.y, estimatedWind.z,
 					    magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
 					    svs, hdop);
 #else
@@ -136,7 +136,7 @@ void MAVUDBExtraOutput_40hz(void)
 					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 					    rmat[0], rmat[1], rmat[2], rmat[3], rmat[4], rmat[5], rmat[6], rmat[7], rmat[8],
 					    (uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
-					    air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
+					    air_speed_3DIMU, estimatedWind.x, estimatedWind.y, estimatedWind.z,
 					    0, 0, 0,
 					    svs, hdop);
 #endif // (MAG_YAW_DRIFT == 1)

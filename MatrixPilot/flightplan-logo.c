@@ -623,19 +623,19 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 			return air_speed_magnitudeXY;
 
 		case AIR_SPEED_Z: // in cm/s
-			return IMUvelocityz._.W1 - estimatedWind[2];
+			return IMUvelocityz._.W1 - estimatedWind.z;
 
 		case WIND_SPEED: // in cm/s
-			return sqrt_long(estimatedWind[0] * (int32_t)estimatedWind[0] + estimatedWind[1] * (int32_t)estimatedWind[1]);
+			return sqrt_long(estimatedWind.x * (int32_t)estimatedWind.x + estimatedWind.y * (int32_t)estimatedWind.y);
 
 		case WIND_SPEED_X: // in cm/s
-			return estimatedWind[0];
+			return estimatedWind.x;
 
 		case WIND_SPEED_Y: // in cm/s
-			return estimatedWind[1];
+			return estimatedWind.y;
 
 		case WIND_SPEED_Z: // in cm/s
-			return estimatedWind[2];
+			return estimatedWind.z;
 
 		case PARAM:
 		{
