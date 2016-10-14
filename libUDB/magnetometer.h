@@ -29,6 +29,7 @@ extern int16_t magGain[];           // magnetometer calibration gains
 extern int16_t rawMagCalib[];
 extern int16_t magFieldRaw[];
 extern int16_t magMessage;          // message type
+extern int16_t I2messages;
 
 typedef void (*magnetometer_callback_funcptr)(void);
 
