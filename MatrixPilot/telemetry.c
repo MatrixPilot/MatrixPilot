@@ -821,12 +821,6 @@ void telemetry_output_8hz(void)
 
 #elif (SERIAL_OUTPUT_FORMAT == SERIAL_MAGNETOMETER)
 
-extern int16_t udb_magFieldBody[3];
-//extern int16_t magFieldEarth[3];
-//extern int16_t udb_magOffset[3];
-extern int16_t magGain[3];
-extern int16_t rawMagCalib[3];
-extern int16_t magMessage;
 
 #define OFFSETSHIFT 1
 
@@ -862,7 +856,8 @@ void telemetry_output_8hz(void)
 		              "Calib: %i, %i, %i\r\n"
 		              "MagMessage: %i\r\n"
 		              "TotalMsg: %i\r\n"
-		              "I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n"
+		              //"I2CCON: %X, I2CSTAT: %X, I2ERROR: %X\r\n" // PDH
+			      "I2CCON: %X, I2CSTAT: %X\r\n"
 		              "\r\n",
 		    udb_magOffset[0]>>OFFSETSHIFT, udb_magOffset[1]>>OFFSETSHIFT, udb_magOffset[2]>>OFFSETSHIFT,
 		    udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2],
@@ -871,7 +866,8 @@ void telemetry_output_8hz(void)
 		    rawMagCalib[0], rawMagCalib[1], rawMagCalib[2],
 		    magMessage,
 		    I2messages,
-		    I2CCONREG, I2CSTATREG, I2ERROR);
+		    //I2CCONREG, I2CSTATREG, I2ERROR); // PDH I2ERROR no where to be found.
+		    I2CCONREG, I2CSTATREG);
 	}
 }
 
