@@ -29,7 +29,7 @@ Q := $(if $(V),,@)
 # Establish some sensible defaults for build system critical variables (if not already defined)
 TARGET_NAME ?= MatrixPilot
 #SOURCE_DIR ?= ..
-DEVICE ?= SILSIM
+DEVICE ?= SIL
 
 #$(if $(filter $(MAKE_VERSION),3.80 3.81 3.90 3.92),,\
 #  $(error This makefile requires one of GNU make version ….))
@@ -131,9 +131,9 @@ INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
 ################################################################################
 # Determine the full target names and include the toolchain specific makefile
 
-TARGET_NAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
-TARGET_MAP := $(TARGET_NAME).map
-TARGET := $(TARGET_NAME).$(TARGET_TYPE)
+TARGET_LNAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
+TARGET_MAP := $(TARGET_LNAME).map
+TARGET := $(TARGET_LNAME).$(TARGET_TYPE)
 
 include $(MKFILES_DIR)/toolchain-$(TOOLCHAIN).mk
 

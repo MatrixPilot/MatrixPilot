@@ -22,7 +22,7 @@
 #include "../../libUDB/libUDB.h"
 #include "../../libUDB/heartbeat.h"
 #include "../../libUDB/osd.h"
-#include "../../libUDB/ADchannel.h"
+//#include "../../libUDB/ADchannel.h"
 #include "../../MatrixPilot/osd_layout.h" // Defines whether using NTSC or PAL Video
 #include "font_data.h"
 
@@ -144,7 +144,7 @@ void udb_callback_radio_did_turn_off(void) {}
 
 
 void init_analogs(void) {}
-void init_events(void) {}
+//void init_events(void) {}
 void radioIn_init(void) {}
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
 	void MPU6000_init16(callback_fptr_t fptr); // required for UDB5 and AUAV3 for heartbeat
@@ -160,12 +160,12 @@ void init_gps(void) {}
 void udb_init_ADC(void) {}
 void calculate_analog_sensor_values(void) {}
 
-struct ADchannel udb_xaccel;
-struct ADchannel udb_yaccel;
-struct ADchannel udb_zaccel;
-struct ADchannel udb_xrate;
-struct ADchannel udb_yrate;
-struct ADchannel udb_zrate;
+//struct ADchannel udb_xaccel;
+//struct ADchannel udb_yaccel;
+//struct ADchannel udb_zaccel;
+//struct ADchannel udb_xrate;
+//struct ADchannel udb_yrate;
+//struct ADchannel udb_zrate;
 
 void start_pwm_outputs(void) {}
 void servoOut_init(void) {}
