@@ -117,8 +117,7 @@ static void cmd_barom(char* arg)
 	printf("Barometer temp %i, pres %u, alt %u\r\n",
 	       get_barometer_temperature(),
 	       (uint16_t)get_barometer_pressure(),
-	       (uint16_t)get_barometer_altitude(),
-	      );
+		   (uint16_t)get_barometer_altitude());
 #endif
 }
 

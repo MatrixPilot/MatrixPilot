@@ -29,6 +29,7 @@
 #include "../libUDB/osd.h"
 #include "options_osd.h"
 #include "navigate.h"
+#include "states.h"
 
 #if (USE_OSD == OSD_REMZIBI)
 

@@ -24,10 +24,10 @@
 // Bill Premerlani's UAV Dev Board
 //
 // This file includes the main user-configuration for this firmware.
-// Once an options is enabled, it may require further options, and these
+// Once an option is enabled, it may require further options, and these
 // are often in a further more detail options file. For example if you enable
 // mavlink, then you may also want to review the file options_mavlink.h. 
-// Autonomous flight plans are either specified in flightplan-waypoints.hi, which is 
+// Autonomous flight plans are either specified in flightplan-waypoints.h, which is 
 // a simple list of waypoints to follow, or in flightplan-logo.h which provides  
 // an interpreted language with more powerful features for dynamic flight planning.
 
@@ -64,7 +64,9 @@
 //    AIRFRAME_QUAD             Under development
 //    AIRFRAME_GLIDER           Under development. Elevator, Flaps, Ailerons and/or Rudder control, motor optional 
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
+#ifndef AIRFRAME_TYPE
 #define AIRFRAME_TYPE                       AIRFRAME_STANDARD
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -512,11 +514,11 @@
 // ELEVATOR_TRIM_INVERTED               Elevator trim in fractional servo units (-1.0 to 1.0 ) for inverted straight and level flight at cruise speed.
 // Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
 
-#define REFERENCE_SPEED			    (  12.0 )
-#define ANGLE_OF_ATTACK_NORMAL		    (   0.0 )
-#define ANGLE_OF_ATTACK_INVERTED	    (   0.0 )
-#define ELEVATOR_TRIM_NORMAL		    (   0.0 )
-#define ELEVATOR_TRIM_INVERTED		    (   0.0 )
+#define REFERENCE_SPEED                 (  12.0 )
+#define ANGLE_OF_ATTACK_NORMAL          (   0.0 )
+#define ANGLE_OF_ATTACK_INVERTED        (   0.0 )
+#define ELEVATOR_TRIM_NORMAL            (   0.0 )
+#define ELEVATOR_TRIM_INVERTED          (   0.0 )
 
 // CUSTOM OFFSETS are recommended when using Angle of Attack and Trim Parameters
 // They ensure that the measured orientation of the plane, particularly in pitch,
@@ -806,7 +808,7 @@
 // the default usage of that UART, being the GPS and Telemetry respectively.
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
-// Set to 9 in order to use the USB for the console connection
+// Set to 9 in order to use the USB for the console connection (under development)
 #define CONSOLE_UART                        0
 //#define CONSOLE_UART                        6
 
