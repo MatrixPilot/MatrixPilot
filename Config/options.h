@@ -147,7 +147,7 @@
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
-// the magnetometerOptions.h file, including declination and magnetometer type.
+// the options_magnetometer.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT                       0
 
 // Define USE_BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
