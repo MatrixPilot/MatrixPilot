@@ -16,8 +16,8 @@
  * Software License Agreement
  *
  * The software supplied herewith by Microchip Technology Incorporated
- * (the �Company�) for its PICmicro� Microcontroller is intended and
- * supplied to you, the Company�s customer, for use solely and
+ * (the "Company") for its PICmicro' Microcontroller is intended and
+ * supplied to you, the Company's customer, for use solely and
  * exclusively on Microchip PICmicro Microcontroller products. The
  * software is owned by the Company and/or its supplier, and is
  * protected under applicable copyright laws. All rights are reserved.
@@ -26,7 +26,7 @@
  * civil liability for the breach of the terms and conditions of this
  * license.
  *
- * THIS SOFTWARE IS PROVIDED IN AN �AS IS� CONDITION. NO WARRANTIES,
+ * THIS SOFTWARE IS PROVIDED IN AN "AS IS" CONDITION. NO WARRANTIES,
  * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
  * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
  * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
@@ -1516,170 +1516,170 @@ int FindNext (SearchRec * rec);
     None.
   Return Values:
     FSInit       - 
-                 - CE_GOOD �                  No Error 
-                 - CE_INIT_ERROR �            The physical media could not be initialized
-                 - CE_BAD_SECTOR_READ �       The MBR or the boot sector could not be
+                 - CE_GOOD -                  No Error 
+                 - CE_INIT_ERROR -            The physical media could not be initialized
+                 - CE_BAD_SECTOR_READ -       The MBR or the boot sector could not be
                                               read correctly
-                 - CE_BAD_PARITION �          The MBR signature code was incorrect.
-                 - CE_NOT_FORMATTED �         The boot sector signature code was incorrect or
+                 - CE_BAD_PARITION -          The MBR signature code was incorrect.
+                 - CE_NOT_FORMATTED -         The boot sector signature code was incorrect or
                                               indicates an invalid number of bytes per sector. 
-                 - CE_CARDFAT32 �             The physical media is FAT32 type (only an error 
+                 - CE_CARDFAT32 -             The physical media is FAT32 type (only an error 
                                               when FAT32 support is disabled). 
-                 - CE_UNSUPPORTED_FS �        The device is formatted with an unsupported file 
+                 - CE_UNSUPPORTED_FS -        The device is formatted with an unsupported file 
                                               system (not FAT12 or 16).
     FSfopen      -
-                 - CE_GOOD �                  No Error 
-                 - CE_NOT_INIT �              The device has not been initialized. 
-                 - CE_TOO_MANY_FILES_OPEN �   The function could not allocate any 
+                 - CE_GOOD -                  No Error 
+                 - CE_NOT_INIT -              The device has not been initialized. 
+                 - CE_TOO_MANY_FILES_OPEN -   The function could not allocate any 
                                               additional file information to the array 
                                               of FSFILE structures or the heap. 
-                 - CE_INVALID_FILENAME �      The file name argument was invalid.
-                 - CE_INVALID_ARGUMENT �      The user attempted to open a directory in a 
+                 - CE_INVALID_FILENAME -      The file name argument was invalid.
+                 - CE_INVALID_ARGUMENT -      The user attempted to open a directory in a 
                                               write mode or specified an invalid mode argument. 
-                 - CE_FILE_NOT_FOUND �        The specified file (which was to be opened in read 
+                 - CE_FILE_NOT_FOUND -        The specified file (which was to be opened in read 
                                               mode) does not exist on the device. 
-                 - CE_BADCACHEREAD �          A read from the device failed.
-                 - CE_ERASE_FAIL �            The existing file could not be erased (when opening 
+                 - CE_BADCACHEREAD -          A read from the device failed.
+                 - CE_ERASE_FAIL -            The existing file could not be erased (when opening 
                                               a file in FS_WRITE mode). 
-                 - CE_DIR_FULL �              The directory is full. 
-                 - CE_DISK_FULL�              The data memory section is full. 
-                 - CE_WRITE_ERROR �           A write to the device failed. 
-                 - CE_SEEK_ERROR �            The current position in the file could not be set to 
+                 - CE_DIR_FULL -              The directory is full. 
+                 - CE_DISK_FULL-              The data memory section is full. 
+                 - CE_WRITE_ERROR -           A write to the device failed. 
+                 - CE_SEEK_ERROR -            The current position in the file could not be set to 
                                               the end (when the file was opened in FS_APPEND mode).
     FSfclose     - 
-                 - CE_GOOD �                  No Error 
-                 - CE_WRITE_ERROR �           The existing data in the data buffer or the new file
+                 - CE_GOOD -                  No Error 
+                 - CE_WRITE_ERROR -           The existing data in the data buffer or the new file
                                               entry information could not be written to the device.
-                 - CE_BADCACHEREAD �          The file entry information could not be cached
+                 - CE_BADCACHEREAD -          The file entry information could not be cached
     FSfread      - 
-                 - CE_GOOD �                  No Error 
-                 - CE_WRITEONLY �             The file was opened in a write-only mode.
-                 - CE_WRITE_ERROR �           The existing data in the data buffer could not be 
+                 - CE_GOOD -                  No Error 
+                 - CE_WRITEONLY -             The file was opened in a write-only mode.
+                 - CE_WRITE_ERROR -           The existing data in the data buffer could not be 
                                               written to the device. 
-                 - CE_BAD_SECTOR_READ �       The data sector could not be read. 
-                 - CE_EOF �                   The end of the file was reached.
-                 - CE_COULD_NOT_GET_CLUSTER � Additional clusters in the file could not be loaded.
+                 - CE_BAD_SECTOR_READ -       The data sector could not be read. 
+                 - CE_EOF -                   The end of the file was reached.
+                 - CE_COULD_NOT_GET_CLUSTER - Additional clusters in the file could not be loaded.
     FSfwrite     - 
-                 - CE_GOOD �                  No Error 
-                 - CE_READONLY �              The file was opened in a read-only mode. 
-                 - CE_WRITE_PROTECTED �       The device write-protect check function indicated 
+                 - CE_GOOD -                  No Error 
+                 - CE_READONLY -              The file was opened in a read-only mode. 
+                 - CE_WRITE_PROTECTED -       The device write-protect check function indicated 
                                               that the device has been write-protected.
-                 - CE_WRITE_ERROR �           There was an error writing data to the device.
-                 - CE_BADCACHEREAD �          The data sector to be modified could not be read from
+                 - CE_WRITE_ERROR -           There was an error writing data to the device.
+                 - CE_BADCACHEREAD -          The data sector to be modified could not be read from
                                               the device. 
-                 - CE_DISK_FULL �             All data clusters on the device are in use.
+                 - CE_DISK_FULL -             All data clusters on the device are in use.
     FSfseek      -
-                 - CE_GOOD �                  No Error 
-                 - CE_WRITE_ERROR �           The existing data in the data buffer could not be
+                 - CE_GOOD -                  No Error 
+                 - CE_WRITE_ERROR -           The existing data in the data buffer could not be
                                               written to the device. 
-                 - CE_INVALID_ARGUMENT �      The specified offset exceeds the size of the file. 
-                 - CE_BADCACHEREAD �          The sector that contains the new current position 
+                 - CE_INVALID_ARGUMENT -      The specified offset exceeds the size of the file. 
+                 - CE_BADCACHEREAD -          The sector that contains the new current position 
                                               could not be loaded.
-                 - CE_COULD_NOT_GET_CLUSTER � Additional clusters in the file could not be 
+                 - CE_COULD_NOT_GET_CLUSTER - Additional clusters in the file could not be 
                                               loaded/allocated.
     FSftell      - 
-                 - CE_GOOD �                  No Error
+                 - CE_GOOD -                  No Error
     FSattrib     -
-                 - CE_GOOD �                  No Error 
-                 - CE_INVALID_ARGUMENT �      The attribute argument was invalid. 
-                 - CE_BADCACHEREAD �          The existing file entry information could not be 
+                 - CE_GOOD -                  No Error 
+                 - CE_INVALID_ARGUMENT -      The attribute argument was invalid. 
+                 - CE_BADCACHEREAD -          The existing file entry information could not be 
                                               loaded. 
-                 - CE_WRITE_ERROR �           The file entry information could not be written to 
+                 - CE_WRITE_ERROR -           The file entry information could not be written to 
                                               the device.
     FSrename     -
-                 - CE_GOOD �                  No Error 
-                 - CE_FILENOTOPENED �         A null file pointer was passed into the function. 
-                 - CE_INVALID_FILENAME �      The file name passed into the function was invalid. 
-                 - CE_BADCACHEREAD �          A read from the device failed. 
-                 - CE_FILENAME_EXISTS �       A file with the specified name already exists. 
-                 - CE_WRITE_ERROR �           The new file entry data could not be written to the 
+                 - CE_GOOD -                  No Error 
+                 - CE_FILENOTOPENED -         A null file pointer was passed into the function. 
+                 - CE_INVALID_FILENAME -      The file name passed into the function was invalid. 
+                 - CE_BADCACHEREAD -          A read from the device failed. 
+                 - CE_FILENAME_EXISTS -       A file with the specified name already exists. 
+                 - CE_WRITE_ERROR -           The new file entry data could not be written to the 
                                               device.
     FSfeof       -
-                 - CE_GOOD �                  No Error
+                 - CE_GOOD -                  No Error
     FSformat     -
-                 - CE_GOOD �                  No Error 
-                 - CE_INIT_ERROR �            The device could not be initialized. 
-                 - CE_BADCACHEREAD �          The master boot record or boot sector could not be 
+                 - CE_GOOD -                  No Error 
+                 - CE_INIT_ERROR -            The device could not be initialized. 
+                 - CE_BADCACHEREAD -          The master boot record or boot sector could not be 
                                               loaded successfully. 
-                 - CE_INVALID_ARGUMENT �      The user selected to create their own boot sector on 
+                 - CE_INVALID_ARGUMENT -      The user selected to create their own boot sector on 
                                               a device that has no master boot record, or the mode 
                                               argument was invalid. 
-                 - CE_WRITE_ERROR �           The updated MBR/Boot sector could not be written to 
+                 - CE_WRITE_ERROR -           The updated MBR/Boot sector could not be written to 
                                               the device.
-                 - CE_BAD_PARTITION �         The calculated number of sectors per clusters was 
+                 - CE_BAD_PARTITION -         The calculated number of sectors per clusters was 
                                               invalid. 
-                 - CE_NONSUPPORTED_SIZE �     The card has too many sectors to be formatted as 
+                 - CE_NONSUPPORTED_SIZE -     The card has too many sectors to be formatted as 
                                               FAT12 or FAT16.
     FSremove     - 
-                 - CE_GOOD �                  No Error 
-                 - CE_WRITE_PROTECTED �       The device write-protect check function indicated 
+                 - CE_GOOD -                  No Error 
+                 - CE_WRITE_PROTECTED -       The device write-protect check function indicated 
                                               that the device has been write-protected. 
-                 - CE_INVALID_FILENAME �      The specified filename was invalid. 
-                 - CE_FILE_NOT_FOUND �        The specified file could not be found.
-                 - CE_ERASE_FAIL �            The file could not be erased.
+                 - CE_INVALID_FILENAME -      The specified filename was invalid. 
+                 - CE_FILE_NOT_FOUND -        The specified file could not be found.
+                 - CE_ERASE_FAIL -            The file could not be erased.
     FSchdir      -
-                 - CE_GOOD �                  No Error 
-                 - CE_INVALID_ARGUMENT �      The path string was mis-formed or the user tried to 
+                 - CE_GOOD -                  No Error 
+                 - CE_INVALID_ARGUMENT -      The path string was mis-formed or the user tried to 
                                               change to a non-directory file.
-                 - CE_BADCACHEREAD �          A directory entry could not be cached.
-                 - CE_DIR_NOT_FOUND �         Could not find a directory in the path.
+                 - CE_BADCACHEREAD -          A directory entry could not be cached.
+                 - CE_DIR_NOT_FOUND -         Could not find a directory in the path.
     FSgetcwd     -
-                 - CE_GOOD �                  No Error 
-                 - CE_INVALID_ARGUMENT �      The user passed a 0-length buffer into the function.
-                 - CE_BADCACHEREAD �          A directory entry could not be cached. 
-                 - CE_BAD_SECTOR_READ �       The function could not determine a previous directory 
+                 - CE_GOOD -                  No Error 
+                 - CE_INVALID_ARGUMENT -      The user passed a 0-length buffer into the function.
+                 - CE_BADCACHEREAD -          A directory entry could not be cached. 
+                 - CE_BAD_SECTOR_READ -       The function could not determine a previous directory 
                                               of the current working directory.
     FSmkdir      -
-                 - CE_GOOD �                  No Error 
-                 - CE_WRITE_PROTECTED �       The device write-protect check function indicated 
+                 - CE_GOOD -                  No Error 
+                 - CE_WRITE_PROTECTED -       The device write-protect check function indicated 
                                               that the device has been write-protected. 
-                 - CE_INVALID_ARGUMENT �      The path string was mis-formed.
-                 - CE_BADCACHEREAD �          Could not successfully change to a recently created 
+                 - CE_INVALID_ARGUMENT -      The path string was mis-formed.
+                 - CE_BADCACHEREAD -          Could not successfully change to a recently created 
                                               directory to store its dir entry information, or 
                                               could not cache directory entry information. 
-                 - CE_INVALID_FILENAME �      One or more of the directory names has an invalid 
+                 - CE_INVALID_FILENAME -      One or more of the directory names has an invalid 
                                               format. 
-                 - CE_WRITE_ERROR �           The existing data in the data buffer could not be 
+                 - CE_WRITE_ERROR -           The existing data in the data buffer could not be 
                                               written to the device or the dot/dotdot entries could 
                                               not be written to a newly created directory.
-                 - CE_DIR_FULL �              There are no available dir entries in the CWD.
-                 - CE_DISK_FULL �             There are no available clusters in the data region of 
+                 - CE_DIR_FULL -              There are no available dir entries in the CWD.
+                 - CE_DISK_FULL -             There are no available clusters in the data region of 
                                               the device.    
     FSrmdir      - 
-                 - CE_GOOD �                  No Error 
-                 - CE_DIR_NOT_FOUND �         The directory specified could not be found or the 
+                 - CE_GOOD -                  No Error 
+                 - CE_DIR_NOT_FOUND -         The directory specified could not be found or the 
                                               function could not change to a subdirectory within 
                                               the directory to be deleted (when recursive delete is 
                                               enabled).
-                 - CE_INVALID_ARGUMENT �      The user tried to remove the CWD or root directory. 
-                 - CE_BADCACHEREAD �          A directory entry could not be cached.
-                 - CE_DIR_NOT_EMPTY �         The directory to be deleted was not empty and 
+                 - CE_INVALID_ARGUMENT -      The user tried to remove the CWD or root directory. 
+                 - CE_BADCACHEREAD -          A directory entry could not be cached.
+                 - CE_DIR_NOT_EMPTY -         The directory to be deleted was not empty and 
                                               recursive subdirectory removal was disabled. 
-                 - CE_ERASE_FAIL �            The directory or one of the directories or files 
+                 - CE_ERASE_FAIL -            The directory or one of the directories or files 
                                               within it could not be deleted. 
-                 - CE_BAD_SECTOR_READ �       The function could not determine a previous directory 
+                 - CE_BAD_SECTOR_READ -       The function could not determine a previous directory 
                                               of the CWD.
     SetClockVars -
-                 - CE_GOOD �                  No Error 
-                 - CE_INVALID_ARGUMENT �      The time values passed into the function were 
+                 - CE_GOOD -                  No Error 
+                 - CE_INVALID_ARGUMENT -      The time values passed into the function were 
                                               invalid.    
     FindFirst    - 
-                 - CE_GOOD �                  No Error 
-                 - CE_INVALID_FILENAME �      The specified filename was invalid. 
-                 - CE_FILE_NOT_FOUND �        No file matching the specified criteria was found. 
-                 - CE_BADCACHEREAD �          The file information for the file that was found 
+                 - CE_GOOD -                  No Error 
+                 - CE_INVALID_FILENAME -      The specified filename was invalid. 
+                 - CE_FILE_NOT_FOUND -        No file matching the specified criteria was found. 
+                 - CE_BADCACHEREAD -          The file information for the file that was found 
                                               could not be cached.
     FindNext     - 
-                 - CE_GOOD �                  No Error 
-                 - CE_NOT_INIT �              The SearchRec object was not initialized by a call to 
+                 - CE_GOOD -                  No Error 
+                 - CE_NOT_INIT -              The SearchRec object was not initialized by a call to 
                                               FindFirst. 
-                 - CE_INVALID_ARGUMENT �      The SearchRec object was initialized in a different 
+                 - CE_INVALID_ARGUMENT -      The SearchRec object was initialized in a different 
                                               directory from the CWD.
-                 - CE_INVALID_FILENAME �      The filename is invalid. 
-                 - CE_FILE_NOT_FOUND �        No file matching the specified criteria was found.
+                 - CE_INVALID_FILENAME -      The filename is invalid. 
+                 - CE_FILE_NOT_FOUND -        No file matching the specified criteria was found.
     FSfprintf    - 
-                 - CE_GOOD �                  No Error 
-                 - CE_WRITE_ERROR �           Characters could not be written to the file.                                                   
+                 - CE_GOOD -                  No Error 
+                 - CE_WRITE_ERROR -           Characters could not be written to the file.                                                   
   Description:
     The FSerror function will return the FSerrno variable.  This global
     variable will have been set to an error value during the last call of a
