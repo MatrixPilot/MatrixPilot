@@ -27,11 +27,12 @@
 
 
 // define USE_OSD to one of the types above to enables that system
+#ifndef USE_OSD
 #define USE_OSD           OSD_NONE
 //#define USE_OSD         OSD_NATIVE
 //#define USE_OSD         OSD_REMZIBI
 //#define USE_OSD         OSD_MINIM
-
+#endif
 
 // OSD_NATIVE development options:
 // Set OSD_LEGACY_SPI_PINOUT to 1 if you wired up your UDB4 or UDB5 for the Native OSD
