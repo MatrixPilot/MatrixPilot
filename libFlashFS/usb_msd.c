@@ -25,7 +25,7 @@
 
 #include "USB/usb.h"
 #include "USB/usb_function_msd.h"
-#include "options_file_system.h"
+#include "FSconfig.h"
 
 #if (USE_MSD == 1)
 
