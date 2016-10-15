@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2014 MatrixPilot Team
+// Copyright 2009-2016 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -23,12 +23,13 @@
 // options.h
 // Bill Premerlani's UAV Dev Board
 //
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
-//
-// Note that there is a small but growing library of preset options.h files for
-// specific planes located in the MatrixPilot/example-options-files directory.
-// You can use one of those files by replacing this file with that one.
+// This file includes the main user-configuration for this firmware.
+// Once an option is enabled, it may require further options, and these
+// are often in a further more detail options file. For example if you enable
+// mavlink, then you may also want to review the file options_mavlink.h. 
+// Autonomous flight plans are either specified in flightplan-waypoints.h, which is 
+// a simple list of waypoints to follow, or in flightplan-logo.h which provides  
+// an interpreted language with more powerful features for dynamic flight planning.
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +62,7 @@
 //    AIRFRAME_DELTA            Aileron and Elevator as Elevons, and Rudder(optional)
 //    AIRFRAME_HELI             Not currently supported
 //    AIRFRAME_QUAD             Under development
+//    AIRFRAME_GLIDER           Under development. Elevator, Flaps, Ailerons and/or Rudder control, motor optional 
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
 #define AIRFRAME_TYPE                       AIRFRAME_STANDARD
 
@@ -146,11 +148,11 @@
 // the magnetometerOptions.h file, including declination and magnetometer type.
 #define MAG_YAW_DRIFT                       0
 
-// Define BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Define USE_BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define BAROMETER_ALTITUDE                  0
+#define USE_BAROMETER_ALTITUDE                  0
 
 // Set your takeoff/launch/initialisation altitude in meters.
 #define LAUNCH_ALTITUDE                     300
@@ -167,7 +169,9 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
+#ifndef NORADIO
 #define NORADIO                             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,10 +217,14 @@
 #define ELEVATOR_INPUT_CHANNEL              CHANNEL_2
 #define RUDDER_INPUT_CHANNEL                CHANNEL_4
 #define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_5
+#define BRAKE_THR_SEL_INPUT_CHANNEL         CHANNEL_UNUSED
+#define BRAKE_INPUT_CHANNEL                 CHANNEL_UNUSED
+#define FLAPS_INPUT_CHANNEL                 CHANNEL_UNUSED
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
 #define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_UNUSED
+#define MODE_INVERTED_CHANNEL               CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL         CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL         CHANNEL_UNUSED
 #define PASSTHROUGH_C_INPUT_CHANNEL         CHANNEL_UNUSED
@@ -242,9 +250,15 @@
 //
 #define THROTTLE_OUTPUT_CHANNEL             CHANNEL_3
 #define AILERON_OUTPUT_CHANNEL              CHANNEL_1
+#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
 #define ELEVATOR_OUTPUT_CHANNEL             CHANNEL_2
 #define RUDDER_OUTPUT_CHANNEL               CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
+#define AILERON_LEFT_OUTPUT_CHANNEL         CHANNEL_UNUSED
+#define FLAP_LEFT_OUTPUT_CHANNEL            CHANNEL_UNUSED
+#define FLAP_RIGHT_OUTPUT_CHANNEL           CHANNEL_UNUSED
+#define AILERON_RIGHT_OUTPUT_CHANNEL        CHANNEL_UNUSED
+#define BRAKE_OUTPUT_CHANNEL                CHANNEL_UNUSED
+#define FLAPS_OUTPUT_CHANNEL                CHANNEL_UNUSED
 #define CAMERA_PITCH_OUTPUT_CHANNEL         CHANNEL_UNUSED
 #define CAMERA_YAW_OUTPUT_CHANNEL           CHANNEL_UNUSED
 #define TRIGGER_OUTPUT_CHANNEL              CHANNEL_UNUSED
@@ -310,12 +324,12 @@
 // signal.  (Set to FAILSAFE_RTL or FAILSAFE_MAIN_FLIGHTPLAN.)
 //
 // When using FAILSAFE_RTL (Return To Launch), the UDB will begin following the RTL flight plan
-// as defined near the bottom of the waypoints.h or flightplan-logo.h files.  By default, this
+// as defined near the bottom of the flightplan-waypoints.h or flightplan-logo.h files.  By default, this
 // is set to return to a point above the location where the UDB was powered up, and to loiter there.
-// See the waypoints.h or flightplan-logo.h files for info on modifying this behavior.
+// See the flightplan-waypoints.h or flightplan-logo.h files for info on modifying this behavior.
 //
 // When set to FAILSAFE_MAIN_FLIGHTPLAN, the UDB will instead follow the main flight plan as
-// defined in either waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
+// defined in either flightplan-waypoints.h or flightplan-logo.h.  If the UDB was already in waypoint mode
 // when it lost signal, the plane will just continue following the main flight plan without
 // starting them over.  And if the transmitter is still in waypoint mode when the UDB sees it
 // again, the UDB will still continue following the main flight plan without restarting.  If
@@ -351,13 +365,6 @@
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
 //#define SERIAL_BAUDRATE                     19200 // default
 #define SERIAL_BAUDRATE                     115200
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-// MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
-// Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       1
 
 
 // NUM_ANALOG_INPUTS:
@@ -433,7 +440,7 @@
 // The trigger action output is always either low or high.  In servo mode, low and high are servo
 // values set below.  In digital mode, low and high are 0V and 5V on pin RE4.
 // The action is triggered when starting on a waypoint leg that includes the F_TRIGGER flag (see the
-// waypoints.h file).
+// flightplan-waypoints.h file).
 // If set to TRIGGER_PULSE_HIGH or TRIGGER_PULSE_LOW, then the output will pulse high or low for the
 // number of milliseconds set by TRIGGER_PULSE_DURATION.
 // If set to TRIGGER_TOGGLE, the output will just switch from high to low, or low to high each time
@@ -504,7 +511,7 @@
 // Parameters below are used in the computation of angle of attack and pitch trim.
 // ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.)
 // If these parameters are not defined, angle of attack and pitch trim will be set to zero.
-// CRUISE_SPEED                         The nominal speed in meters per second at which the parameters are defined.
+// REFERENCE_SPEED                      The nominal speed in meters per second at which the parameters are defined.
 // ANGLE_OF_ATTACK_NORMAL               Angle of attack in degrees in the body frame for normal straight and level flight at cruise speed.
 // ANGLE_OF_ATTACK_INVERTED             Angle of attack in degrees in the body frame for inverted straight and level flight at cruise speed.
 // Note: ANGLE_OF_ATTACK_INVERTED is usually negative, with typical values in the -5 to -10 degree range.
@@ -513,11 +520,27 @@
 // Note: ELEVATOR_TRIM_INVERTED is usually negative, with typical values in the -0.5 to -1.0 range.
 
 // The following are the values for HILSIM EasyStar2:
-#define CRUISE_SPEED                      ( 12.0 )
+#define REFERENCE_SPEED                   ( 12.0 )
 #define ANGLE_OF_ATTACK_NORMAL            ( -0.8 )
 #define ANGLE_OF_ATTACK_INVERTED          ( -7.2 )
 #define ELEVATOR_TRIM_NORMAL              ( -0.03 )
 #define ELEVATOR_TRIM_INVERTED            ( -0.67 )
+
+// CUSTOM OFFSETS are recommended when using Angle of Attack and Trim Parameters
+// They ensure that the measured orientation of the plane, particularly in pitch,
+// are the same for each flight (they are not re-calibrated on bootup but are
+// pre-measured and fixed for all flights by the offsets below).
+// Note each offset is specific to one specific autopilot board.
+// Be careful not to use the offsets below with the wrong board.
+// Uncomment the line below to activate the CUSTOM_OFFSETS feature in MatrixPilot.
+
+//#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET (  000 ) 
+#define YACCEL_OFFSET (  000 )
+#define ZACCEL_OFFSET (  000 )
+#define XRATE_OFFSET  (  000 ) // not used by the UDB4
+#define YRATE_OFFSET  (  000 ) // not used by the UDB4
+#define ZRATE_OFFSET  (  000 ) // not used by the UDB4
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.
@@ -584,7 +607,7 @@
 //  In UDB Manual Mode the camera is fixed straight ahead. (Camera mode 1)
 //  In UDB Stabilized Mode, the camera stabilizes in the pitch axis but stabilizes a constant yaw
 //     relative to the plane's frame of reference. (Camera mode 2).
-//  In Waypoint Mode, the direction of the camera is driven from a flight camera plan in waypoints.h
+//  In Waypoint Mode, the direction of the camera is driven from a flight camera plan in flightplan-waypoints.h
 // In all three flight modes, if you set CAMERA_INPUT_CHANNEL then the transmitter camera controls
 // will be mixed into the camera stabilisation. This allows a pilot to override the camera stabilization dynamically
 // during flight and point the camera at a specific target of interest.
@@ -685,10 +708,39 @@
 //
 // You can define your flightplan either using the UDB Waypoints format, or using UDB Logo
 // Set this to either FP_WAYPOINTS or FP_LOGO
-// The Waypoint definitions and options are located in the waypoints.h file.
+// The Waypoint definitions and options are located in the flightplan-waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
 #define FLIGHT_PLAN_TYPE                    FP_WAYPOINTS
 
+////////////////////////////////////////////////////////////////////////////////
+// Waypoint handling
+
+// Move on to the next waypoint when getting within this distance of the current goal (in meters)
+#define WAYPOINT_PROXIMITY_RADIUS	25
+
+// Origin Location
+// When using relative waypoints, the default is to interpret those waypoints as relative to the
+// plane's power-up location.  Here you can choose to use any specific, fixed 3D location as the
+// origin point for your relative waypoints.
+//
+// USE_FIXED_ORIGIN should be 0 to use the power-up location as the origin for relative waypoints.
+// Set it to 1 to use a fixed location as the origin, no matter where you power up.
+// FIXED_ORIGIN_LOCATION is the location to use as the origin for relative waypoints.  It uses the
+// format { X, Y, Z } where:
+// X is Longitude in degrees * 10^7
+// Y is Latitude in degrees * 10^7
+// Z is altitude above sea level, in meters, as a floating point value.
+// 
+// If you are using waypoints for an autonomous landing, it is a good idea to set the altitude value
+// to be the altitude of the landing point, and then express the heights of all of the waypoints with
+// respect to the landing point.
+// If you are using OpenLog, an easy way to determine the altitude of your landing point is to
+// examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
+// altitude, expressed in meters.
+
+#define USE_FIXED_ORIGIN	    0
+//#define FIXED_ORIGIN_LOCATION	    { -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
+#define FIXED_ORIGIN_LOCATION	    { 113480854, 472580108, 578 }	// Innsbruck, useful for X-Plane flight simulator
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Vehicle and Pilot Identification
@@ -731,11 +783,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Optionally enable the new power saving idle mode of the MCU during mainloop
-//#define USE_MCU_IDLE                        1 // moved to interrupt.h
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Optionally enable experimental extended range navigation support (merged from ballon launch branch)
 //#define USE_EXTENDED_NAV
 
@@ -749,7 +796,9 @@
 // #define TestGains                        // uncomment this line if you want to test your gains without using GPS
 
 // Set this to 1 to calculate and print out free stack space
+#ifndef RECORD_FREE_STACK_SPACE
 #define RECORD_FREE_STACK_SPACE             0
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////

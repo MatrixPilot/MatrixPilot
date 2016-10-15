@@ -5,13 +5,13 @@ cd build
 
 mkdir -p MatrixPilot; cd MatrixPilot
 mkdir -p SIL; cd SIL
-make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=SIL
+make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=SIL CONFIG=Cessna
 cd ..; mkdir -p AUAV3; cd AUAV3
-make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=AUAV3 TOOLCHAIN=XC16 DEFS=USE_OSD=OSD_NATIVE
+make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=AUAV3 TOOLCHAIN=XC16 DEFS=USE_OSD=OSD_NATIVE CONFIG=CloudsFly
 cd ..; mkdir -p UDB5; cd UDB5
 make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB5 TOOLCHAIN=XC16 DEFS=USE_OSD=OSD_REMZIBI
 cd ..; mkdir -p UDB4; cd UDB4
-make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB4 TOOLCHAIN=XC16 DEFS=USE_OSD=OSD_MINIM
+make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB4 TOOLCHAIN=XC16 DEFS=USE_OSD=OSD_MINIM AIRFRAME_TYPE=AIRFRAME_GLIDER
 cd ../..
 
 mkdir -p RollPitchYaw; cd RollPitchYaw
@@ -34,7 +34,7 @@ cd ../..
 
 mkdir -p FlashOSD; cd FlashOSD
 mkdir -p AUAV3; cd AUAV3
-make -j 8 -f ../../../makefile TARGET_NAME=FlashOSD DEVICE=AUAV3 TOOLCHAIN=XC16 DEFS=USE_OSD_SPI=1
+make -j 8 -f ../../../makefile TARGET_NAME=FlashOSD DEVICE=AUAV3 TOOLCHAIN=XC16
 cd ..; mkdir -p UDB5; cd UDB5
 make -j 8 -f ../../../makefile TARGET_NAME=FlashOSD DEVICE=UDB5 TOOLCHAIN=XC16
 cd ..; mkdir -p UDB4; cd UDB4
