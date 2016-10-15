@@ -7,7 +7,6 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
-
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -183,15 +182,26 @@ def C_pre_processor(C_source_filename):
             sys.exit()
     else:
         C_pre_processor_executable1 = \
-             os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
+             os.path.join(programfiles,'Microchip\\xc16\\v1.26\\bin\\bin\\coff-cpp.exe')
         C_pre_processor_executable2 = \
+             os.path.join(programfiles,'Microchip\\xc16\\v1.27\\bin\\bin\\coff-cpp.exe')
+        C_pre_processor_executable3 = \
+             os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
+        C_pre_processor_executable4 = \
                 os.path.join(programfiles,'Microchip\\mplabc30\\v3.25\\bin\\bin\\pic30-coff-cpp.exe')
+        
         # Check that the exectuable exists ....
         if os.path.exists(C_pre_processor_executable1):
             output = subprocess.Popen([C_pre_processor_executable1,C_source_filename],
                                      stdout=subprocess.PIPE).communicate()[0]
         elif os.path.exists(C_pre_processor_executable2):
             output = subprocess.Popen([C_pre_processor_executable2,C_source_filename],
+                                     stdout=subprocess.PIPE).communicate()[0]
+        elif os.path.exists(C_pre_processor_executable3):
+            output = subprocess.Popen([C_pre_processor_executable3,C_source_filename],
+                                     stdout=subprocess.PIPE).communicate()[0]
+        elif os.path.exists(C_pre_processor_executable4):
+            output = subprocess.Popen([C_pre_processor_executable4,C_source_filename],
                                      stdout=subprocess.PIPE).communicate()[0]
         else :
             error_message = "Cannot find the following important executable file:\n" + \
