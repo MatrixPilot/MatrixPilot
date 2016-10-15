@@ -31,8 +31,6 @@
 #include "options_mavlink.h"
 #include <stdlib.h>
 
-//#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
-
 
 #ifdef USE_EXTENDED_NAV
 struct relWaypointDef { struct relative3D_32 loc; int16_t flags; struct relative3D viewpoint; };
@@ -428,5 +426,3 @@ void flightplan_waypoints_live_commit(void)
 		wp_inject_pos = 0;
 	}
 }
-
-//#endif // FLIGHT_PLAN_TYPE

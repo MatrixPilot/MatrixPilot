@@ -161,11 +161,11 @@ static void sio_newMsg(uint8_t inchar)
 		sio_parse = &sio_voltage_high;
 		break;
 	
-#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	case 'L':
-#else
+//#else
 	case 'W':
-#endif
+//#endif
 		fp_high_byte = -1; // -1 means we don't have the high byte yet (0-15 means we do)
 		fp_checksum = 0;
 		sio_parse = &sio_fp_data;
