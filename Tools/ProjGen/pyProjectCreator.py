@@ -228,36 +228,61 @@ def mplabX_count_files(masks, dir):
 					count = count + 1
 	return count
 
-def mplabX_find_files(masks, dir):
-	str = ""
+def mplabX_find_files(masks, dir, recursions):
+	str1 = ""
+	ws = "  " * recursions
+
 	if os.path.isdir(dir):
+		itemList = []
+		dirList = []
 		for entry in os.listdir(dir):
 			if os.path.isdir(os.path.join(dir, entry)):
-				title = entry
-				count = mplabX_count_files(masks, os.path.join(dir, title))
-				if count != 0:
-					str = str + "      <logicalFolder name=\"" + title + "\" displayName=\"" + title + "\" projectFiles=\"true\">\n"
-					str = str + mplabX_find_files(masks, os.path.join(dir, entry))
-					str = str + "      </logicalFolder>\n"
+				dirList.append(entry)
 			else:
 				for mask in masks:
 					if fnmatch.fnmatch(entry, mask):
-						itemPath = mplabX_proj_path + dir.replace(rootdir, "/")
-						itemPath = itemPath.replace("\\", "/")
-						itemPath = itemPath.replace("//", "/")
-						str = str + "        <itemPath>" + itemPath + "/" + entry + "</itemPath>\n"
-	return str
+						if entry:
+							itemList.append(entry)
+		dirList.sort(key=str.lower)
+		for entry in dirList:
+			title = entry
+			count = mplabX_count_files(masks, os.path.join(dir, title))
+			if count != 0:
+				if len(title) < 12:
+					str1 = str1 + ws + "      <logicalFolder name=\"" + title + "\" displayName=\"" + title + "\" projectFiles=\"true\">\n"
+				else:
+					str1 = str1 + ws + "      <logicalFolder name=\"" + title + "\"\n"
+					str1 = str1 + ws + "                     displayName=\"" + title + "\"\n"
+					str1 = str1 + ws + "                     projectFiles=\"true\">\n"
+				str1 = str1 + mplabX_find_files(masks, os.path.join(dir, entry), recursions + 1)
+				str1 = str1 + ws + "      </logicalFolder>\n"
+		itemList.sort(key=str.lower)
+		for entry in itemList:
+			itemPath = mplabX_proj_path + dir.replace(rootdir, "/")
+			itemPath = itemPath.replace("\\", "/")
+			itemPath = itemPath.replace("//", "/")
+			str1 = str1 + ws + "      <itemPath>" + itemPath + "/" + entry + "</itemPath>\n"
+	return str1
 
 def mplabX_scan_dirs(masks, directories):
-	str = ""
+	str1 = ""
+	dirList = []
 	for dir in directories:
+		dirList.append(dir)
+	dirList.sort(key=str.lower)
+	for dir in dirList:
 		path = os.path.join(rootdir, dir)
-		str = str + "      <logicalFolder name=\"" + dir + "\" displayName=\"" + dir + "\" projectFiles=\"true\">\n"
-		str = str + mplabX_find_files(masks, path)
-		str = str + "      </logicalFolder>\n"
-	return str
+		if len(dir) < 12:
+			str1 = str1 + "      <logicalFolder name=\"" + dir + "\" displayName=\"" + dir + "\" projectFiles=\"true\">\n"
+		else:
+			str1 = str1 + "      <logicalFolder name=\"" + dir + "\"\n"
+			str1 = str1 + "                     displayName=\"" + dir + "\"\n"
+			str1 = str1 + "                     projectFiles=\"true\">\n"
+		str1 = str1 + mplabX_find_files(masks, path, 1)
+		str1 = str1 + "      </logicalFolder>\n"
+	return str1
 
-def mplabX_project(mcu_type, name, target_board, root_sep, config_dir, includes, header_files, source_files, project_path, defines):
+def mplabX_project(mcu_type, name, target_board, root_sep, config_dir, includes, header_files, source_files, project_path, defines, offpath):
 	print "writing: " + project_path
 	mkdirnotex(os.path.join(project_path, "Makefile"))
 	with open (script_path + "Makefile", "r") as file:
@@ -346,10 +371,12 @@ if __name__ == '__main__':
 	parser.add_option("-o", "--out",    dest="out",      help="project files output path",               default="_build")
 	parser.add_option("-f", "--file",   dest="file",     help="configuration file",                      default="")
 	parser.add_option("-k", "--make",   dest="mkdir",    help="path to makefile includes",               default="/Tools/makefiles")
+	parser.add_option("-s", "--short",  dest="shortfn",  help="only generate short project file names",  default="")
+	parser.add_option("-p", "--path",   dest="offpath",  help="prepend offset path to source files",     default=[], action='append')
 	(opts, args) = parser.parse_args()
 
 	rootdir = opts.root
-	opts.out = opts.root + "/" + opts.out
+	opts.out = opts.root + "/" + opts.out + "/" + opts.name
 
 	script_path = os.path.dirname(os.path.realpath(__file__)) + "/"
 	work = os.getcwd()
@@ -372,6 +399,7 @@ if __name__ == '__main__':
 	opts.defines  = parse_mk_file(target_mk_path, "defines", opts.defines)
 	opts.includes = parse_mk_file(target_mk_path, "incpath", opts.includes)
 	opts.config   = parse_mk_file(target_mk_path, "cfgpath", opts.config)
+	opts.offpath  = parse_mk_file(target_mk_path, "offpath", opts.offpath)
 
 #
 # Parse extra options from the 'device-*.mk' specific makefile
@@ -394,11 +422,18 @@ if __name__ == '__main__':
 					opts.defines = opts.defines + [md]
 
 	rootsep = "../"
-	inc_list = [rootsep + str(x) for x in opts.includes]
-	includes = ';'.join(inc_list)
-	filters = ""
+	rootsep = rootsep + "".join(opts.offpath) 
+	mplabX_proj_path = "".join(opts.offpath) + mplabX_proj_path
 
-	prjname = opts.name + "-" + opts.target + "-" + opts.config[0].replace("/", " ").split(" ")[-1]
+	for c in opts.config:
+		c = "".join(opts.offpath) + c
+
+	inc_list = [rootsep + str(x) for x in opts.includes]
+	includes = ';'.join(opts.offpath).join(inc_list)
+	filters = ""
+	prjname = opts.name + "-" + opts.target.lower()
+	if opts.shortfn == "":
+		prjname = prjname + "-" + opts.config[0].replace("/", " ").split(" ")[-1]
 	project = os.path.join(opts.out, prjname)
 	print "project: " + prjname
 
@@ -430,4 +465,10 @@ if __name__ == '__main__':
 		headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.config + opts.modules)
 		sources = mplabX_scan_dirs(["*.c", "*.s"], opts.modules)
 		includes = ';'.join(["../" + str(x) for x in inc_list])
-		mplabX_project(arch, opts.name, opts.target, "../" + rootsep, opts.config, includes, headers, sources, project + ".X", opts.defines)
+		mplabX_project(arch, opts.name, opts.target, "../" + rootsep, opts.config, includes, headers, sources, project + ".X", opts.defines, "".join(opts.offpath))
+
+#	lst = ['Robert', 'Suzie', 'Dickenson', 'German', 'Aliye', 'Aria', 'Tols']
+#	print "lst: ", lst
+#	lst.sort()
+#	print "lst: ", lst
+

@@ -142,6 +142,9 @@ void mcu_init(void);
 //! Call this once soon after the board boots up
 void udb_init(void);
 
+//! Call this to clear the main interrupt mask  (start the irq's)
+void udb_init_irq(void);
+
 // Start the UDB running
 // Once you have everything else set up, call udb_run().
 // This function will not return.

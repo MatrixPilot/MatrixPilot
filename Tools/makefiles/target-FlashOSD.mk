@@ -3,3 +3,4 @@
 modules := Tools/FlashOSD
 incpath :=
 cfgpath := Tools/FlashOSD/Config
+offpath := ../
