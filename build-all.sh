@@ -8,7 +8,7 @@ cd build
 mkdir -p MatrixPilot; cd MatrixPilot
 mkdir -p SIL; cd SIL
 #make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=SIL CONFIG=Cessna
-make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=SIL
+make -j 8 -f ../../../makefile TARGET_NAME=MPSIM DEVICE=SIL
 cd ..; mkdir -p AUAV3; cd AUAV3
 make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=AUAV3 DEFS=USE_OSD=OSD_NATIVE CONFIG=CloudsFly
 cd ..; mkdir -p UDB5; cd UDB5

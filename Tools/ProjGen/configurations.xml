@@ -4,65 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../../libUDB/ADchannel.h</itemPath>
-        <itemPath>../../../libUDB/analogs.h</itemPath>
-        <itemPath>../../../libUDB/barometer.h</itemPath>
-        <itemPath>../../../libUDB/boardRotation_defines.h</itemPath>
-        <itemPath>../../../libUDB/builtins.h</itemPath>
-        <itemPath>../../../libUDB/ConfigAUAV3.h</itemPath>
-        <itemPath>../../../libUDB/ConfigHILSIM.h</itemPath>
-        <itemPath>../../../libUDB/ConfigPX4.h</itemPath>
-        <itemPath>../../../libUDB/ConfigUDB4.h</itemPath>
-        <itemPath>../../../libUDB/ConfigUDB5.h</itemPath>
-        <itemPath>../../../libUDB/eeprom_udb4.h</itemPath>
-        <itemPath>../../../libUDB/events.h</itemPath>
-        <itemPath>../../../libUDB/fixDeps.h</itemPath>
-        <itemPath>../../../libUDB/heartbeat.h</itemPath>
-        <itemPath>../../../libUDB/I2C.h</itemPath>
-        <itemPath>../../../libUDB/interrupt.h</itemPath>
-        <itemPath>../../../libUDB/libUDB.h</itemPath>
-        <itemPath>../../../libUDB/libUDB_defines.h</itemPath>
-        <itemPath>../../../libUDB/libUDB_internal.h</itemPath>
-        <itemPath>../../../libUDB/magnetometer.h</itemPath>
-        <itemPath>../../../libUDB/mcu.h</itemPath>
-        <itemPath>../../../libUDB/mpu6000.h</itemPath>
-        <itemPath>../../../libUDB/mpu_spi.h</itemPath>
-        <itemPath>../../../libUDB/NV_memory.h</itemPath>
-        <itemPath>../../../libUDB/oscillator.h</itemPath>
-        <itemPath>../../../libUDB/osd.h</itemPath>
-        <itemPath>../../../libUDB/radioIn.h</itemPath>
-        <itemPath>../../../libUDB/serialIO.h</itemPath>
-        <itemPath>../../../libUDB/servoOut.h</itemPath>
-        <itemPath>../../../libUDB/sonarIn.h</itemPath>
-        <itemPath>../../../libUDB/uart.h</itemPath>
-        <itemPath>../../../libUDB/udbTypes.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="Tools/LedTest"
-                     displayName="Tools/LedTest"
-                     projectFiles="true">
-        <logicalFolder name="Config" displayName="Config" projectFiles="true">
-          <itemPath>../../../Tools/LedTest/Config/options.h</itemPath>
-          <itemPath>../../../Tools/LedTest/Config/options_auav3.h</itemPath>
-          <itemPath>../../../Tools/LedTest/Config/options_magnetometer.h</itemPath>
-          <itemPath>../../../Tools/LedTest/Config/options_nv_memory.h</itemPath>
-          <itemPath>../../../Tools/LedTest/Config/options_osd.h</itemPath>
-          <itemPath>../../../Tools/LedTest/Config/options_ports.h</itemPath>
-        </logicalFolder>
-        <itemPath>../../../Tools/LedTest/nv_memory_options.h</itemPath>
-        <itemPath>../../../Tools/LedTest/options.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="Tools/LedTest/Config"
-                     displayName="Tools/LedTest/Config"
-                     projectFiles="true">
-        <itemPath>../../../Tools/LedTest/Config/options.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/options_auav3.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/options_magnetometer.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/options_nv_memory.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/options_osd.h</itemPath>
-        <itemPath>../../../Tools/LedTest/Config/options_ports.h</itemPath>
-      </logicalFolder>
-    </logicalFolder>
+%%HEADER_FILES%%    </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
@@ -70,49 +12,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../../libUDB/24LC256.c</itemPath>
-        <itemPath>../../../libUDB/ADchannel.c</itemPath>
-        <itemPath>../../../libUDB/analog2digital_auav3.c</itemPath>
-        <itemPath>../../../libUDB/analog2digital_udb4.c</itemPath>
-        <itemPath>../../../libUDB/analog2digital_udb5.c</itemPath>
-        <itemPath>../../../libUDB/analogs.c</itemPath>
-        <itemPath>../../../libUDB/background.c</itemPath>
-        <itemPath>../../../libUDB/barometer.c</itemPath>
-        <itemPath>../../../libUDB/eeprom_udb4.c</itemPath>
-        <itemPath>../../../libUDB/events.c</itemPath>
-        <itemPath>../../../libUDB/fbcl.s</itemPath>
-        <itemPath>../../../libUDB/heartbeat.c</itemPath>
-        <itemPath>../../../libUDB/I2C1.c</itemPath>
-        <itemPath>../../../libUDB/I2C2.c</itemPath>
-        <itemPath>../../../libUDB/libUDB.c</itemPath>
-        <itemPath>../../../libUDB/magnetometer.c</itemPath>
-        <itemPath>../../../libUDB/mcu.c</itemPath>
-        <itemPath>../../../libUDB/mpu6000.c</itemPath>
-        <itemPath>../../../libUDB/mpu_spi.c</itemPath>
-        <itemPath>../../../libUDB/osd.c</itemPath>
-        <itemPath>../../../libUDB/osd_bit.c</itemPath>
-        <itemPath>../../../libUDB/osd_spi.c</itemPath>
-        <itemPath>../../../libUDB/radioIn.c</itemPath>
-        <itemPath>../../../libUDB/read.c</itemPath>
-        <itemPath>../../../libUDB/serialIO.c</itemPath>
-        <itemPath>../../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../../libUDB/sonarIn.c</itemPath>
-        <itemPath>../../../libUDB/traps.c</itemPath>
-        <itemPath>../../../libUDB/traps_asm.s</itemPath>
-        <itemPath>../../../libUDB/uart.c</itemPath>
-        <itemPath>../../../libUDB/write.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="Tools/LedTest"
-                     displayName="Tools/LedTest"
-                     projectFiles="true">
-        <itemPath>../../../Tools/LedTest/io_test.c</itemPath>
-        <itemPath>../../../Tools/LedTest/io_test_auav3.c</itemPath>
-        <itemPath>../../../Tools/LedTest/io_test_udb4.c</itemPath>
-        <itemPath>../../../Tools/LedTest/io_test_udb5.c</itemPath>
-        <itemPath>../../../Tools/LedTest/main.c</itemPath>
-      </logicalFolder>
-    </logicalFolder>
+%%SOURCE_FILES%%    </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
@@ -132,7 +32,7 @@
     <conf name="default" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetDevice>%%DEVICE%%</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
@@ -178,7 +78,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../../Tools/LedTest/Config;"/>
+                  value="%%CONFIG%%%%INCLUDES%%"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -198,7 +98,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="UDB5=1;"/>
+        <property key="preprocessor-macros" value="%%TARGET_BOARD%%=1;%%EXTRA_DEFS%%"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
@@ -254,7 +154,7 @@
         <property key="linker-stack" value="true"/>
         <property key="linker-symbols" value=""/>
         <property key="map-file"
-                  value="&quot;${DISTDIR}/LedTest-UDB5.X.${IMAGE_TYPE}.map&quot;"/>
+                  value="&quot;${DISTDIR}/%%NAME%%-%%TARGET_BOARD%%.X.${IMAGE_TYPE}.map&quot;"/>
         <property key="oXC16ld-extra-opts" value=""/>
         <property key="oXC16ld-fill-upper" value="0"/>
         <property key="oXC16ld-force-link" value="false"/>

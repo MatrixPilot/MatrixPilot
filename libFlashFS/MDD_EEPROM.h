@@ -24,7 +24,7 @@
 
 
 #include "GenericTypeDefs.h"
-#include "options_file_system.h"
+#include "FSconfig.h"
 #include "MDD-File-System/FSDefs.h"
 
 #define FALSE   0

@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "options_file_system.h"
+#include "FSconfig.h"
 #include "EEPROM.h"
 #include "../libUDB/libUDB.h"
 #include "../libUDB/I2C.h"

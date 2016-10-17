@@ -4,8 +4,8 @@ TOOLCHAIN ?= XC16
 TARGET_TYPE := hex
 CPU := 33FJ256GP710A
 
-modules += libUDB libVectorMatrix libFlashFS Microchip
-incpath += Microchip Microchip/Include libVectorMatrix
+modules += libUDB
+incpath +=
 #cfgpath := Config
 
 # mod_list

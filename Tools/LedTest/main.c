@@ -50,7 +50,7 @@ int main(void)
 	mcu_init();
 	IOTest();
 	udb_init();
-#if (BOARD_TYPE != AUAV3_BOARD)
+#if (BOARD_TYPE != AUAV3_BOARD) // NOTE: this is already done in udb_init() above
 	udb_eeprom_init();  // using legacy eeprom driver
 #endif
 	DPRINT("MatrixPilot LedTest\r\n");
@@ -236,19 +236,11 @@ void udb_heartbeat_callback(void)
 	}
 }
 
-int16_t udb_gps_callback_get_byte_to_send(void)
-{
-	return -1;
-}
+//int16_t udb_gps_callback_get_byte_to_send(void) { return -1; }
+//void udb_gps_callback_received_byte(uint8_t rxchar) { }
+//int16_t udb_serial_callback_get_byte_to_send(void) { return -1; }
+//void udb_serial_callback_received_byte(uint8_t rxchar) { }
 
-void udb_gps_callback_received_byte(uint8_t rxchar) { }
-
-int16_t udb_serial_callback_get_byte_to_send(void)
-{
-	return -1;
-}
-
-void udb_serial_callback_received_byte(uint8_t rxchar) { }
 void udb_callback_radio_did_turn_off() { }
 //void init_events(void) { }
 //void osd_init(void) { }

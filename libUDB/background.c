@@ -150,6 +150,11 @@ void udb_init_clock(void)   // initialize timers
 	init_callback_2();
 }
 
+void udb_init_irq(void)
+{
+	SRbits.IPL = 0; // turn on all interrupt priorities
+}
+
 // This interrupt is the Heartbeat of libUDB.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 {

@@ -22,7 +22,7 @@
 #include "../libUDB/libUDB.h"
 #include "MDD-File-System/FSIO.h"
 #include "MDD-File-System/FSDefs.h"
-#include "options_file_system.h"
+#include "FSconfig.h"
 
 #ifdef USE_EEPROM_FLASH
 

@@ -110,7 +110,7 @@ void udb_init(void)
 	MPU6000_init16(&heartbeat);
 #endif
 
-	SRbits.IPL = 0; // turn on all interrupt priorities
+	udb_init_irq(); // turn on all interrupt priorities
 }
 
 void udb_run(void)
