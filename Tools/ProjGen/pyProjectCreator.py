@@ -463,7 +463,7 @@ if __name__ == '__main__':
 		mplab8_scan_dirs("*.h", opts.config + opts.modules)
 		mplab8_project(arch, opts.target, prjname, rootsep, opts.config, includes, project, opts.defines)
 		headers = mplabX_scan_dirs(["*.h", "*.inc"], opts.config + opts.modules)
-		sources = mplabX_scan_dirs(["*.c", "*.s"], opts.modules)
+		sources = mplabX_scan_dirs(["*.c", "*.s", "*.S"], opts.modules)
 		includes = ';'.join(["../" + str(x) for x in inc_list])
 		mplabX_project(arch, opts.name, opts.target, "../" + rootsep, opts.config, includes, headers, sources, project + ".X", opts.defines, "".join(opts.offpath))
 

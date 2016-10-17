@@ -499,6 +499,7 @@
         <itemPath>../../MatrixPilot/servoMix.c</itemPath>
         <itemPath>../../MatrixPilot/servoPrepare.c</itemPath>
         <itemPath>../../MatrixPilot/sonarCntrl.c</itemPath>
+        <itemPath>../../MatrixPilot/stack.S</itemPath>
         <itemPath>../../MatrixPilot/states.c</itemPath>
         <itemPath>../../MatrixPilot/telemetry.c</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.c</itemPath>
