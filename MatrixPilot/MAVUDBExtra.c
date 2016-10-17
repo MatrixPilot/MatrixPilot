@@ -29,14 +29,17 @@
 #include "MAVUDBExtra.h"
 #include "config.h"
 #include "navigate.h"
+#include "altitudeCntrl.h"
 #include "flightplan_waypoints.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/estWind.h"
+#include "../libDCM/estAltitude.h"
 #include "../libDCM/rmat.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
+#include "../libUDB/ADchannel.h"
 #endif
 
 #include "../libUDB/mcu.h"
@@ -44,14 +47,10 @@
 
 extern uint16_t maxstack;
 
-static union intbb voltage_milis = {0};
-int16_t mavlink_sue_telemetry_counter = 8; // Countdown counter, for use with SERIAL_UDB_EXTRA compatibility
+int16_t mavlink_sue_telemetry_counter = 13; // Countdown counter, for use with SERIAL_UDB_EXTRA compatibility
 boolean mavlink_sue_toggle = false;
 
-// Following are required for saving state of PWM variables for SERIAL_UDB_EXTRA compatibility
-#define MAVLINK_SUE_CHANNEL_MAX_SIZE 10 //  MatrixPilot.xml MAVLink has fixed SUE protocol for 10 channels
-int16_t pwIn_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1];
-int16_t pwOut_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1];
+#define MAVLINK_SUE_CHANNEL_MAX_SIZE 12 //  MatrixPilot.xml MAVLink has fixed SUE protocol for 10 channels
 
 void MAVUDBExtraOutput(void)
 {
@@ -62,8 +61,11 @@ void MAVUDBExtraOutput(void)
 	int16_t i;
 	static int mavlink_sue_toggle = 0;
 	static boolean f13_print_prepare = false;
-	static int16_t pwIn_save[NUM_INPUTS + 1];
-	static int16_t pwOut_save[NUM_OUTPUTS + 1];
+	
+	// Following are required for saving state of PWM variables for SERIAL_UDB_EXTRA compatibility
+	static int16_t pwIn_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1];
+	static int16_t pwOut_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1];
+	static int16_t pwTrim_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1];
 	
 	switch  (mavlink_sue_telemetry_counter)
 	{
@@ -72,11 +74,18 @@ void MAVUDBExtraOutput(void)
 //				UDB_XACCEL.value, UDB_YACCEL.value,
 //				UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))),
 //				udb_xrate.value, udb_yrate.value, udb_zrate.value);
+			mavlink_msg_serial_udb_extra_f22_send(MAVLINK_COMM_0,
+				UDB_XACCEL.value, UDB_YACCEL.value,
+				UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))),
+				udb_xrate.value, udb_yrate.value, udb_zrate.value);
 			break;
 		case 12: 
 //			serial_output("F21:Offsets=%i,%i,%i,%i,%i,%i\n",
 //				UDB_XACCEL.offset, UDB_YACCEL.offset, UDB_ZACCEL.offset,
 //				udb_xrate.offset, udb_yrate.offset, udb_zrate.offset);
+			mavlink_msg_serial_udb_extra_f21_send(MAVLINK_COMM_0,
+				UDB_XACCEL.offset, UDB_YACCEL.offset, UDB_ZACCEL.offset,
+				udb_xrate.offset, udb_yrate.offset, udb_zrate.offset);
 			break;
 		case 11:
 //			serial_output("F15:IDA=");
@@ -101,17 +110,24 @@ void MAVUDBExtraOutput(void)
 		case 9:
 //			serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
 //				turns.FeedForward, turns.TurnRateNav, turns.TurnRateFBW);
+			mavlink_msg_serial_udb_extra_f17_send(MAVLINK_COMM_0,
+				turns.FeedForward, turns.TurnRateNav, turns.TurnRateFBW);
 			break;
 		case 8:
 //			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
 //				turns.AngleOfAttackNormal, turns.AngleOfAttackInverted, turns.ElevatorTrimNormal,
 //				turns.ElevatorTrimInverted, turns.RefSpeed);
-			
+			mavlink_msg_serial_udb_extra_f18_send(MAVLINK_COMM_0,
+				turns.AngleOfAttackNormal, turns.AngleOfAttackInverted, turns.ElevatorTrimNormal,
+				turns.ElevatorTrimInverted, turns.RefSpeed);
 			break;
 		case 7:
 //			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",
 //				AILERON_OUTPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_OUTPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
 //				THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
+			mavlink_msg_serial_udb_extra_f19_send(MAVLINK_COMM_0,
+				AILERON_OUTPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_OUTPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
+				THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED);
 			break;
 		case 6:
 //			serial_output("F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
@@ -141,11 +157,9 @@ void MAVUDBExtraOutput(void)
 			break;
 		case 4:
 //			serial_output("F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%5.3f:A_BOOST=NULL\r\n",
-//			    gains.YawKPAileron, gains.YawKDAileron, gains.RollKP, gains.RollKD);
-// PDH: Oct 2016 F5 message format has changed and needs reviewing in matrixpilot.xml so mavlink message commented out.
+//				gains.YawKPAileron, gains.YawKDAileron, gains.RollKP, gains.RollKD);
 			mavlink_msg_serial_udb_extra_f5_send(MAVLINK_COMM_0, 
-				gains.YawKPAileron, gains.YawKDAileron, gains.RollKP, gains.RollKD,
-				    settings._.YawStabilizationAileron, 0);
+				gains.YawKPAileron, gains.YawKDAileron, gains.RollKP, gains.RollKD);
 			break;
 		case 3:
 //			serial_output("F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=NULL:ROL_E_MIX=NULL:E_BOOST=%3.1f:\r\n",
@@ -204,14 +218,13 @@ void MAVUDBExtraOutput(void)
 //#endif // MAG_YAW_DRIFT
 //						svs, hdop);
 					
-					//  PDH: OCT 16: voltage_milis.BB should be removed from F2 message 
 					mavlink_msg_serial_udb_extra_f2_a_send(MAVLINK_COMM_0, 
 						tow.WW, ((udb_flags._.radio_on << 2) + (dcm_flags._.nav_capable << 1) + state_flags._.GPS_steering),
 						lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 						rmat[0], rmat[1], rmat[2],
 						rmat[3], rmat[4], rmat[5],
 						rmat[6], rmat[7], rmat[8],
-						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(), voltage_milis.BB,
+						(uint16_t) cog_gps.BB, sog_gps.BB, (uint16_t) udb_cpu_load(),
 						air_speed_3DIMU, estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
 						magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
@@ -234,10 +247,27 @@ void MAVUDBExtraOutput(void)
 
 					// Save  pwIn and PwOut buffers for printing next time around
 					// Save  pwIn and PwOut buffers for sending next time around in f2_b format message
-					for (i = 0; i <= (NUM_INPUTS > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_INPUTS); i++)
-						pwIn_save[i] = udb_pwIn[i];
-					for (i = 0; i <= (NUM_OUTPUTS > MAVLINK_SUE_CHANNEL_MAX_SIZE ? MAVLINK_SUE_CHANNEL_MAX_SIZE : NUM_OUTPUTS); i++)
-						pwOut_save[i] = udb_pwOut[i];
+					for (i = 0; i <= MAVLINK_SUE_CHANNEL_MAX_SIZE; i++)
+					{
+						if (i <= NUM_INPUTS) 
+						{
+							pwIn_save[i] = udb_pwIn[i];
+							pwTrim_save[i] = udb_pwTrim[i];
+						}
+						else
+						{
+							pwIn_save[i] = 0;
+							pwTrim_save[i] = 0;
+						}
+						if (i <= NUM_OUTPUTS) 
+						{
+							pwOut_save[i] = udb_pwOut[i];
+						}
+						else
+						{
+							pwOut_save[i] = 0;
+						}
+					}	
 				}
 				else
 				{
@@ -276,20 +306,42 @@ void MAVUDBExtraOutput(void)
 //					serial_output("stk%d:", (int16_t)(4096-maxstack));
 //					serial_output("\r\n");
 
-//					***** NOTE **** THIS MESSAGE OUT OF DATE OCT 2016 *******
-					mavlink_msg_serial_udb_extra_f2_b_send(MAVLINK_COMM_0, tow.WW,
-						pwIn_save[1], pwIn_save[2], pwIn_save[3], pwIn_save[4], pwIn_save[5],
-						pwIn_save[6], pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10],
-						pwOut_save[1], pwOut_save[2], pwOut_save[3], pwOut_save[4], pwOut_save[5],
-						pwOut_save[6], pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10],
-						IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1, state_flags.WW,
+					mavlink_msg_serial_udb_extra_f2_b_send(MAVLINK_COMM_0,
+						tow.WW,
+						pwIn_save[1], pwIn_save[2], pwIn_save[3], pwIn_save[4], pwIn_save[5],pwIn_save[6],
+						pwIn_save[7], pwIn_save[8], pwIn_save[9], pwIn_save[10], pwIn_save[11], pwIn_save[12],
+						pwOut_save[1], pwOut_save[2], pwOut_save[3], pwOut_save[4], pwOut_save[5], pwOut_save[6],
+						pwOut_save[7], pwOut_save[8], pwOut_save[9], pwOut_save[10], pwOut_save[11], pwOut_save[12],
+						IMUlocationx._.W1, IMUlocationy._.W1, IMUlocationz._.W1,
+						locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
+						state_flags.WW,
 #if (SILSIM != 1)
 						osc_fail_count,
 #else
 						0,
 #endif // (SILSIM != 1)
 						IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1,
-						goal.x, goal.y, goal.z, stack_free);
+						goal.x, goal.y, goal.z,
+						aero_force[0], aero_force[1], aero_force[2],
+#if (USE_BAROMETER_ALTITUDE == 1)
+						get_barometer_temperature(), get_barometer_pressure(), 
+						get_barometer_altitude(),
+#else
+						(int16_t)0, (int16_t)0, (int16_t)0,
+#endif					
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+				                battery_voltage._.W1,
+#else
+				                (int16_t)0,
+#endif
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)                        
+						battery_current._.W1, battery_mAh_used._.W1,
+#else
+						(int16_t)0, (int16_t)0,                   
+#endif
+						desiredHeight,
+						stack_free);
+						
 				}
 			}
 			if (state_flags._.f13_print_req == 1)
@@ -308,11 +360,15 @@ void MAVUDBExtraOutput(void)
 					week_no.BB, lat_origin.WW, lon_origin.WW, alt_origin.WW);
 				
 //				serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
-				
-				for (i = 1; i <= NUM_INPUTS; i++)
-				{
+				mavlink_msg_serial_udb_extra_f20_send(MAVLINK_COMM_0, 
+					NUM_INPUTS,										\
+					pwTrim_save[1],pwTrim_save[2],pwTrim_save[3],pwTrim_save[4],		\
+					pwTrim_save[5],pwTrim_save[61],pwTrim_save[7],pwTrim_save[8],		\
+					pwTrim_save[9],pwTrim_save[10],pwTrim_save[11],pwTrim_save[12] );
+//				for (i = 1; i <= NUM_INPUTS; i++)
+//				{
 //					serial_output("%i,",udb_pwTrim[i]);
-				}
+//				}
 //				serial_output(":\r\n");
 				state_flags._.f13_print_req = 0;
 			}
