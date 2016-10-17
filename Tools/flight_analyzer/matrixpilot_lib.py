@@ -81,15 +81,14 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F13' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F14' or \
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' or \
-                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17':
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F16' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F17' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F18' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F19' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F20' or \
+                      self.msg.get_type() == 'SERIAL_UDB_EXTRA_F21':
                             #print self.msg.get_seq(),"DEBUG: ", self.msg.get_type()
                             return self.msg
-                elif self.msg.get_type() == 'FORCE':
-                        self.last_aero_force_x = self.msg.aero_x # hang onto message until we process F2_B message later
-                        self.last_aero_force_y = self.msg.aero_y
-                        self.last_aero_force_z = self.msg.aero_z
-                        #print self.msg
-                        continue
                 else :
                         #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                         pass
@@ -202,8 +201,8 @@ class base_telemetry :
         self.earth_mag_vec_N = 0
         self.earth_mag_vec_Z = 0
         self.max_tm_actual = 0
-        self.pwm_input =  [0,0,0,0,0,0,0,0,0,0,0]
-        self.pwm_output = [0,0,0,0,0,0,0,0,0,0,0]
+        self.pwm_input =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.pwm_output = [0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.lex = 0
         self.ley = 0
         self.lez = 0
@@ -235,10 +234,13 @@ class base_telemetry :
         self.flags = 0
         self.sonar_direct = 0 # Direct distance in cm to sonar target
         self.alt_sonar    = 0 # Calculated altitude above ground of plane in cm
-        # The following variables added for the Helical Turns method of fly by wire and auto  flight
         self.aero_force_x = 0
         self.aero_force_y = 0
         self.aero_force_z = 0
+        self.location_error_earth_x = 0
+        self.location_error_earth_y = 0
+        self.location_error_earth_z = 0
+        
         self.feed_forward = 0
         self.navigation_max_earth_vertical_axis_rotation_rate = 0
         self.fly_by_wire_max_earth_vertical_axis_rotation_rate = 0
@@ -247,7 +249,6 @@ class base_telemetry :
         self.elevator_trim_normal = 0
         self.elevator_trim_inverted = 0
         self.nominal_cruise_speed = 0
-        # End of new variables for Helical Turns
         self.aileron_output_channel  = 0
         self.elevator_output_channel = 0
         self.throttle_output_channel = 0
@@ -257,12 +258,15 @@ class base_telemetry :
         self.throttle_output_reversed = 0
         self.rudder_output_reversed   = 0
         self.number_of_input_channels = 0
-        self.channel_trim_values = [0]
+        self.channel_trim_values = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.barometer_temperature = 0
+        self.barometer_pressure = 0
+        self.barometer_altitude = 0
         self.battery_voltage = 0
         self.battery_ampage = 0
         self.battery_amphours = 0
         self.desired_height = 0
-       
+        self.memory_stack_free = 0
 
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
@@ -304,7 +308,6 @@ class mavlink_telemetry(base_telemetry):
                 self.cog = int(telemetry_file.last_F2_A_msg.sue_cog)
                 self.sog = int(telemetry_file.last_F2_A_msg.sue_sog)
                 self.cpu = int(telemetry_file.last_F2_A_msg.sue_cpu_load)
-                self.sue_voltage_milis = int(telemetry_file.last_F2_A_msg.sue_voltage_milis)
                 self.est_airspeed = int(telemetry_file.last_F2_A_msg.sue_air_speed_3DIMU)
                 self.est_wind_x = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_0)
                 self.est_wind_y = int(telemetry_file.last_F2_A_msg.sue_estimated_wind_1)
@@ -316,10 +319,7 @@ class mavlink_telemetry(base_telemetry):
                 self.hdop = int(telemetry_file.last_F2_A_msg.sue_hdop)
 
                 # Storing the last aero force message received before
-                # the F2 SUE message, with the F2 Sue message. 
-                self.aero_force_x = int(telemetry_file.last_aero_force_x)
-                self.aero_force_y = int(telemetry_file.last_aero_force_y)
-                self.aero_force_z = int(telemetry_file.last_aero_force_z)           
+                # the F2 SUE message, with the F2 Sue message.           
 
                 self.pwm_input[1] = int(telemetry_file.msg.sue_pwm_input_1)
                 self.pwm_input[2] = int(telemetry_file.msg.sue_pwm_input_2)
@@ -331,6 +331,8 @@ class mavlink_telemetry(base_telemetry):
                 self.pwm_input[8] = int(telemetry_file.msg.sue_pwm_input_8)
                 self.pwm_input[9] = int(telemetry_file.msg.sue_pwm_input_9)
                 self.pwm_input[10] = int(telemetry_file.msg.sue_pwm_input_10)
+                self.pwm_input[11] = int(telemetry_file.msg.sue_pwm_input_11)
+                self.pwm_input[12] = int(telemetry_file.msg.sue_pwm_input_12)
                 
                 self.pwm_output[1] = int(telemetry_file.msg.sue_pwm_output_1)
                 self.pwm_output[2] = int(telemetry_file.msg.sue_pwm_output_2)
@@ -342,21 +344,42 @@ class mavlink_telemetry(base_telemetry):
                 self.pwm_output[8] = int(telemetry_file.msg.sue_pwm_output_8)
                 self.pwm_output[9] = int(telemetry_file.msg.sue_pwm_output_9)
                 self.pwm_output[10] = int(telemetry_file.msg.sue_pwm_output_10)
+                self.pwm_output[11] = int(telemetry_file.msg.sue_pwm_output_11)
+                self.pwm_output[12] = int(telemetry_file.msg.sue_pwm_output_12)
 
                 self.IMUlocationx_W1 = int(telemetry_file.msg.sue_imu_location_x)
                 self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
                 self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
-                self.flags = int(telemetry_file.msg.sue_flags)
 
+                self.location_error_earth_x = int(telemetry_file.msg.sue_location_error_earth_x)
+                self.location_error_earth_y = int(telemetry_file.msg.sue_location_error_earth_y)
+                self.location_error_earth_z = int(telemetry_file.msg.sue_location_error_earth_z)
+                
+                self.flags = int(telemetry_file.msg.sue_flags)
                 self.osc_fails = int(telemetry_file.msg.sue_osc_fails)
+                
                 self.IMUvelocityx = int(telemetry_file.msg.sue_imu_velocity_x)
                 self.IMUvelocityy = int(telemetry_file.msg.sue_imu_velocity_y)
                 self.IMUvelocityz = int(telemetry_file.msg.sue_imu_velocity_z)
                 self.inline_waypoint_x = int(telemetry_file.msg.sue_waypoint_goal_x)
                 self.inline_waypoint_y = int(telemetry_file.msg.sue_waypoint_goal_y)
                 self.inline_waypoint_z = int(telemetry_file.msg.sue_waypoint_goal_z)
-                self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
 
+                self.aero_force_x = int(telemetry_file.msg.sue_aero_x)
+                self.aero_force_y = int(telemetry_file.msg.sue_aero_y)
+                self.aero_force_z = int(telemetry_file.msg.sue_aero_z)
+
+
+                self.barometer_temperature = int(telemetry_file.msg.sue_barom_temp)
+                self.barometer_pressure = int(telemetry_file.msg.sue_barom_press)
+                self.barometer_altitude = int(telemetry_file.msg.sue_barom_alt)
+                self.battery_voltage = int(telemetry_file.msg.sue_bat_volt)
+                self.battery_ampage = int(telemetry_file.msg.sue_bat_amp)
+                self.battery_amphours = int(telemetry_file.msg.sue_bat_amp_hours)
+                self.desired_height = int(telemetry_file.msg.sue_desired_height)
+                
+                self.sue_memory_stack_free = int(telemetry_file.msg.sue_memory_stack_free)
+                
                 telemetry_file.SUE_F2_A_needs_printing = False
                 return("F2")
             else :
@@ -382,7 +405,6 @@ class mavlink_telemetry(base_telemetry):
             self.yawkd_aileron = float(telemetry_file.msg.sue_YAWKD_AILERON)
             self.rollkp = float(telemetry_file.msg.sue_ROLLKP)
             self.rollkd = float(telemetry_file.msg.sue_ROLLKD)
-            self.aileron_boost = float(telemetry_file.msg.sue_AILERON_BOOST)
 
             return("F5")
         
@@ -450,7 +472,60 @@ class mavlink_telemetry(base_telemetry):
             self.id_diy_drones_url = telemetry_file.msg.sue_ID_DIY_DRONES_URL
 
             return("F16")
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F17' :
+            self.feed_forward = telemetry_file.msg.sue_feed_forward
+            self.navigation_max_earth_vertical_axis_rotation_rate = telemetry_file.msg.sue_turn_rate_nav
+            self.fly_by_wire_max_earth_vertical_axis_rotation_rate = telemetry_file.msg.sue_turn_rate_fbw
+
+            return("F17")
         
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F18' :
+            self.angle_of_attack_normal  = telemetry_file.msg.angle_of_attack_normal
+            self.angle_of_attack_inverted = telemetry_file.msg.angle_of_attack_inverted
+            self.elevator_trim_normal = telemetry_file.msg.elevator_trim_normal
+            self.elevator_trim_inverted = telemetry_file.msg.elevator_trim_inverted
+            self.nominal_cruise_speed = telemetry_file.msg.reference_speed
+
+            return("F18")
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F19' :
+            self.aileron_output_channel = telemetry_file.msg.sue_aileron_output_channel
+            self.aileron_output_reversed = telemetry_file.msg.sue_aileron_reversed
+            self.elevator_output_channel = telemetry_file.msg.sue_elevator_output_channel
+            self.elevator_output_reversed = telemetry_file.msg.sue_elevator_reversed
+            self.throttle_output_channel = telemetry_file.msg.sue_throttle_output_channel
+            self.throttle_output_reversed = telemetry_file.msg.sue_throttle_reversed
+            self.rudder_output_channel = telemetry_file.msg.sue_rudder_output_channel
+            self.rudder_output_reversed = telemetry_file.msg.sue_rudder_reversed
+
+            return('F19')
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F20' :
+            self.number_of_input_channels = telemetry_file.msg.sue_number_of_inputs
+            self.channel_trim_values[1] = telemetry_file.msg.sue_trim_value_input_1
+            self.channel_trim_values[2] = telemetry_file.msg.sue_trim_value_input_2
+            self.channel_trim_values[3] = telemetry_file.msg.sue_trim_value_input_3
+            self.channel_trim_values[4] = telemetry_file.msg.sue_trim_value_input_4
+            self.channel_trim_values[5] = telemetry_file.msg.sue_trim_value_input_5
+            self.channel_trim_values[6] = telemetry_file.msg.sue_trim_value_input_6
+            self.channel_trim_values[7] = telemetry_file.msg.sue_trim_value_input_7
+            self.channel_trim_values[8] = telemetry_file.msg.sue_trim_value_input_8
+            self.channel_trim_values[9] = telemetry_file.msg.sue_trim_value_input_9
+            self.channel_trim_values[10] = telemetry_file.msg.sue_trim_value_input_10
+            self.channel_trim_values[11] = telemetry_file.msg.sue_trim_value_input_11
+            self.channel_trim_values[12] = telemetry_file.msg.sue_trim_value_input_12
+
+            return('F20')
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F21' :
+             # flan.pyw does not currently do anything with sensor value recorded after boot up.
+             pass
+
+        elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F22' :
+             # flan.pyw does not currently use custom offsets.
+             pass
+            
         else :
             err_message = "Warn:" + telemetry_file.msg.get_type()
             return(err_message)
@@ -2180,7 +2255,7 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F5' :
             print >> f, "F5:YAWKP_A=%5.3f:YAWKD_A=%5.3f:ROLLKP=%5.3f:ROLLKD=%5.3f:A_BOOST=%3.1f:\r\n" % \
                   ( msg.sue_YAWKP_AILERON, msg.sue_YAWKD_AILERON, msg.sue_ROLLKP, \
-                    msg.sue_ROLLKD, msg.sue_AILERON_BOOST ),
+                    msg.sue_ROLLKD, 0 ), # Aileron Boost removed as no longer used after Oct 2016
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F6' :
             print >> f, "F6:P_GAIN=%5.3f:P_KD=%5.3f:RUD_E_MIX=%5.3f:ROL_E_MIX=%5.3f:E_BOOST=%3.1f:\r\n" % \
                   ( msg.sue_PITCHGAIN, msg.sue_PITCHKD, msg.sue_RUDDER_ELEV_MIX, \
