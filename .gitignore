@@ -64,3 +64,10 @@
 
 *.pyc
 /Tools/flight_analyzer/flan_config
+
+MatrixPilot.config
+MatrixPilot.creator
+MatrixPilot.creator.user
+MatrixPilot.files
+MatrixPilot.includes
+

@@ -16,16 +16,10 @@
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/mag_drift.h</itemPath>
         <itemPath>../../libDCM/mathlib.h</itemPath>
         <itemPath>../../libDCM/mathlibNAV.h</itemPath>
         <itemPath>../../libDCM/rmat.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
-        <itemPath>../../libFlashFS/AT45D.h</itemPath>
-        <itemPath>../../libFlashFS/EEPROM.h</itemPath>
-        <itemPath>../../libFlashFS/filesys.h</itemPath>
-        <itemPath>../../libFlashFS/MDD_AT45D.h</itemPath>
-        <itemPath>../../libFlashFS/MDD_EEPROM.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ADchannel.h</itemPath>
@@ -66,46 +60,27 @@
                      projectFiles="true">
         <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
       </logicalFolder>
-      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
-        <logicalFolder name="Include" displayName="Include" projectFiles="true">
-          <logicalFolder name="MDD-File-System"
-                         displayName="MDD-File-System"
-                         projectFiles="true">
-            <itemPath>../../Microchip/Include/MDD-File-System/FSDefs.h</itemPath>
-            <itemPath>../../Microchip/Include/MDD-File-System/FSIO.h</itemPath>
-            <itemPath>../../Microchip/Include/MDD-File-System/SD-SPI.h</itemPath>
-          </logicalFolder>
-          <logicalFolder name="USB" displayName="USB" projectFiles="true">
-            <itemPath>../../Microchip/Include/USB/usb.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_ch9.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_common.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_device.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_function_cdc.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_function_msd.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_hal.h</itemPath>
-            <itemPath>../../Microchip/Include/USB/usb_hal_dspic33E.h</itemPath>
-          </logicalFolder>
-          <itemPath>../../Microchip/Include/Compiler.h</itemPath>
-          <itemPath>../../Microchip/Include/GenericTypeDefs.h</itemPath>
+      <logicalFolder name="RollPitchYaw"
+                     displayName="RollPitchYaw"
+                     projectFiles="true">
+        <logicalFolder name="Config" displayName="Config" projectFiles="true">
+          <itemPath>../../RollPitchYaw/Config/options.h</itemPath>
+          <itemPath>../../RollPitchYaw/Config/options_auav3.h</itemPath>
+          <itemPath>../../RollPitchYaw/Config/options_magnetometer.h</itemPath>
+          <itemPath>../../RollPitchYaw/Config/options_nv_memory.h</itemPath>
+          <itemPath>../../RollPitchYaw/Config/options_osd.h</itemPath>
+          <itemPath>../../RollPitchYaw/Config/options_ports.h</itemPath>
         </logicalFolder>
-        <logicalFolder name="USB" displayName="USB" projectFiles="true">
-          <itemPath>../../Microchip/USB/usb_device_local.h</itemPath>
-        </logicalFolder>
-        <itemPath>../../Microchip/HardwareProfile.h</itemPath>
-        <itemPath>../../Microchip/NetConfig.h</itemPath>
-        <itemPath>../../Microchip/Sockets.h</itemPath>
-        <itemPath>../../Microchip/usb_cdc.h</itemPath>
-        <itemPath>../../Microchip/usb_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="RollPitchYaw/Config"
                      displayName="RollPitchYaw/Config"
                      projectFiles="true">
         <itemPath>../../RollPitchYaw/Config/options.h</itemPath>
-        <itemPath>../Config/options_osd.h</itemPath>
-        <itemPath>../Config/options_ports.h</itemPath>
-        <itemPath>../Config/options_nv_memory.h</itemPath>
-        <itemPath>../Config/options_file_system.h</itemPath>
-        <itemPath>../Config/options_magnetometer.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/options_auav3.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/options_magnetometer.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/options_nv_memory.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/options_osd.h</itemPath>
+        <itemPath>../../RollPitchYaw/Config/options_ports.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -130,23 +105,10 @@
         <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
         <itemPath>../../libDCM/hilsim.c</itemPath>
         <itemPath>../../libDCM/libDCM.c</itemPath>
+        <itemPath>../../libDCM/mag_drift.c</itemPath>
         <itemPath>../../libDCM/mathlib.c</itemPath>
         <itemPath>../../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../../libDCM/rmat.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="libFlashFS" displayName="libFlashFS" projectFiles="true">
-        <itemPath>../../libFlashFS/AT45D.c</itemPath>
-        <itemPath>../../libFlashFS/AT45D_DMA.c</itemPath>
-        <itemPath>../../libFlashFS/AT45D_FS.c</itemPath>
-        <itemPath>../../libFlashFS/EEPROM.c</itemPath>
-        <itemPath>../../libFlashFS/EEPROM_FS.c</itemPath>
-        <itemPath>../../libFlashFS/filesys.c</itemPath>
-        <itemPath>../../libFlashFS/MDD_AT45D.c</itemPath>
-        <itemPath>../../libFlashFS/MDD_EEPROM.c</itemPath>
-        <itemPath>../../libFlashFS/usb.c</itemPath>
-        <itemPath>../../libFlashFS/usb_cdc.c</itemPath>
-        <itemPath>../../libFlashFS/usb_descriptors.c</itemPath>
-        <itemPath>../../libFlashFS/usb_msd.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/24LC256.c</itemPath>
@@ -203,28 +165,6 @@
         <itemPath>../../libVectorMatrix/vsub.s</itemPath>
         <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
       </logicalFolder>
-      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
-        <logicalFolder name="MDD-File-System"
-                       displayName="MDD-File-System"
-                       projectFiles="true">
-          <itemPath>../../Microchip/MDD-File-System/FSIO.c</itemPath>
-          <itemPath>../../Microchip/MDD-File-System/SD-SPI.c</itemPath>
-        </logicalFolder>
-        <logicalFolder name="USB" displayName="USB" projectFiles="true">
-          <logicalFolder name="CDC-Device-Driver"
-                         displayName="CDC-Device-Driver"
-                         projectFiles="true">
-            <itemPath>../../Microchip/USB/CDC-Device-Driver/usb_function_cdc.c</itemPath>
-          </logicalFolder>
-          <logicalFolder name="MSD-Device-Driver"
-                         displayName="MSD-Device-Driver"
-                         projectFiles="true">
-            <itemPath>../../Microchip/USB/MSD-Device-Driver/usb_function_msd.c</itemPath>
-          </logicalFolder>
-          <itemPath>../../Microchip/USB/usb_device.c</itemPath>
-          <itemPath>../../Microchip/USB/usb_hal_dspic33e.c</itemPath>
-        </logicalFolder>
-      </logicalFolder>
       <logicalFolder name="RollPitchYaw"
                      displayName="RollPitchYaw"
                      projectFiles="true">
@@ -244,7 +184,6 @@
     <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
     <Elem>../../Config</Elem>
-    <Elem>../Config</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -297,7 +236,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../RollPitchYaw/Config;../../;../../Microchip;../../Microchip/Include;../../libVectorMatrix"/>
+                  value="../../RollPitchYaw/Config;../../libVectorMatrix"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -317,7 +256,7 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="AUAV3"/>
+        <property key="preprocessor-macros" value="AUAV3=1;"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
@@ -403,108 +342,6 @@
         <property key="relaxed-math" value="false"/>
         <property key="save-temps" value="false"/>
       </C30Global>
-      <PICkit3PlatformTool>
-        <property key="ADC 1" value="true"/>
-        <property key="ADC 2" value="true"/>
-        <property key="AutoSelectMemRanges" value="auto"/>
-        <property key="COMPARATOR" value="true"/>
-        <property key="CRC" value="true"/>
-        <property key="DCI" value="true"/>
-        <property key="Freeze All Other Peripherals" value="true"/>
-        <property key="I2C1" value="true"/>
-        <property key="I2C2" value="true"/>
-        <property key="INPUT CAPTURE 1" value="true"/>
-        <property key="INPUT CAPTURE 10" value="true"/>
-        <property key="INPUT CAPTURE 11" value="true"/>
-        <property key="INPUT CAPTURE 12" value="true"/>
-        <property key="INPUT CAPTURE 13" value="true"/>
-        <property key="INPUT CAPTURE 14" value="true"/>
-        <property key="INPUT CAPTURE 15" value="true"/>
-        <property key="INPUT CAPTURE 16" value="true"/>
-        <property key="INPUT CAPTURE 2" value="true"/>
-        <property key="INPUT CAPTURE 3" value="true"/>
-        <property key="INPUT CAPTURE 4" value="true"/>
-        <property key="INPUT CAPTURE 5" value="true"/>
-        <property key="INPUT CAPTURE 6" value="true"/>
-        <property key="INPUT CAPTURE 7" value="true"/>
-        <property key="INPUT CAPTURE 8" value="true"/>
-        <property key="INPUT CAPTURE 9" value="true"/>
-        <property key="OUTPUT COMPARE 1" value="true"/>
-        <property key="OUTPUT COMPARE 10" value="true"/>
-        <property key="OUTPUT COMPARE 11" value="true"/>
-        <property key="OUTPUT COMPARE 12" value="true"/>
-        <property key="OUTPUT COMPARE 13" value="true"/>
-        <property key="OUTPUT COMPARE 14" value="true"/>
-        <property key="OUTPUT COMPARE 15" value="true"/>
-        <property key="OUTPUT COMPARE 16" value="true"/>
-        <property key="OUTPUT COMPARE 2" value="true"/>
-        <property key="OUTPUT COMPARE 3" value="true"/>
-        <property key="OUTPUT COMPARE 4" value="true"/>
-        <property key="OUTPUT COMPARE 5" value="true"/>
-        <property key="OUTPUT COMPARE 6" value="true"/>
-        <property key="OUTPUT COMPARE 7" value="true"/>
-        <property key="OUTPUT COMPARE 8" value="true"/>
-        <property key="OUTPUT COMPARE 9" value="true"/>
-        <property key="PARALLEL MASTER/SLAVE PORT" value="true"/>
-        <property key="PWM" value="true"/>
-        <property key="REAL TIME CLOCK AND CALENDAR" value="true"/>
-        <property key="SPI 1" value="true"/>
-        <property key="SPI 2" value="true"/>
-        <property key="SPI 3" value="true"/>
-        <property key="SPI 4" value="true"/>
-        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
-        <property key="TIMER1" value="true"/>
-        <property key="TIMER2" value="true"/>
-        <property key="TIMER3" value="true"/>
-        <property key="TIMER4" value="true"/>
-        <property key="TIMER5" value="true"/>
-        <property key="TIMER6" value="true"/>
-        <property key="TIMER7" value="true"/>
-        <property key="TIMER8" value="true"/>
-        <property key="TIMER9" value="true"/>
-        <property key="ToolFirmwareFilePath"
-                  value="Press to browse for a specific firmware version"/>
-        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
-        <property key="UART 1" value="true"/>
-        <property key="UART 2" value="true"/>
-        <property key="UART 3" value="true"/>
-        <property key="UART 4" value="true"/>
-        <property key="USB" value="true"/>
-        <property key="hwtoolclock.frcindebug" value="false"/>
-        <property key="memories.aux" value="false"/>
-        <property key="memories.bootflash" value="true"/>
-        <property key="memories.configurationmemory" value="true"/>
-        <property key="memories.configurationmemory2" value="true"/>
-        <property key="memories.dataflash" value="true"/>
-        <property key="memories.eeprom" value="true"/>
-        <property key="memories.flashdata" value="true"/>
-        <property key="memories.id" value="true"/>
-        <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.end" value="0x557ff"/>
-        <property key="memories.programmemory.partition2" value="true"/>
-        <property key="memories.programmemory.partition2.end"
-                  value="${memories.programmemory.partition2.end.value}"/>
-        <property key="memories.programmemory.partition2.start"
-                  value="${memories.programmemory.partition2.start.value}"/>
-        <property key="memories.programmemory.start" value="0x0"/>
-        <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmertogo.imagename" value=""/>
-        <property key="programoptions.donoteraseauxmem" value="false"/>
-        <property key="programoptions.eraseb4program" value="true"/>
-        <property key="programoptions.pgmspeed" value="2"/>
-        <property key="programoptions.preservedataflash" value="false"/>
-        <property key="programoptions.preserveeeprom" value="false"/>
-        <property key="programoptions.preserveprogramrange" value="false"/>
-        <property key="programoptions.preserveprogramrange.end" value="0x557ff"/>
-        <property key="programoptions.preserveprogramrange.start" value="0x0"/>
-        <property key="programoptions.preserveuserid" value="false"/>
-        <property key="programoptions.programcalmem" value="false"/>
-        <property key="programoptions.programuserotp" value="false"/>
-        <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
-        <property key="programoptions.usehighvoltageonmclr" value="false"/>
-        <property key="programoptions.uselvpprogramming" value="false"/>
-        <property key="voltagevalue" value="3.25"/>
-      </PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>

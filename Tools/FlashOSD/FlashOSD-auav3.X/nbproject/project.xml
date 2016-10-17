@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>FlashOSD-auav3</name>
+            <name>FlashOSD-AUAV3</name>
             <creation-uuid>
       b6924440-1a7d-493e-bb23-138d5b6f93ab</creation-uuid>
             <make-project-type>0</make-project-type>
@@ -11,7 +11,7 @@
             <cpp-extensions/>
             <header-extensions>h</header-extensions>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
-            <asminc-extensions/>
+            <asminc-extensions>inc</asminc-extensions>
             <make-dep-projects/>
         </data>
     </configuration>
