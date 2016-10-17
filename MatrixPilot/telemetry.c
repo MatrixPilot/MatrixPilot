@@ -586,13 +586,13 @@ void telemetry_output_8hz(void)
 	switch (telemetry_counter)
 	{
 		case 13:
-			serial_output("F22:Sensors=%i,%i,%i,%i,%i,%i\n",
+			serial_output("F22:Sensors=%i,%i,%i,%i,%i,%i\r\n",
 				UDB_XACCEL.value, UDB_YACCEL.value,
 				UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))),
 				udb_xrate.value, udb_yrate.value, udb_zrate.value);
 			break;
 		case 12: 
-			serial_output("F21:Offsets=%i,%i,%i,%i,%i,%i\n",
+			serial_output("F21:Offsets=%i,%i,%i,%i,%i,%i\r\n",
 				UDB_XACCEL.offset, UDB_YACCEL.offset, UDB_ZACCEL.offset,
 				udb_xrate.offset, udb_yrate.offset, udb_zrate.offset);
 			break;
@@ -714,9 +714,12 @@ void telemetry_output_8hz(void)
 					    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
 					    state_flags.WW, osc_fail_count,
 					    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z, aero_force[0], aero_force[1], aero_force[2]);
-//					serial_output("tmp%i:prs%li:alt%li:",
-//					    get_barometer_temperature(), get_barometer_pressure(), 
-//					    get_barometer_altitude());
+#if (USE_BAROMETER_ALTITUDE == 1)
+					serial_output("tmp%i:prs%li:alt%li:",
+					    get_barometer_temperature(), get_barometer_pressure(), 
+					    get_barometer_altitude());
+#endif
+					
 					serial_output("bmv%i:mA%i:mAh%i:",
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 	                battery_voltage._.W1,
