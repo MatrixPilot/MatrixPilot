@@ -53,12 +53,11 @@ boolean mavlink_sue_telemetry_f2_a = true;
 int16_t pwIn_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1];
 int16_t pwOut_save[MAVLINK_SUE_CHANNEL_MAX_SIZE + 1];
 
-void MAVUDBExtraOutput_40hz(void)
+void MAVUDBExtraOutput(void)
 {
 	// SEND SERIAL_UDB_EXTRA (SUE) VIA MAVLINK FOR BACKWARDS COMPATIBILITY with FLAN.PYW (FLIGHT ANALYZER)
+	// SUE messages have important MatrixPilot specific information like cause of reboots e.g. power brownout.
 	// The MAVLink messages for this section of code are unique to MatrixPilot and are defined in matrixpilot.xml
-//	spread_transmission_load = 10;
-//	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_EXTRA1], mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
 	{
 		switch (mavlink_sue_telemetry_counter)
 		{

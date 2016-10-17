@@ -1061,7 +1061,7 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 10;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_EXTRA1], mavlink_counter_40hz + spread_transmission_load)) // SUE code historically ran at 8HZ
 	{
-		MAVUDBExtraOutput_40hz();
+		MAVUDBExtraOutput(); // Designed to be called at 8Hz.
 	}
 	// Send FORCE information
 	spread_transmission_load = 15;
