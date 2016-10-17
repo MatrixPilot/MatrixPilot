@@ -252,9 +252,11 @@ void MAVUDBExtraOutput(void)
 //					    locationErrorEarth[0], locationErrorEarth[1], locationErrorEarth[2],
 //					    state_flags.WW, osc_fail_count,
 //					    IMUvelocityx._.W1, IMUvelocityy._.W1, IMUvelocityz._.W1, goal.x, goal.y, goal.z, aero_force[0], aero_force[1], aero_force[2]);
+//#if (USE_BAROMETER_ALTITUDE == 1)
 //					serial_output("tmp%i:prs%li:alt%li:",
 //					    get_barometer_temperature(), get_barometer_pressure(), 
 //					    get_barometer_altitude());
+//#endif
 //					serial_output("bmv%i:mA%i:mAh%i:",
 //#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
 //	                battery_voltage._.W1,
