@@ -303,11 +303,16 @@
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_directory_ack.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_read_req.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_flexifunction_set.h</itemPath>
-            <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_force.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f13.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f14.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f15.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f16.h</itemPath>
+            <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f17.h</itemPath>
+            <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f18.h</itemPath>
+            <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f19.h</itemPath>
+            <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f20.h</itemPath>
+            <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f21.h</itemPath>
+            <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f22.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_a.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f2_b.h</itemPath>
             <itemPath>../../MAVLink/include/matrixpilot/mavlink_msg_serial_udb_extra_f4.h</itemPath>
