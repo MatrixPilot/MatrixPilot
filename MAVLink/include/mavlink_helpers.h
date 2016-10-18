@@ -10,6 +10,8 @@
 #define MAVLINK_HELPER
 #endif
 
+extern mavlink_status_t m_mavlink_status[MAVLINK_COMM_NUM_BUFFERS];
+
 /*
  * Internal function to give access to the channel status for each channel
  */
