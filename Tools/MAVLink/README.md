@@ -36,6 +36,9 @@ Submodules were initially used during development, but these proved
 problematic, and so this simpler scheme has been adopted, 
 as the mavlink generator is only updated once per year.
 
+I enclose an example of running mavproxy for Matrixpilot on MacOS:-
+python mavproxy.py --dialect=matrixpilot --baudrate=57600 --mav10 --master=/dev/tty.usbserial-AH00LQ6J 
+
 Peter Hollands 
 October 2016
 
