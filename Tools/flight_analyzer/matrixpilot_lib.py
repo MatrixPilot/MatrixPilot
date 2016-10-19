@@ -89,6 +89,7 @@ class raw_mavlink_telemetry_file:
                       self.msg.get_type() == 'SERIAL_UDB_EXTRA_F21':
                             #print self.msg.get_seq(),"DEBUG: ", self.msg.get_type()
                             return self.msg
+
                 else :
                         #print "Ignoring non SUE MAVLink message", self.msg.get_type()
                         pass
@@ -241,9 +242,9 @@ class base_telemetry :
         self.location_error_earth_y = 0
         self.location_error_earth_z = 0
         
-        self.feed_forward = 0
-        self.navigation_max_earth_vertical_axis_rotation_rate = 0
-        self.fly_by_wire_max_earth_vertical_axis_rotation_rate = 0
+        self.feed_forward = 0.0
+        self.navigation_max_earth_vertical_axis_rotation_rate = 0.0
+        self.fly_by_wire_max_earth_vertical_axis_rotation_rate = 0.0
         self.angle_of_attack_normal = 0
         self.angle_of_attack_inverted = 0
         self.elevator_trim_normal = 0
@@ -2220,35 +2221,39 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
                 if last_F2_A_message is None  :
                     continue
                 if ( last_F2_A_message.sue_time <= msg.sue_time ):
-                    print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i" \
-                     ":i%i:c%u:s%i:cpu%u:bmv%i:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:" % \
-                      ( last_F2_A_message.sue_time, bstr( last_F2_A_message.sue_status ), \
-                        last_F2_A_message.sue_latitude, last_F2_A_message.sue_longitude, \
-                        last_F2_A_message.sue_altitude, last_F2_A_message.sue_waypoint_index,  \
+                    print >> f, "F2:T%li:S%s:N%li:E%li:A%li:W%i:a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i"               \
+                     ":i%i:c%u:s%i:cpu%u:as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:"                    \
+                     "p1i%i:p2i%i:p3i%i:p4i%i:p5i%i:p6i%i:p7i%i:p8i%i:p9i%i:p10i%i:"                           \
+                     "p1o%i:p2o%i:p3o%i:p4o%i:p5o%i:p6o%i:p7o%i:p8o%i:p9o%i:p10o%i:"                           \
+                     "imx%i:imy%i:imz%i:lex%i:ley%i:lez%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:"                \
+                     "AF%i,%i,%i:tmp%i:prs%i:alt%i:bmv%i:mA%i:mAh%i:DH%i:stk%d:\r\n" %                        \
+                      ( last_F2_A_message.sue_time, bstr( last_F2_A_message.sue_status ),                      \
+                        last_F2_A_message.sue_latitude, last_F2_A_message.sue_longitude,                       \
+                        last_F2_A_message.sue_altitude, last_F2_A_message.sue_waypoint_index,                  \
                         last_F2_A_message.sue_rmat0, last_F2_A_message.sue_rmat1, last_F2_A_message.sue_rmat2, \
                         last_F2_A_message.sue_rmat3, last_F2_A_message.sue_rmat4, last_F2_A_message.sue_rmat5, \
                         last_F2_A_message.sue_rmat6, last_F2_A_message.sue_rmat7, last_F2_A_message.sue_rmat8, \
                         last_F2_A_message.sue_cog, last_F2_A_message.sue_sog, last_F2_A_message.sue_cpu_load,  \
-                        last_F2_A_message.sue_voltage_milis, last_F2_A_message.sue_air_speed_3DIMU,            \
+                        last_F2_A_message.sue_air_speed_3DIMU,                                                 \
                         last_F2_A_message.sue_estimated_wind_0, last_F2_A_message.sue_estimated_wind_1,        \
-                        last_F2_A_message.sue_estimated_wind_2, \
+                        last_F2_A_message.sue_estimated_wind_2,                                                \
                         last_F2_A_message.sue_magFieldEarth0, last_F2_A_message.sue_magFieldEarth1,            \
-                        last_F2_A_message.sue_magFieldEarth2, \
-                        last_F2_A_message.sue_svs, last_F2_A_message.sue_hdop ),
-                    sys.stdout.softspace=False # This stops a space being inserted between print statements
-                    print >> f, "p1i%i:p2i%i:p3i%i:p4i%i:p5i%i:p6i%i:p7i%i:p8i%i:p9i%i:p10i%i:" \
-                                "p1o%i:p2o%i:p3o%i:p4o%i:p5o%i:p6o%i:p7o%i:p8o%i:p9o%i:p10o%i:" \
-                                "imx%i:imy%i:imz%i:fgs%X:ofc%i:tx%i:ty%i:tz%i:G%d,%d,%d:stk%d:\r\n" % \
-                      ( msg.sue_pwm_input_1, msg.sue_pwm_input_2, msg.sue_pwm_input_3, msg.sue_pwm_input_4, msg.sue_pwm_input_5, \
+                        last_F2_A_message.sue_magFieldEarth2,                                                  \
+                        last_F2_A_message.sue_svs, last_F2_A_message.sue_hdop,
+                        msg.sue_pwm_input_1, msg.sue_pwm_input_2, msg.sue_pwm_input_3, msg.sue_pwm_input_4, msg.sue_pwm_input_5, \
                         msg.sue_pwm_input_6, msg.sue_pwm_input_7, msg.sue_pwm_input_8, msg.sue_pwm_input_9, msg.sue_pwm_input_10,\
                         msg.sue_pwm_output_1, msg.sue_pwm_output_2, msg.sue_pwm_output_3, \
                         msg.sue_pwm_output_4, msg.sue_pwm_output_5, msg.sue_pwm_output_6, \
                         msg.sue_pwm_output_7, msg.sue_pwm_output_8, msg.sue_pwm_output_9, \
                         msg.sue_pwm_output_10, msg.sue_imu_location_x, msg.sue_imu_location_y, msg.sue_imu_location_z,  \
-                        msg.sue_flags, msg.sue_osc_fails,                                         \
-                        msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,   \
-                        msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,\
-                        msg.sue_memory_stack_free ),
+                        msg.sue_location_error_earth_x, msg.sue_location_error_earth_y, msg.sue_location_error_earth_z,         \
+                        msg.sue_flags, msg.sue_osc_fails,                                           \
+                        msg.sue_imu_velocity_x, msg.sue_imu_velocity_y, msg.sue_imu_velocity_z,     \
+                        msg.sue_waypoint_goal_x, msg.sue_waypoint_goal_y, msg.sue_waypoint_goal_z,  \
+                        msg.sue_aero_x, msg.sue_aero_y, msg.sue_aero_z,                             \
+                        msg.sue_barom_temp, msg.sue_barom_press, msg.sue_barom_alt,                 \
+                        msg.sue_bat_volt, msg.sue_bat_amp, msg.sue_bat_amp_hours,                   \
+                        msg.sue_desired_height, msg.sue_memory_stack_free ),
                     last_F2_A_message.sue_time = msg.sue_time
             #except:
                 #pass
@@ -2284,17 +2289,85 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
             print >> f, "F13:week%i:origN%li:origE%li:origA%li:\r\n" % \
                   (msg.sue_week_no, msg.sue_lat_origin, msg.sue_lon_origin, msg.sue_alt_origin),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F14' :
-            print >> f, "\r\nF14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
+            print >> f, "F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"  \
                        "CLOCK=%i:FP=%d:\r\n" % \
                   ( msg.sue_WIND_ESTIMATION, msg.sue_GPS_TYPE, msg.sue_DR, msg.sue_BOARD_TYPE, \
                     msg.sue_AIRFRAME, msg.sue_RCON, msg.sue_TRAP_FLAGS, msg.sue_TRAP_SOURCE, \
                     msg.sue_osc_fail_count, msg.sue_CLOCK_CONFIG, msg.sue_FLIGHT_PLAN_TYPE ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
             print >> f, "F15:IDA=%s:IDB=%s:\r\n" % \
-                  ( msg.sue_ID_VEHICLE_MODEL_NAME, msg.sue_ID_VEHICLE_REGISTRATION ),
+                  ( convert_to_string(msg.sue_ID_VEHICLE_MODEL_NAME), \
+                    convert_to_string(msg.sue_ID_VEHICLE_REGISTRATION) ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
-            print >> f, "F16:IDC=%s:IDD=%s:\r\n" % \
-                  ( msg.sue_ID_LEAD_PILOT, msg.sue_ID_DIY_DRONES_URL ),
+            print >> f, "F16:IDC=%s:IDD=%s\r\n" % \
+                  ( convert_to_string(msg.sue_ID_LEAD_PILOT), \
+                    convert_to_string(msg.sue_ID_DIY_DRONES_URL) ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F17' :
+            print >> f, "F17:FD_FWD=%5.3f:TR=%5.3f:TR_FBW=%5.3f:\r\n" % \
+               ( msg.sue_feed_forward, msg.sue_turn_rate_nav, msg.sue_turn_rate_fbw ), ;
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F18' :
+            print >> f, "F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n" % \
+                ( msg.angle_of_attack_normal, msg.angle_of_attack_inverted, \
+                  msg.elevator_trim_normal, msg.elevator_trim_inverted,     \
+                  msg.reference_speed ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F19' :
+            print >> f, "F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n" % \
+                ( msg.sue_aileron_output_channel,  msg.sue_aileron_reversed,     \
+                  msg.sue_elevator_output_channel, msg.sue_elevator_reversed,    \
+                  msg.sue_throttle_output_channel, msg.sue_throttle_reversed,    \
+                  msg.sue_rudder_output_channel,   msg.sue_rudder_reversed ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F20' :
+            print >> f, "F20:NUM_IN=%i:TRIM=" % \
+                  msg.sue_number_of_inputs ,
+            f.softspace=False
+            if msg.sue_number_of_inputs <= 0 :
+                break
+            if msg.sue_number_of_inputs >= 1:
+                print >> f, "%i," % msg.sue_trim_value_input_1,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 2:
+                print >> f, "%i," % msg.sue_trim_value_input_2,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 3:
+                print >> f, "%i," % msg.sue_trim_value_input_3,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 4:
+                print >> f, "%i," % msg.sue_trim_value_input_4,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 5:
+                print >> f, "%i," % msg.sue_trim_value_input_5,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 6:
+                print >> f, "%i," % msg.sue_trim_value_input_6,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 7:
+                print >> f, "%i," % msg.sue_trim_value_input_7,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 8:
+                print >> f, "%i," % msg.sue_trim_value_input_8,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 9:
+                print >> f, "%i," % msg.sue_trim_value_input_9,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 10:
+                print >> f, "%i," % msg.sue_trim_value_input_10,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 11:
+                print >> f, "%i," % msg.sue_trim_value_input_11,
+                f.softspace=False
+            if msg.sue_number_of_inputs >= 12:
+                print >> f, "%i," % msg.sue_trim_value_input_12,
+                f.softspace=False
+            print >> f, ""
+                
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F21' :
+            print >> f,"F21:Offsets=%i,%i,%i,%i,%i,%i\r\n" % \
+                ( msg.sue_accel_x_offset, msg.sue_accel_y_offset, msg.sue_accel_z_offset, \
+                  msg.sue_gyro_x_offset, msg.sue_gyro_y_offset, msg.sue_gyro_z_offset ),
+        elif msg.get_type() == 'SERIAL_UDB_EXTRA_F22' :
+             print >> f, "F22:Sensors=%i,%i,%i,%i,%i,%i\r\n" % \
+                ( msg.sue_accel_x_at_calibration, msg.sue_accel_y_at_calibration, msg.sue_accel_z_at_calibration, \
+                  msg.sue_gyro_x_at_calibration , msg.sue_gyro_y_at_calibration, msg.sue_gyro_z_at_calibration ),
         else :
             pass
  
