@@ -462,14 +462,14 @@ class mavlink_telemetry(base_telemetry):
             return("F14")
         
         elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F15' :
-            self.id_vehicle_model_name = telemetry_file.msg.sue_ID_VEHICLE_MODEL_NAME
-            self.id_vehicle_registration = telemetry_file.msg.sue_ID_VEHICLE_REGISTRATION
+            self.id_vehicle_model_name = convert_to_string(telemetry_file.msg.sue_ID_VEHICLE_MODEL_NAME)
+            self.id_vehicle_registration = convert_to_string(telemetry_file.msg.sue_ID_VEHICLE_REGISTRATION)
 
             return("F15")
         
         elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
-            self.id_lead_pilot = telemetry_file.msg.sue_ID_LEAD_PILOT
-            self.id_diy_drones_url = telemetry_file.msg.sue_ID_DIY_DRONES_URL
+            self.id_lead_pilot = convert_to_string(telemetry_file.msg.sue_ID_LEAD_PILOT)
+            self.id_diy_drones_url = convert_to_string(telemetry_file.msg.sue_ID_DIY_DRONES_URL)
 
             return("F16")
 
@@ -530,6 +530,14 @@ class mavlink_telemetry(base_telemetry):
             err_message = "Warn:" + telemetry_file.msg.get_type()
             return(err_message)
 
+def convert_to_string(myarray):
+    k = ''
+    for j in myarray:
+        if j == 0 :
+            break;
+        k = k + chr(j)
+    return(k)
+        
 class ascii_telemetry(base_telemetry):
     """Parse a variety of historical ascii telemetry formats"""
     def parse(self,line,line_no, max_tm_actual) :
