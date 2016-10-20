@@ -9,7 +9,7 @@ Released under GNU GPL version 3 or later
 
 import os, sys, glob, re
 from shutil import copy
-from generator.mavgen import mavgen 
+from pymavlink.generator.mavgen import mavgen 
 
 # allow import from the parent directory, where mavutil.py is
 # Under Windows, this script must be run from a DOS command window 

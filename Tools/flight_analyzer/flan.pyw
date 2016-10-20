@@ -2149,7 +2149,7 @@ def create_log_book(options) :
             log_book.yawkd_aileron = log.yawkd_aileron
             log_book.rollkp = log.rollkp
             log_book.rollkd = log.rollkd
-            log_book.aileron_boost = log.aileron_boost
+            log_book.aileron_boost = 0 # no longer used from Oct 2016
             log_book.F5 = "Recorded"
         elif log.log_format == "F6" : # We have a type of options.h line
             log_book.pitchgain = log.pitchgain

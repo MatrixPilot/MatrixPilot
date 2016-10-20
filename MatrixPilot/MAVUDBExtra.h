@@ -23,7 +23,7 @@
 #define MAVUDBEXTRA_H
 
 
-void MAVUDBExtraOutput_40hz(void);
+void MAVUDBExtraOutput(void);
 
 
 #endif // MAVUDBEXTRA_H
