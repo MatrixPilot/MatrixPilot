@@ -24,7 +24,19 @@
 //
 
 #ifndef USE_MAVLINK
+//#define USE_MAVLINK                         1          //the intended new method for configuring Mavlink
+//#define MAVLINK_BAUD                        57600      //the intended new method for configuring Mavlink
+#endif
+
+#ifndef USE_MAVLINK
+#if (SERIAL_OUTPUT_FORMAT == SERIAL_MAVLINK)             //support the current method for configuring Mavlink
 #define USE_MAVLINK                         1
+#endif
+#endif
+
+#ifndef USE_MAVLINK
+#define USE_MAVLINK                         0
+#define MAVLINK_BAUD                        0
 #endif
 
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft

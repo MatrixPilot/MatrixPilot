@@ -64,7 +64,9 @@
 //    AIRFRAME_QUAD             Under development
 //    AIRFRAME_GLIDER           Under development. Elevator, Flaps, Ailerons and/or Rudder control, motor optional 
 // (Note that although AIRFRAME_HELI is also recognized, the code for this airframe type is not ready.)
+#ifndef AIRFRAME_TYPE
 #define AIRFRAME_TYPE                       AIRFRAME_STANDARD
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,19 +142,25 @@
 
 // Camera Stabilization
 // Set this value to 1, for camera to be stabilized using camera options further below.
+#ifndef USE_CAMERA_STABILIZATION
 #define USE_CAMERA_STABILIZATION            0
+#endif
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
 // If you select this option, you also need to set magnetometer options in
 // the options_magnetometer.h file, including declination and magnetometer type.
+#ifndef MAG_YAW_DRIFT
 #define MAG_YAW_DRIFT                       1
+#endif
 
 // Define USE_BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // If you select this option, you also need to correctly set the LAUNCH_ALTITUDE
 // to your takeoff location altitude at the time of initialisation.
-#define USE_BAROMETER_ALTITUDE                  0
+#ifndef USE_BAROMETER_ALTITUDE
+#define USE_BAROMETER_ALTITUDE              0
+#endif
 
 // Set your takeoff/launch/initialisation altitude in meters.
 #define LAUNCH_ALTITUDE                     300
@@ -346,8 +354,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION, SERIAL_UDB,
-// SERIAL_UDB_EXTRA,SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, or SERIAL_UDB_MAG)
+// Serial Output Format (Can be SERIAL_NONE, SERIAL_DEBUG, SERIAL_ARDUSTATION,
+// SERIAL_UDB_EXTRA, SERIAL_MAVLINK, SERIAL_CAM_TRACK, SERIAL_OSD_REMZIBI, SERIAL_MAGNETOMETER)
 // This determines the format of the output sent out the spare serial port.
 // Note that SERIAL_OSD_REMZIBI only works with a ublox GPS.
 // SERIAL_UDB_EXTRA will add additional telemetry fields to those of SERIAL_UDB.
@@ -355,10 +363,13 @@
 // SERIAL_UDB_EXTRA may result in dropped characters if used with the XBEE wireless transmitter.
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
-// SERIAL_UDB_MAG outputs the automatically calculated offsets and raw magnetometer data.
+// SERIAL_MAGNETOMETER outputs the automatically calculated offsets and raw magnetometer data.
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
+#ifndef SERIAL_OUTPUT_FORMAT
 #define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
@@ -697,7 +708,9 @@
 // See the MatrixPilot wiki for more info on using HILSIM.
 // HILSIM_BAUD is the serial speed for communications with the X-Plane plugin.  Default is
 // now 38400.  Make sure the X-Plane plugin's Setup file has its speed set to match.
+#ifndef HILSIM
 #define HILSIM                              0
+#endif
 #define HILSIM_USB                          0           // AUAV3 only (under development)
 #define HILSIM_BAUD                         38400
 
@@ -709,7 +722,9 @@
 // Set this to either FP_WAYPOINTS or FP_LOGO
 // The Waypoint definitions and options are located in the flightplan-waypoints.h file.
 // The Logo flight plan definitions and options are located in the flightplan-logo.h file.
+#ifndef FLIGHT_PLAN_TYPE
 #define FLIGHT_PLAN_TYPE                    FP_WAYPOINTS
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Waypoint handling
@@ -814,8 +829,10 @@
 // CONSOLE_UART 3 and 4 options are only available with the AUAV3 board.
 // Thus UDB4/5 options are 0, 1, or 2  AUAV3 options are 0, 3, or 4
 // Set to 9 in order to use the USB for the console connection (under development)
+#ifndef CONSOLE_UART
 #define CONSOLE_UART                        1
 //#define CONSOLE_UART                        6
+#endif
 
 // Define USE_DEBUG_IO to enable DPRINT macro to call printf(..)
 #define USE_DEBUG_IO

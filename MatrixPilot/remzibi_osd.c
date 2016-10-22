@@ -217,7 +217,7 @@ static void update_coords(void)
 	toGoal.y = 0 - IMUlocationy._.W1;
 
 	dist_to_home = toGoal.x;
-	dist_to_goal;
+	//dist_to_goal;
 
 	if (state_flags._.GPS_steering)
 	{

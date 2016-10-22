@@ -50,10 +50,10 @@ typedef void (*DS_callbackFunc)(boolean);
 
 // A constant preamble used to determine the start of a data block
 // This also allows the data to be found if the FAT is broken
-extern const uint8_t data_storage_preamble[DATA_PREAMBLE_SIZE];
+//extern const uint8_t data_storage_preamble[DATA_PREAMBLE_SIZE];
 
 // A constant preamble used to determine the start of the data storage table
-extern const uint8_t table_storage_preamble[DATA_PREAMBLE_SIZE];
+//extern const uint8_t table_storage_preamble[DATA_PREAMBLE_SIZE];
 
 // Data storage types defines the way in which the storage area works
 //

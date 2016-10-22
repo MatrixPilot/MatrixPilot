@@ -81,6 +81,10 @@
 #include <stdarg.h>
 #include <math.h>
 
+#if (USE_NV_MEMORY == 1)
+#include "parameter_datatypes.h"
+#include "data_services.h"
+#endif
 
 #if (MAVLINK_TEST_ENCODE_DECODE == 1)
 mavlink_message_t last_msg;
@@ -478,7 +482,7 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 						break;
 				}
 				break;
-#endif // (USE_NV_MEMORY == 1)
+#else
 			case 245: // MAV_CMD_PREFLIGHT_STORAGE:
 				switch ((uint16_t)packet.param1)
 				{
@@ -495,6 +499,7 @@ void MAVLinkCommandLong(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_COMMAND
 						break;
 				}
 				break;
+#endif // (USE_NV_MEMORY == 1)
 			case 246: // halt
 				DPRINT("Halt - packet.command %u\r\n", packet.command);
 				break;
