@@ -21,6 +21,7 @@
 #include "defines.h"
 #include "states.h"
 #include "cameraCntrl.h"
+#include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/rmat.h"
 

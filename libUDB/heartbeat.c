@@ -35,6 +35,8 @@
 #endif
 #if (USE_NV_MEMORY == 1)
 #include "NV_memory.h"
+#include "../MatrixPilot/data_services.h"
+#include "../MatrixPilot/data_storage.h"
 #endif
 
 int one_hertz_flag = 0;

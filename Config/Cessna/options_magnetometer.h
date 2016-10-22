@@ -271,5 +271,3 @@
 
 // The following line computes an internal parameter, do not change it.
 #define DECLINATIONANGLE ((int16_t)(MAGNETICDECLINATION *(32767.0 / 180.0)))
-
-

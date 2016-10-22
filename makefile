@@ -180,30 +180,21 @@ vpath %.sm $(SOURCE_DIR)
 objects = $(call source-to-object,$(sources))
 dependencies = $(subst .o,.d,$(objects))
 
-$(warning *******************************************************************************)
-$(warning Building $(TARGET))
-
-$(warning modules: $(subst $(SOURCE_DIR)/,,$(modules)))
-
 all: 
 include $(addsuffix /module.mk,$(modules))
 #include $(patsubst %,$(SOURCE_DIR)/%/module.mk,$(modules))
-
-$(warning library: $(subst $(SOURCE_DIR)/,,$(libraries)))
-
-#$(warning incpath: $(incpath))
 #INCPATH += $(incpath)
-$(warning INCPATH: $(INCPATH))
 INCLUDES += $(addprefix -I,$(INCPATH))
-#$(warning INCLUDES: $(subst -I$(SOURCE_DIR)/,,$(INCLUDES)))
-#$(warning INCLUDES: $(INCLUDES))
-#$(warning objects = $(objects))
-
-#DEFINES += $(addprefix -D,$(DEVICE)=1 $(defines))
 DEFINES += $(addprefix -D,$(DEVICE)=1 $(DEFS) $(defines))
-$(warning DEFINES: $(subst -D,,$(DEFINES)))
 
-#$(warning *******************************************************************************)
+ifneq ($(MAKE_RESTARTS),1)
+$(warning *******************************************************************************)
+$(warning Building $(TARGET))
+$(warning modules: $(subst $(SOURCE_DIR)/,,$(modules)))
+$(warning library: $(subst $(SOURCE_DIR)/,,$(libraries)))
+$(warning INCPATH: $(subst $(SOURCE_DIR)/,,$(INCPATH)))
+$(warning DEFINES: $(subst -D,,$(DEFINES)))
+endif
 
 ################################################################################
 # Mirror the source tree structure into the build target directory
@@ -224,6 +215,10 @@ all: $(TARGET)
 
 .PHONY: libraries
 libraries: $(libraries)
+
+.SECONDARY: $(TARGET_NAME).cof
+.SECONDARY: $(TARGET_NAME).elf
+.SECONDARY: $(TARGET_NAME).bin
 
 #.PHONY : clean clean_with_libs
 .PHONY: clean
@@ -277,42 +272,39 @@ endif
 ################################################################################
 # Library generation rules (note: seems to work without them)
 
-#%.a: %.o
-#	$(Q) $(AR) -ru $@ $<
-
-#%.a: $(objects)
-#	$(AR) -ru $@ $(objects)
+%.a: %.o
+	$(Q) $(AR) -ru $@ $<
 
 ################################################################################
 # Windows and *nix target rules
 
 %.exe: $(objects) $(libraries)
-	$(CC) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
+	$(Q) $(CC) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
 
 %.out: %.exe
-	mv $< $@
+	$(Q) mv $< $@
 
 ################################################################################
 # Microchip build tools rules
 
 %.cof: $(objects) $(libraries)
-	$(CC) $(TARGET_ARCH) -o $@ $(objects) $(libraries) $(LFLAGS) $(LIBS)
+	$(Q) $(CC) $(TARGET_ARCH) -o $@ $(objects) $(libraries) $(LFLAGS) $(LIBS)
 
 %.hex: %.cof
 	$(Q) $(BIN2HEX) $<
 
 %.elf: $(objects) $(libraries)
-	$(CC) $(TARGET_ARCH) $(objects) $(LFLAGS) $(libraries) $(LIBS) -o $@
+	$(Q) $(CC) $(TARGET_ARCH) $(objects) $(LFLAGS) $(libraries) $(LIBS) -o $@
 
 %.bin: %.elf
-	$(OBJCOPY) -O binary $< $@
+	$(Q) $(OBJCOPY) -O binary $< $@
 
 ################################################################################
 # PixHawk project PX4 loader image generation rules
 
 %.px4: %.bin
-	$(MKFW) --prototype $(SOURCE_DIR)/libSTM/target.prototype --image $< --outfile $@
-	sleep 3
+	$(Q) $(MKFW) --prototype $(SOURCE_DIR)/libSTM/target.prototype --image $< --outfile $@
+	$(Q) sleep 1
 
 ################################################################################
 # State Machine Compiler (SMC) rules

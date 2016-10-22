@@ -74,7 +74,7 @@ static void update_coords(void)
 	struct relative2D toGoal;
 	toGoal.x = 0 - IMUlocationx._.W1;
 	toGoal.y = 0 - IMUlocationy._.W1;
-	int16_t dist_to_home = toGoal.x;
+	//int16_t dist_to_home = toGoal.x;
 	int16_t gps_fix_type;
 	if (gps_nav_valid())
 		gps_fix_type = 3;
