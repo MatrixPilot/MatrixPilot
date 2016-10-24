@@ -1925,6 +1925,21 @@ class ascii_telemetry(base_telemetry):
             for match in re.finditer('([0-9]*?),',line):
                 self.channel_trim_values.append(int(match.group(1)))
             return "F20"
+
+
+       #################################################################
+        # Try Another format of telemetry
+        match = re.match("^F21:",line) # If line starts with F21
+        if match :
+            pass  # Not using this telemetry yet
+            return "F21"
+
+         #################################################################
+        # Try Another format of telemetry
+        match = re.match("^F22:",line) # If line starts with F22
+        if match :
+            pass  # Not using this telemetry yet
+            return "F22"
         
         #################################################################
         # Try Another format of telemetry

@@ -1914,6 +1914,7 @@ class origin() :
 class flight_log_book:
     def __init__(self) :
         self.entries = [] # an empty list of entries  at the beginning.
+        self.F2 = "Empty"
         self.F4 = "Empty"
         self.F5 = "Empty"
         self.F6 = "Empty"
@@ -1928,6 +1929,8 @@ class flight_log_book:
         self.F18 = "Empty"
         self.F19 = "Empty"
         self.F20 = "Empty"
+        self.F21 = "Empty"
+        self.F22 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
@@ -2224,6 +2227,10 @@ def create_log_book(options) :
             log_book.number_of_input_channels = log.number_of_input_channels
             log_book.channel_trim_values = log.channel_trim_values
             log_book.F20 = "Recorded"
+        elif log.log_format == "F21" : # Number of Input Channels and Trim Values
+            pass # flan not yet using sensor offsets
+        elif log.log_format == "F22" : # Number of Input Channels and Trim Values
+            pass # flan not using sensor values measured at boot up time
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
