@@ -6,14 +6,14 @@
                    projectFiles="true">
       <logicalFolder name="Config" displayName="Config" projectFiles="true">
         <logicalFolder name="Cessna" displayName="Cessna" projectFiles="true">
-          <itemPath>../../Config/Cessna/airspeed_options.h</itemPath>
-          <itemPath>../../Config/Cessna/magnetometerOptions.h</itemPath>
-          <itemPath>../../Config/Cessna/mavlink_options.h</itemPath>
-          <itemPath>../../Config/Cessna/nv_memory_options.h</itemPath>
           <itemPath>../../Config/Cessna/options.h</itemPath>
+          <itemPath>../../Config/Cessna/options_airspeed.h</itemPath>
           <itemPath>../../Config/Cessna/options_auav3.h</itemPath>
-          <itemPath>../../Config/Cessna/osd_config.h</itemPath>
-          <itemPath>../../Config/Cessna/ports_config.h</itemPath>
+          <itemPath>../../Config/Cessna/options_magnetometer.h</itemPath>
+          <itemPath>../../Config/Cessna/options_mavlink.h</itemPath>
+          <itemPath>../../Config/Cessna/options_nv_memory.h</itemPath>
+          <itemPath>../../Config/Cessna/options_osd.h</itemPath>
+          <itemPath>../../Config/Cessna/options_ports.h</itemPath>
         </logicalFolder>
         <logicalFolder name="CloudsFly" displayName="CloudsFly" projectFiles="true">
           <itemPath>../../Config/CloudsFly/options.h</itemPath>
