@@ -1914,6 +1914,7 @@ class origin() :
 class flight_log_book:
     def __init__(self) :
         self.entries = [] # an empty list of entries  at the beginning.
+        self.F2 = "Empty"
         self.F4 = "Empty"
         self.F5 = "Empty"
         self.F6 = "Empty"
@@ -1928,6 +1929,8 @@ class flight_log_book:
         self.F18 = "Empty"
         self.F19 = "Empty"
         self.F20 = "Empty"
+        self.F21 = "Empty"
+        self.F22 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
@@ -2029,16 +2032,21 @@ def create_telemetry_kmz(options,log_book):
     flight_origin.relocate_init() # This calculation must occur after origin has been calculated
     calculate_headings_pitch_roll(log_book, flight_origin, options)
     write_document_preamble(log_book,f_pos,telemetry_filename)
-    if (options.waypoint_selector == 1):
-        find_waypoint_start_and_end_times(log_book)
-        create_flown_waypoint_kml_using_waypoint_file(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
-    else :
-        # Check whether waypoint information is embedded in every line (later versions of MatrixPilot)
-        if log_book.waypoints_in_telemetry == True and \
-               log_book.F14 == "Recorded": # Check we received F14 telemetry before checking flight_plan_type
-            if log_book.flight_plan_type == 2 : # Logo waypoint flight plan
-                print "Processing Waypoint locations that are embedded in telemetry stream"
-                create_flown_waypoint_kml_using_telemetry(flight_origin,f_pos,flight_clock,log_book)
+    if log_book.waypoints_in_telemetry == True and \
+           log_book.F14 == "Recorded": # Check we received F14 telemetry before checking flight_plan_type
+        if log_book.flight_plan_type == 2 : # Logo waypoint flight plan
+            print "Processing Waypoint locations that are embedded in telemetry stream"
+            create_flown_waypoint_kml_using_telemetry(flight_origin,f_pos,flight_clock,log_book)
+            if (options.waypoint_selector == 1):
+                 showinfo(title = "Logo Waypoints embedded in teleemtry stream", message = \
+                          "There is no need to select a flightplan-waypoints.h file, or a "+
+                          "flightpan-logo.h file, when using Logo. This is because logo waypoints "+
+                          "are embedded in the actual telemetry stream when using Logo" )
+    elif  (options.waypoint_selector == 1):
+       find_waypoint_start_and_end_times(log_book)
+       print "Processing Waypoint locations from flightplan-waypoints.h file"
+       create_flown_waypoint_kml_using_waypoint_file(waypoint_filename,flight_origin,f_pos,flight_clock,log_book)
+        
     if log_book.primary_locator == GPS:
         print "Using GPS data for plotting waypoint routes"
     elif log_book.primary_locator == IMU :
@@ -2224,6 +2232,10 @@ def create_log_book(options) :
             log_book.number_of_input_channels = log.number_of_input_channels
             log_book.channel_trim_values = log.channel_trim_values
             log_book.F20 = "Recorded"
+        elif log.log_format == "F21" : # Number of Input Channels and Trim Values
+            pass # flan not yet using sensor offsets
+        elif log.log_format == "F22" : # Number of Input Channels and Trim Values
+            pass # flan not using sensor values measured at boot up time
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch

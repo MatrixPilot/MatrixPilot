@@ -1925,6 +1925,21 @@ class ascii_telemetry(base_telemetry):
             for match in re.finditer('([0-9]*?),',line):
                 self.channel_trim_values.append(int(match.group(1)))
             return "F20"
+
+
+       #################################################################
+        # Try Another format of telemetry
+        match = re.match("^F21:",line) # If line starts with F21
+        if match :
+            pass  # Not using this telemetry yet
+            return "F21"
+
+         #################################################################
+        # Try Another format of telemetry
+        match = re.match("^F22:",line) # If line starts with F22
+        if match :
+            pass  # Not using this telemetry yet
+            return "F22"
         
         #################################################################
         # Try Another format of telemetry
@@ -2299,11 +2314,11 @@ def write_mavlink_to_serial_udb_extra(telemetry_filename, serial_udb_extra_filen
                   ( convert_to_string(msg.sue_ID_VEHICLE_MODEL_NAME), \
                     convert_to_string(msg.sue_ID_VEHICLE_REGISTRATION) ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F16' :
-            print >> f, "F16:IDC=%s:IDD=%s\r\n" % \
+            print >> f, "F16:IDC=%s:IDD=%s:\r\n" % \
                   ( convert_to_string(msg.sue_ID_LEAD_PILOT), \
                     convert_to_string(msg.sue_ID_DIY_DRONES_URL) ),
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F17' :
-            print >> f, "F17:FD_FWD=%5.3f:TR=%5.3f:TR_FBW=%5.3f:\r\n" % \
+            print >> f, "F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n" % \
                ( msg.sue_feed_forward, msg.sue_turn_rate_nav, msg.sue_turn_rate_fbw ), ;
         elif msg.get_type() == 'SERIAL_UDB_EXTRA_F18' :
             print >> f, "F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n" % \
