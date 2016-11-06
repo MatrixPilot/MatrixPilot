@@ -1,7 +1,8 @@
 CC       = gcc
 CFLAGS   = -pipe -Wall -W -O0 -DNIX=1
 INCPATH  = -I. -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
-LFLAGS   = -Wl
+#LFLAGS   = -Wl
+LFLAGS   =
 LIBS     = -lm
 RM_FILE  = rm -f
 

@@ -21,8 +21,119 @@
 
 #include "libDCM.h"
 #include "gpsParseCommon.h"
+#include "../libUDB/radioIn.h"
 #include "../libUDB/servoOut.h"
+#include "hilsim.h"
 
+
+#if (HILSIM == 1)
+
+int16_t hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
+{
+	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
+	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
+		printf("%s = %d%%\t\r", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
+	}
+	else {
+		printf("%s = %d%%\t\r", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
+	}
+	return udb_pwIn[inChannelIndex];
+}
+
+int16_t hilsim_input_adjust(char* inChannelName, int delta)
+{
+	int inChannelIndex = 0;
+
+	switch (inChannelName[0]) {
+	case 't':
+		return hil_rc_input_adjust(inChannelName, THROTTLE_INPUT_CHANNEL, delta);
+	case 'r':
+		return hil_rc_input_adjust(inChannelName, RUDDER_INPUT_CHANNEL, delta);
+	case 'e':
+		return hil_rc_input_adjust(inChannelName, ELEVATOR_INPUT_CHANNEL, delta);
+	case 'a':
+		return hil_rc_input_adjust(inChannelName, AILERON_INPUT_CHANNEL, delta);
+	case 'm':
+		{
+		switch (delta) {
+		case 1: // switch mode to manual
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
+			break;
+		case 2: // switch mode to stabilised
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
+			break;
+		case 3: // switch mode to guided
+			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
+			break;
+		case 4: // switch mode to failsafe
+			udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
+			break;
+		default:
+			break;
+		}
+		return udb_pwIn[MODE_SWITCH_INPUT_CHANNEL];
+		}
+	case 's': // centre the flight 'stick'
+		udb_pwIn[AILERON_INPUT_CHANNEL]  = udb_pwTrim[AILERON_INPUT_CHANNEL];
+		udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
+		udb_pwIn[RUDDER_INPUT_CHANNEL]   = udb_pwTrim[RUDDER_INPUT_CHANNEL];
+		printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
+		return 0;
+	default:
+		return 0;
+	}
+	return 0;
+}
+
+#define KEYPRESS_INPUT_DELTA 50
+
+void hilsim_handle_key_input(char c)
+{
+	switch (c) {
+		case 107: // Numpad +
+			hilsim_input_adjust("throttle", KEYPRESS_INPUT_DELTA*2);
+			break;
+		case 109: // Numpad -
+			hilsim_input_adjust("throttle", -KEYPRESS_INPUT_DELTA*2);
+			break;
+		case 97:  // Numpad 1
+			hilsim_input_adjust("rudder", KEYPRESS_INPUT_DELTA);
+			break;
+		case 99:  // Numpad 3
+			hilsim_input_adjust("rudder", -KEYPRESS_INPUT_DELTA);
+			break;
+		case 104: // Numpad 8
+			hilsim_input_adjust("elevator", KEYPRESS_INPUT_DELTA);
+			break;
+		case 98:  // Numpad 2
+			hilsim_input_adjust("elevator", -KEYPRESS_INPUT_DELTA);
+			break;
+		case 100: // Numpad 4
+			hilsim_input_adjust("aileron", KEYPRESS_INPUT_DELTA);
+			break;
+		case 102: // Numpad 6
+			hilsim_input_adjust("aileron", -KEYPRESS_INPUT_DELTA);
+			break;
+		case 101: // Numpad 5
+			hilsim_input_adjust("stick", 0);
+			break;
+		case 35:  // '1' Numpad End (switch mode to manual)
+			hilsim_input_adjust("mode", 1);
+			break;
+		case 111: // '2' Numpad / (switch mode to stabilised)
+			hilsim_input_adjust("mode", 2);
+			break;
+		case 106: // '3' Numpad * (switch mode to guided)
+			hilsim_input_adjust("mode", 3);
+			break;
+		case 36:  // '4' Numpad Home (switch mode to failsafe)
+			hilsim_input_adjust("mode", 4);
+			break;
+		default:
+			break;
+	}
+}
+#endif // (HILSIM == 1)
 
 #if (HILSIM == 1)
 #if (USE_VARIABLE_HILSIM_CHANNELS != 1)

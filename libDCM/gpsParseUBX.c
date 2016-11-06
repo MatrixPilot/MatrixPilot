@@ -23,11 +23,10 @@
 #include "gpsData.h"
 #include "gpsParseCommon.h"
 #include "../libUDB/serialIO.h"
-#include "../libUDB/servoOut.h"
 #include "../libUDB/magnetometer.h"
 #include "mag_drift.h"
 #include "rmat.h"
-
+#include "hilsim.h"
 
 #if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
 
@@ -916,70 +915,6 @@ void HILSIM_saturate(int16_t size, int16_t vector[3])
 		{
 			vector[index] = -RMAX;
 		}
-	}
-}
-
-void hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
-{
-	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
-	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
-		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
-	}
-	else {
-		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
-	}
-}
-
-#define KEYPRESS_INPUT_DELTA 50
-
-void hilsim_handle_key_input(char c)
-{
-	switch (c) {
-		case 107: // Numpad +
-			hil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA*2);
-			break;
-		case 109: // Numpad -
-			hil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA*2);
-			break;
-		case 97:  // Numpad 1
-			hil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
-			break;
-		case 99:  // Numpad 3
-			hil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
-			break;
-		case 104: // Numpad 8
-			hil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
-			break;
-		case 98:  // Numpad 2
-			hil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
-			break;
-		case 100: // Numpad 4
-			hil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
-			break;
-		case 102: // Numpad 6
-			hil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
-			break;
-		case 101: // Numpad 5
-			printf("\naileron, elevator, rudder = 0%%\n");
-			udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
-			udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
-			udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
-			printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
-			break;
-				case 35: // '1' Numpad End (switch mode to manual)
-			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
-			break;
-				case 111: // '2' Numpad / (switch mode to stabilised)
-			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
-			break;
-				case 106: // '3' Numpad * (switch mode to guided)
-			udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
-			break;
-				case 36: // '4' Numpad Home (switch mode to failsafe)
-			udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
-			break;
-		default:
-			break;
 	}
 }
 
