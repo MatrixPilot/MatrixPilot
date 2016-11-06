@@ -78,6 +78,7 @@ SED := sed
 #TEST := [
 space = $(empty) $(empty)
 comma := ,
+CPP := g++
 
 SMC = java -jar $(SOURCE_DIR)/Tools/Smc.jar
 ifeq ($(V),)
@@ -147,7 +148,8 @@ subdirectory = $(patsubst $(SOURCE_DIR)/%/module.mk,%, \
 
 # $(call source-to-object, source-file-list)
 source-to-object = $(subst $(SOURCE_DIR)/,,$(subst .c,.o,$(filter %.c,$1))) \
-                   $(subst $(SOURCE_DIR)/,,$(subst .s,.o,$(filter %.s,$1)))
+                   $(subst $(SOURCE_DIR)/,,$(subst .s,.o,$(filter %.s,$1))) \
+                   $(subst $(SOURCE_DIR)/,,$(subst .cpp,.o,$(filter %.cpp,$1)))
 
 # $(call make-library, library-name, source-file-list)
 define make-library
@@ -170,6 +172,7 @@ endef
 vpath %.c $(SOURCE_DIR)
 vpath %.s $(SOURCE_DIR)
 vpath %.h $(INCPATH)
+vpath %.cpp $(SOURCE_DIR)
 vpath %.inc $(INCPATH)
 vpath %.dot $(SOURCE_DIR)
 vpath %.sm $(SOURCE_DIR)
@@ -253,6 +256,8 @@ endif
 ################################################################################
 # Dependency and Object generation rules
 
+# With the GNU C compiler, you may wish to use the ‘-MM’ flag instead of ‘-M’. This omits prerequisites on system header files.
+
 %.d: %.c
 	$(Q) $(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
 	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
@@ -261,13 +266,32 @@ endif
 %.o: %.c
 	$(Q) $(CC) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
+%.d: %.cpp
+	$(Q) $(CPP) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
+	$(Q) $(MV) $@.tmp $@
+
+%.o: %.cpp
+	$(Q) $(CPP) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+
 %.d: %.s
 	$(Q) $(CC) $(TARGET_ARCH) $(AFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
 	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
 	$(Q) $(MV) $@.tmp $@
 
+# NOTE: this version supports the arm-none-eabi toolchain
+#%.o: %.s
+#	$(Q) $(ASM) $(TARGET_ARCH) $(AFLAGS) -c $< -o $@ $(INCLUDES) 
+
 %.o: %.s
-	$(Q) $(CC) $(TARGET_ARCH) -c -o $@ $< $(AFLAGS),$(subst $(space),$(comma),$(INCLUDES))
+	$(Q) $(ASM) $(TARGET_ARCH) -c $< -o $@ $(AFLAGS) $(INCLUDES) 
+
+# NOTE: this version may be needed to support the C8/MC16 microchip assembler
+#%.o: %.s
+#	$(CC) $(TARGET_ARCH) -c $< -o $@ $(AFLAGS),$(subst $(space),$(comma),$(INCLUDES))
+
+# Original microchip command line (works)
+#	$(Q) $(CC) $(TARGET_ARCH) -c -o $@ $< $(AFLAGS),$(subst $(space),$(comma),$(INCLUDES))
 
 ################################################################################
 # Library generation rules (note: seems to work without them)
@@ -280,6 +304,9 @@ endif
 
 %.exe: $(objects) $(libraries)
 	$(Q) $(CC) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
+
+%.xpl: $(objects) $(libraries)
+	$(Q) $(CPP) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
 
 %.out: %.exe
 	$(Q) mv $< $@
@@ -320,3 +347,10 @@ endif
 
 %_sm.html: %.sm
 	$(SMC) -table $<
+
+################################################################################
+#
+
+print-%:
+	@echo '$*=$($*)'
+

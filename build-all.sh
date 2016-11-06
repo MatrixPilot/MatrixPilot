@@ -5,6 +5,10 @@ git config --get remote.origin.url && git symbolic-ref --short HEAD
 mkdir -p _build
 cd _build
 
+mkdir -p XPlane; cd XPlane
+make -j 8 -f ../../makefile TARGET_NAME=XPlane DEVICE=HIL
+cd ..
+
 mkdir -p MatrixPilot; cd MatrixPilot
 mkdir -p SIL; cd SIL
 make -j 8 -f ../../../makefile TARGET_NAME=MPSIM DEVICE=SIL CONFIG=Cessna DEFS=CONSOLE_UART=0
@@ -54,8 +58,10 @@ cd ../..
 cd ..
 echo
 echo "The following output files now exist:"
-find _build | grep out
 find _build | grep hex
+find _build | grep "\.out"
+find _build | grep xpl
+find _build | grep px4
 
 echo 
 echo "$0" complete.

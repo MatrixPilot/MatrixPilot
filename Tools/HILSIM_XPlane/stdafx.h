@@ -11,15 +11,15 @@
 
 #ifdef WIN32
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #include <Windows.h>
-#include <GL/gl.h>		// Win32
+#include <GL/gl.h>          // Win32
 
-#elif LIN			// Ubuntu Linux
+#elif NIX                   // Ubuntu Linux
 #include <GL/gl.h>
 #else
 
-#include <OpenGL/OpenGL.h>	// Mac
+#include <OpenGL/OpenGL.h>  // Mac
 #include <OpenGL/gl.h>
 
 #endif

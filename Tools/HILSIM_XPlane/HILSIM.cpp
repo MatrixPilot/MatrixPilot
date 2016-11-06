@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "SerialIO.h"
 
 #define MAX_ITEMS 30
 #define MAG_FIELD 1000.0
@@ -336,6 +335,9 @@ int MyKeySniffer(char         inChar,
 //		return 0;   // Returning 0 consumes the keystroke
 //	}
 //	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane
+
+//	LoggingFile.mLogFile << "KeySniffer " << inFlags << ":" << inVirtualKey << endl;
+
 	NAV_KEYSTROKE[6] = (unsigned char)inFlags;
 	NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
 	CalculateChecksum(NAV_KEYSTROKE);

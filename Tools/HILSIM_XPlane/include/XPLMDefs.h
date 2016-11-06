@@ -53,7 +53,7 @@ extern "C" {
 		#endif
 	#elif IBM
 		#define PLUGIN_API extern "C" __declspec(dllexport)
-	#elif LIN
+	#elif NIX
 		#define PLUGIN_API extern "C"
 	#else
 		#error "Platform not defined!"
@@ -67,7 +67,7 @@ extern "C" {
 		#endif		
 	#elif IBM
 		#define PLUGIN_API __declspec(dllexport)
-	#elif LIN
+	#elif NIX
 		#define PLUGIN_API
 	#else
 		#error "Platform not defined!"
@@ -90,7 +90,7 @@ extern "C" {
 	#else
 		#define XPLM_API __declspec(dllimport)
 	#endif
-#elif LIN
+#elif NIX
 	#if XPLM
 		#define XPLM_API
 	#else

@@ -41,7 +41,6 @@
 #include "../libUDB/libUDB.h" // Needed for access to RCON
 #endif
 #include "../libUDB/ADchannel.h"
-
 #include "../libUDB/mcu.h"
 #include "../libUDB/servoOut.h"
 

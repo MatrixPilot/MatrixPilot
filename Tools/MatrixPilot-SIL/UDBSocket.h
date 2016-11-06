@@ -9,10 +9,11 @@
 #ifndef MatrixPilot_SIL_SIL_sockets_h
 #define MatrixPilot_SIL_SIL_sockets_h
 
-#if (!defined(WIN32) || defined(WIN))
+#if (!defined(WIN32) || defined(WIN) || !defined(_MSC_VER))
 #include <stdint.h>
 #else
-#include "stdint-win.h"
+//#include "stdint-win.h" // only for MS Visual C++ builds
+#include <stdint.h>
 #endif
 
 typedef enum {
@@ -34,7 +35,7 @@ typedef struct UDBSocket_t* UDBSocket;
 UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, char* serial_port, long serial_baud);
 void UDBSocket_close(UDBSocket socket);
 int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength);
-int UDBSocket_write(UDBSocket socket, unsigned char* data, int dataLength);
+int UDBSocket_write(UDBSocket socket, const unsigned char* data, int dataLength);
 char* UDBSocketLastErrorMessage(void);
 
 #endif // MatrixPilot_SIL_SIL_sockets_h

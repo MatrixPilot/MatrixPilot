@@ -1,5 +1,7 @@
 # this file is included from makefile
 
+ifneq (,$(filter $(TOOLCHAIN), C30 XC16))
+
 extra_dirs := MDD-File-System USB USB/CDC-Device-Driver USB/MSD-Device-Driver
 #extra_dirs := MDD-File-System
 #ifeq ($(DEVICE),AUAV3) 
@@ -13,3 +15,6 @@ local_src += $(foreach i,$(extra_dirs),$(wildcard $(SOURCE_DIR)/$(subdirectory)/
 
 $(eval $(call make-library,$(subdirectory)/$(subdirectory).a,$(local_src)))
 #$(eval $(call make-target,$(subdirectory)/$(subdirectory).a,$(local_src)))
+
+endif
+

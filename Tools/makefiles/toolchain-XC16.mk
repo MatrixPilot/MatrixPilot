@@ -2,6 +2,7 @@
 
 CC       := xc16-gcc
 AR       := xc16-ar
+ASM      := xc16-gcc
 BIN2HEX  := xc16-bin2hex
 LIBS     := -legacy-libc
 TARGET_ARCH := -mcpu=$(CPU)
