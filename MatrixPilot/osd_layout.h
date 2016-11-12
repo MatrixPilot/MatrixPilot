@@ -78,6 +78,7 @@
 #define OSD_LOC_NUM_SATS                OSD_LOC(13, 3)      // 4 characters wide
 #define OSD_LOC_GPS_LAT                 OSD_LOC(13, 7)      // 9 characters wide
 #define OSD_LOC_GPS_LONG                OSD_LOC(13, 17)     // 10 characters wide
+#define OSD_NUM_SATS_FLASH_LOW_SVS      0                   // For flashing NUM_SATS when SVS<=3
 
 #define OSD_LOC_CALLSIGN_HORIZ          OSD_LOC_DISABLED    // variable width
 #define OSD_LOC_CALLSIGN_VERT           OSD_LOC(0, 28)      // variable height
