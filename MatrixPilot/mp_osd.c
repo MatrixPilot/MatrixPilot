@@ -455,6 +455,10 @@ static void osd_update_values_phase_2(void)
 
 static void osd_update_values_phase_3(void)
 {
+#if (OSD_NUM_SATS_FLASH_LOW_SVS != 0)    
+    static f_OSD_NUM_SATS_flash = 0;        // To keep track on show or hide OSD_NUM_SATS
+#endif
+    
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S);
 	osd_spi_write_number(air_speed_3DIMU/100, 3, 0, 0, 0, 0);   // speed in m/s
