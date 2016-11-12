@@ -519,6 +519,19 @@ static void osd_update_values_phase_3(void)
 
 #if (OSD_LOC_NUM_SATS != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_NUM_SATS);
+
+#if ( OSD_NUM_SATS_FLASH_LOW_SVS != 0 )
+    if ( (f_OSD_NUM_SATS_flash != 0) && showGPS)
+	{
+		osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
+        f_OSD_NUM_SATS_flash = 0;                       // Next time GPS info will be erased
+	}
+	else
+	{
+		osd_spi_erase_chars(3);
+        f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
+	}
+#else       
 	if (showGPS)
 	{
 		osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
@@ -527,6 +540,7 @@ static void osd_update_values_phase_3(void)
 	{
 		osd_spi_erase_chars(3);
 	}
+#endif
 #endif
 
 #if (OSD_LOC_GPS_LAT != OSD_LOC_DISABLED)
