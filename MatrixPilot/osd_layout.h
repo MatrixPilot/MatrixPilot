@@ -39,6 +39,8 @@
 
 #define OSD_AUTO_HIDE_GPS               1   // Only show Lat, Long, and Num Sats while slow and low.
 
+#define OSD_FLASH_GPS                   0   // Flash GPS SVS on LOW SVS
+#define OSD_FLASH_MIN_SVS               4   // GPS SVS info will flash for SVS less than this
 
 // OSD Element Locations
 // Set each one to OSD_LOC_DISABLED or OSD_LOC(row, col) from (0, 0) to (12, 29) for NTSC or up to (15, 29) for PAL.
