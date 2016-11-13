@@ -456,7 +456,8 @@ static void osd_update_values_phase_2(void)
 static void osd_update_values_phase_3(void)
 {
 #if (OSD_NUM_SATS_FLASH_LOW_SVS != 0)    
-    static f_OSD_NUM_SATS_flash = 0;        // To keep track on show or hide OSD_NUM_SATS
+    static char f_OSD_NUM_SATS_flash = 0;        // To keep track on show or hide OSD_NUM_SATS
+    static char cntPhase3 = 0;
 #endif
     
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
@@ -521,16 +522,24 @@ static void osd_update_values_phase_3(void)
 	osd_spi_write_location(OSD_LOC_NUM_SATS);
 
 #if ( OSD_NUM_SATS_FLASH_LOW_SVS != 0 )
-    if ( (f_OSD_NUM_SATS_flash != 0) && showGPS)
+    if(cntPhase3>5)
 	{
-		osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
-        f_OSD_NUM_SATS_flash = 0;                       // Next time GPS info will be erased
-	}
-	else
-	{
-		osd_spi_erase_chars(3);
-        f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
-	}
+        cntPhase3 = 0;
+        if ( (f_OSD_NUM_SATS_flash != 0) && showGPS)
+        {
+            osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
+            f_OSD_NUM_SATS_flash = 0;                       // Next time GPS info will be erased
+        }
+        else
+        {
+            osd_spi_erase_chars(3);
+            f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
+        }
+    }
+    else
+    {
+        cntPhase3++;
+    }       
 #else       
 	if (showGPS)
 	{
