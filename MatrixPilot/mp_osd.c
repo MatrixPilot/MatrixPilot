@@ -522,9 +522,8 @@ static void osd_update_values_phase_3(void)
 	osd_spi_write_location(OSD_LOC_NUM_SATS);
 
 #if ( OSD_NUM_SATS_FLASH_LOW_SVS != 0 )
-    if(cntPhase3>5)
-	{
-        cntPhase3 = 0;
+    if(svs <= 4)                    // I want to run follow code when SVS is LOW
+    {
         if ( (f_OSD_NUM_SATS_flash != 0) && showGPS)
         {
             osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
@@ -533,12 +532,8 @@ static void osd_update_values_phase_3(void)
         else
         {
             osd_spi_erase_chars(3);
-            f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
+             f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
         }
-    }
-    else
-    {
-        cntPhase3++;
     }       
 #else       
 	if (showGPS)
