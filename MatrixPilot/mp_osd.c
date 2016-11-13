@@ -457,7 +457,6 @@ static void osd_update_values_phase_3(void)
 {
 #if (OSD_NUM_SATS_FLASH_LOW_SVS != 0)    
     static char f_OSD_NUM_SATS_flash = 0;        // To keep track on show or hide OSD_NUM_SATS
-    static char cntPhase3 = 0;
 #endif
     
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
