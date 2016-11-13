@@ -524,17 +524,28 @@ static void osd_update_values_phase_3(void)
 #if ( OSD_NUM_SATS_FLASH_LOW_SVS != 0 )
     if(svs <= 4)                    // I want to run follow code when SVS is LOW
     {
-        if ( (f_OSD_NUM_SATS_flash != 0) && showGPS)
-        {
+        if ( (f_OSD_NUM_SATS_flash != 0) && showGPS)        // If blinking flag is 1 and showGPS
+        {                                                   // then shows SVS and sat picture
             osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
             f_OSD_NUM_SATS_flash = 0;                       // Next time GPS info will be erased
+        }
+        else                                                // else
+        {
+            osd_spi_erase_chars(3);                         // erase GPS SVS info 
+            f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
+        }
+    }     
+    else
+    {      
+        if (showGPS)
+        {
+            osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
         }
         else
         {
             osd_spi_erase_chars(3);
-             f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
-        }
-    }       
+        }        
+    }     
 #else       
 	if (showGPS)
 	{
