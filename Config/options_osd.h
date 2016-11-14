@@ -28,8 +28,8 @@
 
 // define USE_OSD to one of the types above to enables that system
 #ifndef USE_OSD
-//#define USE_OSD           OSD_NONE
-#define USE_OSD         OSD_NATIVE
+#define USE_OSD           OSD_NONE
+//#define USE_OSD         OSD_NATIVE
 //#define USE_OSD         OSD_REMZIBI
 //#define USE_OSD         OSD_MINIM
 #endif
@@ -39,6 +39,6 @@
 // before October 2016; In this case, The wiring does not follow the labels on the UDB boards.
 // Otherwise, leave OSD_LEGACY_SPI_PINOUT_UDB as 0, for the pin out labels on the UDB boards
 // to agree with the SPI signals of the OSD.
-#define OSD_LEGACY_SPI_PINOUT   1   // Default setting is 0
+#define OSD_LEGACY_SPI_PINOUT   0   // Default setting is 0
 #define USE_OSD_SPI             0   // set this to 1 to use the SPI peripheral, 0 to bit-bash
 #define OSD_SF                  5   // scale factor for SPI delays - TODO: get rid of

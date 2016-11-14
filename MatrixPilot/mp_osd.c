@@ -455,9 +455,7 @@ static void osd_update_values_phase_2(void)
 
 static void osd_update_values_phase_3(void)
 {
-#if (OSD_NUM_SATS_FLASH_LOW_SVS != 0)    
     static char f_OSD_NUM_SATS_flash = 0;        // To keep track on show or hide OSD_NUM_SATS
-#endif
     
 #if (OSD_LOC_AIR_SPEED_M_S != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_AIR_SPEED_M_S);
@@ -520,7 +518,6 @@ static void osd_update_values_phase_3(void)
 #if (OSD_LOC_NUM_SATS != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_NUM_SATS);
 
-#if ( OSD_NUM_SATS_FLASH_LOW_SVS != 0 )
     if(svs <= 4)                    // I want to run follow code when SVS is LOW
     {
         if ( (f_OSD_NUM_SATS_flash != 0) && showGPS)        // If blinking flag is 1 and showGPS
@@ -534,7 +531,7 @@ static void osd_update_values_phase_3(void)
             f_OSD_NUM_SATS_flash = 1;                       // Next time GPS info will be showed
         }
     }     
-    else
+    else                            // SVS is > than 4 so do as old code
     {      
         if (showGPS)
         {
@@ -545,16 +542,6 @@ static void osd_update_values_phase_3(void)
             osd_spi_erase_chars(3);
         }        
     }     
-#else       
-	if (showGPS)
-	{
-		osd_spi_write_number(svs, 0, 0, 0, 0xEB, 0);    // Num satelites locked, with SatDish icon header
-	}
-	else
-	{
-		osd_spi_erase_chars(3);
-	}
-#endif
 #endif
 
 #if (OSD_LOC_GPS_LAT != OSD_LOC_DISABLED)
