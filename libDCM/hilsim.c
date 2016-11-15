@@ -28,7 +28,7 @@
 
 #if (HILSIM == 1)
 
-int16_t hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
+static int16_t hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
 {
 	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
 	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
@@ -137,7 +137,7 @@ void hilsim_handle_key_input(char c)
 
 #if (HILSIM == 1)
 #if (USE_VARIABLE_HILSIM_CHANNELS != 1)
-uint8_t SIMservoOutputs[] = {
+static uint8_t SIMservoOutputs[] = {
 	0xFF, 0xEE, //sync
 	0x03, 0x04, //S1
 	0x05, 0x06, //S2
@@ -152,7 +152,7 @@ uint8_t SIMservoOutputs[] = {
 #define HILSIM_NUM_SERVOS 8
 #else
 #define HILSIM_NUM_SERVOS NUM_OUTPUTS
-uint8_t SIMservoOutputs[(NUM_OUTPUTS*2) + 5] = {
+static uint8_t SIMservoOutputs[(NUM_OUTPUTS*2) + 5] = {
 	0xFE, 0xEF, // sync
 	0x00        // output count
 	            // Two checksum on the end
