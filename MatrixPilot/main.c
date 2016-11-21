@@ -76,9 +76,6 @@ int matrixpilot_init(void)
 //	filesys_init(); // attempts to mount a file system
 	config_init();  // reads .ini files otherwise initialises with defaults
 	dcm_init();
-#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
-//	init_waypoints();
-#endif
 	servoMix_init();
 	servoPrepare_init();
 	init_states();

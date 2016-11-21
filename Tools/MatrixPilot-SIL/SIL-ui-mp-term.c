@@ -55,9 +55,9 @@ static void print_help(void)
 	printf("z       = zero the sticks\n");
 	printf(";       = toggle LEDs\n");
 	printf("0       = toggle RC Radio connection on/off\n");
-#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#if (FLIGHT_PLAN_TYPE == FP_LOGO)
 	printf("xN      = execute LOGO subroutine N(0-9)\n");
-#endif
+//#endif
 	printf("r       = reset\n");
 	printf("?       = show this help message\n");
 }
@@ -224,11 +224,11 @@ static int sil_handle_key_input(char c)
 					}
 					break;
 
-#if (FLIGHT_PLAN_TYPE == FP_LOGO)
+//#if (FLIGHT_PLAN_TYPE == FP_LOGO)
 				case 'x':
 					inputState = 1;
 					break;
-#endif
+//#endif
 
 				case 'r':
 					printf("\nReally reset? (y/N)");

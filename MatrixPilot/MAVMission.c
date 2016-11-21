@@ -391,7 +391,7 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 {
 	switch (handle_msg->msgid)
 	{
-#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
+//#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 		case MAVLINK_MSG_ID_MISSION_REQUEST_LIST:
 			MissionRequestList(handle_msg);
 			break;
@@ -413,7 +413,7 @@ boolean MAVMissionHandleMessage(mavlink_message_t* handle_msg)
 		case MAVLINK_MSG_ID_MISSION_ITEM:
 			MissionItem(handle_msg);
 			break;
-#endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
+//#endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 		default:
 //			DPRINT("MAVMissionHandleMessage(handle_msg->msgid %u) - NOT HANDLED\r\n", handle_msg->msgid);
 			return false;
@@ -425,7 +425,7 @@ vect3_32t getWaypoint3D(uint16_t wp);
 
 void MAVMissionOutput_40hz(void)
 {
-#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS) // LOGO_WAYPOINTS cannot be uploaded / downloaded
+//#if (FLIGHT_PLAN_TYPE == FP_WAYPOINTS) // LOGO_WAYPOINTS cannot be uploaded / downloaded
 	vect3_32t wp;
 
 	if (mavlink_flags.mavlink_send_waypoint_reached == 1)
@@ -513,7 +513,7 @@ void MAVMissionOutput_40hz(void)
 	}
 	if (mavlink_waypoint_timeout  > 0) mavlink_waypoint_timeout--;
 
-#endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
+//#endif // (FLIGHT_PLAN_TYPE == FP_WAYPOINTS)
 /*
 	// Acknowledge a command if flaged to do so.
 	if (mavlink_send_command_ack == true)

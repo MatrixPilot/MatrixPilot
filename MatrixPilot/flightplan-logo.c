@@ -34,8 +34,6 @@
 #include "../libDCM/gpsParseCommon.h"
 #include <stdlib.h>
 
-//#if (FLIGHT_PLAN_TYPE == FP_LOGO)
-
 
 struct logoInstructionDef {
 	uint16_t cmd        :  6;
@@ -1094,5 +1092,3 @@ void flightplan_logo_live_commit(void)
 		logo_inject_pos = 0;
 	}
 }
-
-//#endif // (FLIGHT_PLAN_TYPE == FP_LOGO)
