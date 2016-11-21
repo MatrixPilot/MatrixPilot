@@ -1,13 +1,15 @@
 # This makefile tested with X-Plane 10 on MacBook Air
 # using gcc downloaded from within preferences of x-code IDE.
-CC 	 = gcc 
-CPP      = g++ 
-CFLAGS   = -pipe -Wall -W -O2 -DAPL=1 -fPIC -m32 
-INCPATH  = -Iinclude 
-#LFLAGS   = -shared -Wl,-rpath  -Llib/XPLM.lib
-LFLAGS   =  -shared -Llib -lXPLM -framework OpenGl
-XFLAGS  = -DAPL -m32
-RM_FILE  = rm -f
+# Set PLUGINS to the location of your X-Plane 10 plugins folder
+PLUGINS   =  ~/Desktop/'X-Plane 10 Demo'/Resources/plugins
+CC        = gcc
+CPP       = g++
+CFLAGS    = -pipe -Wall -W -O2 -DAPL=1 -fPIC -m32
+INCPATH   = -Iinclude
+LFLAGS    =  -shared -framework OpenGl
+FRAMEWORK = -framework XPLM
+XFLAGS    = -DAPL=1 -m32
+RM_FILE   = rm -f
 
 OBJECTS_DIR = ./
 
@@ -15,7 +17,7 @@ TARGET   = HILSIM-apple.xpl
 
 SOURCES = HILSIM.cpp SerialIO.cpp UDBSocketUnix.c Setup.cpp stdafx.cpp utility.cpp
 
-OBJECTS = HILSIM.o SerialIO.o UDBSocketUnix.o Setup.o stdafx.o utility.o 
+OBJECTS = HILSIM.o SerialIO.o UDBSocketUnix.o Setup.o stdafx.o utility.o
 
 first: all
 
@@ -29,12 +31,12 @@ first: all
 
 all: Makefile $(TARGET)
 
-$(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC)  
-	$(CPP) $(XFLAGS) $(INCPATH) -o $(TARGET) $(OBJECTS) $(LFLAGS)
+$(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC)
+	$(CPP) $(XFLAGS) $(INCPATH) -o $(TARGET) $(OBJECTS) $(LFLAGS) -F $(PLUGINS) $(FRAMEWORK)
 
 clean:
 	-$(RM_FILE) $(OBJECTS)
 	-$(RM_FILE) *~ core *.core
 
 install: 
-	cp $(TARGET)  ~/'X-Plane 9 Demo'/Resources/plugins/
+	cp $(TARGET) $(PLUGINS)

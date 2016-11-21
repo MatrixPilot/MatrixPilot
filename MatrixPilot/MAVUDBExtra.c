@@ -39,9 +39,8 @@
 #include "../libDCM/rmat.h"
 #if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
-#include "../libUDB/ADchannel.h"
 #endif
-
+#include "../libUDB/ADchannel.h"
 #include "../libUDB/mcu.h"
 #include "../libUDB/servoOut.h"
 

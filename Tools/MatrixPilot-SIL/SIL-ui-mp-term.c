@@ -14,7 +14,7 @@
 #include "../../MatrixPilot/states.h"
 #include "../../MatrixPilot/config.h"
 #include "../../MatrixPilot/flightplan.h"
-#include "../../libUDB/servoOut.h"
+#include "../../libDCM/hilsim.h"
 #include <stdio.h>
 
 #define BUFLEN 512
@@ -131,17 +131,6 @@ static void sil_checkForLedUpdates(void)
 	}
 }
 
-static void sil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
-{
-	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
-	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
-		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/20);
-	}
-	else {
-		printf("%s = %d%%\n", inChannelName, (udb_pwIn[inChannelIndex]-udb_pwTrim[inChannelIndex])/10);
-	}
-}
-
 #define KEYPRESS_INPUT_DELTA 50
 
 static int sil_handle_key_input(char c)
@@ -154,68 +143,49 @@ static int sil_handle_key_input(char c)
 					printf("\n");
 					print_help();
 					break;
-
 				case 'w':
-					sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA*2);
+					hilsim_input_adjust("throttle", KEYPRESS_INPUT_DELTA*2);
 					break;
-
 				case 's':
-					sil_rc_input_adjust("throttle", THROTTLE_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA*2);
+					hilsim_input_adjust("throttle", -KEYPRESS_INPUT_DELTA*2);
 					break;
-
 				case 'a':
-					sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+					hilsim_input_adjust("rudder", KEYPRESS_INPUT_DELTA);
 					break;
-
 				case 'd':
-					sil_rc_input_adjust("rudder", RUDDER_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+					hilsim_input_adjust("rudder", -KEYPRESS_INPUT_DELTA);
 					break;
-
 				case 'i':
-					sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+					hilsim_input_adjust("elevator", KEYPRESS_INPUT_DELTA);
 					break;
-
 				case 'k':
-					sil_rc_input_adjust("elevator", ELEVATOR_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+					hilsim_input_adjust("elevator", -KEYPRESS_INPUT_DELTA);
 					break;
-
 				case 'j':
-					sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, KEYPRESS_INPUT_DELTA);
+					hilsim_input_adjust("aileron", KEYPRESS_INPUT_DELTA);
 					break;
-
 				case 'l':
-					sil_rc_input_adjust("aileron", AILERON_INPUT_CHANNEL, -KEYPRESS_INPUT_DELTA);
+					hilsim_input_adjust("aileron", -KEYPRESS_INPUT_DELTA);
 					break;
-
 				case 'z':
-					printf("\naileron, elevator, rudder = 0%%\n");
-					udb_pwIn[AILERON_INPUT_CHANNEL] = udb_pwTrim[AILERON_INPUT_CHANNEL];
-					udb_pwIn[ELEVATOR_INPUT_CHANNEL] = udb_pwTrim[ELEVATOR_INPUT_CHANNEL];
-					udb_pwIn[RUDDER_INPUT_CHANNEL] = udb_pwTrim[RUDDER_INPUT_CHANNEL];
-					printf("\naileron, elevator, rudder = %i, %i, %i\n", udb_pwIn[AILERON_INPUT_CHANNEL], udb_pwIn[ELEVATOR_INPUT_CHANNEL], udb_pwIn[RUDDER_INPUT_CHANNEL]);
+					hilsim_input_adjust("stick", 0);
 					break;
-
 				case '1': // switch mode to manual
-					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW - 1;
+					hilsim_input_adjust("mode", 1);
 					break;
-
 				case '2': // switch mode to stabilised
-					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_LOW + 1;
+					hilsim_input_adjust("mode", 2);
 					break;
-
 				case '3': // switch mode to guided
-					udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = MODE_SWITCH_THRESHOLD_HIGH + 1;
+					hilsim_input_adjust("mode", 3);
 					break;
-
 				case '4': // switch mode to failsafe
-					udb_pwIn[FAILSAFE_INPUT_CHANNEL] = FAILSAFE_INPUT_MIN - 1;
+					hilsim_input_adjust("mode", 4);
 					break;
-
 				case '0':
 					sil_radio_on = !sil_radio_on;
 					printf("\nRadio %s\n", (sil_radio_on) ? "On" : "Off");
 					break;
-
 				case ';':
 					showLEDs = !showLEDs;
 					if (showLEDs) {
@@ -223,30 +193,25 @@ static int sil_handle_key_input(char c)
 						print_LED_status();
 					}
 					break;
-
 #if (FLIGHT_PLAN_TYPE == FP_LOGO)
 				case 'x':
 					inputState = 1;
 					break;
 #endif
-
 				case 'r':
 					printf("\nReally reset? (y/N)");
 					fflush(stdout);
 					inputState = 2;
 					break;
-					
 				case '9':
 					printf("Saving Params to ini file\r\n");
 					config_save();
 					break;
-					
 				default:
 					return 0;
 			}
 			break;
 		}
-
 		case 1:
 		{
 			if (c >= '0' && c <= '9') {
@@ -262,7 +227,6 @@ static int sil_handle_key_input(char c)
 			inputState = 0;
 			break;
 		}
-
 		case 2:
 		{
 			if (c == 'y') {

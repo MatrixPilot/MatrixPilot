@@ -1,7 +1,7 @@
 # Build and autotest script for MatrixPilot firmware
 # http://travis-ci.org
 
-language: c
+language: cpp
 
 sudo: true
 
@@ -15,9 +15,9 @@ addons:
     - libexpat1:i386
 
 before_install:
-- chmod +x travis-install-dependencies.sh
 
 install:
+- chmod +x travis-install-dependencies.sh
 - ./travis-install-dependencies.sh
 - export PATH=$PATH:/opt/microchip/xc16/v1.26/bin
 - xc16-gcc --version

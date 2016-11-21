@@ -650,7 +650,7 @@ static void handleMessage(void)
 	handling_of_message_completed |= MAVParamsHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVFlexiFunctionsHandleMessage(handle_msg);
-	handling_of_message_completed |= MAVFTPHandleMessage(handle_msg);
+//	handling_of_message_completed |= MAVFTPHandleMessage(handle_msg); // WIP - RobD
 
 	if (handling_of_message_completed != false)
 	{
@@ -1074,7 +1074,7 @@ void mavlink_output_40hz(void)
 	MAVParamsOutput_40hz();
 	MAVMissionOutput_40hz();
 	MAVFlexiFunctionsOutput_40hz();
-	MAVFTPOutput_40hz();
+//	MAVFTPOutput_40hz(); // WIP - RobD
 
 	// Acknowledge a command if flaged to do so.
 	if (mavlink_send_command_ack == true)

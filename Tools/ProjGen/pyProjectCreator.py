@@ -387,8 +387,10 @@ if __name__ == '__main__':
 		arch = "dsPIC33FJ256GP710A"
 	elif opts.target == "AUAV3":
 		arch = "dsPIC33EP512MU810"
-	elif opts.target == "PX4":
+	elif opts.target == "nucleo":
 		arch = "STM32F401xE"
+	elif opts.target == "PX4":
+		arch = "STM32F427xx"
 	else:
 		arch = ""
 
@@ -447,10 +449,14 @@ if __name__ == '__main__':
 				defines = defines + "\t\t\t<Add option=\"-D" + d + "\" />\n"
 		for inc in inc_list:
 			includes = includes + "\t\t\t<Add directory=\"" + inc + "\" />\n"
+# add the config paths last
+		for inc in opts.config:
+			includes = includes + "\t\t\t<Add directory=\"" + rootsep + inc + "\" />\n"
 		emBlocks_project(arch, opts.name, opts.target, opts.config, defines, includes, headers, sources, project)
 	elif opts.target == "SIL":
 		sources = vs2010_scan_dirs(["*.c"], 1, opts.modules)
 		headers = vs2010_scan_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"])
+		headers = '\r'.join(remove_duplicates(headers.split('\r')))
 		vs2010_project(arch, opts.target, rootsep, opts.config, includes, headers, sources, project, opts.defines, prjname)
 		sources = vs2010_scan_filter_dirs(["*.c"], 1, opts.modules, "Source Files\\")
 		headers = vs2010_scan_filter_dirs(["*.h"], 0, opts.config + opts.modules + ["libUDB"], "Header Files\\")

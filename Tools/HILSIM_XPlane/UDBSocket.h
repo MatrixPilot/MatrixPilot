@@ -15,6 +15,10 @@
 #include "stdint-win.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
 	UDBSocketUndefined = 0,
 	UDBSocketStandardInOut,
@@ -36,5 +40,9 @@ void UDBSocket_close(UDBSocket socket);
 int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength);
 int UDBSocket_write(UDBSocket socket, unsigned char* data, int dataLength);
 char* UDBSocketLastErrorMessage(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MatrixPilot_SIL_SIL_sockets_h

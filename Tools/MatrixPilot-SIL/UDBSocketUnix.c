@@ -399,7 +399,7 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 	return -1;
 }
 
-int UDBSocket_write(UDBSocket socket, unsigned char* data, int dataLength)
+int UDBSocket_write(UDBSocket socket, const unsigned char* data, int dataLength)
 {
 	switch (socket->type)
 	{

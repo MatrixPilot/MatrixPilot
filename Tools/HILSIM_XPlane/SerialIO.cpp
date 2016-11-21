@@ -9,7 +9,6 @@ static UDBSocket serialSock = NULL;
 static UDBSocket udpSock = NULL;
 static UDBSocket activeSock = NULL; // points to one of the other two, only 1 of which remains active
 
-extern LogFile LoggingFile;
 extern string CommPortString;
 extern long CommPortSpeed;
 extern uint16_t PortNum;

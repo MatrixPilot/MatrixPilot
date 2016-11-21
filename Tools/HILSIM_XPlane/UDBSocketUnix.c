@@ -6,9 +6,7 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#if (NIX == 1)
-
-#include "UDBSocket.h"
+#if (NIX == 1) || (APL == 1)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +23,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// all of your legacy C code here
+#include "UDBSocket.h" // MS Visual C++, XCode, linux builds
+
+#ifdef __cplusplus
+}
+#endif
 
 #define LAST_ERR_BUF_SIZE 256
 char UDBSocketLastError[LAST_ERR_BUF_SIZE] = "";
@@ -55,7 +64,7 @@ void SetTermIOs(void)
 
 UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, char* serial_port, long serial_baud)
 {
-#if (LIN == 1)
+#if (NIX == 1)
 	speed_t BAUD;
 #endif
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
@@ -163,7 +172,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
-#if (LIN == 1)
+#if (NIX == 1)
 			switch (newSocket->serial_baud)
 			{
 				case 1152000:
@@ -248,7 +257,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 			//
 			config.c_cc[VMIN]  = 1;
 			config.c_cc[VTIME] = 0;
-#if (LIN == 1)
+#if (NIX == 1)
 			if (cfsetospeed(&config, BAUD) < 0)
 #else
 			if (cfsetospeed(&config, newSocket->serial_baud) < 0)
@@ -258,7 +267,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 				UDBSocket_close(newSocket);
 				return NULL;
 			}
-#if (LIN == 1)
+#if (NIX == 1)
 			if (cfsetispeed(&config, BAUD) < 0)
 #else
 			if (cfsetispeed(&config, newSocket->serial_baud) < 0)

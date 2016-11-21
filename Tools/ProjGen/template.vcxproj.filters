@@ -15,12 +15,9 @@
     <Filter Include="Header Files\Tools">
       <UniqueIdentifier>{4858c16f-d050-4b6e-be04-517fe6b65d70}</UniqueIdentifier>
     </Filter>
-%%FILTERS%%
-  </ItemGroup>
+%%FILTERS%%  </ItemGroup>
   <ItemGroup>
-%%SOURCE_FILES%%
-  </ItemGroup>
+%%SOURCE_FILES%%  </ItemGroup>
   <ItemGroup>
-%%HEADER_FILES%%
-  </ItemGroup>
+%%HEADER_FILES%%  </ItemGroup>
 </Project>

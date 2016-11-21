@@ -5,7 +5,8 @@ TARGET_TYPE := px4
 ARCH := armv7e-m
 CPU := cortex-m4
 FPU := fpv4-sp-d16
-TARGET_ARCH := -mcpu=$(CPU) -march=$(ARCH) -mfpu=$(FPU) -mfloat-abi=hard -mthumb -mlong-calls
+TARGET_ARCH := -mcpu=$(CPU) -march=$(ARCH) -mfpu=$(FPU) -mfloat-abi=hard -mthumb
+#TARGET_ARCH := -mcpu=$(CPU) -march=$(ARCH) -mfpu=$(FPU) -mfloat-abi=hard -mthumb -mlong-calls
 #TARGET_ARCH := -mcpu=$(CPU) -march=$(ARCH) -mfpu=$(FPU) -mfloat-abi=hard -mthumb-interwork -mlong-calls
 
 modules += libSTM
@@ -15,4 +16,5 @@ modules += libSTM
 incpath += libSTM
 #cfgpath := Config
 
-defines += ARM_MATH_CM4 __FPU_USED STM32F401RE STM32F4XX USE_STDPERIPH_DRIVER STM32F401xE
+#defines += ARM_MATH_CM4 __FPU_USED STM32F401RE STM32F4XX USE_STDPERIPH_DRIVER STM32F401xE
+defines += ARM_MATH_CM4 __FPU_USED STM32F4XX USE_STDPERIPH_DRIVER STM32F427xx

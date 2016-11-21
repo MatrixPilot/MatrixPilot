@@ -1,10 +1,10 @@
 CC       = gcc
 CPP      = g++
-CFLAGS   = -pipe -Wall -W -O2 -DLIN=1 -fPIC
+CFLAGS   = -pipe -Wall -W -O2 -DNIX=1 -fPIC
 INCPATH  = -Iinclude 
 #LFLAGS   = -shared -Wl,-rpath  -Llib/XPLM.lib
 LFLAGS   =  -shared -Llib/XPLM.lib
-XFLAGS  = -DLIN -m32
+XFLAGS   = -DNIX -m32
 RM_FILE  = rm -f
 
 OBJECTS_DIR = ./
@@ -32,7 +32,8 @@ $(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC)
 
 clean:
 	-$(RM_FILE) $(OBJECTS)
+	-$(RM_FILE) $(TARGET)
 	-$(RM_FILE) *~ core *.core
 
 install: 
-	cp $(TARGET)  ~/'X-Plane 9 Demo'/Resources/plugins/
+	cp $(TARGET) ~/'X-Plane 10'/Resources/plugins/

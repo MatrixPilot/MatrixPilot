@@ -2,6 +2,7 @@
 
 CC       := pic30-gcc.exe
 AR       := pic30-ar.exe
+ASM      := pic30-gcc.exe
 BIN2HEX  := pic30-bin2hex.exe
 LIBS     := -legacy-libc 
 TARGET_ARCH := -mcpu=$(CPU)
