@@ -27,7 +27,7 @@ before_script:
 - ls -la
 
 script:
-- mkdir -p ./build-yml; cd ./build-yml
+- mkdir -p ./_build-yml; cd ./_build-yml
 - mkdir -p ./SIL; cd ./SIL
 - make -j 8 -f ../../makefile TARGET_NAME=MPSIM DEVICE=SIL
 - cd ..; mkdir -p ./AUAV3; cd ./AUAV3
@@ -43,7 +43,10 @@ script:
 - ./build-all.sh
 
 after_success:
-- find build | grep hex
-- find build | grep map
-- find build | grep out
+- find _build-yml | grep hex
+- find _build-yml | grep map
+- find _build-yml | grep out
+- find _build | grep hex
+- find _build | grep map
+- find _build | grep out
 - cd ~
