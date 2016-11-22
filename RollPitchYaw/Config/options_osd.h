@@ -39,5 +39,7 @@
 // Otherwise, leave OSD_LEGACY_SPI_PINOUT_UDB as 0, for the pin out labels on the UDB boards
 // to agree with the SPI signals of the OSD.
 #define OSD_LEGACY_SPI_PINOUT   0   // Default setting is 0
+#ifndef USE_OSD_SPI
 #define USE_OSD_SPI             0   // set this to 1 to use the SPI peripheral, 0 to bit-bash
+#endif
 #define OSD_SF                  5   // scale factor for SPI delays - TODO: get rid of
