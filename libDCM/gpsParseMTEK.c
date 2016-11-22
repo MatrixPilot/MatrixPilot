@@ -50,12 +50,9 @@ static const char gps_bin_mode[]               = "$PGCMD,16,0,0,0,0,0*6A\r\n"; /
 
 static uint8_t payloadlength;
 static uint8_t un; // dummy char
-//union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 static union longbbbb sog_gps_, cog_gps_;
-//union longbbbb date_gps_, time_gps_;
 static uint8_t svs_;
 static uint8_t fix_type_;
-//union intbb hdop_;
 static union intbb checksum;
 
 static uint8_t CK_A;
