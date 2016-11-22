@@ -161,6 +161,5 @@ public:
 	ofstream mLogFile;
 };
 
-//static LogFile LoggingFile;
 extern LogFile LoggingFile;
 
