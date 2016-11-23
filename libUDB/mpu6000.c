@@ -95,20 +95,43 @@ void MPU6000_init16(callback_fptr_t fptr)
 	writeMPUSPIreg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
 
 	// SAMPLE RATE
+// Modif gfm#6.1 Quadcopter.Gyro : sample rate growing up to 1 KHz
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 0); // Sample rate = 1000Hz  Fsample= 1Khz/(N+1) = 1000Hz
+// Take care : due to this sample rate, dcm_run_imu_step()must be called in libDCM
+//             and not here under.
+//        A filter can be used to limit propeller vibrations (max frequency 10 000 RPM=166 Hz	
+    // scaling & DLPF
+	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_188HZ);
+#define MPUsamplerate 1000   //MPUsamplerate will be use in heartbeat timing call
+#else
 	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
 
 	// scaling & DLPF
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
+#define MPUsamplerate 200   
+#endif
+// fin modif gfm#6.1 Quadcopter.gyro
 
-//	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS);  // Gyro scale 2000º/s
-	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
-
+#if (GYRO_RANGE == 0)
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_250DPS); // Gyro scale 250º/s, °/s = 131 LSB
+#elif (GYRO_RANGE == 1)
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s, °/s = 65.5 LSB
+#elif (GYRO_RANGE == 2)
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_1000DPS); // Gyro scale 1000º/s, °/s = 32.8 LSB
+#elif (GYRO_RANGE == 3)
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS); // Gyro scale 2000º/s, °/s = 16.4 LSB
+#else
+#error "Invalid GYRO_RANGE"
+#endif
 #if (ACCEL_RANGE == 2)
-	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
+	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scale +/-2g, g = 16384LSB
 #elif (ACCEL_RANGE == 4)
-	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 4096
+	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale 4g, g = 8192LSB
 #elif (ACCEL_RANGE == 8)
-	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 2048
+	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale 8g, g = 4096LSB
+#elif (ACCEL_RANGE == 16)
+	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_16G); // Accel scale 16g, g = 2048LSB
 #else
 #error "Invalid ACCEL_RANGE"
 #endif
@@ -168,7 +191,7 @@ void MPU6000_init16(callback_fptr_t fptr)
 	_INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
 	_INT3IP = INT_PRI_INT3;
 	_INT3IF = 0; // Reset INT3 interrupt flag
-	_INT3IE = 1; // Enable INT3 Interrupt Service Routine 
+	_INT3IE = 1; // Enable INT3 Interrupt Service Routine
 #endif
 }
 
@@ -196,6 +219,7 @@ static void process_MPU_data(void)
 
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
+    if (mpuCnt % (MPUsamplerate/HEARTBEAT_HZ)==0)
 	if (callback) callback();   // was directly calling heartbeat()
 #else
 #warning mpu6000: no callback mechanism defined
