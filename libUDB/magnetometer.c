@@ -38,6 +38,12 @@ int16_t magMessage = 0;                         // message type
 #if (MAG_YAW_DRIFT == 1)
 //#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 
+// TODO: select magnetometer type, set MAGNETICDECLINATION,
+// and select orientation of the magnetometer, and remove the next 3 lines.
+#if (HILSIM != 1)
+#warning "Check magnetometer options."
+#endif
+
 static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
 #define HMC5883_COMMAND 0x3C

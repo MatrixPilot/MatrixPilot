@@ -2,7 +2,7 @@
 //
 //    http://code.google.com/p/gentlenav/
 //
-// Copyright 2009-2011 MatrixPilot Team
+// Copyright 2009-2016 MatrixPilot Team
 // See the AUTHORS.TXT file for a list of authors of MatrixPilot.
 //
 // MatrixPilot is free software: you can redistribute it and/or modify
@@ -42,8 +42,6 @@ static int16_t hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int 
 
 int16_t hilsim_input_adjust(char* inChannelName, int delta)
 {
-	int inChannelIndex = 0;
-
 	switch (inChannelName[0]) {
 	case 't':
 		return hil_rc_input_adjust(inChannelName, THROTTLE_INPUT_CHANNEL, delta);
