@@ -55,7 +55,6 @@
 
 // Matrixpilot specific data rates
 #define MAVLINK_RATE_SUE                    8   // SERIAL_UDB_EXTRA data rate on channel EXTRA1
-#define MAVLINK_RATE_FORCE                  4   // Send FORCE on plane (Aerodynamic force)
 #define MAVLINK_RATE_POSITION_SENSORS       0   // Using channel EXTRA2
 
 // Send VFR_HUD message at position rate, 1=yes, 0=no.  Needed for correct mavproxy state

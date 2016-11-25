@@ -227,7 +227,6 @@
 #define MODE_SWITCH_INPUT_CHANNEL           CHANNEL_7
 #define FLAPS_INPUT_CHANNEL                 CHANNEL_8
 #define SPOILER_INPUT_CHANNEL               CHANNEL_UNUSED
-#define TEST_MODE_INPUT_CHANNEL             CHANNEL_2
 #define CAMERA_PITCH_INPUT_CHANNEL          CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
@@ -275,7 +274,6 @@
 #define PASSTHROUGH_C_OUTPUT_CHANNEL        CHANNEL_UNUSED
 #define PASSTHROUGH_D_OUTPUT_CHANNEL        CHANNEL_UNUSED
 #define BRAKE_OUTPUT_CHANNEL                CHANNEL_8
-#define FLAPS_OUTPUT_CHANNEL                CHANNEL_9
 
 
 ////////////////////////////////////////////////////////////////////////////////
