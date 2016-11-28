@@ -12,8 +12,16 @@ cd ..
 mkdir -p MatrixPilot; cd MatrixPilot
 mkdir -p SIL; cd SIL
 make -j 8 -f ../../../makefile TARGET_NAME=MPSIM DEVICE=SIL CONFIG=Cessna DEFS=CONSOLE_UART=0
+
 cd ..; mkdir -p AUAV3; cd AUAV3
-make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=AUAV3 DEFS=USE_OSD=OSD_NATIVE CONFIG=CloudsFly
+make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB5 CONFIG=Cessna
+
+cd ..; mkdir -p Grobularis; cd Grobularis
+make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB5 CONFIG=Grobularis
+
+cd ..; mkdir -p E_Glider; cd E_Glider
+make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=AUAV3 CONFIG=E_Glider
+
 cd ..; mkdir -p UDB5; cd UDB5
 make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB5 DEFS='USE_OSD=OSD_REMZIBI HILSIM=1'
 cd ..; mkdir -p UDB5_UDB_EXTRA; cd UDB5_UDB_EXTRA
