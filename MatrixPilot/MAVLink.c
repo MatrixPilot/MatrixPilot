@@ -1064,13 +1064,6 @@ void mavlink_output_40hz(void)
 	{
 		MAVUDBExtraOutput(); // Designed to be called at 8Hz.
 	}
-	// Send FORCE information
-	spread_transmission_load = 15;
-	if (mavlink_frequency_send(MAVLINK_RATE_FORCE, mavlink_counter_40hz + spread_transmission_load))
-	{
-		//mavlink_msg_force_send(MAVLINK_COMM_0, msec, aero_force[0], aero_force[1], aero_force[2]);
-//static inline void mavlink_msg_force_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t aero_x, int16_t aero_y, int16_t aero_z)
-	}
 	MAVParamsOutput_40hz();
 	MAVMissionOutput_40hz();
 	MAVFlexiFunctionsOutput_40hz();
