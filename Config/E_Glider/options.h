@@ -374,7 +374,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
-//#define SERIAL_BAUDRATE                     19200
+#define SERIAL_BAUDRATE                     57600
 
 
 // NUM_ANALOG_INPUTS:

@@ -2,6 +2,7 @@
 
 pyProjectCreator.py -r ../.. -n MatrixPilot -t SIL -c Config/Cessna
 pyProjectCreator.py -r ../.. -n MatrixPilot -t AUAV3 -c Config/Grobularis
+pyProjectCreator.py -r ../.. -n MatrixPilot -t AUAV3 -c Config/E_Glider
 
 pyProjectCreator.py -r ../.. -n MatrixPilot -t SIL
 pyProjectCreator.py -r ../.. -n MatrixPilot -t PX4
