@@ -121,7 +121,7 @@ include $(MKFILES_DIR)/device-$(DEVICE).mk
 modules := $(addprefix $(SOURCE_DIR)/,$(modules))
 #INCPATH := $(addprefix $(SOURCE_DIR)/,$(cfgpath)) $(addprefix $(SOURCE_DIR)/,$(incpath))
 
-ifneq ($(CONFIG),) 
+ifneq ($(CONFIG),)
 INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath)/$(CONFIG))
 endif
 INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath))
@@ -132,7 +132,12 @@ INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
 ################################################################################
 # Determine the full target names and include the toolchain specific makefile
 
-TARGET_LNAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
+#TARGET_LNAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
+ifneq ($(CONFIG),)
+TARGET_LNAME := $(TARGET_NAME)-$(DEVICE)-$(CONFIG)
+else
+TARGET_LNAME := $(TARGET_NAME)-$(DEVICE)
+endif
 TARGET_MAP := $(TARGET_LNAME).map
 TARGET := $(TARGET_LNAME).$(TARGET_TYPE)
 
