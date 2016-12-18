@@ -238,9 +238,6 @@ class base_telemetry :
         self.aero_force_x = 0
         self.aero_force_y = 0
         self.aero_force_z = 0
-        self.location_error_earth_x = 0
-        self.location_error_earth_y = 0
-        self.location_error_earth_z = 0
         
         self.feed_forward = 0.0
         self.navigation_max_earth_vertical_axis_rotation_rate = 0.0
@@ -352,9 +349,9 @@ class mavlink_telemetry(base_telemetry):
                 self.IMUlocationy_W1 = int(telemetry_file.msg.sue_imu_location_y)
                 self.IMUlocationz_W1 = int(telemetry_file.msg.sue_imu_location_z)
 
-                self.location_error_earth_x = int(telemetry_file.msg.sue_location_error_earth_x)
-                self.location_error_earth_y = int(telemetry_file.msg.sue_location_error_earth_y)
-                self.location_error_earth_z = int(telemetry_file.msg.sue_location_error_earth_z)
+                self.lex = int(telemetry_file.msg.sue_location_error_earth_x)
+                self.ley = int(telemetry_file.msg.sue_location_error_earth_y)
+                self.lez = int(telemetry_file.msg.sue_location_error_earth_z)
                 
                 self.flags = int(telemetry_file.msg.sue_flags)
                 self.osc_fails = int(telemetry_file.msg.sue_osc_fails)
