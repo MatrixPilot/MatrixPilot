@@ -11,6 +11,13 @@ import re
 rootdir = ""
 script_path = ""
 
+def remove_duplicates(input):
+  output = []
+  for x in input:
+    if x not in output:
+      output.append(x)
+  return output
+
 def mkdirnotex(filename):  
 	folder = os.path.dirname(filename)  
 	if not os.path.exists(folder):  

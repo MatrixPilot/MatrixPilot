@@ -360,10 +360,10 @@ void MAVUDBExtraOutput(void)
 				
 //				serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
 				mavlink_msg_serial_udb_extra_f20_send(MAVLINK_COMM_0, 
-					NUM_INPUTS,										\
-					pwTrim_save[1],pwTrim_save[2],pwTrim_save[3],pwTrim_save[4],		\
-					pwTrim_save[5],pwTrim_save[61],pwTrim_save[7],pwTrim_save[8],		\
-					pwTrim_save[9],pwTrim_save[10],pwTrim_save[11],pwTrim_save[12] );
+					NUM_INPUTS,                                                         \
+					pwTrim_save[1], pwTrim_save[2],  pwTrim_save[3],  pwTrim_save[4],   \
+					pwTrim_save[5], pwTrim_save[6],  pwTrim_save[7],  pwTrim_save[8],   \
+					pwTrim_save[9], pwTrim_save[10], pwTrim_save[11], pwTrim_save[12]);
 //				for (i = 1; i <= NUM_INPUTS; i++)
 //				{
 //					serial_output("%i,",udb_pwTrim[i]);
