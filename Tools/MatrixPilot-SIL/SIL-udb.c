@@ -86,9 +86,9 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 uint16_t udb_heartbeat_counter;
 uint16_t udb_pulse_counter;
 
-int16_t udb_pwIn[MAX_INPUTS];   // pulse widths of radio inputs
-int16_t udb_pwTrim[MAX_INPUTS]; // initial pulse widths for trimming
-int16_t udb_pwOut[MAX_OUTPUTS]; // pulse widths for servo outputs
+int16_t udb_pwIn[MAX_INPUTS+1];   // pulse widths of radio inputs
+int16_t udb_pwTrim[MAX_INPUTS+1]; // initial pulse widths for trimming
+int16_t udb_pwOut[MAX_OUTPUTS+1]; // pulse widths for servo outputs
 
 union udb_fbts_byte udb_flags;
 
@@ -366,12 +366,19 @@ void sil_handle_serial_rc_input(uint8_t *buffer, int bytesRead)
 	if (bytesRead >= 2 && buffer[0] == 0xFF && buffer[1] == 0xEE)
 	{
 		headerBytes = 2;
-		numServos = 8;
+		numServos = MAX_OUTPUTS;
 	}
 	else if (bytesRead >= 3 && buffer[0] == 0xFE && buffer[1] == 0xEF)
 	{
 		headerBytes = 3;
-		numServos = buffer[2];
+		if (buffer[2] > MAX_OUTPUTS)
+		{
+			numServos = MAX_OUTPUTS;
+		}
+		else
+		{
+			numServos = buffer[2];
+		}
 	}
 
 	if (numServos && bytesRead >= headerBytes + numServos*2 + 2)
