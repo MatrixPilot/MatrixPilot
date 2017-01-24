@@ -267,7 +267,7 @@ static inline void MissionCount(mavlink_message_t* handle_msg)
 
 static inline void MissionItem(mavlink_message_t* handle_msg)
 {
-	int16_t flags;
+	int16_t flags = 0;
 	struct waypoint3D wp;
 	mavlink_mission_item_t packet;
 	//send_text((uint8_t*)"waypoint\r\n");
