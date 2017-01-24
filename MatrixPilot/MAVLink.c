@@ -719,16 +719,13 @@ static boolean is_this_the_moment_to_send(uint8_t counter, uint8_t max_counter)
 	}
 }
 
-// Decide whether it the correct moment to send a given telemetry update, depending on requested frequency
+// Decide whether it is the correct moment to send a given telemetry update,
+//   depending on requested frequency
 static boolean mavlink_frequency_send(uint8_t frequency, uint8_t counter)
 {
 	uint8_t max_counter;
 
-	if (frequency == 0)
-	{
-		return false;
-	}
-	else if (frequency > 0 && frequency < 11)
+	if (frequency > 0 && frequency < 11)
 	{
 		max_counter = mavlink_freq_table[frequency];
 		return is_this_the_moment_to_send(counter, max_counter);
@@ -752,10 +749,7 @@ static boolean mavlink_frequency_send(uint8_t frequency, uint8_t counter)
 	{
 		return true; // send data on every call
 	}
-	else
-	{
-		return false; // should never reach this line
-	}
+	return false;
 }
 #endif // (MAVLINK_TEST_ENCODE_DECODE != 1)
 
