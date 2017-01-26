@@ -366,12 +366,19 @@ void sil_handle_serial_rc_input(uint8_t *buffer, int bytesRead)
 	if (bytesRead >= 2 && buffer[0] == 0xFF && buffer[1] == 0xEE)
 	{
 		headerBytes = 2;
-		numServos = 8;
+		numServos = MAX_OUTPUTS;
 	}
 	else if (bytesRead >= 3 && buffer[0] == 0xFE && buffer[1] == 0xEF)
 	{
 		headerBytes = 3;
-		numServos = buffer[2];
+		if (buffer[2] > MAX_OUTPUTS)
+		{
+			numServos = MAX_OUTPUTS;
+		}
+		else
+		{
+			numServos = buffer[2];
+		}
 	}
 
 	if (numServos && bytesRead >= headerBytes + numServos*2 + 2)
