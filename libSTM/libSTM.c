@@ -40,9 +40,9 @@
 
 uint16_t udb_heartbeat_counter;
 
-int16_t udb_pwIn[MAX_INPUTS];   // pulse widths of radio inputs
-int16_t udb_pwTrim[MAX_INPUTS]; // initial pulse widths for trimming
-int16_t udb_pwOut[MAX_OUTPUTS]; // pulse widths for servo outputs
+int16_t udb_pwIn[MAX_INPUTS+1];   // pulse widths of radio inputs
+int16_t udb_pwTrim[MAX_INPUTS+1]; // initial pulse widths for trimming
+int16_t udb_pwOut[MAX_OUTPUTS+1]; // pulse widths for servo outputs
 
 union udb_fbts_byte udb_flags;
 
