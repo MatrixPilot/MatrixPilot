@@ -203,7 +203,7 @@ int16_t calculate_week_num(int32_t date)
 	day = date % 100;
 
 	// Wait until we have real date data
-	if (day == 0 || month == 0) return 0;
+	if (day < 1 || day > 31 || month < 1 || month > 12) return 0;
 
 	// Begin counting at May 1, 2011 since this 1st was a Sunday
 	m = 5;                          // May
