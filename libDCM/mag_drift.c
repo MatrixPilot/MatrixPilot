@@ -159,11 +159,13 @@ static void quaternion_adjust(fractional quaternion[], fractional direction[])
 	             + __builtin_mulss(quaternion[2], quaternion[2])
 	             + __builtin_mulss(quaternion[3], quaternion[3]);
 	magnitude = sqrt_long(magnitudesqr);
-
-	quaternion[0] = __builtin_divsd(__builtin_mulsu(quaternion[0], RMAX), magnitude);
-	quaternion[1] = __builtin_divsd(__builtin_mulsu(quaternion[1], RMAX), magnitude);
-	quaternion[2] = __builtin_divsd(__builtin_mulsu(quaternion[2], RMAX), magnitude);
-	quaternion[3] = __builtin_divsd(__builtin_mulsu(quaternion[3], RMAX), magnitude);
+	if (0 != magnitude)
+	{
+		quaternion[0] = __builtin_divsd(__builtin_mulsu(quaternion[0], RMAX), magnitude);
+		quaternion[1] = __builtin_divsd(__builtin_mulsu(quaternion[1], RMAX), magnitude);
+		quaternion[2] = __builtin_divsd(__builtin_mulsu(quaternion[2], RMAX), magnitude);
+		quaternion[3] = __builtin_divsd(__builtin_mulsu(quaternion[3], RMAX), magnitude);
+	}
 }
 
 static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_vector[])
