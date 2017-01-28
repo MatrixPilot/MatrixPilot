@@ -144,6 +144,10 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 		{
 			struct termios  config;
 
+			if (NULL == newSocket->serial_port) {
+				free(newSocket);
+				return NULL;
+			}
 			newSocket->fd = open(newSocket->serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
 			if (newSocket->fd == -1) {
 				perror("serial open() failed");
