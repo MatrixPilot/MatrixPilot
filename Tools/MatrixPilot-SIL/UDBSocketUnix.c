@@ -309,7 +309,7 @@ void UDBSocket_close(UDBSocket socket)
 		case UDBSocketUDPServer:
 		{
 			shutdown(socket->fd, SHUT_RDWR);
-			close(socket->fd);
+			if (socket->fd >= 0) close(socket->fd);
 			if (socket->UDP_host) free(socket->UDP_host);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
@@ -317,7 +317,7 @@ void UDBSocket_close(UDBSocket socket)
 		}
 		case UDBSocketSerial:
 		{
-			close(socket->fd);
+			if (socket->fd >= 0) close(socket->fd);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
 			break;
