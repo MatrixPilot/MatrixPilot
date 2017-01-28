@@ -350,7 +350,10 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 				select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
 				if (FD_ISSET(STDIN_FILENO, &fds)) // only read stdin if there's data ready
 				{
-					buffer[pos++] = fgetc(stdin);
+					int c;
+					c = fgetc(stdin);
+					if (EOF == c) break;
+					buffer[pos++] = (unsigned char)c;
 				}
 				else
 				{
