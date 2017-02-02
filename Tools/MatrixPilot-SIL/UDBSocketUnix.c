@@ -144,6 +144,10 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 		{
 			struct termios  config;
 
+			if (NULL == newSocket->serial_port) {
+				free(newSocket);
+				return NULL;
+			}
 			newSocket->fd = open(newSocket->serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
 			if (newSocket->fd == -1) {
 				perror("serial open() failed");
@@ -309,7 +313,7 @@ void UDBSocket_close(UDBSocket socket)
 		case UDBSocketUDPServer:
 		{
 			shutdown(socket->fd, SHUT_RDWR);
-			close(socket->fd);
+			if (socket->fd >= 0) close(socket->fd);
 			if (socket->UDP_host) free(socket->UDP_host);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
@@ -317,7 +321,7 @@ void UDBSocket_close(UDBSocket socket)
 		}
 		case UDBSocketSerial:
 		{
-			close(socket->fd);
+			if (socket->fd >= 0) close(socket->fd);
 			if (socket->serial_port) free(socket->serial_port);
 			free(socket);
 			break;
@@ -346,7 +350,10 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 				select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
 				if (FD_ISSET(STDIN_FILENO, &fds)) // only read stdin if there's data ready
 				{
-					buffer[pos++] = fgetc(stdin);
+					int c;
+					c = fgetc(stdin);
+					if (EOF == c) break;
+					buffer[pos++] = (unsigned char)c;
 				}
 				else
 				{
