@@ -392,11 +392,12 @@ int32_t long_scale(int32_t arg1, int16_t arg2)
 		arg2 = -arg2;
 	}
 	product  = __builtin_muluu(arg2, arg1ww._.W1);
+	product <<= 2;
 	accum.WW = __builtin_muluu(arg2, arg1ww._.W0);
+	accum.WW <<= 2;
 	accum._.W0 = accum._.W1;
 	accum._.W1 = 0;
 	product += accum.WW;
-	product <<= 2;
 	if (sign_result > 0)
 	{
 		return product;
