@@ -172,9 +172,9 @@ void rotate_2D(struct relative2D* xy, int8_t angle)
 
 	sinang = sine(angle);
 	cosang = cosine(angle);
-	accum.WW = ((__builtin_mulss(cosang, xy->x) - __builtin_mulss(sinang, xy->y)) << 2);
+	accum.WW = ((__builtin_mulss(cosang, xy->x) - __builtin_mulss(sinang, xy->y)) << 2) + 0x00008000;
 	newx = accum._.W1;
-	accum.WW = ((__builtin_mulss(sinang, xy->x) + __builtin_mulss(cosang, xy->y)) << 2);
+	accum.WW = ((__builtin_mulss(sinang, xy->x) + __builtin_mulss(cosang, xy->y)) << 2) + 0x00008000;
 	newy = accum._.W1;
 	xy->x = newx;
 	xy->y = newy;
