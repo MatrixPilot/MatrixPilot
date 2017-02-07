@@ -90,86 +90,86 @@ void estLocation(void)
 
 	location_plane(&location[0]);
 
-		// convert GPS course of 360 degrees to a binary model with 256
-		accum.WW = __builtin_muluu(COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
-		// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East
-		cog_circular = -accum.__.B2 + 64;
+	// convert GPS course of 360 degrees to a binary model with 256
+	accum.WW = __builtin_muluu(COURSEDEG_2_BYTECIR, cog_gps.BB) + 0x00008000;
+	// re-orientate from compass (clockwise) to maths (anti-clockwise) with 0 degrees in East
+	cog_circular = -accum.__.B2 + 64;
 
-		// compensate for GPS reporting latency.
-		// The dynamic model of the EM406 and uBlox is not well known.
-		// However, it seems likely much of it is simply reporting latency.
-		// This section of the code compensates for reporting latency.
-		// markw: what is the latency? It doesn't appear numerically or as a comment
-		// in the following code. Since this method is called at the GPS reporting rate
-		// it must be assumed to be one reporting interval?
+	// compensate for GPS reporting latency.
+	// The dynamic model of the EM406 and uBlox is not well known.
+	// However, it seems likely much of it is simply reporting latency.
+	// This section of the code compensates for reporting latency.
+	// markw: what is the latency? It doesn't appear numerically or as a comment
+	// in the following code. Since this method is called at the GPS reporting rate
+	// it must be assumed to be one reporting interval?
 
-		if (dcm_flags._.gps_history_valid)
-		{
-			cog_delta = cog_circular - cog_previous;
-			sog_delta = sog_gps.BB - sog_previous;
-			climb_rate_delta = climb_gps.BB - climb_rate_previous;
+	if (dcm_flags._.gps_history_valid)
+	{
+		cog_delta = cog_circular - cog_previous;
+		sog_delta = sog_gps.BB - sog_previous;
+		climb_rate_delta = climb_gps.BB - climb_rate_previous;
 
-			location_deltaXY.x = location[0] - location_previous[0];
-			location_deltaXY.y = location[1] - location_previous[1];
-			location_deltaZ    = location[2] - location_previous[2];
-		}
-		else
-		{
-			cog_delta = 0;
-			sog_delta = 0;
-			climb_rate_delta = 0;
-			location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0;
-		}
-		dcm_flags._.gps_history_valid = 1;
-		actual_dir = cog_circular + cog_delta;
-		cog_previous = cog_circular;
+		location_deltaXY.x = location[0] - location_previous[0];
+		location_deltaXY.y = location[1] - location_previous[1];
+		location_deltaZ    = location[2] - location_previous[2];
+	}
+	else
+	{
+		cog_delta = 0;
+		sog_delta = 0;
+		climb_rate_delta = 0;
+		location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0;
+	}
+	dcm_flags._.gps_history_valid = 1;
+	actual_dir = cog_circular + cog_delta;
+	cog_previous = cog_circular;
 
-		// Note that all these velocities are in centimeters / second
+	// Note that all these velocities are in centimeters / second
 
-		ground_velocity_magnitudeXY = sog_gps.BB + sog_delta;
-		sog_previous = sog_gps.BB;
+	ground_velocity_magnitudeXY = sog_gps.BB + sog_delta;
+	sog_previous = sog_gps.BB;
 
-		GPSvelocity.z = climb_gps.BB + climb_rate_delta;
-		climb_rate_previous = climb_gps.BB;
+	GPSvelocity.z = climb_gps.BB + climb_rate_delta;
+	climb_rate_previous = climb_gps.BB;
 
-		accum_velocity.WW = (__builtin_mulss(cosine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
-		GPSvelocity.x = accum_velocity._.W1;
+	accum_velocity.WW = (__builtin_mulss(cosine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
+	GPSvelocity.x = accum_velocity._.W1;
 
-		accum_velocity.WW = (__builtin_mulss(sine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
-		GPSvelocity.y = accum_velocity._.W1;
+	accum_velocity.WW = (__builtin_mulss(sine(actual_dir), ground_velocity_magnitudeXY) << 2) + 0x00008000;
+	GPSvelocity.y = accum_velocity._.W1;
 
-		rotate_2D(&location_deltaXY, cog_delta); // this is a key step to account for rotation effects!!
+	rotate_2D(&location_deltaXY, cog_delta); // this is a key step to account for rotation effects!!
 
-		GPSlocation.x = location[0] + location_deltaXY.x;
-		GPSlocation.y = location[1] + location_deltaXY.y;
-		GPSlocation.z = location[2] + location_deltaZ;
+	GPSlocation.x = location[0] + location_deltaXY.x;
+	GPSlocation.y = location[1] + location_deltaXY.y;
+	GPSlocation.z = location[2] + location_deltaZ;
 
-		location_previous[0] = location[0];
-		location_previous[1] = location[1];
-		location_previous[2] = location[2];
+	location_previous[0] = location[0];
+	location_previous[1] = location[1];
+	location_previous[2] = location[2];
 
-		velocity_thru_air.y = GPSvelocity.y - estimatedWind[1];
-		velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
-		velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
+	velocity_thru_air.y = GPSvelocity.y - estimatedWind[1];
+	velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
+	velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
 
 #if (HILSIM == 1)
-		air_speed_3DGPS = hilsim_airspeed.BB; // use Xplane as a pitot
+	air_speed_3DGPS = hilsim_airspeed.BB; // use Xplane as a pitot
 #else
-		air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
+	air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
 #endif
 
-		calculated_heading  = rect_to_polar(&velocity_thru_air);
-		// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
-		air_speed_magnitudeXY = velocity_thru_air.x; // in cm / sec
+	calculated_heading  = rect_to_polar(&velocity_thru_air);
+	// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
+	air_speed_magnitudeXY = velocity_thru_air.x; // in cm / sec
 
 #if (GPS_RATE == 4)
-		forward_acceleration = (air_speed_3DGPS - velocity_previous) << 2; // Ublox enters code 4 times per second
+	forward_acceleration = (air_speed_3DGPS - velocity_previous) << 2; // Ublox enters code 4 times per second
 #elif (GPS_RATE == 2)
-		forward_acceleration = (air_speed_3DGPS - velocity_previous) << 1; // Ublox enters code 2 times per second
+	forward_acceleration = (air_speed_3DGPS - velocity_previous) << 1; // Ublox enters code 2 times per second
 #else
-		forward_acceleration = (air_speed_3DGPS - velocity_previous);      // EM406 standard GPS enters code once per second
+	forward_acceleration = (air_speed_3DGPS - velocity_previous);      // EM406 standard GPS enters code once per second
 #endif
 
-		velocity_previous = air_speed_3DGPS;
+	velocity_previous = air_speed_3DGPS;
 }
 
