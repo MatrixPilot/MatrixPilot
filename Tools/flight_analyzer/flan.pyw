@@ -2298,7 +2298,7 @@ def write_csv(options,log_book):
     ### write out a csv file enabling analysis in Excel or OpenOffice
    
     f_csv = open(options.CSV_filename, 'w')
-    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,Altitude,",
+    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,GPS Alt ASL,GPS Alt AO,",
     print >> f_csv, "Rmat0,Rmat1,Rmat2,Rmat3,Rmat4,Rmat5,Rmat6,Rmat7,Rmat8,",
     print >> f_csv, "Pitch,Roll,Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
     print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
@@ -2386,6 +2386,7 @@ def write_csv(options,log_book):
               entry.status, "," , \
               entry.latitude / 10000000.0, ",",entry.longitude / 10000000.0,",", \
               entry.waypointIndex, ",", "{0:.2f}".format(entry.altitude / 100.0), "," , \
+              "{0:.2f}".format((entry.altitude - log_book.origin_altitude)/ 100.0), "," , \
               entry.rmat0, "," , entry.rmat1, "," , entry.rmat2 , "," ,\
               entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
               entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
@@ -2393,7 +2394,8 @@ def write_csv(options,log_book):
                               ",", "{0:.2f}".format(entry.heading_degrees), "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
-              entry.est_airspeed, "," , entry.est_wind_x, "," , entry.est_wind_y, ",", entry.est_wind_z , "," , \
+              "{0:.2f}".format(entry.est_airspeed /100.0), "," , "{0:.2f}".format(entry.est_wind_x / 100.0), "," ,  \
+              "{0:.2f}".format(entry.est_wind_y / 100.0), ",", "{0:.2f}".format(entry.est_wind_z / 100.0), "," , \
               entry.pwm_input[1], "," , entry.pwm_input[2], "," , entry.pwm_input[3], "," , entry.pwm_input[4], "," , \
               entry.pwm_input[5], "," , entry.pwm_input[6], "," , entry.pwm_input[7], "," , entry.pwm_input[8], "," , \
               entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
@@ -2402,7 +2404,8 @@ def write_csv(options,log_book):
               entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , entry.desired_height, ",",\
               int(entry.earth_mag_vec_E), "," , int(entry.earth_mag_vec_N), "," , int(entry.earth_mag_vec_Z), "," , \
               entry.inline_waypoint_x, ",", entry.inline_waypoint_y, ",", entry.inline_waypoint_z, ",", \
-              entry.IMUvelocityx, ",", entry.IMUvelocityy, ",", entry.IMUvelocityz, ",", \
+              "{0:.2f}".format(entry.IMUvelocityx / 100.0), ",", "{0:.2f}".format(entry.IMUvelocityy / 100.0), ",", \
+              "{0:.2f}".format(entry.IMUvelocityz / 100.0), ",", \
               entry.flags, ",",hex(entry.flags),",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
               entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(incidence), \
               ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa_using_pitch), \
