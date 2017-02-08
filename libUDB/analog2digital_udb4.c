@@ -234,8 +234,9 @@ void udb_init_ADC(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
-
+			
 #if (RECORD_FREE_STACK_SPACE == 1)
 	uint16_t stack = SP_current();
 	if (stack > maxstack)
@@ -347,6 +348,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 	}
 
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 #endif // BOARD_TYPE

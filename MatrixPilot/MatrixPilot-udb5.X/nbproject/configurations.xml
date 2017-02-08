@@ -87,6 +87,7 @@
         <itemPath>../../libUDB/sonarIn.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../libUDB/servoOutPins.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix"
                      displayName="libVectorMatrix"
@@ -710,6 +711,9 @@
         <property key="relaxed-math" value="false"/>
         <property key="save-temps" value="false"/>
       </C30Global>
+      <PICkit3PlatformTool>
+        <property key="firmware.download.all" value="false"/>
+      </PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>

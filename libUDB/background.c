@@ -159,19 +159,23 @@ void udb_init_irq(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _T1Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 	_T1IF = 0;              // clear the interrupt
 	heartbeat();
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _T5Interrupt(void)
 {
 	interrupt_save_set_corcon;
+	set_ipl_on_output_pin;
 	TMR5 = 0;               // reset the timer
 	_cpu_timer++;           // increment the load counter
 	_T5IF = 0;              // clear the interrupt
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 static background_callback callback_fptr_1 = NULL;
@@ -181,10 +185,12 @@ static background_callback callback_fptr_1 = NULL;
 void __attribute__((__interrupt__,__no_auto_psv__)) _T6Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 	_T6IF = 0;              // clear the interrupt
 	if (callback_fptr_1) callback_fptr_1(); // was called pulse() or heartbeat_pulse()
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 // Trigger the low priority background processing interrupt.
@@ -203,11 +209,13 @@ static background_callback callback_fptr_2 = NULL;
 void __attribute__((__interrupt__,__no_auto_psv__)) _T7Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 	_T7IF = 0;              // clear the interrupt
 	//udb_background_callback_triggered(); // replaced by function pointer callback below
 	if (callback_fptr_2) callback_fptr_2();
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 // Trigger the low priority background processing interrupt.

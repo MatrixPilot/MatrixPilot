@@ -193,6 +193,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 
 	_SPIIF = 0;                 // clear interrupt flag as soon as possible so as to not miss any interrupts
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 	_SPIIE = 0;                 // turn off SPI interrupts
 	spibuf = SPIBUF;            // get first byte from first word
@@ -207,6 +208,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	MPU_SS = 1;
 	(*mpu_call_back)();
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 #else // no SPI FIFO
@@ -234,6 +236,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 
 	_SPIIF = 0;                 // clear interrupt flag as soon as possible so as to not miss any interrupts
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 #if 1
 	if (SPI_i == 0) {
@@ -275,6 +278,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 	SPI_high = 0xFF & spibuf;
 #endif // 0
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 #endif // (__dsPIC33E__)
