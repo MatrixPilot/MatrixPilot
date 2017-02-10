@@ -34,6 +34,7 @@
         <itemPath>../../../libUDB/radioIn.h</itemPath>
         <itemPath>../../../libUDB/serialIO.h</itemPath>
         <itemPath>../../../libUDB/servoOut.h</itemPath>
+        <itemPath>../../../libUDB/servoOutPins.h</itemPath>
         <itemPath>../../../libUDB/sonarIn.h</itemPath>
         <itemPath>../../../libUDB/uart.h</itemPath>
         <itemPath>../../../libUDB/udbTypes.h</itemPath>
