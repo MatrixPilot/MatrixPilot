@@ -13,6 +13,7 @@
         <itemPath>../../libDCM/estYawDrift.h</itemPath>
         <itemPath>../../libDCM/gpsData.h</itemPath>
         <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
+        <itemPath>../../libDCM/hilsim.h</itemPath>
         <itemPath>../../libDCM/libDCM.h</itemPath>
         <itemPath>../../libDCM/libDCM_defines.h</itemPath>
         <itemPath>../../libDCM/libDCM_internal.h</itemPath>
@@ -51,6 +52,7 @@
         <itemPath>../../libUDB/radioIn.h</itemPath>
         <itemPath>../../libUDB/serialIO.h</itemPath>
         <itemPath>../../libUDB/servoOut.h</itemPath>
+        <itemPath>../../libUDB/servoOutPins.h</itemPath>
         <itemPath>../../libUDB/sonarIn.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>

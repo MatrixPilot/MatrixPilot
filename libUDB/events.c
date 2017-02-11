@@ -109,6 +109,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTL_INTERUPT(void)
 {
 	_EVENTL_TRIGGERIF = 0;      // clear the interrupt
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 
 	int16_t eventIndex;
@@ -130,12 +131,14 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTL_INTERUPT(void)
 		}
 	}
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void)
 {
 	_EVENTM_TRIGGERIF = 0;      // clear the interrupt
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 
 	int16_t eventIndex;
@@ -157,5 +160,6 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _EVENTM_INTERUPT(void)
 		}
 	}
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 

@@ -24,42 +24,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "servoOut.h"
-
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-
-#define SERVO_OUT_PIN_1         _LATD0
-#define SERVO_OUT_PIN_2         _LATD1
-#define SERVO_OUT_PIN_3         _LATD2
-#define SERVO_OUT_PIN_4         _LATD3
-#define SERVO_OUT_PIN_5         _LATD4
-#define SERVO_OUT_PIN_6         _LATD5
-#define SERVO_OUT_PIN_7         _LATD6
-#define SERVO_OUT_PIN_8         _LATD7
-#define SERVO_OUT_PIN_9         _LATA4
-#define SERVO_OUT_PIN_10        _LATA1
-#define ACTION_OUT_PIN          SERVO_OUT_PIN_9
-
-#elif (BOARD_TYPE == AUAV3_BOARD)
-
-#define SERVO_OUT_PIN_1         _LATG0
-#define SERVO_OUT_PIN_2         _LATE0
-#define SERVO_OUT_PIN_3         _LATG13
-#define SERVO_OUT_PIN_4         _LATD7
-#define SERVO_OUT_PIN_5         _LATG14
-#define SERVO_OUT_PIN_6         _LATG1
-#define SERVO_OUT_PIN_7         _LATF13
-#define SERVO_OUT_PIN_8         _LATF12
-#define SERVO_OUT_PIN_9         _LATF12
-#define SERVO_OUT_PIN_10        _LATF12
-#define ACTION_OUT_PIN          SERVO_OUT_PIN_8
-
-#if (NUM_OUTPUTS > 8)
-#error "max of 8 servo outputs currently supported for AUAV3"
-#endif
-
-#else
-#error Invalid BOARD_TYPE
-#endif
+#include "servoOutPins.h"
 
 #if (MIPS == 64)
 #define SCALE_FOR_PWM_OUT(x)    (x/2)
@@ -143,7 +108,7 @@ void udb_set_action_state(boolean newValue)
 	ACTION_OUT_PIN = newValue;
 }
 
-// Call this to start sending out pulses to all the PWM output channels sequentially
+
 void start_pwm_outputs(void)
 {
 	if (NUM_OUTPUTS > 0)
@@ -184,9 +149,91 @@ extern uint16_t maxstack;
 	}                                                   \
 }
 
+#if (TEST_INTERRUPT_PRIORITY_TIMINGS == 1)
+// When testing interrupt priorities, all servo output timings are sent to pin 8 
+// Pins 1-7 for are then indicating the timing of  interrupt priorities
+// No Servos should be attached to the board outputs, only a logic analyser.
 void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
+	// interrupt_save_set_corcon;
+
+	switch (outputNum) {
+		case 0:
+			HANDLE_SERVO_OUT(1, SERVO_OUT_PIN_8);
+			break;
+		case 1:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(2, SERVO_OUT_PIN_8);
+			break;
+		case 2:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(3, SERVO_OUT_PIN_8);
+			break;
+		case 3:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(4, SERVO_OUT_PIN_8);
+			break;
+		case 4:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(5, SERVO_OUT_PIN_8);
+			break;
+		case 5:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(6, SERVO_OUT_PIN_8);
+			break;
+		case 6:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(7, SERVO_OUT_PIN_8);
+			break;
+		case 7:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(8, SERVO_OUT_PIN_8);
+			break;
+		case 8:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(9, SERVO_OUT_PIN_8);
+			break;
+#ifdef SERVO_OUT_PIN_10
+		case 9:
+			SERVO_OUT_PIN_8 = 0;
+			HANDLE_SERVO_OUT(10, SERVO_OUT_PIN_8);
+			break;
+		case 10:
+			SERVO_OUT_PIN_8 = 0;   // end the pulse by setting the SERVO_OUT_PIN_10 pin low
+			_T4IE = 0;              // disable timer 4 interrupt
+			break;
+#else
+		case 9:
+			SERVO_OUT_PIN_9 = 0;
+			_T4IE = 0;              // disable timer 4 interrupt
+			break;
+#endif // SERVO_OUT_PIN_10
+	}
+
+	_T4IF = 0;                      // clear the interrupt
+
+#if (RECORD_FREE_STACK_SPACE == 1)
+	// Check stack space here because it's a high-priority ISR
+	// which may have interrupted a whole chain of other ISRs,
+	// So available stack space can get lowest here.
+	uint16_t stack = SP_current();
+	if (stack > maxstack)
+	{
+		maxstack = stack;
+	}
+#endif
+
+	// interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
+}
+#else
+
+void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
+{
+	indicate_loading_inter;
+	// "set_ipl_on_output_pin" macro not here as _T4 Interrupt disabled when testing Interrupt Priorities
 	// interrupt_save_set_corcon;
 
 	switch (outputNum) {
@@ -257,3 +304,5 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 
 	// interrupt_restore_corcon;
 }
+#endif
+

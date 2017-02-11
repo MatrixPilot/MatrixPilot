@@ -135,16 +135,19 @@ void cfgSpi2Master(void)
 void __attribute__((__interrupt__, __no_auto_psv__)) _DMA2Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 
 	_DMA2IF = 0;
 
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 
 	_DMA1IF = 0;
@@ -154,6 +157,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _DMA1Interrupt(void)
 	IsBusy = 0;
 
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 /*
 unsigned char GetRxByte(uint16_t i)

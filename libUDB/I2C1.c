@@ -101,12 +101,14 @@ static void serviceI2C1(void) // service the I2C
 void __attribute__((__interrupt__,__no_auto_psv__)) _MI2C1Interrupt(void)
 {
 	indicate_loading_inter;
+	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
 	
 	_MI2C1IF = 0;                       // clear the interrupt
 	(*I2C1_state)();                    // execute the service routine
 	
 	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
 }
 
 // Check if I2C port is available for use.

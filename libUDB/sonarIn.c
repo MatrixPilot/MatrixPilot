@@ -85,6 +85,7 @@ void udb_init_sonar(void)
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 { \
 	indicate_loading_inter; \
+	set_ipl_on_output_pin; \
 	interrupt_save_set_corcon; \
 	uint16_t time; \
 	_IC##x##IF = 0; \
@@ -103,6 +104,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 		udb_flags._.sonar_updated = 1; \
 	} \
 	interrupt_restore_corcon; \
+	unset_ipl_on_output_pin;  \
 }
 #define SONAR_HANDLER(x, y) _SONAR_HANDLER(x, y)
 

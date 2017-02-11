@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////// 
 // Optionally enable the new power saving idle mode of the MCU during mainloop
 #define USE_MCU_IDLE    0
 
@@ -65,18 +65,86 @@ uint16_t SP_start(void);
 uint16_t SP_limit(void);
 uint16_t SP_current(void);
 
+#define TEST_INTERRUPT_PRIORITY_TIMINGS    0
+#if (TEST_INTERRUPT_PRIORITY_TIMINGS == 1)
+// Set Interrupt Priority on associated Output Pin for timing analysis with Logic Analyzer
+// Servos should be disconnected from OUTPUT pins when using this feature
+#include "servoOutPins.h"
+#define set_ipl_on_output_pin			\
+	{					\
+		switch(SRbits.IPL)		\
+		{				\
+		    case 1:			\
+			   SERVO_OUT_PIN_1 = 1;	\
+			   break;		\
+		    case 2:			\
+			   SERVO_OUT_PIN_2 = 1;	\
+			   break;		\
+		    case 3:			\
+			   SERVO_OUT_PIN_3 = 1;	\
+			   break;		\
+		    case 4:			\
+			   SERVO_OUT_PIN_4 = 1;	\
+			   break;		\
+		    case 5:			\
+			   SERVO_OUT_PIN_5 = 1;	\
+			   break;		\
+		    case 6:			\
+			   SERVO_OUT_PIN_6 = 1;	\
+			   break;		\
+		    case 7:			\
+			   SERVO_OUT_PIN_7 = 1;	\
+			   break;		\
+		}				\
+	}
+
+#define unset_ipl_on_output_pin                 \
+	{                                       \
+		switch(SRbits.IPL)              \
+		{                               \
+		    case 1:                     \
+			   SERVO_OUT_PIN_1 = 0; \
+			   break;               \
+		    case 2:                     \
+			   SERVO_OUT_PIN_2 = 0; \
+			   break;               \
+		    case 3:                     \
+			   SERVO_OUT_PIN_3 = 0; \
+			   break;               \
+		    case 4:                     \
+			   SERVO_OUT_PIN_4 = 0; \
+			   break;               \
+		    case 5:                     \
+			   SERVO_OUT_PIN_5 = 0; \
+			   break;               \
+		    case 6:                     \
+			   SERVO_OUT_PIN_6 = 0; \
+			   break;               \
+		    case 7:                     \
+			   SERVO_OUT_PIN_7 = 0; \
+			   break;               \
+		}                               \
+	}
+#else
+
+#define set_ipl_on_output_pin	    \
+
+#define unset_ipl_on_output_pin	    \
+
+#endif 
+
 #if (USE_MCU_IDLE == 1)
 #define indicate_loading_inter {}
 #define indicate_loading_main  {}
 #else
-#define indicate_loading_inter \
-	{ \
-		T5CONbits.TON = 1; \
+#define indicate_loading_inter			\
+	{					\
+		T5CONbits.TON = 1;		\
 	}
 
-#define indicate_loading_main \
-	{ \
-		T5CONbits.TON = 0; \
+#define indicate_loading_main			\
+	{					\
+		T5CONbits.TON = 0;		\
 	}
 #endif // USE_MCU_IDLE
 
