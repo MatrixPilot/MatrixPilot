@@ -29,10 +29,14 @@
 #define USE_BMP085_ON_I2C 2
 
 // BMP085 oversampling can be set from 0 thru 3
+#ifdef TEST_WITH_DATASHEET_VALUES
+#define OSS 0
+# else
 #define OSS 3
 //#define OSS 2
 //#define OSS 1
 //#define OSS 0
+#endif
 
 typedef union
 {
