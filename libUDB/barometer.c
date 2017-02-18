@@ -37,35 +37,35 @@
 typedef union
 {
 	struct {
-		int ac1;
-		int ac2;
-		int ac3;
-		unsigned int ac4;
-		unsigned int ac5;
-		unsigned int ac6;
-		int b1;
-		int b2;
-		int mb;
-		int mc;
-		int md;
+		int16_t ac1;
+		int16_t ac2;
+		int16_t ac3;
+		uint16_t ac4;
+		uint16_t ac5;
+		uint16_t ac6;
+		int16_t  b1;
+		int16_t  b2;
+		int16_t  mb;
+		int16_t  mc;
+		int16_t  md;
 	};
-	unsigned char buf[22];
+	uint8_t buf[22];
 } barCalib_union_t;
 
 static barCalib_union_t bc; // barometer calibration constants
-static long b5; // this is the important number for calculating the temperature
+static int32_t b5; // this is the important number for calculating the temperature
 
-static const unsigned char bmp085read_barCalib[] = { 0xAA };  // Address of the first register to read
-static const unsigned char bmp085read_barData[]  = { 0xF6 };
+static const uint8_t bmp085read_barCalib[] = { 0xAA };  // Address of the first register to read
+static const uint8_t bmp085read_barData[]  = { 0xF6 };
 
-static const unsigned char bmp085write_index[]   = { 0xF4 };  // Address of the command register to write
-static unsigned char bmp085read_barTemp[]        = { 0x2E };
-static unsigned char bmp085read_barPres[]        = { 0x34 + (OSS<<6) };
+static const uint8_t bmp085write_index[]   = { 0xF4 };  // Address of the command register to write
+static uint8_t bmp085read_barTemp[]        = { 0x2E };
+static uint8_t bmp085read_barPres[]        = { 0x34 + (OSS<<6) };
 
-static unsigned char barData[3];
+static uint8_t barData[3];
 
-static int barMessage = 0;      // message type, state machine counter
-static int barCalibPause = 0;
+static int16_t barMessage = 0;      // message type, state machine counter
+static int16_t barCalibPause = 0;
 
 void ReadBarTemp_callback(boolean I2CtrxOK);
 void ReadBarPres_callback(boolean I2CtrxOK);
@@ -144,16 +144,16 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 
 int TestByteOrder()
 {
-	short int word = 0x0001;
-	char* byte = (char*)&word;
+	int_16_t word = 0x0001;
+	int8_t* byte = (int8_t*)&word;
 	return(byte[0] ? LITTLE_ENDIAN : BIG_ENDIAN);
 }
  */
 
-static void byteswaparray(unsigned char* ary, int len)
+static void byteswaparray(uint8_t* ary, int16_t len)
 {
-	int i;
-	unsigned char tmp;
+	int16_t i;
+	uint8_t tmp;
 
 	for (i = 0; i < len; i += 2)
 	{
@@ -186,12 +186,12 @@ void ReadBarCalib_callback(boolean I2CtrxOK)
 
 // Calculate temperature given ut.
 // Value returned will be in units of 0.1 deg C
-static long bmp085CalcTemperature(unsigned int ut)
+static int32_t bmp085CalcTemperature( uint16_t ut)
 {
-	long x1, x2;
+	int32_t x1, x2;
 
-	x1 = (((long)ut - (long)bc.ac6)*(long)bc.ac5) >> 15;
-	x2 = ((long)bc.mc << 11) / (x1 + bc.md);
+	x1 = (((int32_t)ut - (int32_t)bc.ac6)*(int32_t)bc.ac5) >> 15;
+	x2 = ((int32_t)bc.mc << 11) / (x1 + bc.md);
 	b5 = x1 + x2;
 
 	return ((b5 + 8) >> 4); 
@@ -201,10 +201,10 @@ static long bmp085CalcTemperature(unsigned int ut)
 // calibration values must be known
 // b5 is also required so bmp085CalcTemperature(...) must be called first.
 // Value returned will be pressure in units of Pa.
-static long bmp085CalcPressure(long up)
+static int32_t bmp085CalcPressure(int32_t up)
 {
-	long x1, x2, x3, b3, b6, b7, p;
-	unsigned long b4;
+	int32_t x1, x2, x3, b3, b6, p;
+	uint32_t b4, b7;
 
 	b6 = b5 - 4000;
 	// Calculate B3
@@ -216,8 +216,8 @@ static long bmp085CalcPressure(long up)
 	x1 = (bc.ac3 * b6) >> 13;
 	x2 = (bc.b1 * ((b6 * b6) >> 12)) >> 16;
 	x3 = ((x1 + x2) + 2) >> 2;
-	b4 = (bc.ac4 * (unsigned long)(x3 + 32768)) >> 15;
-	b7 = ((unsigned long)up - b3) * (50000>>OSS);
+	b4 = (bc.ac4 * (uint32_t)(x3 + 32768)) >> 15;
+	b7 = ((uint32_t)up - b3) * (50000>>OSS);
 	if (b7 < 0x80000000) {
 		p = (b7 << 1) / b4;
 	} else {
@@ -233,13 +233,11 @@ static long bmp085CalcPressure(long up)
 
 void ReadBarTemp_callback(boolean I2CtrxOK)
 {
-	long temperature;
-	unsigned int ut;
+	int32_t temperature;
+	uint16_t ut;
 
 	if (I2CtrxOK == true)
 	{
-//		byteswaparray((unsigned char*)&barData, 2);
-//		ut = ((unsigned int) (unsigned int)barData[0] << 8 | (unsigned int)barData[1]);
 		ut = (barData[0] << 8 | barData[1]);
 #ifdef TEST_WITH_DATASHEET_VALUES
 		ut = 27898;
@@ -254,11 +252,11 @@ void ReadBarTemp_callback(boolean I2CtrxOK)
 
 void ReadBarPres_callback(boolean I2CtrxOK)
 {
-	long pressure;
+	int32_t pressure;
 
 	if (I2CtrxOK == true)
 	{
-		pressure = ((long)barData[0] << 16 | (long)barData[1] << 8 | (long)barData[2]) >> (8-OSS);
+		pressure = ((int32_t)barData[0] << 16 | (int32_t)barData[1] << 8 | (int32_t)barData[2]) >> (8-OSS);
 #ifdef TEST_WITH_DATASHEET_VALUES
 		pressure = 23843;
 #endif
