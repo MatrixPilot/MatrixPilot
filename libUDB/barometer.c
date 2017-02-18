@@ -212,16 +212,16 @@ static int32_t bmp085CalcPressure(int32_t up)
 
 	b6 = b5 - 4000;
 	// Calculate B3
-	x1 = (bc.b2 * ((b6 * b6) >> 12)) >> 11;
-	x2 = (bc.ac2 * b6) >> 11;
+	x1 = ((int32_t)bc.b2 * ((b6 * b6) >> 12)) >> 11;
+	x2 = ((int32_t)bc.ac2 * b6) >> 11;
 	x3 = x1 + x2;
-	b3 = (((bc.ac1*4 + x3) << OSS) + 2) >> 2;
+	b3 = ((((int32_t)bc.ac1*4 + x3) << OSS) + 2) >> 2;
 	// Calculate B4
-	x1 = (bc.ac3 * b6) >> 13;
-	x2 = (bc.b1 * ((b6 * b6) >> 12)) >> 16;
+	x1 = ((int32_t)bc.ac3 * b6) >> 13;
+	x2 = ((int32_t)bc.b1 * ((b6 * b6) >> 12)) >> 16;
 	x3 = ((x1 + x2) + 2) >> 2;
-	b4 = (bc.ac4 * (uint32_t)(x3 + 32768)) >> 15;
-	b7 = ((uint32_t)up - b3) * (50000>>OSS);
+	b4 = ((uint32_t)bc.ac4 * (uint32_t)(x3 + 32768)) >> 15;
+	b7 = ((uint32_t)up - b3) * (50000UL>>OSS);
 	if (b7 < 0x80000000) {
 		p = (b7 << 1) / b4;
 	} else {
@@ -230,7 +230,7 @@ static int32_t bmp085CalcPressure(int32_t up)
 	x1 = (p >> 8) * (p >> 8);
 	x1 = (x1 * 3038) >> 16;
 	x2 = (-7357 * p) >> 16;
-	p = p + ((x1 + x2 + 3791) >> 4);
+	p = p + ((x1 + x2 + (int32_t)3791) >> 4);
 
 	return p;
 }
