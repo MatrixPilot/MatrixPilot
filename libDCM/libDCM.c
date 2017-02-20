@@ -90,7 +90,7 @@ static boolean gps_run_init_step(uint16_t count)
 //  result set via the callback. Also on first invocation the barometer driver
 //  reads calibration data, and hence requires one extra call
 
-void do_I2C_stuff(void)
+void get_data_from_I2C_sensors(void)
 {
 	static int toggle = 0;
 	static int counter = 0;
@@ -121,7 +121,7 @@ void udb_heartbeat_callback(void)
 #if (USE_BAROMETER_ALTITUDE == 1)
 	if (udb_pulse_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
-		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
+		get_data_from_I2C_sensors(); // TODO: this should always be be called at 40Hz
 	}
 #else
 //#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
