@@ -65,22 +65,22 @@ static magnetometer_callback_funcptr magnetometer_callback = NULL;
 #error Undefined magnetometer I2C bus
 #endif
 
-// local (static) variables
-static uint8_t hmc5883read_index[]  = { 0x03 }; // Address of the first register to read
-static uint8_t hmc5883write_index[] = { 0x00 }; // Address of the first register to read
 
-static uint8_t enableMagRead[]        = { 0x10 , 0x20 , 0x00 }; // Continous measurament
-static uint8_t enableMagCalibration[] = { 0x11 , 0x20 , 0x01 }; // Positive bias (Self Test) and single measurament
-static uint8_t resetMagnetometer[]    = { 0x10 , 0x20 , 0x02 }; // Idle mode (Reset??)
 
 #if (HILSIM == 1)
 uint8_t magreg[6];              // magnetometer read-write buffer
 #else
 static uint8_t magreg[6];       // magnetometer read-write buffer
-#endif
 
+static uint8_t hmc5883read_index[]  = { 0x03 }; // Address of the first register to read
+static uint8_t hmc5883write_index[] = { 0x00 }; // Address of the first register to read
+
+static uint8_t enableMagRead[]        = { 0x10 , 0x20 , 0x00 }; // Continuous measurement
+static uint8_t enableMagCalibration[] = { 0x11 , 0x20 , 0x01 }; // Positive bias (Self Test) and single measurement
+static uint8_t resetMagnetometer[]    = { 0x10 , 0x20 , 0x02 }; // Idle mode (Reset??)
 static int16_t mrindex;         // index into the read write buffer 
 static int16_t magCalibPause = 0;
+#endif
 
 int16_t I2messages = 0;
 
@@ -88,7 +88,7 @@ int16_t I2messages = 0;
 static void I2C_callback(boolean I2CtrxOK);
 
 
-void rxMagnetometer(magnetometer_callback_funcptr callback)     // service the magnetometer
+uint8_t rxMagnetometer(magnetometer_callback_funcptr callback)     // service the magnetometer
 {
 	magnetometer_callback = callback;
 
@@ -109,7 +109,7 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)     // service the m
 	{
 		magMessage = 0;         // start over again
 		I2C_Reset();            // reset the I2C
-		return;
+		return(MAGNETOMETER_NEEDS_SERVICING);
 	}
 
 	mrindex = 0;
@@ -125,36 +125,38 @@ void rxMagnetometer(magnetometer_callback_funcptr callback)     // service the m
 		{ 
 		case 1:     // read the magnetometer in case it is still sending data, so as to NACK it
 			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_callback, I2C_MODE_WRITE_ADDR_READ); 
-			break;
-		case 2:     // put magnetomter into the power up defaults on a reset
+			return(MAGNETOMETER_SERVICE_CAN_PAUSE);
+		case 2:     // put magnetometer into the power up defaults on a reset
 			I2C_Write(HMC5883_COMMAND, hmc5883write_index, 1, resetMagnetometer, 3, NULL);
-			break;
+			return(MAGNETOMETER_NEEDS_SERVICING);
 		case 3:     // clear out any data that is still there
 			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_callback, I2C_MODE_WRITE_ADDR_READ);
-			break;
+			return(MAGNETOMETER_SERVICE_CAN_PAUSE);
 		case 4:     // enable the calibration process
 			magCalibPause = 2;
 			I2C_Write(HMC5883_COMMAND, hmc5883write_index, 1, enableMagCalibration, 3, NULL);
-			break;
+			return(MAGNETOMETER_NEEDS_SERVICING);
 		case 5:     // read the calibration data
 			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_callback, I2C_MODE_WRITE_ADDR_READ);
-			break;
+			return(MAGNETOMETER_SERVICE_CAN_PAUSE);
 		case 6:     // enable normal continuous readings
 			I2C_Write(HMC5883_COMMAND, hmc5883write_index, 1, enableMagRead, 3, NULL);
-			break;
+			return(MAGNETOMETER_NEEDS_SERVICING);
 		case 7:     // read the magnetometer data
 			I2C_Read(HMC5883_COMMAND, hmc5883read_index, 1, magreg, 6, &I2C_callback, I2C_MODE_WRITE_ADDR_READ);
-			break;
+			return(MAGNETOMETER_SERVICE_CAN_PAUSE);
 		default:
 			magMessage = 0;
-			break;
+			return(MAGNETOMETER_SERVICE_CAN_PAUSE);
 		}
 	}
 	else
 	{
 		magCalibPause--;
+		return(MAGNETOMETER_NEEDS_SERVICING);
 	}
 #endif  // (HILSIM != 1)
+return(MAGNETOMETER_SERVICE_CAN_PAUSE);	
 }
 
 // this is the callback function for when the I2C transaction is complete
