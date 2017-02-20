@@ -212,11 +212,4 @@ void HILSIM_MagData(magnetometer_callback_funcptr callback)
 	I2C_callback(true); // run the magnetometer computations
 }
 
-//#else
-//
-//void rxMagnetometer(magnetometer_callback_funcptr callback)
-//{
-//	magnetometer_callback = callback;
-//}
-//
 #endif // MAG_YAW_DRIFT
