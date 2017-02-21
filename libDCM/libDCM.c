@@ -88,8 +88,8 @@ static boolean gps_run_init_step(uint16_t count)
 // The code below ensures that a given sensor is called repeatedly until it reaches
 // a state where the other device can be called safely over the same I2C2 bus, even if 
 // the first device has not yet returned a complete set of sensor data.
-// For example, at startup the barometer needs 12 calls before returning pressure.
-// But in normal operation it will need 6 calls.
+// For example, at startup the barometer could need 9 calls before returning pressure.
+// But in normal operation it will need 5 calls.
 // By contrast in normal operations the magnetometer only needs one call, once it is calibrated.
 
 void get_data_from_I2C_sensors(void) // Expected to be called at 40Hz
@@ -124,7 +124,7 @@ void get_data_from_I2C_sensors(void) // Expected to be called at 40Hz
 		magnetometer_needs_servicing = rxMagnetometer(mag_drift_callback);
 #endif // (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 	}
-	else // Should be my_modulo at 7,8,9  17,18,19   27,28,29  37,38,39 : a total of 4 consequtive calls to mag.
+	else // Should be my_modulo at 7,8,9  17,18,19   27,28,29  37,38,39 : a total of 4 consecutively calls to mag.
 	{
 		if (magnetometer_needs_servicing)
 		{
