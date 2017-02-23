@@ -358,6 +358,7 @@
 // SERIAL_CAM_TRACK is used to output location data to a 2nd UDB, which will target its camera at this plane.
 // SERIAL_MAVLINK is a bi-directional binary format for use with QgroundControl, HKGCS or MAVProxy (Ground Control Stations.)
 // SERIAL_MAGNETOMETER outputs the automatically calculated offsets and raw magnetometer data.
+// SERIAL_MAG_CALIBRATE is used to calculate  magnetometer offsets for a static non changing calibration. 
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
 #ifndef SERIAL_OUTPUT_FORMAT

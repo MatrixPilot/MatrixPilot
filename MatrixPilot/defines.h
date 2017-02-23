@@ -86,16 +86,17 @@ void save_altitudeCntrlVariable(void);
 #define FP_LOGO                     2
 
 // TELEMETRY_OUTPUT_FORMAT options
-#define SERIAL_NONE         0    // No serial data is sent
-#define SERIAL_DEBUG        1    // UAV Dev Board debug info
-#define SERIAL_ARDUSTATION  2    // Compatible with ArduStation
-#define SERIAL_UDB          3    // Pete's efficient UAV Dev Board format
-#define SERIAL_OSD_REMZIBI  4    // Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
-#define SERIAL_OSD_IF       5    // Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
-#define SERIAL_MAGNETOMETER 6    // Debugging the magnetometer
-#define SERIAL_UDB_EXTRA    7    // Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
-#define SERIAL_CAM_TRACK    8    // Output Location in a format usable by a 2nd UDB to target its camera at this plane
-#define SERIAL_MAVLINK      9    // The Micro Air Vehicle Link protocol from the PixHawk Project
+#define SERIAL_NONE           0     // No serial data is sent
+#define SERIAL_DEBUG          1     // UAV Dev Board debug info
+#define SERIAL_ARDUSTATION    2     // Compatible with ArduStation
+#define SERIAL_UDB            3     // Legacy protocol. Superceded by SERIAL_UDB_EXTRA
+#define SERIAL_OSD_REMZIBI    4     // Output data formatted to use as input to a Remzibi OSD (only works with GPS_UBX)
+#define SERIAL_OSD_IF         5     // Output data formatted to use as input to a IF OSD (only works with GPS_UBX)
+#define SERIAL_MAGNETOMETER   6     // Debugging the magnetometer
+#define SERIAL_UDB_EXTRA      7     // Extra Telemetry beyond that provided by SERIAL_UDB for higher bandwidth connections
+#define SERIAL_CAM_TRACK      8     // Output Location in a format usable by a 2nd UDB to target its camera at this plane
+#define SERIAL_MAVLINK        9     // The Micro Air Vehicle Link protocol from the PixHawk Project
+#define SERIAL_MAG_CALIBRATE 10     // Used to calibrate and report static magnetometer offsets
 
 
 #include "gain_variables.h"
