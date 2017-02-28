@@ -90,7 +90,7 @@ void ReadBarCalib_callback(boolean I2CtrxOK);
 
 barometer_callback_funcptr barometer_callback = NULL;
 
-void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
+uint8_t rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 {
 	barometer_callback = callback;
 
@@ -98,7 +98,7 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 	{
 		barMessage = 0;         // start over again
 		I2C_Reset();            // reset the I2C
-		return;
+		return(BAROMETER_NEEDS_SERVICING);
 	}
 
 	if (barCalibPause == 0)
@@ -111,34 +111,34 @@ void rxBarometer(barometer_callback_funcptr callback)  // service the barometer
 		switch (barMessage)
 		{ 
 		case 1:
-			break;
-		case 2:
-			break;
+			return(BAROMETER_NEEDS_SERVICING);
+		case 2:	
+			return(BAROMETER_NEEDS_SERVICING);
 		case 3:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barCalib, 1, bc.buf, 22, &ReadBarCalib_callback, I2C_MODE_WRITE_ADDR_READ);
-			break;
+			return(BAROMETER_SERVICE_CAN_PAUSE);
 		case 4:
-			barCalibPause = 2;  // probably not required
 			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barTemp, 1, NULL);
-			break;
+			return(BAROMETER_NEEDS_SERVICING);
 		case 5:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 2, &ReadBarTemp_callback, I2C_MODE_WRITE_ADDR_READ);
-			break;
+			return(BAROMETER_SERVICE_CAN_PAUSE);
 		case 6:
-			barCalibPause = 2;  // probably not required
+			barCalibPause = 1;  // With OSS of 3, BMP180 needs 25.5 milliseconds to get the 3 oversamples 
 			I2C_Write(BMP085_ADDRESS, bmp085write_index, 1, bmp085read_barPres, 1, NULL);
-			break;
+			return(BAROMETER_NEEDS_SERVICING);
 		case 7:
 			I2C_Read(BMP085_ADDRESS, bmp085read_barData, 1, barData, 3, &ReadBarPres_callback, I2C_MODE_WRITE_ADDR_READ);
-			break;
+			return(BAROMETER_SERVICE_CAN_PAUSE);
 		default:
 			barMessage = 0;
-			break;
+			return(BAROMETER_SERVICE_CAN_PAUSE);
 		}
 	}
 	else
 	{
 		barCalibPause--;
+		return(BAROMETER_NEEDS_SERVICING);
 	}
 }
 

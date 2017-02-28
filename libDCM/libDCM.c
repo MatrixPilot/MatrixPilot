@@ -82,59 +82,68 @@ static boolean gps_run_init_step(uint16_t count)
 	return false;
 }
 
-#if (USE_BAROMETER_ALTITUDE == 1)
 
-// We want to be reading both the magnetometer and the barometer at 4Hz
-// The magnetometer driver returns a new result via the callback on each call
-// The barometer driver needs to be called several times to get a single 
-//  result set via the callback. Also on first invocation the barometer driver
-//  reads calibration data, and hence requires one extra call
+// We want to be returning reading from both the magnetometer and the barometer at 4Hz.
+// However each device may need to be called many times before a reading is returned.
+// The code below ensures that a given sensor is called repeatedly until it reaches
+// a state where the other device can be called safely over the same I2C2 bus, even if 
+// the first device has not yet returned a complete set of sensor data.
+// For example, at startup the barometer could need 9 calls before returning pressure.
+// But in normal operation it will need 5 calls.
+// By contrast in normal operations the magnetometer only needs one call, once it is calibrated.
 
-void do_I2C_stuff(void)
+void get_data_from_I2C_sensors(void) // Expected to be called at 40Hz
 {
-	static int toggle = 0;
-	static int counter = 0;
-
-	if (toggle) {
-		if (counter++ > 0) {
-//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-#if (MAG_YAW_DRIFT == 1)
-//			printf("rxMag %u\r\n", udb_heartbeat_counter);
-			rxMagnetometer(mag_drift_callback);
-#endif
-			counter = 0;
-			toggle = 0;
-		}
-	} else {
-		rxBarometer(udb_barometer_callback);
-		if (counter++ > 6) {
-			counter = 0;
-			toggle = 1;
+	static uint8_t barometer_needs_servicing = BAROMETER_SERVICE_CAN_PAUSE;
+	static uint8_t magnetometer_needs_servicing = MAGNETOMETER_SERVICE_CAN_PAUSE;
+	static uint8_t counter_40Hz = 0;
+	
+	// Split a 1 second interval (40 calls) into 8 interleaved segments using the following logic
+	if ((counter_40Hz == 0) || (counter_40Hz == 10) || (counter_40Hz == 20) || ( counter_40Hz == 30))
+	{
+#if (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
+		barometer_needs_servicing = rxBarometer(udb_barometer_callback);
+#endif // (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
+	}
+	else if // Allow a total of 6 consecutive calls to the barometer to return pressure
+		(((counter_40Hz >= 1) && (counter_40Hz <= 5))
+		|| ((counter_40Hz >= 11) && (counter_40Hz <= 15))
+		|| ((counter_40Hz >= 21) && (counter_40Hz <= 25))
+		|| ((counter_40Hz >= 31) && (counter_40Hz <= 35)))
+	{
+		if (barometer_needs_servicing)
+		{
+#if (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
+			barometer_needs_servicing = rxBarometer(udb_barometer_callback);
+#endif // (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
 		}
 	}
+	else if ((counter_40Hz == 6) || (counter_40Hz == 16) || (counter_40Hz == 26) || ( counter_40Hz == 36))
+	{
+#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+		magnetometer_needs_servicing = rxMagnetometer(mag_drift_callback);
+#endif // (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+	}
+	else // Should be my_modulo at 7,8,9  17,18,19   27,28,29  37,38,39 : a total of 4 consecutively calls to mag.
+	{
+		if (magnetometer_needs_servicing)
+		{
+#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+			magnetometer_needs_servicing = rxMagnetometer(mag_drift_callback);
+#endif  // (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+		}	   
+	}
+	counter_40Hz++;
+	if (counter_40Hz >= 40) counter_40Hz = 0;
 }
-#endif // USE_BAROMETER_ALTITUDE
 
 // Called at HEARTBEAT_HZ
 void udb_heartbeat_callback(void)
 {
-#if (USE_BAROMETER_ALTITUDE == 1)
 	if (udb_pulse_counter % (HEARTBEAT_HZ / 40) == 0)
 	{
-		do_I2C_stuff(); // TODO: this should always be be called at 40Hz
+		get_data_from_I2C_sensors(); // TODO: this should always be be called at 40Hz
 	}
-#else
-//#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
-#if (MAG_YAW_DRIFT == 1)
-	// This is a simple counter to do stuff at 4hz
-//	if (udb_heartbeat_counter % 10 == 0)
-	if (udb_pulse_counter % (HEARTBEAT_HZ / 4) == 0)
-	{
-		rxMagnetometer(mag_drift_callback);
-	}
-#endif
-#endif // USE_BAROMETER_ALTITUDE
-
 //  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
 	if (dcm_flags._.calib_finished)
 	{
@@ -142,14 +151,6 @@ void udb_heartbeat_callback(void)
 	}
 
 	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();
-
-//	if (!dcm_flags._.init_finished)
-//	{
-//		if (udb_heartbeat_counter % (HEARTBEAT_HZ / 40) == 0)
-//		{
-//			dcm_run_init_step(udb_heartbeat_counter / (HEARTBEAT_HZ / 40));
-//		}
-//	}
 
 	if (udb_pulse_counter % (HEARTBEAT_HZ / 40) == 0)
 	{

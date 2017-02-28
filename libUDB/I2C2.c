@@ -24,6 +24,7 @@
 #include "I2C.h"
 #include "NV_memory.h"
 #include "events.h"
+#include "oscillator.h"
 
 #define USE_I2C_SECOND_PORT_DRIVER 1
 
@@ -36,9 +37,8 @@
 #define _I2C2EN         I2C2CONbits.I2CEN
 
 // Calculate the BRGvalue automatically
-//#define I2C1FSCL 400000 // Bus speed measured in Hz
-//#define I2C1BRGVAL ((FREQOSC/(CLK_PHASES *I2C1FSCL))-(FREQOSC/(CLK_PHASES * 10000000)))-1
-#define I2C2BRGVAL 60 // 200 Khz
+#define I2C_CLOCK_RATE 200000LL  //I2C Bus speed in Hz
+#define I2C2BRGVAL  (((FCY / I2C_CLOCK_RATE)-(FCY / 1111111)) - 1)
 #define I2C2_NORMAL (((I2C2CON & 0b0000000000011111) == 0) && ((I2C2STAT & 0b0100010011000001) == 0))
 
 static void I2C2_Init(void);
@@ -70,12 +70,10 @@ struct I2C_xfer {
 	const uint8_t* cmd;
 	uint16_t cmd_len;
 	uint8_t* data;
-//	uint16_t data_len;
 	uint16_t tx_data_len;
 	uint16_t rx_data_len;
 	I2C_callbackFunc callback;
 	uint16_t mode;
-//
 	uint16_t index;
 	void (*state)(void);
 };

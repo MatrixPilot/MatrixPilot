@@ -22,10 +22,14 @@
 #ifndef BAROMETER_H
 #define BAROMETER_H
 
+enum BAROMETER_SERVICE_STATE {
+  BAROMETER_SERVICE_CAN_PAUSE = 0,
+  BAROMETER_NEEDS_SERVICING
+};
 
 typedef void (*barometer_callback_funcptr)(long pressure, int temperature, char status);
 
-void rxBarometer(barometer_callback_funcptr);  // service the barometer
+uint8_t rxBarometer(barometer_callback_funcptr);  // service the barometer
 
 
 #endif // BAROMETER_H
