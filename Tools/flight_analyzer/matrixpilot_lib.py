@@ -1348,6 +1348,35 @@ class ascii_telemetry(base_telemetry):
                     return "Error"
             else :
                 pass
+            match = re.match(".*:tmp([-0-9]*?):",line) # temperature of barometer chip
+            if match :
+                try:
+                    self.barometer_temperature  = int(match.group(1))
+                except:
+                    print "Corrupt barometer_temperature (:tmp) in line", line_no
+                    return "Error"
+            else :
+                pass
+            match = re.match(".*:prs([-0-9]*?):",line) # pressure measured by barometer
+            if match :
+                try:
+                    self.barometer_pressure  = int(match.group(1))
+                except:
+                    print "Corrupt barometer_pressure (:prs) in line", line_no
+                    return "Error"
+            else :
+                pass
+            match = re.match(".*:alt([-0-9]*?):",line) # Altitude derived from barometer
+            if match :
+                try:
+                    self.barometer_altitude  = int(match.group(1))
+                except:
+                    print "Corrupt barometer_altitude (:alt) in line", line_no
+                    return "Error"
+            else :
+                pass
+            
+            
             
              # line was parsed without major errors
             return "F2"
