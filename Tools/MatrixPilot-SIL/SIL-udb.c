@@ -457,7 +457,7 @@ boolean handleUDBSockets(void)
 
 static magnetometer_callback_funcptr magnetometer_callback = NULL;
 
-void rxMagnetometer(magnetometer_callback_funcptr callback)
+uint8_t rxMagnetometer(magnetometer_callback_funcptr callback)
 {
 	magnetometer_callback = callback;
 }

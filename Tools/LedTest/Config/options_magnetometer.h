@@ -68,7 +68,17 @@
 //#define MAG_FLIPPED
 //#define MAG_DIRECT
 
+// Uncomment the following line for using Static Magnetometer Offsets.
+// You will need to manually calibrate your plane's offsets in advance.
+// Set SERIAL_OUTPUT_FORMAT to  SERIAL_MAG_CALIBRATE to obtain calibration measurements.
+// Turn the plane through all dimensions X,Y,Z  (imagine you are painting a 3D globe by rotating the plane).
+// Inspect the last line of the telemetry file that you have created for the following static offsets,
+// and set them below.
+#define MAG_STATIC_OFFSETS
 
+#define MAG_STATIC_OFFSET_X       0
+#define MAG_STATIC_OFFSET_Y       0
+#define MAG_STATIC_OFFSET_Z       0
 
 // ************************************************************************
 // *** Users should not need to change anything below here ****************
