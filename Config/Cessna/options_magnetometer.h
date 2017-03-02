@@ -62,7 +62,7 @@
 //#define MAG_FLIPPED
 //#define MAG_DIRECT
 
-// Uncomment the following line for using Static Magnetometer Offsets.
+// Uncomment the following line for using Static Magnetometer Offsets. 
 // You will need to manually calibrate your plane's offsets in advance.
 // Set SERIAL_OUTPUT_FORMAT to  SERIAL_MAG_CALIBRATE to obtain calibration measurements.
 // Turn the plane through all dimensions X,Y,Z  (imagine you are painting a 3D globe by rotating the plane).
