@@ -74,7 +74,6 @@
 #define MAG_STATIC_OFFSET_Y       0
 #define MAG_STATIC_OFFSET_Z       0
 
-
 // ************************************************************************
 // *** Users should not need to change anything below here ****************
 // ************************************************************************
