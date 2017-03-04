@@ -196,9 +196,6 @@ static inline void read_accel(void)
 {
 #if (HILSIM == 1)
 	HILSIM_set_gplane(gplane);
-//	gplane[0] = g_a_x_sim.BB;
-//	gplane[1] = g_a_y_sim.BB;
-//	gplane[2] = g_a_z_sim.BB;
 #else
 	gplane[0] = XACCEL_VALUE;
 	gplane[1] = YACCEL_VALUE;
