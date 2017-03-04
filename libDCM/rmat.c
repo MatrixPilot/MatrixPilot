@@ -114,14 +114,18 @@ static union longww gyroCorrectionIntegral[] =  { { 0 }, { 0 },  { 0 } };
 // accumulator for computing adjusted omega:
 fractional omegaAccum[] = { 0, 0, 0 };
 
-// gravity, as measured in plane coordinate system
+// gplane[] is a vector representing (gravity - acceleration) in the plane's coordinate system. 
+// gravity_vector_plane[], is gravity as measured in the plane's coordinate system
 #ifdef INITIALIZE_VERTICAL // VTOL vertical initialization
 static fractional gplane[] = { 0, -GRAVITY, 0 };
+static fractional gravit_vector_plane[] = { 0, -GRAVITY, 0 };
 int16_t aero_force[] = { 0 , GRAVITY , 0 };
 #else  // horizontal initialization
 static fractional gplane[] = { 0, 0, GRAVITY };
+static fractional gravity_vector_plane[] = { 0, 0, GRAVITY };
 int16_t aero_force[] = { 0 , 0 , -GRAVITY };
 #endif
+
 
 // horizontal velocity over ground, as measured by GPS (Vz = 0)
 fractional dirOverGndHGPS[] = { 0, RMAX, 0 };
@@ -345,9 +349,9 @@ static void adj_accel(int16_t angleOfAttack)
 	}
 	// now compute omega vector cross velocity vector and adjust
 	accum.WW = (__builtin_mulss(omega_times_velocity , rotation_axis[1] ) ) << 2;
-	gplane[0] = gplane[0] - accum._.W1;
+	gravity_vector_plane[0] = gplane[0] - accum._.W1;
 	accum.WW = (__builtin_mulss(omega_times_velocity , rotation_axis[0] ) ) << 2;
-	gplane[0] = gplane[0] + accum._.W1;
+	gravity_vector_plane[0] = gplane[0] + accum._.W1;
 }
 #else
 static void adj_accel(int16_t angleOfAttack)
@@ -359,9 +363,9 @@ static void adj_accel(int16_t angleOfAttack)
 	accum.WW = __builtin_mulsu(angleOfAttack, air_speed_3DGPS) << 2;
 	air_speed_z = accum._.W1;
 	// compute centrifugal and forward acceleration compensation
-	gplane[0] = gplane[0] - omegaSOG(omegaAccum[2], air_speed_3DGPS)+ omegaSOG(omegaAccum[1], air_speed_z);
-	gplane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
-	gplane[1] = gplane[1] - omegaSOG(omegaAccum[0], air_speed_z) + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
+	gravity_vector_plane[0] = gplane[0] - omegaSOG(omegaAccum[2], air_speed_3DGPS)+ omegaSOG(omegaAccum[1], air_speed_z);
+	gravity_vector_plane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
+	gravity_vector_plane[1] = gplane[1] - omegaSOG(omegaAccum[0], air_speed_z) + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
 }
 #endif // CENTRIFUGAL_WITHOUT_GPS
 
@@ -454,12 +458,12 @@ static void normalize(void)
 
 static void roll_pitch_drift(void)
 {
-	VectorCross(errorRP, gplane, &rmat[6]);
+	VectorCross(errorRP, gravity_vector_plane, &rmat[6]);
 //#ifdef CATAPULT_LAUNCH_ENABLE
 #define MAXIMUM_PITCH_ERROR ((fractional)(GRAVITY*0.25))
 	// the following is done to limit the pitch error during a catapult launch
 	// it has no effect during normal conditions, because acceleration
-	// compensated gplane is approximately aligned with rmat[6] vector
+	// compensated gravity_vector_plane is approximately aligned with rmat[6] vector
 	if (errorRP[0] >  MAXIMUM_PITCH_ERROR) errorRP[0] =  MAXIMUM_PITCH_ERROR;
 	if (errorRP[0] < -MAXIMUM_PITCH_ERROR) errorRP[0] = -MAXIMUM_PITCH_ERROR;
 //#endif // CATAPULT_LAUNCH_ENABLE
