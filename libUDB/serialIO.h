@@ -27,6 +27,7 @@ void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr);
 void udb_gps_set_rate(int32_t rate);
 boolean udb_gps_check_rate(int32_t rate);
 void udb_gps_start_sending_data(void);
+void udb_serial_stop_sending_data(void);
 
 // Implement this callback to tell the UDB what byte is next to send on the GPS.
 // Return -1 to stop sending data.
