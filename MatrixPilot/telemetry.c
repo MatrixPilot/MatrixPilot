@@ -449,8 +449,10 @@ static void serial_output(const char* format, ...)
 
 	if (remaining > 1)
 	{
+		udb_serial_stop_sending_data();
 		int16_t wrote = vsnprintf((char*)(&serial_buffer[start_index]), (size_t)remaining, format, arglist);
 		end_index = start_index + wrote;
+		udb_serial_start_sending_data();
 	}
 
 	if (sb_index == 0)
