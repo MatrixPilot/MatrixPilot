@@ -31,7 +31,7 @@ if native_supported and float(WIRE_PROTOCOL_VERSION) <= 1:
     try:
         import mavnative
     except ImportError:
-        print('ERROR LOADING MAVNATIVE - falling back to python implementation')
+        print('Warning: Could not load mavnative - falling back to python implementation')
         native_supported = False
 else:
     # mavnative isn't supported for MAVLink2 yet
