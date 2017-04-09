@@ -127,8 +127,12 @@ static void heartbeat_pulse(void)
 	// Gyros need 20 milliseconds to settle after auto-zero, before being used by DCM
 #endif 
 #if (NORADIO != 1)
-	// 20Hz testing of radio link
-	if ((udb_pulse_counter % (HEARTBEAT_HZ/20)) == 1)
+	// 5 Hz testing of radio link
+        // Changed from 20 Hz to 5 Hz to provide more security.
+        // At 20 Hz a single missed or faulty pulse will trigger failsafe.
+        // At 5 Hz missing pulses will be detected in 0.2 seconds while
+        // faulty pulses will be detected separately according to faulty pulse rules
+	if ((udb_pulse_counter % (HEARTBEAT_HZ/5)) == 1)
 	{
 		radioIn_failsafe_check();
 	}
