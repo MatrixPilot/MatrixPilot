@@ -140,7 +140,7 @@ static void heartbeat_pulse(void)
 	// Noise pulses are counted when they are detected, and reset once a second
 	if (udb_pulse_counter % (HEARTBEAT_HZ/1) == 1)
 	{
-		radioIn_failsafe_reset();
+		radioIn_bad_pulse_count_reset();
 	}
 #endif // NORADIO
 
