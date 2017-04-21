@@ -247,7 +247,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 
 	// When there is a chance that data will be read soon,
 	// have the new average values ready.
-	if (sample_count > ALMOST_ENOUGH_SAMPLES)
+    //Modif gfm#1 to avoid an eventual divide by zero exception : add test sample_count>0
+	if ((sample_count > ALMOST_ENOUGH_SAMPLES) && (sample_count>0))
 	{
 		udb_vcc.value = __builtin_divsd(udb_vcc.sum, sample_count);
 		udb_5v.value  = __builtin_divsd(udb_5v.sum,  sample_count);
