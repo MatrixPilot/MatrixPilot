@@ -46,7 +46,8 @@ uint8_t DmaBuffer = 0;
 uint16_t maxstack = 0;
 #endif
 
-#if 1   // these are the original/legacy values, switch this off to test Mark's new timing constants
+#if 0   // these are the original/legacy values, switch this off to test Mark's new timing constants
+// May-29-2017, WJP: Marks timing constants work well and they reduce CPU loading, so lets use them.
 #define ALMOST_ENOUGH_SAMPLES   216 // there are 222 or 223 samples in a sum
 #define ADCLK_DIV_N_MINUS_1     11  // ADC Conversion Clock Tad=Tcy*(ADCS+1)= (1/40M)*12 = 0.3us (3333.3Khz)
                                     // ADC Conversion Time for 12-bit Tc=14*Tad = 4.2us
