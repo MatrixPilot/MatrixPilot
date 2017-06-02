@@ -1839,7 +1839,7 @@ class ascii_telemetry(base_telemetry):
                 self.id_lead_pilot =  match.group(1)
             else :
                 print "Failure parsing ID_LEAD_PILOT at line", line_no
-            match = re.match(".*:IDD=(.*?:.*?):",line) # ID_DIY_DRONES_URL
+            match = re.match(".*:IDD=(.*):.?$",line) # ID_DIY_DRONES_URL
             if match :
                 self.id_diy_drones_url = match.group(1)
             else :
