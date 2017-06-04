@@ -235,22 +235,26 @@ void udb_serial_stop_sending_data(void)
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 {
 	_U2TXIF = 0; // clear the interrupt
-	indicate_loading_inter;
-	set_ipl_on_output_pin;
-	interrupt_save_set_corcon;
+    // prevent losing a character when stop and start sending data
+    if (U2STAbits.UTXBF == 0)
+    {
+        indicate_loading_inter;
+        set_ipl_on_output_pin;
+        interrupt_save_set_corcon;
 
 //	int16_t txchar = udb_serial_callback_get_byte_to_send();
-	int16_t txchar = -1;
-	if (serial_callback_get_byte_to_send && ! udb_serial_stop_sending_flag)
-	{
-		txchar = serial_callback_get_byte_to_send();
-	}
-	if (txchar != -1)
-	{
-		U2TXREG = (uint8_t)txchar;
-	}
-	interrupt_restore_corcon;
-	unset_ipl_on_output_pin;
+        int16_t txchar = -1;
+        if (serial_callback_get_byte_to_send && ! udb_serial_stop_sending_flag)
+        {
+            txchar = serial_callback_get_byte_to_send();
+        }
+        if (txchar != -1)
+        {
+            U2TXREG = (uint8_t)txchar;
+        }
+        interrupt_restore_corcon;
+        unset_ipl_on_output_pin;
+    }
 }
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
