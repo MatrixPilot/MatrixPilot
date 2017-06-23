@@ -636,6 +636,11 @@ void mp_osd_run_step(uint16_t init_counter) // currently gets called with 'udb_h
 #else
 			osd_spi_write(0x0, 0x48);   // VM0: enable display of OSD image, PAL
 #endif
+			int8_t i;
+			for (i=0; i<16; i++) {
+				osd_spi_write(0x10+i, 0b00000111);  // RB0-15 set to 10%-80%
+			}
+            
 			osd_phase = 0;
 			osd_setup_screen();
 			osd_was_on = 1;
