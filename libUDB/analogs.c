@@ -23,16 +23,16 @@
 #include "ADchannel.h"
 #include "analogs.h"
 
-#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 union longww battery_current;
 union longww battery_mAh_used;
 #endif
 
-#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
 #endif
 
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 uint8_t rc_signal_strength;
 #define MIN_RSSI   ((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
 #define RSSI_RANGE ((int32_t)((RSSI_MAX_SIGNAL_VOLTAGE-RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 100))
@@ -41,14 +41,14 @@ uint8_t rc_signal_strength;
 
 void init_analogs(void)
 {
-#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 	battery_current.WW = 0;
 	battery_mAh_used.WW = 0;
 #endif
-#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 	battery_voltage.WW = 0;
 #endif
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	rc_signal_strength = 0;
 #endif
 }
@@ -59,7 +59,9 @@ void calculate_analog_sensor_values(void)
 	// Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
 	// Convert to current in tenths of Amps
 	battery_current.WW = (udb_analogInputs[ANALOG_CURRENT_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_CURRENT) + (((int32_t)(CURRENT_SENSOR_OFFSET)) << 16);
-
+#endif
+    
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
 	// 90000/144000 == 900/1440
 	battery_mAh_used.WW += (battery_current.WW / 1440);
@@ -80,5 +82,12 @@ void calculate_analog_sensor_values(void)
 		rc_signal_strength = 100;
 	else
 		rc_signal_strength = (uint8_t)rssi_accum._.W1;
+#endif
+	
+#if (RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+	int16_t tempRSSI = (udb_pwIn[RSSI_INPUT_CHANNEL]-2000) / 20;
+	if (tempRSSI < 0) tempRSSI = 0;
+	if (tempRSSI > 100) tempRSSI = 100;
+	rc_signal_strength = tempRSSI;
 #endif
 }

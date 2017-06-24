@@ -25,6 +25,7 @@
 #include "interrupt.h"
 #include "servoOut.h"
 #include "servoOutPins.h"
+#include "cll_io.h"
 
 #if (MIPS == 64)
 #define SCALE_FOR_PWM_OUT(x)    (x/2)
@@ -63,7 +64,9 @@ void servoOut_init(void) // was called udb_init_pwm()
 	}
 
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (USE_CASTLE_LINK_THROTTLE != 1)
 	_TRISD0 = 0;
+#endif
 	_TRISD1 = 0;
 	_TRISD2 = 0;
 	_TRISD3 = 0;
@@ -238,10 +241,20 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 
 	switch (outputNum) {
 		case 0:
+#if (USE_CASTLE_LINK_THROTTLE != 1)
 			HANDLE_SERVO_OUT(1, SERVO_OUT_PIN_1);
+#else
+			cll_start_servo_out(SCALE_FOR_PWM_OUT(udb_pwOut[1]), SCALE_FOR_PWM_OUT(100));
+            outputNum++; // usually handled in HANDLE_SERVO_OUT()
+#endif
 			break;
 		case 1:
+#if (USE_CASTLE_LINK_THROTTLE != 1)
 			SERVO_OUT_PIN_1 = 0;
+#else
+			cll_start_listening();
+			if (outputNum >= NUM_OUTPUTS) _T4IE = 0;  // usually handled in HANDLE_SERVO_OUT()
+#endif
 			HANDLE_SERVO_OUT(2, SERVO_OUT_PIN_2);
 			break;
 		case 2:

@@ -227,6 +227,7 @@
 #define CAMERA_YAW_INPUT_CHANNEL            CHANNEL_UNUSED
 #define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
 #define OSD_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_UNUSED
+#define RSSI_INPUT_CHANNEL                  CHANNEL_UNUSED
 #define MODE_INVERTED_CHANNEL               CHANNEL_UNUSED
 #define PASSTHROUGH_A_INPUT_CHANNEL         CHANNEL_UNUSED
 #define PASSTHROUGH_B_INPUT_CHANNEL         CHANNEL_UNUSED
@@ -269,6 +270,11 @@
 #define PASSTHROUGH_B_OUTPUT_CHANNEL        CHANNEL_UNUSED
 #define PASSTHROUGH_C_OUTPUT_CHANNEL        CHANNEL_UNUSED
 #define PASSTHROUGH_D_OUTPUT_CHANNEL        CHANNEL_UNUSED
+
+// Set to 1 to use Output 1 (udb5mini only) for throttle output and Castle Link
+// Live data reads to get voltage and current readings from a Castle ESC.
+// When set to 1, you should also set THROTTLE_OUTPUT_CHANNEL to 1.
+#define USE_CASTLE_LINK_THROTTLE            0
 
 
 ////////////////////////////////////////////////////////////////////////////////

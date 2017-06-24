@@ -23,6 +23,7 @@
 #include "oscillator.h"
 #include "interrupt.h"
 #include "radioIn.h"
+#include "cll_io.h"
 #include "../MatrixPilot/states.h"
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
@@ -142,6 +143,10 @@ void radioIn_init(void) // was called udb_init_capture(void)
 	if (NUM_INPUTS > 7) IC_INIT(8, REGTOK1, REGTOK2);
 #endif // USE_PPM_INPUT
 #endif // NORADIO
+    
+#if (USE_CASTLE_LINK_THROTTLE == 1)
+    cll_setup();
+#endif
 }
 
 // called from heartbeat pulse at 20Hz
@@ -254,7 +259,7 @@ IC_HANDLER(4, REGTOK1, IC_PIN4);
 IC_HANDLER(5, REGTOK1, IC_PIN5);
 IC_HANDLER(6, REGTOK1, IC_PIN6);
 IC_HANDLER(7, REGTOK1, IC_PIN7);
-#if (USE_SONAR_INPUT != 8)
+#if (USE_SONAR_INPUT != 8 && USE_CASTLE_LINK_THROTTLE != 1)
 IC_HANDLER(8, REGTOK1, IC_PIN8);
 #endif // USE_SONAR_INPUT
 

@@ -337,8 +337,11 @@ static void osd_update_values_phase_1(void)
 	int8_t dir_to_goal;
 	int16_t dist_to_goal;
 	struct relative2D curHeading;
-#if (OSD_FLASH_RSSI != 0)
+    
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (OSD_LOC_RSSI != OSD_LOC_DISABLED && OSD_FLASH_RSSI != 0)
 	static char f_OSD_RSSI_flash = 0;        // To keep track on show/hide OSD_RSSI
+#endif
 #endif
 
 	curHeading.x = -rmat[1];
@@ -413,7 +416,7 @@ static void osd_update_values_phase_1(void)
 	osd_spi_write_number(abs(omegagyro[2])/DEGPERSEC, 3, 0, 0, 0, 0);   // yaw rate in degrees/sec/sec
 #endif
 
-#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 
 #if (OSD_LOC_BATT_CURRENT != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_BATT_CURRENT);
@@ -427,7 +430,7 @@ static void osd_update_values_phase_1(void)
 
 #endif
 
-#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 
 #if (OSD_LOC_BATT_VOLTAGE != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_BATT_VOLTAGE);
@@ -436,7 +439,7 @@ static void osd_update_values_phase_1(void)
 
 #endif
 
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 
 #if (OSD_LOC_RSSI != OSD_LOC_DISABLED)
 	osd_spi_write_location(OSD_LOC_RSSI);
