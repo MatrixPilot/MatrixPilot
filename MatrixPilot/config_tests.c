@@ -141,6 +141,19 @@
 #endif
 
 
+// Check Castle Link Live Settings
+#if (USE_CASTLE_LINK_THROTTLE == 1 && THROTTLE_OUTPUT_CHANNEL != 1)
+	#error("THROTTLE_OUTPUT_CHANNEL has to be 1 when using USE_CASTLE_LINK_THROTTLE.")
+#endif
+
+#if (USE_CASTLE_LINK_THROTTLE == 1 && NUM_INPUTS >= 8 && USE_PPM_INPUT == 0)
+	#error("Please use fewer than 8 Inputs, or use PPM, when using USE_CASTLE_LINK_THROTTLE.")
+#endif
+
+#if (USE_CASTLE_LINK_THROTTLE == 1 && PPM_IC == 8)
+	#error("Please choose a different PPM_IC (not 8) when using USE_CASTLE_LINK_THROTTLE.")
+#endif
+
 
 // Check HILSIM Settings
 #if (HILSIM == 1 && GPS_TYPE != GPS_UBX_4HZ)

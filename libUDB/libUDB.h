@@ -229,16 +229,16 @@ extern UDB_SKIP_FLAGS udb_skip_flags;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 extern union longww battery_current;        // battery_current._.W1 is in tenths of Amps
 extern union longww battery_mAh_used;       // battery_mAh_used._.W1 is in mAh
 #endif
 
-#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 extern union longww battery_voltage;        // battery_voltage._.W1 is in tenths of Volts
 #endif
 
-#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
+#if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as percent of full signal
 #endif
 
