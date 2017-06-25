@@ -71,6 +71,7 @@
         <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
         <itemPath>../../libUDB/builtins.h</itemPath>
+        <itemPath>../../libUDB/cll_io.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigHILSIM.h</itemPath>
         <itemPath>../../libUDB/ConfigPX4.h</itemPath>
@@ -428,6 +429,7 @@
         <itemPath>../../libUDB/analogs.c</itemPath>
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/barometer.c</itemPath>
+        <itemPath>../../libUDB/cll_io.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
         <itemPath>../../libUDB/fbcl.s</itemPath>
