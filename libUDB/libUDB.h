@@ -238,6 +238,10 @@ extern union longww battery_mAh_used;       // battery_mAh_used._.W1 is in mAh
 extern union longww battery_voltage;        // battery_voltage._.W1 is in tenths of Volts
 #endif
 
+#if (ANALOG_VOLTAGE2_INPUT_CHANNEL != CHANNEL_UNUSED)
+extern union longww battery_voltage2;        // battery_voltage2._.W1 is in tenths of Volts
+#endif
+
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 extern uint8_t rc_signal_strength;          // rc_signal_strength is 0-100 as percent of full signal
 #endif

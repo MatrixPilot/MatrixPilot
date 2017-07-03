@@ -32,6 +32,10 @@ union longww battery_mAh_used;
 union longww battery_voltage;	// battery_voltage._.W1 is in tenths of Volts
 #endif
 
+#if (ANALOG_VOLTAGE2_INPUT_CHANNEL != CHANNEL_UNUSED)
+union longww battery_voltage2;	// battery_voltage2._.W1 is in tenths of Volts
+#endif
+
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 uint8_t rc_signal_strength;
 #define MIN_RSSI   ((int32_t)((RSSI_MIN_SIGNAL_VOLTAGE)/3.3 * 65536))
@@ -48,6 +52,9 @@ void init_analogs(void)
 #if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
 	battery_voltage.WW = 0;
 #endif
+#if (ANALOG_VOLTAGE2_INPUT_CHANNEL != CHANNEL_UNUSED)
+	battery_voltage2.WW = 0;
+#endif    
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	rc_signal_strength = 0;
 #endif
@@ -73,6 +80,12 @@ void calculate_analog_sensor_values(void)
 	battery_voltage.WW = (udb_analogInputs[ANALOG_VOLTAGE_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE) + (((int32_t)(VOLTAGE_SENSOR_OFFSET)) << 16);
 #endif
 
+#if (ANALOG_VOLTAGE2_INPUT_CHANNEL != CHANNEL_UNUSED)
+    // Shift up from [-2^15 , 2^15-1] to [0 , 2^16-1]
+    // Convert to voltage in tenths of Volts
+    battery_voltage2.WW = (udb_analogInputs[ANALOG_VOLTAGE2_INPUT_CHANNEL-1].value + (int32_t)32768) * (MAX_VOLTAGE2) + (((int32_t)(VOLTAGE2_SENSOR_OFFSET)) << 16);
+#endif
+        
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 	union longww rssi_accum;
 	rssi_accum.WW = (((udb_analogInputs[ANALOG_RSSI_INPUT_CHANNEL-1].value + 32768) - (MIN_RSSI)) * (10000 / (RSSI_RANGE)));
