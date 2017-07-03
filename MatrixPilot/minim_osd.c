@@ -205,6 +205,17 @@ static void update_battery(void)
 #endif
 }
 
+static void update_battery2(void)
+{
+	// $U,volts,CRLF
+
+#if (ANALOG_VOLTAGE2_INPUT_CHANNEL != CHANNEL_UNUSED)
+	fprintf(fp, "$U,%li,\r\n", battery_voltage2._.W1 * 10);
+#else
+	fprintf(fp, "$U,1200,\r\n");
+#endif
+}
+
 static void update_channels(void)
 {
 	int16_t i;
@@ -246,6 +257,7 @@ void minim_osd_8hz(void)
 		if (telemetry_counter % 8 == 0)
 		{
 			update_battery();
+			update_battery2();
 			update_climb_rate();
 		}
 		++telemetry_counter;

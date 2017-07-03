@@ -93,6 +93,7 @@
 #define OSD_LOC_BATT_CURRENT            OSD_LOC(2, 17)      // 4 characters wide
 #define OSD_LOC_BATT_USED               OSD_LOC(2, 22)      // 5 characters wide
 #define OSD_LOC_BATT_VOLTAGE            OSD_LOC(3, 17)      // 4 characters wide
+#define OSD_LOC_BATT_VOLTAGE2           OSD_LOC_DISABLED    // 4 characters wide
 #define OSD_LOC_RSSI                    OSD_LOC(3, 23)      // 4 characters wide
 
 // Set the display vertical offset:

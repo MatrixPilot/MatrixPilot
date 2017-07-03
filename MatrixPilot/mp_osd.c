@@ -439,6 +439,15 @@ static void osd_update_values_phase_1(void)
 
 #endif
 
+#if (ANALOG_VOLTAGE2_INPUT_CHANNEL != CHANNEL_UNUSED)
+
+#if (OSD_LOC_BATT_VOLTAGE2 != OSD_LOC_DISABLED)
+	osd_spi_write_location(OSD_LOC_BATT_VOLTAGE2);
+	osd_spi_write_number(battery_voltage2._.W1, 3, 1, 0, 0, 0xA0);   // tenths of Volts
+#endif
+
+#endif
+        
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED || RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 
 #if (OSD_LOC_RSSI != OSD_LOC_DISABLED)
