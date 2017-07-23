@@ -600,7 +600,6 @@ static void msg_PL1(uint8_t gpschar)
 					{
 						msg_parse = &msg_B3;    // error condition
 					}
-					msg_parse = &msg_VELNED;    // TODO: this does not look right (wipes out error setting above) - RobD
 					break;
 				}
 #if (HILSIM == 1)
