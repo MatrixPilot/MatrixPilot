@@ -234,6 +234,7 @@ static void msg_PL2(uint8_t gpschar)
 			}
 			else
 			{
+				gps_parse_errors++ ;
 				calculated_checksum.BB = INVALID_CHECKSUM; // bad payload length
 				msg_parse = &msg_B3;
 			}
@@ -325,6 +326,7 @@ static void msg_B0(uint8_t gpschar)
 	}
 	else
 	{
+		gps_parse_errors++;
 		msg_parse = &msg_B3; // error condition
 	}
 }

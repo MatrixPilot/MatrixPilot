@@ -677,7 +677,7 @@ void telemetry_output_8hz(void)
 					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
 					              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
 					              "c%u:s%i:cpu%u:"
-					              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+					              "as%u:wvx%i:wvy%i:wvz%i:ma%u:mb%u:mc%u:svs%i:hd%i:",
 					    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
 					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
 					    rmat[0], rmat[1], rmat[2],
@@ -689,7 +689,7 @@ void telemetry_output_8hz(void)
 #if (MAG_YAW_DRIFT == 1)
 				    magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
 #else
-				    (int16_t)0, (int16_t)0, (int16_t)0,
+				    (uint16_t)0, gps_parse_errors, (uint16_t)0,
 #endif // MAG_YAW_DRIFT
 				    svs, hdop);
 
