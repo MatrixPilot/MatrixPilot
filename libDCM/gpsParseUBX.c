@@ -565,6 +565,7 @@ static void msg_PL1(uint8_t gpschar)
 					}
 					else
 					{
+						gps_parse_errors++;
 						msg_parse = &msg_B3;    // error condition
 					}
 					break;
@@ -576,6 +577,7 @@ static void msg_PL1(uint8_t gpschar)
 					}
 					else
 					{
+						gps_parse_errors++;
 						msg_parse = &msg_B3;    // error condition
 					}
 					break;
@@ -587,6 +589,7 @@ static void msg_PL1(uint8_t gpschar)
 					}
 					else
 					{
+						gps_parse_errors++;
 						msg_parse = &msg_B3;    // error condition
 					}
 					break;
@@ -598,6 +601,7 @@ static void msg_PL1(uint8_t gpschar)
 					}
 					else
 					{
+						gps_parse_errors++;
 						msg_parse = &msg_B3;    // error condition
 					}
 					break;
@@ -838,6 +842,7 @@ static void msg_CS1(uint8_t gpschar)
 	}
 	else
 	{
+		gps_parse_errors++;
 		gps_data_age = GPS_DATA_MAX_AGE+1;  // if the checksum is wrong then the data from this packet is invalid. 
 		                                    // setting this ensures the nav routine does not try to use this data.
 	}

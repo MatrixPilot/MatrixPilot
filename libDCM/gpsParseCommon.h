@@ -55,6 +55,7 @@ extern uint16_t air_speed_magnitudeXY;
 extern int8_t calculated_heading;           // takes into account wind velocity
 extern int16_t gps_data_age;
 extern int8_t actual_dir;
+extern uint16_t gps_parse_errors;
 
 extern int16_t forward_acceleration;
 extern uint16_t air_speed_3DGPS;

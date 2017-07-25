@@ -44,6 +44,7 @@ extern void (*msg_parse)(uint8_t gpschar);
 static const uint8_t* gps_out_buffer = 0;
 static int16_t gps_out_buffer_length = 0;
 static int16_t gps_out_index = 0;
+uint16_t gps_parse_errors = 1;
 
 int32_t get_gps_date(void)
 {
