@@ -172,11 +172,7 @@ void dead_reckon(void)
 	                          + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4])) << 2);
 	forward_ground_speed = accum._.W1 ;
 
-#if (HILSIM == 1)
-	air_speed_3DIMU = hilsim_airspeed.BB;    // use Xplane as a pitot
-#else
 	air_speed_3DIMU = vector3_mag(air_speed_x, air_speed_y, air_speed_z);
-#endif
 
 	accum.WW   = __builtin_mulsu(air_speed_x, 37877);
 	energy.WW  = __builtin_mulss(accum._.W1, accum._.W1);

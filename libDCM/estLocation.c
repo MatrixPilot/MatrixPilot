@@ -152,11 +152,7 @@ void estLocation(void)
 	velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
 	velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
 
-#if (HILSIM == 1)
-	air_speed_3DGPS = hilsim_airspeed.BB; // use Xplane as a pitot
-#else
 	air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
-#endif
 
 	calculated_heading  = rect_to_polar(&velocity_thru_air);
 	// veclocity_thru_air.x becomes XY air speed as a by product of CORDIC routine in rect_to_polar()
