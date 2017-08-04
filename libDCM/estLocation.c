@@ -102,7 +102,7 @@ void estLocation(void)
 	// markw: what is the latency? It doesn't appear numerically or as a comment
 	// in the following code. Since this method is called at the GPS reporting rate
 	// it must be assumed to be one reporting interval?
-
+#if (HILSIM != 1)
 	if (dcm_flags._.gps_history_valid)
 	{
 		cog_delta = cog_circular - cog_previous;
@@ -120,6 +120,12 @@ void estLocation(void)
 		climb_rate_delta = 0;
 		location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0;
 	}
+#else
+	cog_delta = 0;
+	sog_delta = 0;
+	climb_rate_delta = 0;
+	location_deltaXY.x = location_deltaXY.y = location_deltaZ = 0;
+#endif //#if (HILSIM != 1)
 	dcm_flags._.gps_history_valid = 1;
 	actual_dir = cog_circular + cog_delta;
 	cog_previous = cog_circular;
