@@ -443,19 +443,36 @@ void flightplan_logo_update(void)
 	}
 
 	// otherwise run the interrupt handler, if configured, and not in-progress
-	if (interruptIndex && !interruptStackBase)
+	if (interruptIndex)
 	{
-		if (logoStackIndex < LOGO_STACK_DEPTH-1)
+		//if not arrived
+		if (tofinish_line >= WAYPOINT_PROXIMITY_RADIUS) // not crossed the finish line
 		{
-			logoStackIndex++;
-			logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE;
-			logoStack[logoStackIndex].arg = 0;
-			logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1;
-			instructionIndex = interruptIndex+1;
-			interruptStackBase = logoStackIndex;
+			if (!interruptStackBase)   //if not in-progress
+			{
+				if (logoStackIndex < LOGO_STACK_DEPTH-1)
+				{
+					logoStackIndex++;
+					logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE;
+					logoStack[logoStackIndex].arg = 0;
+					logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1;
+					instructionIndex = interruptIndex+1;
+					interruptStackBase = logoStackIndex;
+				}
+			}
 			process_instructions();
 			navigate_set_goal_height(turtleLocations[PLANE].z);
 			lastGoal.z = turtleLocations[PLANE].z;
+		}
+		else
+		{
+			if (interruptStackBase)   //if not in-progress
+			{
+				//cleanup uncompleted interrupt
+				instructionIndex = logoStack[interruptStackBase].returnInstructionIndex+1;  //support both end by main and end by END SUBROUTINE
+				logoStackIndex =  interruptStackBase - 1;
+				interruptStackBase = 0;
+			}
 		}
 	}
 
