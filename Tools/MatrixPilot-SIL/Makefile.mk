@@ -11,7 +11,7 @@ ifeq ($(OS),Windows_NT)
 else
 	TARGET_EXTENSION = .out
 	FLAGS = -DNIX=1
-	LFLAGS = -Wl
+	LFLAGS =
 	LIBS = -lm
 	SOCK_OBJECTS = ../HILSIM_XPlane/UDBSocketUnix.o
 	QT = '
@@ -45,20 +45,6 @@ first: all
 	@sed -e $(QT)s/.*://$(QT) -e $(QT)s/\\$$//$(QT) < $*.d.tmp | \
 		fmt -1 | sed -e $(QT)s/^ *//$(QT) -e $(QT)s/$$/:/$(QT) >> $*.d
 	@rm -f $*.d.tmp
-
-#%.o: %.c
-#	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
-#	$(CC) -MM $(CFLAGS) $(INCPATH) $*.c > $*.d
-#	@mv -f $*.d $*.d.tmp
-#	@sed -e "s|.*:|$*.o:|" < $*.d.tmp > $*.d
-#	@sed -e "s/.*://" -e "s/\\$$//" < $*.d.tmp | fmt -1 | sed -e "s/^ *//" -e "s/$$/:/" >> $*.d
-#	@rm -f $*.d.tmp
-
-#	@mv -f $*.d $*.d.tmp
-#	@sed -e 's|.*:|$*.o:|' < $*.d.tmp > $*.d
-#	@sed -e 's/.*://' -e 's/\\$$//' < $*.d.tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
-#	@rm -f $*.d.tmp
-
 
 # pull in dependency info for *existing* .o files
 -include $(MPSIL_OBJECTS:.o=.d)
