@@ -552,12 +552,12 @@
 // Uncomment the line below to activate the CUSTOM_OFFSETS feature in MatrixPilot.
 
 //#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET (  000 ) 
-#define YACCEL_OFFSET (  000 )
-#define ZACCEL_OFFSET (  000 )
-#define XRATE_OFFSET  (  000 ) // not used by the UDB4
-#define YRATE_OFFSET  (  000 ) // not used by the UDB4
-#define ZRATE_OFFSET  (  000 ) // not used by the UDB4
+#define XACCEL_OFFSET ( 0 ) 
+#define YACCEL_OFFSET ( 0 )
+#define ZACCEL_OFFSET ( 0 )
+#define XRATE_OFFSET  ( 0 ) // not used by the UDB4
+#define YRATE_OFFSET  ( 0 ) // not used by the UDB4
+#define ZRATE_OFFSET  ( 0 ) // not used by the UDB4
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.
