@@ -1,3 +1,4 @@
+
 // This file is part of MatrixPilot.
 //
 //    http://code.google.com/p/gentlenav/
@@ -166,6 +167,7 @@ static void cmd_gains(char* arg)
 	printf("ALT_HOLD_PITCH_HIGH: %f\r\n", (double)altit.AltHoldPitchHigh);
 }
 
+#if 0 // unused
 static void printbin16(int a)
 {
 	unsigned int i;
@@ -174,6 +176,7 @@ static void printbin16(int a)
 		else printf("0");
 	}
 }
+#endif // 0
 
 const char* byte_to_binary(int x)
 {
@@ -298,7 +301,7 @@ const cmds_t cmdslist[] = {
 	{ 0, cmd_barom,  "bar" },
 	{ 0, cmd_cpuload,"cpu" },
 	{ 0, cmd_magno,  "mag" },
-	{ 0, cmd_magno,  "nav" },
+	{ 0, cmd_nav,    "nav" },
 	{ 0, cmd_crash,  "crash" },
 	{ 0, cmd_gains,  "gains" },
 	{ 0, cmd_options,"options" },

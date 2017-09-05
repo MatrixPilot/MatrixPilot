@@ -71,5 +71,6 @@ uint16_t get_current_milliseconds(void);
 void sleep_milliseconds(uint16_t ms);
 
 void sil_telemetry_input(uint8_t* buffer, int32_t bytesRead);
+void mavlink_start_sending_data(void);
 
 #endif

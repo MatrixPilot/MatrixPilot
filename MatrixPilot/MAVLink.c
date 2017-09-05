@@ -60,9 +60,9 @@
 #include "MAVUDBExtra.h"
 #include "../MAVLink/MAVFTP.h"
 
-#if (SILSIM != 1)
+//#if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
-#endif
+//#endif
 //#include "../libDCM/libDCM_internal.h" // Needed for access to internal DCM value
 #include "../libDCM/rmat.h" // Needed for access to internal DCM value
 #include "../libDCM/gpsData.h"
@@ -139,7 +139,7 @@ static uint16_t mavlink_command_ack_result = 0;
 static void handleMessage(void);
 #if (USE_NV_MEMORY == 1)
 // callback for when nv memory storage is complete
-inline void preflight_storage_complete_callback(boolean success);
+static inline void preflight_storage_complete_callback(boolean success);
 #endif // (USE_NV_MEMORY == 1)
 
 
@@ -204,7 +204,7 @@ int16_t mavlink_serial_send(mavlink_channel_t UNUSED(chan), const uint8_t buf[],
 
 #if (USE_TELELOG == 1)
 //printf("calling log_telemetry with %u bytes\r\n", len);
-	log_telemetry(buf, len);
+	log_telemetry((const char*)buf, len);
 #endif // USE_TELELOG
 
 	// Note at the moment, all channels lead to the one serial port
@@ -686,7 +686,7 @@ static void handleMessage(void)
 // Callbacks for triggering command complete messaging
 //
 
-inline void preflight_storage_complete_callback(boolean success)
+static inline void preflight_storage_complete_callback(boolean success)
 {
 	if (mavlink_send_command_ack == false)
 	{

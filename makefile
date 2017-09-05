@@ -197,6 +197,7 @@ DEFINES += $(addprefix -D,$(DEVICE)=1 $(DEFS) $(defines))
 
 ifneq ($(MAKE_RESTARTS),1)
 $(warning *******************************************************************************)
+$(warning $(PWD))
 $(warning Building $(TARGET))
 $(warning modules: $(subst $(SOURCE_DIR)/,,$(modules)))
 $(warning library: $(subst $(SOURCE_DIR)/,,$(libraries)))
