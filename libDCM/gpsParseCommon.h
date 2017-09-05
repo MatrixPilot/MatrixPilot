@@ -95,3 +95,5 @@ boolean gps_nav_valid(void);
 void dcm_callback_gps_location_updated(void);   // Callback
 
 int16_t udb_gps_callback_get_byte_to_send(void);
+
+boolean gps_check_startup_metrics(void);

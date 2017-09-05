@@ -250,3 +250,16 @@ int32_t calculate_time_of_week(int32_t time)
 	time = (((((int32_t)(h)) * 60) + m) * 60 + s) * 1000 + ms;
 	return (time + (((int32_t)day_of_week) * MS_PER_DAY));
 }
+
+boolean gps_check_startup_metrics(void)
+{
+	if ((hdop <= GNSS_HDOP_REQUIRED_FOR_STARTUP) && (svs  >=  GNSS_SVS_REQUIRED_FOR_STARTUP))
+	{
+		return(true);
+	}
+	else
+	{
+		return(false);
+	}
+
+}

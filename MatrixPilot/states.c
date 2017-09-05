@@ -388,7 +388,8 @@ static void acquiringS(void)
 			{
 				dcm_flags._.dead_reckon_enable = 1;
 			}
-			else if (standby_timer <= 0)
+			else if ((standby_timer <= 0) && 
+				gps_check_startup_metrics())
 			{
 				ent_manualS();
 			}
