@@ -95,12 +95,28 @@ void sil_telemetry_input(uint8_t* buffer, int32_t bytesRead)
 // Call this function to initiate sending data to the serial port
 void udb_serial_start_sending_data(void)
 {
+	uint8_t buffer[BUFLEN];
 	int16_t c;
 	int16_t pos = 0;
+	int16_t bytesWritten;
+	
+	if (!telemetrySocket) return;
 
 	while (pos < BUFLEN && (c = udb_serial_callback_get_byte_to_send()) != -1) {
-//		buffer[pos++] = c;
+		buffer[pos++] = c;
 	}
+	bytesWritten = UDBSocket_write(telemetrySocket, (uint8_t*)buffer, pos);
+        if (bytesWritten == -1) {
+                UDBSocket_close(telemetrySocket);
+                telemetrySocket = NULL;
+	}
+}
+
+
+void udb_serial_stop_sending_data(void)
+{
+	// No mechanism to stop sending as SILSIM not using Interrupts.
+	return;
 }
 
 void mavlink_start_sending_data(void)
