@@ -454,12 +454,6 @@ static void serial_output(const char* format, ...)
 		end_index = start_index + wrote;
 		udb_serial_start_sending_data();
 	}
-
-	if (sb_index == 0)
-	{
-		udb_serial_start_sending_data();
-	}
-
 	va_end(arglist);
 }
 #endif // USE_TELELOG
