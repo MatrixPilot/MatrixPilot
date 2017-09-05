@@ -1,13 +1,13 @@
 
 ifeq ($(OS),Windows_NT)
 DEFINES  = -DWIN=1
-BINARY   = exe
+BINARY   = .exe
 OSOBJS   = UDBSocketWin.o
 OSLIB    = ws2_32
 RM       = del /Q /F
 else
 DEFINES  = -DNIX=1
-BINARY   = out
+BINARY   =
 OSOBJS   = UDBSocketUnix.o
 OSLIB    = m
 RM       = rm -rf
@@ -22,7 +22,7 @@ LIBS     = -l$(OSLIB)
 OBJECTS_DIR = ./
 
 
-MPSIL_TARGET  = matrixpilot.$(BINARY)
+MPSIL_TARGET  = matrixpilot$(BINARY)
 
 MP_HEADERS = \
 ../../Config/options.h \
@@ -88,7 +88,7 @@ $(OSOBJS) \
 ../../MatrixPilot/yawCntrl.o
 
 
-MPCAT_TARGET   = silcat.$(BINARY)
+MPCAT_TARGET   = silcat$(BINARY)
 MPCAT_OBJECTS  = SILcat.o $(OSOBJS)
 
 
