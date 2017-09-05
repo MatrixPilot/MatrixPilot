@@ -172,8 +172,10 @@
 		var relPlaneAnglePt = absoluteToRelative(planeAnglePoint);
 		var dx = relPlaneAnglePt.we-relPlanePt.we;
 		var dy = relPlaneAnglePt.sn-relPlanePt.sn;
-		var angle = Math.atan2(dy, dx);
-		planeAngle = 90 - (angle * 180/Math.PI);
+		var angle = 90 - (Math.atan2(dy, dx) * 180 / Math.PI);
+		if (angle < 0)
+			angle = angle + 360;
+		planeAngle = angle;
     }
 
     function savePlanePoint(){
@@ -874,14 +876,22 @@ the overlay itself.
 			case "ANGLE_TO_GOAL":
 				return angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
 			case "REL_ANGLE_TO_HOME":
-				var a = angle_between_points(0, 0, logoLocationX, logoLocationY);
-				a = (a - logoPlaneAngle + 360) % 360;
-				if (a > 180) a = a-360;
+				var homeAngle = angle_between_points(0, 0, logoLocationX, logoLocationY);
+				a =  logoPlaneAngle - homeAngle
+				a = 180 - a
+				if (a <= 180) 
+					a = a + 360;
+				if (a >=  180)
+				a = a - 360;
 				return a;
 			case "REL_ANGLE_TO_GOAL":
-				var a = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
-				a = (a - logoPlaneAngle + 360) % 360;
-				if (a > 180) a = a-360;
+				var goalAngle  = angle_between_points(logoLastLocationX, logoLastLocationY, logoLocationX, logoLocationY);
+				a = logoPlaneAngle - goalAngle;
+				a = 180 - a
+				if (a <= 180) 
+					a = a + 360;
+				if (a >=  180)
+				a = a - 360;
 				return a;
 			case "GROUND_SPEED":
 				return 10;
@@ -949,6 +959,8 @@ the overlay itself.
 		var dx = x2-x1;
 		var dy = y2-y1;
 		var a = 90 - Math.atan2(dy,dx) * 360/(Math.PI * 2);
+		if (a < 0)
+			a = a + 360;
 		return a;
 	}
 	
