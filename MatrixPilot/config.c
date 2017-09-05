@@ -175,7 +175,7 @@ and we remove the following:
 static void load_turns(void)
 {
 	turns.FeedForward = ini_getf(strTurns, "feedfwd", FEED_FORWARD, strConfigFile);
-	DPRINT("turns.FeedForward = %f\r\n", turns.FeedForward);
+	DPRINT("turns.FeedForward = %f\r\n", (double)turns.FeedForward);
 	turns.TurnRateNav = ini_getf(strTurns, "ratenav", TURN_RATE_NAV, strConfigFile);
 	turns.TurnRateFBW = ini_getf(strTurns, "ratefbw", TURN_RATE_FBW, strConfigFile);
 	turns.RefSpeed = ini_getf(strTurns, "refspd", REFERENCE_SPEED, strConfigFile);

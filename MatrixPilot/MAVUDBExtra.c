@@ -30,6 +30,7 @@
 #include "config.h"
 #include "navigate.h"
 #include "altitudeCntrl.h"
+#include "telemetry_log.h"
 #include "flightplan_waypoints.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"
