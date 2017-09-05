@@ -15,8 +15,9 @@
 //#include <Windows.h>
 //#include <Time.h>
 
-#include "../HILSIM_XPlane/UDBSocket.h"
-#include "options.h"
+//#include "../HILSIM_XPlane/UDBSocket.h"
+#include "UDBSocket.h"
+//#include "options.h"
 #include "SIL-config.h"
 
 UDBSocket stdioSocket;

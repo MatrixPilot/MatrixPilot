@@ -8,5 +8,6 @@ TARGET_TYPE := out
 endif
 CPU :=
 
-modules += Tools/MatrixPilot-SIL Tools/UDBSocket
+modules += Tools/UDBSocket
 incpath += Tools/UDBSocket
+

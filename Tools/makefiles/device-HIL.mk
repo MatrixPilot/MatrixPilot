@@ -14,6 +14,6 @@ CFLAGS += -fPIC
 
 LFLAGS   =  -shared -Llib/XPLM.lib
 
-modules +=
-incpath +=
+modules += Tools/UDBSocket
+incpath += Tools/UDBSocket
 

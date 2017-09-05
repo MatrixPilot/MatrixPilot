@@ -6,6 +6,12 @@ git config --get remote.origin.url && git symbolic-ref --short HEAD
 mkdir -p _build
 cd _build
  
+mkdir -p SILcat; cd SILcat
+if ! make -j 8 -f ../../makefile TARGET_NAME=SILcat DEVICE=SILcat
+	then
+	command_failed=true
+fi
+cd ..
 mkdir -p XPlane; cd XPlane
 if ! make -j 8 -f ../../makefile TARGET_NAME=XPlane DEVICE=HIL
 	then
