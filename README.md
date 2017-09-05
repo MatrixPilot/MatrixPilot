@@ -12,8 +12,8 @@ There are 4 projects in the repository. They are listed here in order of increas
 
 * ./Tools/FlashOSD updates the character set of the native On Screen Display (OSD). 
 * ./Tools/LedTest is used to test hardware including the accelerometers, gyros, Leds, and PWM outputs.It is factory installed for all 3 boards allowing users to test their boards on delivery.
-* ./RollPitchYaw creates an Inertial Measurement Unit (IMU). It  enables higher level testing of algorithms, firmware and hard hardware all combined together. 
-* ./MatrixPilot integrates the IMU with full automated flight control.
+* ./RollPitchYaw creates an Inertial Measurement Unit (IMU). It  enables higher level testing of algorithms, firmware and our hardware all combined together.
+* ./MatrixPilot integrates the IMU with the potential of achieving full automated flight control.
 
 There are two types of simulation avaiable:-
 * Software in the Loop (SIL) is provided in ./Tools/MatrixPilot-SIL. The autopilot is simulated as a software process in a host computer (Unix, MacOS, Windows) and that is then, in turn, connected to fly an aircraft in the X-Plane 10 flight simulator.
@@ -21,7 +21,7 @@ There are two types of simulation avaiable:-
 
 ./Tools/HilSim provides the software plugin for X-Plane10 to link to the SIL or HIL versions of MatrixPilot. 
 
-./Tools/flight_analyzer provides a python program that allows analysis and display of flights in GoogleEarth.
+./Tools/flight_analyzer provides a python program that allows analysis and display of flights with the help of GoogleEarth, after post-processing with our tool 'flan'.
 
 For developers, there is also a makefile based build system (build-all.bat) and a project generator (Tools/Build/proj_gen.bat), which both Windows and *nix compatible.
 
