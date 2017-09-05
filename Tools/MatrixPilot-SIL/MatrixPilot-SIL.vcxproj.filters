@@ -230,9 +230,6 @@
     <ClCompile Include="..\..\MatrixPilot\parameter_table_init.c">
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libFlashFS\minIni.c">
-      <Filter>Source Files\libFlashFS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libDCM\estLocation.c">
       <Filter>Source Files\libDCM</Filter>
     </ClCompile>
@@ -282,6 +279,12 @@
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
     <ClCompile Include="..\..\MatrixPilot\parameter_table.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\minIni.c">
+      <Filter>Source Files\MatrixPilot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MatrixPilot\flightplan.c">
       <Filter>Source Files\MatrixPilot</Filter>
     </ClCompile>
   </ItemGroup>

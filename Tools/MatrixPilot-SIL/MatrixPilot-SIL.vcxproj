@@ -117,7 +117,6 @@
     <ClCompile Include="..\..\libDCM\mathlibNAV.c" />
     <ClCompile Include="..\..\libDCM\rmat.c" />
     <ClCompile Include="..\..\libFlashFS\filesys.c" />
-    <ClCompile Include="..\..\libFlashFS\minIni.c" />
     <ClCompile Include="..\..\MatrixPilot\airspeedCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\altitudeCntrl.c" />
     <ClCompile Include="..\..\MatrixPilot\altitudeCntrlVariable.c" />
@@ -131,6 +130,7 @@
     <ClCompile Include="..\..\MatrixPilot\euler_angles.c" />
     <ClCompile Include="..\..\MatrixPilot\flightplan-logo.c" />
     <ClCompile Include="..\..\MatrixPilot\flightplan-waypoints.c" />
+    <ClCompile Include="..\..\MatrixPilot\flightplan.c" />
     <ClCompile Include="..\..\MatrixPilot\flight_state.c" />
     <ClCompile Include="..\..\MatrixPilot\fly_by_datalink.c" />
     <ClCompile Include="..\..\MatrixPilot\helicalTurnCntrl.c" />
@@ -141,6 +141,7 @@
     <ClCompile Include="..\..\MatrixPilot\MAVParams.c" />
     <ClCompile Include="..\..\MatrixPilot\MAVUDBExtra.c" />
     <ClCompile Include="..\..\MatrixPilot\minim_osd.c" />
+    <ClCompile Include="..\..\MatrixPilot\minIni.c" />
     <ClCompile Include="..\..\MatrixPilot\mode_switch.c" />
     <ClCompile Include="..\..\MatrixPilot\mp_osd.c" />
     <ClCompile Include="..\..\MatrixPilot\navigate.c" />
