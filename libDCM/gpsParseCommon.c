@@ -266,9 +266,5 @@ boolean gps_check_startup_metrics(void)
 	{
 		return(true);
 	}
-	else
-	{
-		return(false);
-	}
-
+	return(false);
 }
