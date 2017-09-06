@@ -254,7 +254,11 @@ int32_t calculate_time_of_week(int32_t time)
 
 boolean gps_check_startup_metrics(void)
 {
-	if ((hdop <= GNSS_HDOP_REQUIRED_FOR_STARTUP) && (svs  >=  GNSS_SVS_REQUIRED_FOR_STARTUP))
+	if ((hdop <= GNSS_HDOP_REQUIRED_FOR_STARTUP) && 
+#if ((GPS_TYPE == GPS_UBX_4HZ) || (GPS_TYPE == GPS_UBX_2HZ))
+		(vdop <= GNSS_VDOP_REQUIRED_FOR_STARTUP) &&
+#endif
+		(svs  >=  GNSS_SVS_REQUIRED_FOR_STARTUP))
 	{
 		return(true);
 	}
