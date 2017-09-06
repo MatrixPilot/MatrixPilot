@@ -37,6 +37,7 @@ union longbbbb lat_gps_, lon_gps_;
 union longbbbb alt_sl_gps_;
 union longbbbb tow_;
 union intbb hdop_;
+union intbb vdop_;
 union longbbbb date_gps_, time_gps_;
 
 extern void (*msg_parse)(uint8_t gpschar);

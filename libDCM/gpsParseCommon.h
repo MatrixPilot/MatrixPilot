@@ -26,6 +26,7 @@ extern volatile union intbb climb_gps;      // climb
 extern volatile union intbb hilsim_airspeed;// referenced in estWind and deadReckoning modules
 extern volatile union longbbbb tow;
 extern volatile uint8_t hdop;               // horizontal dilution of precision
+extern volatile uint8_t vdop;               // vertical  dilution of precision
 extern volatile uint8_t svs;                // number of satellites
 //extern union longbbbb as_sim_;
 extern union longbbbb xpg, ypg, zpg;        // gps x, y, z position
@@ -46,6 +47,7 @@ extern union longbbbb alt_sl_gps_;
 //extern union longbbbb cog_gps_;
 //extern union longbbbb climb_gps_;
 extern union intbb hdop_;
+extern union intbb vdop_;
 extern union longbbbb tow_;
 extern union longbbbb date_gps_;
 extern union longbbbb time_gps_;
