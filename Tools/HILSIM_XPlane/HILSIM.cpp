@@ -3,6 +3,7 @@
 #define MAX_ITEMS 30
 #define MAG_FIELD 1000.0
 
+static int enable_count = 0;
 bool CommsEnabled;
 float fTextColour[3];
 char szString[100];
@@ -408,6 +409,10 @@ void AttemptConnection(void)
 
 PLUGIN_API void XPluginDisable(void)
 {
+	if (enable_count > 0) --enable_count;
+
+	LoggingFile.mLogFile << "XPluginDisable\n";
+
 	CloseComms();
 
 	XPLMSetDatai(drOverRide, 0);        // Clear the overides
@@ -417,6 +422,13 @@ PLUGIN_API void XPluginDisable(void)
 
 PLUGIN_API int XPluginEnable(void)
 {
+	LoggingFile.mLogFile << "XPluginEnable\n";
+
+	LoggingFile.mLogFile << "enable_count: " << enable_count << "\n";
+	++enable_count;
+	if (enable_count == 1)	return 0;
+	LoggingFile.mLogFile << "enable_count: " << enable_count << "\n";
+
 	PortNum = 0;
 	pendingElapsedTime = 0;
 
@@ -439,7 +451,7 @@ PLUGIN_API int XPluginEnable(void)
 }
 
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFromWho,
-                                      long         inMessage,
+                                      int          inMessage,
                                       void*        inParam)
 {
 	(void)inFromWho;
@@ -798,6 +810,7 @@ int msgSync2(unsigned char rxChar)
 		msg_parse = &msgVarSize;    // Next char is variable size
 		break;
 	default:
+		LoggingFile.mLogFile << "msgSync2 faulty start" << endl;
 		msg_parse = &msgDefault;    // Faulty start
 		break;
 	}
@@ -812,11 +825,13 @@ int msgVarSize(unsigned char rxChar)
 	case 0xFF:
 	case 0xFE:
 	case 0xEF:
+		LoggingFile.mLogFile << "msgVarSize faulty value" << endl;
 		msg_parse = &msgDefault;    // Faulty value
 		break;
 	default:
 		if (var_channel_count > MAX_VARIABLE_CHANNELS)
 		{
+			LoggingFile.mLogFile << "msgVarSize faulty start" << endl;
 			msg_parse = &msgDefault;// Faulty start
 			return 0;
 		}
@@ -856,6 +871,7 @@ int msgSync1(unsigned char rxChar)
 	case 0xFF:
 		break;                      // do nothing
 	default: 
+		LoggingFile.mLogFile << "msgSync1 error condition" << endl;
 		msg_parse = &msgDefault;    // error condition
 		break;
 	}
@@ -887,6 +903,7 @@ int msgCheckSum(unsigned char rxChar)
 		memcpy(SERVO_IN, SERVO_IN_, sizeof(SERVO_IN_));
 		return 1;   // success!
 	}
+	LoggingFile.mLogFile << "msgCheckSum failed" << endl;
 	return 0;
 }
 
@@ -1195,3 +1212,4 @@ int MyDrawCallback(XPLMDrawingPhase inPhase,
  */
 	return 1;
 }
+

@@ -12,8 +12,9 @@ CPU :=
 
 CFLAGS += -fPIC
 
-LFLAGS   =  -shared -Llib/XPLM.lib
+LFLAGS = -shared -Llib/XPLM.lib
 
 modules +=
 incpath +=
+defines += NIX=1 LIN=1
 
