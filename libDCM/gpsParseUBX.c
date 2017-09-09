@@ -329,7 +329,7 @@ uint8_t* const msg_DOP_parse[] = {
 	&un, &un,                                           // gDOP
 	&un, &un,                                           // pDOP
 	&un, &un,                                           // tDOP
-	&un, &un,                                           // vDOP
+	&vdop_._.B0, &vdop_._.B1,                           // vDOP
 	&hdop_._.B0, &hdop_._.B1,                           // hDOP
 	&un, &un,                                           // nDOP
 	&un, &un,                                           // eDOP
@@ -878,6 +878,7 @@ void gps_commit_data(void)
 
 	climb_gps.BB    = - climb_gps_._.W0;            // SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop            = (uint8_t)(hdop_.BB / 20);     // SIRF scales HDOP by 5, UBX by 10^-2
+	vdop		= (uint8_t)(vdop_.BB / 20);
 	// SIRF provides position in m, UBX provides cm
 //	xpg.WW          = xpg_.WW / 100;
 //	ypg.WW          = ypg_.WW / 100;

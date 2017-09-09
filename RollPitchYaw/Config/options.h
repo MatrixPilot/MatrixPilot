@@ -54,6 +54,16 @@
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
 #define GPS_TYPE                            GPS_STD
 
+///////////////////////////////////////////////////////////////////////////////
+// You can specify a level of good GNSS reception before MatrixPilot accepts "GPS ACQUIRED".
+// You can generally leaves these lines at their default values. A value of zero switches off the check.
+// The VDOP parameter is only available for Ublox GNSS devices. It is ignored for other GNSS units.
+// The metrics are not used by HILSIM or SILSIM.
+
+#define GNSS_HDOP_REQUIRED_FOR_STARTUP      200  //  Horizontal Dilution of Precision
+#define GNSS_VDOP_REQUIRED_FOR_STARTUP	    200  //  Vertical Dilution of Precision
+#define GNSS_SVS_REQUIRED_FOR_STARTUP	      4  //  Number of Sattelites in View
+
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.

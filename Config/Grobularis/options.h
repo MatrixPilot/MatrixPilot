@@ -74,6 +74,15 @@
 #define GPS_TYPE                            GPS_UBX_4HZ
 //#define DEFAULT_GPS_BAUD                    57600   // added for GPS_NMEA support
 
+////////////////////////////////////////////////////////////////////////////////
+// You can specify a level of good GNSS reception before MatrixPilot accepts "GPS ACQUIRED".
+// You can generally leaves these lines at their default values. A value of zero switches off the check.
+// The VDOP parameter is only available for Ublox GNSS devices. It is ignored for other GNSS units.
+// The metrics are not used by HILSIM or SILSIM.
+
+#define GNSS_HDOP_REQUIRED_FOR_STARTUP       20  //  Horizontal Dilution of Precision
+#define GNSS_VDOP_REQUIRED_FOR_STARTUP	     60  //  Vertical Dilution of Precision
+#define GNSS_SVS_REQUIRED_FOR_STARTUP	      6  //  Number of Sattelites in View
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enable/Disable core features of this firmware

@@ -371,26 +371,29 @@ static void acquiringS(void)
 		if (udb_flags._.radio_on)
 #endif
 		{
-			if (standby_timer == NUM_WAGGLES+1)
-				waggle = WAGGLE_SIZE;
-			else if (standby_timer <= NUM_WAGGLES)
-				waggle = - waggle;
-			else
-				waggle = 0;
+			if (gps_check_startup_metrics())
+			{
+				if (standby_timer == NUM_WAGGLES+1)
+					waggle = WAGGLE_SIZE;
+				else if (standby_timer <= NUM_WAGGLES)
+					waggle = - waggle;
+				else
+					waggle = 0;
 
-			standby_timer--;
-			DPRINT("standby_timer %u  \r", standby_timer);
-			if (standby_timer == 6)
-			{
-				state_flags._.save_origin = 1;
-			}
-			else if (standby_timer == 2)
-			{
-				dcm_flags._.dead_reckon_enable = 1;
-			}
-			else if (standby_timer <= 0)
-			{
-				ent_manualS();
+				standby_timer--;
+				DPRINT("standby_timer %u  \r", standby_timer);
+				if (standby_timer == 6)
+				{
+					state_flags._.save_origin = 1;
+				}
+				else if (standby_timer == 2)
+				{
+					dcm_flags._.dead_reckon_enable = 1;
+				}
+				else if (standby_timer <= 0)
+				{
+					ent_manualS();
+				}
 			}
 		}
 		else
