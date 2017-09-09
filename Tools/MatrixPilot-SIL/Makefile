@@ -1,4 +1,13 @@
 #CONFIG   = Cessna
+
+ifeq ($(CONFIG),)
+$(warning *******************************************************************************)
+$(warning No configuration specified, defaulting to ./Config directory)
+$(warning To specify an alternate, run make CONFIG='Config subdirectory')
+$(warning eg. $ make CONFIG=Cessna)
+$(warning *******************************************************************************)
+endif
+
 CONFIG  ?= .
 
 ifeq ($(OS),Windows_NT)
