@@ -12,11 +12,11 @@
 // Fake dspic builtin ASM calls for Non dspic devices (e.g. Arm devices))
 // Microchip dspic controllers use __builtin__ calls to engage special fast instructions in the hardware
 // This file is not included in builds for Microchip dspic devices
-#define __builtin_mulss(x,y) ((( int32_t)(x))*( int32_t)(y))
-#define __builtin_mulus(x,y) (((uint32_t)(x))*( int32_t)(y))
-#define __builtin_mulsu(x,y) ((( int32_t)(x))*(uint32_t)(y))
-#define __builtin_muluu(x,y) (((uint32_t)(x))*(uint32_t)(y))
+#define __builtin_mulss(x,y) (( int32_t)((( int16_t)(x))*( int16_t)(y)))
+#define __builtin_mulus(x,y) (( int32_t)(((uint16_t)(x))*( int16_t)(y)))
+#define __builtin_mulsu(x,y) (( int32_t)((( int16_t)(x))*(uint16_t)(y)))
+#define __builtin_muluu(x,y) ((uint32_t)(((uint16_t)(x))*(uint16_t)(y)))
 #define __builtin_divud(x,y) ((uint16_t)(((uint32_t)(x))/(uint16_t)(y)))
-#define __builtin_divsd(x,y) (( int16_t)((( int32_t)(x))/(int16_t)(y)))
+#define __builtin_divsd(x,y) (( int16_t)((( int32_t)(x))/( int16_t)(y)))
 
 #endif // _BUILTINS_H_
