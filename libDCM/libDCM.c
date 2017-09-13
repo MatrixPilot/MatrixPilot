@@ -120,9 +120,9 @@ void get_data_from_I2C_sensors(void) // Expected to be called at 40Hz
 	}
 	else if ((counter_40Hz == 6) || (counter_40Hz == 16) || (counter_40Hz == 26) || ( counter_40Hz == 36))
 	{
-#if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#if (MAG_YAW_DRIFT == 1)
 		magnetometer_needs_servicing = rxMagnetometer(mag_drift_callback);
-#endif // (MAG_YAW_DRIFT == 1 && HILSIM != 1)
+#endif // (MAG_YAW_DRIFT == 1)
 	}
 	else // Should be my_modulo at 7,8,9  17,18,19   27,28,29  37,38,39 : a total of 4 consecutively calls to mag.
 	{

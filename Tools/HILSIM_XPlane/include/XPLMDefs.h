@@ -2,11 +2,11 @@
 #define _XPLMDefs_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -29,6 +29,8 @@ extern "C" {
 
 #if IBM
 #include <windows.h>
+#else
+#include <stdint.h>
 #endif
 /***************************************************************************
  * DLL Definitions
@@ -44,31 +46,45 @@ extern "C" {
  *
  */
 
+
+
 #ifdef __cplusplus
 	#if APL
-		#if __MACH__
+        #if __GNUC__ >= 4
+            #define PLUGIN_API extern "C" __attribute__((visibility("default")))
+        #elif __MACH__
 			#define PLUGIN_API extern "C"
 		#else		
 			#define PLUGIN_API extern "C" __declspec(dllexport)
 		#endif
 	#elif IBM
 		#define PLUGIN_API extern "C" __declspec(dllexport)
-	#elif NIX
-		#define PLUGIN_API extern "C"
+	#elif LIN
+		#if __GNUC__ >= 4
+			#define PLUGIN_API extern "C" __attribute__((visibility("default")))
+		#else
+			#define PLUGIN_API extern "C"
+		#endif
 	#else
 		#error "Platform not defined!"
 	#endif
 #else
 	#if APL
-		#if __MACH__
+        #if __GNUC__ >= 4
+            #define PLUGIN_API __attribute__((visibility("default")))
+        #elif __MACH__
 			#define PLUGIN_API 
 		#else
 			#define PLUGIN_API __declspec(dllexport)
 		#endif		
 	#elif IBM
 		#define PLUGIN_API __declspec(dllexport)
-	#elif NIX
-		#define PLUGIN_API
+	#elif LIN
+        #if __GNUC__ >= 4
+            #define PLUGIN_API __attribute__((visibility("default")))
+		#else
+			#define PLUGIN_API
+		#endif		
 	#else
 		#error "Platform not defined!"
 	#endif
@@ -76,7 +92,9 @@ extern "C" {
 
 #if APL
 	#if XPLM
-		#if __MACH__
+        #if __GNUC__ >= 4
+            #define XPLM_API __attribute__((visibility("default")))
+        #elif __MACH__
 			#define XPLM_API 
 		#else
 			#define XPLM_API __declspec(dllexport)
@@ -90,15 +108,20 @@ extern "C" {
 	#else
 		#define XPLM_API __declspec(dllimport)
 	#endif
-#elif NIX
+#elif LIN
 	#if XPLM
-		#define XPLM_API
+		#if __GNUC__ >= 4
+            #define XPLM_API __attribute__((visibility("default")))
+		#else
+			#define XPLM_API
+		#endif
 	#else
 		#define XPLM_API
 	#endif	
 #else
 	#error "Platform not defined!"
 #endif
+
 /***************************************************************************
  * GLOBAL DEFINITIONS
  ***************************************************************************/
@@ -106,6 +129,8 @@ extern "C" {
  * These definitions are used in all parts of the SDK.                         
  *
  */
+
+
 
 /*
  * XPLMPluginID
@@ -130,8 +155,8 @@ typedef int XPLMPluginID;
 /* X-Plane itself                                                              */
 #define XPLM_PLUGIN_XPLANE   (0)
 
-/* The current XPLM revision is 1.00 (100).                                    */
-#define kXPLM_Version        (100)
+/* The current XPLM revision is 2.10 (210).                                    */
+#define kXPLM_Version        (210)
 
 /*
  * XPLMKeyFlags
@@ -152,19 +177,21 @@ typedef int XPLMPluginID;
  */
 enum {
      /* The shift key is down                                                       */
-     xplm_ShiftFlag                           = 1,
+     xplm_ShiftFlag                           = 1
 
      /* The option or alt key is down                                               */
-     xplm_OptionAltFlag                       = 2,
+    ,xplm_OptionAltFlag                       = 2
 
      /* The control key is down*                                                    */
-     xplm_ControlFlag                         = 4,
+    ,xplm_ControlFlag                         = 4
 
      /* The key is being pressed down                                               */
-     xplm_DownFlag                            = 8,
+    ,xplm_DownFlag                            = 8
 
      /* The key is being released                                                   */
-     xplm_UpFlag                              = 16
+    ,xplm_UpFlag                              = 16
+
+
 };
 typedef int XPLMKeyFlags;
 
@@ -183,6 +210,8 @@ typedef int XPLMKeyFlags;
  * keys.                                                                       
  *
  */
+
+
 
 #define XPLM_KEY_RETURN      13
 
@@ -253,6 +282,8 @@ typedef int XPLMKeyFlags;
  * with MS v-keys.                                                             
  *
  */
+
+
 
 #define XPLM_VK_BACK         0x08
 
