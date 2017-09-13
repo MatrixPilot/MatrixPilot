@@ -2,11 +2,11 @@
 #define _XPLMDisplay_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -89,6 +89,8 @@ extern "C" {
  *
  */
 
+
+
 /*
  * XPLMDrawingPhase
  * 
@@ -106,40 +108,58 @@ extern "C" {
  */
 enum {
      /* This is the earliest point at which you can draw in 3-d.                    */
-     xplm_Phase_FirstScene                    = 0,
+     xplm_Phase_FirstScene                    = 0
 
      /* Drawing of land and water.                                                  */
-     xplm_Phase_Terrain                       = 5,
+    ,xplm_Phase_Terrain                       = 5
 
      /* Drawing runways and other airport detail.                                   */
-     xplm_Phase_Airports                      = 10,
+    ,xplm_Phase_Airports                      = 10
 
      /* Drawing roads, trails, trains, etc.                                         */
-     xplm_Phase_Vectors                       = 15,
+    ,xplm_Phase_Vectors                       = 15
 
      /* 3-d objects (houses, smokestacks, etc.                                      */
-     xplm_Phase_Objects                       = 20,
+    ,xplm_Phase_Objects                       = 20
 
      /* External views of airplanes, both yours and the AI aircraft.                */
-     xplm_Phase_Airplanes                     = 25,
+    ,xplm_Phase_Airplanes                     = 25
 
      /* This is the last point at which you can draw in 3-d.                        */
-     xplm_Phase_LastScene                     = 30,
+    ,xplm_Phase_LastScene                     = 30
 
      /* This is the first phase where you can draw in 2-d.                          */
-     xplm_Phase_FirstCockpit                  = 35,
+    ,xplm_Phase_FirstCockpit                  = 35
 
      /* The non-moving parts of the aircraft panel.                                 */
-     xplm_Phase_Panel                         = 40,
+    ,xplm_Phase_Panel                         = 40
 
      /* The moving parts of the aircraft panel.                                     */
-     xplm_Phase_Gauges                        = 45,
+    ,xplm_Phase_Gauges                        = 45
 
      /* Floating windows from plugins.                                              */
-     xplm_Phase_Window                        = 50,
+    ,xplm_Phase_Window                        = 50
 
      /* The last change to draw in 2d.                                              */
-     xplm_Phase_LastCockpit                   = 55
+    ,xplm_Phase_LastCockpit                   = 55
+
+#if defined(XPLM200)
+     /* 3-d Drawing for the local map.  Use regular OpenGL coordinates to draw in   *
+      * this phase.                                                                 */
+    ,xplm_Phase_LocalMap3D                    = 100
+
+#endif /* XPLM200 */
+#if defined(XPLM200)
+     /* 2-d Drawing of text over the local map.                                     */
+    ,xplm_Phase_LocalMap2D                    = 101
+
+#endif /* XPLM200 */
+#if defined(XPLM200)
+     /* Drawing of the side-profile view in the local map screen.                   */
+    ,xplm_Phase_LocalMapProfile               = 102
+
+#endif /* XPLM200 */
+
 };
 typedef int XPLMDrawingPhase;
 
@@ -178,7 +198,12 @@ typedef int (* XPLMDrawCallback_f)(
  * 
  * inKey is the character pressed, inRefCon is a value you supply during 
  * registration. Return 1 to pass the key on to the next sniffer, the window 
- * mgr, x-plane, or whomever is down stream.  Return 0 to consume the key.     
+ * mgr, x-plane, or whomever is down stream.  Return 0 to consume the key. 
+ * 
+ * Warning: this API declares virtual keys as a signed character; however the 
+ * VKEY #define macros in XPLMDefs.h define the vkeys using unsigned values 
+ * (that is 0x80 instead of -0x80).  So you may need to cast the incoming vkey 
+ * to an unsigned char to get correct comparisons in C.                        
  *
  */
 typedef int (* XPLMKeySniffer_f)(
@@ -261,6 +286,8 @@ XPLM_API int                  XPLMUnregisterKeySniffer(
  *
  */
 
+
+
 /*
  * XPLMMouseStatus
  * 
@@ -272,13 +299,41 @@ XPLM_API int                  XPLMUnregisterKeySniffer(
  *
  */
 enum {
-     xplm_MouseDown                           = 1,
+     xplm_MouseDown                           = 1
 
-     xplm_MouseDrag                           = 2,
+    ,xplm_MouseDrag                           = 2
 
-     xplm_MouseUp                             = 3
+    ,xplm_MouseUp                             = 3
+
+
 };
 typedef int XPLMMouseStatus;
+
+#if defined(XPLM200)
+/*
+ * XPLMCursorStatus
+ * 
+ * XPLMCursorStatus describes how you would like X-Plane to manage the cursor. 
+ * See XPLMHandleCursor_f for more info.                                       
+ *
+ */
+enum {
+     /* X-Plane manages the cursor normally, plugin does not affect the cusrsor.    */
+     xplm_CursorDefault                       = 0
+
+     /* X-Plane hides the cursor.                                                   */
+    ,xplm_CursorHidden                        = 1
+
+     /* X-Plane shows the cursor as the default arrow.                              */
+    ,xplm_CursorArrow                         = 2
+
+     /* X-Plane shows the cursor but lets you select an OS cursor.                  */
+    ,xplm_CursorCustom                        = 3
+
+
+};
+typedef int XPLMCursorStatus;
+#endif /* XPLM200 */
 
 /*
  * XPLMWindowID
@@ -311,7 +366,11 @@ typedef void (* XPLMDrawWindow_f)(
  * This function is called when a key is pressed or keyboard focus is taken 
  * away from your window.  If losingFocus is 1, you are losign the keyboard 
  * focus, otherwise a key was pressed and inKey contains its character.  You 
- * are also passewd your window and a  refcon.                                 
+ * are also passewd your window and a  refcon. Warning: this API declares 
+ * virtual keys as a signed character; however the VKEY #define macros in 
+ * XPLMDefs.h define the vkeys using unsigned values (that is 0x80 instead of 
+ * -0x80).  So you may need to cast the incoming vkey to an unsigned char to 
+ * get correct comparisons in C.                                               
  *
  */
 typedef void (* XPLMHandleKey_f)(
@@ -340,6 +399,84 @@ typedef int (* XPLMHandleMouseClick_f)(
                                    int                  y,    
                                    XPLMMouseStatus      inMouse,    
                                    void *               inRefcon);    
+
+#if defined(XPLM200)
+/*
+ * XPLMHandleCursor_f
+ * 
+ * The SDK calls your cursor status callback when the mouse is over your 
+ * plugin window.  Return a cursor status code to indicate how you would like 
+ * X-Plane to manage the cursor.  If you return xplm_CursorDefault, the SDK 
+ * will try lower-Z-order plugin windows, then let the sim manage the cursor. 
+ * 
+ * Note: you should never show or hide the cursor yourself - these APIs are 
+ * typically reference-counted and thus  cannot safely and predictably be used 
+ * by the SDK.  Instead return one of xplm_CursorHidden to hide the cursor or 
+ * xplm_CursorArrow/xplm_CursorCustom to show the cursor. 
+ * 
+ * If you want to implement a custom cursor by drawing a cursor in OpenGL, use 
+ * xplm_CursorHidden to hide the OS cursor and draw the cursor using a 2-d 
+ * drawing callback (after xplm_Phase_Window is probably a good choice).  If 
+ * you want to use a custom OS-based cursor, use xplm_CursorCustom to ask 
+ * X-Plane to show the cursor but not affect its image.  You can then use an 
+ * OS specific call like SetThemeCursor (Mac) or SetCursor/LoadCursor 
+ * (Windows).                                                                  
+ *
+ */
+typedef XPLMCursorStatus (* XPLMHandleCursor_f)(
+                                   XPLMWindowID         inWindowID,    
+                                   int                  x,    
+                                   int                  y,    
+                                   void *               inRefcon);    
+#endif /* XPLM200 */
+
+#if defined(XPLM200)
+/*
+ * XPLMHandleMouseWheel_f
+ * 
+ * The SDK calls your mouse wheel callback when one of the mouse wheels is 
+ * turned within your window.  Return 1 to consume the  mouse wheel clicks or 
+ * 0 to pass them on to a lower window.  (You should consume mouse wheel 
+ * clicks even if they do nothing if your window appears opaque to the user.)  
+ * The number of clicks indicates how far the wheel was turned since the last 
+ * callback. The wheel is 0 for the vertical axis or 1 for the horizontal axis 
+ * (for OS/mouse combinations that support this).                              
+ *
+ */
+typedef int (* XPLMHandleMouseWheel_f)(
+                                   XPLMWindowID         inWindowID,    
+                                   int                  x,    
+                                   int                  y,    
+                                   int                  wheel,    
+                                   int                  clicks,    
+                                   void *               inRefcon);    
+#endif /* XPLM200 */
+
+#if defined(XPLM200)
+/*
+ * XPLMCreateWindow_t
+ * 
+ * The XPMCreateWindow_t structure defines all of the parameters used to 
+ * create a window using XPLMCreateWindowEx.  The structure will be expanded 
+ * in future SDK APIs to include more features.  Always set the structSize 
+ * member to the size of your struct in bytes!                                 
+ *
+ */
+typedef struct {
+     int                       structSize;
+     int                       left;
+     int                       top;
+     int                       right;
+     int                       bottom;
+     int                       visible;
+     XPLMDrawWindow_f          drawWindowFunc;
+     XPLMHandleMouseClick_f    handleMouseClickFunc;
+     XPLMHandleKey_f           handleKeyFunc;
+     XPLMHandleCursor_f        handleCursorFunc;
+     XPLMHandleMouseWheel_f    handleMouseWheelFunc;
+     void *                    refcon;
+} XPLMCreateWindow_t;
+#endif /* XPLM200 */
 
 /*
  * XPLMGetScreenSize
@@ -392,6 +529,23 @@ XPLM_API XPLMWindowID         XPLMCreateWindow(
                                    XPLMHandleKey_f      inKeyCallback,    
                                    XPLMHandleMouseClick_f inMouseCallback,    
                                    void *               inRefcon);    
+
+#if defined(XPLM200)
+/*
+ * XPLMCreateWindowEx
+ * 
+ * This routine creates a new window - you pass in an XPLMCreateWindow_t 
+ * structure with all of the fields set in.  You must set the structSize of 
+ * the structure to the size of the  actual structure you used.  Also, you 
+ * must provide funtions for every callback - you may not leave them null!  
+ * (If you do not support the cursor or mouse wheel, use functions that return 
+ * the default values.)  The numeric values of the XPMCreateWindow_t structure 
+ * correspond to the parameters of XPLMCreateWindow.                           
+ *
+ */
+XPLM_API XPLMWindowID         XPLMCreateWindowEx(
+                                   XPLMCreateWindow_t * inParams);    
+#endif /* XPLM200 */
 
 /*
  * XPLMDestroyWindow
@@ -510,6 +664,8 @@ XPLM_API int                  XPLMIsWindowInFront(
  *
  */
 
+
+
 /*
  * XPLMHotKey_f
  * 
@@ -560,7 +716,7 @@ XPLM_API void                 XPLMUnregisterHotKey(
  * Returns the number of current hot keys.                                     
  *
  */
-XPLM_API long                 XPLMCountHotKeys(void);
+XPLM_API int                  XPLMCountHotKeys(void);
 
 /*
  * XPLMGetNthHotKey
@@ -569,7 +725,7 @@ XPLM_API long                 XPLMCountHotKeys(void);
  *
  */
 XPLM_API XPLMHotKeyID         XPLMGetNthHotKey(
-                                   long                 inIndex);    
+                                   int                  inIndex);    
 
 /*
  * XPLMGetHotKeyInfo

@@ -460,6 +460,7 @@ static magnetometer_callback_funcptr magnetometer_callback = NULL;
 uint8_t rxMagnetometer(magnetometer_callback_funcptr callback)
 {
 	magnetometer_callback = callback;
+	return MAGNETOMETER_SERVICE_CAN_PAUSE;
 }
 
 void I2C_doneReadMagData(void)

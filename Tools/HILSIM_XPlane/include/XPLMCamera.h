@@ -2,11 +2,11 @@
 #define _XPLMCamera_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -55,6 +55,7 @@ extern "C" {
  *
  */
 
+
 /*
  * XPLMCameraControlDuration
  * 
@@ -64,11 +65,13 @@ extern "C" {
  */
 enum {
      /* Control the camera until the user picks a new view.                         */
-     xplm_ControlCameraUntilViewChanges       = 1,
+     xplm_ControlCameraUntilViewChanges       = 1
 
      /* Control the camera until your plugin is disabled or another plugin forcably *
       * takes control.                                                              */
-     xplm_ControlCameraForever                = 2
+    ,xplm_ControlCameraForever                = 2
+
+
 };
 typedef int XPLMCameraControlDuration;
 
