@@ -52,12 +52,10 @@
 /Tools/LedTest/LedTest-udb4.X/nbproject/Makefile*
 /Tools/LedTest/LedTest-udb4.X/nbproject/Package*
 
-/MatrixPilot/*.o
-/libDCM/*.o
-/libUDB/*.o
-/Tools/MatrixPilot-SIL/*.o
+*.o
+
 /Tools/MatrixPilot-SIL/matrixpilot
-/Tools/HILSIM_XPlane/UDBSocketUnix.o
+/Tools/MatrixPilot-SIL/silcat
 /Tools/LedTest/LedTest-auav3.X/nbproject/private/
 /Tools/LedTest/LedTest-auav3.X/build/default/
 /Tools/LedTest/LedTest-auav3.X/dist/default/
