@@ -3,7 +3,6 @@
 #define MAX_ITEMS 30
 #define MAG_FIELD 1000.0
 
-static int enable_count = 0;
 bool CommsEnabled;
 float fTextColour[3];
 char szString[100];
@@ -327,18 +326,17 @@ int MyKeySniffer(char         inChar,
                  char         inVirtualKey,
                  void*        inRefcon)
 {
-//	if ((inVirtualKey >= 33 && inVirtualKey <= 40) || (inVirtualKey >= 96 && inVirtualKey <= 111))
-//	{
-//		NAV_KEYSTROKE[6] = (unsigned char)inFlags;
-//		NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
-//		CalculateChecksum(NAV_KEYSTROKE);
-//		SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
-//		return 0;   // Returning 0 consumes the keystroke
-//	}
-//	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane
-
+#if 1
+	if ((inVirtualKey >= 33 && inVirtualKey <= 40) || (inVirtualKey >= 96 && inVirtualKey <= 111))
+	{
+		NAV_KEYSTROKE[6] = (unsigned char)inFlags;
+		NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
+		CalculateChecksum(NAV_KEYSTROKE);
+		SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
+		return 0;   // Returning 0 consumes the keystroke
+	}
 //	LoggingFile.mLogFile << "KeySniffer " << inFlags << ":" << inVirtualKey << endl;
-
+#else
 	NAV_KEYSTROKE[6] = (unsigned char)inFlags;
 	NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
 	CalculateChecksum(NAV_KEYSTROKE);
@@ -347,13 +345,15 @@ int MyKeySniffer(char         inChar,
 	{
 		return 0;   // Returning 0 consumes the keystroke
 	}
+#endif
 	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane
 }
 /*
+Key | inChar | inVirtualKey | MatrixPilot function
 Page Up    0 | 33
 Page Down  0 | 34
-End        0 | 35
-Home       0 | 36
+End        0 | 35     Mode manual
+Home       0 | 36     Mode failsafe
 Left      28 | 37
 Up        30 | 38
 Right     29 | 39
@@ -363,19 +363,19 @@ x        120 | 88
 z        122 | 90
 
 Numpad-0  48 | 96
-Numpad-1  49 | 97
-Numpad-2  50 | 98
-Numpad-3  51 | 99
-Numpad-4  52 | 100
-Numpad-5  53 | 101
-Numpad-6  54 | 102
+Numpad-1  49 | 97     Rudder left
+Numpad-2  50 | 98     Elevator down
+Numpad-3  51 | 99     Rudder right
+Numpad-4  52 | 100    Aileron left
+Numpad-5  53 | 101    Centre the stick
+Numpad-6  54 | 102    Aileron right
 Numpad-7  55 | 103
-Numpad-8  56 | 104
+Numpad-8  56 | 104    Elevator up
 Numpad-9  57 | 105
-Numpad-*  42 | 106
-Numpad-+  43 | 107
-Numpad--  45 | 109
-Numpad-/  47 | 111
+Numpad-*  42 | 106    Mode guided / waypoint
+Numpad-+  43 | 107    Throttle up
+Numpad--  45 | 109    Throttle down
+Numpad-/  47 | 111    Mode stablised
 
 ,         44 | 183
 .         46 | 185
@@ -409,7 +409,7 @@ void AttemptConnection(void)
 
 PLUGIN_API void XPluginDisable(void)
 {
-	if (enable_count > 0) --enable_count;
+//	if (enable_count > 0) --enable_count;
 
 	LoggingFile.mLogFile << "XPluginDisable\n";
 
@@ -424,10 +424,10 @@ PLUGIN_API int XPluginEnable(void)
 {
 	LoggingFile.mLogFile << "XPluginEnable\n";
 
-	LoggingFile.mLogFile << "enable_count: " << enable_count << "\n";
-	++enable_count;
-	if (enable_count == 1)	return 0;
-	LoggingFile.mLogFile << "enable_count: " << enable_count << "\n";
+//	LoggingFile.mLogFile << "enable_count: " << enable_count << "\n";
+//	++enable_count;
+//	if (enable_count == 1)	return 0;
+//	LoggingFile.mLogFile << "enable_count: " << enable_count << "\n";
 
 	PortNum = 0;
 	pendingElapsedTime = 0;
