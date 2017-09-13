@@ -326,18 +326,19 @@ int MyKeySniffer(char         inChar,
                  char         inVirtualKey,
                  void*        inRefcon)
 {
-//	if ((inVirtualKey >= 33 && inVirtualKey <= 40) || (inVirtualKey >= 96 && inVirtualKey <= 111))
-//	{
-//		NAV_KEYSTROKE[6] = (unsigned char)inFlags;
-//		NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
-//		CalculateChecksum(NAV_KEYSTROKE);
-//		SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
-//		return 0;   // Returning 0 consumes the keystroke
-//	}
-//	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane
+#if 1
+	if ((inVirtualKey >= 33 && inVirtualKey <= 40) || (inVirtualKey >= 96 && inVirtualKey <= 111))
+	{
+		NAV_KEYSTROKE[6] = (unsigned char)inFlags;
+		NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
+		CalculateChecksum(NAV_KEYSTROKE);
+		SendToComPort(sizeof(NAV_KEYSTROKE), NAV_KEYSTROKE);
+		return 0;   // Returning 0 consumes the keystroke
+	}
 
 //	LoggingFile.mLogFile << "KeySniffer " << inFlags << ":" << inVirtualKey << endl;
 
+#else
 	NAV_KEYSTROKE[6] = (unsigned char)inFlags;
 	NAV_KEYSTROKE[7] = (unsigned char)inVirtualKey;
 	CalculateChecksum(NAV_KEYSTROKE);
@@ -346,13 +347,15 @@ int MyKeySniffer(char         inChar,
 	{
 		return 0;   // Returning 0 consumes the keystroke
 	}
+#endif
 	return 1;       // Return 1 to pass the keystroke to plugin windows and X-Plane
 }
 /*
+Key | inChar | inVirtualKey | MatrixPilot function
 Page Up    0 | 33
 Page Down  0 | 34
-End        0 | 35
-Home       0 | 36
+End        0 | 35     Mode manual
+Home       0 | 36     Mode failsafe
 Left      28 | 37
 Up        30 | 38
 Right     29 | 39
@@ -362,19 +365,19 @@ x        120 | 88
 z        122 | 90
 
 Numpad-0  48 | 96
-Numpad-1  49 | 97
-Numpad-2  50 | 98
-Numpad-3  51 | 99
-Numpad-4  52 | 100
-Numpad-5  53 | 101
-Numpad-6  54 | 102
+Numpad-1  49 | 97     Rudder left
+Numpad-2  50 | 98     Elevator down
+Numpad-3  51 | 99     Rudder right
+Numpad-4  52 | 100    Aileron left
+Numpad-5  53 | 101    Centre the stick
+Numpad-6  54 | 102    Aileron right
 Numpad-7  55 | 103
-Numpad-8  56 | 104
+Numpad-8  56 | 104    Elevator up
 Numpad-9  57 | 105
-Numpad-*  42 | 106
-Numpad-+  43 | 107
-Numpad--  45 | 109
-Numpad-/  47 | 111
+Numpad-*  42 | 106    Mode guided / waypoint
+Numpad-+  43 | 107    Throttle up
+Numpad--  45 | 109    Throttle down
+Numpad-/  47 | 111    Mode stablised
 
 ,         44 | 183
 .         46 | 185
@@ -408,6 +411,8 @@ void AttemptConnection(void)
 
 PLUGIN_API void XPluginDisable(void)
 {
+	LoggingFile.mLogFile << "XPluginDisable\n";
+
 	CloseComms();
 
 	XPLMSetDatai(drOverRide, 0);        // Clear the overides
@@ -419,6 +424,8 @@ PLUGIN_API int XPluginEnable(void)
 {
 	PortNum = 0;
 	pendingElapsedTime = 0;
+
+	LoggingFile.mLogFile << "XPluginEnable\n";
 
 	// Load the setup file on enable.  This allows the user to modify the file without exit of XPlane
 	SetupFile Setup;
@@ -439,7 +446,7 @@ PLUGIN_API int XPluginEnable(void)
 }
 
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFromWho,
-                                      long         inMessage,
+                                      int          inMessage,
                                       void*        inParam)
 {
 	(void)inFromWho;
@@ -798,6 +805,7 @@ int msgSync2(unsigned char rxChar)
 		msg_parse = &msgVarSize;    // Next char is variable size
 		break;
 	default:
+		LoggingFile.mLogFile << "msgSync2 faulty start" << endl;
 		msg_parse = &msgDefault;    // Faulty start
 		break;
 	}
@@ -812,11 +820,13 @@ int msgVarSize(unsigned char rxChar)
 	case 0xFF:
 	case 0xFE:
 	case 0xEF:
+		LoggingFile.mLogFile << "msgVarSize faulty value" << endl;
 		msg_parse = &msgDefault;    // Faulty value
 		break;
 	default:
 		if (var_channel_count > MAX_VARIABLE_CHANNELS)
 		{
+			LoggingFile.mLogFile << "msgVarSize faulty start" << endl;
 			msg_parse = &msgDefault;// Faulty start
 			return 0;
 		}
@@ -856,6 +866,7 @@ int msgSync1(unsigned char rxChar)
 	case 0xFF:
 		break;                      // do nothing
 	default: 
+		LoggingFile.mLogFile << "msgSync1 error condition" << endl;
 		msg_parse = &msgDefault;    // error condition
 		break;
 	}
@@ -887,6 +898,7 @@ int msgCheckSum(unsigned char rxChar)
 		memcpy(SERVO_IN, SERVO_IN_, sizeof(SERVO_IN_));
 		return 1;   // success!
 	}
+	LoggingFile.mLogFile << "msgCheckSum failed" << endl;
 	return 0;
 }
 

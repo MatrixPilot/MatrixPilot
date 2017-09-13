@@ -1,3 +1,14 @@
+#CONFIG = Cessna
+
+ifeq ($(CONFIG),)
+$(warning *******************************************************************************)
+$(warning No configuration specified, defaulting to ./Config directory)
+$(warning To specify an alternate, run make CONFIG='Config subdirectory')
+$(warning eg. $ make CONFIG=Cessna)
+$(warning *******************************************************************************)
+endif
+
+CONFIG  ?= .
 
 ifeq ($(OS),Windows_NT)
 DEFINES  = -DWIN=1
@@ -14,8 +25,9 @@ RM       = rm -rf
 endif
 
 CC       = gcc
-CFLAGS   = -pipe -Wall -W -O0 $(DEFINES)
-INCPATH  = -I. -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
+WARN     = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
+CFLAGS   = -pipe -O0 $(DEFINES) $(WARN)
+INCPATH  = -I. -I../../Config/$(CONFIG) -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
 LFLAGS   =
 LIBS     = -l$(OSLIB)
 
@@ -25,9 +37,10 @@ OBJECTS_DIR = ./
 MPSIL_TARGET  = matrixpilot$(BINARY)
 
 MP_HEADERS = \
-../../Config/options.h \
-../../Config/flightplan-waypoints.h \
-../../Config/flightplan-logo.h
+../../Config/$(CONFIG)/options.h \
+
+#../../Config/$(CONFIG)/flightplan-waypoints.h \
+#../../Config/$(CONFIG)/flightplan-logo.h
 
 MPSIL_OBJECTS = \
 SIL-udb.o \
@@ -52,6 +65,7 @@ $(OSOBJS) \
 ../../libDCM/libDCM.o \
 ../../libDCM/mathlibNAV.o \
 ../../libDCM/rmat.o \
+../../libDCM/mag_drift.o \
  \
 ../../MatrixPilot/airspeedCntrl.o \
 ../../MatrixPilot/altitudeCntrl.o \
@@ -78,13 +92,14 @@ $(OSOBJS) \
 ../../MatrixPilot/mp_osd.o \
 ../../MatrixPilot/navigate.o \
 ../../MatrixPilot/nv_memory_table.o \
-../../MatrixPilot/parameter_table.o \
+../../MatrixPilot/parameter_table2.o \
 ../../MatrixPilot/pitchCntrl.o \
 ../../MatrixPilot/rollCntrl.o \
 ../../MatrixPilot/servoMix.o \
 ../../MatrixPilot/servoPrepare.o \
 ../../MatrixPilot/states.o \
 ../../MatrixPilot/telemetry.o \
+../../MatrixPilot/telemetry_log.o \
 ../../MatrixPilot/yawCntrl.o
 
 

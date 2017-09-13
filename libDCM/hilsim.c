@@ -85,6 +85,7 @@ int16_t hilsim_input_adjust(char* inChannelName, int delta)
 
 #define KEYPRESS_INPUT_DELTA 50
 
+// This is called by the UBX GPS message parser and contians keystroke data from X-Plane
 void hilsim_handle_key_input(char c)
 {
 	switch (c) {
