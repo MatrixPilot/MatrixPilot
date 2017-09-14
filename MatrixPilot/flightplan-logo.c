@@ -443,10 +443,9 @@ void flightplan_logo_update(void)
 		return;
 	}
 
-	// otherwise run the interrupt handler, if configured, and not in-progress
+	// otherwise run the interrupt handler, if configured.
 	if (interruptIndex)
-	{
-		//if not arrived
+	{	
 		if (tofinish_line >= WAYPOINT_PROXIMITY_RADIUS) // not crossed the finish line
 		{
 			if (!interruptStackBase)   //if not in-progress
