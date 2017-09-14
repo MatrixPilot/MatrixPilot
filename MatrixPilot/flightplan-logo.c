@@ -467,7 +467,7 @@ void flightplan_logo_update(void)
 		}
 		else
 		{
-			if (interruptStackBase)   //if not in-progress
+			if (interruptStackBase)   //if in-progress
 			{
 				//cleanup uncompleted interrupt
 				instructionIndex = logoStack[interruptStackBase].returnInstructionIndex+1;  //support both end by main and end by END SUBROUTINE
