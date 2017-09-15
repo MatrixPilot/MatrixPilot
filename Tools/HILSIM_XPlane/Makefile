@@ -128,4 +128,3 @@ clean:
 install:
 	cp $(BUILDDIR)/$(TARGET)/64/$(TARGET)64.xpl ~/'X-Plane 10'/Resources/plugins
 	cp $(BUILDDIR)/$(TARGET)/32/$(TARGET)32.xpl ~/'X-Plane 10'/Resources/plugins
-
