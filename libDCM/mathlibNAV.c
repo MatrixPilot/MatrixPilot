@@ -341,10 +341,11 @@ uint16_t vector2_normalize(int16_t result[], int16_t input[])
 	uint16_t magnitude;
 
 	magnitude = vector2_mag(input[0], input[1]);
+	// use 1/2 magnitude below because divsd is expecting two signed values
 	if (magnitude > 0)
 	{
-		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]), magnitude);
-		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]), magnitude);
+		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]/2), magnitude/2);
+		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]/2), magnitude/2);
 	}
 	else
 	{
@@ -358,11 +359,12 @@ uint16_t vector3_normalize(int16_t result[], int16_t input[])
 	uint16_t magnitude;
 
 	magnitude = vector3_mag(input[0], input[1], input[2]);
+	// use 1/2 of magnitude below because divsd is expecting two signed values
 	if (magnitude > 0)
 	{
-		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]), magnitude);
-		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]), magnitude);
-		result[2] = __builtin_divsd(__builtin_mulss(RMAX, input[2]), magnitude);
+		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]/2), magnitude/2);
+		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]/2), magnitude/2);
+		result[2] = __builtin_divsd(__builtin_mulss(RMAX, input[2]/2), magnitude/2);
 	}
 	else
 	{

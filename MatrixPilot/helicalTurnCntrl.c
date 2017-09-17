@@ -313,14 +313,14 @@ void helicalTurnCntrl(void)
 	if (desiredTilt.WW > (int32_t)2 * (int32_t)RMAX - 1)
 	{
 		desiredTilt.WW = (int32_t)2 * (int32_t)RMAX - 1;
-		accum.WW = __builtin_mulsu(desiredTilt._.W0, GRAVITYCMSECSEC);
+		accum.WW = - __builtin_mulsu(desiredTilt._.W0, GRAVITYCMSECSEC);
 		accum.WW /= airSpeed;
 		desiredTurnRateRadians = accum._.W0;
 	}
 	else if (desiredTilt.WW < -(int32_t)2 * (int32_t)RMAX + 1)
 	{
 		desiredTilt.WW = -(int32_t)2 * (int32_t)RMAX + 1;
-		accum.WW = __builtin_mulsu(desiredTilt._.W0, GRAVITYCMSECSEC);
+		accum.WW = - __builtin_mulsu(desiredTilt._.W0, GRAVITYCMSECSEC);
 		accum.WW /= airSpeed;
 		desiredTurnRateRadians = accum._.W0;
 	}
