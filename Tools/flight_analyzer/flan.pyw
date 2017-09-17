@@ -2364,6 +2364,7 @@ def write_csv(options,log_book):
     wing_loading_list = []
     elevator_with_trim_removed = []
     elevator_reversal_multiplier = 1 # 1 Meaning do not reverse; -1 to reverse
+    aileron_reversal_multiplier = 1
     if log_book.F20 == "Empty" or log_book.F19 == "Empty" :
         print ("Did not receive Elevator Trim Values: setting to default of 3000")
         print "Reversal of Trim Channel may not be correct"
