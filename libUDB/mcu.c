@@ -351,6 +351,9 @@ static void init_pll(void)
 #else
 #error "invalid MIPS Configuration"
 #endif // MIPS
+//Change GFM#9: in accordance with Microchip recommandation
+// Cf. DS70188E-page 17-16    
+while(OSCCONbits.LOCK != 1) {}; // Wait for PLL to lock
 #endif // BOARD_TYPE
 
 #if (BOARD_TYPE == AUAV3_BOARD)
