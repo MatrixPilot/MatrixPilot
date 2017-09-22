@@ -95,8 +95,11 @@ void MPU6000_init16(callback_fptr_t fptr)
 	writeMPUSPIreg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
 
 	// SAMPLE RATE
-	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
-
+#if (HEARTBEAT_HZ == 200)
+	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, BIT_SAMPLE_RATE_200_HZ); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
+#else
+	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate could be whatever, here 4 for 200Hz
+#endif    
 	// scaling & DLPF
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
 
@@ -114,6 +117,7 @@ void MPU6000_init16(callback_fptr_t fptr)
 #endif
 
 #if 0
+#if (HEARTBEAT_HZ == 1000)
 	// Legacy from Mark Whitehorn's testing, we might need it some day.
 	// SAMPLE RATE
 	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 7); // Sample rate = 1KHz  Fsample= 8Khz/(N+1)
@@ -126,7 +130,8 @@ void MPU6000_init16(callback_fptr_t fptr)
 //	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scale 2g, g = 16384
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
 //	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
-#endif
+#endif //(HEARTBEAT_HZ == 1000)
+#endif //0
 
 	// INT CFG => Interrupt on Data Ready, totem-pole (push-pull) output
 	writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
