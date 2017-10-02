@@ -30,6 +30,11 @@ if ! make -j 8 -f ../../../makefile TARGET_NAME=MPSIM DEVICE=SIL CONFIG=Cessna D
 	then
 	command_failed=true
 fi
+cd ..; mkdir -p SIL_LOGO; cd SIL_LOGO
+if ! make -j 8 -f ../../../makefile TARGET_NAME=MPSIM DEVICE=SIL CONFIG=EasyStar DEFS='CONSOLE_UART=0 SERIAL_OUTPUT_FORMAT=SERIAL_UDB_EXTRA'
+	then
+	command_failed=true
+fi
 cd ..; mkdir -p AUAV3; cd AUAV3
 if ! make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB5 CONFIG=Cessna
 	then
