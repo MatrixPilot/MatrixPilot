@@ -471,7 +471,6 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void* refcon)
 
 	union intbb Temp2;
 	float phi, theta, psi;
-	float alpha, beta;
 	float P_flight, Q_flight, R_flight;
 	float ax, ay, az;
 	float gravity_acceleration_x, gravity_acceleration_y, gravity_acceleration_z;
@@ -484,9 +483,6 @@ float GetBodyRates(float elapsedMe, float elapsedSim, int counter, void* refcon)
 	P_flight = XPLMGetDataf(drP)  / 180 * PI;
 	Q_flight = XPLMGetDataf(drQ)  / 180 * PI;
 	R_flight = XPLMGetDataf(drR)  / 180 * PI;
-	alpha = XPLMGetDataf(drAlpha) / 180 * PI;
-	beta = XPLMGetDataf(drBeta)   / 180 * PI;
-
 	
     // On 25th Jan 2015, Bill Premerlani confirmed with Austin Meyer, author of X-Plane
     // that P, Q and R are rotations in the body frame. So they do not need to be rotated into
@@ -1000,14 +996,12 @@ int MyOrbitPlaneFunc(XPLMCameraPosition_t* outCameraPosition,
 	if (outCameraPosition && !inIsLosingControl)
 	{
 		int w, h, x, y;
-		float dx, dz, dy, heading, pitch;
+		float dx, dz, dy; 
 
 		// First get the screen size and mouse location.  We will use this to decide
 		// what part of the orbit we are in.  The mouse will move us up-down and around.
 		XPLMGetScreenSize(&w, &h);
 		XPLMGetMouseLocation(&x, &y);
-		heading = (float)(2 * PI * (((float)x / (float)w) - 0.5));
-		pitch = (float)(PI * (((float)y / (float)h) - 0.5));
 
 		double local_x = XPLMGetDataf(drLocal_x);
 		double local_y = XPLMGetDataf(drLocal_y);
