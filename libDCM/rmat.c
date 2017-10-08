@@ -144,9 +144,6 @@ static fractional errorRP[] = { 0, 0, 0 };
 static fractional errorYawground[] = { 0, 0, 0 };
 static fractional errorYawplane[]  = { 0, 0, 0 };
 
-// measure of error in orthogonality, used for debugging purposes:
-static fractional error = 0;
-
 void yaw_drift_reset(void)
 {
 	errorYawground[0] = errorYawground[1] = errorYawground[2] = 0; // turn off yaw drift
@@ -423,16 +420,15 @@ static void normalize(void)
 	fractional norm;    // actual magnitude
 	fractional renorm;  // renormalization factor
 	fractional rbuff[9];
-	// compute -1/2 of the dot product between rows 1 and 2
-	error =  - VectorDotProduct(3, &rmat[0], &rmat[3]); // note, 1/2 is built into 2.14
-	// scale rows 1 and 2 by the error
-	VectorScale(3, &rbuff[0], &rmat[3], error);
-	VectorScale(3, &rbuff[3], &rmat[0], error);
-	// update the first 2 rows to make them closer to orthogonal:
-	VectorAdd(3, &rbuff[0], &rbuff[0], &rmat[0]);
-	VectorAdd(3, &rbuff[3], &rbuff[3], &rmat[3]);
-	// use the cross product of the first 2 rows to get the 3rd row
-	VectorCross(&rbuff[6], &rbuff[0], &rbuff[3]);
+	VectorCopy( 9 , rbuff , rmat ); // copy direction cosine matrix into buffer
+	
+	// Leave the bottom (tilt) row alone, it is usually the most accurate.
+	// Compute the first row as the cross product of second row with third row.
+	VectorCross(&rbuff[0], &rbuff[3] , &rbuff[6]);
+	// First row is now perpendicular to the second and third row.
+	// Compute the second row as the cross product of the third row with the first row.
+	VectorCross(&rbuff[3], &rbuff[6] , &rbuff[0]);
+	// All three rows are now mutually perpendicular.
 
 	// Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the renormalization
 
