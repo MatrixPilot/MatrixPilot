@@ -268,7 +268,6 @@ static int16_t omegaSOG(int16_t omega, int16_t speed)
 	}
 }
 
-#if (CENTRIFUGAL_WITHOUT_GPS == 1)
 static void adj_accel(int16_t angleOfAttack)
 {
 	// Performs centrifugal compensation without a GPS.
@@ -344,24 +343,21 @@ static void adj_accel(int16_t angleOfAttack)
 	// now compute omega vector cross velocity vector and adjust
 	accum.WW = (__builtin_mulss(omega_times_velocity , rotation_axis[1] ) ) << 2;
 	gravity_vector_plane[0] = gplane[0] - accum._.W1;
+	gravity_vector_plane[1] = gplane[1];
 	accum.WW = (__builtin_mulss(omega_times_velocity , rotation_axis[0] ) ) << 2;
-	gravity_vector_plane[0] = gplane[0] + accum._.W1;
-}
-#else
-static void adj_accel(int16_t angleOfAttack)
-{
-	union longww accum;
+	gravity_vector_plane[2] = gplane[2] + accum._.W1;
+	
+	// account for angle of attack and forward acceleration
 	int16_t air_speed_z;
 	// total (3D) airspeed in cm/sec is used to adjust for acceleration
 	// compute Z component of airspeed due to angle of attack
 	accum.WW = __builtin_mulsu(angleOfAttack, air_speed_3DGPS) << 2;
 	air_speed_z = accum._.W1;
 	// compute centrifugal and forward acceleration compensation
-	gravity_vector_plane[0] = gplane[0] - omegaSOG(omegaAccum[2], air_speed_3DGPS)+ omegaSOG(omegaAccum[1], air_speed_z);
-	gravity_vector_plane[2] = gplane[2] + omegaSOG(omegaAccum[0], air_speed_3DGPS);
-	gravity_vector_plane[1] = gplane[1] - omegaSOG(omegaAccum[0], air_speed_z) + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
+	gravity_vector_plane[0] = gravity_vector_plane[0] + omegaSOG(omegaAccum[1], air_speed_z);
+	gravity_vector_plane[1] = gravity_vector_plane[1] - omegaSOG(omegaAccum[0], air_speed_z) + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
+
 }
-#endif // CENTRIFUGAL_WITHOUT_GPS
 
 // The update algorithm!!
 static void rupdate(void)
