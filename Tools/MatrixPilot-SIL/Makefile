@@ -11,22 +11,36 @@ endif
 CONFIG  ?= .
 
 ifeq ($(OS),Windows_NT)
-DEFINES  = -DWIN=1
-BINARY   = .exe
-OSOBJS   = UDBSocketWin.o
-OSLIB    = ws2_32
-RM       = del /Q /F
+    DEFINES    = -DWIN=1
+    BINARY     = .exe
+    OSOBJS     = UDBSocketWin.o
+    OSLIB      = ws2_32
+    RM         = del /Q /F
+    ARCH_FLAGS = 
+    WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
 else
-DEFINES  = -DNIX=1
-BINARY   =
-OSOBJS   = UDBSocketUnix.o
-OSLIB    = m
-RM       = rm -rf
+    ARCH         := $(shell getconf LONG_BIT)
+    ARCH_FLAGS   := -DMP_WORDSIZE=32 -m32
+    ARCH_FLAGS   := -DMP_WORDSIZE=64 -m64
+    DEFINES  = -DNIX=1
+    BINARY   =
+    OSOBJS   = UDBSocketUnix.o
+    OSLIB    = m
+    RM       = rm -rf
+    UNAME_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+    ifeq ($(UNAME_S),Linux)
+        DEFINES = -DAPL=0 -DIBM=0 -DLIN=1 -DNIX=1
+        WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        DEFINES = -DAPL=1 -DIBM=0 -DLIN=0 -DNIX=1
+        WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-unused-const-variable
+    endif
 endif
 
 CC       = gcc
-WARN     = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
-CFLAGS   = -pipe -O0 $(DEFINES) $(WARN)
+CCP	 = g++
+CFLAGS   = -pipe -O0 $(DEFINES) $(WARN) $(ARCH_FLAGS)
 INCPATH  = -I. -I../../Config/$(CONFIG) -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
 LFLAGS   =
 LIBS     = -l$(OSLIB)
@@ -113,18 +127,19 @@ first: all
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
 %.o: %.cpp $(MP_HEADERS)
-	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
+	$(CCP) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
 all: $(MPSIL_TARGET) $(MPCAT_TARGET)
 
 sil: $(MPSIL_TARGET)
 
 cat: $(MPCAT_TARGET)
+
 $(MPSIL_TARGET): $(MPSIL_OBJECTS)
 	$(CC) $(LFLAGS) -o $(MPSIL_TARGET) $(MPSIL_OBJECTS) $(LIBS)
 
 $(MPCAT_TARGET): $(MPCAT_OBJECTS)
-	$(CC) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
+	$(CCP) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
 
 clean:
 	-$(RM) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
