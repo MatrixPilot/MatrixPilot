@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 {
 	UDBSocketType socketType = (!SILSIM_TELEMETRY_RUN_AS_SERVER) ? UDBSocketUDPServer : UDBSocketUDPClient;
 	uint32_t udpPort = SILSIM_TELEMETRY_PORT;
-	char *udpHost = SILSIM_TELEMETRY_HOST;
+	char *udpHost = (char *)SILSIM_TELEMETRY_HOST;
 	char *serialPort = NULL;
 	uint32_t serialBaud = 0;
 	uint8_t argPos = 0;
