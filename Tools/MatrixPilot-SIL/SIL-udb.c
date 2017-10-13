@@ -26,11 +26,14 @@
 #include <Time.h>
 #include <process.h>
 
+
+#ifndef MINGW
 struct timezone
 {
 	int tz_minuteswest; // of Greenwich
 	int tz_dsttime;     // type of dst correction to apply
 };
+#endif // MINGW
 
 #if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
