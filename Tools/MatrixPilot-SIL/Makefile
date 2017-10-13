@@ -41,7 +41,7 @@ else
     endif
     ifeq ($(UNAME_S),Darwin)
         DEFINES = -DAPL=1 -DIBM=0 -DLIN=0 -DNIX=1
-        WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-unused-const-variable
+        WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-address-of-packed-member -Wno-unused-const-variable
     endif
 endif
 
