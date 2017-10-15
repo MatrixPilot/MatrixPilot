@@ -1,38 +1,48 @@
-
+UNAME_S := $(shell uname -s)
+$(info Development Environment is $(UNAME_S))
 ifeq ($(OS),Windows_NT)
-    DEFINES = -DAPL=0 -DIBM=1 -DLIN=0 -DWIN=1
-    OSOBJS  = UDBSocketWin.o
-    TARGET := HILSIM-win
-    OSLIB   = ws2_32
-    RM      = del /Q /F
-    LIBS = 
+    DEFINES := -DAPL=0 -DIBM=1 -DLIN=0 -DWIN=1
+    TARGET  := HILSIM-win
+    ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
+        DEFINES  += -DMINGW
+        FRAMEWORK := 
+        RM        := rm -rf
+        PLUGINS   := /c/users/$(USER)/'X-Plane 10'/Resources/plugins
+        LIBS      := -static-libgcc -lws2_32 -L$(PLUGINS) 
+        XPLM      := -lXPLM
+        XPLM_64   := -lXPLM_64
+        PATH_32   := /mingw32/bin
+        PATH_64   := /mingw64/bin
+        EXPORTS   := -Wl,--version-script=exports.txt
+    else
+        RM        := del /Q /F
+	$(error This make file must be run under MSYS2 on the Windows platform)
+    endif    
 else
-    PLUGINS = ~/Desktop/'X-Plane 10'/Resources/plugins
-    UNAME_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+    RM        := rm -rf
     ifeq ($(UNAME_S),Linux)
-        DEFINES = -DAPL=0 -DIBM=0 -DLIN=1 -DNIX=1
-        FRAMEWORK = 
-        TARGET   := HILSIM-linux
-        LIBS = -static-libgcc
-        EXPORTS = -Wl,--version-script=exports.txt
+        PLUGINS   := ~/'X-Plane 10'/Resources/plugins
+        DEFINES   := -DAPL=0 -DIBM=0 -DLIN=1 -DNIX=1
+        FRAMEWORK := 
+        TARGET    := HILSIM-linux
+        LIBS      := -static-libgcc -lm
+        EXPORTS   := -Wl,--version-script=exports.txt
     endif
     ifeq ($(UNAME_S),Darwin)
-        DEFINES = -DAPL=1 -DIBM=0 -DLIN=0 -DNIX=0
-        FRAMEWORK = -framework XPLM
-        TARGET   := HILSIM-macos
-        LIBS = -lstdc++ -framework OpenGL -F $(PLUGINS) $(FRAMEWORK)
-        EXPORTS =
+        PLUGINS   := ~/Desktop/'X-Plane 10'/Resources/plugins
+        DEFINES   := -DAPL=1 -DIBM=0 -DLIN=0 -DNIX=0
+        FRAMEWORK := -framework XPLM
+        TARGET    := HILSIM-macos
+        LIBS      := -lm -lstdc++ -framework OpenGL -F $(PLUGINS) $(FRAMEWORK)
+        EXPORTS   :=
     endif
-    OSOBJS    = UDBSocketUnix.o
-    OSLIB     = m
-    RM        = rm -rf
 endif
 
 BUILDDIR :=	./build
 SRC_BASE :=	.
 
 SOURCES = \
-	HILSIM.cpp SerialIO.cpp Setup.cpp stdafx.cpp utility.cpp UDBSocketUnix.c
+	HILSIM.cpp SerialIO.cpp Setup.cpp stdafx.cpp utility.cpp UDBSocketUnix.c UDBSocketWin.c
 
 
 INCLUDES = \
@@ -83,12 +93,12 @@ $(TARGET):  $(BUILDDIR)/$(TARGET)/32/$(TARGET)32.xpl \
 $(BUILDDIR)/$(TARGET)/64/$(TARGET)64.xpl: $(ALL_OBJECTS64)
 	@echo Linking $@
 	mkdir -p $(dir $@)
-	gcc -m64 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS64) $(LIBS) 
+	export PATH=$(PATH_64):$$PATH; g++ -m64 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS64) $(LIBS)  $(XPLM_64)
 
 $(BUILDDIR)/$(TARGET)/32/$(TARGET)32.xpl: $(ALL_OBJECTS)
 	@echo Linking $@
 	mkdir -p $(dir $@)
-	gcc -m32 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS) $(LIBS) 
+	export PATH=$(PATH_32):$$PATH; g++ -m32 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS) $(LIBS)  $(XPLM)
 
 # Compiler rules
 
@@ -100,23 +110,23 @@ $(BUILDDIR)/$(TARGET)/32/$(TARGET)32.xpl: $(ALL_OBJECTS)
 
 $(BUILDDIR)/obj32/%.o : %.c
 	mkdir -p $(dir $@)
-	gcc $(CFLAGS) -m32 -c $< -o $@
-	gcc $(CFLAGS) -MM -MT $@ -o $(@:.o=.cdep) $<
+	export PATH=$(PATH_32):$$PATH; gcc $(CFLAGS) -m32 -c $< -o $@
+	export PATH=$(PATH_32):$$PATH; gcc $(CFLAGS) -MM -MT $@ -o $(@:.o=.cdep) $<
 
 $(BUILDDIR)/obj32/%.o : %.cpp
 	mkdir -p $(dir $@)
-	g++ $(CFLAGS) -m32 -c $< -o $@
-	g++ $(CFLAGS) -MM -MT $@ -o $(@:.o=.cppdep) $<
+	export PATH=$(PATH_32):$$PATH; g++ $(CFLAGS) -m32 -c $< -o $@
+	export PATH=$(PATH_32):$$PATH; g++ $(CFLAGS) -MM -MT $@ -o $(@:.o=.cppdep) $<
 
 $(BUILDDIR)/obj64/%.o : %.c
 	mkdir -p $(dir $@)
-	gcc $(CFLAGS) -m64 -c $< -o $@
-	gcc  $(CFLAGS) -MM -MT $@ -o $(@:.o=.cdep) $<
+	export PATH=$(PATH_64):$$PATH; gcc $(CFLAGS) -m64 -c $< -o $@
+	export PATH=$(PATH_64):$$PATH; gcc  $(CFLAGS) -MM -MT $@ -o $(@:.o=.cdep) $<
 
 $(BUILDDIR)/obj64/%.o : %.cpp
 	mkdir -p $(dir $@)
-	g++ $(CFLAGS) -m64 -c $< -o $@
-	g++ $(CFLAGS) -MM -MT $@ -o $(@:.o=.cppdep) $<
+	export PATH=$(PATH_64):$$PATH; g++ $(CFLAGS) -m64 -c $< -o $@
+	export PATH=$(PATH_64):$$PATH; g++ $(CFLAGS) -MM -MT $@ -o $(@:.o=.cppdep) $<
 
 clean:
 	@echo Cleaning out everything.
