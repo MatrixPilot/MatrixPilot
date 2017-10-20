@@ -667,19 +667,27 @@ void telemetry_output_8hz(void)
 			if (!f13_print_prepare)
 			{
 				if (toggle)
+
 				{
-					serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
-					              "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
-					              "c%u:s%i:cpu%u:"
-					              "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
-					    tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
-					    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
-					    rmat[0], rmat[1], rmat[2],
-					    rmat[3], rmat[4], rmat[5],
-					    rmat[6], rmat[7], rmat[8],
-					    (uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), 
-					    air_speed_3DIMU,
-				    estimatedWind[0], estimatedWind[1], estimatedWind[2],
+#if (MP_WORDSIZE == 64)
+                    serial_output("F2:T%i:S%d%d%d:N%i:E%i:A%i:W%i:"
+                            "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
+                            "c%u:s%i:cpu%u:"
+                            "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",
+#else
+                    serial_output("F2:T%li:S%d%d%d:N%li:E%li:A%li:W%i:"
+                            "a%i:b%i:c%i:d%i:e%i:f%i:g%i:h%i:i%i:"
+                            "c%u:s%i:cpu%u:"
+                            "as%u:wvx%i:wvy%i:wvz%i:ma%i:mb%i:mc%i:svs%i:hd%i:",                  
+#endif
+					tow.WW, udb_flags._.radio_on, dcm_flags._.nav_capable, state_flags._.GPS_steering,
+					lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, waypointIndex,
+					rmat[0], rmat[1], rmat[2],
+					rmat[3], rmat[4], rmat[5],
+					rmat[6], rmat[7], rmat[8],
+					(uint16_t)cog_gps.BB, sog_gps.BB, (uint16_t)udb_cpu_load(), 
+					air_speed_3DIMU,
+                    estimatedWind[0], estimatedWind[1], estimatedWind[2],
 #if (MAG_YAW_DRIFT == 1)
 				    magFieldEarth[0], magFieldEarth[1], magFieldEarth[2],
 #else
@@ -747,7 +755,11 @@ void telemetry_output_8hz(void)
 				{
 					f13_print_prepare = false;
 				}
-				serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
+#if (MP_WORDSIZE == 64)
+				serial_output("F13:week%i:origN%i:origE%i:origA%i:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
+#else
+                serial_output("F13:week%i:origN%li:origE%li:origA%li:\r\n", week_no, lat_origin.WW, lon_origin.WW, alt_origin);
+#endif
 				serial_output("F20:NUM_IN=%i:TRIM=",NUM_INPUTS);
 				for (i = 1; i <= NUM_INPUTS; i++)
 				{

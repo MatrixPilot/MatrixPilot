@@ -2,17 +2,19 @@
 
 TOOLCHAIN := GCC
 ifeq ($(OS),Windows_NT)
-TARGET_TYPE := dll
-LIBS := -lws2_32
+LIBS += -lws2_32 -lOpenGL32
+LFLAGS += -shared -L$(ROOT_DIR)Tools/HILSIM_XPlane/lib -lXPLM
+defines += IBM=1 WIN=1
 else
-TARGET_TYPE := xpl
-LIBS := -lm
+LIBS += -lm
+LFLAGS += -shared -Llib/XPLM.lib
+defines += NIX=1 LIN=1
 endif
-CPU :=
+
+TARGET_TYPE := xpl
+#CPU :=
 
 CFLAGS += -fPIC
-
-LFLAGS   =  -shared -Llib/XPLM.lib
 
 modules +=
 incpath +=

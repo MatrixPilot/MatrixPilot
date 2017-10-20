@@ -338,13 +338,15 @@ uint16_t vector3_mag(int16_t x, int16_t y, int16_t z)
 
 uint16_t vector2_normalize(int16_t result[], int16_t input[])
 {
+	uint16_t half_magnitude;
 	uint16_t magnitude;
 
 	magnitude = vector2_mag(input[0], input[1]);
-	if (magnitude > 0)
+	half_magnitude = magnitude/2 ; // needed because divsd requires two signed values
+	if (half_magnitude > 0)
 	{
-		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]), magnitude);
-		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]), magnitude);
+		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]/2), half_magnitude);
+		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]/2), half_magnitude);
 	}
 	else
 	{
@@ -355,14 +357,16 @@ uint16_t vector2_normalize(int16_t result[], int16_t input[])
 
 uint16_t vector3_normalize(int16_t result[], int16_t input[])
 {
+	uint16_t half_magnitude;
 	uint16_t magnitude;
 
 	magnitude = vector3_mag(input[0], input[1], input[2]);
-	if (magnitude > 0)
+	half_magnitude = magnitude/2; // needed because divsd requires two signed values
+	if (half_magnitude > 0)
 	{
-		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]), magnitude);
-		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]), magnitude);
-		result[2] = __builtin_divsd(__builtin_mulss(RMAX, input[2]), magnitude);
+		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]/2), half_magnitude);
+		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]/2), half_magnitude);
+		result[2] = __builtin_divsd(__builtin_mulss(RMAX, input[2]/2), half_magnitude);
 	}
 	else
 	{

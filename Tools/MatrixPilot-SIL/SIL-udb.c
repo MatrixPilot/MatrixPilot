@@ -26,11 +26,14 @@
 #include <Time.h>
 #include <process.h>
 
+
+#ifndef MINGW
 struct timezone
 {
 	int tz_minuteswest; // of Greenwich
 	int tz_dsttime;     // type of dst correction to apply
 };
+#endif // MINGW
 
 #if 0
 int gettimeofday(struct timeval *tp, struct timezone *tzp);
@@ -314,7 +317,11 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
+#ifdef _MSC_VER
+	const char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+#else
 	char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+#endif
 
 	sil_ui_will_reset();
 
@@ -460,6 +467,7 @@ static magnetometer_callback_funcptr magnetometer_callback = NULL;
 uint8_t rxMagnetometer(magnetometer_callback_funcptr callback)
 {
 	magnetometer_callback = callback;
+	return MAGNETOMETER_SERVICE_CAN_PAUSE;
 }
 
 void I2C_doneReadMagData(void)

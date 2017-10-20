@@ -195,7 +195,7 @@ static void log_write(const char* str, int len)
 	if (fsp)
 	{
 		led_on(LED_BLUE);
-		if (fwrite(str, 1, len, fsp) != len)
+		if ((int)fwrite(str, 1, len, fsp) != len)
 		{
 			DPRINT("ERROR: fwrite\r\n");
 			log_close();

@@ -75,6 +75,7 @@ enum {
 	WIND_SPEED_X,
 	WIND_SPEED_Y,
 	WIND_SPEED_Z,
+	WIND_FROM_ANGLE,
 	PARAM
 };
 
@@ -442,20 +443,36 @@ void flightplan_logo_update(void)
 		return;
 	}
 
-	// otherwise run the interrupt handler, if configured, and not in-progress
-	if (interruptIndex && !interruptStackBase)
-	{
-		if (logoStackIndex < LOGO_STACK_DEPTH-1)
+	// otherwise run the interrupt handler, if configured.
+	if (interruptIndex)
+	{	
+		if (tofinish_line >= WAYPOINT_PROXIMITY_RADIUS) // not crossed the finish line
 		{
-			logoStackIndex++;
-			logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE;
-			logoStack[logoStackIndex].arg = 0;
-			logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1;
-			instructionIndex = interruptIndex+1;
-			interruptStackBase = logoStackIndex;
+			if (!interruptStackBase)   //if not in-progress
+			{
+				if (logoStackIndex < LOGO_STACK_DEPTH-1)
+				{
+					logoStackIndex++;
+					logoStack[logoStackIndex].frameType = LOGO_FRAME_TYPE_SUBROUTINE;
+					logoStack[logoStackIndex].arg = 0;
+					logoStack[logoStackIndex].returnInstructionIndex = instructionIndex-1;
+					instructionIndex = interruptIndex+1;
+					interruptStackBase = logoStackIndex;
+				}
+			}
 			process_instructions();
 			navigate_set_goal_height(turtleLocations[PLANE].z);
 			lastGoal.z = turtleLocations[PLANE].z;
+		}
+		else
+		{
+			if (interruptStackBase)   //if in-progress
+			{
+				//cleanup uncompleted interrupt
+				instructionIndex = logoStack[interruptStackBase].returnInstructionIndex+1;  //support both end by main and end by END SUBROUTINE
+				logoStackIndex =  interruptStackBase - 1;
+				interruptStackBase = 0;
+			}
 		}
 	}
 
@@ -636,6 +653,14 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 
 		case WIND_SPEED_Z: // in cm/s
 			return estimatedWind[2];
+
+		case WIND_FROM_ANGLE: // wind from in degrees 0-359, 0 = North
+		{
+			int16_t angle = get_angle_to_point(estimatedWind[0], estimatedWind[1]);
+			if (angle < 0) angle += 360;
+			if (angle >= 360) angle -= 360;
+			return angle;
+		}
 
 		case PARAM:
 		{
