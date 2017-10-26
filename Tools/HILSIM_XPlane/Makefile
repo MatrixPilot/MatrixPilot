@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
         FRAMEWORK := 
         RM        := rm -rf
         PLUGINS   := /c/users/$(USER)/'X-Plane 10'/Resources/plugins
-        LIBS      := -static-libgcc -lws2_32 -L$(PLUGINS) 
+        LIBS      := -static-libgcc -lws2_32 -L$(PLUGINS) -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
         XPLM      := -lXPLM
         XPLM_64   := -lXPLM_64
         PATH_32   := /mingw32/bin
@@ -93,12 +93,12 @@ $(TARGET):  $(BUILDDIR)/$(TARGET)/32/$(TARGET)32.xpl \
 $(BUILDDIR)/$(TARGET)/64/$(TARGET)64.xpl: $(ALL_OBJECTS64)
 	@echo Linking $@
 	mkdir -p $(dir $@)
-	export PATH=$(PATH_64):$$PATH; g++ -m64 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS64) $(LIBS)  $(XPLM_64)
+	export PATH=$(PATH_64):$$PATH; g++ -m64 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS64) $(XPLM_64) $(LIBS)
 
 $(BUILDDIR)/$(TARGET)/32/$(TARGET)32.xpl: $(ALL_OBJECTS)
 	@echo Linking $@
 	mkdir -p $(dir $@)
-	export PATH=$(PATH_32):$$PATH; g++ -m32 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS) $(LIBS)  $(XPLM)
+	export PATH=$(PATH_32):$$PATH; g++ -m32 -shared $(EXPORTS) -o $@ $(ALL_OBJECTS) $(XPLM) $(LIBS)
 
 # Compiler rules
 
