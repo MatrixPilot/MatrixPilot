@@ -428,10 +428,12 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutbin(config_NAV5_length, config_NAV5);
 }
 
+#ifndef JSB
 boolean gps_nav_valid(void)
 {
 	return (nav_valid_ == 3);
 }
+#endif // JSB
 
 /*
 int16_t hex_count = 0;
@@ -862,6 +864,7 @@ void gps_update_basic_data(void)
 	svs             = svs_;
 }
 
+#ifndef JSB
 void gps_commit_data(void)
 {
 	//bin_out(0xFF);
@@ -896,6 +899,7 @@ void gps_commit_data(void)
 	HILSIM_MagData(mag_drift_callback); // run the magnetometer computations
 #endif // HILSIM
 }
+#endif // JSB
 
 #if (HILSIM == 1)
 static void commit_bodyrate_data(void)
@@ -947,6 +951,7 @@ xplm_UpFlag         16  The key is being released
 	}
 }
 
+#ifndef JSB
 void HILSIM_set_gplane(fractional gplane[])
 {
 	gplane[0] = g_a_x_sim.BB;
@@ -962,6 +967,7 @@ void HILSIM_set_omegagyro(void)
 	omegagyro[2] = r_sim.BB;
 	HILSIM_saturate(3, omegagyro);
 }
+#endif // JSB
 #endif // HILSIM
 
 void init_gps_ubx(void)

@@ -26,7 +26,6 @@
 #include <Time.h>
 #include <process.h>
 
-
 #ifndef MINGW
 struct timezone
 {
@@ -148,6 +147,16 @@ void udb_skip_imu_calibration(boolean b)
 }
 #endif
 
+extern int mp_argc;
+extern char **mp_argv;
+#if (JSB == 1)
+int JSBSimSIL_run(void);
+int JSBSimSIL_init(int argc, char* argv[]);
+#else
+int JSBSimSIL_run(void) { return 0; }
+int JSBSimSIL_init(int argc, char* argv[]) { return 0; }
+#endif // (JSB == 1)
+
 void udb_init(void)
 {
 //	int16_t i;
@@ -214,9 +223,14 @@ void udb_run(void)
 			udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
 		}
 		nextHeartbeatTime = get_current_milliseconds();
+		if (JSBSimSIL_init(mp_argc, mp_argv)) exit(0);
 	}
+	if (JSBSimSIL_run()) exit(0);
 
 //	while (1) {
+#if (JSB == 1)
+		if (1)
+#else
 		if (!handleUDBSockets())
 		{
 			sleep_milliseconds(1);
@@ -227,6 +241,7 @@ void udb_run(void)
 		if (currentTime >= nextHeartbeatTime &&
 		    !(nextHeartbeatTime <= UDB_STEP_TIME && 
 		    currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME))
+#endif // (JSB == 1)
 		{
 			udb_callback_read_sensors();
 
@@ -234,7 +249,6 @@ void udb_run(void)
 			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && 
 			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
 
-//			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 			if (udb_flags._.radio_on)
 			{
 				led_on(LED_GREEN);
@@ -249,7 +263,6 @@ void udb_run(void)
 
 			sil_ui_update();
 
-//			if (udb_heartbeat_counter % 80 == 0)
 			if (udb_heartbeat_counter % (2 * HEARTBEAT_HZ) == 0)
 			{
 				writeEEPROMFileIfNeeded(); // Run at 0.5Hz
@@ -354,7 +367,6 @@ void sleep_milliseconds(uint16_t ms)
 #ifdef WIN
 	// windows implementation
 	Sleep(ms);
-
 #else
 	// *nix / mac implementation
 	usleep(1000*ms);
