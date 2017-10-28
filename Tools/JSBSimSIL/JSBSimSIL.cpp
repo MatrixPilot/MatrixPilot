@@ -97,11 +97,11 @@ static void copy_inputs_to_jsbsim(void)
 static FGColumnVector3 earth_to_body_frame(double phi, double theta, 
                                            double phiDot, double thetaDot, double psiDot)
 {
-    double p, q, r;
+	double p, q, r;
 
-    p = phiDot - psiDot*sin(theta);
-    q = cos(phi)*thetaDot + sin(phi)*psiDot*cos(theta);
-    r = cos(phi)*psiDot*cos(theta) - sin(phi)*thetaDot;
+	p = phiDot - psiDot*sin(theta);
+	q = cos(phi)*thetaDot + sin(phi)*psiDot*cos(theta);
+	r = cos(phi)*psiDot*cos(theta) - sin(phi)*thetaDot;
 
 	return FGColumnVector3(p, q, r);
 }
@@ -116,7 +116,7 @@ static int copy_outputs_from_jsbsim(void)
 	accels = Auxiliary->GetPilotAccel(); // body accelerations (ft/s/s)
 	moments = Auxiliary->GetEulerRates(); // earth frame inertial angular rates in (rad/sec)
 
-    moments = earth_to_body_frame(euler(1), euler(2), moments(1), moments(2), moments(3));
+	moments = earth_to_body_frame(euler(1), euler(2), moments(1), moments(2), moments(3));
 
 	moments *= 57.2958; // convert from rad/sec to deg/sec
 	accels  *=  0.3048; // convert from ft/s/s to m/s/s
