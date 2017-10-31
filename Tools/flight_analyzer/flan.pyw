@@ -529,7 +529,7 @@ def generate_waypoints_kml(waypoints_geo,filename):
             <z>1</z>
           </Scale>
           <Link>
-            <href>""", os.path.join(os.path.dirname(os.path.realpath(__file__)), "models/waypoint2.dae"), """</href>
+            <href>models/waypoint2.dae</href>
           </Link>
           </Model>
           </MultiGeometry>
@@ -627,7 +627,7 @@ def generate_flown_waypoints_kml(waypoints_geo, filename,log_book,flight_origin,
         <z>1</z>
       </Scale>
       <Link>
-        <href>""", os.path.join(os.path.dirname(os.path.realpath(__file__)), "models/waypoint2.dae"), """</href>
+        <href>models/waypoint2.dae</href>
       </Link>
       </Model>
       </MultiGeometry>
@@ -1231,7 +1231,7 @@ def write_T3_waypoints(filename,origin,log_book)  :
         <z>1</z>
       </Scale>
       <Link>
-        <href>""", os.path.join(os.path.dirname(os.path.realpath(__file__)), "models/waypoint.dae"), """</href>
+        <href>models/waypoint.dae</href>
       </Link>
       </Model>
       <DocumentSource>Pete Hollands</DocumentSource>
@@ -1295,7 +1295,7 @@ def write_T3_waypoints(filename,origin,log_book)  :
         <z>1</z>
       </Scale>
       <Link>
-        <href>""", os.path.join(os.path.dirname(os.path.realpath(__file__)), "models/waypoint.dae"), """</href>
+        <href>models/waypoint.dae</href>
       </Link>
       </Model>
       <DocumentSource>Pete Hollands</DocumentSource>
@@ -1648,7 +1648,7 @@ def write_earth_mag_vectors(log_book,flight_origin, filename, flight_clock):
         <z>2</z>
         </Scale>
       <Link>
-        <href>""", os.path.join(os.path.dirname(os.path.realpath(__file__)), "models/mag_arrow.dae"), """</href>
+        <href>models/mag_arrow.dae</href>
       </Link>
       </Model>
       <DocumentSource>Pete Hollands</DocumentSource>
@@ -1731,7 +1731,7 @@ def write_earth_wind_2d_vectors(log_book,flight_origin,filename, flight_clock):
         <z>0.02</z>
         </Scale>
       <Link>
-        <href>""", os.path.join(os.path.dirname(os.path.realpath(__file__)), "models/arrow.dae"), """</href>
+        <href>models/arrow.dae</href>
       </Link>
       </Model>
       <DocumentSource>Pete Hollands</DocumentSource>
@@ -1823,7 +1823,7 @@ def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
         <z>2</z>
         </Scale>
       <Link>
-        <href>""", os.path.join(os.path.dirname(os.path.realpath(__file__)), "models/block_plane.dae"), """</href>
+        <href>models/block_plane.dae</href>
       </Link>
       </Model>
       <DocumentSource>Pete Hollands</DocumentSource>
@@ -2336,11 +2336,11 @@ def wrap_kml_into_kmz(options):
     mag_arrow_model = os.path.join(model_dir[0],"mag_arrow.dae")
     kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
     kmzfile.write(options.GE_filename_kml)
-    kmzfile.write(waypoint_model)
-    kmzfile.write(block_plane_model)
-    kmzfile.write(arrow_model)
-    kmzfile.write(waypoint2_model)
-    kmzfile.write(mag_arrow_model)
+    kmzfile.write(waypoint_model, "models/waypoint.dae")
+    kmzfile.write(block_plane_model, "models/block_plane.dae")
+    kmzfile.write(arrow_model, "models/arrow.dae")
+    kmzfile.write(waypoint2_model, "models/waypoint2.dae")
+    kmzfile.write(mag_arrow_model, "models/mag_arrow.dae")
     kmzfile.close()
     # Remove the temporary kml files, now we have the kmz file
     os.remove(options.GE_filename_kml)
