@@ -124,6 +124,9 @@ static int copy_outputs_from_jsbsim(void)
 
 /*
 	static int i = 0;
+	if (0 == i) {
+		logfile << "time,moment x,moment y,moment z,accel x,accel y,accel z,Phi (roll),Theta (pitch),Psi (yaw),altitude (ft), thro, ailr, aill, ele, rud" << endl;
+	}
 	if (!(i++ % 40) && FDMExec->GetSimTime() > 2.0) {
 		logfile << FDMExec->GetSimTime() << "," \
 		        << moments.Dump(",") << "," \
@@ -150,8 +153,8 @@ static int copy_outputs_from_jsbsim(void)
 	// Divide by SCALEGYRO(3.0 for red board)
 	// 1 * 5632 / 3.0 = 1877.33
 //	moments *= 1877.33; // TODO: this value does not work
-//	moments *= 30; // TODO: magic number derived via trial and error
-	moments *= 28; // TODO: magic number derived via trial and error
+//	moments *= 28; // TODO: magic number derived via trial and error
+	moments *= 27; // TODO: magic number derived via trial and error
 
 	// Accelerations are in m/s^2
 	// Divide by 9.8 to get g's
@@ -202,7 +205,6 @@ static int copy_outputs_from_jsbsim(void)
 extern "C" {
 void gps_commit_data(void)
 {
-	static int i = 0;
 	static int tow_ = 557718769; // arbitrary GPS start time
 
 	week_no.BB = 0;
@@ -212,16 +214,36 @@ void gps_commit_data(void)
 	lat_gps.WW = (int32_t)(Propagate->GetLatitudeDeg() * 10000000);
 	lon_gps.WW = (int32_t)(Propagate->GetLongitudeDeg() * 10000000);
 	alt_sl_gps.WW = Propagate->GetAltitudeASLmeters() * 100;
-
 	cog_gps.BB = euler(3) * 100; // 100000 / 1000
 
-	sog_gps.BB = (int32_t)Propagate->GetInertialVelocityMagnitude() * 0.3048 * 100; // TODO: this is not right
-	sog_gps.BB = 0; // TODO:
+	FGColumnVector3 v = Propagate->GetVel() * 0.3048; // convert ft/s to m/s
+	sog_gps.BB = sqrt(v(1) * v(1) + v(2) * v(2)) * 100; // x & y components in cm/s
+	climb_gps.BB = v(3) * -100.0; // z component in cm/s
+/*
+	static int i = 0;
+	if (0 == i) {
+		logfile << "time (s),cog (deg),sog (km/h),climb (cm/s),alt (m),thr (%)" << endl;
+	}
+	if (!(i++ % 4) && FDMExec->GetSimTime() > 2.0) {
+		logfile << FDMExec->GetSimTime() << "," \
+		        << cog_gps.BB / 100 << "," \
+		        << sog_gps.BB * 3.6 / 100.0 << "," \
+		        << climb_gps.BB << "," \
+		        << Propagate->GetAltitudeASL() * 0.3048 << "," \
+		        << FCS->GetThrottleCmd(0) << "," \
+		        << v.Dump(",") << "," \
+		        << endl;
+	}
+ */
+/*
+//---ADD METHOD TO CALCULATE THESE TERMS---
+    net->v_wind_body_north = (float)(Propagate->GetVel(eNorth)); // north vel in NED relative to airmass, fps
+    net->v_wind_body_east = (float)(Propagate->GetVel(eEast)); // east vel in NED relative to airmass, fps
+    net->v_wind_body_down = (float)(Propagate->GetVel(eDown)); // down vel in NED relative to airmass, fps
+ */
 
 /* TODO: work out values for these variables:
-	sog_gps.BB      = sog_gps_._.W0;                // SIRF uses 2 byte SOG, UBX provides 4 bytes
 	hilsim_airspeed.BB = as_sim_._.W0;              // provided by HILSIM, simulated airspeed
-	climb_gps.BB    = - climb_gps_._.W0;            // SIRF uses 2 byte climb rate, UBX provides 4 bytes
 #if (MAG_YAW_DRIFT == 1)
 	HILSIM_MagData(mag_drift_callback); // run the magnetometer computations
 #endif // MAG_YAW_DRIFT
@@ -280,7 +302,6 @@ int JSBSimSIL_init(int argc, char* argv[])
 		cout << "Aircraft: " << Aircraft->GetAircraftName() << endl;
 
 		logfile.open("logfile.csv");
-		logfile << "time,moment x,moment y,moment z,accel x,accel y,accel z,Phi (roll),Theta (pitch),Psi (yaw),altitude (ft), thro, ailr, aill, ele, rud" << endl;
 
 		return 0;
 	}

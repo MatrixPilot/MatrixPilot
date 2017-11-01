@@ -112,7 +112,7 @@
       <set name="ap/roll-attitude-mode" value="0"/>
       <set name="ap/autopilot-roll-on" value="0"/>
     </event>
-
+<!--
     <event name="Time Notify" persistent="true">
       <description>Output message at 1 minute intervals</description>
       <notify>
@@ -123,6 +123,6 @@
       <condition> simulation/sim-time-sec >= simulation/notify-time-trigger </condition>
       <set name="simulation/notify-time-trigger" value="60" type="FG_DELTA"/>
     </event>
-
+-->
   </run>
 </runscript>
