@@ -116,6 +116,8 @@ static int copy_outputs_from_jsbsim(void)
 	accels = Auxiliary->GetPilotAccel(); // body accelerations (ft/s/s)
 	moments = Auxiliary->GetEulerRates(); // earth frame inertial angular rates in (rad/sec)
 
+	// as a moment is a force we should probably rename 'moments' to 'rates', or 'rotate(s)', which i like better
+
 	moments = earth_to_body_frame(euler(1), euler(2), moments(1), moments(2), moments(3));
 
 	moments *= 57.2958; // convert from rad/sec to deg/sec
@@ -152,9 +154,10 @@ static int copy_outputs_from_jsbsim(void)
 	// multiply by 5632 (constant from UDB code)
 	// Divide by SCALEGYRO(3.0 for red board)
 	// 1 * 5632 / 3.0 = 1877.33
-//	moments *= 1877.33; // TODO: this value does not work
-//	moments *= 28; // TODO: magic number derived via trial and error
-	moments *= 27; // TODO: magic number derived via trial and error
+//	moments *= 1877.33; // TODO: this value does not work (from HILSIM plugin)
+	moments *= 32.7656; // 1877.33 from above, converted to rad/sec
+	                    //   but hold on, we've already converted our moments to
+	                    //   deg/s, so something is fishy.. however this works!
 
 	// Accelerations are in m/s^2
 	// Divide by 9.8 to get g's
@@ -295,9 +298,9 @@ int JSBSimSIL_init(int argc, char* argv[])
 
 		JSBSimAP = FDMExec->GetPropertyManager()->GetNode("ap/altitude_hold");
 
-		hilsim_input_adjust("mode", 1); // switch mode to manual
-//		hilsim_input_adjust("mode", 2); // switch mode to stabilised
-//		hilsim_input_adjust("mode", 3); // switch mode to guided
+		hilsim_input_adjust("mode", 1); // switch MatrixPilot mode to manual
+//		hilsim_input_adjust("mode", 2); // switch MatrixPilot mode to stabilised
+//		hilsim_input_adjust("mode", 3); // switch MatrixPilot mode to guided
 
 		cout << "Aircraft: " << Aircraft->GetAircraftName() << endl;
 
@@ -314,7 +317,7 @@ int JSBSimSIL_run(void)
 	if (dcm_flags._.dead_reckon_enable)
 	{
 		copy_inputs_to_jsbsim(); // write our flight control commands to JSBSim
-		if (JSBSim_run())
+		if (JSBSim_run()) // posix return values, zero is good, other no so good
 		{
 			logfile.close();
 			return -1;
