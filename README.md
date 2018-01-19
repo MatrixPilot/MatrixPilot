@@ -2,9 +2,9 @@
 ## Firmware for Bill Premerlani's IMU based UAV Dev Board and its successors
 
 Welcome to the MatrixPilot codebase. Four board types are supported:-
-* the [UDB4] (https://www.sparkfun.com/products/retired/11115) production retired at SparkFun 
-* the [UDB5] (https://www.sparkfun.com/products/retired/11703) production retired at SparkFun
-* the [UDB5] project in software also supports the [UDB5mini] (https://octopilot.com/) currently available from Octopilot Electronics
+* the [UDB4](https://www.sparkfun.com/products/retired/11115) (Production retired at SparkFun)
+* the [UDB5](https://www.sparkfun.com/products/retired/11703) (Production retired at SparkFun)
+* the UDB5 project in software also supports the [UDB5mini](https://octopilot.com/) currently available from Octopilot Electronics
 * the AUAV3 from Arsov RC Technology. (Production retired).
 
 Projects for the boards are provided for the MPLAB-X Integrated Development Environment (IDE) and XC16 compiler. From October 2016, the master branch no longer supports the legacy MPLAB IDE.
