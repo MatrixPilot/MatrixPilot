@@ -87,6 +87,7 @@
 int16_t tiltError[3];
 int16_t desiredRotationRateRadians[3];
 int16_t rotationRateError[3];
+int16_t desiredTurnRateRadians;
 //int16_t angleOfAttack;
 
 static int16_t estimatedLift;
@@ -203,7 +204,6 @@ void helicalTurnCntrl(void)
 	int16_t rtlkick;
 	int16_t desiredPitch;
 	int16_t steeringInput;
-	int16_t desiredTurnRateRadians;
 	int16_t desiredTiltVector[3];
 	int16_t desiredRotationRateGyro[3];
 	uint16_t airSpeed;
