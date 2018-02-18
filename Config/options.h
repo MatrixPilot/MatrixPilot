@@ -794,6 +794,19 @@
 #define ID_LEAD_PILOT                       "Not Defined"
 #define ID_DIY_DRONES_URL                   "http://www.diydrones.com"
 
+///////////////////////////////////////////////////////////////////////////////////
+// Aid to Flight Analysis of Delta Wing Aircraft. This is an optional setting which
+// allows for minimizing drag of the aircraft from commanded elevator drag (in the elevons).
+// Flight Analyzer can help you track how much elevon is being used to keep the craft in level flight,
+// and let you decide whether to move the balance point of the flying wing forward or backwards.
+// You can set and record the Trim settings for no elevon deflection in relation trailing edger of the main wings.
+// Set the following three lines to allow Flight Analyzer (flan.pyw) compute the amount
+// of up elevon (in UDB units) being used to keep a nose heavy aircraft flying level.
+// Trim the elevons to be in line with the trailing edge, run up MatrixPilot with SERIAL_UDB_EXTRA,
+// and note the values of the relevant channels (e.g. AILERON_OUTPUT_CHANNEL and ELEVATOR_OUTPUT_CHANNEL) in UDB PWM units.
+#define FLIGHT_ANALYZER_TO_USE_NEUTUAL_DEFLECTION_VALUES    1     //Set to 1 to enable and set to 0 to disable this option
+#define AILERON_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION           3000  
+#define ELEVATOR_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION          3000
 
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL
