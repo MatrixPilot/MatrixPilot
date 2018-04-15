@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/dcmTypes.h</itemPath>
+        <itemPath>../../libDCM/deadReckoning.h</itemPath>
+        <itemPath>../../libDCM/estAltitude.h</itemPath>
+        <itemPath>../../libDCM/estLocation.h</itemPath>
+        <itemPath>../../libDCM/estWind.h</itemPath>
+        <itemPath>../../libDCM/estYawDrift.h</itemPath>
+        <itemPath>../../libDCM/gpsData.h</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.h</itemPath>
+        <itemPath>../../libDCM/hilsim.h</itemPath>
+        <itemPath>../../libDCM/libDCM.h</itemPath>
+        <itemPath>../../libDCM/libDCM_defines.h</itemPath>
+        <itemPath>../../libDCM/libDCM_internal.h</itemPath>
+        <itemPath>../../libDCM/mag_drift.h</itemPath>
+        <itemPath>../../libDCM/mathlib.h</itemPath>
+        <itemPath>../../libDCM/mathlibNAV.h</itemPath>
+        <itemPath>../../libDCM/rmat.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/ADchannel.h</itemPath>
+        <itemPath>../../libUDB/analogs.h</itemPath>
+        <itemPath>../../libUDB/barometer.h</itemPath>
+        <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
+        <itemPath>../../libUDB/builtins.h</itemPath>
+        <itemPath>../../libUDB/cll_io.h</itemPath>
+        <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
+        <itemPath>../../libUDB/ConfigHILSIM.h</itemPath>
+        <itemPath>../../libUDB/ConfigPX4.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB4.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB5.h</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.h</itemPath>
+        <itemPath>../../libUDB/events.h</itemPath>
+        <itemPath>../../libUDB/fixDeps.h</itemPath>
+        <itemPath>../../libUDB/heartbeat.h</itemPath>
+        <itemPath>../../libUDB/I2C.h</itemPath>
+        <itemPath>../../libUDB/interrupt.h</itemPath>
+        <itemPath>../../libUDB/libUDB.h</itemPath>
+        <itemPath>../../libUDB/libUDB_defines.h</itemPath>
+        <itemPath>../../libUDB/libUDB_internal.h</itemPath>
+        <itemPath>../../libUDB/magnetometer.h</itemPath>
+        <itemPath>../../libUDB/mcu.h</itemPath>
+        <itemPath>../../libUDB/mpu6000.h</itemPath>
+        <itemPath>../../libUDB/mpu_spi.h</itemPath>
+        <itemPath>../../libUDB/NV_memory.h</itemPath>
+        <itemPath>../../libUDB/oscillator.h</itemPath>
+        <itemPath>../../libUDB/osd.h</itemPath>
+        <itemPath>../../libUDB/radioIn.h</itemPath>
+        <itemPath>../../libUDB/serialIO.h</itemPath>
+        <itemPath>../../libUDB/servoOut.h</itemPath>
+        <itemPath>../../libUDB/servoOutPins.h</itemPath>
+        <itemPath>../../libUDB/sonarIn.h</itemPath>
+        <itemPath>../../libUDB/uart.h</itemPath>
+        <itemPath>../../libUDB/udbTypes.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libVectorMatrix"
+                     displayName="libVectorMatrix"
+                     projectFiles="true">
+        <itemPath>../../libVectorMatrix/dspcommon.inc</itemPath>
+      </logicalFolder>
+      <logicalFolder name="MultiRotor"
+                     displayName="MultiRotor"
+                     projectFiles="true">
+        <logicalFolder name="Config" displayName="Config" projectFiles="true">
+          <itemPath>../../MultiRotor/Config/options.h</itemPath>
+          <itemPath>../../MultiRotor/Config/options_auav3.h</itemPath>
+          <itemPath>../../MultiRotor/Config/options_magnetometer.h</itemPath>
+          <itemPath>../../MultiRotor/Config/options_nv_memory.h</itemPath>
+          <itemPath>../../MultiRotor/Config/options_osd.h</itemPath>
+          <itemPath>../../MultiRotor/Config/options_ports.h</itemPath>
+        </logicalFolder>
+      </logicalFolder>
+      <logicalFolder name="MultiRotor/Config"
+                     displayName="MultiRotor/Config"
+                     projectFiles="true">
+        <itemPath>../../MultiRotor/Config/options.h</itemPath>
+        <itemPath>../../MultiRotor/Config/options_auav3.h</itemPath>
+        <itemPath>../../MultiRotor/Config/options_magnetometer.h</itemPath>
+        <itemPath>../../MultiRotor/Config/options_nv_memory.h</itemPath>
+        <itemPath>../../MultiRotor/Config/options_osd.h</itemPath>
+        <itemPath>../../MultiRotor/Config/options_ports.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
+        <itemPath>../../libDCM/deadReckoning.c</itemPath>
+        <itemPath>../../libDCM/estAirspeed.c</itemPath>
+        <itemPath>../../libDCM/estAltitude.c</itemPath>
+        <itemPath>../../libDCM/estLocation.c</itemPath>
+        <itemPath>../../libDCM/estWind.c</itemPath>
+        <itemPath>../../libDCM/estYawDrift.c</itemPath>
+        <itemPath>../../libDCM/gpsData.c</itemPath>
+        <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
+        <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
+        <itemPath>../../libDCM/gpsParseNMEA.c</itemPath>
+        <itemPath>../../libDCM/gpsParseSTD.c</itemPath>
+        <itemPath>../../libDCM/gpsParseUBX.c</itemPath>
+        <itemPath>../../libDCM/hilsim.c</itemPath>
+        <itemPath>../../libDCM/libDCM.c</itemPath>
+        <itemPath>../../libDCM/mag_drift.c</itemPath>
+        <itemPath>../../libDCM/mathlib.c</itemPath>
+        <itemPath>../../libDCM/mathlibNAV.c</itemPath>
+        <itemPath>../../libDCM/rmat.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <itemPath>../../libUDB/24LC256.c</itemPath>
+        <itemPath>../../libUDB/ADchannel.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
+        <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
+        <itemPath>../../libUDB/analogs.c</itemPath>
+        <itemPath>../../libUDB/background.c</itemPath>
+        <itemPath>../../libUDB/barometer.c</itemPath>
+        <itemPath>../../libUDB/cll_io.c</itemPath>
+        <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
+        <itemPath>../../libUDB/events.c</itemPath>
+        <itemPath>../../libUDB/fbcl.s</itemPath>
+        <itemPath>../../libUDB/heartbeat.c</itemPath>
+        <itemPath>../../libUDB/I2C1.c</itemPath>
+        <itemPath>../../libUDB/I2C2.c</itemPath>
+        <itemPath>../../libUDB/libUDB.c</itemPath>
+        <itemPath>../../libUDB/magnetometer.c</itemPath>
+        <itemPath>../../libUDB/mcu.c</itemPath>
+        <itemPath>../../libUDB/mpu6000.c</itemPath>
+        <itemPath>../../libUDB/mpu_spi.c</itemPath>
+        <itemPath>../../libUDB/osd.c</itemPath>
+        <itemPath>../../libUDB/osd_bit.c</itemPath>
+        <itemPath>../../libUDB/osd_spi.c</itemPath>
+        <itemPath>../../libUDB/radioIn.c</itemPath>
+        <itemPath>../../libUDB/read.c</itemPath>
+        <itemPath>../../libUDB/serialIO.c</itemPath>
+        <itemPath>../../libUDB/servoOut.c</itemPath>
+        <itemPath>../../libUDB/sonarIn.c</itemPath>
+        <itemPath>../../libUDB/traps.c</itemPath>
+        <itemPath>../../libUDB/traps_asm.s</itemPath>
+        <itemPath>../../libUDB/uart.c</itemPath>
+        <itemPath>../../libUDB/write.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="libVectorMatrix"
+                     displayName="libVectorMatrix"
+                     projectFiles="true">
+        <itemPath>../../libVectorMatrix/madd.s</itemPath>
+        <itemPath>../../libVectorMatrix/mmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/mscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/msub.s</itemPath>
+        <itemPath>../../libVectorMatrix/mtrp.s</itemPath>
+        <itemPath>../../libVectorMatrix/vadd.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcon.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcopy.s</itemPath>
+        <itemPath>../../libVectorMatrix/vcor.s</itemPath>
+        <itemPath>../../libVectorMatrix/vdot.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmax.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmin.s</itemPath>
+        <itemPath>../../libVectorMatrix/vmul.s</itemPath>
+        <itemPath>../../libVectorMatrix/vneg.s</itemPath>
+        <itemPath>../../libVectorMatrix/vpow.s</itemPath>
+        <itemPath>../../libVectorMatrix/vscl.s</itemPath>
+        <itemPath>../../libVectorMatrix/vsub.s</itemPath>
+        <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
+      </logicalFolder>
+      <logicalFolder name="RollPitchYaw"
+                     displayName="RollPitchYaw"
+                     projectFiles="true">
+        <itemPath>../../RollPitchYaw/main.c</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../../libDCM</Elem>
+    <Elem>../../libUDB</Elem>
+    <Elem>../../libVectorMatrix</Elem>
+    <Elem>../../MatrixPilot</Elem>
+    <Elem>../../MAVLink</Elem>
+    <Elem>../../Config</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="default" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>dsPIC33FJ256GP710A</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>PICkit3PlatformTool</platformTool>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.26</languageToolchainVersion>
+        <platform>4</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+        <archiverTool>
+        </archiverTool>
+        <loading>
+          <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
+          <alternateLoadableFile></alternateLoadableFile>
+        </loading>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C30>
+        <property key="code-model" value="large-code"/>
+        <property key="const-model" value="default"/>
+        <property key="data-model" value="large-data"/>
+        <property key="disable-instruction-scheduling" value="false"/>
+        <property key="enable-all-warnings" value="true"/>
+        <property key="enable-ansi-std" value="false"/>
+        <property key="enable-ansi-warnings" value="false"/>
+        <property key="enable-fatal-warnings" value="false"/>
+        <property key="enable-large-arrays" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-procedural-abstraction" value="false"/>
+        <property key="enable-short-double" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="extra-include-directories"
+                  value="../../MultiRotor/Config;../../libVectorMatrix"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="keep-inline" value="false"/>
+        <property key="oXC16gcc-align-arr" value="false"/>
+        <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
+        <property key="oXC16gcc-data-sects" value="false"/>
+        <property key="oXC16gcc-errata" value=""/>
+        <property key="oXC16gcc-fillupper" value=""/>
+        <property key="oXC16gcc-large-aggregate" value="false"/>
+        <property key="oXC16gcc-mauxflash" value="false"/>
+        <property key="oXC16gcc-mpa-lvl" value=""/>
+        <property key="oXC16gcc-name-text-sec" value=""/>
+        <property key="oXC16gcc-near-chars" value="false"/>
+        <property key="oXC16gcc-no-isr-warn" value="false"/>
+        <property key="oXC16gcc-sfr-warn" value="false"/>
+        <property key="oXC16gcc-smar-io-lvl" value="1"/>
+        <property key="oXC16gcc-smart-io-fmt" value=""/>
+        <property key="optimization-level" value="0"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value="UDB5=1;"/>
+        <property key="scalar-model" value="default"/>
+        <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
+      </C30>
+      <C30-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C30-AR>
+      <C30-AS>
+        <property key="assembler-symbols" value="PSV_ERRATA=1"/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler"
+                  value="..;../../libVectorMatrix"/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+        <appendMe value="-g"/>
+      </C30-AS>
+      <C30-LD>
+        <property key="additional-options-use-response-files" value="false"/>
+        <property key="boot-eeprom" value="no_eeprom"/>
+        <property key="boot-flash" value="no_flash"/>
+        <property key="boot-ram" value="no_ram"/>
+        <property key="boot-write-protect" value="no_write_protect"/>
+        <property key="enable-check-sections" value="false"/>
+        <property key="enable-data-init" value="true"/>
+        <property key="enable-default-isr" value="true"/>
+        <property key="enable-handles" value="true"/>
+        <property key="enable-pack-data" value="true"/>
+        <property key="extra-lib-directories" value=""/>
+        <property key="fill-flash-options-addr" value=""/>
+        <property key="fill-flash-options-const" value=""/>
+        <property key="fill-flash-options-how" value="0"/>
+        <property key="fill-flash-options-inc-const" value="1"/>
+        <property key="fill-flash-options-increment" value=""/>
+        <property key="fill-flash-options-seq" value=""/>
+        <property key="fill-flash-options-what" value="0"/>
+        <property key="general-code-protect" value="no_code_protect"/>
+        <property key="general-write-protect" value="no_write_protect"/>
+        <property key="generate-cross-reference-file" value="false"/>
+        <property key="heap-size" value="256"/>
+        <property key="input-libraries" value=""/>
+        <property key="linker-stack" value="true"/>
+        <property key="linker-symbols" value=""/>
+        <property key="map-file"
+                  value="&quot;${DISTDIR}/MultiRotor-UDB5.X.${IMAGE_TYPE}.map&quot;"/>
+        <property key="oXC16ld-extra-opts" value=""/>
+        <property key="oXC16ld-fill-upper" value="0"/>
+        <property key="oXC16ld-force-link" value="false"/>
+        <property key="oXC16ld-no-smart-io" value="false"/>
+        <property key="oXC16ld-nostdlib" value="false"/>
+        <property key="oXC16ld-stackguard" value="16"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="remove-unused-sections" value="false"/>
+        <property key="report-memory-usage" value="false"/>
+        <property key="secure-eeprom" value="no_eeprom"/>
+        <property key="secure-flash" value="no_flash"/>
+        <property key="secure-ram" value="no_ram"/>
+        <property key="secure-write-protect" value="no_write_protect"/>
+        <property key="stack-size" value="16"/>
+        <property key="symbol-stripping" value=""/>
+        <property key="trace-symbols" value=""/>
+        <property key="warn-section-align" value="false"/>
+      </C30-LD>
+      <C30Global>
+        <property key="common-include-directories" value=""/>
+        <property key="dual-boot-partition" value="0"/>
+        <property key="fast-math" value="false"/>
+        <property key="generic-16-bit" value="false"/>
+        <property key="legacy-libc" value="true"/>
+        <property key="oXC16glb-macros" value=""/>
+        <property key="output-file-format" value="elf"/>
+        <property key="relaxed-math" value="false"/>
+        <property key="save-temps" value="false"/>
+      </C30Global>
+    </conf>
+  </confs>
+</configurationDescriptor>
