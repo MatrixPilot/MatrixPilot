@@ -76,17 +76,18 @@
 // receiver. (Totally autonomous.)  This is just meant for simulation and debugging.  It is not
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO                             1
+#define NORADIO                             0
+#define THROTTLE_INPUT_CHANNEL		    4
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configure Input and Output Channels
 //
 // NUM_INPUTS: Set to 0-5 
-#define NUM_INPUTS                          0
+#define NUM_INPUTS                          4
 
 // NUM_OUTPUTS: Set to 3, 4, 5, or 6
-#define NUM_OUTPUTS                         3
+#define NUM_OUTPUTS                         4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.
@@ -246,3 +247,11 @@
 #ifndef USE_MSD
 #define USE_MSD                             0
 #endif
+
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 227 )
+#define YACCEL_OFFSET	( 28)
+#define ZACCEL_OFFSET	(-694)
+#define XRATE_OFFSET	(-304)
+#define YRATE_OFFSET	(-46)
+#define ZRATE_OFFSET	(-24)

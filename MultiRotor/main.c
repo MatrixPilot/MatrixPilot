@@ -30,6 +30,7 @@
 #include "../libUDB/serialIO.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/ADchannel.h"
+#include "../libUDB/radioIn.h"
 
 // Used for serial debug output
 #include <stdio.h>
@@ -37,8 +38,10 @@
 char debug_buffer[128];
 int db_index = 0;
 void send_debug_line(void);
+void test_pwm(void);
+void mix_pwm(void);
 
-#define RECORD_OFFSETS ( 1 ) // set to 1 in order to record accelerometer and gyro offsets in telemetry
+#define RECORD_OFFSETS ( 0 ) // set to 1 in order to record accelerometer and gyro offsets in telemetry
 
 int main(void)
 {
@@ -47,6 +50,7 @@ int main(void)
 	// Set up the libraries
 	udb_init();
 	dcm_init();
+//	udb_servo_record_trims() ;
 #ifndef SERIAL_BAUDRATE
 #define SERIAL_BAUDRATE 19200 // default
 #warning SERIAL_BAUDRATE set to default value of 19200 bps
@@ -101,26 +105,21 @@ void dcm_heartbeat_callback(void) // was called dcm_servo_callback_prepare_outpu
 {
 	if (!dcm_flags._.calib_finished)
 	{
-		udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000;
-		udb_pwOut[PITCH_OUTPUT_CHANNEL] = 3000;
-		udb_pwOut[YAW_OUTPUT_CHANNEL] = 3000;
+	//	udb_pwOut[ROLL_OUTPUT_CHANNEL] = 3000;
+	//	udb_pwOut[PITCH_OUTPUT_CHANNEL] = 3000;
+	//	udb_pwOut[YAW_OUTPUT_CHANNEL] = 3000;
+		udb_pwOut[1]= 2000 ;
+		udb_pwOut[2]= 2000 ;
+		udb_pwOut[3]= 2000 ;
+		udb_pwOut[4]= 2000 ;
 	}
 	else
 	{
-		union longww accum;
-
-		accum.WW = __builtin_mulss(rmat[6], 4000);
-		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
-
-		accum.WW = __builtin_mulss(rmat[7], 4000);
-		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
-
-		accum.WW = __builtin_mulss(rmat[4], 4000);
-		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
+			mix_pwm() ;
 	}
 
-	// Serial output at 2Hz  (40Hz / 20)
-	if (udb_heartbeat_counter % 20 == 0)
+	// Serial output at 2Hz  
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/2) == 0)
 	{
 		if (dcm_flags._.calib_finished)
 		{
@@ -143,11 +142,14 @@ void send_debug_line(void)
 	}
 	else
 	{
-		sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
+/*		sprintf(debug_buffer, "lat: %li, long: %li, alt: %li\r\nrmat: %i, %i, %i, %i, %i, %i, %i, %i, %i\r\n", 
 		    lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, 
 		    rmat[0], rmat[1], rmat[2], 
 		    rmat[3], rmat[4], rmat[5], 
 		    rmat[6], rmat[7], rmat[8]);
+ */
+		sprintf(debug_buffer, "thrt_in: %i\r\n",
+				udb_pwIn[3]) ;
 	}
 	udb_serial_start_sending_data();
 }
@@ -172,3 +174,58 @@ void udb_callback_radio_did_turn_off(void)
 {
 }
 
+void test_pwm()
+{
+	union longww accum;
+
+		accum.WW = __builtin_mulss(rmat[6], 4000);
+		udb_pwOut[1] = udb_pwIn[3] ;
+		//udb_servo_pulsesat(3000 + accum._.W1);
+
+		accum.WW = __builtin_mulss(rmat[7], 4000);
+		udb_pwOut[2] = udb_pwIn[3] ;		
+		//udb_servo_pulsesat(3000 + accum._.W1);
+
+		accum.WW = __builtin_mulss(rmat[4], 4000);
+		udb_pwOut[3] = udb_pwIn[3] ;
+		//udb_servo_pulsesat(3000 + accum._.W1);
+		udb_pwOut[4] = udb_pwIn[3] ;
+}
+
+int16_t roll_cntrl, pitch_cntrl, yaw_cntrl , throt_cntrl ;
+
+#define THROT_MIN ( 1000 )
+#define THROT_MAX ( 4000 )
+#define TILT_MIN ( -500 )
+#define TILT_MAX ( 500 )
+#define YAW_MIN ( -500 )
+#define YAW_MAX (500 )
+
+int16_t udb_pulse_limit(int16_t min, int16_t max, int32_t pw)
+{
+	if (pw > max ) pw = max ;
+	if (pw < min ) pw = min ;
+	return (int16_t)pw;
+}
+
+int16_t trims_not_recorded = 1 ;
+
+void mix_pwm()
+{
+	if ( trims_not_recorded == 1  )
+	{
+		udb_servo_record_trims() ;
+		trims_not_recorded = 0 ;
+	}
+
+	throt_cntrl = udb_pulse_limit(THROT_MIN , THROT_MAX , udb_pwIn[3] ) ;
+	roll_cntrl = udb_pulse_limit(TILT_MIN , TILT_MAX , udb_pwIn[1]-udb_pwTrim[1] ) ;
+	pitch_cntrl = udb_pulse_limit(TILT_MIN , TILT_MAX , udb_pwIn[2]-udb_pwTrim[2] ) ;
+	yaw_cntrl = udb_pulse_limit(YAW_MIN , YAW_MAX , udb_pwIn[4]-udb_pwTrim[4] ) ;
+
+	udb_pwOut[1] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl + pitch_cntrl ) ;
+	udb_pwOut[2] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl + roll_cntrl ) ;
+	udb_pwOut[3] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl + yaw_cntrl ) ;
+	udb_pwOut[4] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl ) ;
+	
+}
