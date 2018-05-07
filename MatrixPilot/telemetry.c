@@ -608,11 +608,11 @@ void telemetry_output_8hz(void)
 			serial_output(ID_DIY_DRONES_URL);
 			serial_output(":\r\n");
 			break;
-#if ((FLIGHT_ANALYZER_TO_USE_NEUTUAL_DEFLECTION_VALUES == 1) && (AIRFRAME_TYPE == AIRFRAME_DELTA))
         case 10:
+#if ((FLIGHT_ANALYZER_TO_USE_NEUTUAL_DEFLECTION_VALUES == 1) && (AIRFRAME_TYPE == AIRFRAME_DELTA))
             serial_output("F24:AIL=%i:ELEV=%i:\r\n",AILERON_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION,ELEVATOR_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION);
-			break;
 #endif
+            break;
 		case 9:
 			serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
 			    turns.FeedForward, turns.TurnRateNav, turns.TurnRateFBW);
