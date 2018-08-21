@@ -1975,6 +1975,7 @@ class flight_log_book:
         self.F22 = "Empty"
         self.F23 = "Empty"
         self.F24 = "Empty"
+        self.F25 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
@@ -2267,14 +2268,14 @@ def create_log_book(options) :
             log_book.nominal_cruise_speed = log.nominal_cruise_speed
             log_book.F18 = "Recorded"
         elif log.log_format == "F19" : # Channels numbers and reversal of channels
-            log_book.aileron_output_channel = log.aileron_output_channel
-            log_book.aileron_output_reversed = log.aileron_output_reversed
-            log_book.elevator_output_channel = log.elevator_output_channel
-            log_book.elevator_output_reversed = log.elevator_output_reversed 
-            log_book.throttle_output_channel = log.throttle_output_channel
-            log_book.throttle_output_reversed = log.throttle_output_reversed
-            log_book.rudder_output_channel = log.rudder_output_channel
-            log_book.rudder_output_reversed = log.rudder_output_reversed
+            log_book.aileron_input_channel = log.aileron_input_channel
+            log_book.aileron_input_reversed = log.aileron_input_reversed
+            log_book.elevator_input_channel = log.elevator_input_channel
+            log_book.elevator_input_reversed = log.elevator_input_reversed 
+            log_book.throttle_input_channel = log.throttle_input_channel
+            log_book.throttle_input_reversed = log.throttle_input_reversed
+            log_book.rudder_input_channel = log.rudder_input_channel
+            log_book.rudder_input_reversed = log.rudder_input_reversed
             log_book.F19 = "Recorded"
         elif log.log_format == "F20" : # Number of Input Channels and Trim Values
             log_book.number_of_input_channels = log.number_of_input_channels
@@ -2300,6 +2301,11 @@ def create_log_book(options) :
         elif log.log_format == "F24" :
             log_book.aileron_channel_neutral = log.aileron_channel_neutral
             log_book.elevator_channel_neutral = log.elevator_channel_neutral
+        elif log.log_format == "F25" :
+            log_book.aileron_output_channel = log.aileron_output_channel
+            log_book.elevator_output_channel = log.elevator_output_channel
+            log_book.throttle_output_channel = log.throttle_output_channel
+            log_book.rudder_output_channel = log.rudder_output_channel
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
@@ -2397,14 +2403,14 @@ def write_csv(options,log_book):
     elevator_reversal_multiplier = 1
     rudder_reversal_multiplier = 1
     throttle_reversal_multiplier = 1
-    if log_book.aileron_output_reversed == 1:
+    if log_book.aileron_input_reversed == 1:
         aileron_reversal_multiplier = -1
         print "Aileron Output noted as being reversed"
-    if log_book.elevator_output_reversed == 1:
+    if log_book.elevator_input_reversed == 1:
         elevator_reversal_multiplier = -1
         print "Elevator Output noted as being reversed"
-    if log_book.rudder_output_reversed == 1: rudder_reversal_multiplier = -1
-    if log_book.throttle_output_reversed == 1: throttle_reversal_multiplier = -1
+    if log_book.rudder_input_reversed == 1: rudder_reversal_multiplier = -1
+    if log_book.throttle_input_reversed == 1: throttle_reversal_multiplier = -1
 
     f_csv = open(options.CSV_filename, 'w')
     print >> f_csv, "GPS_Time,GPS Time(XML),Status,Lat,Lon,Waypoint,GPS_Alt_ASL,GPS_Alt_AO,",
@@ -2438,14 +2444,13 @@ def write_csv(options,log_book):
         elevator_trim_pwm_value = 3000
         aileron_trim_pwm_value = 3000
     else :
-        elevator_trim_pwm_value = log_book.channel_trim_values[log_book.elevator_output_channel]
+        elevator_trim_pwm_value = log_book.channel_trim_values[log_book.elevator_input_channel]
         print "Elevator Trim Value set to ",elevator_trim_pwm_value, "(UDB PWM Units)"
-        if log_book.elevator_output_reversed == 1:
+        if log_book.elevator_input_reversed == 1:
             elevator_reversal_multiplier = -1
-        if log_book.airframe == 3: # Delta Aiframe e.g. Flying Wing
-            aileron_trim_pwm_value = log_book.channel_trim_values[log_book.aileron_output_channel]
-            if log_book.aileron_output_reversed == 1:
-                aileron_reversal_multiplier = -1
+        aileron_trim_pwm_value = log_book.channel_trim_values[log_book.aileron_input_channel]
+        if log_book.aileron_input_reversed == 1:
+            aileron_reversal_multiplier = -1
     if (log_book.nominal_cruise_speed > 0 ):
         cruise_speed = log_book.nominal_cruise_speed
         print "Using Nominal Cruise Speed from options.h of ", cruise_speed, " m/s"
@@ -2497,8 +2502,8 @@ def write_csv(options,log_book):
             wing_loading_list.append(relative_wing_loading)
             elevator_with_trim_removed.append(float(elevator_without_trim) / 1000)
 
-        elevator_pwm_out = elevator_reversal_multiplier * (entry.pwm_output[log_book.elevator_output_channel] - log_book.channel_trim_values[log_book.elevator_output_channel])
-        aileron_pwm_out =  aileron_reversal_multiplier  * (entry.pwm_output[log_book.aileron_output_channel]  - log_book.channel_trim_values[log_book.aileron_output_channel] )
+        elevator_pwm_out = elevator_reversal_multiplier * (entry.pwm_output[log_book.elevator_output_channel] - log_book.channel_trim_values[log_book.elevator_input_channel])
+        aileron_pwm_out =  aileron_reversal_multiplier  * (entry.pwm_output[log_book.aileron_output_channel]  - log_book.channel_trim_values[log_book.aileron_input_channel] )
         if log_book.airframe == AIRFRAME_DELTA :
             elevator_temp = (elevator_pwm_out + aileron_pwm_out) / 2
             aileron_temp =  (elevator_pwm_out - aileron_pwm_out) / 2
@@ -2538,8 +2543,8 @@ def write_csv(options,log_book):
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
               aileron_pwm_out, ",", \
               elevator_pwm_out, ",", \
-              rudder_reversal_multiplier * (entry.pwm_output[log_book.rudder_output_channel] - log_book.channel_trim_values[log_book.rudder_output_channel]), ",", \
-              throttle_reversal_multiplier * (entry.pwm_output[log_book.throttle_output_channel] - log_book.channel_trim_values[log_book.throttle_output_channel]), ",", \
+              rudder_reversal_multiplier * (entry.pwm_output[log_book.rudder_output_channel] - log_book.channel_trim_values[log_book.rudder_input_channel]), ",", \
+              throttle_reversal_multiplier * (entry.pwm_output[log_book.throttle_output_channel] - log_book.channel_trim_values[log_book.throttle_input_channel]), ",", \
               entry.desired_turn_rate, ",", \
               entry.rotation_error[0], ",", entry.tilt_error[0], ",", entry.desired_rotation[0], ",",                                                       \
               entry.rotation_error[1], ",", entry.tilt_error[1], ",", entry.desired_rotation[1], ",",                                                       \
