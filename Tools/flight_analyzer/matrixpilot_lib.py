@@ -254,10 +254,14 @@ class base_telemetry :
         self.elevator_output_channel = 0
         self.throttle_output_channel = 0
         self.rudder_output_channel   = 0
-        self.aileron_output_reversed  = 0
-        self.elevator_output_reversed = 0
-        self.throttle_output_reversed = 0
-        self.rudder_output_reversed   = 0
+        self.aileron_input_channel  = 0
+        self.elevator_input_channel = 0
+        self.throttle_input_channel = 0
+        self.rudder_input_channel   = 0
+        self.aileron_input_reversed  = 0
+        self.elevator_input_reversed = 0
+        self.throttle_input_reversed = 0
+        self.rudder_input_reversed   = 0
         self.number_of_input_channels = 0
         self.channel_trim_values = [0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.barometer_temperature = 0
@@ -501,13 +505,13 @@ class mavlink_telemetry(base_telemetry):
 
         elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F19' :
             self.aileron_output_channel = telemetry_file.msg.sue_aileron_output_channel
-            self.aileron_output_reversed = telemetry_file.msg.sue_aileron_reversed
+            self.aileron_input_reversed = telemetry_file.msg.sue_aileron_reversed
             self.elevator_output_channel = telemetry_file.msg.sue_elevator_output_channel
-            self.elevator_output_reversed = telemetry_file.msg.sue_elevator_reversed
+            self.elevator_input_reversed = telemetry_file.msg.sue_elevator_reversed
             self.throttle_output_channel = telemetry_file.msg.sue_throttle_output_channel
-            self.throttle_output_reversed = telemetry_file.msg.sue_throttle_reversed
+            self.throttle_input_reversed = telemetry_file.msg.sue_throttle_reversed
             self.rudder_output_channel = telemetry_file.msg.sue_rudder_output_channel
-            self.rudder_output_reversed = telemetry_file.msg.sue_rudder_reversed
+            self.rudder_input_reversed = telemetry_file.msg.sue_rudder_reversed
 
             return('F19')
 
@@ -1920,28 +1924,28 @@ class ascii_telemetry(base_telemetry):
         match = re.match("^F19:",line) # If line starts with F19
         if match :
             # Parse the line for options.h values
-            match = re.match(".*:AIL=([0-9]*?),([0-9]*?):",line)   # Aileron Channel, and reversal 
+            match = re.match(".*:AIL=([0-9]*?),([0-9]*?):",line)   # Aileron Input Channel, and reversal 
             if match :
-                self.aileron_output_channel  = int(match.group(1))
-                self.aileron_output_reversed = int(match.group(2))
+                self.aileron_input_channel  = int(match.group(1))
+                self.aileron_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing AILERON CHANNEL at line", line_no
-            match = re.match(".*:ELEV=([0-9]*?),([0-9]*?):",line)  # Elevator Channel, and reversal 
+            match = re.match(".*:ELEV=([0-9]*?),([0-9]*?):",line)  # Elevator Input Channel, and reversal 
             if match :
-                self.elevator_output_channel   = int(match.group(1))
-                self.elevator_output_reversed = int(match.group(2))
+                self.elevator_input_channel   = int(match.group(1))
+                self.elevator_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing ELEVATOR CHANNEL at line", line_no
-            match = re.match(".*:THROT=([0-9]*?),([0-9]*?):",line) # Throttle Channel, and reversal 
+            match = re.match(".*:THROT=([0-9]*?),([0-9]*?):",line) # Throttle Input Channel, and reversal 
             if match :
-                self.throttle_output_channel  = int(match.group(1))
-                self.throttle_output_reversed = int(match.group(2))
+                self.throttle_input_channel  = int(match.group(1))
+                self.throttle_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing THROTTLE CHANNEL at line", line_no
-            match = re.match(".*:RUDD=([0-9]*?),([0-9]*?):",line) # Rudder Channel, and reversal 
+            match = re.match(".*:RUDD=([0-9]*?),([0-9]*?):",line) # Rudder Input Channel, and reversal 
             if match :
-                self.rudder_output_channel  = int(match.group(1))
-                self.rudder_output_reversed = int(match.group(2))
+                self.rudder_input_channel  = int(match.group(1))
+                self.rudder_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing RUDDER CHANNEL at line", line_no
             return "F19"
@@ -2054,6 +2058,34 @@ class ascii_telemetry(base_telemetry):
             else :
                 print "Failure parsing ELEVATOR CHANNEL at line", line_no 
             return "F24"
+        
+        #################################################################
+        # Try Another format of telemetry
+
+        match = re.match("^F25:",line) # If line starts with 25
+        if match :
+            # Parse the line for options.h values
+            match = re.match(".*:AIL=([0-9]*?):",line)   # Aileron Output Channel
+            if match :
+                self.aileron_output_channel  = int(match.group(1))
+            else :
+                print "Failure parsing AILERON CHANNEL at line", line_no
+            match = re.match(".*:ELEV=([0-9]*?):",line)  # Elevator Output Channel
+            if match :
+                self.elevator_output_channel   = int(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR CHANNEL at line", line_no
+            match = re.match(".*:THROT=([0-9]*?):",line) # Throttle Output Channel
+            if match :
+                self.throttle_output_channel  = int(match.group(1))
+            else :
+                print "Failure parsing THROTTLE CHANNEL at line", line_no
+            match = re.match(".*:RUDD=([0-9]*?):",line) # Rudder Output Channel 
+            if match :
+                self.rudder_output_channel  = int(match.group(1))
+            else :
+                print "Failure parsing RUDDER CHANNEL at line", line_no
+            return "F25"
         
         #################################################################
         # Try Another format of telemetry
