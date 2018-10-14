@@ -195,11 +195,14 @@ void test_pwm()
 int16_t roll_cntrl, pitch_cntrl, yaw_cntrl , throt_cntrl ;
 
 #define THROT_MIN ( 1000 )
-#define THROT_MAX ( 4000 )
-#define TILT_MIN ( -500 )
-#define TILT_MAX ( 500 )
-#define YAW_MIN ( -500 )
-#define YAW_MAX (500 )
+#define THROT_MAX ( 3400 )
+#define TILT_MIN ( -200 )
+#define TILT_MAX ( 200 )
+#define YAW_MIN ( -200 )
+#define YAW_MAX ( 200 )
+#define PWM_MIN ( 1000 )
+#define PWM_MAX ( 4000 )
+#define THROT_CUT ( 2200 )
 
 int16_t udb_pulse_limit(int16_t min, int16_t max, int32_t pw)
 {
@@ -219,13 +222,22 @@ void mix_pwm()
 	}
 
 	throt_cntrl = udb_pulse_limit(THROT_MIN , THROT_MAX , udb_pwIn[3] ) ;
-	roll_cntrl = udb_pulse_limit(TILT_MIN , TILT_MAX , udb_pwIn[1]-udb_pwTrim[1] ) ;
-	pitch_cntrl = udb_pulse_limit(TILT_MIN , TILT_MAX , udb_pwIn[2]-udb_pwTrim[2] ) ;
+	roll_cntrl = - udb_pulse_limit(TILT_MIN , TILT_MAX , udb_pwIn[1]-udb_pwTrim[1] ) ;
+	pitch_cntrl = - udb_pulse_limit(TILT_MIN , TILT_MAX , udb_pwIn[2]-udb_pwTrim[2] ) ;
 	yaw_cntrl = udb_pulse_limit(YAW_MIN , YAW_MAX , udb_pwIn[4]-udb_pwTrim[4] ) ;
-
-	udb_pwOut[1] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl + pitch_cntrl ) ;
-	udb_pwOut[2] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl + roll_cntrl ) ;
-	udb_pwOut[3] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl + yaw_cntrl ) ;
-	udb_pwOut[4] = udb_pulse_limit(THROT_MIN , THROT_MAX , throt_cntrl ) ;
 	
+	if ( throt_cntrl > THROT_CUT)
+	{
+		udb_pwOut[1] = udb_pulse_limit(PWM_MIN , PWM_MAX , throt_cntrl + pitch_cntrl + yaw_cntrl + roll_cntrl ) ;
+		udb_pwOut[2] = udb_pulse_limit(PWM_MIN , PWM_MAX , throt_cntrl + pitch_cntrl - yaw_cntrl - roll_cntrl ) ;
+		udb_pwOut[3] = udb_pulse_limit(PWM_MIN , PWM_MAX , throt_cntrl - pitch_cntrl + yaw_cntrl - roll_cntrl) ;
+		udb_pwOut[4] = udb_pulse_limit(PWM_MIN , PWM_MAX , throt_cntrl - pitch_cntrl - yaw_cntrl + roll_cntrl ) ;
+	}
+	else
+	{
+		udb_pwOut[1]= THROT_MIN ;
+		udb_pwOut[2]= THROT_MIN ;
+		udb_pwOut[3]= THROT_MIN ;
+		udb_pwOut[4]= THROT_MIN ;
+	}
 }
