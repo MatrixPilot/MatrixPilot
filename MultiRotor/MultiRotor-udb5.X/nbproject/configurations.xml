@@ -163,6 +163,8 @@
       </logicalFolder>
       <logicalFolder name="MultiRotor" displayName="MultiRotor" projectFiles="true">
         <itemPath>../../MultiRotor/main.c</itemPath>
+        <itemPath>../motorCntrl.c</itemPath>
+        <itemPath>../telemetry.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -178,6 +180,7 @@
     <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
     <Elem>../../Config</Elem>
+    <Elem>..</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
