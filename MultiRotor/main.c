@@ -21,6 +21,7 @@
 
 #include "../libDCM/libDCM.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/serialIO.h"
 
 boolean didCalibrate = 0 ;
 
@@ -73,7 +74,17 @@ void udb_background_callback_periodic(void)
 	
 	return ;
 }
-
+int heartbeats = 0 ;
+void udb_heartbeat_40hz_callback( void )
+{
+	heartbeats ++ ;
+	if ( heartbeats == 20)
+	{
+		heartbeats = 0 ;
+		udb_background_callback_periodic();
+	}
+	return ;
+}
 
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)
 void dcm_callback_gps_location_updated(void)
@@ -83,7 +94,7 @@ void dcm_callback_gps_location_updated(void)
 
 
 // Called at 40 Hz, before sending servo pulses
-void dcm_servo_callback_prepare_outputs(void)
+void dcm_heartbeat_callback(void)
 {
 	motorCntrl() ;
 	
