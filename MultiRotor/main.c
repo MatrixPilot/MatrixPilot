@@ -125,8 +125,8 @@ void dcm_heartbeat_callback(void)
 		LED_GREEN = LED_OFF ;
 	}
 	
-	// Serial output at 8Hz  
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/8)) == 0)
+	// Serial output at 20 Hz  
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 0)
 	{
 		if ( didCalibrate )
 		{

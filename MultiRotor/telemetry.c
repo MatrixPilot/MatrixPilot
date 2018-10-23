@@ -30,7 +30,7 @@
 // Used for serial debug output
 #include <stdio.h>
 
-char debug_buffer[128] ;
+char debug_buffer[512] ;
 int db_index = 0 ;
 boolean hasWrittenHeader = 0 ;
 int header_line = 0 ;
@@ -78,7 +78,7 @@ void send_debug_line( void )
 				ACCEL_K ) ;
 			break ;
 		case 6:
-			sprintf(debug_buffer, "r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , yerr, yerrI , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
+			sprintf(debug_buffer, "hrtbt , cpu , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , yerr, yerrI , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
 			hasWrittenHeader = 1 ;			
 			break ;
 		default:
@@ -88,7 +88,8 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			rmat[6] , rmat[7] , 
 			theta[0] , theta[1] , theta[2] , 
 			roll_control , pitch_control, yaw_control ,
