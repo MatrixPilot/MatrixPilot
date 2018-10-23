@@ -19,22 +19,27 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../libDCM/libDCM.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
 #include "../libDCM/rmat.h"
 #include "../libDCM/mathlib.h"
 #include "../libDCM/mathlibNAV.h"
-#include "../libUDB/servoOut.h"
 #include "../libUDB/heartbeat.h"
+#include "../libUDB/serialIO.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/ADchannel.h"
+
+// Used for serial debug output
+#include <stdio.h>
 
 #define MANUAL_DEADBAND 200 // amount of throttle before fly-by-wire controls engage
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 5 // prevent Tx pulse variation from causing yaw drift
 
-#define GGAIN_SERVOS SCALEGYRO*6*(RMAX*(1.0/SERVO_HZ)) // integration multiplier for gyros
-static fractional ggain_servos[] =  { GGAIN_SERVOS, GGAIN_SERVOS, GGAIN_SERVOS };
-
 int theta[3] ;
 extern boolean didCalibrate ;
-extern void MatrixRotate( int[] , int[] ) ;
+void matrix_normalize ( int[] ) ;
+void MatrixRotate( int[] , int[] ) ;
 extern int commanded_tilt_gain ;
 
 int roll_control ;
@@ -64,7 +69,72 @@ union longww yaw_error_integral = { 0 } ;
 int target_orientation[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 
 const int yaw_command_gain = ((long) MAX_YAW_RATE )*(0.03) ;
-extern int rmat[] ;
+
+//	normalization algorithm
+//  TODO this is an older version of the algorithm, it will work well enough where it is used,
+//  but it should eventually be updated
+#define RMAX15 24576 //0b0110000000000000   // 1.5 in 2.14 format
+void matrix_normalize(fractional matrix[])
+//	This is the routine that maintains the orthogonality of the
+//	direction cosine matrix, which is expressed by the identity
+//	relationship that the cosine matrix multiplied by its
+//	transpose should equal the identity matrix.
+//	Small adjustments are made at each time step to assure orthogonality.
+{
+	fractional norm ; // actual magnitude
+	fractional renorm ;	// renormalization factor
+	fractional rbuff[9] ;
+	fractional vbuff[3] ;
+	fractional error ;
+
+	//	compute minus twice the dot product between rows 1 and 3
+	error = (( - VectorDotProduct( 3 , &matrix[0] , &matrix[6] ))<<2) ;
+	//	scale row 1 by the error (there is a 1/2 built into the scaling)
+	VectorScale( 3 , &rbuff[0] , &matrix[6] , error ) ;
+
+	//	compute minus twice the dot product between rows 2 and 3
+	error = (( - VectorDotProduct( 3 , &matrix[3] , &matrix[6] ))<<2) ;
+	//	scale row 1 by the error (there is a 1/2 built into the scaling)
+	VectorScale( 3 , &rbuff[3] , &matrix[6] , error ) ;
+
+	//	compute minus the dot product between rows 1 and 2
+	error = (( - VectorDotProduct( 3 , &matrix[0] , &matrix[3] ))<<1) ;
+
+	//	scale row 2 by 1/2 of the error
+	VectorScale( 3 , vbuff , &matrix[3] , error ) ;
+	//	adjust row 1
+	VectorAdd( 3 , &rbuff[0] , vbuff , &rbuff[0]) ;
+
+	//  scale row 1 by 1/2 of the error
+	VectorScale( 3 , vbuff , &matrix[0] , error ) ;
+	//	adjust row 2
+	VectorAdd( 3 , &rbuff[3] , vbuff , &rbuff[3]) ;
+
+	//	update the rows to make them closer to orthogonal:
+	VectorAdd( 3 , &rbuff[0] , &rbuff[0] , &matrix[0] ) ;
+	VectorAdd( 3 , &rbuff[3] , &rbuff[3] , &matrix[3] ) ;
+	VectorCopy( 3 , &rbuff[6] , &matrix[6] ) ;
+
+
+	//	Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the renormalization
+	//	rescale row1
+	norm = VectorPower( 3 , &rbuff[0] ) ; // Scalegain of 0.5
+	renorm = RMAX15 - norm ;
+	VectorScale( 3 , &rbuff[0] , &rbuff[0] , renorm ) ;
+	VectorAdd( 3 , &matrix[0] , &rbuff[0] , &rbuff[0] ) ;
+	//	rescale row2
+	norm = VectorPower( 3 , &rbuff[3] ) ;
+	renorm = RMAX15 - norm ;
+	VectorScale( 3 , &rbuff[3] , &rbuff[3] , renorm ) ;
+	VectorAdd( 3 , &matrix[3] , &rbuff[3] , &rbuff[3] ) ;
+	//	rescale row3
+	norm = VectorPower( 3 , &rbuff[6] ) ;
+	renorm = RMAX15 - norm ;
+	VectorScale( 3 , &rbuff[6] , &rbuff[6] , renorm ) ;
+	VectorAdd( 3 , &matrix[6] , &rbuff[6] , &rbuff[6] ) ;
+	return ;
+}
+
 
 void MatrixRotate( fractional matrix[] , fractional angle[] )
 {
@@ -105,54 +175,12 @@ void MatrixRotate( fractional matrix[] , fractional angle[] )
 	return ;
 }
 
-// The normalization algorithm
-#define RMAX15 24576 //0b0110000000000000   // 1.5 in 2.14 format
-void normalize( int rotation_matrix[])
-{
-	//  This is the routine that maintains the orthogonality of the
-	//  direction cosine matrix, which is expressed by the identity
-	//  relationship that the cosine matrix multiplied by its
-	//  transpose should equal the identity matrix.
-	//  Small adjustments are made at each time step to assure orthogonality.
-
-	fractional norm;    // actual magnitude
-	fractional renorm;  // renormalization factor
-	fractional rbuff[9];
-	VectorCopy( 9 , rbuff , rotation_matrix ); // copy direction cosine matrix into buffer
-	
-	// Leave the bottom (tilt) row alone, it is usually the most accurate.
-	// Compute the first row as the cross product of second row with third row.
-	VectorCross(&rbuff[0], &rbuff[3] , &rbuff[6]);
-	// First row is now perpendicular to the second and third row.
-	// Compute the second row as the cross product of the third row with the first row.
-	VectorCross(&rbuff[3], &rbuff[6] , &rbuff[0]);
-	// All three rows are now mutually perpendicular.
-
-	// Use a Taylor's expansion for 1/sqrt(X*X) to avoid division in the renormalization
-
-	// rescale row1
-	norm = VectorPower(3, &rbuff[0]); // Scalegain of 0.5
-	renorm = RMAX15 - norm;
-	VectorScale(3, &rbuff[0], &rbuff[0], renorm);
-	VectorAdd(3, &rotation_matrix[0], &rbuff[0], &rbuff[0]);
-	// rescale row2
-	norm = VectorPower(3, &rbuff[3]);
-	renorm = RMAX15 - norm;
-	VectorScale(3, &rbuff[3], &rbuff[3], renorm);
-	VectorAdd(3, &rotation_matrix[3], &rbuff[3], &rbuff[3]);
-	// rescale row3
-	norm = VectorPower(3, &rbuff[6]);
-	renorm = RMAX15 - norm;
-	VectorScale(3, &rbuff[6], &rbuff[6], renorm);
-	VectorAdd(3, &rotation_matrix[6], &rbuff[6], &rbuff[6]);
-}
-
+#define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/SERVO_HZ)) // integration multiplier for gyros
+static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
 
 void motorCntrl(void)
 {
 	int temp ;
-	
-	VectorMultiply(3, theta, omegagyro, ggain_servos); // Scalegain of 2
 	
 	int min_throttle ;
 	
@@ -282,7 +310,7 @@ void motorCntrl(void)
 		target_orientation[8] = rmat[8] ;
 
 //		renormalize to align other two axes into the the plane perpendicular to the vertical
-		normalize( target_orientation ) ;
+		matrix_normalize( target_orientation ) ;
 		
 //		Rotate the virtual quad around the earth vertical axis according to the commanded yaw rate
 		yaw_step = commanded_yaw * yaw_command_gain ;
@@ -338,6 +366,8 @@ void motorCntrl(void)
 		}
 
 //		Compute the derivatives
+		
+		VectorMultiply(3, theta, omegagyro, ggain_control); // Scalegain of 2
 		theta_delta[0] = theta[0] - theta_previous[0] ;
 		theta_delta[1] = theta[1] - theta_previous[1] ;
 
@@ -422,4 +452,3 @@ void motorCntrl(void)
 #if (((int) + MAX_TILT) > 45)
 #error ("MAX_TILT mus be less than or equal to 45 degrees."
 #endif
-

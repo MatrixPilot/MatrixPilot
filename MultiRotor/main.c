@@ -20,8 +20,16 @@
 
 
 #include "../libDCM/libDCM.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/rmat.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/serialIO.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/ADchannel.h"
+
+// Used for serial debug output
+#include <stdio.h>
 
 boolean didCalibrate = 0 ;
 
@@ -34,6 +42,7 @@ int commanded_tilt_gain ;
 int main (void)
 {
 	// Set up the libraries
+	mcu_init();
 	udb_init() ;
 	dcm_init() ;
 	
@@ -41,11 +50,17 @@ int main (void)
 	udb_serial_set_rate(115200) ;
 	
 	LED_GREEN = LED_OFF ;
+#if (CONSOLE_UART != 2)
+	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
+#endif
 
 	commanded_tilt_gain = sine ( max_tilt ) / 1000 ;
 	
 	// Start it up!
-	udb_run() ;  // This never returns.
+	while(1)
+	{
+		udb_run() ; 
+	}
 	
 	return 0 ;
 }
@@ -74,16 +89,15 @@ void udb_background_callback_periodic(void)
 	
 	return ;
 }
-int heartbeats = 0 ;
-void udb_heartbeat_40hz_callback( void )
+
+void udb_heartbeat_40hz_callback(void)
 {
-	heartbeats ++ ;
-	if ( heartbeats == 20)
+	static int count = 0;
+	if (++count > 20)
 	{
-		heartbeats = 0 ;
-		udb_background_callback_periodic();
+		count = 0;
+		udb_background_callback_periodic();	
 	}
-	return ;
 }
 
 // Called every time we get gps data (1, 2, or 4 Hz, depending on GPS config)

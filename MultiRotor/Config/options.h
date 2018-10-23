@@ -35,7 +35,7 @@
 // UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
 // See the MatrixPilot wiki for more details on different UDB boards.
 // If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-// #define BOARD_TYPE 							UDB4_BOARD
+//#define BOARD_TYPE 							UDB5_BOARD
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +48,10 @@
 //#define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
+#define GNSS_HDOP_REQUIRED_FOR_STARTUP      200  //  Horizontal Dilution of Precision
+#define GNSS_VDOP_REQUIRED_FOR_STARTUP	    200  //  Vertical Dilution of Precision
+#define GNSS_SVS_REQUIRED_FOR_STARTUP	      4  //  Number of Sattelites in View
+#define CONSOLE_UART                        0
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // The following 4 orientations have the board parallel with the ground.
@@ -75,11 +79,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
-#define GPS_TYPE							GPS_NONE
-#define GNSS_HDOP_REQUIRED_FOR_STARTUP	100
-#define	GNSS_VDOP_REQUIRED_FOR_STARTUP	100
-#define GNSS_SVS_REQUIRED_FOR_STARTUP	3
-#define CONSOLE_UART 0
+#define GPS_TYPE							GPS_STD
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 

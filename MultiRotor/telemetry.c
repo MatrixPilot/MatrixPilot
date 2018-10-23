@@ -19,10 +19,16 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../libDCM/libDCM.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/rmat.h"
+#include "../libUDB/heartbeat.h"
+#include "../libUDB/serialIO.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/ADchannel.h"
 
 // Used for serial debug output
-#include "stdio.h"
-
+#include <stdio.h>
 
 char debug_buffer[128] ;
 int db_index = 0 ;
@@ -33,7 +39,6 @@ extern int theta[3] , roll_control , pitch_control , yaw_control , accelEarth[3]
 extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[] ;
 extern int roll_error , pitch_error , yaw_error ;
 extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
-extern int rmat[] ;
 
 //volatile int trap_flags __attribute__ ((persistent));
 //volatile long trap_source __attribute__ ((persistent));
@@ -137,7 +142,7 @@ int udb_serial_callback_get_byte_to_send(void)
 
 
 // Don't respond to serial input
-void udb_serial_callback_received_byte(char rxchar)
+void udb_serial_callback_received_byte(uint8_t rxchar)
 {
 	// Do nothing
 	return ;
