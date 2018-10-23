@@ -107,10 +107,13 @@ void dcm_callback_gps_location_updated(void)
 }
 
 
-// Called at 40 Hz, before sending servo pulses
+// Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
 {
-	motorCntrl() ;
+	if((udb_heartbeat_counter%(HEARTBEAT_HZ/40))==0)
+	{
+		motorCntrl() ;
+	}
 	
 	// Update the Green LED to show RC radio status
 	if (udb_flags._.radio_on)
@@ -122,8 +125,8 @@ void dcm_heartbeat_callback(void)
 		LED_GREEN = LED_OFF ;
 	}
 	
-	// Serial output at 8Hz  (40Hz / 5)
-	if (udb_heartbeat_counter % 5 == 0)
+	// Serial output at 8Hz  
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/8)) == 0)
 	{
 		if ( didCalibrate )
 		{
