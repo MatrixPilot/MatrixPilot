@@ -106,12 +106,24 @@ void dcm_callback_gps_location_updated(void)
 	return ;
 }
 
+int rmat_vertical_initialized = 0 ;
 
 // Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
 {
 	if((udb_heartbeat_counter%(HEARTBEAT_HZ/40))==0)
 	{
+		int gplane[3];
+		// record vertical
+		if (rmat_vertical_initialized == 0)
+		{
+			rmat_vertical_initialized = 1;
+			gplane[0] = XACCEL_VALUE;
+			gplane[1] = YACCEL_VALUE;
+			gplane[2] = ZACCEL_VALUE;
+			vector3_normalize(&rmat[6],gplane);
+		}
+		
 		motorCntrl() ;
 	}
 	

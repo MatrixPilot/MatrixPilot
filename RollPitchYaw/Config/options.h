@@ -49,6 +49,13 @@
 //      from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
 #define BOARD_ORIENTATION                   ORIENTATION_FORWARDS
 
+#define CUSTOM_OFFSETS 1
+#define XACCEL_OFFSET ( 433 )
+#define YACCEL_OFFSET (81 )
+#define ZACCEL_OFFSET ( -1317 )
+#define XRATE_OFFSET ( -118 )
+#define YRATE_OFFSET ( -118 )
+#define ZRATE_OFFSET ( -103 )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
