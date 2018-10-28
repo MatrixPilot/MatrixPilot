@@ -70,6 +70,27 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
+// draganflier offsets
+
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 154 )
+#define YACCEL_OFFSET	( 63 )
+#define ZACCEL_OFFSET	( -429 )
+#define XRATE_OFFSET	( -191 )
+#define YRATE_OFFSET	( 45 )
+#define ZRATE_OFFSET	( -5 )
+
+
+// desk UDB offsets
+#define CUSTOM_OFFSETS
+/*
+#define XACCEL_OFFSET	( 438 )
+#define YACCEL_OFFSET	( 81 )
+#define ZACCEL_OFFSET	( -1317 )
+#define XRATE_OFFSET	( -118 )
+#define YRATE_OFFSET	( -118 )
+#define ZRATE_OFFSET	( -103 )
+*/
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
 
@@ -173,11 +194,18 @@
 // All gains should be positive real numbers.
 
 
-// Tilt PID(DD) control gains
+// Baseline Tilt PID(DD) control gains
+/*
 #define TILT_KI 0.05
 #define TILT_KP 0.08
 #define TILT_KD 0.5
 #define TILT_KDD 0.8
+*/
+
+#define TILT_KI 0.01
+#define TILT_KP 0.08
+#define TILT_KD 0.8
+#define TILT_KDD 0.0
 
 // Yaw PID control gains
 #define YAW_KI 0.5

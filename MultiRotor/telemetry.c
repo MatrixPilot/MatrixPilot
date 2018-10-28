@@ -26,6 +26,7 @@
 #include "../libUDB/serialIO.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/ADchannel.h"
+#include "../libUDB/mcu.h"
 
 // Used for serial debug output
 #include <stdio.h>
@@ -40,11 +41,6 @@ extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[] ;
 extern int roll_error , pitch_error , yaw_error ;
 extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
 
-//volatile int trap_flags __attribute__ ((persistent));
-//volatile long trap_source __attribute__ ((persistent));
-//volatile int osc_fail_count __attribute__ ((persistent));
-
-
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
 {
@@ -58,26 +54,30 @@ void send_debug_line( void )
 			sprintf(debug_buffer, "\r\n") ;
 			break ;
 		case 2:
+			sprintf(debug_buffer, "RCON=0x%X , TRAP_FLAGS=0x%X , TRAP_SOURCE=0x%lX , ALARMS=%i\r\n",
+			    get_reset_flags(), trap_flags, trap_source, osc_fail_count);
+			break ;
+		case 3:
 			sprintf(debug_buffer, "TILT_KP = %5f, YAW_KP = %5f\r\n" ,
 				TILT_KP ,
 				YAW_KP  ) ;
 			break ;	
-		case 3:
+		case 4:
 			sprintf(debug_buffer, "TILT_KI = %5f, YAW_KI = %5f\r\n" ,
 				TILT_KI ,
 				YAW_KI  ) ;
 			break ;
-		case 4:
+		case 5:
 			sprintf(debug_buffer, "TILT_KD = %5f, YAW_KD = %5f\r\n" ,
 				TILT_KD ,
 				YAW_KD ) ;
 			break ;
-		case 5:
+		case 6:
 			sprintf(debug_buffer, "TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
 				TILT_KDD ,
 				ACCEL_K ) ;
 			break ;
-		case 6:
+		case 7:
 			sprintf(debug_buffer, "hrtbt , cpu , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , yerr, yerrI , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
 			hasWrittenHeader = 1 ;			
 			break ;
