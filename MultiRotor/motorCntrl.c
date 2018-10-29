@@ -297,7 +297,7 @@ void motorCntrl(void)
 		VectorAdd( 3, yaw_vector , yaw_vector , yaw_vector ) ; // doubles the vector
 		MatrixRotate( target_orientation , yaw_vector ) ;
 
-//		Compute the misalignment between target and actaul
+//		Compute the misalignment between target and actual
 		MatrixTranspose( 3 , 3 , target_orientation_transposed , target_orientation )	;
 		MatrixMultiply ( 3 , 3 , 3 , orientation_error_matrix , target_orientation_transposed , rmat ) ;
 
@@ -366,7 +366,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KP) , roll_error ) ;
 		roll_control = long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KD) , roll_error_delta ) ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KD*SCALEGYRO/26.0) , -omegagyro[1] ) ;
 		roll_control += long_accum._.W1 ;
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[1] ) << 2 ;
@@ -378,7 +378,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KP) , pitch_error ) ;
 		pitch_control = long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KD) , pitch_error_delta ) ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KD*SCALEGYRO/26.0) , -omegagyro[0] ) ;
 		pitch_control += long_accum._.W1 ;
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[0] ) << 2 ;
@@ -390,7 +390,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KP) , yaw_error ) ;
 		yaw_control = long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD) , yaw_error_delta ) ;
+		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD*SCALEGYRO/26.0) , -omegagyro[2] ) ;
 		yaw_control += long_accum._.W1 ;
 
 		yaw_control += yaw_error_integral._.W1 ;

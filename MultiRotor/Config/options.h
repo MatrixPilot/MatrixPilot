@@ -204,7 +204,8 @@
 
 #define TILT_KI 0.01
 #define TILT_KP 0.08
-#define TILT_KD 0.8
+//#define TILT_KD 0.8
+#define TILT_KD 2.0
 #define TILT_KDD 0.0
 
 // Yaw PID control gains
