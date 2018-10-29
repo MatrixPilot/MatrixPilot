@@ -91,7 +91,7 @@ void send_debug_line( void )
 		sprintf(debug_buffer, "%i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			rmat[6] , rmat[7] , 
-			theta[0] , theta[1] , theta[2] , 
+			omegagyro[0] , omegagyro[1] , omegagyro[2] , 
 			roll_control , pitch_control, yaw_control ,
 			roll_error , roll_error_integral._.W1 , pitch_error , pitch_error_integral._.W1 ,
 			yaw_error , yaw_error_integral._.W1 ,
