@@ -66,7 +66,7 @@ union longww roll_error_integral = { 0 } ;
 union longww pitch_error_integral = { 0 } ;
 union longww yaw_error_integral = { 0 } ;
 
-int target_orientation[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+int target_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 
 const int yaw_command_gain = ((long) MAX_YAW_RATE )*(0.03) ;
 
@@ -182,8 +182,10 @@ void motorCntrl(void)
 
 	int yaw_step ;
 	int yaw_vector[3] ;
-	int target_orientation_transposed[9] ;
-	int orientation_error_matrix[9] ;
+	int rmat_transposed[9] ;
+	int correction_matrix[9] ;
+	int tilt_rmat[9] ;
+	int yaw_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 	
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
 	for (temp = 0; temp <= NUM_INPUTS; temp++)
@@ -206,7 +208,7 @@ void motorCntrl(void)
 
 		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] ;
 
-		VectorCopy ( 9 , target_orientation , rmat ) ;
+//		VectorCopy ( 9 , target_orientation , rmat ) ;
 
 		commanded_roll =  ( pwManual[ROLL_INPUT_CHANNEL] 
 						- udb_pwTrim[ROLL_INPUT_CHANNEL]) ;
@@ -258,7 +260,7 @@ void motorCntrl(void)
 		}
 
 //		adjust roll and pitch commands to prevent combined tilt from exceeding 90 degrees
-		commanded_tilt[0] = commanded_roll ;
+		commanded_tilt[0] = - commanded_roll ;
 		commanded_tilt[1] = commanded_pitch ;
 		commanded_tilt[2] = RMAX ;
 		vector3_normalize( commanded_tilt , commanded_tilt ) ;
@@ -273,7 +275,7 @@ void motorCntrl(void)
 #endif
 
 #ifdef CONFIG_X
-
+#error(TODO: this has to be redone for both dragan flier and spedix)
 		commanded_pitch_body_frame =  3*(( commanded_pitch - commanded_roll )/4) ; // approximation to .707, not critcal
 		commanded_roll_body_frame = 3*(( commanded_pitch + commanded_roll )/4) ; 
 
@@ -284,27 +286,56 @@ void motorCntrl(void)
 //		Compute the orientation of the virtual quad (which is used only for yaw control)
 //		Set the earth vertical to match in both frames (since we are interested only in yaw)
 
-		target_orientation[6] = rmat[6] ;
-		target_orientation[7] = rmat[7] ;
-		target_orientation[8] = rmat[8] ;
-
+//		target_orientation[6] = rmat[6] ;
+//		target_orientation[7] = rmat[7] ;
+//		target_orientation[8] = rmat[8] ;
+		// built the commanded tilt matrix from commanded tilt vector
+		tilt_rmat[6] = commanded_tilt[0] ;
+		tilt_rmat[7] = commanded_tilt[1] ;
+		tilt_rmat[8] = commanded_tilt[2] ;
+		tilt_rmat[0] = commanded_tilt[2] ;
+		tilt_rmat[1] = 0 ;
+		tilt_rmat[2] = -commanded_tilt[0] ;
+		tilt_rmat[4] = vector3_normalize(tilt_rmat , tilt_rmat ) ;
+		long_accum.WW = __builtin_mulss( tilt_rmat[2], tilt_rmat[7] ) ;
+		long_accum.WW = long_accum.WW << 2 ;
+		tilt_rmat[3] = long_accum._.W1 ;
+		long_accum.WW = __builtin_mulss( tilt_rmat[0], -tilt_rmat[7] ) ;
+		long_accum.WW = long_accum.WW << 2 ;
+		tilt_rmat[5] = long_accum._.W1 ;
+		
+		// multiply commanded yaw matrix by commanded tilt matrix to get overall target matrix
+		MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;	
+		MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
+		
+		// form the transpose of rmat
+		MatrixTranspose( 3 , 3 , rmat_transposed , rmat )	;
+		
+		// form the correction matrix from rmat_transposed times target rmat
+		MatrixMultiply ( 3 , 3 , 3 , correction_matrix , rmat_transposed , target_rmat ) ;	
+		MatrixAdd( 3 , 3 , correction_matrix , correction_matrix , correction_matrix ) ;
+//
 //		renormalize to align other two axes into the the plane perpendicular to the vertical
-		matrix_normalize( target_orientation ) ;
+//		matrix_normalize( target_orientation ) ;
 		
 //		Rotate the virtual quad around the earth vertical axis according to the commanded yaw rate
-		yaw_step = commanded_yaw * yaw_command_gain ;
-		VectorScale( 3 , yaw_vector , &target_orientation[6] , yaw_step ) ;
-		VectorAdd( 3, yaw_vector , yaw_vector , yaw_vector ) ; // doubles the vector
-		MatrixRotate( target_orientation , yaw_vector ) ;
+//		yaw_step = commanded_yaw * yaw_command_gain ;
+//		VectorScale( 3 , yaw_vector , &target_orientation[6] , yaw_step ) ;
+//		VectorAdd( 3, yaw_vector , yaw_vector , yaw_vector ) ; // doubles the vector
+//		MatrixRotate( target_orientation , yaw_vector ) ;
 
 //		Compute the misalignment between target and actual
-		MatrixTranspose( 3 , 3 , target_orientation_transposed , target_orientation )	;
-		MatrixMultiply ( 3 , 3 , 3 , orientation_error_matrix , target_orientation_transposed , rmat ) ;
+//		MatrixTranspose( 3 , 3 , target_orientation_transposed , target_orientation )	;
+//		MatrixMultiply ( 3 , 3 , 3 , orientation_error_matrix , target_orientation_transposed , rmat ) ;
 
 //		Compute orientation errors
-		roll_error = commanded_roll_body_frame + rmat[6] ;
-		pitch_error = commanded_pitch_body_frame - rmat[7] ;
-		yaw_error = ( orientation_error_matrix[1] - orientation_error_matrix[3] )/2 ;
+//		roll_error = commanded_roll_body_frame + rmat[6] ;
+//		pitch_error = commanded_pitch_body_frame - rmat[7] ;
+//		yaw_error = ( orientation_error_matrix[1] - orientation_error_matrix[3] )/2 ;
+		roll_error = ( correction_matrix[6]- correction_matrix[2])/2 ;
+		pitch_error = ( correction_matrix[5]- correction_matrix[7])/2 ;
+		yaw_error = ( correction_matrix[1]- correction_matrix[3])/2 ;
+		
 
 //		Compute the signals that are common to all 4 motors
 		min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
@@ -396,10 +427,17 @@ void motorCntrl(void)
 		yaw_control += yaw_error_integral._.W1 ;
 
 //		Mix in the yaw, pitch, and roll signals into the motors
-		motor_A += + yaw_control - pitch_control ;
-		motor_B += - yaw_control - roll_control ;
-		motor_C += + yaw_control + pitch_control ;
-		motor_D += - yaw_control + roll_control ;
+//		motor_A += + yaw_control - pitch_control ;
+//		motor_B += - yaw_control - roll_control ;
+//		motor_C += + yaw_control + pitch_control ;
+//		motor_D += - yaw_control + roll_control ;
+		long_accum.WW = __builtin_mulss(roll_error, 4000);
+		motor_A=(3000 + long_accum._.W1);	
+		long_accum.WW = __builtin_mulss(pitch_error, 4000);
+		motor_B=(3000 + long_accum._.W1);	
+		long_accum.WW = __builtin_mulss(yaw_error, 4000);
+		motor_C=(3000 + long_accum._.W1);	
+		motor_D = 3000 ;
 
 //		Send the signals out to the motors
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		

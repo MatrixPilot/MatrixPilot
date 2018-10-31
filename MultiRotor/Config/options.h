@@ -71,7 +71,7 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 // draganflier offsets
-
+/*
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 154 )
 #define YACCEL_OFFSET	( 63 )
@@ -79,18 +79,17 @@
 #define XRATE_OFFSET	( -191 )
 #define YRATE_OFFSET	( 45 )
 #define ZRATE_OFFSET	( -5 )
-
+*/
 
 // desk UDB offsets
 #define CUSTOM_OFFSETS
-/*
 #define XACCEL_OFFSET	( 438 )
 #define YACCEL_OFFSET	( 81 )
 #define ZACCEL_OFFSET	( -1317 )
 #define XRATE_OFFSET	( -118 )
 #define YRATE_OFFSET	( -118 )
 #define ZRATE_OFFSET	( -103 )
-*/
+
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
 
@@ -220,8 +219,8 @@
 #define ACCEL_K 0.2
 
 #define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-#define MAX_TILT 25       // maximum roll or pitch, degrees, not to exceed 45 degrees
-
+//#define MAX_TILT 25       // maximum roll or pitch, degrees, not to exceed 45 degrees
+#define MAX_TILT 45
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!
