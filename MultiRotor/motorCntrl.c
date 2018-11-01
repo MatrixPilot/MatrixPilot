@@ -156,6 +156,7 @@ void MatrixRotate( fractional matrix[] , fractional angle[] )
 
 #define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/SERVO_HZ)) // integration multiplier for gyros
 static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
+int yaw_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 
 void motorCntrl(void)
 {
@@ -178,14 +179,13 @@ void motorCntrl(void)
 	int yaw_error_delta ;
 
 	union longww long_accum ;
-//	union longww accum ; // debugging temporary
 
 	int yaw_step ;
 	int yaw_vector[3] ;
 	int rmat_transposed[9] ;
 	int correction_matrix[9] ;
 	int tilt_rmat[9] ;
-	int yaw_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+
 	
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
 	for (temp = 0; temp <= NUM_INPUTS; temp++)
@@ -286,10 +286,7 @@ void motorCntrl(void)
 //		Compute the orientation of the virtual quad (which is used only for yaw control)
 //		Set the earth vertical to match in both frames (since we are interested only in yaw)
 
-//		target_orientation[6] = rmat[6] ;
-//		target_orientation[7] = rmat[7] ;
-//		target_orientation[8] = rmat[8] ;
-		// built the commanded tilt matrix from commanded tilt vector
+		// build the commanded tilt matrix from commanded tilt vector
 		tilt_rmat[6] = commanded_tilt[0] ;
 		tilt_rmat[7] = commanded_tilt[1] ;
 		tilt_rmat[8] = commanded_tilt[2] ;
@@ -304,6 +301,14 @@ void motorCntrl(void)
 		long_accum.WW = long_accum.WW << 2 ;
 		tilt_rmat[5] = long_accum._.W1 ;
 		
+		// update yaw matrix
+		yaw_step = commanded_yaw * yaw_command_gain ;
+		yaw_vector[0] = 0 ;
+		yaw_vector[1] = 0 ;
+		yaw_vector[2] = yaw_step ;
+		MatrixRotate( yaw_rmat , yaw_vector ) ;
+		matrix_normalize( yaw_rmat ) ;
+		
 		// multiply commanded yaw matrix by commanded tilt matrix to get overall target matrix
 		MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;	
 		MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
@@ -314,24 +319,7 @@ void motorCntrl(void)
 		// form the correction matrix from rmat_transposed times target rmat
 		MatrixMultiply ( 3 , 3 , 3 , correction_matrix , rmat_transposed , target_rmat ) ;	
 		MatrixAdd( 3 , 3 , correction_matrix , correction_matrix , correction_matrix ) ;
-//
-//		renormalize to align other two axes into the the plane perpendicular to the vertical
-//		matrix_normalize( target_orientation ) ;
-		
-//		Rotate the virtual quad around the earth vertical axis according to the commanded yaw rate
-//		yaw_step = commanded_yaw * yaw_command_gain ;
-//		VectorScale( 3 , yaw_vector , &target_orientation[6] , yaw_step ) ;
-//		VectorAdd( 3, yaw_vector , yaw_vector , yaw_vector ) ; // doubles the vector
-//		MatrixRotate( target_orientation , yaw_vector ) ;
 
-//		Compute the misalignment between target and actual
-//		MatrixTranspose( 3 , 3 , target_orientation_transposed , target_orientation )	;
-//		MatrixMultiply ( 3 , 3 , 3 , orientation_error_matrix , target_orientation_transposed , rmat ) ;
-
-//		Compute orientation errors
-//		roll_error = commanded_roll_body_frame + rmat[6] ;
-//		pitch_error = commanded_pitch_body_frame - rmat[7] ;
-//		yaw_error = ( orientation_error_matrix[1] - orientation_error_matrix[3] )/2 ;
 		roll_error = ( correction_matrix[6]- correction_matrix[2])/2 ;
 		pitch_error = ( correction_matrix[5]- correction_matrix[7])/2 ;
 		yaw_error = ( correction_matrix[1]- correction_matrix[3])/2 ;
@@ -342,7 +330,6 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ACCEL_K ) , accelEarth[2] ) ;
 		accel_feedback = long_accum._.W1 ;
 		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback ;
-
 
 //		Compute the error intetgrals
 		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/40.), roll_error ))>>5) ;
