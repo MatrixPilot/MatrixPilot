@@ -71,7 +71,7 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 // draganflier offsets
-/*
+
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 154 )
 #define YACCEL_OFFSET	( 63 )
@@ -79,9 +79,10 @@
 #define XRATE_OFFSET	( -191 )
 #define YRATE_OFFSET	( 45 )
 #define ZRATE_OFFSET	( -5 )
-*/
+
 
 // desk UDB offsets
+/*
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 438 )
 #define YACCEL_OFFSET	( 81 )
@@ -89,6 +90,7 @@
 #define XRATE_OFFSET	( -118 )
 #define YRATE_OFFSET	( -118 )
 #define ZRATE_OFFSET	( -103 )
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
@@ -211,7 +213,6 @@
 #define YAW_KI 0.5
 #define YAW_KP 0.3
 #define YAW_KD 3.0
-
 
 // Vertical damping 
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus

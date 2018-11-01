@@ -320,9 +320,9 @@ void motorCntrl(void)
 		MatrixMultiply ( 3 , 3 , 3 , correction_matrix , rmat_transposed , target_rmat ) ;	
 		MatrixAdd( 3 , 3 , correction_matrix , correction_matrix , correction_matrix ) ;
 
-		roll_error = ( correction_matrix[6]- correction_matrix[2])/2 ;
-		pitch_error = ( correction_matrix[5]- correction_matrix[7])/2 ;
-		yaw_error = ( correction_matrix[1]- correction_matrix[3])/2 ;
+		roll_error = -( correction_matrix[6]- correction_matrix[2])/2 ;
+		pitch_error = -( correction_matrix[5]- correction_matrix[7])/2 ;
+		yaw_error = -( correction_matrix[1]- correction_matrix[3])/2 ;
 		
 
 //		Compute the signals that are common to all 4 motors
@@ -413,11 +413,13 @@ void motorCntrl(void)
 
 		yaw_control += yaw_error_integral._.W1 ;
 
-//		Mix in the yaw, pitch, and roll signals into the motors
-//		motor_A += + yaw_control - pitch_control ;
-//		motor_B += - yaw_control - roll_control ;
-//		motor_C += + yaw_control + pitch_control ;
-//		motor_D += - yaw_control + roll_control ;
+		// Mix in the yaw, pitch, and roll signals into the motors
+		motor_A += + yaw_control - pitch_control ;
+		motor_B += - yaw_control - roll_control ;
+		motor_C += + yaw_control + pitch_control ;
+		motor_D += - yaw_control + roll_control ;
+		
+		/* for debugging
 		long_accum.WW = __builtin_mulss(roll_error, 4000);
 		motor_A=(3000 + long_accum._.W1);	
 		long_accum.WW = __builtin_mulss(pitch_error, 4000);
@@ -425,6 +427,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulss(yaw_error, 4000);
 		motor_C=(3000 + long_accum._.W1);	
 		motor_D = 3000 ;
+		*/
 
 //		Send the signals out to the motors
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
