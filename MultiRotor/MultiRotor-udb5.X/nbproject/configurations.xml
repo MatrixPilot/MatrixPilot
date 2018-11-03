@@ -167,6 +167,7 @@
         <itemPath>../motorCntrl.c</itemPath>
         <itemPath>../telemetry.c</itemPath>
         <itemPath>../rotorLib.c</itemPath>
+        <itemPath>../rotorTilt.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

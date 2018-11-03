@@ -70,6 +70,10 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
+#define deskUDB
+//#define draganflier
+
+#ifdef draganflier
 // draganflier offsets
 
 #define CUSTOM_OFFSETS
@@ -80,9 +84,10 @@
 #define YRATE_OFFSET	( 45 )
 #define ZRATE_OFFSET	( -5 )
 
+#endif
 
+#ifdef deskUDB
 // desk UDB offsets
-/*
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 438 )
 #define YACCEL_OFFSET	( 81 )
@@ -90,7 +95,7 @@
 #define XRATE_OFFSET	( -118 )
 #define YRATE_OFFSET	( -118 )
 #define ZRATE_OFFSET	( -103 )
-*/
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
@@ -203,16 +208,16 @@
 #define TILT_KDD 0.8
 */
 
-#define TILT_KI 0.01
-#define TILT_KP 0.08
+#define TILT_KI 0.01*0.0
+#define TILT_KP 0.8
 //#define TILT_KD 0.8
-#define TILT_KD 2.0
+#define TILT_KD 2.0*0.0
 #define TILT_KDD 0.0
 
 // Yaw PID control gains
-#define YAW_KI 0.5
+#define YAW_KI 0.5*0.0
 #define YAW_KP 0.3
-#define YAW_KD 3.0
+#define YAW_KD 3.0*0.0
 
 // Vertical damping 
 // ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus

@@ -40,6 +40,7 @@
 int theta[3] ;
 extern boolean didCalibrate ;
 extern int commanded_tilt_gain ;
+extern void compute_tilt_rmat( int [] , int , int );
 
 int roll_control ;
 int pitch_control ;
@@ -72,6 +73,7 @@ const int yaw_command_gain = ((long) MAX_YAW_RATE )*(0.03) ;
 #define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/SERVO_HZ)) // integration multiplier for gyros
 static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
 int yaw_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+int tilt_rmat[9] ;
 
 void motorCntrl(void)
 {
@@ -83,11 +85,6 @@ void motorCntrl(void)
 	int motor_B ;
 	int motor_C ;
 	int motor_D ;
-
-	int commanded_roll_body_frame ;
-	int commanded_pitch_body_frame ;
-
-	int commanded_tilt[3] ;
 
 	int roll_error_delta ;
 	int pitch_error_delta ;
@@ -131,20 +128,11 @@ void motorCntrl(void)
 						- udb_pwTrim[PITCH_INPUT_CHANNEL] ) ;
 		commanded_yaw = ( pwManual[YAW_INPUT_CHANNEL] 
 						- udb_pwTrim[YAW_INPUT_CHANNEL] )  ;
-#ifdef CONFIG_PLUS
-		commanded_pitch_body_frame = commanded_pitch ;
-		commanded_roll_body_frame = commanded_roll ;
-#endif
 
-#ifdef CONFIG_X
-		commanded_pitch_body_frame =  3*(( commanded_pitch - commanded_roll )/4) ; // approximation to .707, not critcal
-		commanded_roll_body_frame = 3*(( commanded_pitch + commanded_roll )/4) ; 
-#endif
-
-		motor_A += + commanded_yaw - commanded_pitch_body_frame ;
-		motor_B += - commanded_yaw - commanded_roll_body_frame ;
-		motor_C += + commanded_yaw + commanded_pitch_body_frame ;
-		motor_D += - commanded_yaw + commanded_roll_body_frame ;
+		motor_A += + commanded_yaw - commanded_pitch ;
+		motor_B += - commanded_yaw - commanded_roll ;
+		motor_C += + commanded_yaw + commanded_pitch ;
+		motor_D += - commanded_yaw + commanded_roll ;
 
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
 		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
@@ -174,48 +162,8 @@ void motorCntrl(void)
 			commanded_yaw = 0 ;
 		}
 
-//		adjust roll and pitch commands to prevent combined tilt from exceeding 90 degrees
-		commanded_tilt[0] = - commanded_roll ;
-		commanded_tilt[1] = commanded_pitch ;
-		commanded_tilt[2] = RMAX ;
-		vector3_normalize( commanded_tilt , commanded_tilt ) ;
-		commanded_roll = commanded_tilt[0] ;
-		commanded_pitch = commanded_tilt[1] ;
-
-#ifdef CONFIG_PLUS
-
-		commanded_pitch_body_frame = commanded_pitch ;
-		commanded_roll_body_frame = commanded_roll ;
-
-#endif
-
-#ifdef CONFIG_X
-#error(TODO: this has to be redone for both dragan flier and spedix)
-		commanded_pitch_body_frame =  3*(( commanded_pitch - commanded_roll )/4) ; // approximation to .707, not critcal
-		commanded_roll_body_frame = 3*(( commanded_pitch + commanded_roll )/4) ; 
-
-#endif
-
-
-
-//		Compute the orientation of the virtual quad (which is used only for yaw control)
-//		Set the earth vertical to match in both frames (since we are interested only in yaw)
-
-		// build the commanded tilt matrix from commanded tilt vector
-		tilt_rmat[6] = commanded_tilt[0] ;
-		tilt_rmat[7] = commanded_tilt[1] ;
-		tilt_rmat[8] = commanded_tilt[2] ;
-		tilt_rmat[0] = commanded_tilt[2] ;
-		tilt_rmat[1] = 0 ;
-		tilt_rmat[2] = -commanded_tilt[0] ;
-		tilt_rmat[4] = vector3_normalize(tilt_rmat , tilt_rmat ) ;
-		long_accum.WW = __builtin_mulss( tilt_rmat[2], tilt_rmat[7] ) ;
-		long_accum.WW = long_accum.WW << 2 ;
-		tilt_rmat[3] = long_accum._.W1 ;
-		long_accum.WW = __builtin_mulss( tilt_rmat[0], -tilt_rmat[7] ) ;
-		long_accum.WW = long_accum.WW << 2 ;
-		tilt_rmat[5] = long_accum._.W1 ;
-		
+		compute_tilt_rmat( tilt_rmat , commanded_roll , commanded_pitch ) ;
+	
 		// update yaw matrix
 		yaw_step = commanded_yaw * yaw_command_gain ;
 		yaw_vector[0] = 0 ;
@@ -328,13 +276,16 @@ void motorCntrl(void)
 
 		yaw_control += yaw_error_integral._.W1 ;
 
+//#define flight_control
+		
+#ifdef flight_control		
 		// Mix in the yaw, pitch, and roll signals into the motors
 		motor_A += + yaw_control - pitch_control ;
 		motor_B += - yaw_control - roll_control ;
 		motor_C += + yaw_control + pitch_control ;
 		motor_D += - yaw_control + roll_control ;
-		
-		/* for debugging
+#else		
+		// debugging
 		long_accum.WW = __builtin_mulss(roll_error, 4000);
 		motor_A=(3000 + long_accum._.W1);	
 		long_accum.WW = __builtin_mulss(pitch_error, 4000);
@@ -342,7 +293,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulss(yaw_error, 4000);
 		motor_C=(3000 + long_accum._.W1);	
 		motor_D = 3000 ;
-		*/
+#endif
 
 //		Send the signals out to the motors
 		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
