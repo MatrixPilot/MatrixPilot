@@ -72,6 +72,7 @@
           <itemPath>../../MultiRotor/Config/options_osd.h</itemPath>
           <itemPath>../../MultiRotor/Config/options_ports.h</itemPath>
         </logicalFolder>
+        <itemPath>../rotorLib.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MultiRotor/Config"
                      displayName="MultiRotor/Config"
@@ -165,6 +166,7 @@
         <itemPath>../../MultiRotor/main.c</itemPath>
         <itemPath>../motorCntrl.c</itemPath>
         <itemPath>../telemetry.c</itemPath>
+        <itemPath>../rotorLib.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
