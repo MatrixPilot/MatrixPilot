@@ -70,7 +70,7 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
-//#define deskUDB
+//#define desktest
 #define draganflier
 
 #ifdef draganflier
@@ -86,7 +86,7 @@
 
 #endif
 
-#ifdef deskUDB
+#ifdef desktest
 // desk UDB offsets
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 438 )
@@ -210,8 +210,10 @@
 
 #define TILT_KI 0.01*0.0
 #define TILT_KP 0.08
+//#define TILT_KP 0.12
 //#define TILT_KD 0.8
 #define TILT_KD 2.0
+//#define TILT_KD 4.0
 #define TILT_KDD 0.0
 
 // Yaw PID control gains
@@ -225,8 +227,8 @@
 #define ACCEL_K 0.2
 
 #define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-#define MAX_TILT 25       // maximum roll or pitch, degrees, not to exceed 45 degrees
-//#define MAX_TILT 45
+//#define MAX_TILT 25       // maximum roll or pitch, degrees, not to exceed 45 degrees
+#define MAX_TILT 45
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!

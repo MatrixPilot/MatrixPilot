@@ -58,26 +58,29 @@ void send_debug_line( void )
 			    get_reset_flags(), trap_flags, trap_source, osc_fail_count);
 			break ;
 		case 3:
+			sprintf(debug_buffer, "MAX_TILT = %i\r\n" , MAX_TILT ) ;
+			break ;	
+		case 4:
 			sprintf(debug_buffer, "TILT_KP = %5f, YAW_KP = %5f\r\n" ,
 				TILT_KP ,
 				YAW_KP  ) ;
 			break ;	
-		case 4:
+		case 5:
 			sprintf(debug_buffer, "TILT_KI = %5f, YAW_KI = %5f\r\n" ,
 				TILT_KI ,
 				YAW_KI  ) ;
 			break ;
-		case 5:
+		case 6:
 			sprintf(debug_buffer, "TILT_KD = %5f, YAW_KD = %5f\r\n" ,
 				TILT_KD ,
 				YAW_KD ) ;
 			break ;
-		case 6:
+		case 7:
 			sprintf(debug_buffer, "TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
 				TILT_KDD ,
 				ACCEL_K ) ;
 			break ;
-		case 7:
+		case 8:
 			sprintf(debug_buffer, "hrtbt , cpu , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , yerr, yerrI , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
 			hasWrittenHeader = 1 ;			
 			break ;

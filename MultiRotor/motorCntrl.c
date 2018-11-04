@@ -276,15 +276,16 @@ void motorCntrl(void)
 
 		yaw_control += yaw_error_integral._.W1 ;
 
-#define flight_control
 		
-#ifdef flight_control		
+#ifdef draganflier		
 		// Mix in the yaw, pitch, and roll signals into the motors
 		motor_A += + yaw_control - pitch_control ;
 		motor_B += - yaw_control - roll_control ;
 		motor_C += + yaw_control + pitch_control ;
 		motor_D += - yaw_control + roll_control ;
-#else		
+#endif
+
+#ifdef desktest		
 		// debugging
 		long_accum.WW = __builtin_mulss(roll_error, 4000);
 		motor_A=(3000 + long_accum._.W1);	
