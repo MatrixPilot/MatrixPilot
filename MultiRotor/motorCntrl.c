@@ -276,7 +276,7 @@ void motorCntrl(void)
 
 		yaw_control += yaw_error_integral._.W1 ;
 
-//#define flight_control
+#define flight_control
 		
 #ifdef flight_control		
 		// Mix in the yaw, pitch, and roll signals into the motors

@@ -19,8 +19,7 @@ int commanded_tilt[3] ;
 void compute_tilt_rmat( int tilt_mat[] , int roll , int pitch )
 {
 	int Z ;
-	int one_minus_Z ;
-	int nx , ny ;
+	int one_plus_Z ;
 	commanded_tilt[0] = pitch ;
 	commanded_tilt[1] = roll ;
 	commanded_tilt[2] = RMAX ;
@@ -31,41 +30,21 @@ void compute_tilt_rmat( int tilt_mat[] , int roll , int pitch )
 	tilt_mat[7] = commanded_tilt[0] ;
 	tilt_mat[8] = commanded_tilt[2] ;
 	Z = commanded_tilt[2] ;
-	one_minus_Z = RMAX - Z ;
-	commanded_tilt[2] = 0 ;
-	vector3_normalize( commanded_tilt , commanded_tilt ) ;
-	nx = commanded_tilt[0] ;
-	ny = commanded_tilt[1] ;
-	tilt_mat[0] = fractional_product( Z , fractional_product ( ny , ny ))
-				+ fractional_product( nx , nx ) ;
-	tilt_mat[4] = fractional_product( Z , fractional_product ( nx , nx ))
-				+ fractional_product( ny , ny ) ;
-	tilt_mat[1] = fractional_product( one_minus_Z , fractional_product ( nx , ny )) ;
-	tilt_mat[3] = tilt_mat[1] ;
+	one_plus_Z = RMAX + Z ;
+	if ( one_plus_Z > 0 )
+	{
+		tilt_mat[0] = Z+__builtin_divsd( __builtin_mulss( commanded_tilt[0], commanded_tilt[0]),one_plus_Z );
+		tilt_mat[4] = Z+__builtin_divsd( __builtin_mulss( commanded_tilt[1], commanded_tilt[1]),one_plus_Z );
+		tilt_mat[1] = __builtin_divsd( __builtin_mulss( commanded_tilt[0], commanded_tilt[1]),one_plus_Z );
+		tilt_mat[3] = tilt_mat[1];
+	}
+	else
+	{
+		// this case cannot happen right now, but we may eventually want to control inverted
+		tilt_mat[0] = Z ;
+		tilt_mat[4] = Z ;
+		tilt_mat[1] = 0 ;
+		tilt_mat[3] = 0 ;
+	}
 }
-
-/*
-
-		commanded_roll = commanded_tilt[0] ;
-		commanded_pitch = commanded_tilt[1] ;
-
-		// build the commanded tilt matrix from commanded tilt vector
-		tilt_rmat[6] = commanded_tilt[0] ;
-		tilt_rmat[7] = commanded_tilt[1] ;
-		tilt_rmat[8] = commanded_tilt[2] ;
-		tilt_rmat[0] = commanded_tilt[2] ;
-		tilt_rmat[1] = 0 ;
-		tilt_rmat[2] = -commanded_tilt[0] ;
-		tilt_rmat[4] = vector3_normalize(tilt_rmat , tilt_rmat ) ;
-		long_accum.WW = __builtin_mulss( tilt_rmat[2], tilt_rmat[7] ) ;
-		long_accum.WW = long_accum.WW << 2 ;
-		tilt_rmat[3] = long_accum._.W1 ;
-		long_accum.WW = __builtin_mulss( tilt_rmat[0], -tilt_rmat[7] ) ;
-		long_accum.WW = long_accum.WW << 2 ;
-		tilt_rmat[5] = long_accum._.W1 ;
-
-		roll_error = -( correction_matrix[6]- correction_matrix[2])/2 ;
-		pitch_error = -( correction_matrix[5]- correction_matrix[7])/2 ;
-		yaw_error = -( correction_matrix[1]- correction_matrix[3])/2 ;
-
-*/
+	
