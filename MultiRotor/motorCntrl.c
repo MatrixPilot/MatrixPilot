@@ -285,6 +285,14 @@ void motorCntrl(void)
 		motor_D += - yaw_control + roll_control ;
 #endif
 
+#ifdef spedix		
+		// Mix in the yaw, pitch, and roll signals into the motors
+		motor_A += - yaw_control + ( - pitch_control + roll_control )/2 ;
+		motor_B += + yaw_control + ( - pitch_control - roll_control )/2 ;
+		motor_C += - yaw_control + ( + pitch_control - roll_control )/2 ;
+		motor_D += + yaw_control + ( + pitch_control + roll_control )/2 ;
+#endif
+
 #ifdef desktest		
 		// debugging
 		long_accum.WW = __builtin_mulss(roll_error, 4000);
@@ -305,7 +313,7 @@ void motorCntrl(void)
 	}
 }
 
-
+/*
 #ifndef CONFIG_PLUS
 #ifndef CONFIG_X
 #error ("You have not selected a configuration in options.h, select either CONFIG_PLUS or CONFIG_X.")
@@ -317,7 +325,7 @@ void motorCntrl(void)
 #error ("You have selected both CONFIG_PLUS and CONFIG_X in options.h. Select just one of them."
 #endif
 #endif
-
+*/
 
 #if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
 #error ("MAX_YAW_RATE must be between 50.0 and 500.0 degrees/second.")

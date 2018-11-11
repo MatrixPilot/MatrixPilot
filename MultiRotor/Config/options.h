@@ -71,7 +71,8 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-#define draganflier
+//#define draganflier
+#define spedix
 
 #ifdef draganflier
 // draganflier offsets
@@ -83,7 +84,17 @@
 #define XRATE_OFFSET	( -191 )
 #define YRATE_OFFSET	( 45 )
 #define ZRATE_OFFSET	( -5 )
+#endif
 
+#ifdef spedix
+// spedix offsets
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 227 )
+#define YACCEL_OFFSET	( 28 )
+#define ZACCEL_OFFSET	( -694 )
+#define XRATE_OFFSET	( -304 )
+#define YRATE_OFFSET	( -46 )
+#define ZRATE_OFFSET	( -24 )
 #endif
 
 #ifdef desktest
@@ -100,7 +111,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Select + or X flying configuration by defining exactly one of the following
 
-#define CONFIG_PLUS
+//#define CONFIG_PLUS
 //#define CONFIG_X
 
 
