@@ -208,7 +208,7 @@
 #define TILT_KDD 0.8
 */
 
-#define TILT_KI 0.01*0.0
+#define TILT_KI 0.01
 #define TILT_KP 0.08
 //#define TILT_KP 0.12
 //#define TILT_KD 0.8

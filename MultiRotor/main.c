@@ -112,7 +112,7 @@ int rmat_vertical_initialized = 0 ;
 // Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
 {
-	if((udb_heartbeat_counter%(HEARTBEAT_HZ/40))==0)
+	if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
 	{
 		int gplane[3];
 		// record vertical
@@ -138,8 +138,8 @@ void dcm_heartbeat_callback(void)
 		LED_GREEN = LED_OFF ;
 	}
 	
-	// Serial output at 20 Hz  
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/20)) == 0)
+	// Serial output at half of SERVO_HZ  
+	if ((udb_heartbeat_counter % (2*HEARTBEAT_HZ/SERVO_HZ)) == 0)
 	{
 		if ( didCalibrate )
 		{

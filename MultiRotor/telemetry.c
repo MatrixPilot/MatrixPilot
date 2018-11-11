@@ -40,6 +40,7 @@ extern int theta[3] , roll_control , pitch_control , yaw_control , accelEarth[3]
 extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[] ;
 extern int roll_error , pitch_error , yaw_error ;
 extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
+extern int target_rmat[9] ;
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -81,7 +82,7 @@ void send_debug_line( void )
 				ACCEL_K ) ;
 			break ;
 		case 8:
-			sprintf(debug_buffer, "hrtbt , cpu , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, rerrI , perr, perrI , yerr, yerrI , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
+			sprintf(debug_buffer, "hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , r6cmd, r7cmd, w0 , w1 , w2 , rfb , pfb , yfb , rerr , perr, yerr , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
 			hasWrittenHeader = 1 ;			
 			break ;
 		default:
@@ -91,13 +92,16 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
-			rmat[6] , rmat[7] , 
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] ,
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] ,
+			rmat[6] , rmat[7] , target_rmat[6] , target_rmat[7] ,
 			omegagyro[0] , omegagyro[1] , omegagyro[2] , 
 			roll_control , pitch_control, yaw_control ,
-			roll_error , roll_error_integral._.W1 , pitch_error , pitch_error_integral._.W1 ,
-			yaw_error , yaw_error_integral._.W1 ,
+			roll_error , pitch_error , yaw_error , 
 			commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
 			accel_feedback ) ;
 	}

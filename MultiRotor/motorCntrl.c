@@ -68,7 +68,7 @@ union longww yaw_error_integral = { 0 } ;
 
 int target_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 
-const int yaw_command_gain = ((long) MAX_YAW_RATE )*(0.03) ;
+const int yaw_command_gain = ((long) MAX_YAW_RATE )*(1.2/SERVO_HZ) ;
 
 #define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/SERVO_HZ)) // integration multiplier for gyros
 static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
@@ -195,7 +195,7 @@ void motorCntrl(void)
 		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback ;
 
 //		Compute the error intetgrals
-		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/40.), roll_error ))>>5) ;
+		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/SERVO_HZ), roll_error ))>>5) ;
 		if ( roll_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
 		{
 			roll_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
@@ -205,7 +205,7 @@ void motorCntrl(void)
 			roll_error_integral.WW =  - MAXIMUM_ERROR_INTEGRAL ;
 		}
 
-		pitch_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/40.), pitch_error ))>>5) ;
+		pitch_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/SERVO_HZ), pitch_error ))>>5) ;
 		if ( pitch_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
 		{
 			pitch_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
@@ -215,7 +215,7 @@ void motorCntrl(void)
 			pitch_error_integral.WW =  - MAXIMUM_ERROR_INTEGRAL ;
 		}
 
-		yaw_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*YAW_KI/40.), yaw_error ))>>5) ;
+		yaw_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*YAW_KI/SERVO_HZ), yaw_error ))>>5) ;
 		if ( yaw_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
 		{
 			yaw_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
