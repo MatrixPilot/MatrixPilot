@@ -132,8 +132,8 @@ void dcm_heartbeat_callback(void)
 		LED_GREEN = LED_OFF ;
 	}
 	
-	// Serial output at half of SERVO_HZ  
-	if ((udb_heartbeat_counter % (2*HEARTBEAT_HZ/SERVO_HZ)) == 0)
+	// Serial output one fifth of SERVO_HZ  
+	if ((udb_heartbeat_counter % (5*HEARTBEAT_HZ/SERVO_HZ)) == 0)
 	{
 		if ( didCalibrate )
 		{
