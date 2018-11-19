@@ -41,10 +41,13 @@ int theta[3] ;
 extern boolean didCalibrate ;
 extern int commanded_tilt_gain ;
 extern void compute_tilt_rmat( int [] , int , int );
+void compute_altitude_control(void);
 
 int roll_control ;
 int pitch_control ;
 int yaw_control ;
+int altitude_control = 0;
+int altitude = 0 ;
 int accel_feedback ;
 int theta_previous[2] = { 0 , 0 } ;
 int theta_delta[2] ;
@@ -285,12 +288,13 @@ void motorCntrl(void)
 		motor_D += - yaw_control + roll_control ;
 #endif
 
-#ifdef spedix		
+#ifdef spedix	
+		compute_altitude_control();
 		// Mix in the yaw, pitch, and roll signals into the motors
-		motor_A += - yaw_control + ( - pitch_control + roll_control )/2 ;
-		motor_B += + yaw_control + ( - pitch_control - roll_control )/2 ;
-		motor_C += - yaw_control + ( + pitch_control - roll_control )/2 ;
-		motor_D += + yaw_control + ( + pitch_control + roll_control )/2 ;
+		motor_A += altitude_control - yaw_control + ( - pitch_control + roll_control )/2 ;
+		motor_B += altitude_control + yaw_control + ( - pitch_control - roll_control )/2 ;
+		motor_C += altitude_control - yaw_control + ( + pitch_control - roll_control )/2 ;
+		motor_D += altitude_control + yaw_control + ( + pitch_control + roll_control )/2 ;
 #endif
 
 #ifdef desktest		
@@ -317,7 +321,6 @@ void motorCntrl(void)
 		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
 		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
 		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
-
 	}
 }
 
@@ -334,6 +337,29 @@ void motorCntrl(void)
 #endif
 #endif
 */
+#define MAX_ALT_CONTROL 200
+void compute_altitude_control(void)
+{
+	altitude = udb_pwIn[5] ;
+	if (( pwManual[THROTTLE_INPUT_CHANNEL] > 2500)&&(altitude>0)&&(altitude<3000))
+	{
+		altitude_control = 1500 - altitude ;
+		if ( altitude_control > MAX_ALT_CONTROL )
+		{
+			altitude_control = MAX_ALT_CONTROL;
+		}
+		if ( altitude_control < - MAX_ALT_CONTROL )
+		{
+			altitude_control = - MAX_ALT_CONTROL;
+		}
+		altitude_control = altitude_control/10 ;
+	}
+	else
+	{
+		altitude = 0 ;
+		altitude_control = 0 ;
+	}
+}
 
 #if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
 #error ("MAX_YAW_RATE must be between 50.0 and 500.0 degrees/second.")
