@@ -295,6 +295,13 @@ void motorCntrl(void)
 
 #ifdef desktest		
 		// debugging
+		motor_A = udb_pwIn[1];
+		motor_B = udb_pwIn[2];
+		motor_C = udb_pwIn[3];
+		motor_D = udb_pwIn[4];
+		udb_pwOut[5] = udb_servo_pulsesat( udb_pwIn[5]/10 + 2000 ) ;
+		udb_pwOut[6] = udb_servo_pulsesat( udb_pwIn[5] ) ;
+		/*
 		long_accum.WW = __builtin_mulss(roll_error, 4000);
 		motor_A=(3000 + long_accum._.W1);	
 		long_accum.WW = __builtin_mulss(pitch_error, 4000);
@@ -302,6 +309,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulss(yaw_error, 4000);
 		motor_C=(3000 + long_accum._.W1);	
 		motor_D = 3000 ;
+		*/
 #endif
 
 //		Send the signals out to the motors

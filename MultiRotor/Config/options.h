@@ -75,8 +75,9 @@
 #define spedix
 
 #ifdef draganflier
+#define NUM_INPUTS	4
+#define NUM_OUTPUTS	4
 // draganflier offsets
-
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 154 )
 #define YACCEL_OFFSET	( 63 )
@@ -87,6 +88,8 @@
 #endif
 
 #ifdef spedix
+#define NUM_INPUTS	5
+#define NUM_OUTPUTS	4
 // spedix offsets
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 227 )
@@ -98,6 +101,8 @@
 #endif
 
 #ifdef desktest
+#define NUM_INPUTS	5
+#define NUM_OUTPUTS	6
 // desk UDB offsets
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 438 )
@@ -152,7 +157,6 @@
 // NUM_INPUTS: Set to 0-5 
 //   1-4 enables only the first 1-4 of the 4 standard input channels
 //   5 also enables E8 as the 5th input channel
-#define NUM_INPUTS	4
 
 #define ROLL_INPUT_CHANNEL					CHANNEL_1
 #define PITCH_INPUT_CHANNEL					CHANNEL_2
@@ -164,7 +168,6 @@
 //   4 also enables E0 as the 4th output channel on UDB3
 //   5 also enables E2 as the 5th output channel on UDB3
 //   6 also enables E4 as the 6th output channel on UDB3
-#define NUM_OUTPUTS	4
 
 // Channel numbers for each output
 // Use as is, or edit to match your setup.

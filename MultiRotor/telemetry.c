@@ -82,7 +82,7 @@ void send_debug_line( void )
 				ACCEL_K ) ;
 			break ;
 		case 8:
-			sprintf(debug_buffer, "hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , r6cmd, r7cmd, w0 , w1 , w2 , rfb , pfb , yfb , rerr , perr, yerr , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
+			sprintf(debug_buffer, "lidar, hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , r6cmd, r7cmd, w0 , w1 , w2 , rfb , pfb , yfb , rerr , perr, yerr , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
 			hasWrittenHeader = 1 ;			
 			break ;
 		default:
@@ -92,7 +92,8 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			udb_pwIn[5] ,
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
 			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
