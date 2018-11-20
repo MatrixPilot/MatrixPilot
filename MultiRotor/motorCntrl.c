@@ -339,23 +339,35 @@ void motorCntrl(void)
 #endif
 #endif
 */
-#define MAX_ALT_CONTROL 200
+#define MAX_RATE_CONTROL 100
 void compute_altitude_control(void)
 {
 	int altitude_change ;
+	int rate_control ;
 	altitude = udb_pwIn[5] ;
-	if (( pwManual[THROTTLE_INPUT_CHANNEL] > 2500)&&(altitude>0)&&(altitude<3000))
+	if (( udb_pwIn[THROTTLE_INPUT_CHANNEL] > 2200)&&(altitude>0)&&(altitude<3000))
 	{
+		altitude = __builtin_divsd( __builtin_mulss( altitude , rmat[8] ) , RMAX) ;
 		altitude_change = altitude - previous_altitude ;
 		previous_altitude = altitude ;
-		climb_rate = altitude_change + __builtin_divsd (__builtin_mulss(climb_rate,49),50);
+		climb_rate = 4*altitude_change + __builtin_divsd( __builtin_mulss( climb_rate , 46 ) , 50 );
+		rate_control = -climb_rate/5 ;
+		if(rate_control>MAX_RATE_CONTROL)
+		{
+			rate_control = MAX_RATE_CONTROL ;
+		}
+		if(rate_control< -MAX_RATE_CONTROL)
+		{
+			rate_control = -MAX_RATE_CONTROL ;
+		}
+		altitude_control = rate_control ;
 	}
 	else
 	{
-		altitude = 0 ;
+		altitude = previous_altitude ;
 		altitude_control = 0 ;
 	}
-	altitude_control = 0 ;
+
 }
 
 #if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
