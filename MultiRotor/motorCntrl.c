@@ -48,6 +48,8 @@ int pitch_control ;
 int yaw_control ;
 int altitude_control = 0;
 int altitude = 0 ;
+int previous_altitude = 0 ;
+int climb_rate = 0 ;
 int accel_feedback ;
 int theta_previous[2] = { 0 , 0 } ;
 int theta_delta[2] ;
@@ -340,25 +342,20 @@ void motorCntrl(void)
 #define MAX_ALT_CONTROL 200
 void compute_altitude_control(void)
 {
+	int altitude_change ;
 	altitude = udb_pwIn[5] ;
 	if (( pwManual[THROTTLE_INPUT_CHANNEL] > 2500)&&(altitude>0)&&(altitude<3000))
 	{
-		altitude_control = 1500 - altitude ;
-		if ( altitude_control > MAX_ALT_CONTROL )
-		{
-			altitude_control = MAX_ALT_CONTROL;
-		}
-		if ( altitude_control < - MAX_ALT_CONTROL )
-		{
-			altitude_control = - MAX_ALT_CONTROL;
-		}
-		altitude_control = altitude_control/10 ;
+		altitude_change = altitude - previous_altitude ;
+		previous_altitude = altitude ;
+		climb_rate = altitude_change + __builtin_divsd (__builtin_mulss(climb_rate,49),50);
 	}
 	else
 	{
 		altitude = 0 ;
 		altitude_control = 0 ;
 	}
+	altitude_control = 0 ;
 }
 
 #if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
