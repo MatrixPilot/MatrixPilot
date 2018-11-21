@@ -42,6 +42,7 @@ extern boolean didCalibrate ;
 extern int commanded_tilt_gain ;
 extern void compute_tilt_rmat( int [] , int , int );
 void compute_altitude_control(void);
+extern int lidar_pulses ;
 
 int roll_control ;
 int pitch_control ;
@@ -301,6 +302,7 @@ void motorCntrl(void)
 
 #ifdef desktest		
 		// debugging
+		compute_altitude_control();
 		motor_A = udb_pwIn[1];
 		motor_B = udb_pwIn[2];
 		motor_C = udb_pwIn[3];
@@ -344,14 +346,13 @@ void compute_altitude_control(void)
 {
 	int altitude_change ;
 	int rate_control ;
-	altitude = udb_pwIn[5] ;
-	if (( udb_pwIn[THROTTLE_INPUT_CHANNEL] > 2200)&&(altitude>0)&&(altitude<3000))
+	if (lidar_pulses>5)
 	{
-		altitude = __builtin_divsd( __builtin_mulss( altitude , rmat[8] ) , RMAX) ;
+		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX) ;
 		altitude_change = altitude - previous_altitude ;
 		previous_altitude = altitude ;
-		climb_rate = 4*altitude_change + __builtin_divsd( __builtin_mulss( climb_rate , 46 ) , 50 );
-		rate_control = -climb_rate/5 ;
+		climb_rate = 4*altitude_change + __builtin_divsd( __builtin_mulss( climb_rate , 30 ) , 50 );
+		rate_control = -climb_rate ;
 		if(rate_control>MAX_RATE_CONTROL)
 		{
 			rate_control = MAX_RATE_CONTROL ;
@@ -360,7 +361,14 @@ void compute_altitude_control(void)
 		{
 			rate_control = -MAX_RATE_CONTROL ;
 		}
-		altitude_control = rate_control ;
+		if((altitude > 500 )&&(pwManual[THROTTLE_INPUT_CHANNEL]>2300))
+		{
+			altitude_control = rate_control ;
+		}
+		else
+		{
+			altitude_control = 0 ;
+		}
 	}
 	else
 	{

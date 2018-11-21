@@ -232,6 +232,28 @@ static void set_udb_pwIn(int pwm, int index)
 
 #if (USE_PPM_INPUT == 0)
 
+int lidar_pulses = 0 ;
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
+{
+	indicate_loading_inter;
+	set_ipl_on_output_pin;
+	interrupt_save_set_corcon;
+	static uint16_t rise = 0;
+	uint16_t time = 0;
+	_IC5IF = 0;
+	while (IC5CONbits.ICBNE)
+		time = IC5BUF;
+	if (IC_PIN5)
+		rise = time;
+	else
+	{
+		lidar_pulses++ ;
+		set_udb_pwIn(time - rise, 5);
+	}
+	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
+}
+
 #define _IC_HANDLER(x, y, z) \
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 { \
@@ -256,7 +278,7 @@ IC_HANDLER(1, REGTOK1, IC_PIN1);
 IC_HANDLER(2, REGTOK1, IC_PIN2);
 IC_HANDLER(3, REGTOK1, IC_PIN3);
 IC_HANDLER(4, REGTOK1, IC_PIN4);
-IC_HANDLER(5, REGTOK1, IC_PIN5);
+//IC_HANDLER(5, REGTOK1, IC_PIN5);
 IC_HANDLER(6, REGTOK1, IC_PIN6);
 IC_HANDLER(7, REGTOK1, IC_PIN7);
 #if (USE_SONAR_INPUT != 8 && USE_CASTLE_LINK_THROTTLE != 1)

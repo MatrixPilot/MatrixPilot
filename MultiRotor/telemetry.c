@@ -42,6 +42,7 @@ extern int roll_error , pitch_error , yaw_error ;
 extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
 extern int target_rmat[9] ;
 extern int altitude , altitude_control , climb_rate ;
+extern int lidar_pulses ;
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -83,7 +84,7 @@ void send_debug_line( void )
 				ACCEL_K ) ;
 			break ;
 		case 8:
-			sprintf(debug_buffer, "alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , r6cmd, r7cmd, w0 , w1 , w2 , rfb , pfb , yfb , rerr , perr, yerr , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
+			sprintf(debug_buffer, "pulses, alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , r6cmd, r7cmd, w0 , w1 , w2 , rfb , pfb , yfb , rerr , perr, yerr , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
 			hasWrittenHeader = 1 ;			
 			break ;
 		default:
@@ -93,8 +94,8 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
-			altitude , climb_rate , altitude_control , 
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			lidar_pulses , altitude , climb_rate , altitude_control , 
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
 			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
@@ -106,6 +107,7 @@ void send_debug_line( void )
 			roll_error , pitch_error , yaw_error , 
 			commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
 			accel_feedback ) ;
+		lidar_pulses = 0 ;
 	}
 	
 	udb_serial_start_sending_data() ;
