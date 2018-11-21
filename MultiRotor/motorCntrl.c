@@ -351,7 +351,7 @@ void compute_altitude_control(void)
 	int proportional_control ;
 	number_pulses = lidar_pulses ;
 	lidar_pulses = 0 ;
-	if (number_pulses>3)
+	if (number_pulses>1)
 	{
 		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX) ;
 		altitude_change = altitude - previous_altitude ;

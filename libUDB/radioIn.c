@@ -249,7 +249,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	else
 	{
 		lidar_pulses++ ;
-		lidar_pulse_width = lidar_pulse_width + ((uint16_t)( time - rise ))/8 - lidar_pulse_width/8 ;
+		lidar_pulse_width = lidar_pulse_width + ((uint16_t)( time - rise ))/4 - lidar_pulse_width/4 ;
 		set_udb_pwIn(lidar_pulse_width , 5);
 	}
 	interrupt_restore_corcon;
