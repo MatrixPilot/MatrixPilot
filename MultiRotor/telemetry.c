@@ -42,7 +42,7 @@ extern int roll_error , pitch_error , yaw_error ;
 extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
 extern int target_rmat[9] ;
 extern int altitude , altitude_control , climb_rate ;
-extern int lidar_pulses ;
+extern int number_pulses ;
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -95,7 +95,7 @@ void send_debug_line( void )
 	else
 	{
 		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
-			lidar_pulses , altitude , climb_rate , altitude_control , 
+			number_pulses , altitude , climb_rate , altitude_control , 
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
 			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
@@ -107,7 +107,6 @@ void send_debug_line( void )
 			roll_error , pitch_error , yaw_error , 
 			commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
 			accel_feedback ) ;
-		lidar_pulses = 0 ;
 	}
 	
 	udb_serial_start_sending_data() ;
