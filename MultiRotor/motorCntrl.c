@@ -351,7 +351,7 @@ void compute_altitude_control(void)
 		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX) ;
 		altitude_change = altitude - previous_altitude ;
 		previous_altitude = altitude ;
-		climb_rate = 4*altitude_change + __builtin_divsd( __builtin_mulss( climb_rate , 30 ) , 50 );
+		climb_rate = 50*altitude_change ;
 		rate_control = -climb_rate ;
 		if(rate_control>MAX_RATE_CONTROL)
 		{
@@ -363,7 +363,8 @@ void compute_altitude_control(void)
 		}
 		if((altitude > 500 )&&(pwManual[THROTTLE_INPUT_CHANNEL]>2300))
 		{
-			altitude_control = rate_control ;
+			//altitude_control = rate_control ;
+			altitude_control = 0 ;
 		}
 		else
 		{
