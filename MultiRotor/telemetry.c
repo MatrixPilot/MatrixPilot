@@ -84,8 +84,8 @@ void send_debug_line( void )
 				ACCEL_K ) ;
 			break ;
 		case 8:
-			sprintf(debug_buffer, "pulses, alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , r6cmd, r7cmd, w0 , w1 , w2 , rfb , pfb , yfb , rerr , perr, yerr , rcmd , pcmd, ycmd, thr , accfb\r\n" ) ;
-			hasWrittenHeader = 1 ;			
+			sprintf(debug_buffer, "pulses, alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+			hasWrittenHeader = 1 ;
 			break ;
 		default:
 			hasWrittenHeader = 1 ;
@@ -94,19 +94,20 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i ,%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 			number_pulses , altitude , climb_rate , altitude_control , 
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
 			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
 			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] ,
 			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] ,
-			rmat[6] , rmat[7] , target_rmat[6] , target_rmat[7] ,
+			rmat[6] , rmat[7] , 
+			// target_rmat[6] , target_rmat[7] ,
 			omegagyro[0] , omegagyro[1] , omegagyro[2] , 
 			roll_control , pitch_control, yaw_control ,
-			roll_error , pitch_error , yaw_error , 
-			commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
-			accel_feedback ) ;
+			roll_error , pitch_error , yaw_error ) ;
+			//commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
+			//accel_feedback ) ;
 	}
 	
 	udb_serial_start_sending_data() ;

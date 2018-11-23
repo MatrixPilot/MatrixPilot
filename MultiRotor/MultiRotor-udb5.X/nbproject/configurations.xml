@@ -6,7 +6,6 @@
                    projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
-        <itemPath>../../libDCM/deadReckoning.h</itemPath>
         <itemPath>../../libDCM/estAltitude.h</itemPath>
         <itemPath>../../libDCM/estLocation.h</itemPath>
         <itemPath>../../libDCM/estWind.h</itemPath>
@@ -21,6 +20,7 @@
         <itemPath>../../libDCM/mathlib.h</itemPath>
         <itemPath>../../libDCM/mathlibNAV.h</itemPath>
         <itemPath>../../libDCM/rmat.h</itemPath>
+        <itemPath>../../libDCM/deadReckoning_lidar.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ADchannel.h</itemPath>
@@ -87,7 +87,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/deadReckoning.c</itemPath>
         <itemPath>../../libDCM/estAirspeed.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
         <itemPath>../../libDCM/estLocation.c</itemPath>
@@ -105,6 +104,7 @@
         <itemPath>../../libDCM/mathlib.c</itemPath>
         <itemPath>../../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../../libDCM/rmat.c</itemPath>
+        <itemPath>../../libDCM/deadReckoning_lidar.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/24LC256.c</itemPath>
