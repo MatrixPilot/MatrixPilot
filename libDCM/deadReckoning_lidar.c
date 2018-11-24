@@ -39,7 +39,10 @@
 #define MAX16 (4.0*RMAX)
 
 // seconds
-#define DR_TAU 2.5
+#define DR_TAU 2.0
+//#define DR_TAU 2.5
+//#define DR_TAU 4.0
+//#define DR_TAU 10.0
 
 // seconds * (cm/sec^2 / count) ??? is G always represented as cm/sec^2 ?
 // GRAVITYM is 980 cm/sec^2, GRAVITY is 2000 counts
@@ -68,6 +71,10 @@ union longww IMUvelocityz = { 0 };
 int16_t forward_ground_speed = 0 ;
 int16_t IMU_altitude = 0 ;
 int16_t IMU_climb = 0 ;
+extern int16_t altitude ;
+extern int16_t climb_rate ;
+extern int16_t pwManual[NUM_INPUTS+1] ;
+extern int16_t number_pulses ;
 
 // location, as estimated by the IMU
 // high word is meters, low word is fractional meters
@@ -99,13 +106,42 @@ void dead_reckon(void)
 	//if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
 	{
 		// compute location and velocity errors
-		locationErrorEarth[0] = - IMUlocationx._.W1;
-		locationErrorEarth[1] = - IMUlocationy._.W1;
-		locationErrorEarth[2] = - IMUlocationz._.W1;
+		if (abs(pwManual[THROTTLE_INPUT_CHANNEL]-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< 200 )
+		{
+			// sitting on the ground
+			locationErrorEarth[0] = - IMUlocationx._.W1;
+			locationErrorEarth[1] = - IMUlocationy._.W1;
+			locationErrorEarth[2] = - IMUlocationz._.W1;
 
-		velocityErrorEarth[0] = - IMUvelocityx._.W1;
-		velocityErrorEarth[1] = - IMUvelocityy._.W1;
-		velocityErrorEarth[2] = - IMUvelocityz._.W1;
+			velocityErrorEarth[0] = - IMUvelocityx._.W1;
+			velocityErrorEarth[1] = - IMUvelocityy._.W1;
+			velocityErrorEarth[2] = - IMUvelocityz._.W1;
+		}
+		else
+		{
+			if (number_pulses>3)
+			{
+				// use LIDAR for altitude
+				locationErrorEarth[0] = - IMUlocationx._.W1;
+				locationErrorEarth[1] = - IMUlocationy._.W1;
+				locationErrorEarth[2] = altitude - IMUlocationz._.W1;
+
+				velocityErrorEarth[0] = - IMUvelocityx._.W1;
+				velocityErrorEarth[1] = - IMUvelocityy._.W1;
+				velocityErrorEarth[2] = climb_rate - IMUvelocityz._.W1;
+			}
+			else
+			{
+				// true dead reckoning, ignore the LIDAR
+				locationErrorEarth[0] = - IMUlocationx._.W1;
+				locationErrorEarth[1] = - IMUlocationy._.W1;
+				locationErrorEarth[2] = 0 ;
+
+				velocityErrorEarth[0] = - IMUvelocityx._.W1;
+				velocityErrorEarth[1] = - IMUvelocityy._.W1;
+				velocityErrorEarth[2] = 0 ;
+			}
+		}
 		
 		// compute the integral term for the acceleration bias compensation
 		IMUintegralAccelerationx.WW += __builtin_mulss(((int16_t)(DR_I_GAIN)), velocityErrorEarth[0]);

@@ -70,9 +70,9 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
-#define desktest
+//#define desktest
 //#define draganflier
-//#define spedix
+#define spedix
 
 #ifdef draganflier
 #define NUM_INPUTS	4

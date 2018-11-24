@@ -55,6 +55,8 @@ int climb_rate = 0 ;
 int accel_feedback ;
 int theta_previous[2] = { 0 , 0 } ;
 int theta_delta[2] ;
+extern int IMU_climb ;
+extern int IMU_altitude ;
 
 int pwManual[NUM_INPUTS+1] ;
 int commanded_roll ;
@@ -351,48 +353,45 @@ void compute_altitude_control(void)
 	int proportional_control ;
 	number_pulses = lidar_pulses ;
 	lidar_pulses = 0 ;
-	if (number_pulses>1)
+	if (number_pulses>3)
 	{
-		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX) ;
+		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX)/2 ;
 		altitude_change = altitude - previous_altitude ;
 		previous_altitude = altitude ;
-		climb_rate = altitude_change ; // it is actually 1/50 of climb rate
-		rate_control = -10*climb_rate ;
-		proportional_control = (1800-altitude)/20 ;
-		if(rate_control>MAX_RATE_CONTROL)
-		{
-			rate_control = MAX_RATE_CONTROL ;
-		}
-		if(rate_control< -MAX_RATE_CONTROL)
-		{
-			rate_control = -MAX_RATE_CONTROL ;
-		}
+		climb_rate = 50*altitude_change ; // it is actually 1/50 of climb rate
+		//rate_control = - climb_rate/2 ;
+		//proportional_control = (900-altitude)/10 ;
+	}
+	rate_control = - IMU_climb/2 ;
+	proportional_control = (900-IMU_altitude)/10 ; 
+	if(rate_control>MAX_RATE_CONTROL)
+	{
+		rate_control = MAX_RATE_CONTROL ;
+	}
+	if(rate_control< -MAX_RATE_CONTROL)
+	{
+		rate_control = -MAX_RATE_CONTROL ;
+	}
 		
-		if(proportional_control>MAX_PROP_CONTROL)
-		{
-			proportional_control = MAX_PROP_CONTROL ;
-		}
-		if(proportional_control< -MAX_PROP_CONTROL)
-		{
-			proportional_control = -MAX_PROP_CONTROL ;
-		}
+	if(proportional_control>MAX_PROP_CONTROL)
+	{
+		proportional_control = MAX_PROP_CONTROL ;
+	}
+	if(proportional_control< -MAX_PROP_CONTROL)
+	{
+		proportional_control = -MAX_PROP_CONTROL ;
+	}
 		
-		if((altitude > 500 )&&(pwManual[THROTTLE_INPUT_CHANNEL]>2300))
-		{
-			altitude_control = rate_control + proportional_control ;
-			//altitude_control = 0 ;
-		}
-		else
-		{
-			altitude_control = 0 ;
-		}
+	if((IMU_altitude > 0 )&&(pwManual[THROTTLE_INPUT_CHANNEL]>2300))
+	{
+		altitude_control = rate_control + proportional_control ;
+		//altitude_control = 0 ;
 	}
 	else
 	{
-		altitude = previous_altitude ;
 		altitude_control = 0 ;
 	}
-
+	
 }
 
 #if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
