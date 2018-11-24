@@ -56,6 +56,7 @@
 
 // 1/seconds
 #define ONE_OVER_TAU (uint16_t)(MAX16/DR_TAU)
+#define DR_I_GAIN (DR_FILTER_GAIN/DR_TAU)
 
 int16_t dead_reckon_clock = DR_PERIOD;
 
@@ -97,63 +98,45 @@ void dead_reckon(void)
 	if(1)
 	//if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
 	{
-		// integrate the accelerometers to update IMU velocity
-		IMUintegralAccelerationx.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[0]);
-		IMUintegralAccelerationy.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[1]);
-		IMUintegralAccelerationz.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[2]);
+		// compute location and velocity errors
+		locationErrorEarth[0] = - IMUlocationx._.W1;
+		locationErrorEarth[1] = - IMUlocationy._.W1;
+		locationErrorEarth[2] = - IMUlocationz._.W1;
 
+		velocityErrorEarth[0] = - IMUvelocityx._.W1;
+		velocityErrorEarth[1] = - IMUvelocityy._.W1;
+		velocityErrorEarth[2] = - IMUvelocityz._.W1;
+		
+		// compute the integral term for the acceleration bias compensation
+		IMUintegralAccelerationx.WW += __builtin_mulss(((int16_t)(DR_I_GAIN)), velocityErrorEarth[0]);
+		IMUintegralAccelerationy.WW += __builtin_mulss(((int16_t)(DR_I_GAIN)), velocityErrorEarth[1]);
+		IMUintegralAccelerationz.WW += __builtin_mulss(((int16_t)(DR_I_GAIN)), velocityErrorEarth[2]);
+
+		// integrate the raw acceleration
+		IMUvelocityx.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[0]);
+		IMUvelocityy.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[1]);
+		IMUvelocityz.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[2]);
+		
+		// apply the proportional term for the acceleration bias compensation
+		IMUvelocityx.WW += __builtin_mulss(2*DR_FILTER_GAIN, velocityErrorEarth[0]);
+		IMUvelocityy.WW += __builtin_mulss(2*DR_FILTER_GAIN, velocityErrorEarth[1]);
+		IMUvelocityz.WW += __builtin_mulss(2*DR_FILTER_GAIN, velocityErrorEarth[2]);
+		
+		// apply the integral term for the acceleration bias compensation
+		IMUvelocityx.WW += __builtin_mulss(DR_TIMESTEP*MAX16,IMUintegralAccelerationx._.W1);
+		IMUvelocityy.WW += __builtin_mulss(DR_TIMESTEP*MAX16,IMUintegralAccelerationy._.W1);
+		IMUvelocityz.WW += __builtin_mulss(DR_TIMESTEP*MAX16,IMUintegralAccelerationz._.W1);
+		
 		// integrate IMU velocity to update the IMU location	
-		IMUlocationx.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUintegralAccelerationx._.W1)>>4);
-		IMUlocationy.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUintegralAccelerationy._.W1)>>4);
-		IMUlocationz.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUintegralAccelerationz._.W1)>>4);
+		IMUlocationx.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUvelocityx._.W1)>>4);
+		IMUlocationy.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUvelocityy._.W1)>>4);
+		IMUlocationz.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUvelocityz._.W1)>>4);
 
-		if(1)
-		//if (dead_reckon_clock > 0)
-		// apply drift adjustments only while valid GPS data is in force.
-		// This is done with a countdown clock that gets reset each time new data comes in.
-		{
-			//dead_reckon_clock --;
-
-			IMUintegralAccelerationx.WW += __builtin_mulss(DR_FILTER_GAIN, velocityErrorEarth[0]);
-			IMUintegralAccelerationy.WW += __builtin_mulss(DR_FILTER_GAIN, velocityErrorEarth[1]);
-			IMUintegralAccelerationz.WW += __builtin_mulss(DR_FILTER_GAIN, velocityErrorEarth[2]);
-
-			IMUlocationx.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[0]);
-			IMUlocationy.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[1]);
-			IMUlocationz.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[2]);
-
-			IMUvelocityx.WW = IMUintegralAccelerationx.WW +
-			                  __builtin_mulus(ONE_OVER_TAU, locationErrorEarth[0]);
-			IMUvelocityy.WW = IMUintegralAccelerationy.WW +
-			                  __builtin_mulus(ONE_OVER_TAU, locationErrorEarth[1]);
-			IMUvelocityz.WW = IMUintegralAccelerationz.WW +
-			                  __builtin_mulus(ONE_OVER_TAU, locationErrorEarth[2]);
-
-		}
-		else  // GPS has gotten disconnected
-		{
-			yaw_drift_reset();
-			dcm_flags._.gps_history_valid = 0; // restart GPS history variables
-			IMUvelocityx.WW = IMUintegralAccelerationx.WW;
-			IMUvelocityy.WW = IMUintegralAccelerationy.WW;
-			IMUvelocityz.WW = IMUintegralAccelerationz.WW;
-		}
-
-		//if (gps_nav_valid() && (dcm_flags._.reckon_req == 1))
-		if(1)
-		{
-			// compute error indications and restart the dead reckoning clock to apply them
-			//dcm_flags._.reckon_req = 0;
-			//dead_reckon_clock = DR_PERIOD;
-
-			locationErrorEarth[0] = - IMUlocationx._.W1;
-			locationErrorEarth[1] = - IMUlocationy._.W1;
-			locationErrorEarth[2] = - IMUlocationz._.W1;
-
-			velocityErrorEarth[0] = - IMUintegralAccelerationx._.W1;
-			velocityErrorEarth[1] = - IMUintegralAccelerationy._.W1;
-			velocityErrorEarth[2] = - IMUintegralAccelerationz._.W1;
-		}
+		// apply the location bias compensation
+		IMUlocationx.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[0]);
+		IMUlocationy.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[1]);
+		IMUlocationz.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[2]);
+		
 	}
 	else
 	{
@@ -175,21 +158,4 @@ void dead_reckon(void)
 	IMU_climb = air_speed_z ;
 	IMU_altitude = IMUlocationz._.W1 ;
 
-	//accum.WW = ((__builtin_mulss(-IMUintegralAccelerationx._.W1, rmat[1])
-	//                         + __builtin_mulss( IMUintegralAccelerationy._.W1, rmat[4])) << 2);
-	//forward_ground_speed = accum._.W1 ;
-
-	//air_speed_3DIMU = vector3_mag(air_speed_x, air_speed_y, air_speed_z);
-
-	//accum.WW   = __builtin_mulsu(air_speed_x, 37877);
-	//energy.WW  = __builtin_mulss(accum._.W1, accum._.W1);
-
-	//accum.WW   = __builtin_mulsu(air_speed_y, 37877);
-	//energy.WW += __builtin_mulss(accum._.W1, accum._.W1);
-
-	accum.WW   = __builtin_mulsu(air_speed_z, 37877);
-	energy.WW += __builtin_mulss(accum._.W1, accum._.W1);
-
-	energy.WW += IMUlocationz.WW;
-	total_energy = energy._.W1;
 }
