@@ -83,8 +83,29 @@ void send_debug_line( void )
 			sprintf(debug_buffer, "TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
 				TILT_KDD ,
 				ACCEL_K ) ;
-			break ;
+			break ;			
 		case 8:
+			sprintf(debug_buffer, ROTOR_CRAFT );
+			break ;
+		case 9:
+			sprintf(debug_buffer, "SERVO_HZ = %i , DR_TAU = %5f\r\n" , SERVO_HZ , DR_TAU );
+			break ;
+		case 10:
+			sprintf(debug_buffer, "MAX_ALT_RATE_CONTROL = %i, MAX_ALT_PROP_CONTROL = %i\r\n" ,
+				MAX_ALT_RATE_CONTROL ,
+				MAX_ALT_PROP_CONTROL ) ;
+			break ;			
+		case 11:
+			sprintf(debug_buffer, "MIN_LIDAR_PULSE_THRESH = %i, IMU_CLIMB_RATE_DIVISOR = %i\r\n" ,
+				MIN_LIDAR_PULSE_THRESH ,
+				IMU_CLIMB_RATE_DIVISOR ) ;
+			break ;				
+		case 12:
+			sprintf(debug_buffer, "IMU_ALT_DIVISOR = %i, TARGET_ALTITUDE = %i\r\n" ,
+				IMU_ALT_DIVISOR ,
+				TARGET_ALTITUDE ) ;
+			break ;			
+		case 13:
 			sprintf(debug_buffer, "IMU_alt , IMU_climb , pulses, alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			hasWrittenHeader = 1 ;
 			break ;

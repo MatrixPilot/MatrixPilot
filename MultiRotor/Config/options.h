@@ -26,7 +26,13 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
-
+#define MAX_ALT_RATE_CONTROL 200
+#define MAX_ALT_PROP_CONTROL 50
+#define MIN_LIDAR_PULSE_THRESH 3
+#define IMU_CLIMB_RATE_DIVISOR 2
+#define IMU_ALT_DIVISOR 10
+#define TARGET_ALTITUDE 900
+#define DR_TAU 2.0
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -75,6 +81,7 @@
 #define spedix
 
 #ifdef draganflier
+#define ROTOR_CRAFT "draganflier\r\n"
 #define NUM_INPUTS	4
 #define NUM_OUTPUTS	4
 // draganflier offsets
@@ -88,6 +95,7 @@
 #endif
 
 #ifdef spedix
+#define ROTOR_CRAFT "spedix, nov. 28, 2018\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	4
 // spedix offsets
@@ -101,6 +109,7 @@
 #endif
 
 #ifdef desktest
+#define ROTOR_CRAFT "desk\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	6
 // desk UDB offsets

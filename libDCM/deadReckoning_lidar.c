@@ -39,12 +39,8 @@
 #define MAX16 (4.0*RMAX)
 
 // seconds
-#define DR_TAU 2.0
-//#define DR_TAU 2.5
-//#define DR_TAU 4.0
-//#define DR_TAU 10.0
+//#define DR_TAU 2.0
 
-// seconds * (cm/sec^2 / count) ??? is G always represented as cm/sec^2 ?
 // GRAVITYM is 980 cm/sec^2, GRAVITY is 2000 counts
 // dx/dt^2 * ACCEL2DELTAV = mm/sec
 #define ACCEL2DELTAV ((DR_TIMESTEP*10.0*GRAVITYM*MAX16)/GRAVITY)
@@ -63,7 +59,7 @@
 
 int16_t dead_reckon_clock = DR_PERIOD;
 
-// velocity, as estimated by the IMU: high word is cm/sec
+// velocity, as estimated by the IMU: high word is millimeters/sec
 union longww IMUvelocityx = { 0 };
 union longww IMUvelocityy = { 0 };
 union longww IMUvelocityz = { 0 };
@@ -77,12 +73,12 @@ extern int16_t pwManual[NUM_INPUTS+1] ;
 extern int16_t number_pulses ;
 
 // location, as estimated by the IMU
-// high word is meters, low word is fractional meters
+// high word is millimeters, low word is fractional millimeters
 union longww IMUlocationx = { 0 };
 union longww IMUlocationy = { 0 };
 union longww IMUlocationz = { 0 };
 
-// integral of acceleration
+// integral of velocity error for acceleration bias compensation
 union longww IMUintegralAccelerationx = { 0 };
 union longww IMUintegralAccelerationy = { 0 };
 union longww IMUintegralAccelerationz = { 0 };
@@ -90,7 +86,7 @@ union longww IMUintegralAccelerationz = { 0 };
 uint16_t air_speed_3DIMU = 0;
 int16_t total_energy = 0;
 
-// GPSlocation - IMUlocation: meters
+// GPSlocation - IMUlocation: millimeters
 fractional locationErrorEarth[] = { 0, 0, 0 };
 // GPSvelocity - IMUvelocity
 fractional velocityErrorEarth[] = { 0, 0, 0 };
@@ -98,14 +94,10 @@ fractional velocityErrorEarth[] = { 0, 0, 0 };
 void dead_reckon(void)
 {
 	int16_t air_speed_x, air_speed_y, air_speed_z;
-	union longww accum;
-	union longww energy;
 	
-	
-	if(1)
-	//if (dcm_flags._.dead_reckon_enable == 1)  // wait for startup of GPS
 	{
 		// compute location and velocity errors
+		// wait until takeoff to use altitude information, LIDAR does not work on the ground
 		if (abs(pwManual[THROTTLE_INPUT_CHANNEL]-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< 200 )
 		{
 			// sitting on the ground
@@ -142,7 +134,7 @@ void dead_reckon(void)
 				velocityErrorEarth[2] = 0 ;
 			}
 		}
-		
+
 		// compute the integral term for the acceleration bias compensation
 		IMUintegralAccelerationx.WW += __builtin_mulss(((int16_t)(DR_I_GAIN)), velocityErrorEarth[0]);
 		IMUintegralAccelerationy.WW += __builtin_mulss(((int16_t)(DR_I_GAIN)), velocityErrorEarth[1]);
@@ -174,24 +166,11 @@ void dead_reckon(void)
 		IMUlocationz.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[2]);
 		
 	}
-	else
-	{
-		IMUintegralAccelerationx.WW = 0;
-		IMUintegralAccelerationy.WW = 0;
-		IMUintegralAccelerationz.WW = 0;
-
-		IMUvelocityx.WW = 0;
-		IMUvelocityy.WW = 0;
-		IMUvelocityz.WW = 0;
-
-		IMUlocationx.WW = 0;
-		IMUlocationy.WW = 0;
-		IMUlocationz.WW = 0;
-	}
+	
+	// the following used to include an adjustment for the wind
 	air_speed_x = IMUvelocityx._.W1 ;
 	air_speed_y = IMUvelocityy._.W1 ;
 	air_speed_z = IMUvelocityz._.W1 ;
 	IMU_climb = air_speed_z ;
 	IMU_altitude = IMUlocationz._.W1 ;
-
 }

@@ -80,7 +80,7 @@ int target_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 const int yaw_command_gain = ((long) MAX_YAW_RATE )*(1.2/SERVO_HZ) ;
 
 #define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/SERVO_HZ)) // integration multiplier for gyros
-static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
+//static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
 int yaw_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 int tilt_rmat[9] ;
 
@@ -95,9 +95,9 @@ void motorCntrl(void)
 	int motor_C ;
 	int motor_D ;
 
-	int roll_error_delta ;
-	int pitch_error_delta ;
-	int yaw_error_delta ;
+	//int roll_error_delta ;
+	//int pitch_error_delta ;
+	//int yaw_error_delta ;
 
 	union longww long_accum ;
 
@@ -128,8 +128,6 @@ void motorCntrl(void)
 	{
 
 		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] ;
-
-//		VectorCopy ( 9 , target_orientation , rmat ) ;
 
 		commanded_roll =  ( pwManual[ROLL_INPUT_CHANNEL] 
 						- udb_pwTrim[ROLL_INPUT_CHANNEL]) ;
@@ -236,21 +234,21 @@ void motorCntrl(void)
 
 //		Compute the derivatives
 		
-		VectorMultiply(3, theta, omegagyro, ggain_control); // Scalegain of 2
-		theta_delta[0] = theta[0] - theta_previous[0] ;
-		theta_delta[1] = theta[1] - theta_previous[1] ;
+	//	VectorMultiply(3, theta, omegagyro, ggain_control); // Scalegain of 2
+	//	theta_delta[0] = theta[0] - theta_previous[0] ;
+	//	theta_delta[1] = theta[1] - theta_previous[1] ;
 
-		theta_previous[0] = theta[0] ;
-		theta_previous[1] = theta[1] ;
+	//	theta_previous[0] = theta[0] ;
+	//	theta_previous[1] = theta[1] ;
 
-		roll_error_delta = roll_error - roll_error_previous ;
-		roll_error_previous = roll_error ;
+	//	roll_error_delta = roll_error - roll_error_previous ;
+	//	roll_error_previous = roll_error ;
 
-		pitch_error_delta = pitch_error - pitch_error_previous ;
-		pitch_error_previous = pitch_error ;
+	//	pitch_error_delta = pitch_error - pitch_error_previous ;
+	//	pitch_error_previous = pitch_error ;
 
-		yaw_error_delta = yaw_error - yaw_error_previous ;
-		yaw_error_previous = yaw_error ;
+	//	yaw_error_delta = yaw_error - yaw_error_previous ;
+	//	yaw_error_previous = yaw_error ;
 
 //		Compute the PID(DD) signals
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KP) , roll_error ) ;
@@ -259,11 +257,10 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KD*SCALEGYRO/26.0) , -omegagyro[1] ) ;
 		roll_control += long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[1] ) << 2 ;
-		roll_control += long_accum._.W1 ;
+		//long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[1] ) << 2 ;
+		//roll_control += long_accum._.W1 ;
 
 		roll_control += roll_error_integral._.W1 ;
-
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KP) , pitch_error ) ;
 		pitch_control = long_accum._.W1 ;
@@ -271,11 +268,10 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KD*SCALEGYRO/26.0) , -omegagyro[0] ) ;
 		pitch_control += long_accum._.W1 ;
 
-		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[0] ) << 2 ;
-		pitch_control += long_accum._.W1 ;
+		//long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[0] ) << 2 ;
+		//pitch_control += long_accum._.W1 ;
 
 		pitch_control += pitch_error_integral._.W1 ;
-
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KP) , yaw_error ) ;
 		yaw_control = long_accum._.W1 ;
@@ -344,8 +340,7 @@ void motorCntrl(void)
 #endif
 #endif
 */
-#define MAX_RATE_CONTROL 200
-#define MAX_PROP_CONTROL 50
+
 void compute_altitude_control(void)
 {
 	int altitude_change ;
@@ -353,33 +348,32 @@ void compute_altitude_control(void)
 	int proportional_control ;
 	number_pulses = lidar_pulses ;
 	lidar_pulses = 0 ;
-	if (number_pulses>3)
+	if (number_pulses>MIN_LIDAR_PULSE_THRESH)
 	{
+		// compute LIDAR altitude in millimeters. account for tilt
 		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX)/2 ;
 		altitude_change = altitude - previous_altitude ;
 		previous_altitude = altitude ;
-		climb_rate = 50*altitude_change ; // it is actually 1/50 of climb rate
-		//rate_control = - climb_rate/2 ;
-		//proportional_control = (900-altitude)/10 ;
+		climb_rate = SERVO_HZ*altitude_change ; // it is actually 1/50 of climb rate
 	}
-	rate_control = - IMU_climb/2 ;
-	proportional_control = (900-IMU_altitude)/10 ; 
-	if(rate_control>MAX_RATE_CONTROL)
+	rate_control = - IMU_climb/IMU_CLIMB_RATE_DIVISOR ;
+	proportional_control = (TARGET_ALTITUDE-IMU_altitude)/IMU_ALT_DIVISOR ; 
+	if(rate_control>MAX_ALT_RATE_CONTROL)
 	{
-		rate_control = MAX_RATE_CONTROL ;
+		rate_control = MAX_ALT_RATE_CONTROL ;
 	}
-	if(rate_control< -MAX_RATE_CONTROL)
+	if(rate_control< -MAX_ALT_RATE_CONTROL)
 	{
-		rate_control = -MAX_RATE_CONTROL ;
+		rate_control = -MAX_ALT_RATE_CONTROL ;
 	}
 		
-	if(proportional_control>MAX_PROP_CONTROL)
+	if(proportional_control>MAX_ALT_PROP_CONTROL)
 	{
-		proportional_control = MAX_PROP_CONTROL ;
+		proportional_control = MAX_ALT_PROP_CONTROL ;
 	}
-	if(proportional_control< -MAX_PROP_CONTROL)
+	if(proportional_control< -MAX_ALT_PROP_CONTROL)
 	{
-		proportional_control = -MAX_PROP_CONTROL ;
+		proportional_control = -MAX_ALT_PROP_CONTROL ;
 	}
 		
 	if((IMU_altitude > 0 )&&(pwManual[THROTTLE_INPUT_CHANNEL]>2300))
