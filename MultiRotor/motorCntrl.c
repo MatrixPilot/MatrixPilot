@@ -76,6 +76,9 @@ union longww pitch_error_integral = { 0 } ;
 union longww yaw_error_integral = { 0 } ;
 
 int target_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+int target_rmat_prev_transpose[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
+int target_rmat_change[9] ;
+int target_rate[3] ;
 
 const int yaw_command_gain = ((long) MAX_YAW_RATE )*(1.2/SERVO_HZ) ;
 
@@ -182,6 +185,14 @@ void motorCntrl(void)
 		// multiply commanded yaw matrix by commanded tilt matrix to get overall target matrix
 		MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;	
 		MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
+		
+		// compute feed forward
+		MatrixMultiply( 3 , 3 , 3 , target_rmat_change , target_rmat_prev_transpose , target_rmat ) ;
+		target_rate[0] = ( target_rmat_change[7]-target_rmat_change[5])/2 ;
+		target_rate[1] = ( target_rmat_change[2]-target_rmat_change[6])/2 ;
+		target_rate[2] = ( target_rmat_change[3]-target_rmat_change[1])/2 ;
+		
+		MatrixTranspose( 3 , 3 , target_rmat_prev_transpose , target_rmat ) ;
 		
 		// form the transpose of rmat
 		MatrixTranspose( 3 , 3 , rmat_transposed , rmat )	;

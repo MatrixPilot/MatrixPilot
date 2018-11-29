@@ -36,14 +36,15 @@ int db_index = 0 ;
 boolean hasWrittenHeader = 0 ;
 int header_line = 0 ;
 
-extern int theta[3] , roll_control , pitch_control , yaw_control , accelEarth[3] , accel_feedback ;
-extern int commanded_roll, commanded_pitch, commanded_yaw, pwManual[] ;
-extern int roll_error , pitch_error , yaw_error ;
+extern int16_t theta[3] , roll_control , pitch_control , yaw_control , accelEarth[3] , accel_feedback ;
+extern int16_t commanded_roll, commanded_pitch, commanded_yaw, pwManual[] ;
+extern int16_t roll_error , pitch_error , yaw_error ;
 extern union longww roll_error_integral, pitch_error_integral , yaw_error_integral ;
-extern int target_rmat[9] ;
-extern int altitude , altitude_control , climb_rate ;
-extern int number_pulses ;
+extern int16_t target_rmat[9] ;
+extern int16_t altitude , altitude_control , climb_rate ;
+extern int16_t number_pulses ;
 extern int16_t IMU_climb , IMU_altitude ;
+extern int16_t target_rate[3] ;
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -106,7 +107,7 @@ void send_debug_line( void )
 				TARGET_ALTITUDE ) ;
 			break ;			
 		case 13:
-			sprintf(debug_buffer, "IMU_alt , IMU_climb , pulses, alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+			sprintf(debug_buffer, "ffx , ffy , ffz , IMU_alt , IMU_climb , pulses, alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -116,7 +117,8 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+				target_rate[0] , target_rate[1] , target_rate[2] , 
 				IMU_altitude , IMU_climb  ,
 				number_pulses , altitude , climb_rate , altitude_control , 
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
