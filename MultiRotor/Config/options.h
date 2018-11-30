@@ -77,11 +77,12 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-//#define draganflier
-#define spedix
+#define draganflier
+//#define spedix
 
 #ifdef draganflier
-#define ROTOR_CRAFT "draganflier\r\n"
+#define USE_LIDAR 0
+#define ROTOR_CRAFT "draganflier, nov. 29, 2018\r\n"
 #define NUM_INPUTS	4
 #define NUM_OUTPUTS	4
 // draganflier offsets
@@ -95,7 +96,8 @@
 #endif
 
 #ifdef spedix
-#define ROTOR_CRAFT "spedix, nov. 28, 2018\r\n"
+#define USE_LIDAR 0
+#define ROTOR_CRAFT "spedix, nov. 29, 2018\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	4
 // spedix offsets
@@ -109,6 +111,7 @@
 #endif
 
 #ifdef desktest
+#define USE_LIDAR 1
 #define ROTOR_CRAFT "desk\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	6

@@ -386,7 +386,7 @@ void compute_altitude_control(void)
 	{
 		proportional_control = -MAX_ALT_PROP_CONTROL ;
 	}
-		
+#if  ( USE_LIDAR == 1 )		
 	if((IMU_altitude > 0 )&&(pwManual[THROTTLE_INPUT_CHANNEL]>2300))
 	{
 		altitude_control = rate_control + proportional_control ;
@@ -396,7 +396,9 @@ void compute_altitude_control(void)
 	{
 		altitude_control = 0 ;
 	}
-	
+#else
+	altitude_control = 0 ;
+#endif // USE_LIDAR
 }
 
 #if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))

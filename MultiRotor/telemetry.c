@@ -92,7 +92,8 @@ void send_debug_line( void )
 			sprintf(debug_buffer, "SERVO_HZ = %i , DR_TAU = %5f\r\n" , SERVO_HZ , DR_TAU );
 			break ;
 		case 10:
-			sprintf(debug_buffer, "MAX_ALT_RATE_CONTROL = %i, MAX_ALT_PROP_CONTROL = %i\r\n" ,
+			sprintf(debug_buffer, "USE_LIDAR = %i , MAX_ALT_RATE_CONTROL = %i , MAX_ALT_PROP_CONTROL = %i\r\n" ,
+				USE_LIDAR ,
 				MAX_ALT_RATE_CONTROL ,
 				MAX_ALT_PROP_CONTROL ) ;
 			break ;			
