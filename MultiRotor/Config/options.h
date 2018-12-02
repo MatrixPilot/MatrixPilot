@@ -26,13 +26,21 @@
 // This file includes all of the user-configuration for this firmware,
 // with the exception of waypoints, which live in the waypoints.h file.
 // 
-#define MAX_ALT_RATE_CONTROL 200
-#define MAX_ALT_PROP_CONTROL 50
+//#define MAX_ALT_RATE_CONTROL 200
+//#define MAX_ALT_PROP_CONTROL 50
+//#define MIN_LIDAR_PULSE_THRESH 3
+//#define IMU_CLIMB_RATE_DIVISOR 2
+//#define IMU_ALT_DIVISOR 10
+//#define TARGET_ALTITUDE 900
+//#define DR_TAU 2.0
+
+#define MAX_ALT_RATE_CONTROL 400
+#define MAX_ALT_PROP_CONTROL 400
 #define MIN_LIDAR_PULSE_THRESH 3
 #define IMU_CLIMB_RATE_DIVISOR 2
-#define IMU_ALT_DIVISOR 10
+#define IMU_ALT_DIVISOR 20
 #define TARGET_ALTITUDE 900
-#define DR_TAU 2.0
+#define DR_TAU 2.5
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -81,6 +89,20 @@
 //#define spedix
 
 #ifdef draganflier
+#define TEST_ONOFF 1.0
+#define TILT_KI ( 0.01 * TEST_ONOFF )
+#define TILT_KP ( 0.08 * TEST_ONOFF )
+#define TILT_KD ( 2.0 * TEST_ONOFF )
+#define TILT_FF 1.0
+#define TILT_KDD 0.0
+#define YAW_KI 0.5*0.0
+#define YAW_KP ( 0.3* TEST_ONOFF )
+#define YAW_KD ( 3.0* TEST_ONOFF )
+#define ACCEL_K 0.2*0.0
+#define MAX_YAW_RATE 51  
+// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+#define MAX_TILT 45
+
 #define USE_LIDAR 0
 #define ROTOR_CRAFT "draganflier, nov. 29, 2018\r\n"
 #define NUM_INPUTS	4
@@ -96,8 +118,21 @@
 #endif
 
 #ifdef spedix
-#define USE_LIDAR 0
-#define ROTOR_CRAFT "spedix, nov. 29, 2018\r\n"
+#define TILT_KI 0.01
+#define TILT_KP 0.08
+#define TILT_KD 2.0
+#define TILT_FF 0.1
+#define TILT_KDD 0.0
+#define YAW_KI 0.5*0.0
+#define YAW_KP 0.3
+#define YAW_KD 3.0
+#define ACCEL_K 0.2*0.0
+#define MAX_YAW_RATE 51  
+// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+#define MAX_TILT 45
+
+#define USE_LIDAR 1
+#define ROTOR_CRAFT "spedix, dec. 1, 2018\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	4
 // spedix offsets
@@ -111,6 +146,19 @@
 #endif
 
 #ifdef desktest
+#define TILT_KI 0.01
+#define TILT_KP 0.08
+#define TILT_KD 2.0
+#define TILT_KDD 0.0
+#define TILT_FF 0.1
+#define YAW_KI 0.5*0.0
+#define YAW_KP 0.3
+#define YAW_KD 3.0
+#define ACCEL_K 0.2*0.0
+#define MAX_YAW_RATE 51  
+// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+#define MAX_TILT 45
+
 #define USE_LIDAR 1
 #define ROTOR_CRAFT "desk\r\n"
 #define NUM_INPUTS	5
@@ -234,27 +282,6 @@
 #define TILT_KDD 0.8
 */
 
-#define TILT_KI 0.01
-#define TILT_KP 0.08
-//#define TILT_KP 0.12
-//#define TILT_KD 0.8
-#define TILT_KD 2.0
-//#define TILT_KD 4.0
-#define TILT_KDD 0.0
-
-// Yaw PID control gains
-#define YAW_KI 0.5*0.0
-#define YAW_KP 0.3
-#define YAW_KD 3.0
-
-// Vertical damping 
-// ****Note*** if your ESCs work "backwards", meaning that faster speed requires shorter pulses, then flip the sign to minus
-//#define ACCEL_K 1.0
-#define ACCEL_K 0.2*0.0
-
-#define MAX_YAW_RATE 51  // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-//#define MAX_TILT 25       // maximum roll or pitch, degrees, not to exceed 45 degrees
-#define MAX_TILT 45
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation
 // Only set this to 1 for testing in the simulator.  Do not try to fly with this set to 1!

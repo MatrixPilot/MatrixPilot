@@ -81,8 +81,9 @@ void send_debug_line( void )
 				YAW_KD ) ;
 			break ;
 		case 7:
-			sprintf(debug_buffer, "TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
-				TILT_KDD ,
+			sprintf(debug_buffer, "TILT_FF = %5f, TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
+					TILT_FF ,
+					TILT_KDD ,
 				ACCEL_K ) ;
 			break ;			
 		case 8:
@@ -108,7 +109,7 @@ void send_debug_line( void )
 				TARGET_ALTITUDE ) ;
 			break ;			
 		case 13:
-			sprintf(debug_buffer, "ffx , ffy , ffz , IMU_alt , IMU_climb , pulses, alt , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+			sprintf(debug_buffer, "ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -119,9 +120,10 @@ void send_debug_line( void )
 	else
 	{
 		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
-				target_rate[0] , target_rate[1] , target_rate[2] , 
-				IMU_altitude , IMU_climb  ,
-				number_pulses , altitude , climb_rate , altitude_control , 
+			target_rate[0] , target_rate[1] , target_rate[2] , 
+				//IMU_altitude , IMU_climb  ,
+				//number_pulses , altitude , climb_rate , altitude_control , 
+			number_pulses , IMU_altitude , altitude , IMU_climb  , climb_rate , altitude_control , 
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
 			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
