@@ -80,9 +80,9 @@ int target_rmat_prev_transpose[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX
 int target_rmat_change[9] ;
 int target_rate[3] ;
 
-const int yaw_command_gain = ((long) MAX_YAW_RATE )*(1.2/SERVO_HZ) ;
+const int yaw_command_gain = ((long) MAX_YAW_RATE )*(2.4/PID_HZ) ;
 
-#define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/SERVO_HZ)) // integration multiplier for gyros
+//#define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/PID_HZ)) // integration multiplier for gyros
 //static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
 int yaw_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 int tilt_rmat[9] ;
@@ -175,7 +175,7 @@ void motorCntrl(void)
 		compute_tilt_rmat( tilt_rmat , commanded_roll , commanded_pitch ) ;
 	
 		// update yaw matrix
-		yaw_step = commanded_yaw * yaw_command_gain ;
+		yaw_step = (commanded_yaw * yaw_command_gain)/2 ;
 		yaw_vector[0] = 0 ;
 		yaw_vector[1] = 0 ;
 		yaw_vector[2] = yaw_step ;
@@ -213,7 +213,7 @@ void motorCntrl(void)
 		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback ;
 
 //		Compute the error intetgrals
-		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/SERVO_HZ), roll_error ))>>5) ;
+		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/PID_HZ), roll_error ))>>5) ;
 		if ( roll_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
 		{
 			roll_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
@@ -223,7 +223,7 @@ void motorCntrl(void)
 			roll_error_integral.WW =  - MAXIMUM_ERROR_INTEGRAL ;
 		}
 
-		pitch_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/SERVO_HZ), pitch_error ))>>5) ;
+		pitch_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/PID_HZ), pitch_error ))>>5) ;
 		if ( pitch_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
 		{
 			pitch_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
@@ -233,7 +233,7 @@ void motorCntrl(void)
 			pitch_error_integral.WW =  - MAXIMUM_ERROR_INTEGRAL ;
 		}
 
-		yaw_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*YAW_KI/SERVO_HZ), yaw_error ))>>5) ;
+		yaw_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*YAW_KI/PID_HZ), yaw_error ))>>5) ;
 		if ( yaw_error_integral.WW > MAXIMUM_ERROR_INTEGRAL )
 		{
 			yaw_error_integral.WW = MAXIMUM_ERROR_INTEGRAL ;
@@ -299,7 +299,11 @@ void motorCntrl(void)
 		yaw_control += yaw_error_integral._.W1 ;
 
 		
-#ifdef draganflier		
+#ifdef draganflier
+		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
+		{
+			compute_altitude_control();
+		}		
 		// Mix in the yaw, pitch, and roll signals into the motors
 		motor_A += + yaw_control - pitch_control ;
 		motor_B += - yaw_control - roll_control ;
@@ -307,8 +311,11 @@ void motorCntrl(void)
 		motor_D += - yaw_control + roll_control ;
 #endif
 
-#ifdef spedix	
-		compute_altitude_control();
+#ifdef spedix
+		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
+		{
+			compute_altitude_control();
+		}
 		// Mix in the yaw, pitch, and roll signals into the motors
 		motor_A += altitude_control - yaw_control + ( - pitch_control + roll_control )/2 ;
 		motor_B += altitude_control + yaw_control + ( - pitch_control - roll_control )/2 ;

@@ -72,7 +72,7 @@ inline uint16_t heartbeat_cnt(void)
 inline void heartbeat(void) // called from ISR
 {
 #if ( USE_ESC_RATE == 1 )
-	// Start the sequential servo pulses at frequency SERVO_HZ
+	// Start the sequential servo pulses at frequency ESC_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/ESC_HZ) == 0)
 	{
 		start_pwm_ESC_outputs();

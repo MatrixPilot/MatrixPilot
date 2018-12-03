@@ -90,7 +90,7 @@ void send_debug_line( void )
 			sprintf(debug_buffer, ROTOR_CRAFT );
 			break ;
 		case 9:
-			sprintf(debug_buffer, "SERVO_HZ = %i , DR_TAU = %5f\r\n" , SERVO_HZ , DR_TAU );
+			sprintf(debug_buffer, "ESC_HZ = %i , PID_HZ = %i , SERVO_HZ = %i , DR_TAU = %5f\r\n" , ESC_HZ , PID_HZ , SERVO_HZ , DR_TAU );
 			break ;
 		case 10:
 			sprintf(debug_buffer, "USE_LIDAR = %i , MAX_ALT_RATE_CONTROL = %i , MAX_ALT_PROP_CONTROL = %i\r\n" ,

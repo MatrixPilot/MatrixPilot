@@ -36,12 +36,16 @@
 //#define SERVO_HZ 100
 
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
-#define PID_HZ 40
+//#define PID_HZ 40
+#define PID_HZ 100
 
 // PWM rate for ESCs (Quadcopter support)
 //#define ESC_HZ 400
-//#define ESC_HZ 200
-#define ESC_HZ 50
+#define ESC_HZ 100
+//#define ESC_HZ 50
+
+// servicing rate for LIDAR interface
+#define LIDAR_HZ 50
 
 // Read-only value increments with each heartbeat
 extern uint16_t udb_heartbeat_counter;

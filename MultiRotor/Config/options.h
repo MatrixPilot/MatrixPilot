@@ -133,7 +133,7 @@
 #define MAX_TILT 45
 
 #define USE_LIDAR 1
-#define ROTOR_CRAFT "spedix, dec. 1, 2018\r\n"
+#define ROTOR_CRAFT "spedix, dec. 3, 2018\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	4
 // spedix offsets

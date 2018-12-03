@@ -116,7 +116,7 @@ void dcm_callback_gps_location_updated(void)
 // Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
 {
-	if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
+	if((udb_heartbeat_counter%(HEARTBEAT_HZ/PID_HZ))==0)
 	{
 	
 		motorCntrl() ;
