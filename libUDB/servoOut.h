@@ -35,3 +35,7 @@ void udb_set_action_state(boolean newValue);
 // Call this to start sending out pulses to all the PWM output channels sequentially
 void start_pwm_outputs(void);
 
+// Call this to start sending out pulses to all the PWM output channels at the same time
+void start_pwm_ESC_outputs(void);
+
+

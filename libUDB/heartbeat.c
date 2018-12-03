@@ -71,12 +71,19 @@ inline uint16_t heartbeat_cnt(void)
 //              outside of this module, so it could be moved up.
 inline void heartbeat(void) // called from ISR
 {
+#if ( USE_ESC_RATE == 1 )
+	// Start the sequential servo pulses at frequency SERVO_HZ
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/ESC_HZ) == 0)
+	{
+		start_pwm_ESC_outputs();
+	}
+#else
 	// Start the sequential servo pulses at frequency SERVO_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
 	{
 		start_pwm_outputs();
 	}
-
+#endif
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
 	{

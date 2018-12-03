@@ -22,6 +22,7 @@
 
 #include "libUDB.h"
 #include "oscillator.h"
+#include "heartbeat.h"
 #include "interrupt.h"
 #include "servoOut.h"
 #include "servoOutPins.h"
@@ -40,7 +41,83 @@
 int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 static volatile int16_t outputNum;
 
+#if ((USE_ESC_RATE == 1)&&!(BOARD_TYPE == UDB5_BOARD ))
+#error "ESC high rate is supported only by UDB5"
+#endif
 
+#if ( USE_ESC_RATE == 1 )
+#if ( MIPS == 16 )
+#define TMR3_PERIOD (2000000/ESC_HZ)
+#elif ( MIPS == 32 )
+#define TMR3_PERIOD (4000000/ESC_HZ)
+#else
+#error "MIPS must be either 16 or 32"
+#endif // MIPS
+void servoOut_init(void)
+{
+	int16_t i;
+	for (i = 0; i <= 8 ; i++)
+	{
+		udb_pwOut[i] = 0;
+	}
+	// set PWM output pins as outputs
+	_TRISD0 = 0;
+	_TRISD1 = 0;
+	_TRISD2 = 0;
+	_TRISD3 = 0;
+	_TRISD4 = 0;
+	_TRISD5 = 0;
+	_TRISD6 = 0;
+	_TRISD7 = 0;
+	
+	// disable
+	OC1CONbits.OCM = 0 ;
+	OC2CONbits.OCM = 0 ;
+	OC3CONbits.OCM = 0 ;
+	OC4CONbits.OCM = 0 ;
+	OC5CONbits.OCM = 0 ;
+	OC6CONbits.OCM = 0 ;
+	OC7CONbits.OCM = 0 ;
+	OC8CONbits.OCM = 0 ;
+	
+	// turn off pulses
+	OC1RS = 0 ;
+	OC2RS = 0 ;
+	OC3RS = 0 ;
+	OC4RS = 0 ;
+	OC5RS = 0 ;
+	OC6RS = 0 ;
+	OC7RS = 0 ;
+	OC8RS = 0 ;
+	
+	// enable
+	OC1CONbits.OCM = 6 ;
+	OC2CONbits.OCM = 6 ;
+	OC3CONbits.OCM = 6 ;
+	OC4CONbits.OCM = 6 ;
+	OC5CONbits.OCM = 6 ;
+	OC6CONbits.OCM = 6 ;
+	OC7CONbits.OCM = 6 ;
+	OC8CONbits.OCM = 6 ;
+	
+	// timer 3
+	OC1CONbits.OCTSEL = 1 ;
+	OC2CONbits.OCTSEL = 1 ;
+	OC3CONbits.OCTSEL = 1 ;
+	OC4CONbits.OCTSEL = 1 ;
+	OC5CONbits.OCTSEL = 1 ;
+	OC6CONbits.OCTSEL = 1 ;
+	OC7CONbits.OCTSEL = 1 ;
+	OC8CONbits.OCTSEL = 1 ;
+	
+	TMR3 = 0 ; // reset timer
+	PR3 = TMR3_PERIOD ;
+	T3CONbits.TCKPS = 1 ; // prescaler 1/8
+	T3CONbits.TCS = 0 ; // internal clock
+	T3CONbits.TON = 1 ; // turn on timer 3
+	
+}
+#else // not ESC_RATE
 // initialize the PWM
 void servoOut_init(void) // was called udb_init_pwm()
 {
@@ -95,7 +172,7 @@ void servoOut_init(void) // was called udb_init_pwm()
 #error Invalid BOARD_TYPE
 #endif
 }
-
+#endif // USE_ESC_RATE
 // saturation logic to maintain pulse width within bounds
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
@@ -122,6 +199,19 @@ void start_pwm_outputs(void)
 		_T4IF = 0;                      // clear the interrupt
 		_T4IE = 1;                      // enable timer 4 interrupt
 	}
+}
+
+// Call this to start sending out pulses to all the PWM output channels sequentially
+void start_pwm_ESC_outputs(void)
+{
+	OC1RS = udb_pwOut[1] ;
+	OC2RS = udb_pwOut[2] ;
+	OC3RS = udb_pwOut[3] ;
+	OC4RS = udb_pwOut[4] ;
+	OC5RS = udb_pwOut[5] ;
+	OC6RS = udb_pwOut[6] ;
+	OC7RS = udb_pwOut[7] ;
+	OC8RS = udb_pwOut[8] ;
 }
 
 #if (RECORD_FREE_STACK_SPACE == 1)
@@ -233,6 +323,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 }
 #else
 
+#if ( USE_ESC_RATE == 1 )
+void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
+{
+	_T4IE = 0;              // disable timer 4 interrupt
+	_T4IF = 0; 
+}
+#else
+
 void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 {
 	indicate_loading_inter;
@@ -317,5 +415,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 
 	// interrupt_restore_corcon;
 }
+#endif
+
 #endif
 

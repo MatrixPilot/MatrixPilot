@@ -36,7 +36,7 @@
 
 #define MAX_ALT_RATE_CONTROL 400
 #define MAX_ALT_PROP_CONTROL 400
-#define MIN_LIDAR_PULSE_THRESH 3
+#define MIN_LIDAR_PULSE_THRESH 2
 #define IMU_CLIMB_RATE_DIVISOR 2
 #define IMU_ALT_DIVISOR 20
 #define TARGET_ALTITUDE 900
@@ -85,15 +85,15 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-#define draganflier
-//#define spedix
+//#define draganflier
+#define spedix
 
 #ifdef draganflier
 #define TEST_ONOFF 1.0
 #define TILT_KI ( 0.01 * TEST_ONOFF )
 #define TILT_KP ( 0.08 * TEST_ONOFF )
 #define TILT_KD ( 2.0 * TEST_ONOFF )
-#define TILT_FF 1.0
+#define TILT_FF 0.2
 #define TILT_KDD 0.0
 #define YAW_KI 0.5*0.0
 #define YAW_KP ( 0.3* TEST_ONOFF )
@@ -118,10 +118,11 @@
 #endif
 
 #ifdef spedix
+#define USE_ESC_RATE 1
 #define TILT_KI 0.01
 #define TILT_KP 0.08
 #define TILT_KD 2.0
-#define TILT_FF 0.1
+#define TILT_FF 0.2
 #define TILT_KDD 0.0
 #define YAW_KI 0.5*0.0
 #define YAW_KP 0.3
@@ -150,7 +151,7 @@
 #define TILT_KP 0.08
 #define TILT_KD 2.0
 #define TILT_KDD 0.0
-#define TILT_FF 0.1
+#define TILT_FF 0.2
 #define YAW_KI 0.5*0.0
 #define YAW_KP 0.3
 #define YAW_KD 3.0
