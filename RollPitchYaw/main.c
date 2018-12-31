@@ -69,7 +69,7 @@ int main(void)
 	return 0;
 }
 
-int rmat_vertical_initialized = 0 ;
+//int rmat_vertical_initialized = 0 ;
 
 // Called every 1/40 second at high priority
 void udb_heartbeat_40hz_callback(void)
@@ -111,24 +111,14 @@ void dcm_heartbeat_callback(void) // was called dcm_servo_callback_prepare_outpu
 	else
 	{
 		union longww accum;
-		int gplane[3];
-		// record vertical
-		if (rmat_vertical_initialized == 0)
-		{
-			rmat_vertical_initialized = 1;
-			gplane[0] = XACCEL_VALUE;
-			gplane[1] = YACCEL_VALUE;
-			gplane[2] = ZACCEL_VALUE;
-			vector3_normalize(&rmat[6],gplane);
-		}
-
-		accum.WW = __builtin_mulss(rmat[6], 4000);
+		
+		accum.WW = __builtin_mulss((rmat[6]/2- rmat[2]/2), 4000);
 		udb_pwOut[ROLL_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 
-		accum.WW = __builtin_mulss(rmat[7], 4000);
+		accum.WW = __builtin_mulss((rmat[7]/2-rmat[5]/2), 4000);
 		udb_pwOut[PITCH_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 
-		accum.WW = __builtin_mulss(rmat[4], 4000);
+		accum.WW = __builtin_mulss((rmat[3]/2-rmat[1]/2), 4000);
 		udb_pwOut[YAW_OUTPUT_CHANNEL] = udb_servo_pulsesat(3000 + accum._.W1);
 	}
 

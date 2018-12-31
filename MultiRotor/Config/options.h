@@ -84,9 +84,9 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
-//#define desktest
+#define desktest
 //#define draganflier
-#define spedix
+//#define spedix
 
 #ifdef draganflier
 #define TEST_ONOFF 1.0

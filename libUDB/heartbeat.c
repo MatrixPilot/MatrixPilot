@@ -115,7 +115,7 @@ inline void heartbeat(void) // called from ISR
 // This is a good place to eventually compute pulse widths for servos.
 static void heartbeat_pulse(void)
 {
-	led_off(LED_BLUE);  // indicates logfile activity
+	//led_off(LED_BLUE);  // indicates logfile activity
 #if (BOARD_TYPE == UDB4_BOARD) 
 	// IDG500 and ISZ500 Gyros settle at least 200 milliseconds after startup
 	// Auto-zero the UDB4 gyros 1 second before calibration of offsets

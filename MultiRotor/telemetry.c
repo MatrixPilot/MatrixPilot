@@ -45,6 +45,7 @@ extern int16_t altitude , altitude_control , climb_rate ;
 extern int16_t number_pulses ;
 extern int16_t IMU_climb , IMU_altitude ;
 extern int16_t target_rate[3] ;
+extern union longww IMUlocationx , IMUlocationy , IMUvelocityx , IMUvelocityy ;
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -109,7 +110,7 @@ void send_debug_line( void )
 				TARGET_ALTITUDE ) ;
 			break ;			
 		case 13:
-			sprintf(debug_buffer, "ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+			sprintf(debug_buffer, "X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -119,7 +120,8 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,
 			target_rate[0] , target_rate[1] , target_rate[2] , 
 				//IMU_altitude , IMU_climb  ,
 				//number_pulses , altitude , climb_rate , altitude_control , 

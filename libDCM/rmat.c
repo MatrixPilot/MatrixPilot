@@ -445,17 +445,59 @@ static void normalize(void)
 	VectorAdd(3, &rmat[6], &rbuff[6], &rbuff[6]);
 }
 
+void align_roll_pitch(fractional tilt_mat[])
+{
+	fractional vertical[3] ;
+	fractional Z , one_plus_Z ;
+	LED_BLUE = LED_ON ;
+	vertical[0] = gravity_vector_plane[0] ;
+	vertical[1] = gravity_vector_plane[1] ;
+	vertical[2] = gravity_vector_plane[2] ;
+	vector3_normalize( vertical , vertical ) ;
+	tilt_mat[2] = - vertical[0] ;
+	tilt_mat[5] = - vertical[1] ;
+	tilt_mat[6] = vertical[0] ;
+	tilt_mat[7] = vertical[1] ;
+	tilt_mat[8] = vertical[2] ;
+	Z = vertical[2] ;
+	one_plus_Z = RMAX + Z ;
+	if ( one_plus_Z > 0 )
+	{
+		tilt_mat[0] = Z+__builtin_divsd( __builtin_mulss( vertical[1], vertical[1]),one_plus_Z );
+		tilt_mat[4] = Z+__builtin_divsd( __builtin_mulss( vertical[0], vertical[0]),one_plus_Z );
+		tilt_mat[1] = - __builtin_divsd( __builtin_mulss( vertical[0], vertical[1]),one_plus_Z );
+		tilt_mat[3] = tilt_mat[1];
+	}
+	else
+	{
+		// this case cannot happen right now, but we may eventually want to control inverted
+		tilt_mat[0] = Z ;
+		tilt_mat[4] = Z ;
+		tilt_mat[1] = 0 ;
+		tilt_mat[3] = 0 ;
+	}
+}
+
+static boolean roll_pitch_initialized = 0 ;
 static void roll_pitch_drift(void)
 {
-	VectorCross(errorRP, gravity_vector_plane, &rmat[6]);
+	if ( roll_pitch_initialized == 1)
+	{
+		VectorCross(errorRP, gravity_vector_plane, &rmat[6]);
 //#ifdef CATAPULT_LAUNCH_ENABLE
 #define MAXIMUM_PITCH_ERROR ((fractional)(GRAVITY*0.25))
-	// the following is done to limit the pitch error during a catapult launch
-	// it has no effect during normal conditions, because acceleration
-	// compensated gravity_vector_plane is approximately aligned with rmat[6] vector
-	if (errorRP[0] >  MAXIMUM_PITCH_ERROR) errorRP[0] =  MAXIMUM_PITCH_ERROR;
-	if (errorRP[0] < -MAXIMUM_PITCH_ERROR) errorRP[0] = -MAXIMUM_PITCH_ERROR;
+		// the following is done to limit the pitch error during a catapult launch
+		// it has no effect during normal conditions, because acceleration
+		// compensated gravity_vector_plane is approximately aligned with rmat[6] vector
+		if (errorRP[0] >  MAXIMUM_PITCH_ERROR) errorRP[0] =  MAXIMUM_PITCH_ERROR;
+		if (errorRP[0] < -MAXIMUM_PITCH_ERROR) errorRP[0] = -MAXIMUM_PITCH_ERROR;
 //#endif // CATAPULT_LAUNCH_ENABLE
+	}
+	else
+	{
+		align_roll_pitch(rmat) ;
+		roll_pitch_initialized = 1 ;
+	}
 }
 
 static void yaw_drift(void)
