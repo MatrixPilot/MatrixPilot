@@ -89,6 +89,7 @@
 //#define spedix
 
 #ifdef draganflier
+#define MAG_YAW_DRIFT 						0
 #define TEST_ONOFF 1.0
 #define TILT_KI ( 0.01 * TEST_ONOFF )
 #define TILT_KP ( 0.08 * TEST_ONOFF )
@@ -118,6 +119,7 @@
 #endif
 
 #ifdef spedix
+#define MAG_YAW_DRIFT 						0
 #define USE_ESC_RATE 1
 #define TILT_KI 0.01
 #define TILT_KP 0.08
@@ -147,6 +149,7 @@
 #endif
 
 #ifdef desktest
+#define MAG_YAW_DRIFT 						1
 #define TILT_KI 0.01
 #define TILT_KP 0.08
 #define TILT_KD 2.0
@@ -189,7 +192,7 @@
 
 // Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
 // Otherwise, if set to 0 the GPS will be used.
-#define MAG_YAW_DRIFT 						0
+//#define MAG_YAW_DRIFT 						0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that

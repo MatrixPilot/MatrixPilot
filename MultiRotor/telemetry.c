@@ -46,6 +46,7 @@ extern int16_t number_pulses ;
 extern int16_t IMU_climb , IMU_altitude ;
 extern int16_t target_rate[3] ;
 extern union longww IMUlocationx , IMUlocationy , IMUvelocityx , IMUvelocityy ;
+extern int16_t udb_magFieldBody[3] ;
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -110,7 +111,7 @@ void send_debug_line( void )
 				TARGET_ALTITUDE ) ;
 			break ;			
 		case 13:
-			sprintf(debug_buffer, "X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+			sprintf(debug_buffer, "mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -120,7 +121,8 @@ void send_debug_line( void )
 	}
 	else
 	{
-		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+		sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,
 			target_rate[0] , target_rate[1] , target_rate[2] , 
 				//IMU_altitude , IMU_climb  ,

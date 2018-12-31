@@ -31,15 +31,15 @@
 // HMC5883L_SF is the SparkFun HMC5883L
 
 //#define HMC5843
-#define HMC5883L
-//#define HMC5883L_SF
+//#define HMC5883L
+#define HMC5883L_SF
 
 // Define magneticDeclination to be the magnectic declination, in degrees, measured
 // clockwise from the north, east is plus, west is minus.
 //  Mississauga, ON is Lat 45.58 N and Long 79.65 W, Mag. Decl. therefore is 10deg21' W or -10.35 degrees
 //  Bennet Field Springvale, ON is Lat 42deg58' N and Long 80deg9' W, Mag. Decl. therefore is 9deg48' W or -9.48 degrees
   //Salinas, CA Magnetic Variation: 16E (1980), http://www.airport-data.com/airport/SNS/
-#define MAGNETICDECLINATION                 0
+#define MAGNETICDECLINATION                 -12.0
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
 #define DECLINATIONANGLE_VARIABLE           0
@@ -48,7 +48,7 @@
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
 // #define LED_RED_MAG_CHECK 0 if you want the RED LED to indicate control mode.
 
-#define LED_RED_MAG_CHECK                   0
+#define LED_RED_MAG_CHECK                   1
 
 ////////////////////////////////////////////////////////////////////////////////
 // Uncomment one of the defines below to specify orientation of the mag.
@@ -62,11 +62,11 @@
 // For 3DRobotics mags, for MAG_DIRECT the mag mounts over the UDB, component side down.
 // For SparkFun HMC5883L, for MAG_DIRECT the mag mounts over the UDB, component side up.
 
-#define MAG_FORWARDS
+//#define MAG_FORWARDS
 //#define MAG_BACKWARDS
 //#define MAG_INVERTED
 //#define MAG_FLIPPED
-//#define MAG_DIRECT
+#define MAG_DIRECT
 
 // Uncomment the following line for using Static Magnetometer Offsets.
 // You will need to manually calibrate your plane's offsets in advance.
