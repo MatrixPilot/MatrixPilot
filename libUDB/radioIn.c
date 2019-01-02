@@ -26,6 +26,9 @@
 #include "cll_io.h"
 #include "../MatrixPilot/states.h"
 
+int lidar_pulses = 0 ;
+int lidar_pulse_width = 0 ;
+
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
 #include "mode_switch.h"
@@ -232,8 +235,6 @@ static void set_udb_pwIn(int pwm, int index)
 
 #if (USE_PPM_INPUT == 0)
 
-int lidar_pulses = 0 ;
-int lidar_pulse_width = 0 ;
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 {
 	indicate_loading_inter;

@@ -149,6 +149,9 @@ static void heartbeat_pulse(void)
 	{
 		radioIn_bad_pulse_count_reset();
 	}
+#else
+	udb_flags._.radio_on = 1;
+	led_on(LED_GREEN);
 #endif // NORADIO
 
 #ifdef VREF

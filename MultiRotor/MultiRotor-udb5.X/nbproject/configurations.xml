@@ -180,7 +180,6 @@
     <Elem>../../libDCM</Elem>
     <Elem>../../libUDB</Elem>
     <Elem>../../libVectorMatrix</Elem>
-    <Elem>../../MatrixPilot</Elem>
     <Elem>../../MAVLink</Elem>
     <Elem>../../Config</Elem>
     <Elem>..</Elem>

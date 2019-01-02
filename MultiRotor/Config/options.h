@@ -135,7 +135,7 @@
 #define MAX_TILT 45
 
 #define USE_LIDAR 1
-#define ROTOR_CRAFT "spedix, dec. 3, 2018\r\n"
+#define ROTOR_CRAFT "spedix, jan 1, 2019\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	4
 // spedix offsets
@@ -163,18 +163,25 @@
 // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45
 
-#define USE_LIDAR 1
-#define ROTOR_CRAFT "desk\r\n"
+#define USE_LIDAR 0
+#define ROTOR_CRAFT "desk, Jan 1, 2019\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	6
 // desk UDB offsets
-#define CUSTOM_OFFSETS
+/*#define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 438 )
 #define YACCEL_OFFSET	( 81 )
 #define ZACCEL_OFFSET	( -1317 )
 #define XRATE_OFFSET	( -118 )
 #define YRATE_OFFSET	( -118 )
-#define ZRATE_OFFSET	( -103 )
+#define ZRATE_OFFSET	( -103 )*/
+// mag tester offsets
+#define XACCEL_OFFSET	( 304 )
+#define YACCEL_OFFSET	( 143 )
+#define ZACCEL_OFFSET	( -1284 )
+#define XRATE_OFFSET	( 101 )
+#define YRATE_OFFSET	( 167 )
+#define ZRATE_OFFSET	( -16 )
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -198,7 +205,7 @@
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
 // you actually use this since there is no automatic landing code yet, and you'd have no manual
 // control to fall back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								0
+#define NORADIO								1
 
 
 ////////////////////////////////////////////////////////////////////////////////

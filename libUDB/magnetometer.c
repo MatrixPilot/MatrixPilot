@@ -91,11 +91,11 @@ uint8_t rxMagnetometer(magnetometer_callback_funcptr callback)     // service th
 #if (LED_RED_MAG_CHECK == 1)
 	if (magMessage == 7)
 	{
-		led_off(LED_RED);
+		led_off(LED_ORANGE);
 	}
 	else
 	{
-		led_on(LED_RED);
+		led_on(LED_ORANGE);
 	}
 #endif
 
