@@ -344,7 +344,7 @@ void mag_drift(fractional errorYawplane[])
 			udb_magOffset[0] = udb_magOffset[0] + ((offsetEstimate[0] + 2) >> 2);
 			udb_magOffset[1] = udb_magOffset[1] + ((offsetEstimate[1] + 2) >> 2);
 			udb_magOffset[2] = udb_magOffset[2] + ((offsetEstimate[2] + 2) >> 2);
-			quaternion_adjust(magAlignment, magAlignmentAdjustment);
+			//quaternion_adjust(magAlignment, magAlignmentAdjustment);
 		}
 		else
 		{

@@ -142,7 +142,8 @@ fractional dirOverGndHrmat[] = { 0, RMAX, 0 };
 // vector buffer
 static fractional errorRP[] = { 0, 0, 0 };
 static fractional errorYawground[] = { 0, 0, 0 };
-static fractional errorYawplane[]  = { 0, 0, 0 };
+//static fractional errorYawplane[]  = { 0, 0, 0 };
+fractional errorYawplane[]  = { 0, 0, 0 };
 
 void yaw_drift_reset(void)
 {

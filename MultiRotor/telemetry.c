@@ -49,7 +49,7 @@ extern union longww IMUlocationx , IMUlocationy , IMUvelocityx , IMUvelocityy ;
 extern int16_t udb_magFieldBody[3] ;
 extern fractional magFieldEarth[3];
 extern fractional magAlignment[4];
-extern int16_t udb_magOffset[3] ;
+extern int16_t udb_magOffset[3] , errorYawplane[3] ;
 
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
@@ -115,7 +115,7 @@ void send_debug_line( void )
 			break ;			
 		case 13:
 			/*sprintf(debug_buffer, "mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;*/
-			sprintf(debug_buffer, "magBdyx , magBdyy , magBdyz , mErthx , mErthy , mErthz , offx , offy , offz , algn0 , algn1 , algn2 , algn3\r\n") ;
+			sprintf(debug_buffer, "yw_err_x , yw_err_y , yw_err_z , magBdyx , magBdyy , magBdyz , mErthx , mErthy , mErthz , offx , offy , offz , algn0 , algn1 , algn2 , algn3\r\n") ;
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -144,7 +144,8 @@ void send_debug_line( void )
 			roll_error , pitch_error , yaw_error ) ;
 			//commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
 			//accel_feedback ) ; */
-			sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			errorYawplane[0] , errorYawplane[1] , errorYawplane[2] , 
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			magFieldEarth[0] , magFieldEarth[1] , magFieldEarth[2] , 
 			udb_magOffset[0] , udb_magOffset[1] , udb_magOffset[2] ,
