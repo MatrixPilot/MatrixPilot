@@ -74,11 +74,11 @@
 // Turn the plane through all dimensions X,Y,Z  (imagine you are painting a 3D globe by rotating the plane).
 // Inspect the last line of the telemetry file that you have created for the following static offsets,
 // and set them below.
-//#define MAG_STATIC_OFFSETS
+#define MAG_STATIC_OFFSETS
 
-#define MAG_STATIC_OFFSET_X       -77
-#define MAG_STATIC_OFFSET_Y       0
-#define MAG_STATIC_OFFSET_Z       0
+#define MAG_STATIC_OFFSET_X       -177
+#define MAG_STATIC_OFFSET_Y       123
+#define MAG_STATIC_OFFSET_Z       -80
 
 // ************************************************************************
 // *** Users should not need to change anything below here ****************

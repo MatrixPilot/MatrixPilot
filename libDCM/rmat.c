@@ -371,7 +371,6 @@ static void rupdate(void)
 	fractional rbuff[9];
 	uint32_t thetaSquare;
 	unsigned nonlinearAdjust;
-
 	VectorAdd(3, omegaAccum, omegagyro, omegacorrI);
 	VectorAdd(3, omega, omegaAccum, omegacorrP);
 	//	scale by the integration factors:
@@ -450,7 +449,7 @@ void align_roll_pitch(fractional tilt_mat[])
 {
 	fractional vertical[3] ;
 	fractional Z , one_plus_Z ;
-	LED_BLUE = LED_ON ;
+	udb_led_toggle(LED_BLUE) ;
 	vertical[0] = gravity_vector_plane[0] ;
 	vertical[1] = gravity_vector_plane[1] ;
 	vertical[2] = gravity_vector_plane[2] ;

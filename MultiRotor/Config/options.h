@@ -176,6 +176,7 @@
 #define YRATE_OFFSET	( -118 )
 #define ZRATE_OFFSET	( -103 )*/
 // mag tester offsets
+#define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 304 )
 #define YACCEL_OFFSET	( 143 )
 #define ZACCEL_OFFSET	( -1284 )

@@ -118,8 +118,24 @@ void dcm_heartbeat_callback(void)
 {
 	if((udb_heartbeat_counter%(HEARTBEAT_HZ/PID_HZ))==0)
 	{
-	
+#ifdef DEBUG_MAGNETOMETER
+		int motor_A, motor_B, motor_C, motor_D ;
+		union longww long_accum ;
+		long_accum.WW = __builtin_mulss(rmat[1], 4000);
+		motor_A=(3000 + long_accum._.W1);	
+		long_accum.WW = __builtin_mulss(rmat[4], 4000);
+		motor_B=(3000 + long_accum._.W1);	
+		long_accum.WW = __builtin_mulss(rmat[6], 4000);
+		motor_C=(3000 + long_accum._.W1);
+		long_accum.WW = __builtin_mulss(rmat[7], 4000);
+		motor_D = (3000 + long_accum._.W1) ;
+		udb_pwOut[1] = udb_servo_pulsesat( motor_A ) ;		
+		udb_pwOut[2] = udb_servo_pulsesat( motor_B ) ;
+		udb_pwOut[3] = udb_servo_pulsesat( motor_C ) ;
+		udb_pwOut[4] = udb_servo_pulsesat( motor_D ) ;
+#else
 		motorCntrl() ;
+#endif // debug magnetometer
 	}
 	
 	// Update the Green LED to show RC radio status

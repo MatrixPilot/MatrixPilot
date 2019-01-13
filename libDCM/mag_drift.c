@@ -71,18 +71,24 @@ void mag_drift_init(void) // TODO: can this be called during align_rmat_to_mag b
 	declinationVector[1] = sine((int8_t) (DECLINATIONANGLE >> 8));
 #endif
 }
-
+extern fractional yaw_rmat[9];
 static void align_rmat(int16_t costheta, int16_t sintheta)
 {
-	rmat[0] = costheta;
+	fractional matrix_buffer[9] ;
+	yaw_rmat[0] = costheta;
 #ifdef INITIALIZE_VERTICAL // vertical initialization for VTOL
+#error "TODO: revise handling of VTOL"
 	rmat[5] = costheta;
 	rmat[2] = sintheta;
 #else
-	rmat[4] = costheta;
-	rmat[1] = sintheta;
+	yaw_rmat[4] = costheta;
+	yaw_rmat[1] = sintheta;
 #endif
-	rmat[3] = -sintheta;
+	yaw_rmat[3] = -sintheta;
+	// net matrix is yaw matrix times rmat (rmat has already been tilt aligned)
+	MatrixMultiply(3, 3, 3, matrix_buffer, yaw_rmat, rmat);
+	// multiply by 2 and copy back rmat:
+	MatrixAdd(3, 3, rmat, matrix_buffer, matrix_buffer);
 }
 
 #ifdef INITIALIZE_VERTICAL // vertical initialization for VTOL
@@ -114,8 +120,11 @@ static void align_rmat_to_mag(void)
 	struct relative2D initialBodyField;
 //	int16_t costheta;
 //	int16_t sintheta;
-	initialBodyField.x = udb_magFieldBody[0];
-	initialBodyField.y = udb_magFieldBody[1];
+	magFieldEarth[0] = VectorDotProduct(3, &rmat[0], udb_magFieldBody)<<1;
+	magFieldEarth[1] = VectorDotProduct(3, &rmat[3], udb_magFieldBody)<<1;
+	magFieldEarth[2] = VectorDotProduct(3, &rmat[6], udb_magFieldBody)<<1;
+	initialBodyField.x = magFieldEarth[0];
+	initialBodyField.y = magFieldEarth[1];
 #if(DECLINATIONANGLE_VARIABLE == 1)
 	theta = rect_to_polar(&initialBodyField) -64 - (dcm_declination_angle._.B1);
 #else
@@ -302,6 +311,7 @@ void mag_drift(fractional errorYawplane[])
 #endif
 		mag_error = VectorDotProduct(2, magFieldEarthHorzNorm, declinationVector);
 		VectorScale(3, errorYawplane, &rmat[6], mag_error); // Scalegain = 1/2
+		udb_led_toggle(LED_GREEN) ;
 
 		// Do the computations needed to compensate for magnetometer misalignment
 

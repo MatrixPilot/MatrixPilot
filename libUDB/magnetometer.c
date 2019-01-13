@@ -28,7 +28,7 @@
 #include <stdlib.h>
 
 int16_t udb_magFieldBody[3];                    // magnetic field in the body frame of reference 
-int16_t udb_magOffset[3] = { -90 , 10 , 20 }; 
+int16_t udb_magOffset[3] = { -177 , 123 , -80 }; 
 //int16_t udb_magOffset[3] = { 0 , 0 , 0 };       // magnetic offset in the body frame of reference
 // To use static offsets, Change the variable name udb_magOffset to udb_staticMagOffset on lines 169, 170, 171
 int16_t udb_staticMagOffset[3] = { MAG_STATIC_OFFSET_X , MAG_STATIC_OFFSET_Y , MAG_STATIC_OFFSET_Z }; 
@@ -91,7 +91,8 @@ uint8_t rxMagnetometer(magnetometer_callback_funcptr callback)     // service th
 	I2messages++;
 #if (LED_RED_MAG_CHECK == 1)
 	// TODO this logic no longer detects whether or not I2C communication to magnetometer is working
-	if (magMessage == 7)
+	//if (magMessage == 7)
+	if ( I2C2STATbits.ACKSTAT == 0 )
 	{
 		led_off(LED_ORANGE);
 	}
