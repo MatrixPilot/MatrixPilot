@@ -311,7 +311,7 @@ void mag_drift(fractional errorYawplane[])
 #endif
 		mag_error = VectorDotProduct(2, magFieldEarthHorzNorm, declinationVector);
 		VectorScale(3, errorYawplane, &rmat[6], mag_error); // Scalegain = 1/2
-		udb_led_toggle(LED_GREEN) ;
+	//	udb_led_toggle(LED_GREEN) ;
 
 		// Do the computations needed to compensate for magnetometer misalignment
 

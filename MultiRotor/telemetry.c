@@ -112,10 +112,22 @@ void send_debug_line( void )
 			sprintf(debug_buffer, "IMU_ALT_DIVISOR = %i, TARGET_ALTITUDE = %i\r\n" ,
 				IMU_ALT_DIVISOR ,
 				TARGET_ALTITUDE ) ;
-			break ;			
+			break ;	
 		case 13:
-			/*sprintf(debug_buffer, "mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;*/
-			sprintf(debug_buffer, "rmat1 , rmat4 , yw_err_z , magBdyx , magBdyy , magBdyz , mErthx , mErthy , mErthz , offx , offy , offz , algn0 , algn1 , algn2 , algn3 , gain0 , gain1 , gain2\r\n") ;
+			sprintf(debug_buffer, "offsets = %i , %i , %i , %i , %i , %i\r\n " ,
+					udb_xaccel.offset , udb_yaccel.offset , udb_zaccel.offset ,
+					udb_xrate.offset , udb_yrate.offset , udb_zrate.offset ) ;
+			break ;
+		case 14:
+#if (DEBUG_MAG == 1)
+			{
+				sprintf(debug_buffer, "rmat1 , rmat4 , yw_err_z , magBdyx , magBdyy , magBdyz , mErthx , mErthy , mErthz , offx , offy , offz , algn0 , algn1 , algn2 , algn3 , gain0 , gain1 , gain2\r\n") ;
+			}
+#else
+			{
+				sprintf(debug_buffer, "mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+			}
+#endif // DEBUG_MAG
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -125,25 +137,8 @@ void send_debug_line( void )
 	}
 	else
 	{
-		/* sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
-			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
-			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,
-			target_rate[0] , target_rate[1] , target_rate[2] , 
-				//IMU_altitude , IMU_climb  ,
-				//number_pulses , altitude , climb_rate , altitude_control , 
-			number_pulses , IMU_altitude , altitude , IMU_climb  , climb_rate , altitude_control , 
-			udb_heartbeat_counter , (int) udb_cpu_load() ,
-			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
-			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
-			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] ,
-			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] ,
-			rmat[6] , rmat[7] , 
-			// target_rmat[6] , target_rmat[7] ,
-			omegagyro[0] , omegagyro[1] , omegagyro[2] , 
-			roll_control , pitch_control, yaw_control ,
-			roll_error , pitch_error , yaw_error ) ;
-			//commanded_roll , commanded_pitch , commanded_yaw , pwManual[THROTTLE_INPUT_CHANNEL] ,
-			//accel_feedback ) ; */
+#if (DEBUG_MAG == 1)
+		{
 			sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 			rmat[1] , rmat[4] , errorYawplane[2] , 
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
@@ -151,7 +146,27 @@ void send_debug_line( void )
 			udb_magOffset[0] , udb_magOffset[1] , udb_magOffset[2] ,
 			magAlignment[0] , magAlignment[1] , magAlignment[2] , magAlignment[3] ,
 			magGain[0] , magGain[1] , magGain[2]
-			);
+			);	
+		}
+#else
+		{
+			sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
+			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,
+			target_rate[0] , target_rate[1] , target_rate[2] , 
+			number_pulses , IMU_altitude , altitude , IMU_climb  , climb_rate , altitude_control , 
+			udb_heartbeat_counter , (int) udb_cpu_load() ,
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] ,
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] ,
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] ,
+			rmat[6] , rmat[7] , 
+			omegagyro[0] , omegagyro[1] , omegagyro[2] , 
+			roll_control , pitch_control, yaw_control ,
+			roll_error , pitch_error , yaw_error ) ;	
+		}
+#endif // DEBUG_MAG
+	
 	}
 	
 	udb_serial_start_sending_data() ;

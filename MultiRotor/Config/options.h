@@ -87,9 +87,12 @@
 #define desktest
 //#define draganflier
 //#define spedix
+//#define arduCopter
 
-#ifdef draganflier
+#ifdef arduCopter
+#define NO_RADIO						0
 #define MAG_YAW_DRIFT 						0
+#define DEBUG_MAG						0
 #define TEST_ONOFF 1.0
 #define TILT_KI ( 0.01 * TEST_ONOFF )
 #define TILT_KP ( 0.08 * TEST_ONOFF )
@@ -105,21 +108,55 @@
 #define MAX_TILT 45
 
 #define USE_LIDAR 0
-#define ROTOR_CRAFT "draganflier, nov. 29, 2018\r\n"
+#define ROTOR_CRAFT "arduCopter, Jan. 27, 2019\r\n"
 #define NUM_INPUTS	4
 #define NUM_OUTPUTS	4
+// arduCopter offsets
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 270 )
+#define YACCEL_OFFSET	( 56 )
+#define ZACCEL_OFFSET	( -390 )
+#define XRATE_OFFSET	( -189 )
+#define YRATE_OFFSET	( 43 )
+#define ZRATE_OFFSET	( -21 )
+#endif
+
+#ifdef draganflier
+#define NO_RADIO						0
+#define MAG_YAW_DRIFT 						0
+#define DEBUG_MAG						0
+#define TEST_ONOFF 1.0
+#define TILT_KI ( 0.01 * TEST_ONOFF )
+#define TILT_KP ( 0.08 * TEST_ONOFF )
+#define TILT_KD ( 2.0 * TEST_ONOFF )
+#define TILT_FF 0.2
+#define TILT_KDD 0.0
+#define YAW_KI 0.5*0.0
+#define YAW_KP ( 0.3* TEST_ONOFF )
+#define YAW_KD ( 3.0* TEST_ONOFF )
+#define ACCEL_K 0.2*0.0
+#define MAX_YAW_RATE 51  
+// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
+#define MAX_TILT 45
+#define USE_LIDAR 0
+#define ROTOR_CRAFT "draganflier, Jan. 27, 2018\r\n"
+#define NUM_INPUTS	4
+#define NUM_OUTPUTS	4
+
 // draganflier offsets
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 154 )
-#define YACCEL_OFFSET	( 63 )
-#define ZACCEL_OFFSET	( -429 )
-#define XRATE_OFFSET	( -191 )
-#define YRATE_OFFSET	( 45 )
-#define ZRATE_OFFSET	( -5 )
+#define XACCEL_OFFSET	( 340 )
+#define YACCEL_OFFSET	( 231 )
+#define ZACCEL_OFFSET	( -1279 )
+#define XRATE_OFFSET	( -123 )
+#define YRATE_OFFSET	( -118 )
+#define ZRATE_OFFSET	( -99 )
 #endif
 
 #ifdef spedix
+#define NO_RADIO						0
 #define MAG_YAW_DRIFT 						0
+#define DEBUG_MAG						0
 #define USE_ESC_RATE 1
 #define TILT_KI 0.01
 #define TILT_KP 0.08
@@ -149,22 +186,26 @@
 #endif
 
 #ifdef desktest
-#define MAG_YAW_DRIFT 						1
-#define TILT_KI 0.01
-#define TILT_KP 0.08
-#define TILT_KD 2.0
+#define MAG_YAW_DRIFT						1
+#define NO_RADIO						1
+#define DEBUG_MAG						1
+#define NO_GAIN 0.0
+#define BOOST_GAIN 4.0 
+#define TILT_KI 0.01*NO_GAIN
+#define TILT_KP 0.08*BOOST_GAIN
+#define TILT_KD 2.0*NO_GAIN
 #define TILT_KDD 0.0
 #define TILT_FF 0.2
-#define YAW_KI 0.5*0.0
-#define YAW_KP 0.3
-#define YAW_KD 3.0
+#define YAW_KI 0.5*NO_GAIN
+#define YAW_KP 0.3*BOOST_GAIN
+#define YAW_KD 3.0*NO_GAIN
 #define ACCEL_K 0.2*0.0
 #define MAX_YAW_RATE 51  
 // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45
 
 #define USE_LIDAR 0
-#define ROTOR_CRAFT "desk, Jan 1, 2019\r\n"
+#define ROTOR_CRAFT "desk, Feb 10, 2019\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	6
 // desk UDB offsets
@@ -206,7 +247,7 @@
 // receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
 // you actually use this since there is no automatic landing code yet, and you'd have no manual
 // control to fall back on if things go wrong.  It may not even be legal in your area.
-#define NORADIO								1
+//#define NORADIO								0
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -297,7 +297,17 @@ void motorCntrl(void)
 		yaw_control += long_accum._.W1 ;
 
 		yaw_control += yaw_error_integral._.W1 ;
-
+#ifdef arduCopter
+		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
+		{
+			compute_altitude_control();
+		}		
+		// Mix in the yaw, pitch, and roll signals into the motors
+		motor_A += + yaw_control - pitch_control ;
+		motor_B += - yaw_control - roll_control ;
+		motor_C += + yaw_control + pitch_control ;
+		motor_D += - yaw_control + roll_control ;
+#endif
 		
 #ifdef draganflier
 		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
@@ -325,14 +335,14 @@ void motorCntrl(void)
 
 #ifdef desktest		
 		// debugging
-		compute_altitude_control();
+		/*compute_altitude_control();
 		motor_A = udb_pwIn[1];
 		motor_B = udb_pwIn[2];
 		motor_C = udb_pwIn[3];
 		motor_D = udb_pwIn[4];
 		udb_pwOut[5] = udb_servo_pulsesat( udb_pwIn[5]/10 + 2000 ) ;
-		udb_pwOut[6] = udb_servo_pulsesat( udb_pwIn[5] ) ;
-		/*
+		udb_pwOut[6] = udb_servo_pulsesat( udb_pwIn[5] ) ;*/
+		
 		long_accum.WW = __builtin_mulss(roll_error, 4000);
 		motor_A=(3000 + long_accum._.W1);	
 		long_accum.WW = __builtin_mulss(pitch_error, 4000);
@@ -340,7 +350,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulss(yaw_error, 4000);
 		motor_C=(3000 + long_accum._.W1);	
 		motor_D = 3000 ;
-		*/
+		
 #endif
 
 //		Send the signals out to the motors
