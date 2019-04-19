@@ -76,10 +76,13 @@
 // and set them below.
 #define MAG_STATIC_OFFSETS
 
-#define MAG_STATIC_OFFSET_X       -177
-#define MAG_STATIC_OFFSET_Y       123
-#define MAG_STATIC_OFFSET_Z       -80
+//#define MAG_STATIC_OFFSET_X       -177
+//#define MAG_STATIC_OFFSET_Y       123
+//#define MAG_STATIC_OFFSET_Z       -80
 
+#define MAG_STATIC_OFFSET_X       -190
+#define MAG_STATIC_OFFSET_Y       183
+#define MAG_STATIC_OFFSET_Z       -17
 // ************************************************************************
 // *** Users should not need to change anything below here ****************
 // ************************************************************************

@@ -84,15 +84,16 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
-#define desktest
+//#define desktest
 //#define draganflier
-//#define spedix
+#define spedix
 //#define arduCopter
 
 #ifdef arduCopter
 #define NO_RADIO						0
 #define MAG_YAW_DRIFT 						0
 #define DEBUG_MAG						0
+#define USE_ESC_RATE 1
 #define TEST_ONOFF 1.0
 #define TILT_KI ( 0.01 * TEST_ONOFF )
 #define TILT_KP ( 0.08 * TEST_ONOFF )
@@ -108,7 +109,7 @@
 #define MAX_TILT 45
 
 #define USE_LIDAR 0
-#define ROTOR_CRAFT "arduCopter, Jan. 27, 2019\r\n"
+#define ROTOR_CRAFT "arduCopter, March 12, 2019\r\n"
 #define NUM_INPUTS	4
 #define NUM_OUTPUTS	4
 // arduCopter offsets
@@ -155,7 +156,7 @@
 
 #ifdef spedix
 #define NO_RADIO						0
-#define MAG_YAW_DRIFT 						0
+#define MAG_YAW_DRIFT 						1
 #define DEBUG_MAG						0
 #define USE_ESC_RATE 1
 #define TILT_KI 0.01
@@ -172,7 +173,7 @@
 #define MAX_TILT 45
 
 #define USE_LIDAR 1
-#define ROTOR_CRAFT "spedix, jan 1, 2019\r\n"
+#define ROTOR_CRAFT "spedix, April 19, 2019\r\n"
 #define NUM_INPUTS	5
 #define NUM_OUTPUTS	4
 // spedix offsets

@@ -111,7 +111,7 @@ void dead_reckon(void)
 		}
 		else
 		{
-			if (number_pulses>3)
+			if (number_pulses>MIN_LIDAR_PULSE_THRESH)
 			{
 				// use LIDAR for altitude
 				locationErrorEarth[0] = - IMUlocationx._.W1;
