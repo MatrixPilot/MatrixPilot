@@ -382,7 +382,7 @@ void compute_altitude_control(void)
 	int proportional_control ;
 	number_pulses = lidar_pulses ;
 	lidar_pulses = 0 ;
-	if (number_pulses>MIN_LIDAR_PULSE_THRESH)
+	if (number_pulses>=MIN_LIDAR_PULSE_THRESH)
 	{
 		// compute LIDAR altitude in millimeters. account for tilt
 		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX)/2 ;
