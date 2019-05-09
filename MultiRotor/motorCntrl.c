@@ -80,7 +80,7 @@ int target_rmat_prev_transpose[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX
 int target_rmat_change[9] ;
 int target_rate[3] ;
 
-const int yaw_command_gain = ((long) MAX_YAW_RATE )*(2.4/PID_HZ) ;
+const uint16_t yaw_command_gain = ((long) MAX_YAW_RATE )*(4.8/PID_HZ) ;
 
 //#define GGAIN_CONTROL SCALEGYRO*6*(RMAX*(1.0/PID_HZ)) // integration multiplier for gyros
 //static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
@@ -175,7 +175,7 @@ void motorCntrl(void)
 		compute_tilt_rmat( tilt_rmat , commanded_roll , commanded_pitch ) ;
 	
 		// update yaw matrix
-		yaw_step = (commanded_yaw * yaw_command_gain)/2 ;
+		yaw_step = (commanded_yaw/4) * yaw_command_gain;
 		yaw_vector[0] = 0 ;
 		yaw_vector[1] = 0 ;
 		yaw_vector[2] = yaw_step ;
@@ -424,8 +424,8 @@ void compute_altitude_control(void)
 #endif // USE_LIDAR
 }
 
-#if  (( ( int ) + MAX_YAW_RATE   < 50 ) || ( ( int ) + MAX_YAW_RATE > 500 ))
-#error ("MAX_YAW_RATE must be between 50.0 and 500.0 degrees/second.")
+#if  (( ( int ) + MAX_YAW_RATE   < 25 ) || ( ( int ) + MAX_YAW_RATE > 250 ))
+#error ("MAX_YAW_RATE must be between 25.0 and 250.0 degrees/second.")
 #endif
 
 #if (((int) + MAX_TILT) > 45)
