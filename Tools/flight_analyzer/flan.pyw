@@ -26,6 +26,7 @@ import re
 import sys
 import os
 import stat
+import glob
 
 from matrixpilot_lib import raw_mavlink_telemetry_file
 from matrixpilot_lib import ascii_telemetry_file
@@ -165,9 +166,9 @@ def shellquote(s):
 def C_pre_processor(C_source_filename):
     """"Use the C Pre Processor to parse a C source code file like waypoints.h"""
     try:
-        programfiles = os.environ['ProgramFiles']
+        programfiles = os.environ['ProgramFiles'] # Test whether in Windows 
     except:
-        #No luck with Windows environment variable, what about GCC?
+        #No luck with Windows environment variable, what about GCC in macos / Linux ?
         try:
             output = subprocess.Popen(["/bin/sh", "-c", "gcc -E " + shellquote(C_source_filename)],
                                    stdout=subprocess.PIPE, universal_newlines=True).communicate()[0]
@@ -181,33 +182,32 @@ def C_pre_processor(C_source_filename):
                 message = error_message)
             sys.exit()
     else:
+        mystring = os.path.join(programfiles,'Microchip\\xc16\\v*')
+        directory_list = glob.glob(mystring)
+        if not directory_list:
+            # We may be running Compiler in 32 bit mode on 64 bit machine....
+            programfiles = os.environ['ProgramFiles(x86)']
+            mystring = os.path.join(programfiles,'Microchip\\xc16\\v*')
+            directory_list = glob.glob(mystring)
+            
         C_pre_processor_executable1 = \
-             os.path.join(programfiles,'Microchip\\xc16\\v1.26\\bin\\bin\\coff-cpp.exe')
-        C_pre_processor_executable2 = \
-             os.path.join(programfiles,'Microchip\\xc16\\v1.27\\bin\\bin\\coff-cpp.exe')
-        C_pre_processor_executable3 = \
              os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
-        C_pre_processor_executable4 = \
+        C_pre_processor_executable2 = \
                 os.path.join(programfiles,'Microchip\\mplabc30\\v3.25\\bin\\bin\\pic30-coff-cpp.exe')
         
         # Check that the exectuable exists ....
-        if os.path.exists(C_pre_processor_executable1):
+        if directory_list:
+            if os.path.exists(directory_list[-1]+'\\bin\\bin\\coff-cpp.exe'): # Use the last entry in directory_list
+                output = subprocess.Popen([directory_list[-1]+'\\bin\\bin\\coff-cpp.exe',C_source_filename],
+                                      stdout=subprocess.PIPE).communicate()[0]
+        elif os.path.exists(C_pre_processor_executable1):
             output = subprocess.Popen([C_pre_processor_executable1,C_source_filename],
                                      stdout=subprocess.PIPE).communicate()[0]
         elif os.path.exists(C_pre_processor_executable2):
             output = subprocess.Popen([C_pre_processor_executable2,C_source_filename],
                                      stdout=subprocess.PIPE).communicate()[0]
-        elif os.path.exists(C_pre_processor_executable3):
-            output = subprocess.Popen([C_pre_processor_executable3,C_source_filename],
-                                     stdout=subprocess.PIPE).communicate()[0]
-        elif os.path.exists(C_pre_processor_executable4):
-            output = subprocess.Popen([C_pre_processor_executable4,C_source_filename],
-                                     stdout=subprocess.PIPE).communicate()[0]
         else :
-            error_message = "Cannot find the following important executable file:\n" + \
-                    C_pre_processor_executable2 + "\n" + \
-                    "This is needed for processing wayoint files \n" + \
-                    "Currently the location is hardcoded in flan.py." 
+            error_message = "Cannot find the C Pre-Processor\n"
             print error_message
             showerror(title="Error: No C Pre-Processor Available",
                     message = error_message)
