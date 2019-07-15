@@ -781,12 +781,14 @@ void mavlink_output_40hz(void)
 	float earth_roll_velocity;      // radians / sec with respect to earth
 	float earth_yaw_velocity;       // radians / sec with respect to earth
 	int16_t accum;                  // general purpose temporary storage
+	uint64_t gps_time;              // general purpose temporary storage
 	union longbbbb accum_A_long;    // general purpose temporary storage
 	union longbbbb accum_B_long;    // general purpose temporary storage
 	uint8_t mavlink_base_mode;      // System mode, see MAV_MODE ENUM in mavlink/include/mavlink_types.h
 	uint32_t mavlink_custom_mode;   // Custom Status mode specific to the UDB / MatrixPilot
-	int32_t lat, lon, alt, relative_alt = 0;
+	int32_t lat, lon, alt, relative_alt = 0, baro = 0;
 	uint16_t mavlink_heading = 0;
+    extern int32_t barometer_agl_altitude;
 
 	enum MAV_CUSTOM_UDB_MODE_FLAG
 	{
@@ -798,7 +800,7 @@ void mavlink_output_40hz(void)
 
 	uint8_t spread_transmission_load = 0;   // Used to spread sending of different message types over a period of 1 second.
 
-	if (++mavlink_counter_40hz >= 40) mavlink_counter_40hz = 0;
+	if (++mavlink_counter_40hz >= MAVLINK_FRAME_FREQUENCY) mavlink_counter_40hz = 0;
 
 	usec += 25000;  // Frequency sensitive code
 	msec += 25;     // Frequency sensitive code
@@ -843,11 +845,15 @@ void mavlink_output_40hz(void)
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
 		int16_t gps_fix_type;
-		if (gps_nav_valid())
+		if (gps_nav_valid()){
 			gps_fix_type = 3;
-		else
+            gps_time = ((uint64_t)(week_no.BB) << 32) + tow.WW;
+        }
+		else{
 			gps_fix_type = 0;
-		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, usec, gps_fix_type, lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs);
+            gps_time = usec;
+        }
+		mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0, gps_time, gps_fix_type, lat_gps.WW, lon_gps.WW, alt_sl_gps.WW, hdop, 65535, sog_gps.BB, cog_gps.BB, svs);
 	}
 
 	// GLOBAL POSITION INT - derived from fused sensors
@@ -872,9 +878,10 @@ void mavlink_output_40hz(void)
 		accum_A_long.WW = IMUlocationz._.W1;
 		relative_alt = accum_A_long.WW * 1000;
 		alt = relative_alt + (alt_origin.WW * 10);          // In millimeters; more accurate if used IMUlocationz._.W0
+        baro = (int32_t) barometer_agl_altitude;
 
 		mavlink_heading = get_geo_heading_angle() * 100;    // mavlink global position expects heading value x 100
-		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon, alt, relative_alt,
+		mavlink_msg_global_position_int_send(MAVLINK_COMM_0, msec, lat, lon, baro, get_barometer_altitude(),
 		    IMUvelocityy._.W1, IMUvelocityx._.W1, -IMUvelocityz._.W1, //  IMUVelocity upper word gives V in cm / second
 		        // MAVLink is using North,East,Down Frame (NED). MatrixPilot IMUVelocity is in earth frame (X is East, Y is North, Z is Up)
 		    mavlink_heading); // heading should be from 0 to 35999 meaning 0 to 359.99 degrees.
@@ -885,7 +892,7 @@ void mavlink_output_40hz(void)
 	// ATTITUDE
 	//  Roll: Earth Frame of Reference
 	spread_transmission_load = 12;
-	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_POSITION], mavlink_counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_EXTRA2], mavlink_counter_40hz + spread_transmission_load))
 	{
 		matrix_accum.x = rmat[8];
 		matrix_accum.y = rmat[6];
@@ -991,7 +998,8 @@ void mavlink_output_40hz(void)
 	//     uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw,
 	//     uint16_t chan8_raw, uint8_t rssi)
 	spread_transmission_load = 24;
-	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
+//gfm	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RC_CHANNELS], mavlink_counter_40hz + spread_transmission_load))
 	{
 		mavlink_msg_rc_channels_raw_send(MAVLINK_COMM_0, msec,
 		    (uint16_t)((udb_pwIn[0]) >> 1),
@@ -1040,7 +1048,7 @@ void mavlink_output_40hz(void)
 	spread_transmission_load = 36;
 	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_EXTRA2], mavlink_counter_40hz + spread_transmission_load))
 	{
-		mavlink_msg_altitudes_send(MAVLINK_COMM_0, msec, alt_sl_gps.WW, relative_alt, 0, 0, 0, 0);
+		mavlink_msg_altitudes_send(MAVLINK_COMM_0, msec, alt_sl_gps.WW, relative_alt, IMUheight, get_barometer_altitude(), 0, 0);
 		//mavlink_msg_altitudes_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t alt_gps, int32_t alt_imu, int32_t alt_barometric, int32_t alt_optical_flow, int32_t alt_range_finder, int32_t alt_extra)
 	}
 

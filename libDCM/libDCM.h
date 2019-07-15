@@ -63,7 +63,7 @@ vect3_32t dcm_rel2abs(vect3_32t rel);
 extern union dcm_fbts_word { struct dcm_flag_bits _; int16_t W; } dcm_flags;
 
 // Calibrate for 10 seconds before moving servos
-#define DCM_CALIB_COUNT  400    // 10 seconds at 40 Hz
-#define DCM_GPS_COUNT    1000   // 25 seconds at 40 Hz
+#define DCM_CALIB_COUNT  10*PID_HZ    // 10 seconds at 40 Hz
+#define DCM_GPS_COUNT    25*PID_HZ   // 25 seconds at 40 Hz
 
 #endif // LIB_DCM_H

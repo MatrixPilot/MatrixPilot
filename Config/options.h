@@ -151,14 +151,20 @@
 // If you select this option, you also need to set magnetometer options in
 // the options_magnetometer.h file, including declination and magnetometer type.
 #ifndef MAG_YAW_DRIFT
-#define MAG_YAW_DRIFT                       0
+#define MAG_YAW_DRIFT                       1
 #endif
 
-// Define USE_BAROMETER_ALTITUDE to be 1 to use barometer for altitude correction.
+// Define USE_BAROMETER_ALTITUDE to be 1 to use barometer BMP085 for altitude correction.
+// Define USE_BAROMETER_ALTITUDE to be 2 to use barometer MPL3115A2 for altitude correction.
 // Otherwise, if set to 0 only the GPS will be used.
 // Barometers such as the BMP180 must be shaded from sunlight or they will return false readings.
 #ifndef USE_BAROMETER_ALTITUDE
-#define USE_BAROMETER_ALTITUDE              0
+#define USE_BAROMETER_ALTITUDE              2
+#endif
+
+// Define USE_LIDAR_ALTITUDE to be 1 to use Lidar Lite V3 for altitude correction.
+#ifndef USE_LIDAR_ALTITUDE
+#define USE_LIDAR_ALTITUDE                  1
 #endif
 
 // Racing Mode
@@ -209,7 +215,8 @@
 // If using PWM inputs (parallel Rx connections), set to the number of cables connected, 1-8
 // If using PPM inputs (serial Rx connection), set to the number of Rx channels, up to PPM_NUMBER_OF_CHANNELS
 // If using LRS library (integrated SPI tranceiver), set to the number of Rx channels, up to 16
-#define NUM_INPUTS                          5
+// In case of Lidar connected to the input channels, define NUM_INPUTS as number of radio channels + 1
+#define NUM_INPUTS                          7
 
 // Channel numbers for each input.
 // Use as is, or edit to match your setup.
@@ -369,7 +376,7 @@
 // Note that SERIAL_MAVLINK defaults to using a baud rate of 57600 baud (other formats default to 19200)
 
 #ifndef SERIAL_OUTPUT_FORMAT
-#define SERIAL_OUTPUT_FORMAT                SERIAL_NONE
+#define SERIAL_OUTPUT_FORMAT                SERIAL_MAVLINK
 #endif
 
 

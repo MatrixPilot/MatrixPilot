@@ -30,7 +30,7 @@
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
 #include "sonarCntrl.h"
-#include "../libDCM/deadReckoning.h"
+#include "../libDCM/estAltitude.h"
 #include "../libUDB/servoOut.h"
 
 #if (ALTITUDE_GAINS_VARIABLE == 1)
@@ -149,9 +149,6 @@ static int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) 
 
 void altitudeCntrl(void)
 {
-#if (USE_SONAR_INPUT != 0)
-	calculate_sonar_height_above_ground();
-#endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)
 	{
 		hoverAltitudeCntrl();
@@ -308,7 +305,8 @@ static void normalAltitudeCntrl(void)
 		else
 		{
 			heightError._.W1 = - desiredHeight;
-			heightError.WW = (heightError.WW + IMUlocationz.WW + speed_height) >> 13;
+//			heightError.WW = (heightError.WW + IMUlocationz.WW + speed_height) >> 13;
+			heightError.WW = (heightError.WW + estimated_altitude*64 + speed_height) >> 13; //  (in 1/8 m) 64 would be 65.536         
 			if (heightError._.W0 < -height_marginx8)
 			{
 				throttleAccum.WW = (int16_t)(max_throttle);
@@ -324,7 +322,7 @@ static void normalAltitudeCntrl(void)
 			}
 
 			heightError._.W1 = - desiredHeight;
-			heightError.WW = (heightError.WW + IMUlocationz.WW - speed_height) >> 13;
+			heightError.WW = (heightError.WW + estimated_altitude*64 - speed_height) >> 13;
 			if (heightError._.W0 < -height_marginx8)
 			{
 				pitchAltitudeAdjust = (int16_t)(pitch_at_max);

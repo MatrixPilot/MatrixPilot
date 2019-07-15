@@ -26,6 +26,7 @@
 #include "../libDCM/estWind.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/deadReckoning.h"
+#include "../libUDB/heartbeat.h"
 
 int16_t minimum_groundspeed;
 int16_t minimum_airspeed;
@@ -53,7 +54,7 @@ void init_airspeedCntrl(void)
 	maximum_airspeed    = MAXIMUM_AIRSPEED    * 100;
 	cruise_airspeed     = CRUISE_AIRSPEED     * 100;
 
-	airspeed_pitch_adjust_rate = (AIRSPEED_PITCH_ADJ_RATE * (RMAX/(57.3 * 40.0)));
+	airspeed_pitch_adjust_rate = (AIRSPEED_PITCH_ADJ_RATE * (RMAX/(57.3 * PID_HZ)));
 	airspeed_pitch_ki_limit    = (AIRSPEED_PITCH_KI_MAX   * (RMAX/57.3));
 	airspeed_pitch_ki          = (AIRSPEED_PITCH_KI       * (RMAX));
 	airspeed_pitch_min_aspd    = (AIRSPEED_PITCH_MIN_ASPD * (RMAX/57.3));
@@ -68,7 +69,7 @@ void save_airspeedCntrl(void)
 	= maximum_airspeed    / MAXIMUM_AIRSPEED    * 100;
 	= cruise_airspeed     / CRUISE_AIRSPEED     * 100;
 
-	= airspeed_pitch_adjust_rate / (AIRSPEED_PITCH_ADJ_RATE * (RMAX/(57.3 * 40.0)));
+	= airspeed_pitch_adjust_rate / (AIRSPEED_PITCH_ADJ_RATE * (RMAX/(57.3 * PID_HZ)));
 	= airspeed_pitch_ki_limit    / (AIRSPEED_PITCH_KI_MAX   * (RMAX/57.3));
 	= airspeed_pitch_ki          / (AIRSPEED_PITCH_KI       * (RMAX));
 	= airspeed_pitch_min_aspd    / (AIRSPEED_PITCH_MIN_ASPD * (RMAX/57.3));

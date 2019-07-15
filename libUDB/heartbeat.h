@@ -36,6 +36,13 @@
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)
 #define PID_HZ 40
 
+// Sensors rate on the I2C bus. Same rate for all sensors connected to the bus
+#define I2C_SENSOR_RATE 6
+
+//Telemetry rate
+#define TELEMETRY_RATE 8
+//OSD rate
+#define OSD_RATE 8
 // PWM rate for ESCs (Quadcopter support)
 //#define ESC_HZ 400
 #define ESC_HZ 200

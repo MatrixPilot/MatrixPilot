@@ -149,7 +149,7 @@ static void gps_parse_common_callback(void)
 
 		estLocation();
 		estWind(GetAofA());
-		estAltitude();
+//		estAltitude(); // Altitude update is reported in libDCM/udb_heartbeat_callback
 		estYawDrift();
 
 		dcm_flags._.yaw_req = 1;       // request yaw drift correction

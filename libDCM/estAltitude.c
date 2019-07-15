@@ -22,6 +22,7 @@
 #include "libDCM.h"
 #include "gpsData.h"
 #include "../libUDB/barometer.h"
+#include "../libUDB/lidar.h"
 #include "estAltitude.h"
 #include <math.h>
 #include <stdlib.h>
@@ -31,12 +32,17 @@
 // The origin is recorded as the altitude of the plane during power up.
 
 long barometer_pressure_gnd = 0;
+long barometer_altitude_gnd = 0;
+long barometer_altitude_gnd0 = 0;
+int32_t barometer_agl_altitude;
 int barometer_temperature_gnd = 0;
 
 static long barometer_altitude;        // above sea level altitude - ASL (millimeters)
 long barometer_pressure;
 int16_t barometer_temperature;
 float sea_level_pressure;
+static int32_t lidar_altitude;        // lidar above ground height (millimeters)
+int32_t estimated_altitude;        //  (millimeters)
 
 inline int16_t get_barometer_temperature(void)   { return barometer_temperature; }
 inline long get_barometer_pressure(void)     { return barometer_pressure; }
@@ -48,6 +54,7 @@ int16_t barometerInterval = 0;
  */
 void altimeter_calibrate(void)
 {
+#if (USE_BAROMETER_ALTITUDE == 1)
 	int ground_altitude = alt_origin.WW / 100;    // meters
 	barometer_temperature_gnd = barometer_temperature;
 	barometer_pressure_gnd = barometer_pressure;
@@ -55,6 +62,15 @@ void altimeter_calibrate(void)
 	sea_level_pressure = ((float)barometer_pressure / powf((1 - (ground_altitude/44330.0)), 5.255));
 
 	DPRINT("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
+#elif (USE_BAROMETER_ALTITUDE == 2)
+	if (barometer_altitude_gnd0 == 0) barometer_altitude_gnd0 = barometer_altitude;
+        else barometer_altitude_gnd0 = (15*barometer_altitude_gnd0 + barometer_altitude)/16;
+        barometer_altitude_gnd = barometer_altitude_gnd0;
+#endif
+#if (USE_LIDAR_ALTITUDE >0)
+	if (lidar0 == 0) lidar0 = lidar_altitude;
+        else lidar0 = (15*lidar0 + lidar_altitude)/16;
+#endif  //LIDAR_ALTITUDE > 0
 }
 
 #if (USE_BAROMETER_ALTITUDE == 1)
@@ -63,6 +79,12 @@ void udb_barometer_callback(long pressure, int16_t temperature, char status)
 	barometer_temperature = temperature; // units of 0.1 deg C
 	barometer_pressure = pressure; // units are Pascals so this could be reduced to an uint16_t
 }
+#elif (USE_BAROMETER_ALTITUDE == 2)
+void udb_barometer_callback(long altitude, int16_t temperature, char status)
+{
+	barometer_temperature = temperature; // units of 0.1 deg C
+	barometer_altitude = altitude;//Altitude in mm
+}
 #endif
 
 /**
@@ -70,6 +92,13 @@ void udb_barometer_callback(long pressure, int16_t temperature, char status)
  * @param
  * @return
  */
+void udb_lidar_callback(long altitude)
+{
+	lidar_altitude = altitude;//Altitude in mm
+}
+
+//Estimate the best altitude from all four sensors IMU, Baro, Lidar or sonanr and GPS
+
 void estAltitude(void)
 {
 #if (USE_BAROMETER_ALTITUDE == 1)
@@ -87,6 +116,23 @@ void estAltitude(void)
 		// print pressure altitude, pressure and current SLP estimate
 		printf("estAltitude %f, pressure %f, sea level pressure %f\r\n", (double) barometer_alt, (double) (.01 * pressure_ambient), (double) (.01 * sea_level_pressure));
 #endif
-	}
+#elif (USE_BAROMETER_ALTITUDE == 2)
+        barometer_agl_altitude = barometer_altitude - barometer_altitude_gnd;
+#ifdef USE_DEBUG_IO
+		// estimate sea level pressure assuming we're still on the ground
+		// print altitude
+		printf("estAltitude %f\r\n", (double) barometer_agl_altitude);
+#endif
 #endif // USE_BAROMETER_ALTITUDE
+#if (USE_BAROMETER_ALTITUDE > 0)
+        estimated_altitude = lidar_altitude;        // barometer altitude (millimeters)
+#endif
+#if (USE_LIDAR_ALTITUDE >0)
+        if (lidar_altitude <10000) estimated_altitude = lidar_altitude;        // lidar altitude (millimeters)
+
+#endif  //LIDAR_ALTITUDE > 0
+#if (USE_SONAR_INPUT != 0)
+	calculate_sonar_height_above_ground();
+    if (sonar_height_to_ground <10000) estimated_altitude = sonar_height_to_ground;        // lidar altitude (millimeters)
+#endif
 }

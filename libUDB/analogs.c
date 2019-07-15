@@ -69,7 +69,7 @@ void calculate_analog_sensor_values(void)
 #endif
     
 #if (ANALOG_CURRENT_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
-	// mAh = mA / 144000 (increment per 40Hz tick is /40*60*60)
+	// mAh = mA / 144000 (increment per PID_HZ tick is /PID_HZ*60*60)
 	// 90000/144000 == 900/1440
 	battery_mAh_used.WW += (battery_current.WW / 1440);
 #endif

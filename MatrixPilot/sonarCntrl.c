@@ -22,6 +22,7 @@
 #include "defines.h"
 #include "sonarCntrl.h"
 #include "../libUDB/sonarIn.h"
+#include "../libDCM/estAltitude.h"
 #include "../libDCM/rmat.h"
 
 #if (USE_SONAR_INPUT != 0)

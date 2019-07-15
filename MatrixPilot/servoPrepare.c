@@ -83,7 +83,7 @@ void servoPrepare_init(void) // initialize the PWM
 
 static void flight_controller(void)
 {
-	if (udb_pulse_counter % (HEARTBEAT_HZ/40) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ/PID_HZ) == 0)
 	{
 		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
 	
@@ -129,16 +129,9 @@ void dcm_heartbeat_callback(void)
 	// TODO: move this block into the end of flight_controller or after it's called
 	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 	{
-#if (USE_MAVLINK == 1)
-		// Poll the MAVLink subsystem at 40hz
-		if (udb_pulse_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			mavlink_output_40hz();
-		}
-#endif // (USE_MAVLINK == 1)
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 		// Send telemetry updates at 8hz
-		if (udb_pulse_counter % (HEARTBEAT_HZ/8) == 0)
+		if ((udb_pulse_counter % (HEARTBEAT_HZ/TELEMETRY_RATE) == 0) && (dcm_flags._.udb_init_finished == 1))
 		{
 // RobD			flight_state_8hz();
 			telemetry_output_8hz();
@@ -147,7 +140,7 @@ void dcm_heartbeat_callback(void)
 	}
 
 		// Poll the OSD subsystem at 8hz
-	if (udb_pulse_counter % (HEARTBEAT_HZ/8) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ/OSD_RATE) == 0)
 	{
 #if (USE_OSD == OSD_NATIVE)
 		mp_osd_run_step(udb_pulse_counter); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
@@ -159,4 +152,11 @@ void dcm_heartbeat_callback(void)
 		minim_osd_8hz();
 #endif // USE_OSD
 	}
+#if (USE_MAVLINK == 1)
+		// Poll the MAVLink subsystem at 40hz
+		if ((udb_pulse_counter % (HEARTBEAT_HZ/MAVLINK_FRAME_FREQUENCY) == 0) && (dcm_flags._.udb_init_finished == 1))
+		{
+			mavlink_output_40hz();
+		}
+#endif // (USE_MAVLINK == 1)
 }

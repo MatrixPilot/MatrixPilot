@@ -33,7 +33,7 @@
 // BEWARE: This uses an alternative library for altitude control
 // Your aircraft will not behave the same way as when using non variable gains.
 #ifndef ALTITUDE_GAINS_VARIABLE
-#define ALTITUDE_GAINS_VARIABLE             0
+#define ALTITUDE_GAINS_VARIABLE             1
 #endif
 
 // Aileron/Roll Control Gains

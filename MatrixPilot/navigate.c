@@ -122,9 +122,6 @@ void dcm_callback_gps_location_updated(void)
 		// extend this code.
 		state_flags._.save_origin = 0;
 		setup_origin();
-#if (USE_BAROMETER_ALTITUDE == 1)
-		altimeter_calibrate();
-#endif
 	}
 
 // Ideally, navigate should take less than one second.

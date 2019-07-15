@@ -45,6 +45,7 @@ struct dcm_flag_bits {
 	uint16_t init_finished          : 1;
 	uint16_t calib_finished         : 1;
 	uint16_t integrate_req          : 1; // for multirotor support, under development
+	uint16_t udb_init_finished      : 1; // for multirotor support, under development
 };
 
 

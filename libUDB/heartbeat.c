@@ -88,8 +88,8 @@ inline void heartbeat(void) // called from ISR
 	// This calls the state machine implemented in MatrixPilot/states.c
 	// it is called at high priority to ensure manual control takeover can
 	// occur, even if the lower priority tasks hang
-	// Call the periodic callback at 40 Hz
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/40) == 0)
+	// Call the periodic callback at PID_HZ (40 Hz)
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/PID_HZ) == 0)
 	{
 		// by default runs the MatrixPilot state machine in states.c
 		udb_heartbeat_40hz_callback(); // this was called udb_background_callback_periodic()
@@ -112,13 +112,13 @@ static void heartbeat_pulse(void)
 #if (BOARD_TYPE == UDB4_BOARD) 
 	// IDG500 and ISZ500 Gyros settle at least 200 milliseconds after startup
 	// Auto-zero the UDB4 gyros 1 second before calibration of offsets
-	if (((udb_pulse_counter / (HEARTBEAT_HZ / 40)) > ( DCM_CALIB_COUNT - 40 )) 
+	if (((udb_pulse_counter / (HEARTBEAT_HZ / PID_HZ)) > ( DCM_CALIB_COUNT - PID_HZ )) 
 		&& (udb_gyros_autozero_latched_up == false ))
 	{
 		udb_gyros_auto_zero_latch_up();
 		udb_gyros_autozero_latched_up = true;
 	}
-	if (((udb_pulse_counter / (HEARTBEAT_HZ / 40)) > (DCM_CALIB_COUNT - 39))  
+	if (((udb_pulse_counter / (HEARTBEAT_HZ / PID_HZ)) > (DCM_CALIB_COUNT - 39))  
 		&& (udb_gyros_autozero_latched_down == false ))
 	{
 		udb_gyros_auto_zero_latch_down();
@@ -151,7 +151,7 @@ static void heartbeat_pulse(void)
 #endif // VREF
 
 	udb_callback_read_sensors();
-	if ((udb_pulse_counter % (HEARTBEAT_HZ/40)) == 0)
+	if ((udb_pulse_counter % (HEARTBEAT_HZ/PID_HZ)) == 0)
  	{
  		calculate_analog_sensor_values();
  		udb_flags._.a2d_read = 1; // signal the A/D to start the next summation
@@ -160,7 +160,7 @@ static void heartbeat_pulse(void)
 	// process sensor data, run flight controller, generate outputs. implemented in libDCM.c
 	udb_heartbeat_callback(); // this was called udb_servo_callback_prepare_outputs()
 
-	if (udb_pulse_counter % (HEARTBEAT_HZ/40) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ/PID_HZ) == 0)
 	{
 #if (USE_I2C1_DRIVER == 1)
 		I2C1_trigger_service();
