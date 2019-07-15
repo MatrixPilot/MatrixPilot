@@ -34,6 +34,8 @@
 #include <math.h>
 #include <stdlib.h> // for declaration of function abs() under gcc
 #include "options_airspeed.h" 
+#include "../Config/options_multicopter.h"
+#include "euler_angles.h"
 
 //#ifndef RTL_PITCH_DOWN
 //#define RTL_PITCH_DOWN (0.0)
@@ -88,6 +90,48 @@ int16_t tiltError[3];
 int16_t desiredRotationRateRadians[3];
 int16_t rotationRateError[3];
 //int16_t angleOfAttack;
+
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+extern int control_mode;
+void helicalTurnCntrl(void)
+{
+	union longww gyroPitchFeedback;
+//Roll set-up 
+	if (!canStabilizeInverted() || !desired_behavior._.inverted)
+	{
+		 tiltError[1] = rmat[6];
+		rotationRateError[1]  = omegaAccum[1];
+	}
+	else
+	{
+		 tiltError[1] = -rmat[6];
+		 rotationRateError[1] = -omegaAccum[1];
+	}
+        desiredRotationRateRadians[1] =0;
+//Pitch set-up 
+	if (!canStabilizeInverted() || !desired_behavior._.inverted)
+	{
+		 tiltError[0] = rmat[7];
+	          gyroPitchFeedback.WW = (__builtin_mulss(rmat[8], omegagyro[0])
+	               - __builtin_mulss(rmat[6], omegagyro[2])) << 1;
+	}
+	else
+	{
+		 tiltError[0] = -rmat[7];
+	          gyroPitchFeedback.WW = (__builtin_mulss(rmat[6], omegagyro[2])
+	               - __builtin_mulss(rmat[8], omegagyro[0])) << 1;
+	}
+       rotationRateError[0]  = gyroPitchFeedback._.W1;
+       desiredRotationRateRadians[0] =0;
+// Yaw set-up
+        if (control_mode == TILT_MODE) 
+            tiltError[2] = 0;
+        else
+       tiltError[2] = (get_geo_heading_angle()/360*RMAX); //Heading in binaire
+       rotationRateError[2]  = omegaAccum[2];
+       desiredRotationRateRadians[2] =0;
+}
+#else
 
 static int16_t estimatedLift;
 static int16_t relativeLoading;
@@ -497,3 +541,4 @@ void helicalTurnCntrl(void)
 	// compute the rotation rate error vector
 	VectorSubtract(3, rotationRateError, omegaAccum, desiredRotationRateGyro);
 }
+#endif

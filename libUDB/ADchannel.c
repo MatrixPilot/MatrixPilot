@@ -21,6 +21,7 @@
 
 #include "libUDB.h"
 #include "ADchannel.h"
+#include "../libDCM/libDCM.h"
 
 
 struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
@@ -88,18 +89,18 @@ void udb_a2d_record_offsets(void)
 #ifdef INITIALIZE_VERTICAL // for VTOL, vertical initialization
 	// almost ready to turn the control on, save the input offsets
 	UDB_XACCEL.offset = UDB_XACCEL.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // opposite direction
+	UDB_YACCEL.offset = UDB_YACCEL.value - (Y_GRAVITY_SIGN ((int16_t)(ACCEL_RANGE/2*GRAVITY))); // opposite direction
 	UDB_ZACCEL.offset = UDB_ZACCEL.value;	
 #else
 	// almost ready to turn the control on, save the input offsets
-	UDB_XACCEL.offset = UDB_XACCEL.value;
-	UDB_YACCEL.offset = UDB_YACCEL.value;
-	UDB_ZACCEL.offset = UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))); // same direction
+		UDB_XACCEL.offset = __builtin_divsd(udb_xaccel.sum, DCM_CALIB_COUNT);
+		UDB_YACCEL.offset = __builtin_divsd(udb_yaccel.sum, DCM_CALIB_COUNT);
+		UDB_ZACCEL.offset = __builtin_divsd(udb_zaccel.sum, DCM_CALIB_COUNT)+ (Z_GRAVITY_SIGN ((int16_t)(ACCEL_RANGE/2*GRAVITY))); // same direction;
 #endif // INITIALIZE_VERTICAL
 
-	udb_xrate.offset  = udb_xrate.value;
-	udb_yrate.offset  = udb_yrate.value;
-	udb_zrate.offset  = udb_zrate.value;
+		udb_xrate.offset  = __builtin_divsd(udb_xrate.sum,  DCM_CALIB_COUNT);
+		udb_yrate.offset  = __builtin_divsd(udb_yrate.sum,  DCM_CALIB_COUNT);
+		udb_zrate.offset  = __builtin_divsd(udb_zrate.sum,  DCM_CALIB_COUNT);
 	
 #endif // CUSTOM_OFFSETS
 	

@@ -32,6 +32,8 @@
 //#include <string.h>
 //#include <stdarg.h>
 #include <math.h>
+#include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
 
 //#if (DECLINATIONANGLE_VARIABLE != 1)
 //union intbb dcm_declination_angle = { .BB = 0};
@@ -54,6 +56,11 @@ int16_t send_variables_counter = 0;
 int16_t send_by_index = 0;
 
 extern uint16_t maxstack;
+// modif gfm
+extern uint16_t  AID_INI_length;
+extern void send_msg_AID_INI(uint8_t* );
+extern uint8_t  AID_INI[];
+// fin modif gfm
 static boolean mavlink_parameter_out_of_bounds(mavlink_param_union_t parm, int16_t i);
 
 // ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
@@ -360,7 +367,24 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
 	*((int16_t*)mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 }
+/*// modif gfm send & get GPS position
+void mavlink_send_gps_position(int16_t i)
+{
+	param_union_t param;
 
+	param.param_int32 = *((int32_t*)mavlink_parameters_list[i].pparam);
+	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
+	    param.param_float, MAVLINK_TYPE_INT32_T, count_of_parameters_list, i); 
+}
+
+void mavlink_set_gps_position(mavlink_param_union_t setting, int16_t i)
+{
+	if (setting.type != MAVLINK_TYPE_INT32_T) return;
+
+	*((int32_t*)mavlink_parameters_list[i].pparam) = (int32_t) setting.param_int32;
+}
+// fin modif gfm
+*/
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
 static int16_t get_param_index(const char* key)
@@ -431,7 +455,46 @@ static void MAVParamsSet(const mavlink_message_t* handle_msg)
 				send_by_index = i;
 				mavlink_flags.mavlink_send_specific_variable = 1;
 			}
-		}
+/*// modif gfm send GPS init into GPS
+                                        // looking for GPS param
+                                            union longww temp;
+//                                      // compare key with parameter name
+                                            if (!strcmp(packet.param_id,"GPS_LATITUDE" )) // If QGC is setting a GPS value
+                                                {
+                                                lat_gps.WW=(int32_t)param.param_int32;
+                                                send_msg_AID_INI(AID_INI);
+                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                }
+                                            if (!strcmp(packet.param_id,"GPS_LONGITUDE" )) // If QGC is setting a GPS value
+                                                {
+                                                lon_gps.WW=(int32_t)param.param_int32;
+                                                send_msg_AID_INI(AID_INI);
+                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                }
+                                            if (!strcmp(packet.param_id,"GPS_ALTITUDE" )) // If QGC is setting a GPS value
+                                                {
+                                                alt_sl_gps.WW=(int32_t)param.param_int32;
+                                                send_msg_AID_INI(AID_INI);
+                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                }
+                                            if (!strcmp(packet.param_id,"GPS_WEEK_NO" )) // If QGC is setting a GPS value
+                                                {
+                                                week_no.BB=(int16_t)param.param_int32;
+                                                send_msg_AID_INI(AID_INI);
+                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                }
+                                            if (!strcmp(packet.param_id,"GPS_TOW" )) // If QGC is setting a GPS value
+                                                {
+                                                temp.WW = (int32_t)param.param_int32;
+                                                tow.__.B0=(uint8_t)(temp._.W0&0x00FF);
+                                                tow.__.B1=(uint8_t)(temp._.W0 >> 8);
+                                                tow.__.B2=(uint8_t)(temp._.W1&0x00FF);
+                                                tow.__.B3=(uint8_t)(temp._.W1 >> 8);
+                                                send_msg_AID_INI(AID_INI);
+                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                }
+// fin modif gfm
+*/		}
 		else
 		{
 			DPRINT("Attempt to set unknown parameter name: %s\r\n", (const char*)packet.param_id);

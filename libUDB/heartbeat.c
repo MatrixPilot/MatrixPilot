@@ -71,12 +71,13 @@ inline uint16_t heartbeat_cnt(void)
 //              outside of this module, so it could be moved up.
 inline void heartbeat(void) // called from ISR
 {
+#if AIRFRAME_TYPE != AIRFRAME_QUAD
 	// Start the sequential servo pulses at frequency SERVO_HZ
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
 	{
 		start_pwm_outputs();
 	}
-
+#endif
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
 	{
@@ -108,7 +109,7 @@ inline void heartbeat(void) // called from ISR
 // This is a good place to eventually compute pulse widths for servos.
 static void heartbeat_pulse(void)
 {
-	led_off(LED_BLUE);  // indicates logfile activity
+//	led_off(LED_BLUE);  // indicates logfile activity
 #if (BOARD_TYPE == UDB4_BOARD) 
 	// IDG500 and ISZ500 Gyros settle at least 200 milliseconds after startup
 	// Auto-zero the UDB4 gyros 1 second before calibration of offsets

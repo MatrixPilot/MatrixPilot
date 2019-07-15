@@ -248,7 +248,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 
 	// When there is a chance that data will be read soon,
 	// have the new average values ready.
-	if (sample_count > ALMOST_ENOUGH_SAMPLES)
+	if ((sample_count > ALMOST_ENOUGH_SAMPLES) && (sample_count>0))
 	{
 		udb_vcc.value = __builtin_divsd(udb_vcc.sum, sample_count);
 		udb_5v.value  = __builtin_divsd(udb_5v.sum,  sample_count);
@@ -264,6 +264,14 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _DMA0Interrupt(void)
 #if (NUM_ANALOG_INPUTS >= 4)
 		udb_analogInputs[3].value = __builtin_divsd(udb_analogInputs[3].sum, sample_count);
 #endif
+// modif gfm to avoid division by 0 exception occurrence encountered on my UDB5
+                  sample_count = 0;
+		udb_vcc.sum = 0;
+		udb_5v.sum = 0;
+#if (NUM_ANALOG_INPUTS >= 1)
+		udb_analogInputs[0].sum = 0;
+#endif
+// fin modif gfm
 	}
 
 	interrupt_restore_corcon;

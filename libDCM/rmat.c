@@ -156,11 +156,6 @@ void dcm_init_rmat(void)
 {
 #if (MAG_YAW_DRIFT == 1)
 	mag_drift_init();
-//#if (DECLINATIONANGLE_VARIABLE == 1)
-//	dcm_declination_angle.BB = DECLINATIONANGLE;
-//#endif
-//	declinationVector[0] = cosine((int8_t) (DECLINATIONANGLE >> 8));
-//	declinationVector[1] = sine((int8_t) (DECLINATIONANGLE >> 8));
 #endif
 }
 

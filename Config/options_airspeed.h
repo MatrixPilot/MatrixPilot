@@ -47,6 +47,7 @@
 
 // Airspeed error integrator
 #define AIRSPEED_PITCH_KI           0.04    // Integrataion rate.  High = unstable, low = slow response.
+#define AIRSPEED_PITCH_KP           0.2    // Proportional.  High = unstable, low = slow response.
 #define AIRSPEED_PITCH_KI_MAX       0.0     // Limit of integration control in degrees.  Start with 5.0.
 
 

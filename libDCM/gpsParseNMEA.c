@@ -132,7 +132,7 @@ static uint8_t data_valid_, NS_, EW_;
 //union longbbbb date_gps_, time_gps_;
 union intbb nav_valid_, nav_type_;
 //union longbbbb climb_gps_;
-union longbbbb week_no_;
+union intbb week_no_;
 
 
 // if data_valid is 'A', there is valid GPS data that can be used for navigation.

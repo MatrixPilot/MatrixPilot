@@ -44,8 +44,8 @@
 //OSD rate
 #define OSD_RATE 8
 // PWM rate for ESCs (Quadcopter support)
-//#define ESC_HZ 400
-#define ESC_HZ 200
+#define ESC_HZ 400
+//#define ESC_HZ 200
 
 // Read-only value increments with each heartbeat
 extern uint16_t udb_heartbeat_counter;

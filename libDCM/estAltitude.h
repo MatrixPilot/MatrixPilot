@@ -34,6 +34,7 @@ void udb_lidar_callback(long altitude);
 void altimeter_calibrate(void);
 void estAltitude(void);
 extern int32_t estimated_altitude;        // previous above ground height (millimeters)
+//extern int32_t fusion,vze_fusion;                // Altitude fusion output (in mm)
 
 long get_barometer_altitude(void);
 long get_barometer_pressure(void);

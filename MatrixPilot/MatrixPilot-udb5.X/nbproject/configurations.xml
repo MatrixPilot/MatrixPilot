@@ -39,6 +39,7 @@
         <itemPath>../../Config/options_osd.h</itemPath>
         <itemPath>../../Config/options_ports.h</itemPath>
         <itemPath>../../Config/options_servo_mix.h</itemPath>
+        <itemPath>../../Config/options_multicopter.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
         <itemPath>../../libDCM/dcmTypes.h</itemPath>
@@ -160,6 +161,7 @@
         <itemPath>../../MatrixPilot/states.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.h</itemPath>
+        <itemPath>../motorCntrl.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
@@ -525,6 +527,7 @@
         <itemPath>../../MatrixPilot/telemetry.c</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.c</itemPath>
         <itemPath>../../MatrixPilot/yawCntrl.c</itemPath>
+        <itemPath>../motorCntrl.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">

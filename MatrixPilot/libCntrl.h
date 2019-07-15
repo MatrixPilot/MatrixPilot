@@ -25,7 +25,7 @@
 extern int16_t pitch_control;
 extern int16_t roll_control;
 extern int16_t yaw_control;
-//extern int16_t throttle_control;
+extern int16_t throttle_control;
 //extern union longww throttleFiltered;
 //extern int16_t pitchAltitudeAdjust;
 

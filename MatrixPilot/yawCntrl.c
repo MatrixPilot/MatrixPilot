@@ -36,8 +36,11 @@ uint16_t yawkdrud;
 uint16_t yawkpfdfwd;
 uint16_t rollkprud;
 uint16_t rollkdrud;
+uint16_t yawkarud;
+static union longww  yawAccel_1 = { 0 };
 uint16_t hoveryawkp;
 uint16_t hoveryawkd;
+uint16_t yawkafilter;//Contain the static filter gain
 
 void normalYawCntrl(void);
 void hoverYawCntrl(void);
@@ -45,16 +48,20 @@ void hoverYawCntrl(void);
 void init_yawCntrl(void)
 {
 	yawkdrud   = (uint16_t)(gains.YawKDRudder*SCALEGYRO*RMAX);
+	yawkarud   = (uint16_t)(gains.YawKARudder*SCALEGYRO*RMAX);
+         yawkafilter   = (uint16_t)(gains.YawKARudder*SCALEGYRO*RMAX*20);//Contain the static filter gain
 	yawkpfdfwd = (uint16_t)(turns.FeedForward*gains.YawKPRudder*RMAX);
 	rollkprud  = (uint16_t)(gains.RollKPRudder*RMAX);
 	rollkdrud  = (uint16_t)(gains.RollKDRudder*SCALEGYRO*RMAX);
 	hoveryawkp = (uint16_t)(hover.HoverYawKP*RMAX);
 	hoveryawkd = (uint16_t)(hover.HoverYawKD*SCALEGYRO*RMAX);
+        yawAccel_1.WW = 0;
 }
 
 void save_yawCntrl(void)
 {
 	gains.YawKDRudder  = (float)yawkdrud   / (SCALEGYRO*RMAX);
+	gains.YawKARudder  = (float)yawkarud   / (SCALEGYRO*RMAX);
 	gains.RollKPRudder = (float)rollkprud  / (RMAX);
 	gains.RollKDRudder = (float)rollkdrud  / (SCALEGYRO*RMAX);
 	hover.HoverYawKP   = (float)hoveryawkp / (RMAX);
@@ -79,15 +86,29 @@ void normalYawCntrl(void)
 	union longww gyroYawFeedback;
 	union longww yawStabilization;
 	int16_t ail_rud_mix;
+	int16_t yawNavDeflection;
 
 #ifdef TestGains
 	state_flags._.GPS_steering = 0; // turn off navigation
 	state_flags._.pitch_feedback = 1; // turn on stabilization
 #endif 
+	if (RUDDER_NAVIGATION && state_flags._.GPS_steering)
+	{
+		yawNavDeflection = navigate_determine_deflection('t');
+		
+		if (canStabilizeInverted() && current_orientation == F_INVERTED)
+		{
+			yawNavDeflection = -yawNavDeflection;
+		}
+	}
+	else
+	{
+		yawNavDeflection = 0;
+	}
 
 	if (settings._.YawStabilizationRudder && state_flags._.pitch_feedback)
 	{
-		gyroYawFeedback.WW   = - __builtin_mulsu(rotationRateError[2], yawkdrud);
+//gfm reports in inner loop		gyroYawFeedback.WW   = - __builtin_mulsu(rotationRateError[2], yawkdrud);
 		yawStabilization.WW  = - __builtin_mulsu(tiltError[2], yawkprud);  // yaw orientation error in body frame
 		yawStabilization.WW +=   __builtin_mulsu(desiredRotationRateRadians[2], yawkpfdfwd); // feed forward term
 	}
@@ -114,10 +135,8 @@ void normalYawCntrl(void)
 		ail_rud_mix = 0;
 	}
 
-	yaw_control = (int32_t)gyroYawFeedback._.W1 
-	            + (int32_t)rollStabilization._.W1 
-	            + (int32_t)yawStabilization._.W1 
-	            + ail_rud_mix;
+	yaw_control = (int32_t)rollStabilization._.W1 + (int32_t)yawStabilization._.W1 + ail_rud_mix;
+                outeryaw_control =yaw_control;
 	// Servo reversing is handled in servoMix.c
 }
 
@@ -141,4 +160,29 @@ void hoverYawCntrl(void)
 		yawAccum.WW = 0;
 	}
 	yaw_control = (int32_t)yawAccum._.W1 - (int32_t)gyroYawFeedback._.W1;
+}
+void InneryawCntrl(void)
+{
+	union longww  yawAccel_1 = { 0 };
+	union longww gyroYawFeedback;
+	union longww gyroAccelFeedback;
+        // filtre dérivateur 19*(1.005*z-1)/(z-0.9048)
+        //equivalent to (1+s)/(1+0.05s) with Tsample = 0.005 s
+        //0.005*65536=328
+        //(1-0.9048)*1024=97
+        //19
+	if (settings._.YawStabilizationRudder && state_flags._.pitch_feedback)
+	{
+                  gyroAccelFeedback.WW = __builtin_mulus(yawkafilter ,rotationRateError[2]>>1);
+                  yawAccel_1.WW = __builtin_mulus(59297 , yawAccel_1._.W1);
+                  yawAccel_1.WW += gyroAccelFeedback.WW;
+                  gyroAccelFeedback.WW -= __builtin_mulus(6239 , yawAccel_1._.W1);
+	          gyroYawFeedback.WW = __builtin_mulus(yawkdrud, rotationRateError[2]>>1);
+	}
+	else
+	{
+		gyroYawFeedback.WW = 0;
+                  gyroAccelFeedback.WW = 0;
+	}
+	yaw_control = outeryaw_control + (int32_t)gyroYawFeedback._.W1 + (int32_t)gyroAccelFeedback._.W1;
 }

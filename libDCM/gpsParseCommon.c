@@ -36,6 +36,7 @@
 union longbbbb lat_gps_, lon_gps_;
 union longbbbb alt_sl_gps_;
 union longbbbb tow_;
+union intbb week_no_;
 union intbb hdop_;
 union longbbbb date_gps_, time_gps_;
 

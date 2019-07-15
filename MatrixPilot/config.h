@@ -80,18 +80,25 @@ struct gains_variables {
 	float YawKDAileron;
 	float RollKP;
 	float RollKD;
+	float RollKA;
 	float AileronBoost;
 	float Pitchgain;
 	float PitchKD;
+	float PitchKA;
 	float RudderElevMix;
 	float RollElevMix;
 	float ElevatorBoost;
 	float YawKPRudder;
 	float YawKDRudder;
+	float YawKARudder;
 	float RollKPRudder;
 	float RollKDRudder;
 	float RudderBoost;
 	float RtlPitchDown;
+         float ThrottleKP;
+         float ThrottleKD;
+         float ThrottleKA;
+         float ThrottleKI;
 };
 	
 struct altit_variables {

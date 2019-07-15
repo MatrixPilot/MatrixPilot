@@ -23,10 +23,12 @@
 #include "libUDB.h"
 #include "oscillator.h"
 #include "interrupt.h"
+#include "heartbeat.h"
 #include "servoOut.h"
 #include "servoOutPins.h"
 #include "cll_io.h"
-
+#include "../Config/options_multicopter.h"
+#if AIRFRAME_TYPE != AIRFRAME_QUAD
 #if (MIPS == 64)
 #define SCALE_FOR_PWM_OUT(x)    (x/2)
 #elif (MIPS == 32)
@@ -37,6 +39,35 @@
 #error Invalid MIPS Configuration
 #endif
 
+#else
+    //AIRFRAMETYPE=QUAD
+// Timer 3 for Output Compare module clocks at T3FREQ (= 5MHz with FREQOSC = 80e6)
+// 32e6 is the legacy value of FREQOSC
+#if (MIPS == 64)
+#define PWMOUTSCALE (FREQOSC / 64E6)
+#elif (MIPS == 40)
+#define PWMOUTSCALE (FREQOSC / 40E6)
+#elif (MIPS == 32)
+#define PWMOUTSCALE (FREQOSC / 32E6)
+#elif (MIPS == 16)
+#define PWMOUTSCALE (FREQOSC / 16E6)
+#else
+#error Invalid MIPS Configuration
+#endif // MIPS
+// 2e6 is the legacy value of T3FREQ
+#define T3FREQ (2000000 * PWMOUTSCALE)
+// Timer 3 period is 1 / (ESC_HZ)
+#define T3PERIOD (T3FREQ / ESC_HZ)
+inline int scale_pwm_out(int channel) {
+    union longww pww;
+    pww.WW = __builtin_muluu(udb_pwOut[channel], (unsigned int)(65536 * PWMOUTSCALE / 4));
+    pww.WW <<= 2;
+    return pww._.W1;
+}
+#endif
+
+//	routines to drive the PWM pins for the servos,
+
 int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 static volatile int16_t outputNum;
 
@@ -44,6 +75,16 @@ static volatile int16_t outputNum;
 // initialize the PWM
 void servoOut_init(void) // was called udb_init_pwm()
 {
+#if AIRFRAME_TYPE != AIRFRAME_QUAD
+    #if (MIPS == 64)
+    #define SCALE_FOR_PWM_OUT(x)    (x/2)
+    #elif (MIPS == 32)
+    #define SCALE_FOR_PWM_OUT(x)    (x*2)
+    #elif (MIPS == 16)
+    #define SCALE_FOR_PWM_OUT(x)    (x)
+    #else
+    #error Invalid MIPS Configuration
+    #endif
 	int16_t i;
 	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
@@ -94,7 +135,192 @@ void servoOut_init(void) // was called udb_init_pwm()
 #else // Classic board
 #error Invalid BOARD_TYPE
 #endif
+
+#else
+
+    int i;
+    for (i = 1; i <= NUM_OUTPUTS; i++)
+        udb_pwOut[i] = FAILSAFE_INPUT_MIN;
+
+    if (NUM_OUTPUTS >= 1) {
+#if ( (BOARD_IS_CLASSIC_UDB == 1 && CLOCK_CONFIG == FRC8X_CLOCK) || BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE & AUAV2_BOARD)
+        // changed to Timer3 and Output Compare Module for PWM out
+        // Since Output Compare mode uses 16 bit registers for both period and duty cycle, the max period at 5MHz Timer3 rate
+        // is 65536 / 5e6 = 76.3Hz. At 400Hz, period is 12,500 counts, 1500usec is 7500 counts
+        // Initialize and enable Timer3
+        T3CONbits.TON = 0; // Disable Timer
+        T3CONbits.TCS = 0; // Select internal instruction cycle clock
+        T3CONbits.TGATE = 0; // Disable Gated Timer mode
+        T3CONbits.TCKPS = 0b01; // Select 8:1 Prescaler 16MHz/8 = 2MHz 40MHz/8 = 5MHz 32Mhz/8=4MHz
+        TMR3 = 0x00; // Clear timer register
+        PR3 = T3PERIOD; // Load the period value (gfm calcul:4000/8 at 32 MIPS = 500 µs)
+        IEC0bits.T3IE = 1; // disable interrupts
+        T3CONbits.TON = 1; // Start timer
+        //		_T4IP = 7 ;							// priority 7
+        //		_T4IE = 0 ;							// disable timer 4 interrupt for now (enable for each set of pulses)
+#endif
+    
+
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE & AUAV2_BOARD)
+    // OC modules 1-8 are used for outputs
+    // On the UDB4 and AUAV2_ALPHA2, these are labeled as outputs, on the AUAV2_alpha1 they are labeled I1-I8
+
+    // configure OC1-8 as output pins
+    TRISD &= 0xFF00; // clear _TRISD0-7
+
+    // Initialize Output Compare Module
+    OC1CONbits.OCM = 0b000; // Disable Output Compare Module
+    OC1R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = 250 counts)
+    OC1RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
+    OC1CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
+    OC1CONbits.OCM = 0b110; // Select the Output Compare mode
+
+    OC2CONbits.OCM = 0b000; // Disable Output Compare Module
+    OC2R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
+    OC2RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
+    OC2CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
+    OC2CONbits.OCM = 0b110; // Select the Output Compare mode
+
+    OC3CONbits.OCM = 0b000; // Disable Output Compare Module
+    OC3R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
+    OC3RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
+    OC3CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
+    OC3CONbits.OCM = 0b110; // Select the Output Compare mode
+
+    OC4CONbits.OCM = 0b000; // Disable Output Compare Module
+    OC4R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
+    OC4RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
+    OC4CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
+    OC4CONbits.OCM = 0b110; // Select the Output Compare mode
+
+#if (NUM_ROTORS > 4)
+    OC5CONbits.OCM = 0b000; // Disable Output Compare Module
+    OC5R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
+    OC5RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
+    OC5CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
+    OC5CONbits.OCM = 0b110; // Select the Output Compare mode
+
+    OC6CONbits.OCM = 0b000; // Disable Output Compare Module
+    OC6R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
+    OC6RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
+    OC6CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
+    OC6CONbits.OCM = 0b110; // Select the Output Compare mode
+    #endif
+// gfm quadcopter tabking account Trigger_Action
+#if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
+    OC5CONbits.OCM = 0b000; // Disable Output Compare Module
+    OC5R = FAILSAFE_INPUT_MIN; // Write the duty cycle for the first PWM pulse (1msec = FAILSAFE_INPUT_MIN counts)
+    OC5RS = FAILSAFE_INPUT_MIN; // Write the duty cycle for the second PWM pulse
+    OC5CONbits.OCTSEL = 1; // Select Timer 3 as output compare time base
+    OC5CONbits.OCM = 0b110; // Select the Output Compare mode
+    #endif
+
+
+#else // Classic board
+    TRISE = 0b1111111111000000;
+
+    if (NUM_OUTPUTS >= 1) {
+#if (USE_PPM_INPUT == 1)
+#if (PPM_ALT_OUTPUT_PINS != 1)
+        _TRISD1 = 0; // Set D1 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 5) _TRISB5 = 0; // Set B5 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 6) _TRISB4 = 0; // Set B4 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 7) _TRISE0 = 0; // Set E0 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 8) _TRISE2 = 0; // Set E2 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 9) _TRISE4 = 0; // Set E4 to be an output if we're using PPM
+#else
+        _TRISE0 = 0; // Set E0 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 5) _TRISE2 = 0; // Set E2 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 6) _TRISE4 = 0; // Set E4 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 7) _TRISD1 = 0; // Set D1 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 8) _TRISB5 = 0; // Set B5 to be an output if we're using PPM
+        if (NUM_OUTPUTS >= 9) _TRISB4 = 0; // Set B4 to be an output if we're using PPM
+#endif
+#endif
 }
+#endif
+    
+//    return;
+#endif
+    }
+}
+static int dc_mod = 0;
+void udb_set_dc()
+{
+    #if !CHANNEL_1_REDUCED_RATE
+        OC1RS = scale_pwm_out(1);
+    #endif
+    #if !CHANNEL_2_REDUCED_RATE
+        OC2RS = scale_pwm_out(2);
+    #endif
+    #if !CHANNEL_3_REDUCED_RATE
+        OC3RS = scale_pwm_out(3);
+    #endif
+    #if !CHANNEL_4_REDUCED_RATE
+        OC4RS = scale_pwm_out(4);
+    #endif
+    #if (NUM_ROTORS > 4)
+    #if !CHANNEL_5_REDUCED_RATE
+        OC5RS = scale_pwm_out(5);
+    #endif
+    #if !CHANNEL_6_REDUCED_RATE
+        OC6RS = scale_pwm_out(6);
+    #endif
+    #endif
+// gfm quadcopter taking into account Trigger_Action
+    #if (TRIGGER_TYPE == TRIGGER_TYPE_SERVO)
+        OC5RS = scale_pwm_out(5);
+    #endif
+    if (dc_mod++ >= REDUCED_RATE_SKIPS)
+    {
+        dc_mod = 0;
+        #if CHANNEL_1_REDUCED_RATE
+            OC1RS = scale_pwm_out(1);
+        #endif
+        #if CHANNEL_2_REDUCED_RATE
+            OC2RS = scale_pwm_out(2);
+        #endif
+        #if CHANNEL_3_REDUCED_RATE
+            OC3RS = scale_pwm_out(3);
+        #endif
+        #if CHANNEL_4_REDUCED_RATE
+            OC4RS = scale_pwm_out(4);
+        #endif
+        #if (NUM_ROTORS > 4)
+        #if CHANNEL_5_REDUCED_RATE
+            OC5RS = scale_pwm_out(5);
+        #endif
+        #if CHANNEL_6_REDUCED_RATE
+            OC6RS = scale_pwm_out(6);
+        #endif
+        #endif
+    } else
+    {
+        #if CHANNEL_1_REDUCED_RATE
+            OC1RS = 0;
+        #endif
+        #if CHANNEL_2_REDUCED_RATE
+            OC2RS = 0;
+        #endif
+        #if CHANNEL_3_REDUCED_RATE
+            OC3RS = 0;
+        #endif
+        #if CHANNEL_4_REDUCED_RATE
+            OC4RS = 0;
+        #endif
+        #if (NUM_ROTORS > 4)
+        #if CHANNEL_5_REDUCED_RATE
+            OC5RS = 0;
+        #endif
+        #if CHANNEL_6_REDUCED_RATE
+            OC6RS = 0;
+        #endif
+        #endif
+    }
+}
+
+    
+    
 
 // saturation logic to maintain pulse width within bounds
 // This takes a servo out value, and clips it to be within
@@ -108,10 +334,13 @@ int16_t udb_servo_pulsesat(int32_t pw)
 
 void udb_set_action_state(boolean newValue)
 {
+#if AIRFRAME_TYPE != AIRFRAME_QUAD
 	ACTION_OUT_PIN = newValue;
+#else
+    SERVO_OUT_PIN_6 = newValue;
+#endif
 }
-
-
+#if AIRFRAME_TYPE != AIRFRAME_QUAD
 void start_pwm_outputs(void)
 {
 	if (NUM_OUTPUTS > 0)
@@ -317,5 +546,23 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 
 	// interrupt_restore_corcon;
 }
+#endif
+#else
+// Modif gfm Quadcopter : _T3Interrupt use in mpu6000.c only
+// All following lines are so DE_commented
+
+void __attribute__((__interrupt__, __no_auto_psv__)) _T3Interrupt(void)
+{
+    indicate_loading_inter;
+    interrupt_save_set_corcon;
+    _T3IF = 0; // clear the interrupt
+    // set the motor PWM values; these are sent to all ESCs continuously at ESC_HZ
+    udb_set_dc();
+
+    interrupt_restore_corcon;
+    return;
+}
+ 
+#warning("synchronous PWM outputs using OC capability: not sequential")
 #endif
 

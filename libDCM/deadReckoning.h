@@ -31,6 +31,9 @@ extern union longww IMUlocationx, IMUlocationy, IMUlocationz;
 extern union longww IMUvelocityx, IMUvelocityy, IMUvelocityz;
 extern union longww IMUintegralAccelerationx;
 extern union longww IMUintegralAccelerationy;
+// Modif gfm #4 fusion
+extern union longww IMUintegralAccelerationz;
+// fin modif gfm #4 fusion
 
 extern int16_t forward_ground_speed;
 

@@ -46,6 +46,9 @@ typedef enum
 	UDB_TYPE_FRAME_ANGLERATE,
 	UDB_TYPE_DCM_ANGLE,
 	UDB_TYPE_FLOAT,
+// modif gfm declare UDB_TYPE_GPS_Position
+	UDB_TYPE_GPS_POSITION,
+// fin modif gfm
 	} udb_internal_type_e;
 
 extern void mavlink_send_param_int16(int16_t i);
@@ -81,4 +84,8 @@ extern void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i);
 extern void mavlink_send_param_float(int16_t i);
 extern void mavlink_set_param_float(mavlink_param_union_t setting, int16_t i);
 
+// modif gfm declare Mavlink send & get GPS Position
+//extern void mavlink_send_gps_position(int16_t i);
+//extern void mavlink_set_gps_position(mavlink_param_union_t setting, int16_t i);
+// fin modif gfm
 #endif // PARAMETER_DATATYPES_H

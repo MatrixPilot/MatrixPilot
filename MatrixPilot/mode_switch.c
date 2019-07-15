@@ -22,8 +22,10 @@
 #include "defines.h"
 #include "states.h"
 #include "mode_switch.h"
+#include "../libUDB/heartbeat.h"
+#include "../Config/options_multicopter.h"
 
-#define  MAX_PAUSE_TOGGLE  20  // 20 frames at 40Hz is 1/2 second.
+#define  MAX_PAUSE_TOGGLE  PID_HZ/2  // 20 frames at 40Hz is 1/2 second.
 
 enum AUTOPILOT_MODE
 {
@@ -198,6 +200,33 @@ void flight_mode_switch_2pos_poll(void) // this is called at 40 hertz
 	}
 #endif // MODE_SWITCH_TWO_POSITION
 }
+extern int control_mode;
+
+void control_mode_switch_check_set(void)
+{
+	if (udb_flags._.radio_on)
+	{
+		if (udb_pwIn[CTRL_MODE_SWITCH_INPUT_CHANNEL] < CTRL_MODE_SWITCH_THRESHOLD_LOW)
+		{
+			control_mode = TILT_MODE;
+		}
+		else if (udb_pwIn[CTRL_MODE_SWITCH_INPUT_CHANNEL] < CTRL_MODE_SWITCH_THRESHOLD_HIGH )
+		{
+			control_mode = RATE_MODE;
+		}
+		else
+		{
+			#if (FLY_BY_DATALINK_ENABLED == 1)
+			// when using fbdl, we are *always* in stabilized mode
+			control_mode = TILT_MODE;
+
+			#else
+			control_mode = COMPASS_MODE;
+			#endif
+		}
+
+        }
+}
 
 void flight_mode_switch_check_set(void)
 {
@@ -229,13 +258,13 @@ void flight_mode_switch_check_set(void)
 		}
 #else // Three Mode Switch
 		// Select manual, automatic, or come home, based on pulse width of the switch input channel as defined in options.h.
-		if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_HIGH)
+		if (udb_pwIn[FLIGHT_MODE_SWITCH_INPUT_CHANNEL] > FLIGHT_MODE_SWITCH_THRESHOLD_HIGH)
 		{
 			state_flags._.man_req = 0;
 			state_flags._.auto_req = 0;
 			state_flags._.home_req = 1;
 		}
-		else if (udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] > MODE_SWITCH_THRESHOLD_LOW)
+		else if (udb_pwIn[FLIGHT_MODE_SWITCH_INPUT_CHANNEL] > FLIGHT_MODE_SWITCH_THRESHOLD_LOW)
 		{
 			state_flags._.man_req = 0;
 			state_flags._.auto_req = 1;

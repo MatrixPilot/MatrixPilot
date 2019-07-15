@@ -29,7 +29,14 @@
 #include "../libDCM/deadReckoning.h"
 #include "../libDCM/gpsParseCommon.h"
 #include "../libUDB/heartbeat.h"
+// Modif gfm Quadcopter
+#include "../libUDB/oscillator.h"
+#include "motorCntrl.h"
+#include "behaviour.h"
+#include "../Config/options_multicopter.h"
 
+unsigned int tailFlash;
+//fin modif gfm Quadcopter
 union state_flags_int state_flags;
 int16_t waggle = 0;
 static uint8_t counter = 0;
@@ -52,7 +59,8 @@ static uint8_t counter = 0;
 #define WAGGLE_SIZE 300
 
 static int16_t calib_timer = CALIB_PAUSE;
-static int16_t standby_timer = STANDBY_PAUSE;
+static int16_t standby_timer = STANDBY_PAUSE-CALIB_PAUSE;
+static int8_t desiredtailFlash = 0;
 
 static void startS(void);
 static void calibrateS(void);
@@ -84,6 +92,7 @@ void init_states(void)
 	gps_data_age = GPS_DATA_MAX_AGE+1;
 	dcm_flags._.dead_reckon_enable = 0;
 	state_flags._.update_autopilot_state_asap = 0;
+       desiredtailFlash = 0;
 	stateS = &startS;
 }
 
@@ -150,8 +159,13 @@ void udb_heartbeat_40hz_callback(void)
 {
 	// Determine whether a flight mode switch is commanded.
 	flight_mode_switch_check_set();
+	control_mode_switch_check_set();
 	if (counter++ >= PID_HZ / FSM_CLK)    // 2Hz
 	{
+                   if (tailFlash != desiredtailFlash) {
+                            setBehavior(F_TRIGGER);
+                            tailFlash = (tailFlash+1) % 7;
+                            }
 		counter = 0;
 		// Update the nav capable flag. If the GPS has a lock, gps_data_age will be small.
 		// For now, nav_capable will always be 0 when the Airframe type is AIRFRAME_HELI.
@@ -163,6 +177,17 @@ void udb_heartbeat_40hz_callback(void)
 		(*stateS)();
 	}
 	state_flags._.update_autopilot_state_asap = 0;
+//Modif gfm Quadcopter
+    if (!didCalibrate) {        
+        if (udb_flags._.radio_on && dcm_flags._.calib_finished) {
+#if (HARD_TRIMS == 0)
+            // trims not hardwired in udb_init_capture()
+            udb_servo_record_trims();
+#endif
+            didCalibrate = 1; // not in trunk
+        }
+    }
+// fin modif gfm Quadcopter
 }
 #endif // CATAPULT_LAUNCH_ENABLE
 
@@ -182,6 +207,7 @@ static void ent_calibrateS(void)
 	stateS = &calibrateS;
 	calib_timer = CALIB_PAUSE;
 	led_on(LED_RED); // turn on mode led
+           desiredtailFlash = 1;    
 }
 
 // Acquire state is used to wait for the GPS to achieve lock.
@@ -205,13 +231,17 @@ static void ent_acquiringS(void)
 		udb_servo_record_trims();
  #endif
 #endif
-	dcm_calibrate();
+            // this is called in libDCM.c:dcm_run_init_step()
+            // ask Bill why he decided to re-record offset?
+            //            dcm_calibrate();
 
 	waggle = WAGGLE_SIZE;
 	throttleFiltered._.W1 = 0;
 	stateS = &acquiringS;
-	standby_timer = STANDBY_PAUSE;
+	standby_timer = STANDBY_PAUSE - CALIB_PAUSE;
 	led_off(LED_RED);
+	led_on(LED_ORANGE);
+       desiredtailFlash = 2;      
 }
 
 //	Manual state is used for direct pass-through control from radio to servos.
@@ -221,12 +251,19 @@ static void ent_manualS(void)
 
 	state_flags._.GPS_steering = 0;
 	state_flags._.pitch_feedback = 0;
+// modif GFM QuadCopter because heli cannot fly without gyro stab
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+	state_flags._.pitch_feedback = 1;
+        LED_BLUE = LED_ON;
+        LED_ORANGE = LED_OFF;
+#endif
 	state_flags._.altitude_hold_throttle = 0;
 	state_flags._.altitude_hold_pitch = 0;
 	state_flags._.disable_throttle = 0;
 	waggle = 0;
 	led_off(LED_RED);
 	stateS = &manualS;
+        desiredtailFlash = 3;
 }
 
 //	Auto state provides augmented control.
@@ -246,8 +283,11 @@ static void ent_stabilizedS(void)
 	state_flags._.altitude_hold_throttle = (settings._.AltitudeholdStabilized == AH_FULL);
 	state_flags._.altitude_hold_pitch = (settings._.AltitudeholdStabilized == AH_FULL || settings._.AltitudeholdStabilized == AH_PITCH_ONLY);
 	waggle = 0;
-	led_on(LED_RED);
+	LED_BLUE = LED_OFF; 
+//	LED_RED = LED_ON;
+        LED_ORANGE = LED_ON;
 	stateS = &stabilizedS;
+       desiredtailFlash = 4;
 }
 
 #ifdef CATAPULT_LAUNCH_ENABLE
@@ -301,7 +341,10 @@ static void ent_waypointS(void)
 
 	waggle = 0;
 	led_on(LED_RED);
+	LED_ORANGE = LED_OFF; // turn on mode led
+	LED_BLUE = LED_OFF; // turn on mode led
 	stateS = &waypointS;
+        desiredtailFlash = 5;
 }
 
 //	Come home state, entered when the radio signal is lost, and gps is locked.
@@ -327,7 +370,10 @@ static void ent_returnS(void)
 
 	waggle = 0;
 	led_on(LED_RED);
+	LED_ORANGE = LED_ON; // turn on mode led
+	LED_BLUE = LED_ON; // turn on mode led
 	stateS = &returnS;
+       desiredtailFlash = 6;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +413,7 @@ static void acquiringS(void)
 	return;
 #endif
 
-	if (dcm_flags._.nav_capable && ((MAG_YAW_DRIFT == 0) || (magMessage == 7)))
+	if ((dcm_flags._.nav_capable && ((MAG_YAW_DRIFT == 0) || (magMessage == 7))) || (AIRFRAME_TYPE == AIRFRAME_QUAD))
 	{
 #if (NORADIO == 1)
 		if (1)
@@ -375,13 +421,14 @@ static void acquiringS(void)
 		if (udb_flags._.radio_on)
 #endif
 		{
+#if (AIRFRAME_TYPE != AIRFRAME_QUAD)
 			if (standby_timer == NUM_WAGGLES+1)
 				waggle = WAGGLE_SIZE;
 			else if (standby_timer <= NUM_WAGGLES)
 				waggle = - waggle;
 			else
 				waggle = 0;
-
+#endif
 			standby_timer--;
 			DPRINT("standby_timer %u  \r", standby_timer);
 			if (standby_timer == 6)

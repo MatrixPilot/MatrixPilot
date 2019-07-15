@@ -62,6 +62,11 @@
 #undef RUDDER_BOOST
 #undef RTL_PITCH_DOWN
 
+#undef THROTTLEKP
+#undef THROTTLEKD
+#undef THROTTLEKA
+#undef THROTTLEKI
+
 #undef HEIGHT_TARGET_MAX
 #undef HEIGHT_TARGET_MIN
 #undef ALT_HOLD_THROTTLE_MIN
@@ -97,6 +102,11 @@
 #define ROLLKP_RUDDER gains.RollKPRudder
 #define ROLLKD_RUDDER gains.RollKDRudder
 #define RUDDER_BOOST gains.RudderBoost
+#define THROTTLEKP gains.ThrottleKP
+#define THROTTLEKD gains.ThrottleKD
+#define THROTTLEKA gains.ThrottleKA
+#define THROTTLEKI gains.ThrottleKI
+
 #define RTL_PITCH_DOWN gains.RtlPitchDown
 #define HEIGHT_TARGET_MAX gains.HeightTargetMax
 #define HEIGHT_TARGET_MIN gains.HeightTargetMin

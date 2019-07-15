@@ -90,43 +90,43 @@ class DIYDrones_race_state :
         for entry in log_book.entries :
             if self.race_state == self.state_manual_stabilized :
                 if entry.status == "111" : # plane is autonmous
-                    print "Race: entering autonomous"
+                    print("Race: entering autonomous")
                     self.race_state = self.state_autonomous_and_not_in_start_area
                 else :
                     continue
             if self.race_state == self.state_autonomous_and_not_in_start_area :
                 if entry.status != "111" :
-                    print "Race: reverting to stabilized / manual"
+                    print("Race: reverting to stabilized / manual")
                     self.race_state = self.state_manual_stabilized
                     continue
                 if self.plane_is_north_east_of_start(entry) :
-                    print "Race: entering start area"
+                    print("Race: entering start area")
                     self.race_state = self.state_autonomous_and_in_starting_area
                 else :
                     continue
             if self.race_state == self.state_autonomous_and_in_starting_area :
                 if entry.status != "111" :
-                    print "Race: reverting to stabilized / manual"
+                    print("Race: reverting to stabilized / manual")
                     self.race_state = self.state_manual_stabilized
                     continue
                 if self.plane_is_east_of_start(entry) :
                     if self.plane_is_south_of_start(entry) :
                         self.race_state = self.state_race_started
                         self.race_start_time = entry.tm
-                        print "Race: found start of race"
-                        print "entry.tm is", entry.tm
+                        print("Race: found start of race")
+                        print("entry.tm is", entry.tm)
                         flight_clock.init_race_time_start_object(entry.tm, log_book) 
                         return(True)
                     else :
                         continue # We are still in start area   
                 else: # we've drifted west of start area
-                    print "Race: reverting to being out of start area"
+                    print("Race: reverting to being out of start area")
                     self.race_state = self.state_autonomous_and_not_in_start_area
                     continue
             if self.race_state == self.state_race_started :
-                print "Error: reached race_started, but should never reach this code"
+                print("Error: reached race_started, but should never reach this code")
                 continue
-        print "About to return False (No race start) from race state machine"
+        print("About to return False (No race start) from race state machine")
         return(False)# Could not find a start time.
     
 
@@ -172,11 +172,11 @@ def C_pre_processor(C_source_filename):
             output = subprocess.Popen(["/bin/sh", "-c", "gcc -E " + shellquote(C_source_filename)],
                                    stdout=subprocess.PIPE, universal_newlines=True).communicate()[0]
         except:
-            print "No GCC found either."
+            print("No GCC found either.")
             error_message = "Cannot find a C preprocessor (GCC) \n" + \
                 "This is needed for processing wayoint files \n" + \
                 "Currently the location is hardcoded in flan.py." 
-            print error_message
+            print(error_message)
             showerror(title="Error: No C Pre-Processor Available",
                 message = error_message)
             sys.exit()
@@ -208,11 +208,11 @@ def C_pre_processor(C_source_filename):
                     C_pre_processor_executable2 + "\n" + \
                     "This is needed for processing wayoint files \n" + \
                     "Currently the location is hardcoded in flan.py." 
-            print error_message
+            print(error_message)
             showerror(title="Error: No C Pre-Processor Available",
                     message = error_message)
             sys.exit()
-    if debug: print "Ouput from C Pre Processor Follows: \n", output
+    if debug: print("Ouput from C Pre Processor Follows: \n", output)
     return(output)
 
 def convert_meters_north_to_lat(meters):
@@ -327,7 +327,7 @@ def get_waypoints(text):
                 waypoint_with_type = [m, waypoint_type ]
                 waypoints_list.append(waypoint_with_type)
             except:
-                print"Error in get_waypoints function when matching waypoints from waypoints.h"
+                print("Error in get_waypoints function when matching waypoints from waypoints.h")
     return waypoints_list
 
 def remove_slash_comments(text):
@@ -414,25 +414,25 @@ def waypoints_do_not_need_telemetry(waypoint_file) :
     code_wo_comments = remove_slash_comments(code_wo_star_comments)
     origin_line = get_fixed_origin(code_wo_comments)
     for y in origin_line :
-        if debug: print y.group(1), y.group(2), y.group(3)
+        if debug: print(y.group(1), y.group(2), y.group(3))
         if (int(y.group(3)) == 1):  # We are using an absolute and specified origin
-            if debug: print waypoint_file,"\n uses a fixed fixed origin"
+            if debug: print(waypoint_file,"\n uses a fixed fixed origin")
             return True
         else :
             #check to see if we have any relative waypoints...
             waypoints_list = get_waypoints_with_defines(code_wo_comments)
             
             for waypoint in waypoints_list :
-                if debug: print "here is a waypoint line to analyse" , waypoint.group(4)
+                if debug: print("here is a waypoint line to analyse" , waypoint.group(4))
                 match = re.match(".*F_ABSOLUTE.*",waypoint.group(4)) #
                 if match:
-                    if debug: print "Waypoint is Absolute"
+                    if debug: print("Waypoint is Absolute")
                 else:
-                    if debug: print "did not find an F_ABSOLUTE this time so file has RELATIVE waypoints"
-                    if debug: print waypoint_file, "uses a movable (boot up time) origin for relative coordinates"
+                    if debug: print("did not find an F_ABSOLUTE this time so file has RELATIVE waypoints")
+                    if debug: print(waypoint_file, "uses a movable (boot up time) origin for relative coordinates")
                     return False
             if debug:
-                if debug: print "waypoint file uses a movable origin \nbut there are no relative waypoints\n" 
+                if debug: print("waypoint file uses a movable origin \nbut there are no relative waypoints\n")
             showinfo(title = "oops", message = "paused for test purposes")
             return True
     ## this routine should never get to this point. 
@@ -642,17 +642,17 @@ def create_flown_waypoint_kml_using_waypoint_file(waypoint_filename,flight_origi
     generate_flown_waypoints_kml(waypoints_geo, file_handle_kml,log_book,flight_origin, flight_clock)
     message = "Parsing of " + waypoint_filename + "\n into KML Placemarks is complete"
     if debug:
-        print message
+        print(message)
     else :
-        print "Waypoints flown analyzed, and converted to KML"
+        print("Waypoints flown analyzed, and converted to KML")
 
 def write_logo_waypoint_kml_folder_preamble(filename) :
-    print >> filename, """     <Folder><open>0</open>
+    print(>> filename, """     <Folder><open>0</open>)
     <name>Logo Waypoint Paths</name>
     <description>Waypoint Routes generated from Logo Flight Plan</description>"""
 
 def write_logo_waypoint_kml_folder_postamble(filename) :
-    print >> filename, """      </Folder>"""
+    print(>> filename, """      </Folder>""")
         
 def write_logo_waypoint_kml(this_waypoint, latitude, flight_origin,filename,flight_clock,log_book):
     """create the kml for a given waypoint segment (Used with Logo Flight Plans)"""

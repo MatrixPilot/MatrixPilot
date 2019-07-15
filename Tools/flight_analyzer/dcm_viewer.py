@@ -26,12 +26,12 @@ def conv_udb_vpython(vector) :
     # So it turns out that one can covert from UDB to Vpython by means
     # of a 90 degree rotation matrix.
     vpython_rotate = (1,0,0,   0,0,-1,  0,1,0)
-    return(matrix_multiply_3x3_3x1(vpython_rotate, vector))
+    return matrix_multiply_3x3_3x1(vpython_rotate, vector)
     
 # Setup the Serial Port Communications
 ser = serial.Serial(3)  # open COM 4, Change this for your setup.
-print ser.portstr       # check which port was really used
-print ser              
+print (ser.portstr)       # check which port was really used
+print (ser)
 ser.baudrate = 19200    # UDB prints telemetry at 19200 baud.
 print                   # print out the serial configuration
 
@@ -79,7 +79,7 @@ while (True) :
         line = ser.readline()
         
         result = telemetry_line.parse(line, line_no, max_tm_actual)
-        print line
+        print (line)
         
         if result == "F2" : # If received SERIAL_UDB or SERIAL_UDB_EXTRA format telemetry
             rmat[0] =   telemetry_line.rmat0 /16384.0
@@ -113,8 +113,8 @@ while (True) :
 
             
     except:
-        print "There has been a program exception."
-        print "This has been caught by dcm_viewer's own code logic"
-        print "That logic will now close the program, and close the serial port"
+        print("There has been a program exception.")
+        print("This has been caught by dcm_viewer's own code logic")
+        print("That logic will now close the program, and close the serial port")
         ser.close()
         exit()

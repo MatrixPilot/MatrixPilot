@@ -404,8 +404,8 @@ void gps_startup_sequence(int16_t gpscount)
 		// set the UBX to use binary mode
 		gpsoutline(bin_mode_nonmea);
 #if (HILSIM != 1)
-	else if (gpscount == 150)
-		udb_gps_set_rate(19200);
+        else if (gpscount == 150)
+	         udb_gps_set_rate(19200);
 #endif
 	else if (gpscount == 140)
 		gpsoutbin(set_rate_length, set_rate);
@@ -426,7 +426,7 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutbin(enable_SBAS_length, enable_SBAS);
 	else if (gpscount == 70)
 		gpsoutbin(config_NAV5_length, config_NAV5);
-}
+        }
 
 boolean gps_nav_valid(void)
 {

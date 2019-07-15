@@ -32,8 +32,11 @@ uint16_t yawkdail;
 uint16_t rollkp;
 uint16_t rollkpfdfwd;
 uint16_t rollkd;
+uint16_t rollka;
 uint16_t hoverrollkp;
 uint16_t hoverrollkd;
+uint16_t rollkafilter;
+static union longww  rollAccel_1 = { 0 };
 
 void normalRollCntrl(void);
 void hoverRollCntrl(void);
@@ -46,6 +49,11 @@ void init_rollCntrl(void)
 	rollkd      = (uint16_t)(gains.RollKD*SCALEGYRO*RMAX);
 	hoverrollkp = (uint16_t)(hover.HoverRollKP*SCALEGYRO*RMAX);
 	hoverrollkd = (uint16_t)(hover.HoverRollKD*SCALEGYRO*RMAX);
+       // Modif gfm Quadcopter
+        rollka      = (uint16_t)(gains.RollKA*SCALEGYRO*RMAX);
+        rollkafilter   = (uint16_t)(gains.RollKA*SCALEGYRO*RMAX*20);//Contain the static filter gain
+	rollAccel_1.WW =  0 ;
+        //Fin modif gfm Quadcopter
 }
 
 void save_rollCntrl(void)
@@ -53,6 +61,7 @@ void save_rollCntrl(void)
 	gains.YawKDAileron = (float)yawkdail    / (SCALEGYRO*RMAX);
 	gains.RollKP       = (float)rollkp      / (RMAX);
 	gains.RollKD       = (float)rollkd      / (SCALEGYRO*RMAX);
+	gains.RollKA       = (float)rollka      / (SCALEGYRO*RMAX);
 	hover.HoverRollKP  = (float)hoverrollkp / (SCALEGYRO*RMAX);
 	hover.HoverRollKD  = (float)hoverrollkd / (SCALEGYRO*RMAX);
 }
@@ -72,7 +81,6 @@ void rollCntrl(void)
 void normalRollCntrl(void)
 {
 	union longww rollAccum = { 0 };
-	union longww gyroRollFeedback;
 	union longww gyroYawFeedback;
 	fractional omegaAccum2;
 
@@ -88,15 +96,22 @@ void normalRollCntrl(void)
 #ifdef TestGains
 	state_flags._.pitch_feedback = 1;
 #endif
+	if (settings._.AileronNavigation && state_flags._.GPS_steering)
+	{
+		rollAccum._.W1 = navigate_determine_deflection('h');
+	}
+        else 
+                rollAccum.WW = 0;
 	if (settings._.RollStabilizaionAilerons && state_flags._.pitch_feedback)
 	{
-		gyroRollFeedback.WW = - __builtin_mulus(rollkd, rotationRateError[1]);
-		rollAccum.WW -= __builtin_mulsu(tiltError[1], rollkp);
-		rollAccum.WW += __builtin_mulsu(desiredRotationRateRadians[1], rollkpfdfwd);
+//gfm reports in inner loop		gyroRollFeedback.WW = - __builtin_mulus(rollkd, rotationRateError[1]);
+		rollAccum.WW -= __builtin_mulsu(tiltError[1], rollkp); 
+//		rollAccum.WW += __builtin_mulsu(desiredRotationRateRadians[1], rollkpfdfwd);
+//		rollAccum.WW += __builtin_mulsu(rmat[6] , rollkp);
 	}
 	else
 	{
-		gyroRollFeedback.WW = 0;
+//gfm reports in inner loop		gyroRollFeedback.WW = 0;
 	}
 	if (settings._.YawStabilizationAileron && state_flags._.pitch_feedback)
 	{
@@ -106,7 +121,9 @@ void normalRollCntrl(void)
 	{
 		gyroYawFeedback.WW = 0;
 	}
-	roll_control = (int32_t)rollAccum._.W1 + (int32_t)gyroRollFeedback._.W1 + (int32_t)gyroYawFeedback._.W1;
+//upstream	roll_control = (int32_t)rollAccum._.W1 + (int32_t)gyroRollFeedback._.W1 + (int32_t)gyroYawFeedback._.W1;
+        outerroll_control = (int32_t)rollAccum._.W1- (int32_t)gyroYawFeedback._.W1;
+//gfm	roll_control = (int32_t)rollAccum._.W1 - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroYawFeedback._.W1;
 	// Servo reversing is handled in servoMix.c
 }
 
@@ -133,4 +150,34 @@ void hoverRollCntrl(void)
 		gyroRollFeedback.WW = 0;
 	}
 	roll_control = rollNavDeflection -(int32_t)gyroRollFeedback._.W1;
+}
+void InnerrollCntrl(void)
+{
+//	union longww  rollAccel;
+	union longww gyroRollFeedback;
+	union longww gyroAccelFeedback;
+
+        // filtre dérivateur 20*(z-1)/(z-0.9048) (zoh)
+        // filtre dérivateur 19*(z-1)/(z-0.9048) (Tustin)
+        //20=2*Tau/Tsample ; 0.9048=(2-Tsample/Tau)/(2+Tsample/Tau)
+        //equivalent to (0.01+s)/(1+tau*s) with Tsample = 5ms and tau=50ms
+        //S_1 = E + 0.9048 * S_1
+        //S = E - (1-0.9048)* S_1
+        //S = 20 * S ; 20 included in rollkafilter
+        //(1-0.9048)*65536=6239
+        //0.9048*65536=59297
+        if (settings._.RollStabilizaionAilerons && state_flags._.pitch_feedback)
+	{
+        gyroAccelFeedback.WW = __builtin_mulus(rollkafilter ,rotationRateError[1]);
+        rollAccel_1.WW = __builtin_mulus(59297 , rollAccel_1._.W1);
+        rollAccel_1.WW += gyroAccelFeedback.WW;
+        gyroAccelFeedback.WW -= __builtin_mulus(6239 , rollAccel_1._.W1);
+		gyroRollFeedback.WW = __builtin_mulus(rollkd, rotationRateError[1]);
+	}
+	else
+	{
+	gyroRollFeedback.WW = 0;
+        gyroAccelFeedback.WW = 0;
+	}
+	roll_control =  outerroll_control + (int32_t)gyroRollFeedback._.W1 + (int32_t)gyroAccelFeedback._.W1;
 }

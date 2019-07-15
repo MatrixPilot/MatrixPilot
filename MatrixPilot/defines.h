@@ -33,6 +33,10 @@ void helicalTurnCntrl(void);
 void rollCntrl(void);
 void pitchCntrl(void);
 void yawCntrl(void);
+void InnerrollCntrl(void);
+void InnerpitchCntrl(void);
+void InneryawCntrl(void);
+void InneraltitudeCntrl(void);
 void altitudeCntrl(void);
 void setTargetAltitude(int16_t targetAlt);
 
@@ -47,6 +51,7 @@ void save_rollCntrl(void);
 void save_pitchCntrl(void);
 void save_altitudeCntrl(void);
 void save_altitudeCntrlVariable(void);
+extern int16_t outerpitch_control, outerroll_control, outeryaw_control,outeraltitude_control;
 
 
 // Negate VALUE if NEEDS_REVERSING is true

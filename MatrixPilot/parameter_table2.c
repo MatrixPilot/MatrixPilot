@@ -100,6 +100,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"ASPD_P_MAX_ASPD", {-90}, {90.0}, UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*)&airspeed_pitch_max_aspd, sizeof(airspeed_pitch_max_aspd) },
 	{"ASPD_P_RATE_LIM", {1.0}, {720.0}, UDB_TYPE_FRAME_ANGLERATE, PARAMETER_READWRITE, (void*)&airspeed_pitch_adjust_rate, sizeof(airspeed_pitch_adjust_rate) },
 	{"ASPD_P_KI", {0.0}, {1.0}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&airspeed_pitch_ki, sizeof(airspeed_pitch_ki) },
+	{"ASPD_P_KP", {0.0}, {1.0}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&airspeed_pitch_kp, sizeof(airspeed_pitch_kp) },
 	{"ASPD_P_KI_LIMIT", {0.0}, {45.0}, UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*)&airspeed_pitch_ki_limit, sizeof(airspeed_pitch_ki_limit) },
 
 	{"TURN_ELE_TR_NRM", {-1.0}, {1.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.ElevatorTrimNormal, sizeof(turns.ElevatorTrimNormal) },

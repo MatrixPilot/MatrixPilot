@@ -37,8 +37,11 @@
 uint16_t pitchgain;
 uint16_t pitchfdfwd;
 uint16_t pitchkd;
+uint16_t pitchka;
+static union longww  pitchAccel_1 = { 0 };
 uint16_t hoverpitchgain;
 uint16_t hoverpitchkd;
+uint16_t pitchkafilter;//Contain the static filter gain
 
 int16_t pitchrate;
 
@@ -54,14 +57,18 @@ void init_pitchCntrl(void)
 	pitchgain = (uint16_t)(gains.Pitchgain*RMAX);
 	pitchfdfwd = (uint16_t)(turns.FeedForward*gains.Pitchgain*RMAX);
 	pitchkd = (uint16_t) (gains.PitchKD*SCALEGYRO*RMAX);
+	pitchka = (uint16_t) (gains.PitchKA*SCALEGYRO*RMAX);
+         pitchkafilter   = (uint16_t)(gains.PitchKA*SCALEGYRO*RMAX*20);//Contain the static filter gain
 	hoverpitchgain = (uint16_t)(hover.HoverPitchGain*RMAX);
 	hoverpitchkd = (uint16_t) (hover.HoverPitchKD*SCALEGYRO*RMAX);
+	pitchAccel_1.WW =  0 ;
 }
 
 void save_pitchCntrl(void)
 {
 	gains.Pitchgain      = (float)pitchgain         / (RMAX);
 	gains.PitchKD        = (float)pitchkd           / (SCALEGYRO*RMAX);
+	gains.PitchKA        = (float)pitchka           / (SCALEGYRO*RMAX);
 	hover.HoverPitchGain = (float)hoverpitchgain    / (RMAX);
 	hover.HoverPitchKD   = (float)hoverpitchkd      / (SCALEGYRO*RMAX);
 //	gains.RudderElevMix  = (float)rudderElevMixGain / (RMAX);
@@ -90,18 +97,30 @@ static void normalPitchCntrl(void)
 	state_flags._.GPS_steering = 0; // turn navigation off
 	state_flags._.pitch_feedback = 1; // turn stabilization on
 #endif
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+	fractional aspd_pitch_adj;
+	if (settings._.PitchStabilization && state_flags._.pitch_feedback && state_flags._.auto_req)
+	{
+	aspd_pitch_adj = quad_airspeed_pitch_adjust();
+        }
+    else {
+        	aspd_pitch_adj = 0;
+    }
+#endif
 
 	if (settings._.PitchStabilization && state_flags._.pitch_feedback)
 	{
-		pitchAccum.WW = __builtin_mulsu(tiltError[0], pitchgain) 
-		              - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd)
-		              + __builtin_mulsu(rotationRateError[0], pitchkd );
-		pitch_control = (int32_t)pitchAccum._.W1 + (int32_t) elevatorLoadingTrim;
+		pitchAccum.WW = (__builtin_mulsu(tiltError[0], pitchgain) )
+		              - __builtin_mulsu(desiredRotationRateRadians[0], pitchfdfwd);
+//gfm reports in inner loop		              + __builtin_mulsu(rotationRateError[0], pitchkd );
+//		pitch_control = (int32_t)pitchAccum._.W1 + (int32_t) elevatorLoadingTrim;
 	}
 	else
 	{
 		pitch_control = 0;
+                  outerpitch_control = 0;
 	}
+         outerpitch_control = (int32_t)pitchAccum._.W1 + (int32_t) elevatorLoadingTrim;
 }
 
 static void hoverPitchCntrl(void)
@@ -136,4 +155,23 @@ static void hoverPitchCntrl(void)
 		pitchAccum.WW = 0;
 	}
 	pitch_control = (int32_t)pitchAccum._.W1;
+}
+void InnerpitchCntrl(void)
+{
+	union longww gyroPitchFeedback;
+	union longww gyroAccelFeedback;
+        if (state_flags._.pitch_feedback)
+	{
+        gyroAccelFeedback.WW = __builtin_mulus(pitchkafilter ,rotationRateError[0]);
+        pitchAccel_1.WW = __builtin_mulus(59297 , pitchAccel_1._.W1);
+        pitchAccel_1.WW += gyroAccelFeedback.WW;
+        gyroAccelFeedback.WW -= __builtin_mulus(6239 , pitchAccel_1._.W1);
+        gyroPitchFeedback.WW = __builtin_mulus(pitchkd , rotationRateError[0]);
+	}
+	else
+	{
+	gyroPitchFeedback.WW = 0;
+        gyroAccelFeedback.WW = 0;
+	}
+	pitch_control = outerpitch_control + (int32_t)gyroPitchFeedback._.W1 + (int32_t)gyroAccelFeedback._.W1;
 }

@@ -22,6 +22,7 @@
 #include "libUDB.h"
 #include "I2C.h"
 #include "interrupt.h"
+#include "mpu_spi.h"
 #include "barometer.h"
 #include "oscillator.h"
 #include "delay.h"
@@ -381,6 +382,30 @@ uint8_t rxBarometer(barometer_callback_funcptr callback)  // service the MPL3115
 		}
 
 }
+#if (MPU_SPI == 1)
+void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
+{
+	_INT3IF = 0; // Clear the INT3 interrupt flag
+        _INT3IE = 0; // Disable INT3 Interrupt Service Routine
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+/*        //Read INT Source
+	I2C_Read(MPL3115_ADDRESS, MPL3115A2_INT_SOURCE_REG, 1, barData, 1, &ReadBarAltitude_callback, I2C_MODE_READ_ONLY);
+        delay_us(300);
+        // Test if data ready
+        if ((barData[0] && MPL3115A2_SRC_DRDY)  )
+        {
+       //Read data
+	I2C_Read(MPL3115_ADDRESS, MPL3115A2_REGISTER_STATUS, 1, barData, 6, &ReadBarAltitude_callback, I2C_MODE_WRITE_ADDR_READ);
+        delay_us(800);//Waiting for first message transmission 9 tics * 10탎 * 8 bytes = 720 탎 + 10% margin = 300 탎
+        }
+ */
+    // Reset OST
+        I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG1, 1, MPL3115A2_ALT_OSR, 1, NULL);
+//        delay_us(300);
+	interrupt_restore_corcon;
+}
+#else
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
 {
 	_INT1IF = 0; // Clear the INT1 interrupt flag
@@ -393,18 +418,17 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
         // Test if data ready
         if ((barData[0] && MPL3115A2_SRC_DRDY)  )
         {
-        }
-
         //Read data
 	I2C_Read(MPL3115_ADDRESS, MPL3115A2_REGISTER_STATUS, 1, barData, 6, &ReadBarAltitude_callback, I2C_MODE_WRITE_ADDR_READ);
         delay_us(800);//Waiting for first message transmission 9 tics * 10탎 * 8 bytes = 720 탎 + 10% margin = 300 탎
+        }
 */
     // Reset OST
         I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG1, 1, MPL3115A2_ALT_OSR, 1, NULL);
 //        delay_us(300);
 	interrupt_restore_corcon;
 }
-
+#endif
 void ReadBarAltitude_callback(boolean I2CtrxOK)
 {
 	long altitude;  // (signed long integer 32 bits) in mm

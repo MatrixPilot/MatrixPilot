@@ -40,5 +40,6 @@ extern union state_flags_int state_flags;
 
 extern int16_t waggle;
 //extern uint8_t counter;
+extern boolean didCalibrate;
 
 void init_states(void);

@@ -35,6 +35,7 @@
 #define TICKS PID_HZ/I2C_SENSOR_RATE
 #include "../libUDB/Lidar.h"
 
+
 union dcm_fbts_word dcm_flags;
 int16_t angleOfAttack;
 
@@ -55,6 +56,12 @@ void dcm_init(void)
 	dcm_flags.W = 0;
 	dcm_flags._.first_mag_reading = 1;
 	dcm_init_rmat();
+                  UDB_XACCEL.sum = 0;
+                  UDB_YACCEL.sum = 0;
+                  UDB_ZACCEL.sum = 0;
+                  udb_xrate.sum = 0;
+                  udb_yrate.sum = 0;
+                  udb_zrate.sum = 0;
 }
 
 #if (DCM_CALIB_COUNT > DCM_GPS_COUNT)
@@ -68,7 +75,23 @@ void dcm_run_calib_step(uint16_t count)
 		DPRINT("calib_finished\r\n");
 		dcm_flags._.calib_finished = 1;
 		dcm_calibrate();    // Finish calibration
+                  UDB_XACCEL.sum = 0;
+                  UDB_YACCEL.sum = 0;
+                  UDB_ZACCEL.sum = 0;
+                  udb_xrate.sum = 0;
+                  udb_yrate.sum = 0;
+                  udb_zrate.sum = 0;
 	}
+        else if (count < DCM_CALIB_COUNT)
+         {
+            UDB_XACCEL.sum += UDB_XACCEL.value;
+            UDB_YACCEL.sum += UDB_YACCEL.value;
+            UDB_ZACCEL.sum += UDB_ZACCEL.value;
+            udb_xrate.sum  += udb_xrate.value;
+	   udb_yrate.sum  += udb_yrate.value;
+	   udb_zrate.sum  += udb_zrate.value;
+
+         }
 }
 
 static boolean gps_run_init_step(uint16_t count)
@@ -155,10 +178,10 @@ void udb_heartbeat_callback(void)
     }
 
 #endif // LIDAR_ALTITUDE
+    
 	if (udb_pulse_counter % (HEARTBEAT_HZ / PID_HZ) == 0)
 	{
 		get_data_from_I2C_sensors(); // TODO: this should always be be called at 40Hz
-        estAltitude();
     }
 //  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
 	if (dcm_flags._.calib_finished)
@@ -173,8 +196,8 @@ void udb_heartbeat_callback(void)
 		if (!dcm_flags._.calib_finished)
 		{
 			dcm_run_calib_step(udb_pulse_counter / (HEARTBEAT_HZ / PID_HZ));
-            #if (USE_BAROMETER_ALTITUDE > 0)
-                altimeter_calibrate();
+            #if ((USE_BAROMETER_ALTITUDE > 0) ||  (USE_LIDAR_ALTITUDE > 0))
+                            altimeter_calibrate();
             #endif
 		}
 		if (!dcm_flags._.init_finished)

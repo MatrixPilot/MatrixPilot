@@ -48,7 +48,7 @@ vect3_32t get_fixed_origin(void)
 
 #if (FLIGHT_PLAN_TYPE != FP_NONE)
 
-static boolean flightplan_logo_active = false;
+static boolean flightplan_logo_active = true;
 
 void flightplan_init(void)
 {

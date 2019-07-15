@@ -25,6 +25,7 @@
 #include "../libUDB/servoOut.h"
 #include "../libDCM/estYawDrift.h"
 #include "../libDCM/rmat.h"
+#include "../libUDB/heartbeat.h"
 
 int16_t current_orientation;
 union bfbts_word desired_behavior;
@@ -144,16 +145,17 @@ void updateBehavior(void)
 #endif
 	if (state_flags._.pitch_feedback && !state_flags._.GPS_steering)
 	{
-		desired_behavior.W = current_orientation;
+//gfm this line is deleted to avoid masking the trigger command at 2Hz sent by states.c
+        //		desired_behavior.W = current_orientation;
 	}
 	dcm_enable_yaw_drift_correction(current_orientation != F_HOVER);
 	
 }
 
-// This function is called every 25ms
+// This function is called every 1/PID_HZ (25ms)
 void updateTriggerAction(void)
 {
-	if (cyclesUntilStopTriggerAction == 1)
+        if (cyclesUntilStopTriggerAction == 1)
 	{
 		triggerActionSetValue(TRIGGER_ACTION != TRIGGER_PULSE_HIGH);
 		cyclesUntilStopTriggerAction = 0;
@@ -168,7 +170,7 @@ void updateTriggerAction(void)
 		{
 			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
 
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)(1000/PID_HZ);
 			cyclesUntilStartTriggerAction = 0;
 		}
 		else if (TRIGGER_ACTION == TRIGGER_TOGGLE)
@@ -182,8 +184,8 @@ void updateTriggerAction(void)
 		{
 			triggerActionSetValue(TRIGGER_ACTION == TRIGGER_PULSE_HIGH);
 
-			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)25;
-			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)25;
+			cyclesUntilStopTriggerAction = TRIGGER_PULSE_DURATION / (int32_t)(1000/PID_HZ);
+			cyclesUntilStartTriggerAction = TRIGGER_REPEAT_PERIOD / (int32_t)(1000/PID_HZ);
 		}
 	}
 	else if (cyclesUntilStartTriggerAction > 0)
