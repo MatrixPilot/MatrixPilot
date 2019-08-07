@@ -108,8 +108,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 }
 #define SONAR_HANDLER(x, y) _SONAR_HANDLER(x, y)
 
-#if (USE_SONAR_INPUT != 0)
+
 SONAR_HANDLER(USE_SONAR_INPUT, REGTOK1);
-#endif // USE_SONAR_INPUT
+
 
 #endif // USE_SONAR_INPUT

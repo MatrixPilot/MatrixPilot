@@ -95,6 +95,9 @@ void udb_init(void)
 #endif
 	udb_init_clock();
 	radioIn_init(); // was udb_init_capture();
+#if (USE_SONAR_INPUT !=0)
+    udb_init_sonar();
+#endif
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif

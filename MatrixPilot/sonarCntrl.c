@@ -55,10 +55,11 @@ void calculate_sonar_height_above_ground(void)
 		accum.WW = __builtin_mulss(get_sonar_value(), UDB_SONAR_PWM_UNITS_TO_CENTIMETERS) + 32768;
 		sonar_distance = accum._.W1;
 		// RMAT 8 is the cosine of the tilt of the plane in pitch and roll	;
-		cos_pitch_roll = rmat[8];
-		if (cos_pitch_roll > 16383)
+		cos_pitch_roll = rmat[8]; // rmat[8] can change in another thread of execution
+		if (cos_pitch_roll < 8192) // tilt >  45 degrees
 		{
-			cos_pitch_roll = 16383;
+			sonar_height_to_ground = OUT_OF_RANGE_DISTANCE;
+            return;
 		}
 		if (sonar_distance > USEABLE_SONAR_DISTANCE)
 		{
@@ -71,8 +72,8 @@ void calculate_sonar_height_above_ground(void)
 			if (good_sample_count > SONAR_SAMPLE_THRESHOLD) 
 			{
 				good_sample_count = SONAR_SAMPLE_THRESHOLD;
-				accum.WW = __builtin_mulss(cos_pitch_roll, sonar_distance);
-				sonar_height_to_ground = accum._.W1 << 2; 
+				accum.WW = (__builtin_mulss(cos_pitch_roll, sonar_distance) + 8192)<<2;
+				sonar_height_to_ground = accum._.W1; 
 			}
 			else
 			{
@@ -80,7 +81,6 @@ void calculate_sonar_height_above_ground(void)
 			}
 		}
 		udb_flags._.sonar_updated = 0;
-		udb_flags._.sonar_print_telemetry = 1;
 	}
 	else
 	{
