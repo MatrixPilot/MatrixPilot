@@ -20,7 +20,7 @@
 
 
 void radioIn_init(void);
-void udb_init_sonar(void);
+void udb_init_ranger(void);
 boolean radioIn_isFailSafe(void);
 uint8_t radioIn_getInput(int16_t* ppm, uint8_t channels);
 

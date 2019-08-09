@@ -26,7 +26,7 @@
 #include "config.h"
 #include "states.h"
 #include "altitudeCntrl.h"
-#include "sonarCntrl.h"
+#include "alt_agl.h"
 #include "../libDCM/rmat.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/estWind.h"
@@ -162,8 +162,8 @@ int16_t desiredSpeed = (DESIRED_SPEED*10);
 
 void altitudeCntrl(void)
 {
-#if (USE_SONAR_INPUT != 0)
-	calculate_sonar_height_above_ground();
+#if (USE_RANGER_INPUT != 0)
+	calculate_height_above_ground_level();
 #endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)
 	{

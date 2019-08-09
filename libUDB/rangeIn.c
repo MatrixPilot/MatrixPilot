@@ -21,22 +21,22 @@
 
 #include "libUDB.h"
 #include "interrupt.h"
-#include "sonarIn.h"
+#include "rangeIn.h"
 
-#if (USE_SONAR_INPUT != 0)
+#if (USE_RANGER_INPUT != 0)
 
-int16_t udb_pwm_sonar;          // pulse width of sonar signal
-static int16_t udb_pwm_sonar_rise;
-static uint16_t sonar_pwm_count;
+int16_t udb_pwm_range;          // pulse width of sonar signal
+static int16_t udb_pwm_range_rise;
+static uint16_t range_pwm_count;
 
-int16_t get_sonar_value(void)
+int16_t get_range_value(void)
 {
-	return udb_pwm_sonar;
+	return udb_pwm_range;
 }
 
-uint16_t get_sonar_count(void)
+uint16_t get_range_count(void)
 {
-	return sonar_pwm_count;
+	return range_pwm_count;
 }
 
 #if (BOARD_TYPE == AUAV3_BOARD)
@@ -49,7 +49,7 @@ uint16_t get_sonar_count(void)
 
 //	_TRISD15 = 1; \  // TODO: check if we need to be setting the tris bit for our input capture
 
-#define _SONAR_INIT(x, y, z) \
+#define _RANGER_INIT(x, y, z) \
 { \
 	IC##x##CO##y##z = 0; \
 	IC##x##CO##y##bits.ICM = 1; \
@@ -57,11 +57,12 @@ uint16_t get_sonar_count(void)
 	_IC##x##IF = 0; \
 	_IC##x##IE = 1; \
 }
-#define SONAR_INIT(x, y, z) _SONAR_INIT(x, y, z)
+#define RANGER_INIT(x, y, z) _RANGER_INIT(x, y, z)
 
-void udb_init_sonar(void)
+void udb_init_ranger(void)
 {
-	// Setup Channel 8 for Sonar
+    
+    // Timer Calculations: Sonar
 	// Sonar PWM Pulses are at 58 micro seconds per cm measured. Maximum for MB1230 is 765 cm. So Max Pulse is 44370 micro seconds.
 	// ( MB1260 Maximum is 1053cm. So Max Pulse is 61074)
 	// Clock of timer is running at 16,000,000 Hz. So Max Sonar Pulse is 16000000 * 0.044379 clock pulses which is 710064 pulses. 
@@ -70,18 +71,27 @@ void udb_init_sonar(void)
 	// If minimum reading is 0.2 meters, then minimum PWM is  (20 * 58) = 1160 micro seconds. So the
 	// minimum integer in MatrixPilot should then be (16000000 * 0.001160) / 64 = 290
 	// Each unit of UDB PWM sonar pulse is 64 / 16000000 seconds which is 0.000004 seconds in length.
-	// Therefore each centimeter of measured distance will show 0.000058 / 0.000004 or 58 or 14.5 UDB PWM sonar units / centimeter.
+	// Therefore each centimeter of measured distance will show 0.000058 / 0.000004 or 14.5 UDB timer ticks / centimeter.
+    
+    // Timer Calculations: Lidar (Garmin Lidar 3LiteHP)
+    // Lidar PWM Pulses are 10 microseconds in width for each 1 centimeters of detected range
+    // Expect a maximum range of 40 meters from published specs. 
+    // maximum cpu clock pulses of a detected range will be will be 16000000 * 0.04 which is 640000 cpu clock ticks.
+    // If we pre-scale that by 64 then we will have max timer ticks of 10,000 .
+    // 1 centimeter will be 10,000 / (40*100) ticks which is 2.5 timer ticks / centimeter.
+
 
 	TMR3 = 0;               // initialize timer
+    // Note: prescaler predicated on 16 Mhz cpu clock rate
 	T3CONbits.TCKPS = 2;    // prescaler = 64,  see page 175 at http://ww1.microchip.com/downloads/en/DeviceDoc/70593C.pdf
 	T3CONbits.TCS = 0;      // use the internal clock
 	T3CONbits.TON = 1;      // turn on timer 3
 
-	SONAR_INIT(USE_SONAR_INPUT, REGTOK1, REGLBL1);
+	RANGER_INIT(USE_RANGER_INPUT, REGTOK1, REGLBL1);
 
 }
 
-#define _SONAR_HANDLER(x, y) \
+#define _RANGER_HANDLER(x, y) \
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 { \
 	indicate_loading_inter; \
@@ -95,21 +105,21 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
 	} \
 	if (IC_PIN##x) \
 	{ \
-		udb_pwm_sonar_rise = time; \
-		sonar_pwm_count++; \
+		udb_pwm_range_rise = time; \
+		range_pwm_count++; \
 	} \
 	else \
 	{ \
-		udb_pwm_sonar = time - udb_pwm_sonar_rise; \
-		udb_flags._.sonar_updated = 1; \
+		udb_pwm_range = time - udb_pwm_range_rise; \
+		udb_flags._.range_updated = 1; \
 	} \
 	interrupt_restore_corcon; \
 	unset_ipl_on_output_pin;  \
 }
-#define SONAR_HANDLER(x, y) _SONAR_HANDLER(x, y)
+#define RANGER_HANDLER(x, y) _RANGER_HANDLER(x, y)
 
 
-SONAR_HANDLER(USE_SONAR_INPUT, REGTOK1);
+RANGER_HANDLER(USE_RANGER_INPUT, REGTOK1);
 
 
-#endif // USE_SONAR_INPUT
+#endif // USE_RANGER_INPUT

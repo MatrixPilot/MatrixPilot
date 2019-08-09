@@ -29,7 +29,7 @@
 #include "states.h"
 #include "airspeedCntrl.h"
 #include "altitudeCntrl.h"
-#include "sonarCntrl.h"
+#include "alt_agl.h"
 #include "../libDCM/deadReckoning.h"
 #include "../libUDB/servoOut.h"
 
@@ -149,8 +149,8 @@ static int32_t excess_energy_height(int16_t targetAspd, int16_t acutalAirspeed) 
 
 void altitudeCntrl(void)
 {
-#if (USE_SONAR_INPUT != 0)
-	calculate_sonar_height_above_ground();
+#if (USE_RANGER_INPUT != 0)
+	calculate_height_above_ground_level();
 #endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)
 	{

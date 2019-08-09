@@ -26,7 +26,7 @@
 #include "flightplan.h"
 #include "cameraCntrl.h"
 #include "altitudeCntrl.h"
-#include "sonarCntrl.h"
+#include "alt_agl.h"
 #include "flightplan_logo.h"
 #include "../libDCM/rmat.h"
 #include "../libDCM/estWind.h"
@@ -604,10 +604,10 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 
 		case ALT: // altitude above origin in m
 			return IMUlocationz._.W1;
-            
-        case ALT_AGL: // altitude Above Ground Level (AGL) in centimeters (Sonar / Lidar_)
-            return sonar_height_to_ground;
-
+#if (USE_RANGER_INPUT != 0)           
+        case ALT_AGL: // altitude Above Ground Level (AGL) in centimeters (Sonar / Lidar)
+            return height_above_ground_level;
+#endif
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
 			return get_current_angle();
 

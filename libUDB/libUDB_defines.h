@@ -132,7 +132,7 @@ struct udb_flag_bits {
 	uint16_t unused                 : 13;
 	uint16_t a2d_read               : 1;
 	uint16_t radio_on               : 1;
-	uint16_t sonar_updated          : 1;
+	uint16_t range_updated          : 1;
 };
 
 

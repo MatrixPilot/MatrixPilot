@@ -428,19 +428,22 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// MAXBOTIX SONAR LANDING FLARE
-// Designed for use with the following device:-
-// http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
-// Can be used on INPUT 8 of the UDB4/5 if that is not used for a channel input.
-// Will return distance to ground in meters and compensate for roll subject to
-// receiving a returned sonar signal.
-// This option is designed to be used with Logo Flight Planning.
-// Logo allows the user to Interrupt a Landing and flare, or Go Around,
-// based on sonar distance to ground.
+// LIDAR or SONAR Ranging
+// Designed for use with the following devices:-
+// Lidar: https://www.sparkfun.com/products/14599
+// Sonar: http://www.maxbotix.com/Ultrasonic_Sensors/MB1230.htm
+// Can be used on INPUT 6,7,8 of the UDB5 if that is not used for a channel input.
+// Will return distance to ground in centimeters and compensate for tilt subject to
+// receiving a valid returned distance to target.
+// This option can be used with Logo Flight Planning
+// and allows the user to interrupt a Landing and flare, or Go Around,
+// based on calculated height above ground level. 
 
-// Set USE_SONAR_INPUT to the input capture channel which the sensor
+// Set USE_RANGER_INPUT to the input capture channel which the sensor
 // is connected to. Must be greater than the last used servo channel.
-#define USE_SONAR_INPUT                     0
+#define USE_RANGER_INPUT                     0
+// set to RANGER_NONE, RANGER_LIDAR or RANGER_SONAR
+#define RANGER_TYPE                          RANGER_NONE
 
 
 ////////////////////////////////////////////////////////////////////////////////

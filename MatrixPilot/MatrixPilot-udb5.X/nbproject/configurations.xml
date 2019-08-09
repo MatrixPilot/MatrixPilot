@@ -101,9 +101,9 @@
         <itemPath>../../libUDB/serialIO.h</itemPath>
         <itemPath>../../libUDB/servoOut.h</itemPath>
         <itemPath>../../libUDB/servoOutPins.h</itemPath>
-        <itemPath>../../libUDB/sonarIn.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../libUDB/rangeIn.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix"
                      displayName="libVectorMatrix"
@@ -159,10 +159,10 @@
         <itemPath>../../MatrixPilot/ring_buffer.h</itemPath>
         <itemPath>../../MatrixPilot/servoMix.h</itemPath>
         <itemPath>../../MatrixPilot/servoPrepare.h</itemPath>
-        <itemPath>../../MatrixPilot/sonarCntrl.h</itemPath>
         <itemPath>../../MatrixPilot/states.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.h</itemPath>
+        <itemPath>../../MatrixPilot/alt_agl.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
@@ -452,11 +452,11 @@
         <itemPath>../../libUDB/read.c</itemPath>
         <itemPath>../../libUDB/serialIO.c</itemPath>
         <itemPath>../../libUDB/servoOut.c</itemPath>
-        <itemPath>../../libUDB/sonarIn.c</itemPath>
         <itemPath>../../libUDB/traps.c</itemPath>
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
+        <itemPath>../../libUDB/rangeIn.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix"
                      displayName="libVectorMatrix"
@@ -521,12 +521,12 @@
         <itemPath>../../MatrixPilot/rollCntrl.c</itemPath>
         <itemPath>../../MatrixPilot/servoMix.c</itemPath>
         <itemPath>../../MatrixPilot/servoPrepare.c</itemPath>
-        <itemPath>../../MatrixPilot/sonarCntrl.c</itemPath>
         <itemPath>../../MatrixPilot/stack.S</itemPath>
         <itemPath>../../MatrixPilot/states.c</itemPath>
         <itemPath>../../MatrixPilot/telemetry.c</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.c</itemPath>
         <itemPath>../../MatrixPilot/yawCntrl.c</itemPath>
+        <itemPath>../../MatrixPilot/alt_agl.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
@@ -730,6 +730,9 @@
         <property key="relaxed-math" value="false"/>
         <property key="save-temps" value="false"/>
       </C30Global>
+      <PICkit3PlatformTool>
+        <property key="firmware.download.all" value="false"/>
+      </PICkit3PlatformTool>
     </conf>
   </confs>
 </configurationDescriptor>

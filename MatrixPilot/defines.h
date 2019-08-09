@@ -98,6 +98,10 @@ void save_altitudeCntrlVariable(void);
 #define SERIAL_MAVLINK        9     // The Micro Air Vehicle Link protocol from the PixHawk Project
 #define SERIAL_MAG_CALIBRATE 10     // Used to calibrate and report static magnetometer offsets
 
+// RANGING DEVICES
+#define RANGER_NONE           0     // No Lidar or Sonar device
+#define RANGER_SONAR          1     // Sonar device
+#define RANGER_LIDAR          2     // Lidar device
 
 #include "gain_variables.h"
 

@@ -19,7 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-extern int16_t sonar_distance;         // distance to target in centimeters
-extern int16_t sonar_height_to_ground; // calculated distance to ground in Earth's Z Plane allowing for tilt
+extern int16_t range_to_target;         // distance to target in centimeters
+extern int16_t height_above_ground_level; // calculated distance to ground in Earth's Z Plane allowing for tilt
 
-void calculate_sonar_height_above_ground(void);
+void calculate_height_above_ground_level(void);
