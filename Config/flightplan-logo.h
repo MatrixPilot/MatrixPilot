@@ -204,7 +204,8 @@
 // 
 // DIST_TO_HOME         - in m
 // DIST_TO_GOAL         - in m
-// ALT                  - in m
+// ALT                  - in m  Above Origin
+// ALT_AGL              - in cm Above Ground Level (Sonar / Lidar)
 // CURRENT_ANGLE        - in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_HOME        - in degrees. 0-359 (clockwise, 0=North)
 // ANGLE_TO_GOAL        - in degrees. 0-359 (clockwise, 0=North)

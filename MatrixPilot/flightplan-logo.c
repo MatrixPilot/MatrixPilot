@@ -26,6 +26,7 @@
 #include "flightplan.h"
 #include "cameraCntrl.h"
 #include "altitudeCntrl.h"
+#include "sonarCntrl.h"
 #include "flightplan_logo.h"
 #include "../libDCM/rmat.h"
 #include "../libDCM/estWind.h"
@@ -63,6 +64,7 @@ enum {
 	DIST_TO_HOME = 16,
 	DIST_TO_GOAL,
 	ALT,
+    ALT_AGL,
 	CURRENT_ANGLE,
 	ANGLE_TO_HOME,
 	ANGLE_TO_GOAL,
@@ -600,8 +602,11 @@ static int16_t logo_value_for_identifier(uint8_t ident)
 		case DIST_TO_GOAL: // in m
 			return tofinish_line;
 
-		case ALT: // in m
+		case ALT: // altitude above origin in m
 			return IMUlocationz._.W1;
+            
+        case ALT_AGL: // altitude Above Ground Level (AGL) in centimeters (Sonar / Lidar_)
+            return sonar_height_to_ground;
 
 		case CURRENT_ANGLE: // in degrees. 0-359 (clockwise, 0=North)
 			return get_current_angle();
