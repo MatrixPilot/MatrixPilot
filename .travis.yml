@@ -13,6 +13,7 @@ addons:
     - libxext6:i386
     - libstdc++6:i386
     - libexpat1:i386
+    - mesa-common-dev
 
 before_install:
 
