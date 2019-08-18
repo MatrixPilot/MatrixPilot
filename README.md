@@ -1,5 +1,7 @@
 # MatrixPilot 
-https://api.travis-ci.org/Inspirati/MatrixPilot.svg?branch=master
+
+[![Travis CI](https://api.travis-ci.org/Inspirati/MatrixPilot.svg?branch=master)]
+
 ## Firmware for Bill Premerlani's IMU based UAV Dev Board and its successors
 
 Welcome to the MatrixPilot codebase. Three board types are supported:-
