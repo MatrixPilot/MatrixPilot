@@ -1,6 +1,6 @@
 # MatrixPilot 
 
-[Travis CI](https://travis-ci.org/MatrixPilot/MatrixPilot) ![Travis CI](https://api.travis-ci.org/Inspirati/MatrixPilot.svg?branch=master)
+[Travis CI](https://travis-ci.org/Inspirati/MatrixPilot) ![Travis CI](https://api.travis-ci.org/Inspirati/MatrixPilot.svg?branch=master)
 
 ## Firmware for Bill Premerlani's IMU based UAV Dev Board and its successors
 
