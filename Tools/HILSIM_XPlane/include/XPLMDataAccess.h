@@ -2,11 +2,11 @@
 #define _XPLMDataAccess_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -75,6 +75,8 @@ extern "C" {
  *
  */
 
+
+
 /*
  * XPLMDataRef
  * 
@@ -99,25 +101,27 @@ typedef void * XPLMDataRef;
  */
 enum {
      /* Data of a type the current XPLM doesn't do.                                 */
-     xplmType_Unknown                         = 0,
+     xplmType_Unknown                         = 0
 
      /* A single 4-byte integer, native endian.                                     */
-     xplmType_Int                             = 1,
+    ,xplmType_Int                             = 1
 
      /* A single 4-byte float, native endian.                                       */
-     xplmType_Float                           = 2,
+    ,xplmType_Float                           = 2
 
      /* A single 8-byte double, native endian.                                      */
-     xplmType_Double                          = 4,
+    ,xplmType_Double                          = 4
 
      /* An array of 4-byte floats, native endian.                                   */
-     xplmType_FloatArray                      = 8,
+    ,xplmType_FloatArray                      = 8
 
      /* An array of 4-byte integers, native endian.                                 */
-     xplmType_IntArray                        = 16,
+    ,xplmType_IntArray                        = 16
 
      /* A variable block of data.                                                   */
-     xplmType_Data                            = 32
+    ,xplmType_Data                            = 32
+
+
 };
 typedef int XPLMDataTypeID;
 
@@ -154,7 +158,8 @@ XPLM_API int                  XPLMCanWriteDataRef(
  * WARNING: This function is deprecated and should not be used. Datarefs are 
  * valid until plugins are reloaded or the sim quits.  Plugins sharing 
  * datarefs should support these semantics by not unregistering datarefs 
- * during operation. 
+ * during operation.  (You should however unregister datarefs when your plugin 
+ * is unloaded, as part of general resource cleanup.) 
  * 
  * This function returns whether a data ref is still valid.  If it returns 
  * false, you should refind the data ref from its original string.  Calling an 
@@ -186,7 +191,9 @@ XPLM_API XPLMDataTypeID       XPLMGetDataRefTypes(
  * there is a type mismatch, the functions that read data will return 0 as a 
  * default value or not modify the passed in memory. The plugins that write 
  * data will not write under these circumstances or if the data ref is 
- * read-only. 
+ * read-only. NOTE: to keep the overhead of reading datarefs low, these 
+ * routines do not do full validation of a  dataref; passing a junk value for 
+ * a dataref can result in crashing the sim. 
  * 
  * For array-style datarefs, you specify the number of items to read/write and 
  * the offset into the array; the actual number of items read or written is 
@@ -194,10 +201,14 @@ XPLM_API XPLMDataTypeID       XPLMGetDataRefTypes(
  *
  */
 
+
+
 /*
  * XPLMGetDatai
  * 
- * Read a single integer data ref.                                             
+ * Read an integer data ref and return its value. The return value is the 
+ * dataref value or 0 if the dataref is invalid/NULL or the plugin is 
+ * disabled.                                                                   
  *
  */
 XPLM_API int                  XPLMGetDatai(
@@ -206,7 +217,9 @@ XPLM_API int                  XPLMGetDatai(
 /*
  * XPLMSetDatai
  * 
- * Write a single integer data ref.                                            
+ * Write a new value to an integer data ref.   This routine is a no-op if the 
+ * plugin publishing the dataref is disabled, the dataref is invalid, or the 
+ * dataref is not writable.                                                    
  *
  */
 XPLM_API void                 XPLMSetDatai(
@@ -216,7 +229,9 @@ XPLM_API void                 XPLMSetDatai(
 /*
  * XPLMGetDataf
  * 
- * Read a single precision floating point (float) data ref.                    
+ * Read a single precision floating point dataref and return its value. The 
+ * return value is the dataref value or 0.0 if the dataref is invalid/NULL or 
+ * the plugin is disabled.                                                     
  *
  */
 XPLM_API float                XPLMGetDataf(
@@ -225,7 +240,9 @@ XPLM_API float                XPLMGetDataf(
 /*
  * XPLMSetDataf
  * 
- * Write a single precision floating point (float) data ref.                   
+ * Write a new value to a single precision floating point data ref.   This 
+ * routine is a no-op if the plugin publishing the dataref is disabled, the 
+ * dataref is invalid, or the dataref is not writable.                         
  *
  */
 XPLM_API void                 XPLMSetDataf(
@@ -235,7 +252,9 @@ XPLM_API void                 XPLMSetDataf(
 /*
  * XPLMGetDatad
  * 
- * Read a double precision floating point data ref.                            
+ * Read a double precision floating point dataref and return its value. The 
+ * return value is the dataref value or 0.0 if the dataref is invalid/NULL or 
+ * the plugin is disabled.                                                     
  *
  */
 XPLM_API double               XPLMGetDatad(
@@ -244,7 +263,9 @@ XPLM_API double               XPLMGetDatad(
 /*
  * XPLMSetDatad
  * 
- * Write a double precision floating point data ref.                           
+ * Write a new value to a double precision floating point data ref.   This 
+ * routine is a no-op if the plugin publishing the dataref is disabled, the 
+ * dataref is invalid, or the dataref is not writable.                         
  *
  */
 XPLM_API void                 XPLMSetDatad(
@@ -254,12 +275,22 @@ XPLM_API void                 XPLMSetDatad(
 /*
  * XPLMGetDatavi
  * 
- * Read a part of an array of integers. Returns number of ints returned.  You 
- * may pass NULL to just measure the number of values available.  You may pass 
- * a non-negative offset to read only part of the array.                       
+ * Read a part of an integer array dataref.  If you pass NULL for outVaules, 
+ * the routine will return the size of the array, ignoring inOffset and inMax. 
+ * 
+ * 
+ * If outValues is not NULL, then up to inMax values are copied from the 
+ * dataref into outValues, starting at inOffset in the dataref. If inMax + 
+ * inOffset is larger than the size of the dataref, less than inMax values 
+ * will be copied.  The number of values copied is returned. 
+ * 
+ * Note: the semantics of array datarefs are entirely implemented by the 
+ * plugin (or X-Plane) that provides the dataref, not the SDK itself; the 
+ * above description is how these datarefs are intended to work, but a rogue 
+ * plugin may have different behavior.                                         
  *
  */
-XPLM_API long                 XPLMGetDatavi(
+XPLM_API int                  XPLMGetDatavi(
                                    XPLMDataRef          inDataRef,    
                                    int *                outValues,    /* Can be NULL */
                                    int                  inOffset,    
@@ -268,7 +299,15 @@ XPLM_API long                 XPLMGetDatavi(
 /*
  * XPLMSetDatavi
  * 
- * Write part or all of an array of integers.                                  
+ * Write part or all of an integer array dataref.  The values passed by 
+ * inValues are written into the dataref starting at  inOffset.  Up to inCount 
+ * values are written; however if the values would write "off the end" of the 
+ * dataref array, then fewer values are written. 
+ * 
+ * Note: the semantics of array datarefs are entirely implemented by the 
+ * plugin (or X-Plane) that provides the dataref, not the SDK itself; the 
+ * above description is how these datarefs are intended to work, but a rogue 
+ * plugin may have different behavior.				                                     
  *
  */
 XPLM_API void                 XPLMSetDatavi(
@@ -280,12 +319,22 @@ XPLM_API void                 XPLMSetDatavi(
 /*
  * XPLMGetDatavf
  * 
- * Reads part or all of an array of floats. Returns number of floats read.  
- * You may pass NULL to just measure the number of values available.  You may 
- * pass a positive offset to read only part of the array.                      
+ * Read a part of a single precision floating point array dataref.  If you 
+ * pass NULL for outVaules, the routine will return the size of the array, 
+ * ignoring inOffset and inMax. 
+ * 
+ * If outValues is not NULL, then up to inMax values are copied from the 
+ * dataref into outValues, starting at inOffset in the dataref. If inMax + 
+ * inOffset is larger than the size of the dataref, less than inMax values 
+ * will be copied.  The number of values copied is returned. 
+ * 
+ * Note: the semantics of array datarefs are entirely implemented by the 
+ * plugin (or X-Plane) that provides the dataref, not the SDK itself; the 
+ * above description is how these datarefs are intended to work, but a rogue 
+ * plugin may have different behavior.                                         
  *
  */
-XPLM_API long                 XPLMGetDatavf(
+XPLM_API int                  XPLMGetDatavf(
                                    XPLMDataRef          inDataRef,    
                                    float *              outValues,    /* Can be NULL */
                                    int                  inOffset,    
@@ -294,7 +343,15 @@ XPLM_API long                 XPLMGetDatavf(
 /*
  * XPLMSetDatavf
  * 
- * Writes part or all of an array of floats.                                   
+ * Write part or all of a single precision floating point array dataref.  The 
+ * values passed by inValues are written into the dataref starting at  
+ * inOffset.  Up to inCount values are written; however if the values would 
+ * write "off the end" of the dataref array, then fewer values are written. 
+ * 
+ * Note: the semantics of array datarefs are entirely implemented by the 
+ * plugin (or X-Plane) that provides the dataref, not the SDK itself; the 
+ * above description is how these datarefs are intended to work, but a rogue 
+ * plugin may have different behavior.				                                     
  *
  */
 XPLM_API void                 XPLMSetDatavf(
@@ -306,27 +363,45 @@ XPLM_API void                 XPLMSetDatavf(
 /*
  * XPLMGetDatab
  * 
- * Reads part or all of an array of bytes. Returns length of data actually 
- * retreived.  You may pass NULL to measure the amount of data available.      
+ * Read a part of a byte array dataref.  If you pass NULL for outVaules, the 
+ * routine will return the size of the array, ignoring inOffset and inMax. 
+ * 
+ * If outValues is not NULL, then up to inMax values are copied from the 
+ * dataref into outValues, starting at inOffset in the dataref. If inMax + 
+ * inOffset is larger than the size of the dataref, less than inMax values 
+ * will be copied.  The number of values copied is returned. 
+ * 
+ * Note: the semantics of array datarefs are entirely implemented by the 
+ * plugin (or X-Plane) that provides the dataref, not the SDK itself; the 
+ * above description is how these datarefs are intended to work, but a rogue 
+ * plugin may have different behavior.                                         
  *
  */
-XPLM_API long                 XPLMGetDatab(
+XPLM_API int                  XPLMGetDatab(
                                    XPLMDataRef          inDataRef,    
                                    void *               outValue,    /* Can be NULL */
-                                   long                 inOffset,    
-                                   long                 inMaxBytes);    
+                                   int                  inOffset,    
+                                   int                  inMaxBytes);    
 
 /*
  * XPLMSetDatab
  * 
- * Writes part or all of an array of bytes.                                    
+ * Write part or all of a byte array dataref.  The values passed by inValues 
+ * are written into the dataref starting at  inOffset.  Up to inCount values 
+ * are written; however if the values would write "off the end" of the dataref 
+ * array, then fewer values are written. 
+ * 
+ * Note: the semantics of array datarefs are entirely implemented by the 
+ * plugin (or X-Plane) that provides the dataref, not the SDK itself; the 
+ * above description is how these datarefs are intended to work, but a rogue 
+ * plugin may have different behavior.				                                     
  *
  */
 XPLM_API void                 XPLMSetDatab(
                                    XPLMDataRef          inDataRef,    
                                    void *               inValue,    
-                                   long                 inOffset,    
-                                   long                 inLength);    
+                                   int                  inOffset,    
+                                   int                  inLength);    
 
 /***************************************************************************
  * PUBLISHING YOUR PLUGINS DATA
@@ -336,12 +411,21 @@ XPLM_API void                 XPLMSetDatab(
  * access via the above data access APIs.  Data references published by other 
  * plugins operate the same as ones published by x-plane in all manners except 
  * that your data reference will not be available to other plugins if/when 
- * your plugin is disabled. NEWINE You share data by registering data provider 
- * callback functions.  When a plug-in requests your data, these callbacks are 
- * then called.  You provide one callback to return the value when a plugin 
- * 'reads' it and another to change the value when a plugin 'writes' it.       
+ * your plugin is disabled. 
+ * 
+ * You share data by registering data provider callback functions.  When a 
+ * plug-in requests your data, these callbacks are then called.  You provide 
+ * one callback to return the value when a plugin 'reads' it and another to 
+ * change the value when a plugin 'writes' it. 
+ * 
+ * Important: you must pick a prefix for your datarefs other than "sim/" - 
+ * this prefix is reserved for X-Plane.  The X-Plane SDK website contains a 
+ * registry where authors can select a unique first word for dataref names, to 
+ * prevent dataref collisions between plugins.                                 
  *
  */
+
+
 
 /*
  * XPLMGetDatai_f
@@ -353,11 +437,11 @@ XPLM_API void                 XPLMSetDatab(
  * pointer you pass in your register routine; you can use it to find global 
  * variables, etc. 
  * 
- * Functions work the same as the accessors above.  WARNING: when asked to get 
- * an array of floats or raw data, the buffer may be NULL.  In this case, just 
- * return the actual size of the data or number of floats available.   Also, 
- * if the buffer size is NULL, you should ignore the 'max size' param and 
- * return a count of all of your items or data size.                           
+ * The semantics of your callbacks are the same as the dataref accessor above 
+ * - basically routines like XPLMGetDatai are just pass-throughs from a caller 
+ * to your plugin.  Be particularly mindful in implementing array dataref 
+ * read-write accessors; you are responsible for avoiding overruns, supporting 
+ * offset read/writes, and handling a read with a NULL buffer.			              
  *
  */
 typedef int (* XPLMGetDatai_f)(
@@ -411,7 +495,7 @@ typedef void (* XPLMSetDatad_f)(
  * 
  *
  */
-typedef long (* XPLMGetDatavi_f)(
+typedef int (* XPLMGetDatavi_f)(
                                    void *               inRefcon,    
                                    int *                outValues,    /* Can be NULL */
                                    int                  inOffset,    
@@ -433,7 +517,7 @@ typedef void (* XPLMSetDatavi_f)(
  * 
  *
  */
-typedef long (* XPLMGetDatavf_f)(
+typedef int (* XPLMGetDatavf_f)(
                                    void *               inRefcon,    
                                    float *              outValues,    /* Can be NULL */
                                    int                  inOffset,    
@@ -455,11 +539,11 @@ typedef void (* XPLMSetDatavf_f)(
  * 
  *
  */
-typedef long (* XPLMGetDatab_f)(
+typedef int (* XPLMGetDatab_f)(
                                    void *               inRefcon,    
                                    void *               outValue,    /* Can be NULL */
                                    int                  inOffset,    
-                                   long                 inMaxLength);    
+                                   int                  inMaxLength);    
 
 /*
  * XPLMSetDatab_f
@@ -470,7 +554,7 @@ typedef void (* XPLMSetDatab_f)(
                                    void *               inRefcon,    
                                    void *               inValue,    
                                    int                  inOffset,    
-                                   long                 inLength);    
+                                   int                  inLength);    
 
 /*
  * XPLMRegisterDataAccessor
@@ -560,6 +644,8 @@ XPLM_API void                 XPLMUnregisterDataAccessor(
  * data is changed, use shared data references.                                
  *
  */
+
+
 
 /*
  * XPLMDataChanged_f

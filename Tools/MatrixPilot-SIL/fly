@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# CONFIG can be the Full size Cessna in X-Plane , or EasyStar RC model which 
+# is available from uavdevboard discussion list members.
+make -j 8 CONFIG=Cessna
+UNAME_S=`uname -s`
+if [[ $UNAME_S == Darwin ]] || [[ $UNAME_S == Linux ]]; then
+	./matrixpilot
+elif [[ $UNAME_S == MINGW* ]]; then
+	if which winpty > /dev/null; then
+		winpty ./matrixpilot.exe
+	else
+		echo "You must install winpty to use matrixpilot SIL under Windows"
+		echo "You can install it with: pacman -Ss winpty"
+	fi
+else 
+	echo "Did not find suitable operating system type"
+fi

@@ -217,7 +217,7 @@ void mavlink_send_int_circular(int16_t i)
 	deg_angle._.W0 = *((int16_t*) mavlink_parameters_list[i].pparam);
 	deg_angle.WW = __builtin_mulss(deg_angle._.W0, (int16_t)(RMAX * 180.0 / 256.0));
 	deg_angle.WW >>= 5;
-	if (deg_angle._.W0 > 0x8000) deg_angle._.W1++; // Take care of the rounding error
+    deg_angle.WW += 0x8000 ; // Take care of the rounding error
 	param.param_int32 = deg_angle._.W1; // >> 6;
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
 	    param.param_float, MAVLINK_TYPE_INT32_T, count_of_parameters_list, i);
@@ -231,7 +231,7 @@ void mavlink_set_int_circular(mavlink_param_union_t setting, int16_t i)
 
 	dec_angle.WW = __builtin_mulss((int16_t)setting.param_int32, (int16_t)(RMAX * (256.0 / 180.0)));
 	dec_angle.WW <<= 9;
-	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
+	dec_angle.WW += 0x8000 ; // Take care of the rounding error
 	*((int16_t*)mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 }
 
@@ -312,7 +312,7 @@ void mavlink_send_dcm_angle(int16_t i)
 //	deg_angle.WW = __builtin_mulss(deg_angle._.W0, 40);
 	deg_angle.WW = __builtin_mulss(deg_angle._.W0, (int16_t)(57.3 * 16.0)); //(RMAX * 180.0 / 256.0));
 	deg_angle.WW >>= 2;
-	if (deg_angle._.W0 > 0x8000) deg_angle._.W1++; // Take care of the rounding error
+	deg_angle.WW += 0x8000 ; // Take care of the rounding error
 	param.param_int32 = deg_angle._.W1; // >> 6;
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
 	    param.param_float, MAVLINK_TYPE_INT32_T, count_of_parameters_list, i);
@@ -327,7 +327,7 @@ void mavlink_set_dcm_angle(mavlink_param_union_t setting, int16_t i)
 
 	dec_angle.WW = __builtin_mulss((int16_t)setting.param_int32, (RMAX * (16.0 / 57.3))); //(int16_t)(RMAX * 64 / 57.3)
 	dec_angle.WW <<= 12;
-	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
+	dec_angle.WW += 0x8000 ; // Take care of the rounding error
 	*((int16_t*)mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 }
 
@@ -342,7 +342,7 @@ void mavlink_send_frame_anglerate(int16_t i)
 //	deg_angle.WW = __builtin_mulss(deg_angle._.W0, 40);
 	deg_angle.WW = __builtin_mulss(deg_angle._.W0, (int16_t)(57.3 * 40.0)); //(RMAX * 180.0 / 256.0));
 	deg_angle.WW <<= 2;
-	if (deg_angle._.W0 > 0x8000) deg_angle._.W1++; // Take care of the rounding error
+	deg_angle.WW += 0x8000 ; // Take care of the rounding error
 	param.param_int32 = deg_angle._.W1; // >> 6;
 	mavlink_msg_param_value_send(MAVLINK_COMM_0, mavlink_parameters_list[i].name,
 	    param.param_float, MAVLINK_TYPE_INT32_T, count_of_parameters_list, i);
@@ -357,7 +357,7 @@ void mavlink_set_frame_anglerate(mavlink_param_union_t setting, int16_t i)
 
 	dec_angle.WW = __builtin_mulss((int16_t)setting.param_int32, (128.0 * 7.15)); //(int16_t)(RMAX * 128 / (57.3 * 40.0))
 	dec_angle.WW <<= 9;
-	if (dec_angle._.W0 > 0x8000) dec_angle.WW += 0x8000; // Take care of the rounding error
+	dec_angle.WW += 0x8000 ; // Take care of the rounding error
 	*((int16_t*)mavlink_parameters_list[i].pparam) = dec_angle._.W1;
 }
 

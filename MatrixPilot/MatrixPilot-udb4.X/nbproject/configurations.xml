@@ -23,6 +23,10 @@
           <itemPath>../../Config/E_Glider/options.h</itemPath>
           <itemPath>../../Config/E_Glider/options_airspeed.h</itemPath>
         </logicalFolder>
+        <logicalFolder name="EasyStar" displayName="EasyStar" projectFiles="true">
+          <itemPath>../../Config/EasyStar/flightplan-logo.h</itemPath>
+          <itemPath>../../Config/EasyStar/options.h</itemPath>
+        </logicalFolder>
         <logicalFolder name="Grobularis" displayName="Grobularis" projectFiles="true">
           <itemPath>../../Config/Grobularis/options.h</itemPath>
           <itemPath>../../Config/Grobularis/options_airspeed.h</itemPath>
@@ -71,6 +75,7 @@
         <itemPath>../../libUDB/barometer.h</itemPath>
         <itemPath>../../libUDB/boardRotation_defines.h</itemPath>
         <itemPath>../../libUDB/builtins.h</itemPath>
+        <itemPath>../../libUDB/cll_io.h</itemPath>
         <itemPath>../../libUDB/ConfigAUAV3.h</itemPath>
         <itemPath>../../libUDB/ConfigHILSIM.h</itemPath>
         <itemPath>../../libUDB/ConfigPX4.h</itemPath>
@@ -428,6 +433,7 @@
         <itemPath>../../libUDB/analogs.c</itemPath>
         <itemPath>../../libUDB/background.c</itemPath>
         <itemPath>../../libUDB/barometer.c</itemPath>
+        <itemPath>../../libUDB/cll_io.c</itemPath>
         <itemPath>../../libUDB/eeprom_udb4.c</itemPath>
         <itemPath>../../libUDB/events.c</itemPath>
         <itemPath>../../libUDB/fbcl.s</itemPath>

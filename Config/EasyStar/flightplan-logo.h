@@ -271,24 +271,18 @@
 //
 // Fly a 100m square at an altitude of 100m, beginning above the origin, pointing North
 
-#define SQUARE 1
 
 const struct logoInstructionDef instructions[] = {
 
+    USE_CURRENT_POS
+    SET_SPEED(14)
+    LOAD_TO_PARAM(ALT) // Check altitude to be more than 100m, if not climb)
+    SET_ALT_PARAM
+    IF_LE(ALT,100)
 	SET_ALT(100)
-
-	// Go Home and point North
-	HOME
-
-	REPEAT_FOREVER
-		DO_ARG(SQUARE, 100)
-	END
-
-	TO (SQUARE)
-		REPEAT(4)
-			FD_PARAM
-			RT(90)
-		END
+    ELSE
+        //LOAD_TO_PARAM(ALT)
+        SET_ALT_PARAM
 	END
 };
 
