@@ -30,6 +30,8 @@
 #include "flightplan.h"
 #include "flightplan_waypoints.h"
 #include "altitudeCntrl.h"
+#include "helicalTurnCntrl.h"
+#include "servoPrepare.h"
 #if (USE_TELELOG == 1)
 #include "telemetry_log.h"
 #endif
@@ -118,7 +120,7 @@ static uint8_t fp_checksum;
 static void (*sio_parse)(uint8_t inchar) = &sio_newMsg;
 
 
-#define SERIAL_BUFFER_SIZE 256
+#define SERIAL_BUFFER_SIZE 500
 static char serial_buffer[SERIAL_BUFFER_SIZE+1];
 static int16_t sb_index = 0;
 static int16_t end_index = 0;
@@ -474,11 +476,11 @@ int16_t udb_serial_callback_get_byte_to_send(void)
 	return -1;
 }
 
-static int16_t telemetry_counter = 13;
+static int16_t telemetry_counter = 15;
 
 void telemetry_restart(void)
 {
-	telemetry_counter = 13;
+	telemetry_counter = 15;
 }
 
 #if (SERIAL_OUTPUT_FORMAT == SERIAL_DEBUG)
@@ -581,45 +583,54 @@ void telemetry_output_8hz(void)
 	
 	switch (telemetry_counter)
 	{
-		case 13:
+		case 15:
 			serial_output("F22:Sensors=%i,%i,%i,%i,%i,%i\r\n",
 				UDB_XACCEL.value, UDB_YACCEL.value,
 				UDB_ZACCEL.value + (Z_GRAVITY_SIGN ((int16_t)(2*GRAVITY))),
 				udb_xrate.value, udb_yrate.value, udb_zrate.value);
 			break;
-		case 12: 
+		case 14: 
 			serial_output("F21:Offsets=%i,%i,%i,%i,%i,%i\r\n",
 				UDB_XACCEL.offset, UDB_YACCEL.offset, UDB_ZACCEL.offset,
 				udb_xrate.offset, udb_yrate.offset, udb_zrate.offset);
 			break;
-		case 11:
+		case 13:
 			serial_output("F15:IDA=");
 			serial_output(ID_VEHICLE_MODEL_NAME);
 			serial_output(":IDB=");
 			serial_output(ID_VEHICLE_REGISTRATION);
 			serial_output(":\r\n");
 			break;
-		case 10:
+		case 12:
 			serial_output("F16:IDC=");
 			serial_output(ID_LEAD_PILOT);
 			serial_output(":IDD=");
 			serial_output(ID_DIY_DRONES_URL);
 			serial_output(":\r\n");
 			break;
-		case 9:
+        case 11:
+#if ((FLIGHT_ANALYZER_TO_USE_NEUTUAL_DEFLECTION_VALUES == 1) && (AIRFRAME_TYPE == AIRFRAME_DELTA))
+            serial_output("F24:AIL=%i:ELEV=%i:\r\n",AILERON_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION,ELEVATOR_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION);
+#endif
+            break;
+		case 10:
 			serial_output("F17:FD_FWD=%5.3f:TR_NAV=%5.3f:TR_FBW=%5.3f:\r\n",
 			    turns.FeedForward, turns.TurnRateNav, turns.TurnRateFBW);
 			break;
-		case 8:
+		case 9:
 			serial_output("F18:AOA_NRM=%5.3f:AOA_INV=%5.3f:EL_TRIM_NRM=%5.3f:EL_TRIM_INV=%5.3f:CRUISE_SPD=%5.3f:\r\n",
 			    turns.AngleOfAttackNormal, turns.AngleOfAttackInverted, turns.ElevatorTrimNormal,
 			    turns.ElevatorTrimInverted, turns.RefSpeed);
 			break;
-		case 7:
-			serial_output("F19:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",
-			    AILERON_OUTPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_OUTPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
-			    THROTTLE_OUTPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_OUTPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
+		case 8:
+			serial_output("F19:INPUTS:AIL=%i,%i:ELEV=%i,%i:THROT=%i,%i:RUDD=%i,%i:\r\n",
+			    AILERON_INPUT_CHANNEL, AILERON_CHANNEL_REVERSED, ELEVATOR_INPUT_CHANNEL,ELEVATOR_CHANNEL_REVERSED,
+			    THROTTLE_INPUT_CHANNEL, THROTTLE_CHANNEL_REVERSED, RUDDER_INPUT_CHANNEL,RUDDER_CHANNEL_REVERSED );
 			break;
+        case 7:
+            serial_output("F25:OUTPUTS:AIL=%i:ELEV=%i:THROT=%i:RUDD=%i:\r\n",
+			    AILERON_OUTPUT_CHANNEL, ELEVATOR_OUTPUT_CHANNEL,THROTTLE_OUTPUT_CHANNEL, RUDDER_OUTPUT_CHANNEL);
+            break;
 		case 6:
 			serial_output("F14:WIND_EST=%i:GPS_TYPE=%i:DR=%i:BOARD_TYPE=%i:AIRFRAME=%i:"
 			              "RCON=0x%X:TRAP_FLAGS=0x%X:TRAP_SOURCE=0x%lX:ALARMS=%i:"
@@ -741,7 +752,12 @@ void telemetry_output_8hz(void)
 					serial_output("stk%d:", (int16_t)(4096-maxstack));
 #endif // RECORD_FREE_STACK_SPACE
 					serial_output("\r\n");
-					serial_output("F23:G%i:V%i:\r\n",gps_parse_errors,vdop);
+					serial_output("F23:G%i:V%i:RE%d,%d,%d:TE%d,%d,%d:DR%d,%d,%d:OM%d,%d,%d:DT%d:EL%d:\r\n",            \
+                            gps_parse_errors,vdop,                                                                     \
+                            rotationRateError[0],rotationRateError[1],rotationRateError[2],                            \
+                            tiltError[0],tiltError[1],tiltError[2],                                                    \
+                            desiredRotationRateRadians[0],desiredRotationRateRadians[1],desiredRotationRateRadians[2], \
+                            omegaAccum[0],omegaAccum[1],omegaAccum[2],desiredTurnRateRadians,elevatorLoadingTrim);
 				}
 			}
 			if (state_flags._.f13_print_req == 1)

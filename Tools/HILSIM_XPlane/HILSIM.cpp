@@ -2,6 +2,8 @@
 
 #define MAX_ITEMS 30
 #define MAG_FIELD 1000.0
+#define DEBUG_DISPLAY_AXIS 0
+
 
 bool CommsEnabled;
 float fTextColour[3];
@@ -1039,6 +1041,7 @@ int MyDrawCallback(XPLMDrawingPhase inPhase,
                    int              inIsBefore,
                    void*            inRefcon)
 {
+#if (DEBUG_DISPLAY_AXIS == 1)
 	(void)inPhase;
 	(void)inIsBefore;
 	(void)inRefcon;
@@ -1199,5 +1202,6 @@ int MyDrawCallback(XPLMDrawingPhase inPhase,
 	glVertex3f(planeX, planeY, planeZ);
 	glEnd();
  */
+#endif   // (DEBUG_DISPLAY_AXIS == 1)
 	return 1;
 }

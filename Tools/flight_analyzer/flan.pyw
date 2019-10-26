@@ -26,6 +26,7 @@ import re
 import sys
 import os
 import stat
+import glob
 
 from matrixpilot_lib import raw_mavlink_telemetry_file
 from matrixpilot_lib import ascii_telemetry_file
@@ -165,9 +166,9 @@ def shellquote(s):
 def C_pre_processor(C_source_filename):
     """"Use the C Pre Processor to parse a C source code file like waypoints.h"""
     try:
-        programfiles = os.environ['ProgramFiles']
+        programfiles = os.environ['ProgramFiles'] # Test whether in Windows 
     except:
-        #No luck with Windows environment variable, what about GCC?
+        #No luck with Windows environment variable, what about GCC in macos / Linux ?
         try:
             output = subprocess.Popen(["/bin/sh", "-c", "gcc -E " + shellquote(C_source_filename)],
                                    stdout=subprocess.PIPE, universal_newlines=True).communicate()[0]
@@ -181,33 +182,32 @@ def C_pre_processor(C_source_filename):
                 message = error_message)
             sys.exit()
     else:
+        mystring = os.path.join(programfiles,'Microchip\\xc16\\v*')
+        directory_list = glob.glob(mystring)
+        if not directory_list:
+            # We may be running Compiler in 32 bit mode on 64 bit machine....
+            programfiles = os.environ['ProgramFiles(x86)']
+            mystring = os.path.join(programfiles,'Microchip\\xc16\\v*')
+            directory_list = glob.glob(mystring)
+            
         C_pre_processor_executable1 = \
-             os.path.join(programfiles,'Microchip\\xc16\\v1.26\\bin\\bin\\coff-cpp.exe')
-        C_pre_processor_executable2 = \
-             os.path.join(programfiles,'Microchip\\xc16\\v1.27\\bin\\bin\\coff-cpp.exe')
-        C_pre_processor_executable3 = \
              os.path.join(programfiles,'Microchip\\MPLAB C30\\bin\\bin\\pic30-coff-cpp.exe')
-        C_pre_processor_executable4 = \
+        C_pre_processor_executable2 = \
                 os.path.join(programfiles,'Microchip\\mplabc30\\v3.25\\bin\\bin\\pic30-coff-cpp.exe')
         
         # Check that the exectuable exists ....
-        if os.path.exists(C_pre_processor_executable1):
+        if directory_list:
+            if os.path.exists(directory_list[-1]+'\\bin\\bin\\coff-cpp.exe'): # Use the last entry in directory_list
+                output = subprocess.Popen([directory_list[-1]+'\\bin\\bin\\coff-cpp.exe',C_source_filename],
+                                      stdout=subprocess.PIPE).communicate()[0]
+        elif os.path.exists(C_pre_processor_executable1):
             output = subprocess.Popen([C_pre_processor_executable1,C_source_filename],
                                      stdout=subprocess.PIPE).communicate()[0]
         elif os.path.exists(C_pre_processor_executable2):
             output = subprocess.Popen([C_pre_processor_executable2,C_source_filename],
                                      stdout=subprocess.PIPE).communicate()[0]
-        elif os.path.exists(C_pre_processor_executable3):
-            output = subprocess.Popen([C_pre_processor_executable3,C_source_filename],
-                                     stdout=subprocess.PIPE).communicate()[0]
-        elif os.path.exists(C_pre_processor_executable4):
-            output = subprocess.Popen([C_pre_processor_executable4,C_source_filename],
-                                     stdout=subprocess.PIPE).communicate()[0]
         else :
-            error_message = "Cannot find the following important executable file:\n" + \
-                    C_pre_processor_executable2 + "\n" + \
-                    "This is needed for processing wayoint files \n" + \
-                    "Currently the location is hardcoded in flan.py." 
+            error_message = "Cannot find the C Pre-Processor\n"
             print error_message
             showerror(title="Error: No C Pre-Processor Available",
                     message = error_message)
@@ -1974,10 +1974,13 @@ class flight_log_book:
         self.F21 = "Empty"
         self.F22 = "Empty"
         self.F23 = "Empty"
+        self.F24 = "Empty"
+        self.F25 = "Empty"
         self.ardustation_pos = "Empty"
         self.rebase_time_to_race_time = False
         self.waypoints_in_telemetry = False
         self.nominal_cruise_speed = 0
+        self.gps_parse_errors = 0
 
 def calc_average_wind_speed(log_book):
     if log_book.racing_mode == 0 :
@@ -2117,6 +2120,7 @@ def create_log_book(options) :
     roll = 0  # only used with ardustation roll
     pitch = 0 # only used with ardustation pitch
     record_no = 0
+    an_F2_record_has_been_stored = False
     telemetry_restarts = 0 # Number of times we see telemetry re-start
     skip_entry = 3 # hack required as first F2 entry can have wrong status in telemetry
                             # e.g. first status 100 even though GPS is good, second entry will
@@ -2179,6 +2183,7 @@ def create_log_book(options) :
                 log.tm = flight_clock.synthesize(log.tm,record_no) # interpolate time between identical entries
                 if (miss_out_counter > miss_out_interval) :# only store log every X times for large datasets
                     log_book.entries.append(log)
+                    an_F2_record_has_been_stored = True
                     miss_out_counter = 0
         elif log.log_format == "F4" : # We have a type of options.h line
             # format of roll_stabilization has changed over time
@@ -2231,6 +2236,7 @@ def create_log_book(options) :
             log_book.dead_reckoning = log.dead_reckoning
             log_book.airframe = log.airframe
             log_book.flight_plan_type = log.flight_plan_type
+            log_book.board_type = log.board_type
             log_book.F14 = "Recorded"
             log_book.F11 = "Recorded"
         elif log.log_format == "F13" : # We have origin information from telemetry
@@ -2262,14 +2268,14 @@ def create_log_book(options) :
             log_book.nominal_cruise_speed = log.nominal_cruise_speed
             log_book.F18 = "Recorded"
         elif log.log_format == "F19" : # Channels numbers and reversal of channels
-            log_book.aileron_output_channel = log.aileron_output_channel
-            log_book.aileron_output_reversed = log.aileron_output_reversed
-            log_book.elevator_output_channel = log.elevator_output_channel
-            log_book.elevator_output_reversed = log.elevator_output_reversed 
-            log_book.throttle_output_channel = log.throttle_output_channel
-            log_book.throttle_output_reversed = log.throttle_output_reversed
-            log_book.rudder_output_channel = log.rudder_output_channel
-            log_book.rudder_output_reversed = log.rudder_output_reversed
+            log_book.aileron_input_channel = log.aileron_input_channel
+            log_book.aileron_input_reversed = log.aileron_input_reversed
+            log_book.elevator_input_channel = log.elevator_input_channel
+            log_book.elevator_input_reversed = log.elevator_input_reversed 
+            log_book.throttle_input_channel = log.throttle_input_channel
+            log_book.throttle_input_reversed = log.throttle_input_reversed
+            log_book.rudder_input_channel = log.rudder_input_channel
+            log_book.rudder_input_reversed = log.rudder_input_reversed
             log_book.F19 = "Recorded"
         elif log.log_format == "F20" : # Number of Input Channels and Trim Values
             log_book.number_of_input_channels = log.number_of_input_channels
@@ -2281,6 +2287,25 @@ def create_log_book(options) :
             pass # flan not using sensor values measured at boot up time
         elif log.log_format == "F23" :
             log_book.gps_parse_errors = log.gps_parse_errors
+            # logbook.entries[-1] is the last F2 entry in the log book
+            # In the following lines, the F23 fields are added onto the F2 fields in the log book.
+            if an_F2_record_has_been_stored :
+                log_book.entries[-1].gps_parse_errors = log.gps_parse_errors
+                log_book.entries[-1].vdop = log.vdop
+                log_book.entries[-1].rotation_error = log.rotation_error
+                log_book.entries[-1].tilt_error = log.tilt_error
+                log_book.entries[-1].desired_rotation = log.desired_rotation
+                log_book.entries[-1].omega_accum = log.omega_accum
+                log_book.entries[-1].desired_turn_rate = log.desired_turn_rate
+                log_book.entries[-1].elevator_loading_trim = log.elevator_loading_trim
+        elif log.log_format == "F24" :
+            log_book.aileron_channel_neutral = log.aileron_channel_neutral
+            log_book.elevator_channel_neutral = log.elevator_channel_neutral
+        elif log.log_format == "F25" :
+            log_book.aileron_output_channel = log.aileron_output_channel
+            log_book.elevator_output_channel = log.elevator_output_channel
+            log_book.throttle_output_channel = log.throttle_output_channel
+            log_book.rudder_output_channel = log.rudder_output_channel
         elif log.log_format == "ARDUSTATION+++" : # Intermediate Ardustation line
             roll = log.roll
             pitch = log.pitch
@@ -2345,16 +2370,63 @@ def wrap_kml_into_kmz(options):
 
 def write_csv(options,log_book):
     ### write out a csv file enabling analysis in Excel or OpenOffice
-   
+
+    AIRFRAME_STANDARD = 1
+    AIRFRAME_DELTA = 3
+    AIRFAME_GLIDER = 6
+    
+    # Need gyros scale for diferent boards to calculate some of the PID gains.
+    RED_BOARD =              1   # red board with vertical LISY gyros (deprecated)
+    GREEN_BOARD =            2   # green board with Analog Devices 75 degree/second gyros (deprecated)
+    UDB3_BOARD =             3   # red board with daughter boards 500 degree/second Invensense gyros (deprecated)
+    RUSTYS_BOARD =           4   # Red board with Rusty's IXZ-500_RAD2a patch board (deprecated)
+    UDB4_BOARD =             5   # board with dsPIC33 and integrally mounted 500 degree/second Invensense gyros
+    CAN_INTERFACE =          6   #
+    AUAV2_BOARD =            7   # Nick Arsov's AUAV2 with dsPIC33 and MPU6000
+    UDB5_BOARD =             8   # board with dsPIC33 and MPU6000
+    AUAV3_BOARD =            9   # Nick Arsov's AUAV3 with dsPIC33EP and MPU6000
+    AUAV4_BOARD =            10  # AUAV4 with PIC32MX
+    PX4_BOARD =              11  # PX4 with STM32F4xx
+
+    if (log_book.board_type == UDB5_BOARD) or \
+        (log_book.board_type == AUAV3_BOARD):
+        gyro_scale = 3.0016 # 500 degree / second range
+    elif log_book.board_type == UDB4_BOARD:
+        gyro_scale = 4.95
+    else:
+        print "Board Type:", log_book.board_type, "Unsupported by csv generator in flan.pyw"
+        print "PWM analysis of turns will not be correct (zero)."
+        gyro_scale = 0.0
+    RMAX = 16384
+
+    aileron_reversal_multiplier = 1
+    elevator_reversal_multiplier = 1
+    rudder_reversal_multiplier = 1
+    throttle_reversal_multiplier = 1
+    if log_book.aileron_input_reversed == 1:
+        aileron_reversal_multiplier = -1
+        print "Aileron Output noted as being reversed"
+    if log_book.elevator_input_reversed == 1:
+        elevator_reversal_multiplier = -1
+        print "Elevator Output noted as being reversed"
+    if log_book.rudder_input_reversed == 1: rudder_reversal_multiplier = -1
+    if log_book.throttle_input_reversed == 1: throttle_reversal_multiplier = -1
+
     f_csv = open(options.CSV_filename, 'w')
-    print >> f_csv, "GPS Time(secs),GPS Time(XML),Status,Lat,Lon,Waypoint,GPS Alt ASL,GPS Alt AO,",
+    print >> f_csv, "GPS_Time,GPS Time(XML),Status,Lat,Lon,Waypoint,GPS_Alt_ASL,GPS_Alt_AO,",
     print >> f_csv, "Rmat0,Rmat1,Rmat2,Rmat3,Rmat4,Rmat5,Rmat6,Rmat7,Rmat8,",
-    print >> f_csv, "Pitch,Roll,Heading, COG, SOG, CPU, SVS, VDOP, HDOP,",
-    print >> f_csv, "Est AirSpd,Est X Wind,Est Y Wind,Est Z Wind,IN1,IN2,IN3,IN4,",
+    print >> f_csv, "Pitch,Roll,Heading,COG,SOG,CPU,SVS,VDOP,HDOP,",
+    print >> f_csv, "EstAirSpd,EstXWind,EstYWind,EstZWind,IN1,IN2,IN3,IN4,",
     print >> f_csv, "IN5,IN6,IN7,IN8,OUT1,OUT2,OUT3,OUT4,",
-    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,Desired Height,Bar Tmp,Bar Prs,Bar Alt ASL,Bar Alt AO,MAG W,MAG N,MAG Z,",
+    print >> f_csv, "OUT5,OUT6,OUT7,OUT8,OUT_AIL,OUT_ELEV,OUT_RUDD,OUT_THROT,DesTurnRate,",
+    print >> f_csv, "RotErrX,TiltErrX,DesRotX,RotErrY,TiltErrY,DesRotY,RotErrZ,TiltErrZ,DesRotZ,",
+    print >> f_csv, "RotErrX_PWM,TiltErrX_PWM,DesRotX_PWM,X_PWM_TOT,",
+    print >> f_csv, "RotErrY_PWM,TiltErrY_PWM,DesRotY_PWM,Y_PWM_TOT,",
+    print >> f_csv, "RotErrZ_PWM,TiltErrZ_PWM,DesRotZ_PWM,Z_PWM_TOT,",
+    print >> f_csv, "ElevLoadTrim,",
+    print >> f_csv, "LEX,LEY,LEZ,IMU X,IMU Y,IMU Z,Desired_Height,Bar_Tmp,Bar_Prs,Bar_Alt_ASL,Bar_Alt_AO,MAG_W,MAG_N,MAG_Z,",
     print >> f_csv, "Waypoint X,WaypointY,WaypointZ,IMUvelocityX,IMUvelocityY,IMUvelocityZ,",
-    print >> f_csv, "Flags Dec,Flags Hex,Sonar Dst,ALT_SONAR, Aero X, Aero Y, Aero Z, AoI,Wing Load, AoA Pitch,",
+    print >> f_csv, "Flags Dec,Flags Hex,Sonar Dst,ALT_SONAR,AeroX,AeroY,AeroZ,OmegaX,OmegaY,OmegaZ,AoI,WingLoad,AoA_Pitch,",
     print >> f_csv, "Volts,Amps,mAh"
     
     counter = 0
@@ -2372,14 +2444,13 @@ def write_csv(options,log_book):
         elevator_trim_pwm_value = 3000
         aileron_trim_pwm_value = 3000
     else :
-        elevator_trim_pwm_value = log_book.channel_trim_values[log_book.elevator_output_channel]
+        elevator_trim_pwm_value = log_book.channel_trim_values[log_book.elevator_input_channel]
         print "Elevator Trim Value set to ",elevator_trim_pwm_value, "(UDB PWM Units)"
-        if log_book.elevator_output_reversed == 1:
+        if log_book.elevator_input_reversed == 1:
             elevator_reversal_multiplier = -1
-        if log_book.airframe == 3: # Delta Aiframe e.g. Flying Wing
-            aileron_trim_pwm_value = log_book.channel_trim_values[log_book.aileron_output_channel]
-            if log_book.aileron_output_reversed == 1:
-                aileron_reversal_multiplier = -1
+        aileron_trim_pwm_value = log_book.channel_trim_values[log_book.aileron_input_channel]
+        if log_book.aileron_input_reversed == 1:
+            aileron_reversal_multiplier = -1
     if (log_book.nominal_cruise_speed > 0 ):
         cruise_speed = log_book.nominal_cruise_speed
         print "Using Nominal Cruise Speed from options.h of ", cruise_speed, " m/s"
@@ -2418,19 +2489,39 @@ def write_csv(options,log_book):
             elevator_without_trim = elevator_reversal_multiplier * \
                    (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value)
         elif log_book.airframe == 3: # Delta Wing, unmix elevator and aileron
-            elevator_without_trim = (( elevator_reversal_multiplier * \
-                   (entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value)) + \
-                   (aileron_reversal_multiplier * \
-                   (entry.pwm_output[log_book.aileron_output_channel] - aileron_trim_pwm_value)) / 2)
+            elevator_without_trim = elevator_reversal_multiplier * \
+                   ((entry.pwm_output[log_book.elevator_output_channel] - elevator_trim_pwm_value) + \
+                   (entry.pwm_output[log_book.aileron_output_channel] - aileron_trim_pwm_value) / 2)
         else :
             print "Warning using Airframe type that is not yet supported", log_book.airframe
         
         if is_level_flight_data(entry, centimeter_cruise_speed):
             aoa_using_pitch_list.append(aoa_using_pitch)
             aoa_using_velocity_list.append(aoa_using_velocity)
+            
             wing_loading_list.append(relative_wing_loading)
             elevator_with_trim_removed.append(float(elevator_without_trim) / 1000)
-        
+
+        elevator_pwm_out = elevator_reversal_multiplier * (entry.pwm_output[log_book.elevator_output_channel] - log_book.channel_trim_values[log_book.elevator_input_channel])
+        aileron_pwm_out =  aileron_reversal_multiplier  * (entry.pwm_output[log_book.aileron_output_channel]  - log_book.channel_trim_values[log_book.aileron_input_channel] )
+        if log_book.airframe == AIRFRAME_DELTA :
+            elevator_temp = (elevator_pwm_out + aileron_pwm_out) / 2
+            aileron_temp =  (elevator_pwm_out - aileron_pwm_out) / 2
+            elevator_pwm_out = elevator_temp
+            aileron_pwm_out = aileron_temp
+        INTEGER_SCALE = 65536 #take account of RMAX for integer method of floating point in firmware
+        rotation_error_x_pwm =int((entry.rotation_error[0] * log_book.pitchkd * RMAX * gyro_scale) / INTEGER_SCALE)
+        tilt_error_x_pwm = int((entry.tilt_error[0] * log_book.pitchgain * RMAX) / INTEGER_SCALE)
+        desired_rotation_x_pwm = int((-entry.desired_rotation[0] * log_book.pitchgain * RMAX * log_book.feed_forward) / INTEGER_SCALE)
+        rotation_error_y_pwm = int((-entry.rotation_error[1] * log_book.rollkd * RMAX * gyro_scale) / INTEGER_SCALE)
+        tilt_error_y_pwm = int((-entry.tilt_error[1] * log_book.rollkp * RMAX) / INTEGER_SCALE)
+        desired_rotation_y_pwm = int((entry.desired_rotation[1] * log_book.rollkp * RMAX * log_book.feed_forward) / INTEGER_SCALE)
+        rotation_error_z_pwm = int((-entry.rotation_error[2] * log_book.yawkd_rudder * RMAX * gyro_scale) / INTEGER_SCALE)
+        tilt_error_z_pwm = int((-entry.tilt_error[2] * log_book.yawkp_rudder * RMAX) / INTEGER_SCALE)
+        desired_rotation_z_pwm = int((entry.desired_rotation[2] * log_book.yawkp_rudder * RMAX * log_book.feed_forward) / INTEGER_SCALE)
+        pwm_x_tot = rotation_error_x_pwm + tilt_error_x_pwm + desired_rotation_x_pwm
+        pwm_y_tot = rotation_error_y_pwm + tilt_error_y_pwm + desired_rotation_y_pwm
+        pwm_z_tot = rotation_error_z_pwm + tilt_error_z_pwm + desired_rotation_z_pwm
         print >> f_csv, entry.tm / 1000.0, ",",\
               flight_clock.convert(entry.tm, log_book), ",", \
               entry.status, "," , \
@@ -2441,7 +2532,7 @@ def write_csv(options,log_book):
               entry.rmat3, "," , entry.rmat4, "," , entry.rmat5 , "," ,\
               entry.rmat6, "," , entry.rmat7, "," , entry.rmat8 , "," ,\
               "{0:.2f}".format(-entry.pitch), ",", "{0:.2f}".format(-entry.roll), \
-                              ",", "{0:.2f}".format(entry.heading_degrees), "," , \
+              ",", "{0:.2f}".format(entry.heading_degrees), "," , \
               entry.cog / 100.0 , "," , entry.sog / 100.0,",", entry.cpu,",", entry.svs, \
               ",", entry.vdop, ",", entry.hdop, "," , \
               "{0:.2f}".format(entry.est_airspeed /100.0), "," , "{0:.2f}".format(entry.est_wind_x / 100.0), "," ,  \
@@ -2450,6 +2541,27 @@ def write_csv(options,log_book):
               entry.pwm_input[5], "," , entry.pwm_input[6], "," , entry.pwm_input[7], "," , entry.pwm_input[8], "," , \
               entry.pwm_output[1], "," , entry.pwm_output[2], "," , entry.pwm_output[3], "," , entry.pwm_output[4], "," , \
               entry.pwm_output[5], "," , entry.pwm_output[6], "," , entry.pwm_output[7], "," , entry.pwm_output[8], "," , \
+              aileron_pwm_out, ",", \
+              elevator_pwm_out, ",", \
+              rudder_reversal_multiplier * (entry.pwm_output[log_book.rudder_output_channel] - log_book.channel_trim_values[log_book.rudder_input_channel]), ",", \
+              throttle_reversal_multiplier * (entry.pwm_output[log_book.throttle_output_channel] - log_book.channel_trim_values[log_book.throttle_input_channel]), ",", \
+              entry.desired_turn_rate, ",", \
+              entry.rotation_error[0], ",", entry.tilt_error[0], ",", entry.desired_rotation[0], ",",                                                       \
+              entry.rotation_error[1], ",", entry.tilt_error[1], ",", entry.desired_rotation[1], ",",                                                       \
+              entry.rotation_error[2], ",", entry.tilt_error[2], ",", entry.desired_rotation[2], ",",                                                       \
+              rotation_error_x_pwm, ",",   \
+              tilt_error_x_pwm, ",",       \
+              desired_rotation_x_pwm, ",", \
+              pwm_x_tot, ",",              \
+              rotation_error_y_pwm, ",",   \
+              tilt_error_y_pwm, ",",       \
+              desired_rotation_y_pwm, ",", \
+              pwm_y_tot, ",",              \
+              rotation_error_z_pwm, ",",   \
+              tilt_error_z_pwm, ",",       \
+              desired_rotation_z_pwm, ",", \
+              pwm_z_tot, ",",              \
+              entry.elevator_loading_trim, ",",                                                                                                             \
               entry.lex, "," , entry.ley , "," , entry.lez, ",", \
               entry.IMUlocationx_W1, ",", entry.IMUlocationy_W1, ",", entry.IMUlocationz_W1, "," , entry.desired_height, ",",\
               entry.barometer_temperature / 10.0, ",",entry.barometer_pressure / 100.0, ",", \
@@ -2460,7 +2572,9 @@ def write_csv(options,log_book):
               "{0:.2f}".format(entry.IMUvelocityx / 100.0), ",", "{0:.2f}".format(entry.IMUvelocityy / 100.0), ",", \
               "{0:.2f}".format(entry.IMUvelocityz / 100.0), ",", \
               entry.flags, ",",hex(entry.flags),",", entry.sonar_direct, ",",  entry.alt_sonar, ",", \
-              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",","{0:.2f}".format(incidence), \
+              entry.aero_force_x, ",", entry.aero_force_y, ",", entry.aero_force_z,",", \
+              entry.omega_accum[0], ",", entry.omega_accum[1], ",", entry.omega_accum[2], ",", \
+              "{0:.2f}".format(incidence), \
               ",","{0:.4f}".format(relative_wing_loading),",","{0:.2f}".format(aoa_using_pitch), \
               ",","{0:.3f}".format(entry.battery_voltage/10),",","{0:.3f}".format(entry.battery_ampage/10), \
               ",","{0:.3f}".format(entry.battery_amphours)
