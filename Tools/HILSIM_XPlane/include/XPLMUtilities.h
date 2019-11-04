@@ -2,11 +2,11 @@
 #define _XPLMUtilities_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -31,6 +31,8 @@ extern "C" {
  * underlying sim data.                                                        
  *
  */
+
+
 
 /*
  * XPLMCommandKeyID
@@ -259,46 +261,107 @@ typedef int XPLMCommandButtonID;
  *
  */
 enum {
-     xplm_Host_Unknown                        = 0,
+     xplm_Host_Unknown                        = 0
 
-     xplm_Host_XPlane                         = 1,
+    ,xplm_Host_XPlane                         = 1
 
-     xplm_Host_PlaneMaker                     = 2,
+    ,xplm_Host_PlaneMaker                     = 2
 
-     xplm_Host_WorldMaker                     = 3,
+    ,xplm_Host_WorldMaker                     = 3
 
-     xplm_Host_Briefer                        = 4,
+    ,xplm_Host_Briefer                        = 4
 
-     xplm_Host_PartMaker                      = 5,
+    ,xplm_Host_PartMaker                      = 5
 
-     xplm_Host_YoungsMod                      = 6,
+    ,xplm_Host_YoungsMod                      = 6
 
-     xplm_Host_XAuto                          = 7
+    ,xplm_Host_XAuto                          = 7
+
+
 };
 typedef int XPLMHostApplicationID;
 
 /*
  * XPLMLanguageCode
  * 
- * These enums define what language the sim is running in.                     
+ * These enums define what language the sim is running in.  These enumerations 
+ * do not imply that the sim can or does run in all of these languages; they 
+ * simply provide a known encoding in the event that a given sim version is 
+ * localized to a certain language.                                            
  *
  */
 enum {
-     xplm_Language_Unknown                    = 0,
+     xplm_Language_Unknown                    = 0
 
-     xplm_Language_English                    = 1,
+    ,xplm_Language_English                    = 1
 
-     xplm_Language_French                     = 2,
+    ,xplm_Language_French                     = 2
 
-     xplm_Language_German                     = 3,
+    ,xplm_Language_German                     = 3
 
-     xplm_Language_Italian                    = 4,
+    ,xplm_Language_Italian                    = 4
 
-     xplm_Language_Spanish                    = 5,
+    ,xplm_Language_Spanish                    = 5
 
-     xplm_Language_Korean                     = 6
+    ,xplm_Language_Korean                     = 6
+
+#if defined(XPLM200)
+    ,xplm_Language_Russian                    = 7
+
+#endif /* XPLM200 */
+#if defined(XPLM200)
+    ,xplm_Language_Greek                      = 8
+
+#endif /* XPLM200 */
+#if defined(XPLM200)
+    ,xplm_Language_Japanese                   = 9
+
+#endif /* XPLM200 */
+#if defined(XPLM200)
+    ,xplm_Language_Chinese                    = 10
+
+#endif /* XPLM200 */
+
 };
 typedef int XPLMLanguageCode;
+
+#if defined(XPLM200)
+/*
+ * XPLMDataFileType
+ * 
+ * These enums define types of data files you can load or unload using the 
+ * SDK.                                                                        
+ *
+ */
+enum {
+     /* A situation (.sit) file, which starts off a flight in a given               *
+      * configuration.                                                              */
+     xplm_DataFile_Situation                  = 1
+
+     /* A situation movie (.smo) file, which replays a past flight.                 */
+    ,xplm_DataFile_ReplayMovie                = 2
+
+
+};
+typedef int XPLMDataFileType;
+#endif /* XPLM200 */
+
+#if defined(XPLM200)
+/*
+ * XPLMError_f
+ * 
+ * An XPLM error callback is a function that you provide to receive debugging 
+ * information from the plugin SDK.  See XPLMSetErrorCallback for more 
+ * information.  NOTE: for the sake of debugging, your error callback will be 
+ * called even if your plugin is not enabled, allowing you to receive debug 
+ * info in your XPluginStart and XPluginStop  callbacks.  To avoid causing 
+ * logic errors in the management code, do not call any other plugin routines 
+ * from your error callback - it is only meant for logging!                    
+ *
+ */
+typedef void (* XPLMError_f)(
+                                   const char *         inMessage);    
+#endif /* XPLM200 */
 
 /*
  * XPLMSimulateKeyPress
@@ -381,6 +444,8 @@ XPLM_API const char *         XPLMGetVirtualKeyDescription(
  *                                                                             
  *
  */
+
+
 
 /*
  * XPLMReloadScenery
@@ -485,13 +550,13 @@ XPLM_API char *               XPLMExtractFileAndPath(
  */
 XPLM_API int                  XPLMGetDirectoryContents(
                                    const char *         inDirectoryPath,    
-                                   long                 inFirstReturn,    
+                                   int                  inFirstReturn,    
                                    char *               outFileNames,    
-                                   long                 inFileNameBufSize,    
+                                   int                  inFileNameBufSize,    
                                    char **              outIndices,    /* Can be NULL */
-                                   long                 inIndexCount,    
-                                   long *               outTotalFiles,    /* Can be NULL */
-                                   long *               outReturnedFiles);    /* Can be NULL */
+                                   int                  inIndexCount,    
+                                   int *                outTotalFiles,    /* Can be NULL */
+                                   int *                outReturnedFiles);    /* Can be NULL */
 
 /*
  * XPLMInitialized
@@ -513,7 +578,7 @@ XPLM_API int                  XPLMInitialized(void);
  * 
  * This routine returns the revision of both X-Plane and the XPLM DLL.  All 
  * versions are three-digit decimal numbers (e.g. 606 for version 6.06 of 
- * X-Plane); the current revision of the XPLM is 100 (1.00).  This routine 
+ * X-Plane); the current revision of the XPLM is 200 (2.00).  This routine 
  * also returns the host ID of the app running us. 
  * 
  * The most common use of this routine is to special-case around x-plane 
@@ -536,15 +601,237 @@ XPLM_API XPLMLanguageCode     XPLMGetLanguage(void);
 /*
  * XPLMDebugString
  * 
- * This routine outputs a C-style string to the Error.out file (or 
- * deverror.out file if one is being created).  The file is immediately 
- * flushed so you will not lose  data.  (This does cause a performance 
- * penalty.)                                                                   
+ * This routine outputs a C-style string to the Log.txt file.  The file is 
+ * immediately flushed so you will not lose  data.  (This does cause a 
+ * performance penalty.)                                                       
  *
  */
 XPLM_API void                 XPLMDebugString(
                                    const char *         inString);    
 
+#if defined(XPLM200)
+/*
+ * XPLMSetErrorCallback
+ * 
+ * XPLMSetErrorCallback installs an error-reporting callback for your plugin.  
+ * Normally the plugin system performs minimum diagnostics to maximize 
+ * performance.  When you install an error callback, you will receive calls 
+ * due to certain plugin errors, such as passing bad parameters or incorrect 
+ * data. 
+ * 
+ * The intention is for you to install the error callback during debug 
+ * sections and put a break-point inside your callback.  This will cause you 
+ * to break into the debugger from within the SDK at the point in your plugin 
+ * where you made an illegal call. 
+ * 
+ * Installing an error callback may activate error checking code that would 
+ * not normally run, and this may adversely affect performance, so do not 
+ * leave error callbacks installed in shipping plugins.                        
+ *
+ */
+XPLM_API void                 XPLMSetErrorCallback(
+                                   XPLMError_f          inCallback);    
+#endif /* XPLM200 */
+
+#if defined(XPLM200)
+/*
+ * XPLMFindSymbol
+ * 
+ * This routine will attempt to find the symbol passed in the inString 
+ * parameter. If the symbol is found a pointer the function is returned, 
+ * othewise the function will return NULL.                                     
+ *
+ */
+XPLM_API void *               XPLMFindSymbol(
+                                   const char *         inString);    
+#endif /* XPLM200 */
+
+#if defined(XPLM200)
+/*
+ * XPLMLoadDataFile
+ * 
+ * Loads a data file of a given type.  Paths must be relative to the X-System 
+ * folder. To clear the replay, pass a NULL file name (this is only valid with 
+ * replay movies, not sit files).                                              
+ *
+ */
+XPLM_API int                  XPLMLoadDataFile(
+                                   XPLMDataFileType     inFileType,    
+                                   const char *         inFilePath);    /* Can be NULL */
+#endif /* XPLM200 */
+
+#if defined(XPLM200)
+/*
+ * XPLMSaveDataFile
+ * 
+ * Saves the current situation or replay; paths are relative to the X-System 
+ * folder.                                                                     
+ *
+ */
+XPLM_API int                  XPLMSaveDataFile(
+                                   XPLMDataFileType     inFileType,    
+                                   const char *         inFilePath);    
+#endif /* XPLM200 */
+
+#if defined(XPLM200)
+/***************************************************************************
+ * X-PLANE COMMAND MANAGEMENT
+ ***************************************************************************/
+/*
+ * The command management APIs let plugins interact with the command-system in 
+ * X-Plane, the abstraction behind keyboard presses and joystick buttons.  
+ * This API lets you create new commands and modify the behavior (or get 
+ * notification) of existing ones. 
+ * 
+ * An X-Plane command consists of three phases: a beginning, continuous 
+ * repetition, and an ending.  The command may be repeated zero times in  the 
+ * event that the user presses a button only momentarily.			                   
+ *
+ */
+
+
+
+
+/*
+ * XPLMCommandPhase
+ * 
+ * The phases of a command.                                                    
+ *
+ */
+enum {
+     /* The command is being started.                                               */
+     xplm_CommandBegin                        = 0
+
+     /* The command is continuing to execute.                                       */
+    ,xplm_CommandContinue                     = 1
+
+     /* The command has ended.                                                      */
+    ,xplm_CommandEnd                          = 2
+
+
+};
+typedef int XPLMCommandPhase;
+
+/*
+ * XPLMCommandRef
+ * 
+ * A command ref is an opaque identifier for an X-Plane command.  Command 
+ * references stay the same for the life of your plugin but not between 
+ * executions of X-Plane.  Command refs are used to execute commands, create 
+ * commands, and create callbacks for particular commands. 
+ * 
+ * Note that a command is not "owned" by a particular plugin.  Since many 
+ * plugins may participate in a command's execution, the command does not go 
+ * away if the plugin that created it is unloaded.                             
+ *
+ */
+typedef void * XPLMCommandRef;
+
+/*
+ * XPLMCommandCallback_f
+ * 
+ * A command callback is a function in your plugin that is called when a 
+ * command is pressed.  Your callback receives the commadn  reference for the 
+ * particular command, the phase of the command that is executing, and a 
+ * reference pointer that you specify when registering the callback. 
+ * 
+ * Your command handler should return 1 to let processing of the command 
+ * continue to other plugins and X-Plane, or 0 to halt  processing, 
+ * potentially bypassing X-Plane code.                                         
+ *
+ */
+typedef int (* XPLMCommandCallback_f)(
+                                   XPLMCommandRef       inCommand,    
+                                   XPLMCommandPhase     inPhase,    
+                                   void *               inRefcon);    
+
+/*
+ * XPLMFindCommand
+ * 
+ * XPLMFindCommand looks up a command by name, and returns its command 
+ * reference or NULL if the command does not exist.                            
+ *
+ */
+XPLM_API XPLMCommandRef       XPLMFindCommand(
+                                   const char *         inName);    
+
+/*
+ * XPLMCommandBegin
+ * 
+ * XPLMCommandBegin starts the execution of a command, specified by its 
+ * command reference.  The  command is "held down" until XPLMCommandEnd is 
+ * called.                                                                     
+ *
+ */
+XPLM_API void                 XPLMCommandBegin(
+                                   XPLMCommandRef       inCommand);    
+
+/*
+ * XPLMCommandEnd
+ * 
+ * XPLMCommandEnd ends the execution of a given command that was started with 
+ * XPLMCommandBegin.                                                           
+ *
+ */
+XPLM_API void                 XPLMCommandEnd(
+                                   XPLMCommandRef       inCommand);    
+
+/*
+ * XPLMCommandOnce
+ * 
+ * This executes a given command momentarily, that is, the command begins and 
+ * ends immediately.                                                           
+ *
+ */
+XPLM_API void                 XPLMCommandOnce(
+                                   XPLMCommandRef       inCommand);    
+
+/*
+ * XPLMCreateCommand
+ * 
+ * XPLMCreateCommand creates a new command for a given string.  If the command 
+ * already exists, the  existing command reference is returned.  The 
+ * description may appear in user interface contexts, such as the joystick 
+ * configuration screen.                                                       
+ *
+ */
+XPLM_API XPLMCommandRef       XPLMCreateCommand(
+                                   const char *         inName,    
+                                   const char *         inDescription);    
+
+/*
+ * XPLMRegisterCommandHandler
+ * 
+ * XPLMRegisterCommandHandler registers a callback to be called when a command 
+ * is executed.  You provide a callback with a reference pointer. 
+ * 
+ * If inBefore is true, your command handler callback will be executed before 
+ * X-Plane executes the command, and returning 0 from your callback will 
+ * disable X-Plane's processing of the command.  If inBefore is  false, your 
+ * callback will run after X-Plane.  (You can register a single callback both 
+ * before and after a command.)                                                
+ *
+ */
+XPLM_API void                 XPLMRegisterCommandHandler(
+                                   XPLMCommandRef       inComand,    
+                                   XPLMCommandCallback_f inHandler,    
+                                   int                  inBefore,    
+                                   void *               inRefcon);    
+
+/*
+ * XPLMUnregisterCommandHandler
+ * 
+ * XPLMUnregisterCommandHandler removes a command callback registered with 
+ * XPLMRegisterCommandHandler.                                                 
+ *
+ */
+XPLM_API void                 XPLMUnregisterCommandHandler(
+                                   XPLMCommandRef       inComand,    
+                                   XPLMCommandCallback_f inHandler,    
+                                   int                  inBefore,    
+                                   void *               inRefcon);    
+
+#endif /* XPLM200 */
 #ifdef __cplusplus
 }
 #endif

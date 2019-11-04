@@ -2,11 +2,11 @@
 #define _XPLMGraphics_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -57,6 +57,8 @@ extern "C" {
  *
  */
 
+
+
 /*
  * XPLMTextureID
  * 
@@ -66,13 +68,15 @@ extern "C" {
  */
 enum {
      /* The bitmap that contains window outlines, button outlines, fonts, etc.      */
-     xplm_Tex_GeneralInterface                = 0,
+     xplm_Tex_GeneralInterface                = 0
 
      /* The exterior paint for the user's aircraft (daytime).                       */
-     xplm_Tex_AircraftPaint                   = 1,
+    ,xplm_Tex_AircraftPaint                   = 1
 
      /* The exterior light map for the user's aircraft.                             */
-     xplm_Tex_AircraftLiteMap                 = 2
+    ,xplm_Tex_AircraftLiteMap                 = 2
+
+
 };
 typedef int XPLMTextureID;
 
@@ -189,7 +193,9 @@ XPLM_API int                  XPLMGetTexture(
  * XPLMWorldToLocal
  * 
  * This routine translates coordinates from latitude, longitude, and altitude 
- * to local scene coordinates.                                                 
+ * to local scene coordinates. Latitude and longitude are in decimal degrees, 
+ * and altitude is in meters MSL (mean sea level).  The XYZ coordinates are in 
+ * meters in the local OpenGL coordinate system.                               
  *
  */
 XPLM_API void                 XPLMWorldToLocal(
@@ -204,9 +210,12 @@ XPLM_API void                 XPLMWorldToLocal(
  * XPLMLocalToWorld
  * 
  * This routine translates a local coordinate triplet back into latitude, 
- * longitude, and altitude.  NOTE: world coordinates are less precise than 
- * local coordinates; you should try to avoid  round tripping from local to 
- * world and back.                                                             
+ * longitude, and altitude.  Latitude and longitude are in decimal degrees, 
+ * and altitude is in meters MSL (mean sea level).  The XYZ coordinates are in 
+ * meters in the local OpenGL coordinate system. 
+ * 
+ * NOTE: world coordinates are less precise than local coordinates; you should 
+ * try to avoid round tripping from local to world and back.                   
  *
  */
 XPLM_API void                 XPLMLocalToWorld(
@@ -239,6 +248,8 @@ XPLM_API void                 XPLMDrawTranslucentDarkBox(
  *
  */
 
+
+
 /*
  * XPLMFontID
  * 
@@ -246,8 +257,7 @@ XPLM_API void                 XPLMDrawTranslucentDarkBox(
  * metrics. 
  * 
  * WARNING: Some of these fonts are no longer supported or may have changed 
- * geometries. For maximum copmatibility, use xplmFont_Basic for all user 
- * interface. 
+ * geometries. For maximum copmatibility, see the comments below. 
  * 
  * Note: X-Plane 7 supports proportional-spaced fonts.  Since no measuring 
  * routine is available yet, the SDK will normally draw using a fixed-width 
@@ -256,54 +266,66 @@ XPLM_API void                 XPLMDrawTranslucentDarkBox(
  *
  */
 enum {
-     xplmFont_Basic                           = 0,
+     /* Mono-spaced font for user interface.  Available in all versions of the SDK. */
+     xplmFont_Basic                           = 0
 
-     xplmFont_Menus                           = 1,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_Menus                           = 1
 
-     xplmFont_Metal                           = 2,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_Metal                           = 2
 
-     xplmFont_Led                             = 3,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_Led                             = 3
 
-     xplmFont_LedWide                         = 4,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_LedWide                         = 4
 
-     xplmFont_PanelHUD                        = 5,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_PanelHUD                        = 5
 
-     xplmFont_PanelEFIS                       = 6,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_PanelEFIS                       = 6
 
-     xplmFont_PanelGPS                        = 7,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_PanelGPS                        = 7
 
-     /* Austin uses these fonts for radios                                          *
-      *                                                                             *
-      * General Aviation                                                            */
-     xplmFont_RadiosGA                        = 8,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_RadiosGA                        = 8
 
-     /* Business/Corporate                                                          */
-     xplmFont_RadiosBC                        = 9,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_RadiosBC                        = 9
 
-     /* Heavy Metal                                                                 */
-     xplmFont_RadiosHM                        = 10,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_RadiosHM                        = 10
 
-     /* Austin uses narrow radio fonts for DME.                                     *
-      *                                                                             *
-      * General Aviation                                                            */
-     xplmFont_RadiosGANarrow                  = 11,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_RadiosGANarrow                  = 11
 
-     /* Business/Corporate                                                          */
-     xplmFont_RadiosBCNarrow                  = 12,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_RadiosBCNarrow                  = 12
 
-     /* Heavy Metal                                                                 */
-     xplmFont_RadiosHMNarrow                  = 13,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_RadiosHMNarrow                  = 13
 
-     /* cockpit TIMER and OAT                                                       */
-     xplmFont_Timer                           = 14,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_Timer                           = 14
 
-     /* cockpit large adaptive (airspeed)                                           */
-     xplmFont_FullRound                       = 15,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_FullRound                       = 15
 
-     /* cockpit small adaptive (engine)                                             */
-     xplmFont_SmallRound                      = 16,
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_SmallRound                      = 16
 
-     xplmFont_Menus_Localized                 = 17
+     /* Deprecated, do not use.                                                     */
+    ,xplmFont_Menus_Localized                 = 17
+
+#if defined(XPLM200)
+     /* Proportional UI font.                                                       */
+    ,xplmFont_Proportional                    = 18
+
+#endif /* XPLM200 */
+
 };
 typedef int XPLMFontID;
 
@@ -352,7 +374,8 @@ XPLM_API void                 XPLMDrawNumber(
  * 
  * This routine returns the width and height of a character in a given font. 
  * It also tells you if the font only supports numeric digits.  Pass NULL if 
- * you don't need a given field.                                               
+ * you don't need a given field.  Note that for a proportional font the width 
+ * will be an arbitrary, hopefully average width.                              
  *
  */
 XPLM_API void                 XPLMGetFontDimensions(
@@ -360,6 +383,23 @@ XPLM_API void                 XPLMGetFontDimensions(
                                    int *                outCharWidth,    /* Can be NULL */
                                    int *                outCharHeight,    /* Can be NULL */
                                    int *                outDigitsOnly);    /* Can be NULL */
+
+#if defined(XPLM200)
+/*
+ * XPLMMeasureString
+ * 
+ * This routine returns the width in pixels of a string using a given font.  
+ * The string is passed as a pointer plus length (and does not need to be null 
+ * terminated); this is used to allow for measuring substrings. The return 
+ * value is floating point; it is possible that future font drawing may allow 
+ * for fractional pixels.                                                      
+ *
+ */
+XPLM_API float                XPLMMeasureString(
+                                   XPLMFontID           inFontID,    
+                                   const char *         inChar,    
+                                   int                  inNumChars);    
+#endif /* XPLM200 */
 
 #ifdef __cplusplus
 }

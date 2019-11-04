@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 # NOTE: (Windows) this makefile assumes that the MinGW\bin & MinGW\msys\1.0\bin
-#                 directories are added to the PATH environment variable.
+#                 directories are added to the PATH environment variable. (Peter pls note this anciant comment)
 #
 # Top level MatrixPilot makefile
 #
@@ -31,6 +31,7 @@ TARGET_NAME ?= MatrixPilot
 #SOURCE_DIR ?= ..
 DEVICE ?= SIL
 
+# RobD - revist this, what is req.?
 #$(if $(filter $(MAKE_VERSION),3.80 3.81 3.90 3.92),,\
 #  $(error This makefile requires one of GNU make version ….))
 
@@ -99,7 +100,6 @@ define source-path-rel-dir
 endef
 $(foreach l,$(subst /, ,$(subst $(ROOT_DIR),,$(CURDIR))),$(eval $(call source-path-rel-dir,$l)))
 SOURCE_DIR ?= $(subst $(space),/,$(TMP_SRC_DIR))
-#$(warning SOURCE_DIR: $(SOURCE_DIR))
 MKFILES_DIR = $(SOURCE_DIR)/Tools/makefiles
 
 ################################################################################
@@ -119,7 +119,6 @@ MKFILES_DIR = $(SOURCE_DIR)/Tools/makefiles
 include $(MKFILES_DIR)/target-$(TARGET_NAME).mk
 include $(MKFILES_DIR)/device-$(DEVICE).mk
 modules := $(addprefix $(SOURCE_DIR)/,$(modules))
-#INCPATH := $(addprefix $(SOURCE_DIR)/,$(cfgpath)) $(addprefix $(SOURCE_DIR)/,$(incpath))
 
 ifneq ($(CONFIG),)
 INCPATH += $(addprefix $(SOURCE_DIR)/,$(cfgpath)/$(CONFIG))
@@ -132,7 +131,6 @@ INCPATH += $(addprefix $(SOURCE_DIR)/,$(incpath))
 ################################################################################
 # Determine the full target names and include the toolchain specific makefile
 
-#TARGET_LNAME := $(TARGET_NAME)-$(DEVICE)-$(TOOLCHAIN)
 ifneq ($(CONFIG),)
 TARGET_LNAME := $(TARGET_NAME)-$(DEVICE)-$(CONFIG)
 else
@@ -190,8 +188,6 @@ dependencies = $(subst .o,.d,$(objects))
 
 all: 
 include $(addsuffix /module.mk,$(modules))
-#include $(patsubst %,$(SOURCE_DIR)/%/module.mk,$(modules))
-#INCPATH += $(incpath)
 INCLUDES += $(addprefix -I,$(INCPATH))
 DEFINES += $(addprefix -D,$(DEVICE)=1 $(DEFS) $(defines))
 
@@ -262,7 +258,8 @@ endif
 ################################################################################
 # Dependency and Object generation rules
 
-# With the GNU C compiler, you may wish to use the ‘-MM’ flag instead of ‘-M’. This omits prerequisites on system header files.
+# With the GNU C compiler, you may wish to use the ‘-MM’ flag instead of ‘-M’.
+# This omits prerequisites on system header files.
 
 %.d: %.c
 	$(Q) $(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
@@ -309,10 +306,10 @@ endif
 # Windows and *nix target rules
 
 %.exe: $(objects) $(libraries)
-	$(Q) $(CC) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
+	$(Q) $(CPP) -o $@ $(objects) $(libraries) $(LFLAGS) $(LIBS)
 
 %.xpl: $(objects) $(libraries)
-	$(Q) $(CPP) -o $@ $(LFLAGS) $(objects) $(libraries) $(LIBS)
+	$(Q) $(CPP) -o $@ $(objects) $(libraries) $(LFLAGS) $(LIBS)
 
 %.out: %.exe
 	$(Q) mv $< $@
@@ -340,7 +337,7 @@ endif
 	$(Q) sleep 1
 
 ################################################################################
-# State Machine Compiler (SMC) rules
+# State Machine Compiler (SMC) rules (work in progress, aka, our state machines could better be defined with specialised tools
 
 %_sm.h %_sm.c : %.sm
 	$(SMC) $(SMC_FLAGS) $<

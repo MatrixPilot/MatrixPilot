@@ -122,10 +122,10 @@ void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& Comm
 	}
 }
 
-// PArse a line of the setup file
+// Parse a line of the setup file
 void SetupFile::ParseLine(string& ParseString, Channels& ChannelInfo, string& CommStr, long& CommSpeed, uint16_t& PortNum, string& OverideStr)
 {
-	unsigned int iSearchPos	= 0;        // The next position found for a delimeter
+	size_t iSearchPos = 0;        // The next position found for a delimeter
 
 	string TypeStr;
 	TypeStr.resize(60);
@@ -170,8 +170,8 @@ void SetupFile::ParseLine(string& ParseString, Channels& ChannelInfo, string& Co
 void SetupFile::ParseControlLine(string& ParseString, Channels &ChannelInfo)
 {
 	int iValueIndex = 0;            // Index of the number of values found
-	unsigned int iSearchPos	= 0;    // The next position found fora delimeter;
-	unsigned int iLastPos = 0;      // The next position found fora delimeter;
+	size_t iSearchPos = 0;          // The next position found for a delimeter;
+	size_t iLastPos = 0;            // The last position found for a delimeter;
 	bool EndFound = false;
 
 	ChannelSetup ParseSetup;
@@ -214,7 +214,6 @@ void SetupFile::ParseControlLine(string& ParseString, Channels &ChannelInfo)
 // Parse a Control string in the setup file
 void SetupFile::ParseControlString(string& ValueString, int Index, ChannelSetup* pSetup)
 {
-//	string WriteStr;
 	LoggingFile.mLogFile << Index;
 	LoggingFile.mLogFile << ":";
 	LoggingFile.mLogFile << ValueString;
@@ -254,8 +253,8 @@ void SetupFile::ParseControlString(string& ValueString, int Index, ChannelSetup*
 void SetupFile::ParseEngineLine(string& ParseString, Channels &ChannelInfo)
 {
 	int iValueIndex = 0;            // Index of the number of values found
-	unsigned int iSearchPos	= 0;    // The next position found fora delimeter;
-	unsigned int iLastPos = 0;      // The next position found fora delimeter;
+	size_t iSearchPos = 0;          // The next position found for a delimeter;
+	size_t iLastPos = 0;            // The last position found for a delimeter;
 	bool EndFound = false;
 
 	ChannelSetup ParseSetup;
@@ -335,13 +334,13 @@ void SetupFile::ParseEngineString(string& ValueString, int Index, ChannelSetup* 
 
 void SetupFile::ParseCommLine(string& ParseString, string& CommStr, long& CommSpeed)
 {
-	unsigned int iSearchPos = 0;    // The next position found fora delimeter;
+	size_t iSearchPos = 0;    // The next position found for a delimeter;
 
 	iSearchPos = ParseString.find(",", 0);
 	if (iSearchPos == ParseString.npos) return;
 
 	iSearchPos++;
-	unsigned int sSearchPos = ParseString.find(",", iSearchPos);
+	size_t sSearchPos = ParseString.find(",", iSearchPos);
 	if (sSearchPos == ParseString.npos)
 	{
 		CommStr.clear();
@@ -364,7 +363,7 @@ void SetupFile::ParseCommLine(string& ParseString, string& CommStr, long& CommSp
 
 void SetupFile::ParsePortLine(string& ParseString, uint16_t& PortNum)
 {
-	unsigned int iSearchPos = 0;    // The next position found fora delimeter;
+	size_t iSearchPos = 0;    // The next position found for a delimeter;
 
 	iSearchPos = ParseString.find(",", 0);
 	if (iSearchPos == ParseString.npos) return;
@@ -378,7 +377,7 @@ void SetupFile::ParsePortLine(string& ParseString, uint16_t& PortNum)
 
 void SetupFile::ParseOverideLine(string& ParseString, string& OverideStr)
 {
-	unsigned int iSearchPos = 0;    // The next position found fora delimeter;
+	size_t iSearchPos = 0;    // The next position found for a delimeter;
 
 	iSearchPos = ParseString.find(",", 0);
 	if (iSearchPos == ParseString.npos) return;
@@ -403,7 +402,7 @@ LogFile::~LogFile()
 
 void LogFile::AppendString(string& AddString)
 {
-	mLogFile << AddString;
+	mLogFile << AddString << endl;
 }
 
 LogFile LoggingFile;

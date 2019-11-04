@@ -23,6 +23,10 @@
           <itemPath>../../Config/E_Glider/options.h</itemPath>
           <itemPath>../../Config/E_Glider/options_airspeed.h</itemPath>
         </logicalFolder>
+        <logicalFolder name="EasyStar" displayName="EasyStar" projectFiles="true">
+          <itemPath>../../Config/EasyStar/flightplan-logo.h</itemPath>
+          <itemPath>../../Config/EasyStar/options.h</itemPath>
+        </logicalFolder>
         <logicalFolder name="Grobularis" displayName="Grobularis" projectFiles="true">
           <itemPath>../../Config/Grobularis/options.h</itemPath>
           <itemPath>../../Config/Grobularis/options_airspeed.h</itemPath>

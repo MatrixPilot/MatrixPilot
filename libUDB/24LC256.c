@@ -47,8 +47,7 @@ static NVMemory_callbackFunc pcallerCallback = NULL;
 static uint16_t nv_memory_service_handle = INVALID_HANDLE;
 
 static boolean MCP24LC256_write_chunk(void);
-//void (*callbackWriteDone)(void);
-static void NVMemory_callback(void);
+static void NVMemory_callback(void) __attribute__ ((unused)); // quiet warning - is called via function pointer path
 static void MCP24LC256_callback(boolean I2CtrxOK);
 
 
