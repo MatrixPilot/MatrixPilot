@@ -28,21 +28,22 @@
 extern int16_t airspeed;
 extern int16_t groundspeed;
 
-extern int16_t target_airspeed;
+extern uint16_t target_airspeed;
 extern int16_t airspeedError;
 
-extern int16_t minimum_airspeed;
-extern int16_t maximum_airspeed;
-extern int16_t cruise_airspeed;
+extern uint16_t minimum_airspeed;
+extern uint16_t maximum_airspeed;
+extern uint16_t cruise_airspeed;
 
 // Feedforward values of pitch 
 extern int16_t airspeed_pitch_min_aspd;
 extern int16_t airspeed_pitch_max_aspd;
 
-extern int16_t minimum_groundspeed;
+extern uint16_t minimum_groundspeed;
 extern int16_t airspeed_pitch_adjust_rate;
 extern int16_t airspeed_pitch_ki_limit;
 extern fractional airspeed_pitch_ki;
+extern fractional airspeed_pitch_kp;
 
 
 void init_airspeedCntrl(void);
@@ -57,6 +58,8 @@ void airspeedCntrl(void);
 //Calculate and return pitch target adjustment for target airspeed
 // return value is in dcm scale angle 
 fractional gliding_airspeed_pitch_adjust(void);
+// gfm speed control
+fractional quad_airspeed_pitch_adjust(void);
 
 
 #endif // AIRSPEEDCNTRL_H

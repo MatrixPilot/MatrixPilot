@@ -27,11 +27,13 @@
 #define ACCEL_RANGE         4       // 4 g range
 
 // note : it is possible to use other accelerometer ranges on the MPU6000
+// gfm : SCALEGYRO is defined by the relation
+// SCALEGYRO=GYRO_RANGE/1024/6*HEARTBEAT thus 3.255 instead of 3.0016?
 #define SCALEGYRO           3.0016  // 500 degree/second range
-//#define SCALEACCEL          1.29    // 4 g range
-#define SCALEACCEL          1.27    // 4 g range measured by WJP on a few UDB5s
+// gfm : SCALEACCEL=5280/RMAX/ACCEL_RANGE ; 5280 is defined for GRAVITY in libUDB_defines.h
+#define SCALEACCEL          1.29    // 4 g range
 
-#define NUM_ANALOG_INPUTS   4
+#define NUM_ANALOG_INPUTS   1
 
 // External A/D channels:
 #define analogInput1BUFF    3
@@ -91,3 +93,7 @@
 #define IC_PIN6             _RD13
 #define IC_PIN7             _RD14
 #define IC_PIN8             _RD15
+
+#if (USE_LIDAR_ALTITUDE	== 1)
+#define LIDAR_Trigger LATAbits.LATA4//Sortie trigger Lidar sur RA4
+#endif

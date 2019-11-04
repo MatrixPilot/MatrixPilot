@@ -25,6 +25,7 @@
 #include "radioIn.h"
 #include "cll_io.h"
 #include "../MatrixPilot/states.h"
+#include "../Config/options_multicopter.h"
 
 #if (FLY_BY_DATALINK_ENABLED == 1)
 #include "fly_by_datalink.h"
@@ -78,6 +79,9 @@ void udb_servo_record_trims(void)
 	{
 		udb_pwTrim[i] = udb_pwIn[i];
 	}
+        //Modif gfm Quadcopter : always force udb_pwTrim[THROTTLE_INPUT_CHANNEL] to THROTTLE_IDLE
+        udb_pwTrim[THROTTLE_INPUT_CHANNEL] = THROTTLE_IDLE;
+        // Fin modif gfm Quadcopter
 }
 
 void radioIn_init(void) // was called udb_init_capture(void)
@@ -87,6 +91,8 @@ void radioIn_init(void) // was called udb_init_capture(void)
 #if (USE_NV_MEMORY == 1)
 	if (udb_skip_flags.skip_radio_trim == 0)
 #endif
+            //modif gfm Quadcopter
+        #if AIRFRAME_TYPE != AIRFRAME_QUAD
 	{	
 		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
@@ -98,6 +104,31 @@ void radioIn_init(void) // was called udb_init_capture(void)
 			udb_pwTrim[i] = udb_pwIn[i] = 0;
 	#endif
 	}
+        #else
+        {
+        #if (HARD_TRIMS != 0)
+//        #warning("initial udb_pwTrim values set to NEUTRAL_TRIM and THROTTLE_IDLE")
+        for (i = 0; i <= NUM_INPUTS; i++) {
+            udb_pwIn[i] = 0;
+            udb_pwTrim[i] = NEUTRAL_TRIM;
+        }
+        udb_pwTrim[THROTTLE_INPUT_CHANNEL] = THROTTLE_IDLE;
+        #else
+    // At the end of the calibration interval, udb_servo_record_trims is called to set
+    // udb_pwTrim values to whatever is coming from the receiver at that instant.
+    // This will be about 1500usec if the TX trims are centered.
+
+    // trim values of zero are never correct for channels 1-4; init to 1500usec instead
+    //FIXME for channels 5-8, trim values are unused in MPQpid
+    for (i = 0; i <= NUM_INPUTS; i++) {
+        udb_pwIn[i] = 0;
+        udb_pwTrim[i] = 3000;
+    }
+    udb_pwTrim[THROTTLE_INPUT_CHANNEL] = THROTTLE_IDLE;
+        #endif // HARD_TRIMS
+        }
+        #endif // AIRFRAME_TYPE != AIRFRAME_QUAD
+// fin modif gfm Quadcopter
 
 	TMR2 = 0;               // initialize timer
 #if (MIPS == 64)
@@ -107,6 +138,12 @@ void radioIn_init(void) // was called udb_init_capture(void)
 #endif
 	T2CONbits.TCS = 0;      // use the internal clock
 	T2CONbits.TON = 1;      // turn on timer 2
+#if ( USE_SONAR_ON_PWM_INPUT_7	== 1 )
+	// Setup Channel 7 for Sonar
+    // Lidar PWM Pulses are at 1 micro seconds per mm measured.
+    // Lidar range Maximum is 10m. So Max Pulse is 10 ms
+#endif
+
 
 #if (NORADIO != 1)
 
@@ -159,6 +196,10 @@ void radioIn_failsafe_check(void)
 		if (udb_flags._.radio_on == 1)
 		{
 			udb_flags._.radio_on = 0;
+                                // Modif gfm Quadcopter
+                       		asm("reset");// No hesitation in case of fading : RESET!
+// #warning "Reset in case of fading"
+                                // Fin Modif gfm Quadcopter
 			udb_callback_radio_did_turn_off();
 		}
 		led_off(LED_GREEN);

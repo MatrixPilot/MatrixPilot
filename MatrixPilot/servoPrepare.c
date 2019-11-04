@@ -39,13 +39,25 @@
 #include "options_osd.h"
 #include "mp_osd.h"
 #include "options_mavlink.h"
+#include "../libDCM/estAltitude.h"
+#include "states.h"
 
 int16_t pitch_control;
 int16_t roll_control;
 int16_t yaw_control;
 int16_t throttle_control;
 uint16_t wind_gain;
-
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+// Called at HEARTBEAT_HZ, before sending servo pulses
+// modif gfm quadcopter
+#include "../libDCM/estAltitude.h"
+#include "motorCntrl.h"
+boolean telem_on = false;
+int16_t outerroll_control;
+int16_t outerpitch_control;
+int16_t outeryaw_control;
+extern int16_t outerthrottle_control;
+#endif
 void servoPrepare_init(void) // initialize the PWM
 {
 	int16_t i;
@@ -60,12 +72,16 @@ void servoPrepare_init(void) // initialize the PWM
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwTrim[i] = udb_pwIn[i] = ((i == THROTTLE_INPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else
-		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 0 : 3000);
+		udb_pwIn[i] = udb_pwTrim[i] = ((i == THROTTLE_INPUT_CHANNEL) ? 2000 : 3000);
 #endif
 	}
 
 	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+		// initialise all motors to FAILSAFE_INPUT_MIN idle
+		udb_pwOut[i] = FAILSAFE_INPUT_MIN;
+#else
 #if (THROTTLE_INPUT_CHANNEL != 0 )
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
@@ -74,37 +90,56 @@ void servoPrepare_init(void) // initialize the PWM
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? 0 : 3000);
 #endif
 #endif
+#endif
 	}
 
 #if (NORADIO == 1)
-	udb_pwIn[MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[MODE_SWITCH_INPUT_CHANNEL] = 4000;
+	udb_pwIn[FLIGHT_MODE_SWITCH_INPUT_CHANNEL] = udb_pwTrim[FLIGHT_MODE_SWITCH_INPUT_CHANNEL] = 4000;
 #endif
 }
 
 static void flight_controller(void)
 {
-	if (udb_pulse_counter % (HEARTBEAT_HZ/40) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ/PID_HZ) == 0)
 	{
+#if (MODE_SWITCH_TWO_POSITION == 1)
 		flight_mode_switch_2pos_poll(); // we always want this called at 40Hz
-	
+#endif	
 #if (DEADRECKONING == 1)
 		navigate_process_flightplan();
 #endif
 #if (ALTITUDE_GAINS_VARIABLE == 1)
-        airspeedCntrl();
+                  airspeedCntrl();
 #endif // ALTITUDE_GAINS_VARIABLE
 		updateBehavior();
 		wind_gain = wind_gain_adjustment();
 		helicalTurnCntrl();
+#if (AIRFRAME_TYPE == AIRFRAME_QUAD)
+		rollCntrl();
+		yawCntrl();
+		pitchCntrl();
+                  if (dcm_flags._.init_finished)
+                     estAltitude(); //estAltitude in mm
+		altitudeCntrl();
+#else		
+		wind_gain = wind_gain_adjustment();
 		rollCntrl();
 		yawCntrl();
 		altitudeCntrl();
 		pitchCntrl();
-		servoMix();
+                  servoMix();
 		cameraCntrl();
 		cameraServoMix();
+#endif
 		updateTriggerAction();
 	}
+//gfm    // PID Inner loop at 200 Hz
+   InnerrollCntrl();
+   InnerpitchCntrl();
+   InneryawCntrl();
+   if (state_flags._.altitude_hold_throttle) InneraltitudeCntrl();
+   motorCntrl();
+
 }
 
 static void manualPassthrough(void)
@@ -129,16 +164,9 @@ void dcm_heartbeat_callback(void)
 	// TODO: move this block into the end of flight_controller or after it's called
 	if (dcm_flags._.calib_finished)         // start telemetry after calibration
 	{
-#if (USE_MAVLINK == 1)
-		// Poll the MAVLink subsystem at 40hz
-		if (udb_pulse_counter % (HEARTBEAT_HZ/40) == 0)
-		{
-			mavlink_output_40hz();
-		}
-#endif // (USE_MAVLINK == 1)
 #if (SERIAL_OUTPUT_FORMAT != SERIAL_NONE)
 		// Send telemetry updates at 8hz
-		if (udb_pulse_counter % (HEARTBEAT_HZ/8) == 0)
+		if ((udb_pulse_counter % (HEARTBEAT_HZ/TELEMETRY_RATE) == 0) && (dcm_flags._.udb_init_finished == 1))
 		{
 // RobD			flight_state_8hz();
 			telemetry_output_8hz();
@@ -147,7 +175,7 @@ void dcm_heartbeat_callback(void)
 	}
 
 		// Poll the OSD subsystem at 8hz
-	if (udb_pulse_counter % (HEARTBEAT_HZ/8) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ/OSD_RATE) == 0)
 	{
 #if (USE_OSD == OSD_NATIVE)
 		mp_osd_run_step(udb_pulse_counter); // TODO: this was being called at HEARTBEAT_HZ (investigate) - RobD
@@ -159,4 +187,11 @@ void dcm_heartbeat_callback(void)
 		minim_osd_8hz();
 #endif // USE_OSD
 	}
+#if (USE_MAVLINK == 1)
+		// Poll the MAVLink subsystem at 40hz
+		if ((udb_pulse_counter % (HEARTBEAT_HZ/MAVLINK_FRAME_FREQUENCY) == 0) && (dcm_flags._.udb_init_finished == 1))
+		{
+			mavlink_output_40hz();
+		}
+#endif // (USE_MAVLINK == 1)
 }

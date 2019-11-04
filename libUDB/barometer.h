@@ -26,10 +26,16 @@ enum BAROMETER_SERVICE_STATE {
   BAROMETER_SERVICE_CAN_PAUSE = 0,
   BAROMETER_NEEDS_SERVICING
 };
+#if (USE_BAROMETER_ALTITUDE == 1)
+    typedef void (*barometer_callback_funcptr)(long pressure, int temperature, char status);
 
-typedef void (*barometer_callback_funcptr)(long pressure, int temperature, char status);
-
-uint8_t rxBarometer(barometer_callback_funcptr);  // service the barometer
+    uint8_t rxBarometer(barometer_callback_funcptr);  // service the barometer
+    #elif (USE_BAROMETER_ALTITUDE == 2)
+    extern int32_t barometer_agl_altitude;    // above ground level altitude - AGL in mm
+    typedef void (*barometer_callback_funcptr)(long altitude, int temperature, char status);
+    void MPL3115A2_Init(void);
+    uint8_t rxBarometer(barometer_callback_funcptr);  // service the barometer
+    #endif
 
 
 #endif // BAROMETER_H

@@ -41,28 +41,28 @@
 
 // MAVLink requires an aircraft Identifier (I.D) as it is designed to control multiple aircraft
 // Each aircraft in the sky will need a unique I.D. in the range from 0-255
-#define MAVLINK_SYSID                       1
+#define MAVLINK_SYSID                                    55
 
 // Common data rates
-#define MAVLINK_RATE_RC_CHAN                0   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |
-#define MAVLINK_RATE_IMU_RAW                0   // ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. |
-#define MAVLINK_RATE_POSITION               8   // LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages. |
-#define MAVLINK_RATE_RAW_SENSORS            2   // IMU_RAW, GPS_RAW, GPS_STATUS packets.
+#define MAVLINK_RATE_RC_CHAN                   40   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |
+#define MAVLINK_RATE_IMU_RAW                   0   // ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. |
+#define MAVLINK_RATE_POSITION                  40   // LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages. |
+#define MAVLINK_RATE_RAW_SENSORS         4   // IMU_RAW, GPS_RAW, GPS_STATUS packets.
 
 // Fixed data rates
-#define MAVLINK_RATE_HEARTBEAT              4
-#define MAVLINK_RATE_SYSTEM_STATUS          4
+#define MAVLINK_RATE_HEARTBEAT              40
+#define MAVLINK_RATE_SYSTEM_STATUS     0
 
 // Matrixpilot specific data rates
-#define MAVLINK_RATE_SUE                    8   // SERIAL_UDB_EXTRA data rate on channel EXTRA1
-#define MAVLINK_RATE_FORCE                  4   // Send FORCE on plane (Aerodynamic force)
-#define MAVLINK_RATE_POSITION_SENSORS       0   // Using channel EXTRA2
+#define MAVLINK_RATE_SUE                             0   // SERIAL_UDB_EXTRA data rate on channel EXTRA1
+#define MAVLINK_RATE_FORCE                        0   // Send FORCE on plane (Aerodynamic force)
+#define MAVLINK_RATE_POSITION_SENSORS 0   // Using channel EXTRA2
 
 // Send VFR_HUD message at position rate, 1=yes, 0=no.  Needed for correct mavproxy state
-#define MSG_VFR_HUD_WITH_POSITION           1
+#define MSG_VFR_HUD_WITH_POSITION         0
 
-#define MAVLINK_FRAME_FREQUENCY             40
-#define MAVLINK_WAYPOINT_TIMEOUT            120 // Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.
+#define MAVLINK_FRAME_FREQUENCY           40
+#define MAVLINK_WAYPOINT_TIMEOUT          120 // Dependent on frequency of calling mavlink_output_40hz. 120 is 3 second timeout.
 
 // 19200,38400,57600,115200,230400,460800,921600
 // Fixed 19200 for non free running clock

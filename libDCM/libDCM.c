@@ -30,6 +30,10 @@
 #include "mathlibNAV.h"
 #include "rmat.h"
 #include "mag_drift.h"
+// Number of PID_HZ ticks for each sensor connected to the same I2C
+//during PID_HZ (25 ms nominal)
+#define TICKS PID_HZ/I2C_SENSOR_RATE
+#include "../libUDB/Lidar.h"
 
 
 union dcm_fbts_word dcm_flags;
@@ -52,6 +56,12 @@ void dcm_init(void)
 	dcm_flags.W = 0;
 	dcm_flags._.first_mag_reading = 1;
 	dcm_init_rmat();
+                  UDB_XACCEL.sum = 0;
+                  UDB_YACCEL.sum = 0;
+                  UDB_ZACCEL.sum = 0;
+                  udb_xrate.sum = 0;
+                  udb_yrate.sum = 0;
+                  udb_zrate.sum = 0;
 }
 
 #if (DCM_CALIB_COUNT > DCM_GPS_COUNT)
@@ -65,7 +75,23 @@ void dcm_run_calib_step(uint16_t count)
 		DPRINT("calib_finished\r\n");
 		dcm_flags._.calib_finished = 1;
 		dcm_calibrate();    // Finish calibration
+                  UDB_XACCEL.sum = 0;
+                  UDB_YACCEL.sum = 0;
+                  UDB_ZACCEL.sum = 0;
+                  udb_xrate.sum = 0;
+                  udb_yrate.sum = 0;
+                  udb_zrate.sum = 0;
 	}
+        else if (count < DCM_CALIB_COUNT)
+         {
+            UDB_XACCEL.sum += UDB_XACCEL.value;
+            UDB_YACCEL.sum += UDB_YACCEL.value;
+            UDB_ZACCEL.sum += UDB_ZACCEL.value;
+            udb_xrate.sum  += udb_xrate.value;
+	   udb_yrate.sum  += udb_yrate.value;
+	   udb_zrate.sum  += udb_zrate.value;
+
+         }
 }
 
 static boolean gps_run_init_step(uint16_t count)
@@ -88,37 +114,39 @@ static boolean gps_run_init_step(uint16_t count)
 // The code below ensures that a given sensor is called repeatedly until it reaches
 // a state where the other device can be called safely over the same I2C2 bus, even if 
 // the first device has not yet returned a complete set of sensor data.
-// For example, at startup the barometer could need 9 calls before returning pressure.
+// For example, at startup the barometer BMP085 or BMP180 could need 9 calls before returning pressure.
 // But in normal operation it will need 5 calls.
+// MPL3115A2 barometer needs 2 calls.
 // By contrast in normal operations the magnetometer only needs one call, once it is calibrated.
-
+#if ((USE_BAROMETER_ALTITUDE == 1) && (TICKS<10) )
+#warning "I2C_SENSOR_RATE is too high"
+#elif ((USE_BAROMETER_ALTITUDE == 2) && (TICKS<6))
+#warning "I2C_SENSOR_RATE is too high"
+#endif
 void get_data_from_I2C_sensors(void) // Expected to be called at 40Hz
 {
 	static uint8_t barometer_needs_servicing = BAROMETER_SERVICE_CAN_PAUSE;
 	static uint8_t magnetometer_needs_servicing = MAGNETOMETER_SERVICE_CAN_PAUSE;
 	static uint8_t counter_40Hz = 0;
 	
-	// Split a 1 second interval (40 calls) into 8 interleaved segments using the following logic
-	if ((counter_40Hz == 0) || (counter_40Hz == 10) || (counter_40Hz == 20) || ( counter_40Hz == 30))
+	// Split a 1 second interval (40 calls) into ticks interleaved segments using the following logic
+	if (counter_40Hz == 0) 
 	{
-#if (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
+#if (USE_BAROMETER_ALTITUDE > 0 && HILSIM != 1)
 		barometer_needs_servicing = rxBarometer(udb_barometer_callback);
 #endif // (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
 	}
 	else if // Allow a total of 6 consecutive calls to the barometer to return pressure
-		(((counter_40Hz >= 1) && (counter_40Hz <= 5))
-		|| ((counter_40Hz >= 11) && (counter_40Hz <= 15))
-		|| ((counter_40Hz >= 21) && (counter_40Hz <= 25))
-		|| ((counter_40Hz >= 31) && (counter_40Hz <= 35)))
+		((counter_40Hz >= 1) && (counter_40Hz <= (uint8_t)(TICKS/2)))
 	{
 		if (barometer_needs_servicing)
 		{
-#if (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
+#if (USE_BAROMETER_ALTITUDE > 0 && HILSIM != 1)
 			barometer_needs_servicing = rxBarometer(udb_barometer_callback);
 #endif // (USE_BAROMETER_ALTITUDE == 1 && HILSIM != 1)
 		}
 	}
-	else if ((counter_40Hz == 6) || (counter_40Hz == 16) || (counter_40Hz == 26) || ( counter_40Hz == 36))
+	else if (counter_40Hz == (uint8_t)(TICKS/2+1)) 
 	{
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 		magnetometer_needs_servicing = rxMagnetometer(mag_drift_callback);
@@ -134,16 +162,27 @@ void get_data_from_I2C_sensors(void) // Expected to be called at 40Hz
 		}	   
 	}
 	counter_40Hz++;
-	if (counter_40Hz >= 40) counter_40Hz = 0;
+	if (counter_40Hz >= (uint8_t)(TICKS)) counter_40Hz = 0;
 }
 
 // Called at HEARTBEAT_HZ
 void udb_heartbeat_callback(void)
 {
-	if (udb_pulse_counter % (HEARTBEAT_HZ / 40) == 0)
+#if (USE_LIDAR_ALTITUDE > 0)
+    static int lidarCounter = 0;
+    // Modif GFM Quadcopter to call Lidar at 80 Hz to avoid too much lag
+    // These oversampled data are not filtered, for the moment.
+    if (++lidarCounter >= HEARTBEAT_HZ / 80) {
+        lidarCounter = 0;
+        rxLidar_on_PWM(udb_lidar_callback);        
+    }
+
+#endif // LIDAR_ALTITUDE
+    
+	if (udb_pulse_counter % (HEARTBEAT_HZ / PID_HZ) == 0)
 	{
 		get_data_from_I2C_sensors(); // TODO: this should always be be called at 40Hz
-	}
+    }
 //  when we move the IMU step to the MPU call back, to run at 200 Hz, remove this
 	if (dcm_flags._.calib_finished)
 	{
@@ -152,15 +191,18 @@ void udb_heartbeat_callback(void)
 
 	dcm_heartbeat_callback();    // this was called dcm_servo_callback_prepare_outputs();
 
-	if (udb_pulse_counter % (HEARTBEAT_HZ / 40) == 0)
+	if (udb_pulse_counter % (HEARTBEAT_HZ / PID_HZ) == 0)
 	{
 		if (!dcm_flags._.calib_finished)
 		{
-			dcm_run_calib_step(udb_pulse_counter / (HEARTBEAT_HZ / 40));
+			dcm_run_calib_step(udb_pulse_counter / (HEARTBEAT_HZ / PID_HZ));
+            #if ((USE_BAROMETER_ALTITUDE > 0) ||  (USE_LIDAR_ALTITUDE > 0))
+                            altimeter_calibrate();
+            #endif
 		}
 		if (!dcm_flags._.init_finished)
 		{
-			dcm_flags._.init_finished = gps_run_init_step(udb_pulse_counter / (HEARTBEAT_HZ / 40));
+			dcm_flags._.init_finished = gps_run_init_step(udb_pulse_counter / (HEARTBEAT_HZ / PID_HZ));
 		}
 	}
 

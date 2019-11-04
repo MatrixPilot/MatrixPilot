@@ -226,10 +226,10 @@ static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_v
 #define MAG_LATENCY_COUNT ((int16_t)(HEARTBEAT_HZ * MAG_LATENCY))
 
 // Since mag_drift is called every heartbeat the first assignment to rmatDelayCompensated
-// will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
-// Since rxMagnetometer is called  at multiples of .25 seconds, this initial
-// delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
-static int16_t mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
+// will occur at udb_heartbeat_counter = (1/I2C_SENSOR_RATE - MAG_LATENCY) seconds.
+// Since rxMagnetometer is called  at I2C_SENSOR_RATE, this initial
+// delay offsets the I2C_SENSOR_RATE Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
+static int16_t mag_latency_counter = (HEARTBEAT_HZ /I2C_SENSOR_RATE) - MAG_LATENCY_COUNT;//200/6-200*0.085=16
 
 //static void mag_drift(void)
 //void mag_drift(fractional rmatDelayCompensated[], fractional errorYawplane[])
@@ -253,9 +253,9 @@ void mag_drift(fractional errorYawplane[])
 	// of when rmat is read
 	mag_latency_counter --;
 	if (mag_latency_counter == 0)
-	{
+	{//rmatDelayCompensated is uodated with the rmat values 16*0.005=80 ms before
 		VectorCopy(9, rmatDelayCompensated, rmat);
-		mag_latency_counter = (HEARTBEAT_HZ / 4);   // not really needed, but its good insurance
+		mag_latency_counter = (HEARTBEAT_HZ / I2C_SENSOR_RATE);   // not really needed, but its good insurance
 		// mag_latency_counter is assigned in the next block
 	}
 
@@ -283,7 +283,7 @@ void mag_drift(fractional errorYawplane[])
 			VectorCopy(9, rmatDelayCompensated, rmat);
 		}
 
-		mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT; // setup for the next reading
+		mag_latency_counter = (HEARTBEAT_HZ / I2C_SENSOR_RATE) - MAG_LATENCY_COUNT; // setup for the next reading
 
 		// Compute the mag field in the earth frame
 

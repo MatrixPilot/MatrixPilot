@@ -23,9 +23,18 @@
 #define ESTALTITUDE_H
 
 
+#if (USE_BAROMETER_ALTITUDE == 1)
 void udb_barometer_callback(long pressure, int16_t temperature, char status);
+#elif (USE_BAROMETER_ALTITUDE == 2)
+void udb_barometer_callback(long altitude, int16_t temperature, char status);
+#endif
+#if (USE_LIDAR_ALTITUDE > 0)
+void udb_lidar_callback(long altitude);
+#endif
 void altimeter_calibrate(void);
 void estAltitude(void);
+extern int32_t estimated_altitude;        // previous above ground height (millimeters)
+//extern int32_t fusion,vze_fusion;                // Altitude fusion output (in mm)
 
 long get_barometer_altitude(void);
 long get_barometer_pressure(void);

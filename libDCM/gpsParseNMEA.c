@@ -106,14 +106,14 @@ void (*msg_parse)(uint8_t gpschar) = &msg_start;
 //const char set_BAUD_38400[]     = "$PMTK251,38400*27\r\n";
 //const char set_BAUD_57600[]     = "$PMTK251,57600*2C\r\n";
 //const char set_BAUD_115200[]    = "$PMTK251,115200*1F\r\n";
-//static const char set_FIX_1Hz[] = "$PMTK220,1000*1F\r\n";
+static const char set_FIX_1Hz[] = "$PMTK220,1000*1F\r\n";
 //const char set_FIX_2Hz[]        = "$PMTK220,500*2B\r\n";
 //const char set_FIX_3Hz[]        = "$PMTK220,333*2D\r\n";
 //const char set_FIX_4Hz[]        = "$PMTK220,250*29\r\n";
 //const char set_FIX_5Hz[]        = "$PMTK220,200*2C\r\n";
 //const char set_RMC[]            = "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n";
 //const char set_GGA_RMC[]        = "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n";
-//static const char set_DEFAULT[] = "$PMTK314,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n";
+static const char set_DEFAULT[] = "$PMTK314,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n";
 
 static uint16_t rmc_counter, gga_counter;
 static uint8_t id1, id2, XOR;
@@ -132,7 +132,7 @@ static uint8_t data_valid_, NS_, EW_;
 //union longbbbb date_gps_, time_gps_;
 union intbb nav_valid_, nav_type_;
 //union longbbbb climb_gps_;
-union longbbbb week_no_;
+union intbb week_no_;
 
 
 // if data_valid is 'A', there is valid GPS data that can be used for navigation.
@@ -154,11 +154,11 @@ void gps_startup_sequence(int16_t gpscount)
 	}
 	else if (gpscount == 50)
 	{
-//		gpsoutline(set_FIX_1Hz);
+		gpsoutline(set_FIX_1Hz);
 	}
 	else if (gpscount == 20)
 	{
-//		gpsoutline(set_DEFAULT);
+		gpsoutline(set_DEFAULT);
 	}
 //	else if (gpscount == 850)
 //		gpsoutline(set_BAUD_9600);

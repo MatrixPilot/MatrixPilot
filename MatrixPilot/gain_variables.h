@@ -46,6 +46,7 @@
 // MAVLINK, QGROUND CONTROL (Ground Control Station) can change these variables
 extern uint16_t rollkp;
 extern uint16_t rollkd;
+extern uint16_t rollka;
 extern uint16_t yawkpail;
 extern uint16_t yawkdail;
 //#define AILERON_BOOST                     1.0
@@ -58,6 +59,7 @@ extern uint16_t yawkdail;
 // ELEVATOR_BOOST is the additional gain multiplier for the manually commanded elevator deflection
 extern uint16_t pitchgain;
 extern uint16_t pitchkd;
+extern uint16_t pitchka;
 //extern uint16_t rudderElevMixGain;
 extern uint16_t rollElevMixGain;
 //#define ELEVATOR_BOOST                    0.5
@@ -76,10 +78,17 @@ extern uint16_t rollElevMixGain;
 // RUDDER_BOOST is the additional gain multiplier for the manually commanded rudder deflection
 extern uint16_t yawkprud;
 extern uint16_t yawkdrud;
+extern uint16_t yawkarud;
 extern uint16_t rollkprud;
 extern uint16_t rollkdrud;
 //extern uint16_t MANUAL_AILERON_RUDDER_MIX 0.20
 //#define RUDDER_BOOST                      1.0
+
+// Throttle Control Gains
+extern uint16_t throttlekp;
+extern uint16_t throttlekd;
+extern uint16_t throttleka;
+extern uint16_t throttleki;
 
 // Gains for Hovering
 // Gains are named based on plane's frame of reference (roll means ailerons)

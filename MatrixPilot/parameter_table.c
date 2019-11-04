@@ -12,6 +12,7 @@
 #include "altitudeCntrl.h"
 #include "airspeedCntrl.h"
 #include "config.h"
+#include "../libDCM/gpsData.h"
 
 #include "gain_variables.h"
 
@@ -36,13 +37,15 @@ const mavlink_parameter mavlink_parameters_list[] = {
 #endif // _MSC_VER
 	{"PID_ROLLKP", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rollkp, sizeof(rollkp) },
 	{"PID_ROLLKD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&rollkd, sizeof(rollkd) },
-	{"PID_YAWKPAIL", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&yawkpail, sizeof(yawkpail) },
-	{"PID_YAWKDAIL", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkdail, sizeof(yawkdail) },
+	{"PID_ROLLKA", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&rollka, sizeof(rollka) },
 	{"PID_PITCHGAIN", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&pitchgain, sizeof(pitchgain) },
-	{"PID_PITCHKD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&pitchkd, sizeof(pitchkd) },
-	{"PID_ROLLKPRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rollkprud, sizeof(rollkprud) },
+	{"PID_PITCHKD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&pitchkd, sizeof(pitchkd) },
+	{"PID_PITCHKA", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&pitchka, sizeof(pitchka) },
 	{"PID_YAWKPRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&yawkprud, sizeof(yawkprud) },
 	{"PID_YAWKDRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkdrud, sizeof(yawkdrud) },
+	{"PID_YAWKARUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkarud, sizeof(yawkarud) },
+/*	{"PID_YAWKPAIL", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&yawkpail, sizeof(yawkpail) },
+	{"PID_YAWKDAIL", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkdail, sizeof(yawkdail) },
 	{"PID_ROLLKPRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rollkprud, sizeof(rollkprud) },
 	{"PID_ROLLKDRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rollkdrud, sizeof(rollkdrud) },
 
@@ -72,7 +75,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"PWTRIM_CROW", {.param_float=800.0}, {.param_float=2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CROW_INPUT_CHANNEL], sizeof(udb_pwTrim[CROW_INPUT_CHANNEL]) },
 	{"PWTRIM_CAMPITCH", {.param_float=800.0}, {.param_float=2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL], sizeof(udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL]) },
 	{"PWTRIM_CAM_YAW", {.param_float=800.0}, {.param_float=2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL], sizeof(udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL]) },
-
+*/
 	{"IMU_XACCEL_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_xaccel.offset, sizeof(udb_xaccel.offset) },
 	{"IMU_YACCEL_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_yaccel.offset, sizeof(udb_yaccel.offset) },
 	{"IMU_ZACCEL_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_zaccel.offset, sizeof(udb_zaccel.offset) },
@@ -86,7 +89,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"TH_H_MARGIN", {.param_int32=1}, {.param_int32=500}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&height_margin, sizeof(height_margin) },
 	{"TH_T_HOLD_MIN", {.param_float=0}, {.param_float=1}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&alt_hold_throttle_min, sizeof(alt_hold_throttle_min) },
 	{"TH_T_HOLD_MAX", {.param_float=0}, {.param_float=1}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&alt_hold_throttle_max, sizeof(alt_hold_throttle_max) },
-	{"TH_P_HOLD_MIN", {.param_int32=-89}, {.param_int32=0}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_min, sizeof(alt_hold_pitch_min) },
+/*	{"TH_P_HOLD_MIN", {.param_int32=-89}, {.param_int32=0}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_min, sizeof(alt_hold_pitch_min) },
 	{"TH_P_HOLD_MAX", {.param_int32=0}, {.param_int32=89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_max, sizeof(alt_hold_pitch_max) },
 	{"TH_P_HIGH", {.param_int32=0}, {.param_int32=89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_high, sizeof(alt_hold_pitch_high) },
 	{"TH_P_RTL_DOWN", {.param_int32=0}, {.param_int32=89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&rtl_pitch_down, sizeof(rtl_pitch_down) },
@@ -100,6 +103,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"ASPD_P_MAX_ASPD", {.param_int32=-90}, {.param_int32=90.0}, UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*)&airspeed_pitch_max_aspd, sizeof(airspeed_pitch_max_aspd) },
 	{"ASPD_P_RATE_LIM", {.param_int32=1.0}, {.param_int32=720.0}, UDB_TYPE_FRAME_ANGLERATE, PARAMETER_READWRITE, (void*)&airspeed_pitch_adjust_rate, sizeof(airspeed_pitch_adjust_rate) },
 	{"ASPD_P_KI", {.param_float=0.0}, {.param_float=1.0}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&airspeed_pitch_ki, sizeof(airspeed_pitch_ki) },
+	{"ASPD_P_KP", {.param_float=0.0}, {.param_float=1.0}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&airspeed_pitch_kp, sizeof(airspeed_pitch_kp) },
 	{"ASPD_P_KI_LIMIT", {.param_int32=0.0}, {.param_int32=45.0}, UDB_TYPE_DCM_ANGLE, PARAMETER_READWRITE, (void*)&airspeed_pitch_ki_limit, sizeof(airspeed_pitch_ki_limit) },
 
 	{"TURN_ELE_TR_NRM", {.param_float=-1.0}, {.param_float=1.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.ElevatorTrimNormal, sizeof(turns.ElevatorTrimNormal) },
@@ -110,7 +114,14 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"TURN_FEED_FWD", {.param_float=0.0}, {.param_float=100.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.FeedForward, sizeof(turns.FeedForward) },
 	{"TURN_RATE_NAV", {.param_float=0.0}, {.param_float=100.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.TurnRateNav, sizeof(turns.TurnRateNav) },
 	{"TURN_RATE_FBW", {.param_float=0.0}, {.param_float=100.0}, UDB_TYPE_FLOAT, PARAMETER_READWRITE, (void*)&turns.TurnRateFBW, sizeof(turns.TurnRateFBW) },
-
+*/
+    // Modif gfm GPS parameters creation
+    {"GPS_LATITUDE" , {.param_int32=-900000000} , {.param_int32=900000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &lat_gps, sizeof(lat_gps) },
+    {"GPS_LONGITUDE" , {.param_int32=-1800000000} , {.param_int32=1800000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &lon_gps, sizeof(lon_gps) },
+    {"GPS_ALTITUDE" , {.param_int32=-1000000} , {.param_int32=1000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &alt_sl_gps, sizeof(alt_sl_gps) },
+    {"GPS_WEEK_NO" , {.param_int32=0} , {.param_int32=10000} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &week_no, sizeof(week_no) },
+    {"GPS_TOW" , {.param_int32=0} , {.param_int32=605000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &tow, sizeof(tow) },
+// fin modif gfm GPS
 };
 
 const uint16_t count_of_parameters_list = sizeof(mavlink_parameters_list) / sizeof(mavlink_parameter);

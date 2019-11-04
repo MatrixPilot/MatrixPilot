@@ -20,6 +20,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////////// 
+#include "mpu_spi.h"
 // Optionally enable the new power saving idle mode of the MCU during mainloop
 #define USE_MCU_IDLE    0
 
@@ -33,9 +34,14 @@
 #define INT_PRI_T7      2   // background.c : trigger navigation processing after new data is received from the GPS
 
 #define INT_PRI_MPUSPI  6   // mpu6000.c : SPI1 (UDB4 or AUAV3) or SPI2 (UDB4 or UDB5)
-#define INT_PRI_INT1    6   // mpu6000.c : mpu on SPI1 uses external interrupt 1
-#define INT_PRI_INT3    6   // mpu6000.c : mpu on SPI3 uses external interrupt 3
-
+// gfm for barometer 
+#if (MPU_SPI == 1)
+#define INT_PRI_INT1    6   // mpu6000.c : SPI1 uses external interrupt 1
+#define INT_PRI_INT3    3   // barometer.c : barometer MPL3115A2 uses external interrupt 3
+#else
+#define INT_PRI_INT1    3   // barometer.c : barometer MPL3115A2 uses external interrupt 1
+#define INT_PRI_INT3    6   // mpu6000.c : mpu on SPI1 uses external interrupt 1
+#endif
 #define INT_PRI_IC      6   // radioIn.c : input capture interrupt
 
 #define INT_PRI_I2C1    5   // I2C1.c

@@ -314,6 +314,10 @@ static void configureDigitalIO(void) // UDB4 and UDB5 boards
 	_TRISD9 = _TRISD10 = _TRISD11 = _TRISD12 = _TRISD13 = _TRISD14 = _TRISD15 = _TRISD8;
 #endif
 	TRISF = 0b1111111111101100;
+#if (USE_LIDAR_ALTITUDE	== 1)
+        LIDAR_Trigger = 1;_TRISA4 = 0;// Sortie digitale
+        _LATA1 = LED_OFF;_TRISA1 = 1;// Input Lidar PWM
+#endif
 }
 #endif // BOARD_TYPE
 
@@ -351,6 +355,9 @@ static void init_pll(void)
 #else
 #error "invalid MIPS Configuration"
 #endif // MIPS
+//Change GFM#9: in accordance with Microchip recommandation to avoid wrong data transfer rate
+// Cf. DS70188E-page 17-16    
+while(OSCCONbits.LOCK != 1) {}; // Wait for PLL to lock
 #endif // BOARD_TYPE
 
 #if (BOARD_TYPE == AUAV3_BOARD)

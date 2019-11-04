@@ -26,6 +26,7 @@
 extern boolean filterManual;
 extern int16_t desiredHeight;
 // Variables required for mavlink.  Used in AltitudeCntrlVariable and airspeedCntrl
+//extern int32_t fusion;
 extern int16_t height_target_min;
 extern int16_t height_target_max;
 extern int16_t height_margin;

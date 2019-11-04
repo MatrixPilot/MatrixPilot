@@ -35,7 +35,7 @@
 #include <spi.h>
 
 //Sensor variables
-uint16_t mpu_data[8], mpuCnt = 0;
+uint16_t mpu_data[8], mpuCnt = 0, mpuOverSample = 1;
 boolean mpuDAV = false;
 
 //struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
@@ -95,8 +95,14 @@ void MPU6000_init16(callback_fptr_t fptr)
 	writeMPUSPIreg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
 
 	// SAMPLE RATE
-	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
-
+// Modif gfm Gyro : sample rate growing up to 1 KHz with DLPF <> 0 and 7 to keep Fsample=1kHz
+//	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1kHz/(N+1) = 200Hz
+	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 0); // Sample rate = 1000Hz  Fsample= 1kHz/(N+1) = 1000Hz
+         mpuOverSample = 1000 / HEARTBEAT_HZ;
+// Take care : due to this sample rate, dcm_run_imu_step()must be called in libDCM
+//             and not here under.
+//        A filter can be used to limit propeller vibrations (max frequency 10 000 RPM=166 Hz
+// fin modif gfm gyro
 	// scaling & DLPF
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
 
@@ -196,7 +202,8 @@ static void process_MPU_data(void)
 
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
-	if (callback) callback();   // was directly calling heartbeat()
+	if (mpuCnt % mpuOverSample == 0)
+            if (callback) callback();   // was directly calling heartbeat()
 #else
 #warning mpu6000: no callback mechanism defined
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)

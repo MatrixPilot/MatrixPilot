@@ -21,7 +21,11 @@
 
 #include "libUDB.h"
 #include "I2C.h"
+#include "interrupt.h"
+#include "mpu_spi.h"
 #include "barometer.h"
+#include "oscillator.h"
+#include "delay.h"
 
 #if (USE_BAROMETER_ALTITUDE == 1)
 
@@ -268,6 +272,180 @@ void ReadBarPres_callback(boolean I2CtrxOK)
 		if (barometer_callback != NULL)
 		{
 			barometer_callback(pressure, ((b5 + 8) >> 4), 0);   // Callback
+		}
+	}
+	else
+	{
+		// the operation failed - we should probably do something about it...
+	}
+}
+
+#elif (USE_BAROMETER_ALTITUDE == 2)
+#define USE_MPL3115A2_ON_I2C 2
+#define MPL3115_ADDRESS 0xC0  // I2C address of MPL3115A2
+static unsigned char MPL3115A2_CTRL_REG1[]       = { 0x26 };
+//static unsigned char MPL3115A2_INT_SOURCE_REG[]  = { 0x12 };
+static unsigned char MPL3115A2_PT_DATA_CFG[]     = { 0x13 };
+static unsigned char MPL3115A2_CTRL_REG3[]       = { 0x28 };
+static unsigned char MPL3115A2_CTRL_REG4[]       = { 0x29 };
+static unsigned char MPL3115A2_CTRL_REG5[]       = { 0x2A };
+static unsigned char MPL3115A2_REGISTER_STATUS[] = { 0x00 };
+//static unsigned char MPL3115A2_STD_BY[]           = { 0x00 };//
+static unsigned char MPL3115A2_ALT_OSR[]         = { 0xA8 };//MPL3115A2_CTRL_REG1_ALT+MPL3115A2_CTRL_REG1_OS132ms+STD_BY
+static unsigned char MPL3115A2_PT_CFG[]          = { 0x07 };//MPL3115A2_PT_DATA_CFG_DREM+MPL3115A2_MPL3115A2_PT_DATA_CFG_PDEFE
+static unsigned char MPL3115A2_REG3_CFG[]        = { 0x00 };//MPL3115A2_IPOL2 Active low, internal Pull-up
+static unsigned char MPL3115A2_REG4_CFG[]        = { 0x80 };//MPL3115A2_INT_EN_DRDY
+static unsigned char MPL3115A2_REG5_CFG[]        = { 0x00 };//MPL3115A2_INT_CFG_DRDY on INT2
+//static unsigned char MPL3115A2_ACTIVE[]          = { 0xA9 };//MPL3115A2_CTRL_REG1_ALT+MPL3115A2_CTRL_REG1_OS132+MPL3115A2_CTRL_REG1_SBYB
+static unsigned char MPL3115A2_OST[]             = { 0xAA };//MPL3115A2_CTRL_REG1_ALT+OS132ms+OST
+//static unsigned char MPL3115A2_SRC_DRDY[]        = { 0x80 };//MPL3115A2 INT Data Ready
+static unsigned char barData[6];
+
+static int barMessage = 0;      // message type, state machine counter
+void ReadBarAltitude_callback(boolean I2CtrxOK);
+
+#if (USE_MPL3115A2_ON_I2C == 1)
+	#define I2C_Normal		I2C1_Normal
+	#define I2C_Read		I2C1_Read
+	#define I2C_Write		I2C1_Write
+	#define I2C_Reset		I2C1_Reset
+#elif (USE_MPL3115A2_ON_I2C == 2)
+	#define I2C_Normal		I2C2_Normal
+	#define I2C_Read		I2C2_Read
+	#define I2C_Write		I2C2_Write
+	#define I2C_Reset		I2C2_Reset
+#endif
+
+
+barometer_callback_funcptr barometer_callback = NULL;
+
+// MPL115A2 Initialization and configuration
+
+void MPL3115A2_Init(void)
+{   //Write (device_adress,*Register,Reg byte number,*data,data byte number, data pointer)
+    // Std by
+    I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG1, 1, MPL3115A2_ALT_OSR, 1, NULL);
+    delay_us(300);//Waiting for first message transmission 9 tics * 10탎 * 3 bytes = 720 탎 + 10% margin = 300 탎
+    // Read data and status to clear all interrupts
+//    I2C_Read(MPL3115_ADDRESS, MPL3115A2_REGISTER_STATUS, 1, barData, 6, &ReadBarAltitude_callback, I2C_MODE_WRITE_ADDR_READ);
+//    delay_us(800);//Waiting for first message transmission 9 tics * 10탎 * 8 bytes = 720 탎 + 10% margin = 300 탎
+    // interrupt on data ready, raise event on new altitude
+    I2C_Write(MPL3115_ADDRESS, MPL3115A2_PT_DATA_CFG, 1, MPL3115A2_PT_CFG, 1, NULL);//PT_DATA_CFG=06
+    delay_us(300);
+    // interrupt on data ready, interrupt active low and internal pull_up interface on INT1 & INT2
+    I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG3, 1, MPL3115A2_REG3_CFG, 1, NULL);//REG3=0x11
+    delay_us(300);
+    // interrupt on data ready, route interrupt on INT2
+    I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG4, 1, MPL3115A2_REG4_CFG, 1, NULL);
+     delay_us(300);
+    // interrupt on data ready, raise event on new altitude
+    I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG5, 1, MPL3115A2_REG5_CFG, 1, NULL);
+     delay_us(300);
+    // Barometer activate altitude mode and OS=b101, 32 samples, 132 ms minimum time between sample, 6Hz sample rate
+    I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG1, 1, MPL3115A2_OST, 1, NULL);
+    delay_us(300);
+
+}
+uint8_t rxBarometer(barometer_callback_funcptr callback)  // service the MPL3115A2 barometer
+{
+	barometer_callback = callback;
+
+	if (I2C_Normal() == false)  // if I2C is not ok
+	{
+		I2C_Reset();            // reset the I2C
+		return(BAROMETER_NEEDS_SERVICING);
+	}
+		barMessage++;
+		if (barMessage > 2)
+		{
+			barMessage = 1;
+		}
+		switch (barMessage)
+		{ 
+		case 1:
+	// Baro activation : enable INT and set OST (One Shot Trigger)
+
+    // Read data and status to clear all interrupts
+            I2C_Read(MPL3115_ADDRESS, MPL3115A2_REGISTER_STATUS, 1, barData, 6, &ReadBarAltitude_callback, I2C_MODE_WRITE_ADDR_READ);
+            //delay_us(800);//Waiting for first message transmission 9 tics * 10탎 * 8 bytes = 720 탎 + 10% margin = 800 탎
+        	return(BAROMETER_NEEDS_SERVICING);
+		case 2:
+            I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG1, 1, MPL3115A2_OST, 1, NULL);
+            //delay_us(300);
+//        	return(BAROMETER_NEEDS_SERVICING);
+//		case 3:
+            _INT1IE = 1; // Enable INT1 Interrupt Service Routine
+			return(BAROMETER_SERVICE_CAN_PAUSE);
+		default:
+			barMessage = 0;
+			return(BAROMETER_SERVICE_CAN_PAUSE);
+		}
+
+}
+#if (MPU_SPI == 1)
+void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
+{
+	_INT3IF = 0; // Clear the INT3 interrupt flag
+        _INT3IE = 0; // Disable INT3 Interrupt Service Routine
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+/*        //Read INT Source
+	I2C_Read(MPL3115_ADDRESS, MPL3115A2_INT_SOURCE_REG, 1, barData, 1, &ReadBarAltitude_callback, I2C_MODE_READ_ONLY);
+        delay_us(300);
+        // Test if data ready
+        if ((barData[0] && MPL3115A2_SRC_DRDY)  )
+        {
+       //Read data
+	I2C_Read(MPL3115_ADDRESS, MPL3115A2_REGISTER_STATUS, 1, barData, 6, &ReadBarAltitude_callback, I2C_MODE_WRITE_ADDR_READ);
+        delay_us(800);//Waiting for first message transmission 9 tics * 10탎 * 8 bytes = 720 탎 + 10% margin = 300 탎
+        }
+ */
+    // Reset OST
+        I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG1, 1, MPL3115A2_ALT_OSR, 1, NULL);
+//        delay_us(300);
+	interrupt_restore_corcon;
+}
+#else
+void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt(void)
+{
+	_INT1IF = 0; // Clear the INT1 interrupt flag
+        _INT1IE = 0; // Disable INT1 Interrupt Service Routine
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+/*        //Read INT Source
+	I2C_Read(MPL3115_ADDRESS, MPL3115A2_INT_SOURCE_REG, 1, barData, 1, &ReadBarAltitude_callback, I2C_MODE_READ_ONLY);
+        delay_us(300);
+        // Test if data ready
+        if ((barData[0] && MPL3115A2_SRC_DRDY)  )
+        {
+        //Read data
+	I2C_Read(MPL3115_ADDRESS, MPL3115A2_REGISTER_STATUS, 1, barData, 6, &ReadBarAltitude_callback, I2C_MODE_WRITE_ADDR_READ);
+        delay_us(800);//Waiting for first message transmission 9 tics * 10탎 * 8 bytes = 720 탎 + 10% margin = 300 탎
+        }
+*/
+    // Reset OST
+        I2C_Write(MPL3115_ADDRESS, MPL3115A2_CTRL_REG1, 1, MPL3115A2_ALT_OSR, 1, NULL);
+//        delay_us(300);
+	interrupt_restore_corcon;
+}
+#endif
+void ReadBarAltitude_callback(boolean I2CtrxOK)
+{
+	long altitude;  // (signed long integer 32 bits) in mm
+	long temperature;// in 1/256 캜
+
+	if (I2CtrxOK == true)
+	{
+                altitude = ((long)barData[1] << 24); // Taking into account the sign
+                altitude = ((long)barData[1] >> 6 | (long)barData[2] << 10 | (long)barData[3] << 2) ;
+//                altitude = altitude * 1000 / 1024;// the exact altitude value must be corrected by the factor 1/1.024
+		temperature = ((long)barData[4] << 8) + (long)barData[5] ;
+#ifdef TEST_WITH_DATASHEET_VALUES
+		altitude = 23843;
+#endif
+		if (barometer_callback != NULL)
+		{
+			barometer_callback(altitude, temperature, 0);   // Callback
 		}
 	}
 	else

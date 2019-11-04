@@ -28,15 +28,16 @@
 #include "radioIn.h"
 #include "eeprom_udb4.h"
 #include "ADchannel.h"
+#include "mpu_spi.h"
 #include "mpu6000.h"
 #include "analogs.h"
 #include "events.h"
 #include "osd.h"
 #include "options_ports.h"
 
-#if (USE_I2C1_DRIVER == 1)
+//#if (USE_I2C1_DRIVER == 1)
 #include "I2C.h"
-#endif
+//#endif
 
 // Include the NV memory services if required
 #if (USE_NV_MEMORY == 1)
@@ -85,6 +86,26 @@ void udb_init(void)
 #if (USE_I2C1_DRIVER == 1)
 	I2C1_Init();
 #endif
+        // Modif gfm barometer
+#if (USE_BAROMETER_ALTITUDE > 0)
+	I2C2_Reset();
+#endif
+#if (USE_BAROMETER_ALTITUDE == 2)
+#if (MPU_SPI == 1)
+        // Int 3 is used to capture MPL measurement
+	_INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
+	_INT3IP = INT_PRI_INT3;
+	_INT3IF = 0; // Reset INT3 interrupt flag
+	_INT3IE = 0; // Disable INT3 Interrupt Service Routine
+#else
+        // Int 1 is used to capture MPL measurement
+	_INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
+	_INT1IP = INT_PRI_INT1;
+	_INT1IF = 0; // Reset INT1 interrupt flag
+	_INT1IE = 0; // Disable INT1 Interrupt Service Routine
+#endif
+#endif
+        // Fin modif gfm barometer
 #if (USE_NV_MEMORY == 1)
 	nv_memory_init();
 	data_storage_init();

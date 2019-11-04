@@ -65,9 +65,28 @@ extern uint16_t air_speed_3DGPS;
 //extern void (*gps_startup_sequence)(int16_t gpscount);
 //extern boolean (*gps_nav_valid)(void);
 //extern void (*gps_commit_data)(void);
-void gps_commit_data(void);
-void gpsoutline(const char* message);
-void gpsoutbin(int16_t length, const uint8_t* msg);
+// Ajout gfm pout Aid_Ini
+extern union intbb week_no_;
+extern union longbbbb p_Acc_;// 30m
+extern union longbbbb time_Acc_;
+extern union longbbbb f_Acc_;
+extern union longbbbb clkd_Acc_;
+extern union longbbbb Flags_;// position precise:0x21
+extern union longbbbb clkd_;
+extern union longbbbb ftow_;
+extern union intbb tncfg_;
+extern uint8_t CK_A;
+extern uint8_t CK_B;
+extern uint16_t  AID_INI_length;
+
+extern uint8_t  AID_INI[];
+// fin ajout gfm
+
+// Modif gfm declare send_msg_AID_INI
+//const uint16_t  AID_INI_length = 56;
+extern void send_msg_AID_INI(uint8_t* );
+// UDB to send AID_INI message to GPS UBX
+// fin modif gfm
 
 void gps_init(void);
 void gps_parse_common(void);
@@ -75,6 +94,9 @@ void gps_update_basic_data(void);
 boolean gps_nav_capable_check_set(void);
 void HILSIM_set_gplane(fractional gplane[]);
 void HILSIM_set_omegagyro(void);
+void gpsoutline(const char* message);
+void gps_commit_data(void);
+void gpsoutbin(int16_t length, const uint8_t msg[]); // output a binary message to the GPS
 
 int32_t get_gps_date(void);
 int32_t get_gps_time(void);

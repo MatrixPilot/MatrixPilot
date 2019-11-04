@@ -48,6 +48,7 @@ static const char* strNavigation = "NAVIGATION";
 static const char* strRoll = "ROLL";
 static const char* strPitch = "PITCH";
 static const char* strYaw = "YAW";
+static const char* strThrottle = "THROTTLE";
 static const char* strAltitude = "ALTITUDE";
 static const char* strRTL = "RTL";
 static const char* strHover = "HOVER";
@@ -190,6 +191,7 @@ static void load_gains(void)
 // Aileron/Roll Control Gains
 	gains.RollKP = ini_getf(strRoll, "rollkp", ROLLKP, strConfigFile);
 	gains.RollKD = ini_getf(strRoll, "rollkd", ROLLKD, strConfigFile);
+	gains.RollKA = ini_getf(strRoll, "rollka", ROLLKA, strConfigFile);
 	gains.YawKPAileron = ini_getf(strRoll, "yawkp", YAWKP_AILERON, strConfigFile);
 	gains.YawKDAileron = ini_getf(strRoll, "yawkd", YAWKD_AILERON, strConfigFile);
 //	gains.AileronBoost = ini_getf(strRoll, "boost", AILERON_BOOST, strConfigFile);
@@ -197,6 +199,7 @@ static void load_gains(void)
 // Elevator/Pitch Control Gains
 	gains.Pitchgain = ini_getf(strPitch, "gain", PITCHGAIN, strConfigFile);
 	gains.PitchKD = ini_getf(strPitch, "pitchkd", PITCHKD, strConfigFile);
+	gains.PitchKA = ini_getf(strPitch, "pitchka", PITCHKA, strConfigFile);
 //	gains.RudderElevMix = ini_getf(strPitch, "rudder", RUDDER_ELEV_MIX, strConfigFile);
 //	gains.RollElevMix = ini_getf(strPitch, "roll", ROLL_ELEV_MIX, strConfigFile);
 	gains.ElevatorBoost = ini_getf(strPitch, "boost", ELEVATOR_BOOST, strConfigFile);
@@ -205,10 +208,18 @@ static void load_gains(void)
 // Rudder/Yaw Control Gains
 	gains.YawKPRudder = ini_getf(strYaw, "yawkp", YAWKP_RUDDER, strConfigFile);
 	gains.YawKDRudder = ini_getf(strYaw, "yawkd", YAWKD_RUDDER, strConfigFile);
+	gains.YawKARudder = ini_getf(strYaw, "yawka", YAWKA_RUDDER, strConfigFile);
 	gains.RollKPRudder = ini_getf(strYaw, "rollkp", ROLLKP_RUDDER, strConfigFile);
 	gains.RollKDRudder = ini_getf(strYaw, "rollkd", ROLLKD_RUDDER, strConfigFile);
 	// = ini_getf(strYaw, "mix", MANUAL_AILERON_RUDDER_MIX, strConfigFile);
 	gains.RudderBoost = ini_getf(strYaw, "boost", RUDDER_BOOST, strConfigFile);
+
+    // Rudder/Yaw Control Gains
+	gains.ThrottleKP = ini_getf(strThrottle, "ThrottleKp", THROTTLE_KP, strConfigFile);
+	gains.ThrottleKD = ini_getf(strThrottle, "ThrottleKd", THROTTLE_KD, strConfigFile);
+	gains.ThrottleKA = ini_getf(strThrottle, "ThrottleKa", THROTTLE_KA, strConfigFile);
+	gains.ThrottleKI = ini_getf(strThrottle, "ThrottleKi", THROTTLE_KI, strConfigFile);
+
 
 // Altitude Hold
 	altit.DesiredSpeed = ini_getf(strAltitude, "desired_speed", DESIRED_SPEED, strConfigFile);
@@ -243,6 +254,7 @@ static void save_gains(void)
 // Aileron/Roll Control Gains
 	ini_putf(strRoll, "rollkp", gains.RollKP, strConfigFile);
 	ini_putf(strRoll, "rollkd", gains.RollKD, strConfigFile);
+	ini_putf(strRoll, "rollka", gains.RollKA, strConfigFile);
 	ini_putf(strRoll, "yawkp", gains.YawKPAileron, strConfigFile);
 	ini_putf(strRoll, "yawkd", gains.YawKDAileron, strConfigFile);
 	ini_putf(strRoll, "boost", gains.AileronBoost, strConfigFile);
@@ -250,6 +262,7 @@ static void save_gains(void)
 // Elevator/Pitch Control Gains
 	ini_putf(strPitch, "gain", gains.Pitchgain, strConfigFile);
 	ini_putf(strPitch, "pitchkd", gains.PitchKD, strConfigFile);
+	ini_putf(strPitch, "pitchka", gains.PitchKA, strConfigFile);
 	ini_putf(strPitch, "rudder", gains.RudderElevMix, strConfigFile);
 	ini_putf(strPitch, "roll", gains.RollElevMix, strConfigFile);
 	ini_putf(strPitch, "boost", gains.ElevatorBoost, strConfigFile);
@@ -258,12 +271,19 @@ static void save_gains(void)
 // Rudder/Yaw Control Gains
 	ini_putf(strYaw, "yawkp", gains.YawKPRudder, strConfigFile);
 	ini_putf(strYaw, "yawkd", gains.YawKDRudder, strConfigFile);
+	ini_putf(strYaw, "yawka", gains.YawKARudder, strConfigFile);
 	ini_putf(strYaw, "rollkp", gains.RollKPRudder, strConfigFile);
 	ini_putf(strYaw, "rollkd", gains.RollKDRudder, strConfigFile);
 	// = ini_putf(strYaw, "mix", gains.MANUAL_AILERON_Rudder_MIX, strConfigFile);
 	ini_putf(strYaw, "boost", gains.RudderBoost, strConfigFile);
 
-// Altitude Hold
+// Throttle Control Gains
+	ini_putf(strThrottle, "Throttlekp", gains.ThrottleKP, strConfigFile);
+	ini_putf(strThrottle, "Throttlekd", gains.ThrottleKD, strConfigFile);
+	ini_putf(strThrottle, "Throttleka", gains.ThrottleKA, strConfigFile);
+	ini_putf(strThrottle, "Throttleki", gains.ThrottleKI, strConfigFile);
+
+    // Altitude Hold
 	ini_putf(strAltitude, "desired_speed", altit.DesiredSpeed, strConfigFile);
 	ini_putf(strAltitude, "height_margin", altit.HeightMargin, strConfigFile);
 	ini_putf(strAltitude, "height_max", altit.HeightTargetMax, strConfigFile);
