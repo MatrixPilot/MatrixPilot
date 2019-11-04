@@ -179,7 +179,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 					{
 						//sprintf(ErrorString, "GetCommState Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
-						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "GetCommState Error = %d", GetLastError());
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "GetCommState Error = %lu", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -205,7 +205,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 					{
 						//sprintf(ErrorString, "SetCommState Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
-						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "SetCommState Error = %d", GetLastError());
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "SetCommState Error = %lu", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -214,7 +214,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 					{
 						//sprintf(ErrorString, "GetCommTimeouts Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
-						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "GetCommTimeouts Error = %d", GetLastError());
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "GetCommTimeouts Error = %lu", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -229,7 +229,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 					{
 						//sprintf(ErrorString, "SetCommTimeouts Error = %d", GetLastError());
 						//ShowMessage(ErrorString);
-						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "SetCommTimeouts Error = %d", GetLastError());
+						snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "SetCommTimeouts Error = %lu", GetLastError());
 						UDBSocket_close(newSocket);
 						return NULL;
 					}
@@ -401,7 +401,7 @@ int UDBSocket_write(UDBSocket socket, const unsigned char* data, int dataLength)
 				dwRetFlag = WriteFile(socket->hComms, data, dataLength, &bytesWritten, NULL);
 				if (!dwRetFlag)
 				{
-					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "WriteFile Error = %d", GetLastError());
+					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "WriteFile Error = %lu", GetLastError());
 					//ShowMessage(ErrorString);
 					return -1;
 				}

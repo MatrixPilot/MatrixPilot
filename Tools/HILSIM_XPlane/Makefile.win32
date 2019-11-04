@@ -1,8 +1,8 @@
-CC       = /usr/local/i386-mingw32-4.3.0/bin/i386-mingw32-gcc
-CPP      = /usr/local/i386-mingw32-4.3.0/bin/i386-mingw32-g++
+CC       = gcc
+CPP      = g++
 CFLAGS   = -pipe -Wall -W -O0 -DWIN=1 -DIBM=1
 INCPATH  = -Iinclude -I.
-LFLAGS   = -shared -Wl -lws2_32 -lOpenGL32 -Llib -lXPLM
+LFLAGS   = -shared -lws2_32 -lOpenGL32 -Llib -lXPLM
 RM_FILE  = rm -f
 
 OBJECTS_DIR = ./

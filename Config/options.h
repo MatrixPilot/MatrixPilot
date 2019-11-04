@@ -76,6 +76,15 @@
 //#define GPS_TYPE                            GPS_NONE
 #define DEFAULT_GPS_BAUD                    4800   // added for GPS_NMEA support
 
+////////////////////////////////////////////////////////////////////////////////
+// You can specify a level of good GNSS reception before MatrixPilot accepts "GPS ACQUIRED".
+// You can generally leaves these lines at their default values. A value of zero switches off the check.
+// The VDOP parameter is only available for Ublox GNSS devices. It is ignored for other GNSS units.
+// The metrics are not used by HILSIM or SILSIM.
+
+#define GNSS_HDOP_REQUIRED_FOR_STARTUP       20  //  Horizontal Dilution of Precision
+#define GNSS_VDOP_REQUIRED_FOR_STARTUP	     60  //  Vertical Dilution of Precision
+#define GNSS_SVS_REQUIRED_FOR_STARTUP	      6  //  Number of Sattelites in View
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enable/Disable core features of this firmware
@@ -770,9 +779,10 @@
 // examine the telemetry after a flight, take a look in the .csv file, it will be easy to spot the
 // altitude, expressed in meters.
 
-#define USE_FIXED_ORIGIN	    0
+#define USE_FIXED_ORIGIN	    1
 //#define FIXED_ORIGIN_LOCATION	    { -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
-#define FIXED_ORIGIN_LOCATION	    { 113480854, 472580108, 578 }	// Innsbruck, useful for X-Plane flight simulator
+//#define FIXED_ORIGIN_LOCATION	    { 113480854, 472580108, 578 }	// Innsbruck, useful for X-Plane flight simulator
+#define FIXED_ORIGIN_LOCATION	    { -020362500, 486154800, 35 }	// St Malo, useful gfm development
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Vehicle and Pilot Identification
@@ -796,6 +806,19 @@
 #define ID_LEAD_PILOT                       "Not Defined"
 #define ID_DIY_DRONES_URL                   "http://www.diydrones.com"
 
+///////////////////////////////////////////////////////////////////////////////////
+// Aid to Flight Analysis of Delta Wing Aircraft. This is an optional setting which
+// allows for minimizing drag of the aircraft from commanded elevator drag (in the elevons).
+// Flight Analyzer can help you track how much elevon is being used to keep the craft in level flight,
+// and let you decide whether to move the balance point of the flying wing forward or backwards.
+// You can set and record the Trim settings for no elevon deflection in relation trailing edger of the main wings.
+// Set the following three lines to allow Flight Analyzer (flan.pyw) compute the amount
+// of up elevon (in UDB units) being used to keep a nose heavy aircraft flying level.
+// Trim the elevons to be in line with the trailing edge, run up MatrixPilot with SERIAL_UDB_EXTRA,
+// and note the values of the relevant channels (e.g. AILERON_OUTPUT_CHANNEL and ELEVATOR_OUTPUT_CHANNEL) in UDB PWM units.
+#define FLIGHT_ANALYZER_TO_USE_NEUTUAL_DEFLECTION_VALUES    1     //Set to 1 to enable and set to 0 to disable this option
+#define AILERON_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION           3000  
+#define ELEVATOR_OUTPUT_CHANNEL_NEUTRAL_DEFLECTION          3000
 
 ////////////////////////////////////////////////////////////////////////////////
 // The following define is used to enable vertical initialization for VTOL

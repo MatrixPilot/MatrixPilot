@@ -134,6 +134,7 @@ static void flight_controller(void)
 		updateTriggerAction();
 	}
 //gfm    // PID Inner loop at 200 Hz
+   helicalTurnCntrl();
    InnerrollCntrl();
    InnerpitchCntrl();
    InneryawCntrl();

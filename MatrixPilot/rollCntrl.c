@@ -172,6 +172,7 @@ void InnerrollCntrl(void)
         rollAccel_1.WW += gyroAccelFeedback.WW;
         gyroAccelFeedback.WW -= __builtin_mulus(6239 , rollAccel_1._.W1);
 		gyroRollFeedback.WW = - __builtin_mulus(rollkd, rotationRateError[1]);
+		gyroRollFeedback.WW = __builtin_mulus(rollkd, rotationRateError[1]);
 	}
 	else
 	{
@@ -179,4 +180,5 @@ void InnerrollCntrl(void)
         gyroAccelFeedback.WW = 0;
 	}
 	roll_control = outerroll_control - (int32_t)gyroRollFeedback._.W1 - (int32_t)gyroAccelFeedback._.W1;
+	roll_control =  outerroll_control + (int32_t)gyroRollFeedback._.W1 + (int32_t)gyroAccelFeedback._.W1;
 }

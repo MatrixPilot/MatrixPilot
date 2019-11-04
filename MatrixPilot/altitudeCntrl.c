@@ -120,6 +120,7 @@ void init_altitudeCntrl(void)
         throttleki            = (uint16_t)(gains.ThrottleKI*RMAX/PID_HZ*2.0*SERVORANGE/1000.0);
         throttle_error_integral.WW = 0; //initialization of the integrator
         desiredHeight_1     = HEIGHT_TARGET_MIN;
+        throttle_control = Neutral;
 #define DHRATEMAX 2000/PID_HZ //MAximum rate for the desired height = 2m/s thus 50mm per 25 ms (1/PID_HZ)
         //Butterworth filter coefficients for cutoff frequency 30 Hz and TSamp=5 ms
         C[1][1]=(int16_t)(0.672740911*RMAX);C[1][2]=(int16_t)(0.89765794*RMAX);
@@ -208,6 +209,7 @@ int16_t desiredSpeed = (DESIRED_SPEED*10);
 void altitudeCntrl(void)
 {
 #if (( USE_SONAR_ON_PWM_INPUT_8 == 1 ) || (LIDAR_ALTITUDE > 0) )
+#if (( USE_SONAR_ON_PWM_INPUT_8 == 1 ) || (USE_LIDAR_ALTITUDE > 0) )
 	calculate_sonar_height_above_ground();
 #endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)
@@ -282,6 +284,7 @@ static void normalAltitudeCntrl(void)
 	}
 #if AIRFRAME_TYPE == AIRFRAME_QUAD
 	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch)
+	if (state_flags._.altitude_hold_throttle) 
 	{
 		if (THROTTLE_CHANNEL_REVERSED)
 		{
@@ -326,6 +329,10 @@ else
    {
 	 throttleAccum.WW  = 0;
           IntegthrottleAccum.WW = 0;
+          // desiredHeight_1 is initialized at the current throttle stick position during manual mode
+	desiredHeight_1 = ((__builtin_mulss((int16_t)(HEIGHTTHROTTLEGAIN), throttleInOffset - ((int16_t)(DEADBAND)))) >> 8)
+			                + ((int16_t)(HEIGHT_TARGET_MIN*10));
+
    }
 outeraltitude_control = throttleAccum._.W1+Neutral+IntegthrottleAccum._.W1;
  #else

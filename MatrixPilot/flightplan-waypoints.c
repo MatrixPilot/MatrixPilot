@@ -348,10 +348,8 @@ static void next_waypoint(void)
 	else
 	{
 		navigate_set_goal(GPSlocation, current_waypoint.loc);
-#if (DEADRECKONING == 0)
-		navigate_compute_bearing_to_goal();
-#endif
 	}
+    navigate_compute_bearing_to_goal();
 }
 
 //void run_flightplan(void)

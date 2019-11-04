@@ -12,11 +12,11 @@
 // Fake dspic builtin ASM calls for Non dspic devices (e.g. Arm devices))
 // Microchip dspic controllers use __builtin__ calls to engage special fast instructions in the hardware
 // This file is not included in builds for Microchip dspic devices
-#define __builtin_mulss(x,y) ((( int32_t)(x))*( int32_t)(y))
-#define __builtin_mulus(x,y) (((uint32_t)(x))*( int32_t)(y))
-#define __builtin_mulsu(x,y) ((( int32_t)(x))*(uint32_t)(y))
-#define __builtin_muluu(x,y) (((uint32_t)(x))*(uint32_t)(y))
-#define __builtin_divud(x,y) ((uint16_t)(((uint32_t)(x))/(uint16_t)(y)))
-#define __builtin_divsd(x,y) (( int16_t)((( int32_t)(x))/(int16_t)(y)))
+static inline int32_t  __builtin_mulss(const  int16_t  p0, const  int16_t  p1) { return (p0 * p1);   }
+static inline int32_t  __builtin_mulus(const uint16_t  p0, const  int16_t  p1) { return (p0 * p1);   }
+static inline int32_t  __builtin_mulsu(const  int16_t  p0, const uint16_t  p1) { return (p0 * p1);   }
+static inline uint32_t __builtin_muluu(const uint16_t  p0, const uint16_t  p1) { return (p0 * p1);   }
+static inline uint16_t __builtin_divud(const uint32_t num, const uint16_t den) { return (num / den); }
+static inline int16_t  __builtin_divsd(const  int32_t num, const  int16_t den) { return (num / den); }
 
 #endif // _BUILTINS_H_

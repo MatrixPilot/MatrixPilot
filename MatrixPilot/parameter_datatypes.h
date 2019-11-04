@@ -87,5 +87,7 @@ extern void mavlink_set_param_float(mavlink_param_union_t setting, int16_t i);
 // modif gfm declare Mavlink send & get GPS Position
 extern void mavlink_send_gps_position(int16_t i);
 extern void mavlink_set_gps_position(mavlink_param_union_t setting, int16_t i);
+//extern void mavlink_send_gps_position(int16_t i);
+//extern void mavlink_set_gps_position(mavlink_param_union_t setting, int16_t i);
 // fin modif gfm
 #endif // PARAMETER_DATATYPES_H

@@ -437,6 +437,9 @@ void motorCntrl(void) {
         } else if (control_mode == RATE_MODE) {
             // manual (rate) flight mode
             get_rateMode_commands(&cmd_RPY);
+            //get_rateMode_commands(&cmd_RPY);
+            get_angleMode_commands(&cmd_RPY, CMD_TILT_GAIN);
+            updateYaw(&cmd_RPY);
         } else if (control_mode == COMPASS_MODE) {
             // manual mode: forward cyclic is North
             get_angleMode_commands(&cmd_RPY, CMD_TILT_GAIN);
@@ -455,6 +458,7 @@ void motorCntrl(void) {
         // Compute the signals that are common to all 4 motors
         // Mix in the yaw, pitch, and roll signals into the motors
         if (state_flags._.man_req)
+        if (!state_flags._.altitude_hold_throttle )
             motorOut(pwManual[THROTTLE_INPUT_CHANNEL], &adv_RPY);
         else
             motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL]+(int)throttle_control, &adv_RPY);

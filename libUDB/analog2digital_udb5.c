@@ -90,7 +90,7 @@ uint16_t maxstack = 0;
 #endif
 
 // TAD is 1/ADC_CLK
-#define ADC_CLK (MIPS / (ADCLK_DIV_N_MINUS_1 + 1))
+#define ADC_CLK (FCY / (ADCLK_DIV_N_MINUS_1 + 1))
 
 // At FCY=40MHz, ADC_CLK=625KHz
 // At FCY=40MHz, ADC_RATE = 25 KHz

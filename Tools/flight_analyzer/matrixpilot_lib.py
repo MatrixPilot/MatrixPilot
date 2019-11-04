@@ -227,8 +227,11 @@ class base_telemetry :
         self.alarms = 0
         self.clock_type = 0
         self.flight_plan_type = 0
-        self.rollkd_rudder = 0
-        self.rollkp_rudder = 0
+        self.rollkd_rudder = 0.0
+        self.rollkp_rudder = 0.0
+        self.rollkp = 0.0
+        self.rollkd = 0.0
+        self.pitchgain = 0.0
         self.IMUvelocityx = 0
         self.IMUvelocityy = 0
         self.IMUvelocityz = 0
@@ -242,19 +245,23 @@ class base_telemetry :
         self.feed_forward = 0.0
         self.navigation_max_earth_vertical_axis_rotation_rate = 0.0
         self.fly_by_wire_max_earth_vertical_axis_rotation_rate = 0.0
-        self.angle_of_attack_normal = 0
-        self.angle_of_attack_inverted = 0
-        self.elevator_trim_normal = 0
-        self.elevator_trim_inverted = 0
-        self.nominal_cruise_speed = 0
+        self.angle_of_attack_normal = 0.0
+        self.angle_of_attack_inverted = 0.0
+        self.elevator_trim_normal = 0.0
+        self.elevator_trim_inverted = 0.0
+        self.nominal_cruise_speed = 0.0
         self.aileron_output_channel  = 0
         self.elevator_output_channel = 0
         self.throttle_output_channel = 0
         self.rudder_output_channel   = 0
-        self.aileron_output_reversed  = 0
-        self.elevator_output_reversed = 0
-        self.throttle_output_reversed = 0
-        self.rudder_output_reversed   = 0
+        self.aileron_input_channel  = 0
+        self.elevator_input_channel = 0
+        self.throttle_input_channel = 0
+        self.rudder_input_channel   = 0
+        self.aileron_input_reversed  = 0
+        self.elevator_input_reversed = 0
+        self.throttle_input_reversed = 0
+        self.rudder_input_reversed   = 0
         self.number_of_input_channels = 0
         self.channel_trim_values = [0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.barometer_temperature = 0
@@ -266,7 +273,15 @@ class base_telemetry :
         self.desired_height = 0
         self.memory_stack_free = 0
         self.gps_parse_errors = 0
-
+        self.aileron_channel_neutral = 0
+        self.elevator_channel_neutral = 0
+        self.rotation_error = [0,0,0]
+        self.tilt_error = [0,0,0]
+        self.desired_rotation = [0,0,0]
+        self.omega_accum = [0,0,0]
+        self.desired_turn_rate = 0
+        self.elevator_loading_trim = 0
+        
 class mavlink_telemetry(base_telemetry):
     """Parse a single binary mavlink message record"""
     def parse(self,telemetry_file,record_no, max_tm_actual) :
@@ -490,13 +505,13 @@ class mavlink_telemetry(base_telemetry):
 
         elif telemetry_file.msg.get_type() == 'SERIAL_UDB_EXTRA_F19' :
             self.aileron_output_channel = telemetry_file.msg.sue_aileron_output_channel
-            self.aileron_output_reversed = telemetry_file.msg.sue_aileron_reversed
+            self.aileron_input_reversed = telemetry_file.msg.sue_aileron_reversed
             self.elevator_output_channel = telemetry_file.msg.sue_elevator_output_channel
-            self.elevator_output_reversed = telemetry_file.msg.sue_elevator_reversed
+            self.elevator_input_reversed = telemetry_file.msg.sue_elevator_reversed
             self.throttle_output_channel = telemetry_file.msg.sue_throttle_output_channel
-            self.throttle_output_reversed = telemetry_file.msg.sue_throttle_reversed
+            self.throttle_input_reversed = telemetry_file.msg.sue_throttle_reversed
             self.rudder_output_channel = telemetry_file.msg.sue_rudder_output_channel
-            self.rudder_output_reversed = telemetry_file.msg.sue_rudder_reversed
+            self.rudder_input_reversed = telemetry_file.msg.sue_rudder_reversed
 
             return('F19')
 
@@ -1725,9 +1740,7 @@ class ascii_telemetry(base_telemetry):
                 self.origin_altitude = int (match.group(1))
             else :
                 print "Failure parsing Origin Altitude at line", line_no
-                return "Error"
-
-            
+                return "Error"            
             # line was parsed without Errors
             return "F13"
 
@@ -1911,28 +1924,28 @@ class ascii_telemetry(base_telemetry):
         match = re.match("^F19:",line) # If line starts with F19
         if match :
             # Parse the line for options.h values
-            match = re.match(".*:AIL=([0-9]*?),([0-9]*?):",line)   # Aileron Channel, and reversal 
+            match = re.match(".*:AIL=([0-9]*?),([0-9]*?):",line)   # Aileron Input Channel, and reversal 
             if match :
-                self.aileron_output_channel  = int(match.group(1))
-                self.aileron_output_reversed = int(match.group(2))
+                self.aileron_input_channel  = int(match.group(1))
+                self.aileron_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing AILERON CHANNEL at line", line_no
-            match = re.match(".*:ELEV=([0-9]*?),([0-9]*?):",line)  # Elevator Channel, and reversal 
+            match = re.match(".*:ELEV=([0-9]*?),([0-9]*?):",line)  # Elevator Input Channel, and reversal 
             if match :
-                self.elevator_output_channel   = int(match.group(1))
-                self.elevator_output_reversed = int(match.group(2))
+                self.elevator_input_channel   = int(match.group(1))
+                self.elevator_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing ELEVATOR CHANNEL at line", line_no
-            match = re.match(".*:THROT=([0-9]*?),([0-9]*?):",line) # Throttle Channel, and reversal 
+            match = re.match(".*:THROT=([0-9]*?),([0-9]*?):",line) # Throttle Input Channel, and reversal 
             if match :
-                self.throttle_output_channel  = int(match.group(1))
-                self.throttle_output_reversed = int(match.group(2))
+                self.throttle_input_channel  = int(match.group(1))
+                self.throttle_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing THROTTLE CHANNEL at line", line_no
-            match = re.match(".*:RUDD=([0-9]*?),([0-9]*?):",line) # Rudder Channel, and reversal 
+            match = re.match(".*:RUDD=([0-9]*?),([0-9]*?):",line) # Rudder Input Channel, and reversal 
             if match :
-                self.rudder_output_channel  = int(match.group(1))
-                self.rudder_output_reversed = int(match.group(2))
+                self.rudder_input_channel  = int(match.group(1))
+                self.rudder_input_reversed = int(match.group(2))
             else :
                 print "Failure parsing RUDDER CHANNEL at line", line_no
             return "F19"
@@ -1949,8 +1962,10 @@ class ascii_telemetry(base_telemetry):
                 print "Failure parsing NUMBER OF INPUT CHANNELS at line", line_no
             # Only Trim values will match in the follwoing iterative line. Here is an example:
             # F20:NUM_IN=5:TRIM=2992,3000,2057,2989,2043,:
+            trim_index = 1
             for match in re.finditer('([0-9]*?),',line):
-                self.channel_trim_values.append(int(match.group(1)))
+                self.channel_trim_values[trim_index] = int(match.group(1))
+                trim_index += 1
             return "F20"
 
 
@@ -1978,7 +1993,99 @@ class ascii_telemetry(base_telemetry):
                 self.gps_parse_errors  = int(match.group(1))
             else :
                 print "Failure parsing gps_parse_errors at line", line_no
-            return "F23"       
+            match = re.match(".*:V([-0-9]*?):",line) # Vertical Dilution of Precision
+            if match :
+                try:
+                    self.vdop = int(match.group(1))
+                except:
+                    pass
+            match = re.match(".*:RE([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) #RE is Rotation Error
+            if match :
+                self.rotation_error[0] = int(match.group(1))
+                self.rotation_error[1] = int(match.group(2))
+                self.rotation_error[2] = int(match.group(3))
+            else:
+                print "Failure parsing helical turn rotation_error at", line_no
+            match = re.match(".*:TE([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) #TE is Tilt Error
+            if match :
+                self.tilt_error[0] = int(match.group(1))
+                self.tilt_error[1] = int(match.group(2))
+                self.tilt_error[2] = int(match.group(3))
+            else:
+                print "Failure parsing helical turn tilt_error at", line_no
+            match = re.match(".*:DR([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) #DR is Desired Rotation
+            if match :
+                self.desired_rotation[0] = int(match.group(1))
+                self.desired_rotation[1] = int(match.group(2))
+                self.desired_rotation[2] = int(match.group(3))
+            else:
+                print "Failure parsing helical turn desired_rotation_rate at", line_no
+            match = re.match(".*:OM([-0-9]*?),([-0-9]*?),([-0-9]*?):",line) #OM, Omega is gyro rates
+            if match :
+                self.omega_accum[0] = int(match.group(1))
+                self.omega_accum[1] = int(match.group(2))
+                self.omega_accum[2] = int(match.group(3))
+            else:
+                print "Failure parsing omega_accum gyros rates at", line_no
+            match = re.match(".*:DT([-0-9]*?):",line) # Desired Turn Rate in the Earth Z Axis
+            if match :
+                try:
+                    self.desired_turn_rate = int(match.group(1))
+                except:
+                    pass
+            match = re.match(".*:EL([-0-9]*?):",line) # Elevator Trim as a reault Main Wing Loading
+            if match :
+                try:
+                    self.elevator_loading_trim = int(match.group(1))
+                except:
+                    pass
+                
+            return "F23"
+
+        #################################################################
+        # Try Another format of telemetry
+        match = re.match("^F24:",line) # If line starts with F24 (Delta Wing elevon neutral value)
+        if match :
+            # Parse the line for options.h values
+            match = re.match(".*:AIL=([0-9]*?):",line)   # Aileron Channel
+            if match :
+                self.aileron_channel_neutral  = int(match.group(1))
+            else :
+                print "Failure parsing Delta Wing Neutral values for AILERON CHANNEL at line", line_no
+            match = re.match(".*:ELEV=([0-9]*?):",line)  # Elevator Channel
+            if match :
+                self.elevator_channel_neutral   = int(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR CHANNEL at line", line_no 
+            return "F24"
+        
+        #################################################################
+        # Try Another format of telemetry
+
+        match = re.match("^F25:",line) # If line starts with 25
+        if match :
+            # Parse the line for options.h values
+            match = re.match(".*:AIL=([0-9]*?):",line)   # Aileron Output Channel
+            if match :
+                self.aileron_output_channel  = int(match.group(1))
+            else :
+                print "Failure parsing AILERON CHANNEL at line", line_no
+            match = re.match(".*:ELEV=([0-9]*?):",line)  # Elevator Output Channel
+            if match :
+                self.elevator_output_channel   = int(match.group(1))
+            else :
+                print "Failure parsing ELEVATOR CHANNEL at line", line_no
+            match = re.match(".*:THROT=([0-9]*?):",line) # Throttle Output Channel
+            if match :
+                self.throttle_output_channel  = int(match.group(1))
+            else :
+                print "Failure parsing THROTTLE CHANNEL at line", line_no
+            match = re.match(".*:RUDD=([0-9]*?):",line) # Rudder Output Channel 
+            if match :
+                self.rudder_output_channel  = int(match.group(1))
+            else :
+                print "Failure parsing RUDDER CHANNEL at line", line_no
+            return "F25"
         
         #################################################################
         # Try Another format of telemetry
