@@ -107,10 +107,14 @@ void altimeter_calibrate(void)
 #endif  //LIDAR_ALTITUDE > 0
     fusion = 0;
     vze_fusion = 0;
-       qual_lidar = 2;
-       lidar_altitude_1 = lidar_altitude;
-       lidar_altitude_pred = lidar_altitude;
-
+    qual_lidar = 2;
+    lidar_altitude_1 = lidar_altitude;
+    lidar_altitude_pred = lidar_altitude;
+    qual_baro = 0;
+    val_baro = 0;
+    val_lidar = 0;
+    val_IMU = 1;
+   
 #ifdef USE_DEBUG_IO
 	printf("altimeter_calibrate: ground temp & pres set %i, %li\r\n", barometer_temperature_gnd, barometer_pressure_gnd);
 #endif
@@ -208,12 +212,13 @@ void estAltitude(void)
 #if USE_LIDAR_ALTITUDE>0
       if (abs(lidar_altitude - fusion)<500)
       {          
-          if (qual_lidar <2 ) qual_lidar=qual_lidar+1;
+          if (qual_lidar <8 ) qual_lidar=qual_lidar+1;
       }
       else
       {         
           if (qual_lidar>2) qual_lidar=qual_lidar-1;
       }
+#endif
 
 // Lidar confidence when altitude is lower than 12 m 
       if (IMU_altitude<12000) {         
