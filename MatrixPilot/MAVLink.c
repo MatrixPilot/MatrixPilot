@@ -863,13 +863,18 @@ extern int control_mode;
 //gfm IMU altitude sent instead of custom_mode,gps_fix_type instead of MAV_TYPE_QUADROTOR
                 //udb_cpu_load() instead of MAV_AUTOPILOT_UDB and Lidar/32 instead of MAV_STATE_ACTIVE
 		mavlink_custom_mode =(int32_t)IMUlocationz.WW >> 6;//Imu altitude in mm
-                mavlink_msg_heartbeat_send(MAVLINK_COMM_0, gps_fix_type, tailFlash, mavlink_base_mode, mavlink_custom_mode, (uint8_t)((udb_pwIn[7]-lidar0) >> 6));
-//                mavlink_msg_heartbeat_send(MAVLINK_COMM_0, (uint8_t)((udb_pwIn[7]-lidar0) && 0x00FF), udb_cpu_load(), mavlink_base_mode, mavlink_custom_mode, (uint8_t)((udb_pwIn[7]-lidar0) >> 8));
+        #if (USE_LIDAR_ALTITUDE	== 1)
+
+                mavlink_msg_heartbeat_send(MAVLINK_COMM_0, gps_fix_type, tailFlash, mavlink_base_mode, mavlink_custom_mode, (uint8_t)((udb_pwIn[LIDAR_INPUT_CHANNEL]-lidar0) >> 6));
+#else
+                mavlink_msg_heartbeat_send(MAVLINK_COMM_0, gps_fix_type, tailFlash, mavlink_base_mode, mavlink_custom_mode, 0);
+#endif
+        //                mavlink_msg_heartbeat_send(MAVLINK_COMM_0, (uint8_t)((udb_pwIn[7]-lidar0) && 0x00FF), udb_cpu_load(), mavlink_base_mode, mavlink_custom_mode, (uint8_t)((udb_pwIn[7]-lidar0) >> 8));
 		//mavlink_msg_heartbeat_send(mavlink_channel_t chan, uint8_t type, uint8_t autopilot, uint8_t base_mode, uint32_t custom_mode, uint8_t system_status)
 	}
 	// GPS RAW INT - Data from GPS Sensor sent as raw integers.
 	spread_transmission_load = 4;
-	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_POSITION], mavlink_counter_40hz + spread_transmission_load))
 	{
 		int16_t gps_fix_type;
 		if (gps_nav_valid()){
@@ -904,7 +909,7 @@ extern int control_mode;
 */
 			lon = (int32_t)(IMUlocationx.WW >> 6) ;   // cm
 		}
-                  lat = (int32_t)(IMUlocationy.WW >> 6);//cm
+        lat = (int32_t)(IMUlocationy.WW >> 6);//cm
  		relative_alt = (int32_t)(IMUlocationz.WW >> 6);// in cm
 //		relative_alt =IMUlocationz._.W1 * 1000;
 //		relative_alt =(int32_t)IMUlocationz.WW >> 6;
@@ -926,7 +931,7 @@ extern int control_mode;
 	// ATTITUDE
 	//  Roll: Earth Frame of Reference
 	spread_transmission_load = 12;
-	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_POSITION], mavlink_counter_40hz + spread_transmission_load))
+	if (mavlink_frequency_send(streamRates[MAV_DATA_STREAM_RAW_SENSORS], mavlink_counter_40hz + spread_transmission_load))
 	{
 		matrix_accum.x = rmat[8];
 		matrix_accum.y = rmat[6];
@@ -1044,13 +1049,17 @@ extern int control_mode;
 		    (uint16_t)((udb_pwOut[2]) >> 1),
 		    (uint16_t)((udb_pwOut[3]) >> 1),
 		    (uint16_t)((udb_pwOut[4]) >> 1),
-                      (uint8_t) ((udb_pwOut[5]) >> 3),//gfm test TailFlash servo output
+            (uint8_t) ((udb_pwOut[5]) >> 3),//gfm test TailFlash servo output
 //		    (uint8_t)0,     // port number for more than 8 servos
 #if (ANALOG_RSSI_INPUT_CHANNEL != CHANNEL_UNUSED)
 		    (uint8_t)rc_signal_strength);
 #else
-//gfm		    (uint8_t)255);  // 255 denotes not in use
-                    (uint8_t)(__builtin_divud(battery_voltage._.W1,100 ) ) );// Battery voltage in tenth of Volt
+//gfm		    
+#if (ANALOG_VOLTAGE_INPUT_CHANNEL != CHANNEL_UNUSED || USE_CASTLE_LINK_THROTTLE == 1)
+            (uint8_t)(__builtin_divud(battery_voltage._.W1,100 ) ) );// Battery voltage in tenth of Volt
+#else
+            (uint8_t)255);  // 255 denotes not in use
+#endif
 #endif
 
 	}

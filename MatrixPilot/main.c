@@ -72,6 +72,7 @@ int matrixpilot_init(void)
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
+    udb_gps_set_rate(DEFAULT_GPS_BAUD); // Set the baud rate before gps_init call
 	gps_init();     // this sets function pointers so i'm calling it early for now
 	udb_init();     // configure clocks and enables global interrupts
 //	filesys_init(); // attempts to mount a file system

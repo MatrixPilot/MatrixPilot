@@ -206,11 +206,11 @@ void control_mode_switch_check_set(void)
 {
 	if (udb_flags._.radio_on)
 	{
-		if (udb_pwIn[CTRL_MODE_SWITCH_INPUT_CHANNEL] < CTRL_MODE_SWITCH_THRESHOLD_LOW)
+		if (udb_pwIn[CTRL_MODE_SWITCH_INPUT_CHANNEL] < FLIGHT_MODE_SWITCH_THRESHOLD_LOW)
 		{
 			control_mode = TILT_MODE;
 		}
-		else if (udb_pwIn[CTRL_MODE_SWITCH_INPUT_CHANNEL] < CTRL_MODE_SWITCH_THRESHOLD_HIGH )
+		else if (udb_pwIn[CTRL_MODE_SWITCH_INPUT_CHANNEL] < FLIGHT_MODE_SWITCH_THRESHOLD_HIGH )
 		{
 			control_mode = RATE_MODE;
 		}

@@ -29,7 +29,7 @@
 #include "hilsim.h"
 
 // Ajout gfm pout Aid_Ini
-extern union intbb week_no_;
+union intbb week_no_;
 extern union longbbbb lat_gps_, lon_gps_;
 extern union longbbbb alt_sl_gps_;
 extern union longbbbb tow_;
@@ -107,64 +107,64 @@ void send_msg_AID_INI(uint8_t* AID_INI)
         AID_INI[3]=0x01;
         AID_INI[4]=0x30;
         AID_INI[5]=0x00;
-	AID_INI[6]=lat_gps.__.B0;
+        AID_INI[6]=lat_gps.__.B0;
         AID_INI[7]=lat_gps.__.B1;
-	AID_INI[8]=lat_gps.__.B2;
+        AID_INI[8]=lat_gps.__.B2;
         AID_INI[9]=lat_gps.__.B3;// lon
-	AID_INI[10]=lon_gps.__.B0;
+        AID_INI[10]=lon_gps.__.B0;
         AID_INI[11]=lon_gps.__.B1;
         AID_INI[12]=lon_gps.__.B2;
         AID_INI[13]=lon_gps.__.B3;                   // lat
-	AID_INI[14]=alt_sl_gps.__.B0;
+        AID_INI[14]=alt_sl_gps.__.B0;
         AID_INI[15]=alt_sl_gps.__.B1;
-	AID_INI[16]=alt_sl_gps.__.B2;
+        AID_INI[16]=alt_sl_gps.__.B2;
         AID_INI[17]=alt_sl_gps.__.B3;             // hMSL
-	AID_INI[18]=p_Acc_.__.B0;
+        AID_INI[18]=p_Acc_.__.B0;
         AID_INI[19]=p_Acc_.__.B1;
         AID_INI[20]=p_Acc_.__.B2;
         AID_INI[21]=p_Acc_.__.B3;                       // pAcc
-	AID_INI[22]=tncfg_._.B0;
+        AID_INI[22]=tncfg_._.B0;
         AID_INI[23]=tncfg_._.B1;                          //tncfg
-	AID_INI[24]=week_no._.B0;
+        AID_INI[24]=week_no._.B0;
         AID_INI[25]=week_no._.B1;                     // week
-	AID_INI[26]=tow.__.B0;
+        AID_INI[26]=tow.__.B0;
         AID_INI[27]=tow.__.B1;
         AID_INI[28]=tow.__.B2;
         AID_INI[29]=tow.__.B3; // iTOW
-	AID_INI[30]=ftow_.__.B0;
+        AID_INI[30]=ftow_.__.B0;
         AID_INI[31]=ftow_.__.B1;
         AID_INI[32]=ftow_.__.B2;
         AID_INI[33]=ftow_.__.B3, // fTOW
-	AID_INI[34]=time_Acc_.__.B0;
+        AID_INI[34]=time_Acc_.__.B0;
         AID_INI[35]=time_Acc_.__.B1;
-	AID_INI[36]=time_Acc_.__.B2;
+        AID_INI[36]=time_Acc_.__.B2;
         AID_INI[37]=time_Acc_.__.B3;                 // Time Accuracy
-	AID_INI[38]=f_Acc_.__.B0;
+        AID_INI[38]=f_Acc_.__.B0;
         AID_INI[39]=f_Acc_.__.B1;
-	AID_INI[40]=f_Acc_.__.B2;
+        AID_INI[40]=f_Acc_.__.B2;
         AID_INI[41]=f_Acc_.__.B3;                       // f Accuracy
-	AID_INI[42]=clkd_.__.B0;
+        AID_INI[42]=clkd_.__.B0;
         AID_INI[43]=clkd_.__.B1;
-	AID_INI[44]=clkd_.__.B2;
+        AID_INI[44]=clkd_.__.B2;
         AID_INI[45]=clkd_.__.B3;                         // Clock Drift
-	AID_INI[46]=clkd_Acc_.__.B0;
+        AID_INI[46]=clkd_Acc_.__.B0;
         AID_INI[47]=clkd_Acc_.__.B1;
-	AID_INI[48]=clkd_Acc_.__.B2;
+        AID_INI[48]=clkd_Acc_.__.B2;
         AID_INI[49]=clkd_Acc_.__.B3;                 // ClkD Accuracy
         if (tow_.WW==0) {
               AID_INI[50]=0x21;}// Only position is precise
         else {AID_INI[50]=0x23;}// Both time and positions are precise
         AID_INI[51]=Flags_.__.B1;
-	AID_INI[52]=Flags_.__.B2;
+        AID_INI[52]=Flags_.__.B2;
         AID_INI[53]=Flags_.__.B3;                       // Flags
-       int i;
+        int i;
         for (i=0;i<AID_INI_length-2;i++)
         {
-	CK_A += AID_INI[i];
-	CK_B += CK_A;
-	}
-	AID_INI[54]=CK_A;                                           // Checksum
-	AID_INI[55]=CK_B;                                           // Checksum
+            CK_A += AID_INI[i];
+            CK_B += CK_A;
+        }
+        AID_INI[54]=CK_A;                                           // Checksum
+        AID_INI[55]=CK_B;                                           // Checksum
 }
 // fin modif gfm
 
@@ -190,8 +190,8 @@ static uint8_t msg_id;
 static uint16_t ack_class; // set but never used - RobD
 static uint16_t ack_id; // set but never used - RobD
 static uint16_t ack_type; // set but never used - RobD
-static uint8_t CK_A;
-static uint8_t CK_B;
+//static uint8_t CK_A;
+//static uint8_t CK_B;
 
 static void msg_B3(uint8_t inchar);
 static void msg_SYNC1(uint8_t inchar);
@@ -421,7 +421,7 @@ static union longbbbb sog_gps_, cog_gps_, climb_gps_;
 //static union longbbbb tow_;
 static union longbbbb as_sim_;
 //static union intbb hdop_;
-static union intbb week_no_;
+//static union intbb week_no_;
 
 uint8_t svsmin = 24;
 uint8_t svsmax = 0;
@@ -605,35 +605,35 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutline(bin_mode_withnmea);
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		// set the UBX to use binary mode
-		gpsoutline(bin_mode_nonmea);
+		gpsoutline(bin_mode_nonmea); // Set GPS baud rate 19200
 #if (HILSIM != 1)
         else if (gpscount == 150)
-	         udb_gps_set_rate(19200);
+	         udb_gps_set_rate(19200);// UART1 baudrate = 19200 instead of default value 9600 of GT-635T default baudrate
 #endif
 	else if (gpscount == 140)
-		gpsoutbin(set_rate_length, set_rate);
-	else if (gpscount == 130)
+		gpsoutbin(set_rate_length, set_rate); // Is this command redundant with bin_mode_nonmea?
+	else if (dcm_flags._.nmea_passthrough && gpscount == 130)
+		gpsoutbin(enable_UBX_only_length, enable_UBX_NMEA);
+	else if (!dcm_flags._.nmea_passthrough && gpscount == 130)
+		gpsoutbin(enable_UBX_only_length, enable_UBX_only);
+	else if (gpscount == 120)
 		// command GPS to select which messages are sent, using UBX interface
 		gpsoutbin(enable_NAV_SOL_length, enable_NAV_SOL);
-	else if (gpscount == 120)
-		gpsoutbin(enable_NAV_POSLLH_length, enable_NAV_POSLLH);
 	else if (gpscount == 110)
-		gpsoutbin(enable_NAV_VELNED_length, enable_NAV_VELNED);
+		gpsoutbin(enable_NAV_POSLLH_length, enable_NAV_POSLLH);
 	else if (gpscount == 100)
+		gpsoutbin(enable_NAV_VELNED_length, enable_NAV_VELNED);
+	else if (gpscount == 90)
 		gpsoutbin(enable_NAV_DOP_length, enable_NAV_DOP);
-	else if (dcm_flags._.nmea_passthrough && gpscount == 90)
-		gpsoutbin(enable_UBX_only_length, enable_UBX_NMEA);
-	else if (!dcm_flags._.nmea_passthrough && gpscount == 90)
-		gpsoutbin(enable_UBX_only_length, enable_UBX_only);
 	else if (gpscount == 80)
 		gpsoutbin(enable_SBAS_length, enable_SBAS);
 	else if (gpscount == 70)
 		gpsoutbin(config_NAV5_length, config_NAV5);
        // modif gfm
 	else if (gpscount == 60) 
-        {
-                send_msg_AID_INI(AID_INI);
-  		gpsoutbin(AID_INI_length, AID_INI);
+        { // Ne faut-ilpas envoyer AID_INI que lorsque l'heure est envoyée par le GCS?
+//        send_msg_AID_INI(AID_INI);
+//  		gpsoutbin(AID_INI_length, AID_INI);
         
         }
 // fin modif gfm
@@ -1158,9 +1158,10 @@ void init_gps_data(void)
 	Flags_.__.B2 =0;
         Flags_.__.B3 =0;            // Flags
 
-	lat_gps_         = lat_gps;
-	lon_gps_        = lon_gps;
-	alt_sl_gps_.WW   = alt_sl_gps.WW * 1;          // SIRF provides altMSL in cm, UBX provides it in mm gfm mm->cm
+	lat_gps_         = lat_origin;
+	lon_gps_        = lon_origin;
+	alt_sl_gps_.WW   = alt_origin.WW;          // SIRF provides altMSL in cm, UBX provides it in mm gfm mm->cm
+                                            // à faire dans la fonction get_fixed_origin de flightplan.c
 }
 
 #if (HILSIM == 1)

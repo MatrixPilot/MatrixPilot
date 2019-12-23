@@ -30,11 +30,13 @@
 #define	LIDAR_H
 
 #define LIDAR_ADDRESS 0xC4  // I2C address of Lidar Lite
+#if (USE_LIDAR_ALTITUDE	== 1)
 extern int32_t lidar0;// LidarLite value for a null altitude in half millimeters
 
     typedef void (*lidar_callback_funcptr)(long altitude);
     void rxLidar_on_PWM(lidar_callback_funcptr callback);  // service the Lidar altimeter on PWM
 
-
+#endif
+    
 #endif	/* LIDAR_H */
 

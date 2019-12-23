@@ -67,6 +67,7 @@ static uint8_t magreg[6];       // magnetometer read-write buffer
 
 static uint8_t hmc5883read_index[]  = { 0x03 }; // Address of the first register to read
 static uint8_t hmc5883write_index[] = { 0x00 }; // Address of the first register to read
+static uint8_t hmc5883mode_index[] = { 0x02 }; // Address of the first register to read
 
 static uint8_t enableMagRead[]        = { 0x10 , 0x20 , 0x00 }; // Continuous measurement
 static uint8_t enableMagCalibration[] = { 0x11 , 0x20 , 0x01 }; // Positive bias (Self Test) and single measurement
@@ -193,13 +194,21 @@ static void I2C_callback(boolean I2CtrxOK)
 		}
 		else if (magMessage == 5)       // Calibration data
 		{
-			for (vectorIndex = 0; vectorIndex < 3; vectorIndex++)
+            for (vectorIndex = 0; vectorIndex < 3; vectorIndex++)
 			{
 				rawMagCalib[vectorIndex] = magFieldRaw[vectorIndex];
 				if ((magFieldRaw[vectorIndex] > MAGNETICMINIMUM) && (magFieldRaw[vectorIndex] < MAGNETICMAXIMUM))
 				{
-					magGain[vectorIndex] = __builtin_divud(((int32_t)(MAG_GAIN*RMAX)), magFieldRaw[vectorIndex]);
-				}
+                    switch (vectorIndex)
+                    { 
+                    case 0:     // read the magnetometer in case it is still sending data, so as to NACK it
+					magGain[vectorIndex] = __builtin_divud(((int32_t)(MAG_GAIN*RMAX)), magFieldRaw[MAG_X_AXIS]);
+                    case 1:     // read the magnetometer in case it is still sending data, so as to NACK it
+					magGain[vectorIndex] = __builtin_divud(((int32_t)(MAG_GAIN*RMAX)), magFieldRaw[MAG_Y_AXIS]);
+                    case 2:     // read the magnetometer in case it is still sending data, so as to NACK it
+					magGain[vectorIndex] = __builtin_divud(((int32_t)(MAG_GAIN*RMAX)), magFieldRaw[MAG_Z_AXIS]);
+                    }
+                }
 				else
 				{
 					magGain[vectorIndex] = RMAX;

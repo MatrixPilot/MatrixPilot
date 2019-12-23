@@ -36,7 +36,7 @@
 #define MAGNETICDECLINATION                 0
 
 // Set to 0 for fixed declination angle or 1 for variable declination angle
-#define DECLINATIONANGLE_VARIABLE           1
+#define DECLINATIONANGLE_VARIABLE           0
 
 
 // #define LED_RED_MAG_CHECK 1 if you want the RED LED to indicate the magnetometer is not working.
@@ -70,9 +70,12 @@
 // and set them below.
 #define MAG_STATIC_OFFSETS
 
-#define MAG_STATIC_OFFSET_X       0
-#define MAG_STATIC_OFFSET_Y       0
-#define MAG_STATIC_OFFSET_Z       0
+//#define MAG_STATIC_OFFSET_X       0
+//#define MAG_STATIC_OFFSET_Y       0
+//#define MAG_STATIC_OFFSET_Z       0
+#define MAG_STATIC_OFFSET_X       53
+#define MAG_STATIC_OFFSET_Y       -112
+#define MAG_STATIC_OFFSET_Z       -158
 
 // ************************************************************************
 // *** Users should not need to change anything below here ****************
@@ -194,7 +197,7 @@
 #define MAG_Z_SIGN +
 #endif
 
-#define MAG_GAIN 1300.0
+#define MAG_GAIN 1090.0
 #endif
 
 // SparkFun HMC5883L mag

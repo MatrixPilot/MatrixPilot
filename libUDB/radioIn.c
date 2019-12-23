@@ -122,7 +122,7 @@ void radioIn_init(void) // was called udb_init_capture(void)
     //FIXME for channels 5-8, trim values are unused in MPQpid
     for (i = 0; i <= NUM_INPUTS; i++) {
         udb_pwIn[i] = 0;
-        udb_pwTrim[i] = 3000;
+        udb_pwTrim[i] = NEUTRAL_TRIM;
     }
     udb_pwTrim[THROTTLE_INPUT_CHANNEL] = THROTTLE_IDLE;
         #endif // HARD_TRIMS
@@ -154,7 +154,7 @@ void radioIn_init(void) // was called udb_init_capture(void)
 #else // UDB4 or 5
 #define REGTOK1 N
 #define REGTOK2 N
-#define IC1VAL 0x0081
+#define IC1VAL 0x0081 // Use TMR2 and capture every edge
 #endif
 #define IC2VAL 0 // SYNCSEL = 0x00: no sync, no trigger, rollover at 0xFFFF
 
@@ -196,10 +196,10 @@ void radioIn_failsafe_check(void)
 		if (udb_flags._.radio_on == 1)
 		{
 			udb_flags._.radio_on = 0;
-                                // Modif gfm Quadcopter
-                       		asm("reset");// No hesitation in case of fading : RESET!
+            // Modif gfm Quadcopter
+            asm("reset");// No hesitation in case of fading : RESET!
 // #warning "Reset in case of fading"
-                                // Fin Modif gfm Quadcopter
+            // Fin Modif gfm Quadcopter
 			udb_callback_radio_did_turn_off();
 		}
 		led_off(LED_GREEN);

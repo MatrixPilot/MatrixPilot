@@ -179,7 +179,8 @@ void udb_heartbeat_40hz_callback(void)
 	state_flags._.update_autopilot_state_asap = 0;
 //Modif gfm Quadcopter
     if (!didCalibrate) {        
-        if (udb_flags._.radio_on && dcm_flags._.calib_finished) {
+//        if (udb_flags._.radio_on && dcm_flags._.calib_finished) {
+        if (dcm_flags._.calib_finished) {
 #if (HARD_TRIMS == 0)
             // trims not hardwired in udb_init_capture()
             udb_servo_record_trims();
@@ -285,7 +286,7 @@ static void ent_stabilizedS(void)
 	waggle = 0;
 	LED_BLUE = LED_OFF; 
 //	LED_RED = LED_ON;
-        LED_ORANGE = LED_ON;
+    LED_ORANGE = LED_ON;
 	stateS = &stabilizedS;
        desiredtailFlash = 4;
 }
@@ -431,17 +432,8 @@ static void acquiringS(void)
 #endif
 			standby_timer--;
 			DPRINT("standby_timer %u  \r", standby_timer);
-			if (standby_timer == 6)
-			if (gps_check_startup_metrics())
+			if ((standby_timer <= 6) || (gps_check_startup_metrics()))
 			{
-				if (standby_timer == NUM_WAGGLES+1)
-					waggle = WAGGLE_SIZE;
-				else if (standby_timer <= NUM_WAGGLES)
-					waggle = - waggle;
-				else
-					waggle = 0;
-
-				standby_timer--;
 				DPRINT("standby_timer %u  \r", standby_timer);
 				if (standby_timer == 6)
 				{
@@ -541,6 +533,7 @@ static void manualS(void)
 
 static void stabilizedS(void)
 {
+	udb_led_toggle(LED_ORANGE);
 	if (udb_flags._.radio_on)
 	{
 #ifdef CATAPULT_LAUNCH_ENABLE

@@ -209,7 +209,6 @@ int16_t desiredSpeed = (DESIRED_SPEED*10);
 void altitudeCntrl(void)
 {
 #if (( USE_SONAR_ON_PWM_INPUT_8 == 1 ) || (LIDAR_ALTITUDE > 0) )
-#if (( USE_SONAR_ON_PWM_INPUT_8 == 1 ) || (USE_LIDAR_ALTITUDE > 0) )
 	calculate_sonar_height_above_ground();
 #endif
 	if (canStabilizeHover() && current_orientation == F_HOVER)
@@ -284,7 +283,6 @@ static void normalAltitudeCntrl(void)
 	}
 #if AIRFRAME_TYPE == AIRFRAME_QUAD
 	if (state_flags._.altitude_hold_throttle || state_flags._.altitude_hold_pitch)
-	if (state_flags._.altitude_hold_throttle) 
 	{
 		if (THROTTLE_CHANNEL_REVERSED)
 		{

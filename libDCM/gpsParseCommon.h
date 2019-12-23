@@ -19,16 +19,6 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-extern volatile union intbb week_no;
-extern volatile union intbb sog_gps;        // speed over ground
-extern volatile union uintbb cog_gps;       // course over ground, units: degrees * 100, range [0-35999]
-extern volatile union intbb climb_gps;      // climb
-extern volatile union intbb hilsim_airspeed;// referenced in estWind and deadReckoning modules
-extern volatile union longbbbb tow;
-extern volatile uint8_t hdop;               // horizontal dilution of precision
-extern volatile uint8_t vdop;               // vertical  dilution of precision
-extern volatile uint8_t svs;                // number of satellites
-//extern union longbbbb as_sim_;
 extern union longbbbb xpg, ypg, zpg;        // gps x, y, z position
 extern union intbb xvg, yvg, zvg;           // gps x, y, z velocity
 //extern uint8_t mode1, mode2;              // gps mode1, mode2
@@ -76,8 +66,6 @@ extern union longbbbb Flags_;// position precise:0x21
 extern union longbbbb clkd_;
 extern union longbbbb ftow_;
 extern union intbb tncfg_;
-extern uint8_t CK_A;
-extern uint8_t CK_B;
 extern uint16_t  AID_INI_length;
 
 extern uint8_t  AID_INI[];

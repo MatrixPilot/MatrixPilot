@@ -113,7 +113,7 @@ static void flight_controller(void)
 #endif // ALTITUDE_GAINS_VARIABLE
 		updateBehavior();
 		wind_gain = wind_gain_adjustment();
-		helicalTurnCntrl();
+		//helicalTurnCntrl();// Reported to inner loop
 #if (AIRFRAME_TYPE == AIRFRAME_QUAD)
 		rollCntrl();
 		yawCntrl();

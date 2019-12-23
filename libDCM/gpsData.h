@@ -43,6 +43,7 @@ extern union longbbbb lat_origin, lon_origin, alt_origin;  // (COULD THIS BETTER
 // WRAP ALL THIS UP INTO A STRUCTURE
 extern volatile union longbbbb lat_gps, lon_gps, alt_sl_gps;        // latitude, longitude, altitude   (COULD THIS BETTER BE A VECTOR??)
 extern volatile uint8_t hdop;                                       // horizontal dilution of precision
+extern volatile uint8_t vdop;               // vertical  dilution of precision
 extern volatile uint8_t svs;    // referenced by telemetry and OSD modules  // number of satellites
 // these are only exported for telemetry output
 extern volatile union intbb week_no;

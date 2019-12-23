@@ -385,14 +385,6 @@ void mavlink_set_gps_position(mavlink_param_union_t setting, int16_t i)
 }
 // fin modif gfm
 
-void mavlink_set_gps_position(mavlink_param_union_t setting, int16_t i)
-{
-	if (setting.type != MAVLINK_TYPE_INT32_T) return;
-
-	*((int32_t*)mavlink_parameters_list[i].pparam) = (int32_t) setting.param_int32;
-}
-// fin modif gfm
-*/
 // END OF GENERAL ROUTINES FOR CHANGING UAV ONBOARD PARAMETERS
 
 static int16_t get_param_index(const char* key)

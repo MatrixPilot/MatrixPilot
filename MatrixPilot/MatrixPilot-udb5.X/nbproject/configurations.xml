@@ -23,10 +23,6 @@
           <itemPath>../../Config/E_Glider/options.h</itemPath>
           <itemPath>../../Config/E_Glider/options_airspeed.h</itemPath>
         </logicalFolder>
-        <logicalFolder name="EasyStar" displayName="EasyStar" projectFiles="true">
-          <itemPath>../../Config/EasyStar/flightplan-logo.h</itemPath>
-          <itemPath>../../Config/EasyStar/options.h</itemPath>
-        </logicalFolder>
         <logicalFolder name="Grobularis" displayName="Grobularis" projectFiles="true">
           <itemPath>../../Config/Grobularis/options.h</itemPath>
           <itemPath>../../Config/Grobularis/options_airspeed.h</itemPath>
@@ -165,7 +161,7 @@
         <itemPath>../../MatrixPilot/states.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.h</itemPath>
-        <itemPath>../motorCntrl.h</itemPath>
+        <itemPath>../../../MP5/MatrixPilot/motorCntrl.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
@@ -531,7 +527,7 @@
         <itemPath>../../MatrixPilot/telemetry.c</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.c</itemPath>
         <itemPath>../../MatrixPilot/yawCntrl.c</itemPath>
-        <itemPath>../motorCntrl.c</itemPath>
+        <itemPath>../../../MP5/MatrixPilot/motorCntrl.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
@@ -576,6 +572,7 @@
     <Elem>../../MAVLink</Elem>
     <Elem>../../Config</Elem>
     <Elem>../../../../../../../Program Files (x86)/Microchip/xc16/v1.26/support/dsPIC33F/h</Elem>
+    <Elem>../../../MP5/MatrixPilot</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -775,10 +772,6 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
-<<<<<<< HEAD
-        <property key="firmware.download.all" value="false"/>
-=======
->>>>>>> 137a67d396a6495325022157faf21fb2edb9bbd9
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

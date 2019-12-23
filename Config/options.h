@@ -72,9 +72,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
 // gfm quad 
-#define GPS_TYPE                            GPS_NMEA
-//#define GPS_TYPE                            GPS_NONE
-#define DEFAULT_GPS_BAUD                    4800   // added for GPS_NMEA support
+//#define GPS_TYPE                            GPS_NMEA
+//#define DEFAULT_GPS_BAUD                    4800   // added for GPS_UBX_4HZ support
+#define GPS_TYPE                            GPS_NONE
+#define DEFAULT_GPS_BAUD                    9600   // added for GPS_UBX_4HZ support
 
 ////////////////////////////////////////////////////////////////////////////////
 // You can specify a level of good GNSS reception before MatrixPilot accepts "GPS ACQUIRED".
@@ -137,7 +138,7 @@
 // in the altitude controls, and will trim the throttle and  pitch to maintain air speed.
 // Define DESIRED_SPEED to be the air speed that you want, in meters/second.
 #define SPEED_CONTROL                       1
-#define DESIRED_SPEED                         2    // 2m/s
+#define DESIRED_SPEED                       2    // 2m/s
 
 // Inverted flight
 // Set these to 1 to enable stabilization of inverted flight in stabilized and/or waypoint modes.
@@ -182,7 +183,7 @@
 // Setting RACING_MODE to 1 will keep the plane at a set throttle value while in waypoint mode.
 // RACING_MODE_WP_THROTTLE is the throttle value to use, and should be set between 0.0 and 1.0.
 // Racing performance can be improved by disabling cross tracking for your waypoints.
-#define RACING_MODE                                         0
+#define RACING_MODE                         0
 #define RACING_MODE_WP_THROTTLE             1.0
 
 // Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
@@ -210,8 +211,8 @@
 // PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
 // often different from the NUM_INPUTS value below, and should usually be left at 8.
 //
-#define USE_PPM_INPUT                               0
-#define PPM_NUMBER_OF_CHANNELS         8
+#define USE_PPM_INPUT                         0
+#define PPM_NUMBER_OF_CHANNELS                8
 #define PPM_SIGNAL_INVERTED                   0
 #define PPM_ALT_OUTPUT_PINS                   0
 
@@ -233,20 +234,20 @@
 // Use as is, or edit to match your setup.
 //   - If you're set up to use Rudder Navigation (like MatrixNav), then you may want to swap
 //     the aileron and rudder channels so that rudder is CHANNEL_1, and aileron is 5.
-#define THROTTLE_INPUT_CHANNEL                    CHANNEL_1
-#define AILERON_INPUT_CHANNEL                       CHANNEL_2
-#define ELEVATOR_INPUT_CHANNEL                    CHANNEL_3
-#define RUDDER_INPUT_CHANNEL                        CHANNEL_4
-#define CTRL_MODE_SWITCH_INPUT_CHANNEL  CHANNEL_5
-#define FLIGHT_MODE_SWITCH_INPUT_CHANNEL CHANNEL_6
+#define THROTTLE_INPUT_CHANNEL               CHANNEL_1
+#define AILERON_INPUT_CHANNEL                CHANNEL_2
+#define ELEVATOR_INPUT_CHANNEL               CHANNEL_3
+#define RUDDER_INPUT_CHANNEL                 CHANNEL_4
+#define CTRL_MODE_SWITCH_INPUT_CHANNEL       CHANNEL_5
+#define FLIGHT_MODE_SWITCH_INPUT_CHANNEL     CHANNEL_6
 #define CAMERA_PITCH_INPUT_CHANNEL           CHANNEL_UNUSED
 #define CAMERA_YAW_INPUT_CHANNEL             CHANNEL_UNUSED
-#define CAMERA_MODE_INPUT_CHANNEL           CHANNEL_UNUSED
-#define PASSTHROUGH_A_INPUT_CHANNEL       CHANNEL_UNUSED
-#define PASSTHROUGH_B_INPUT_CHANNEL       CHANNEL_UNUSED
-#define PASSTHROUGH_C_INPUT_CHANNEL       CHANNEL_UNUSED
-#define PASSTHROUGH_D_INPUT_CHANNEL       CHANNEL_UNUSED
-
+#define CAMERA_MODE_INPUT_CHANNEL            CHANNEL_UNUSED
+#define PASSTHROUGH_A_INPUT_CHANNEL          CHANNEL_UNUSED
+#define PASSTHROUGH_B_INPUT_CHANNEL          CHANNEL_UNUSED
+#define PASSTHROUGH_C_INPUT_CHANNEL          CHANNEL_UNUSED
+#define PASSTHROUGH_D_INPUT_CHANNEL          CHANNEL_UNUSED
+#define LIDAR_INPUT_CHANNEL                  CHANNEL_7
 // NUM_OUTPUTS:
 //   NOTE: If USE_PPM_INPUT is enabled above, up to 9 outputs are available.)
 // For UDB4/5 boards: Set to 3-8 (or up to 10 using pins RA4 and RA1.)
@@ -266,13 +267,13 @@
 // sure your board gets power.
 //
 #define THROTTLE_OUTPUT_CHANNEL                        CHANNEL_1
-#define AILERON_OUTPUT_CHANNEL                           CHANNEL_2
+#define AILERON_OUTPUT_CHANNEL                         CHANNEL_2
 #define ELEVATOR_OUTPUT_CHANNEL                        CHANNEL_3
-#define RUDDER_OUTPUT_CHANNEL                            CHANNEL_4
-#define AILERON_SECONDARY_OUTPUT_CHANNEL    CHANNEL_UNUSED
-#define CAMERA_PITCH_OUTPUT_CHANNEL                CHANNEL_UNUSED
-#define CAMERA_YAW_OUTPUT_CHANNEL                  CHANNEL_UNUSED
-#define TRIGGER_OUTPUT_CHANNEL                           CHANNEL_5
+#define RUDDER_OUTPUT_CHANNEL                          CHANNEL_4
+#define AILERON_SECONDARY_OUTPUT_CHANNEL        CHANNEL_UNUSED
+#define CAMERA_PITCH_OUTPUT_CHANNEL             CHANNEL_UNUSED
+#define CAMERA_YAW_OUTPUT_CHANNEL               CHANNEL_UNUSED
+#define TRIGGER_OUTPUT_CHANNEL                         CHANNEL_5
 #define PASSTHROUGH_A_OUTPUT_CHANNEL            CHANNEL_UNUSED
 #define PASSTHROUGH_B_OUTPUT_CHANNEL            CHANNEL_UNUSED
 #define PASSTHROUGH_C_OUTPUT_CHANNEL            CHANNEL_UNUSED
@@ -288,13 +289,13 @@
 // Servo Reversing Configuration
 // For any of these that are set to 1, that servo will be sent reversed controls.
 // Note that your servo reversing settings here should match what you set on your transmitter.
-#define AILERON_CHANNEL_REVERSED              0
+#define AILERON_CHANNEL_REVERSED            0
 #define ELEVATOR_CHANNEL_REVERSED           0
-#define RUDDER_CHANNEL_REVERSED               0
+#define RUDDER_CHANNEL_REVERSED             0
 #define AILERON_SECONDARY_CHANNEL_REVERSED  0
 #define THROTTLE_CHANNEL_REVERSED           0
-#define CAMERA_PITCH_CHANNEL_REVERSED   0
-#define CAMERA_YAW_CHANNEL_REVERSED     0
+#define CAMERA_PITCH_CHANNEL_REVERSED       0
+#define CAMERA_YAW_CHANNEL_REVERSED         0
 
 // Set this to 1 if you need to switch the left and right elevon or vtail surfaces
 #define ELEVON_VTAIL_SURFACES_REVERSED      0
@@ -307,8 +308,8 @@
 // Normal signals should fall within about 2000 - 4000.
 #define FLIGHT_MODE_SWITCH_THRESHOLD_LOW           2640
 #define FLIGHT_MODE_SWITCH_THRESHOLD_HIGH          3440
-#define CTRL_MODE_SWITCH_THRESHOLD_LOW               2640
-#define CTRL_MODE_SWITCH_THRESHOLD_HIGH              3440
+#define CTRL_MODE_SWITCH_THRESHOLD_LOW             2640
+#define CTRL_MODE_SWITCH_THRESHOLD_HIGH            3440
 
 
 // Setting MODE_SWITCH_TWO_POSITION to 1,  allows a two state mode switch on the transmitter to be used
@@ -321,7 +322,7 @@
 // Stabilized position is Stabilized mode unless you try  hard to reach Autonomous mode.
 // Set MODE_SWITCH_TWO_POSITION to 0 for a normal three position mode switch.
 #define AUTO_MODE_SWITCH_TWO_POSITION            0
-#define CTRL_MODE_SWITCH_TWO_POSITION             0
+#define CTRL_MODE_SWITCH_TWO_POSITION            0
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Failsafe Channel is the RX channel that is monitored for loss of signal
@@ -691,7 +692,7 @@
 
 // Min and Max target heights in meters.  These only apply to stabilized mode.
 #define HEIGHT_TARGET_MIN                   50.0 //gfm changes 25 m to 50 cm
-#define HEIGHT_TARGET_MAX                   450.0//gfm changes 100 m to 250 cm
+#define HEIGHT_TARGET_MAX                   450.0//gfm changes 100 m to 450 cm
 
 // The range of altitude within which to linearly vary the throttle
 // and pitch to maintain altitude.  A bigger value makes altitude hold
