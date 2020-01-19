@@ -234,7 +234,6 @@ void udb_run(void)
 			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] >= FAILSAFE_INPUT_MIN && 
 			    udb_pwIn[FAILSAFE_INPUT_CHANNEL] <= FAILSAFE_INPUT_MAX);
 
-//			LED_GREEN = (udb_flags._.radio_on) ? LED_ON : LED_OFF;
 			if (udb_flags._.radio_on)
 			{
 				led_on(LED_GREEN);
@@ -249,7 +248,6 @@ void udb_run(void)
 
 			sil_ui_update();
 
-//			if (udb_heartbeat_counter % 80 == 0)
 			if (udb_heartbeat_counter % (2 * HEARTBEAT_HZ) == 0)
 			{
 				writeEEPROMFileIfNeeded(); // Run at 0.5Hz

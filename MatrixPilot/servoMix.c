@@ -320,7 +320,7 @@ void servoMix(void)
 	}
 	mixerSteps = 0;
 	mixerSteps += (brakeSelectedStep * aileronLeftBrakeFactor)>>5;
-	if ( flapsSelectedStep > 0 ) //speed slected
+	if (flapsSelectedStep > 0) // speed selected
 	{
 		mixerSteps += (flapsSelectedStep * aileronLeftFlapsPosFactor)>>5;
 	}
@@ -340,7 +340,7 @@ void servoMix(void)
 #if (FLAP_LEFT_OUTPUT_CHANNEL != 0 )
 	mixerSteps = 0;
 	mixerSteps += (brakeSelectedStep * flapLeftBrakeFactor)>>5;
-	if ( flapsSelectedStep > 0 ) //speed slected
+	if (flapsSelectedStep > 0) // speed selected
 	{
 		mixerSteps += (flapsSelectedStep * flapLeftFlapsPosFactor)>>5;
 	}
@@ -360,7 +360,7 @@ void servoMix(void)
 #if (FLAP_RIGHT_OUTPUT_CHANNEL != 0 )
 	mixerSteps = 0;
 	mixerSteps += (brakeSelectedStep * flapRightBrakeFactor)>>5;
-	if ( flapsSelectedStep > 0 ) //speed slected
+	if (flapsSelectedStep > 0) // speed selected
 	{
 		mixerSteps += (flapsSelectedStep * flapLeftFlapsPosFactor)>>5;
 	}
@@ -475,7 +475,7 @@ void servoMix(void)
 	int16_t yawInput;
 	int16_t pitchCommand;
 	int16_t yawCommand;
-		int32_t vtail_yaw_control;
+	int32_t vtail_yaw_control;
 
 	// Unmix the vtail
 	rudderInput  = REVERSE_IF_NEEDED(RUDDER_CHANNEL_REVERSED, (pwManual[RUDDER_INPUT_CHANNEL] - udb_pwTrim[RUDDER_INPUT_CHANNEL]));

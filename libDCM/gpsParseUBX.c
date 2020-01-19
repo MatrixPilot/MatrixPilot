@@ -321,7 +321,7 @@ uint8_t* const msg_SOL_parse[] = {
 	&un, &un,                                           // pDOP
 	&un,                                                // res1
 	&svs_,                                              // numSV
-	&un, &un, &un, &un,                                 // res2
+	&un, &un, &un, &un                                  // res2
 };
 
 uint8_t* const msg_DOP_parse[] = {
@@ -332,7 +332,7 @@ uint8_t* const msg_DOP_parse[] = {
 	&vdop_._.B0, &vdop_._.B1,                           // vDOP
 	&hdop_._.B0, &hdop_._.B1,                           // hDOP
 	&un, &un,                                           // nDOP
-	&un, &un,                                           // eDOP
+	&un, &un                                            // eDOP
 };
 
 uint8_t* const msg_POSLLH_parse[] = {
@@ -345,7 +345,7 @@ uint8_t* const msg_POSLLH_parse[] = {
 	&alt_sl_gps_.__.B0, &alt_sl_gps_.__.B1,
 	&alt_sl_gps_.__.B2, &alt_sl_gps_.__.B3,             // hMSL
 	&un, &un, &un, &un,                                 // hAcc
-	&un, &un, &un, &un,                                 // vAcc
+	&un, &un, &un, &un                                  // vAcc
 };
 
 uint8_t* const msg_VELNED_parse[] = {
@@ -361,7 +361,7 @@ uint8_t* const msg_VELNED_parse[] = {
 	&cog_gps_.__.B0, &cog_gps_.__.B1,
 	&cog_gps_.__.B2, &cog_gps_.__.B3,                   // heading
 	&un, &un, &un, &un,                                 // sAcc
-	&un, &un, &un, &un,                                 // cAcc
+	&un, &un, &un, &un                                  // cAcc
 };
 
 #if (HILSIM == 1)
@@ -372,10 +372,10 @@ uint8_t* const msg_BODYRATES_parse[] = {
 	&r_sim_._.B0, &r_sim_._.B1,         // yaw rate
 	&g_a_x_sim_._.B0, &g_a_x_sim_._.B1, // x accel reading (grav - accel, body frame)
 	&g_a_y_sim_._.B0, &g_a_y_sim_._.B1, // y accel reading (grav - accel, body frame)
-	&g_a_z_sim_._.B0, &g_a_z_sim_._.B1, // z accel reading (grav - accel, body frame)
+	&g_a_z_sim_._.B0, &g_a_z_sim_._.B1  // z accel reading (grav - accel, body frame)
 };
 uint8_t* const msg_KEYSTROKE_parse[] = {
-	&x_ckey_, &x_vkey_, // control code, virtual keystroke code
+	&x_ckey_, &x_vkey_  // control code, virtual keystroke code
 };
 #endif // HILSIM
 
@@ -428,10 +428,12 @@ void gps_startup_sequence(int16_t gpscount)
 		gpsoutbin(config_NAV5_length, config_NAV5);
 }
 
+#ifndef JSB
 boolean gps_nav_valid(void)
 {
 	return (nav_valid_ == 3);
 }
+#endif // JSB
 
 /*
 int16_t hex_count = 0;
@@ -862,6 +864,7 @@ void gps_update_basic_data(void)
 	svs             = svs_;
 }
 
+#ifndef JSB
 void gps_commit_data(void)
 {
 	//bin_out(0xFF);
@@ -878,7 +881,7 @@ void gps_commit_data(void)
 
 	climb_gps.BB    = - climb_gps_._.W0;            // SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop            = (uint8_t)(hdop_.BB / 20);     // SIRF scales HDOP by 5, UBX by 10^-2
-	vdop		= (uint8_t)(vdop_.BB / 20);
+	vdop            = (uint8_t)(vdop_.BB / 20);
 	// SIRF provides position in m, UBX provides cm
 //	xpg.WW          = xpg_.WW / 100;
 //	ypg.WW          = ypg_.WW / 100;
@@ -896,6 +899,7 @@ void gps_commit_data(void)
 	HILSIM_MagData(mag_drift_callback); // run the magnetometer computations
 #endif // HILSIM
 }
+#endif // JSB
 
 #if (HILSIM == 1)
 static void commit_bodyrate_data(void)
@@ -947,6 +951,7 @@ xplm_UpFlag         16  The key is being released
 	}
 }
 
+#ifndef JSB
 void HILSIM_set_gplane(fractional gplane[])
 {
 	gplane[0] = g_a_x_sim.BB;
@@ -962,6 +967,7 @@ void HILSIM_set_omegagyro(void)
 	omegagyro[2] = r_sim.BB;
 	HILSIM_saturate(3, omegagyro);
 }
+#endif // JSB
 #endif // HILSIM
 
 void init_gps_ubx(void)

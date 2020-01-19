@@ -530,7 +530,7 @@
 // Parameters below are used in the computation of angle of attack and pitch trim.
 // ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.)
 // If these parameters are not defined, angle of attack and pitch trim will be set to zero.
-// REFERENCE_SPEED                      The nominal speed in meters per second at which the parameters are defined.
+// REFERENCE_SPEED                      The nominal speed in meters per second at which the parameters are defined. (This is only used to predict the stall speed, being half)
 // ANGLE_OF_ATTACK_NORMAL               Angle of attack in degrees in the body frame for normal straight and level flight at cruise speed.
 // ANGLE_OF_ATTACK_INVERTED             Angle of attack in degrees in the body frame for inverted straight and level flight at cruise speed.
 // Note: ANGLE_OF_ATTACK_INVERTED is usually negative, with typical values in the -5 to -10 degree range.
@@ -554,12 +554,12 @@
 // Uncomment the line below to activate the CUSTOM_OFFSETS feature in MatrixPilot.
 
 //#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET (  000 ) 
-#define YACCEL_OFFSET (  000 )
-#define ZACCEL_OFFSET (  000 )
-#define XRATE_OFFSET  (  000 ) // not used by the UDB4
-#define YRATE_OFFSET  (  000 ) // not used by the UDB4
-#define ZRATE_OFFSET  (  000 ) // not used by the UDB4
+#define XACCEL_OFFSET ( 0 ) 
+#define YACCEL_OFFSET ( 0 )
+#define ZACCEL_OFFSET ( 0 )
+#define XRATE_OFFSET  ( 0 ) // not used by the UDB4
+#define YRATE_OFFSET  ( 0 ) // not used by the UDB4
+#define ZRATE_OFFSET  ( 0 ) // not used by the UDB4
 
 // Rudder/Yaw Control Gains
 // YAWKP_RUDDER is the proportional feedback gain for rudder control of yaw orientation.

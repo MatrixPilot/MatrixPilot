@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#ifndef MatrixPilot_SIL_dsp_compat_h
-#define MatrixPilot_SIL_dsp_compat_h
+#ifndef MatrixPilot_SIL_SIL_udb_h
+#define MatrixPilot_SIL_SIL_udb_h
 
 #include "SIL-dsp.h"
 #include "UDBSocket.h"
@@ -73,4 +73,4 @@ void sleep_milliseconds(uint16_t ms);
 void sil_telemetry_input(uint8_t* buffer, int32_t bytesRead);
 void mavlink_start_sending_data(void);
 
-#endif
+#endif // MatrixPilot_SIL_SIL_udb_h

@@ -244,14 +244,6 @@ static void normalAltitudeCntrl(void)
 		if (state_flags._.GPS_steering)
 		{
 			desiredHeight = navigate_desired_height();
-//			if (desired_behavior._.takeoff || desired_behavior._.altitude)
-//			{
-//				desiredHeight = goal.height;
-//			}
-//			else
-//			{
-//				desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal) >> 12);
-//			}
 		}
 		else
 		{

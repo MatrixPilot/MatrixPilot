@@ -66,7 +66,7 @@ void servoPrepare_init(void) // initialize the PWM
 
 	for (i = 0; i <= NUM_OUTPUTS; i++)
 	{
-#if (THROTTLE_INPUT_CHANNEL != 0 )
+#if (THROTTLE_INPUT_CHANNEL != 0) // TODO: Why not THROTTLE_OUTPUT_CHANNEL? RobD.
 #if (FIXED_TRIMPOINT == 1)
 		udb_pwOut[i] = ((i == THROTTLE_OUTPUT_CHANNEL) ? THROTTLE_TRIMPOINT : CHANNEL_TRIMPOINT);
 #else

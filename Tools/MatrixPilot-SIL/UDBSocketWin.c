@@ -332,8 +332,6 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 		case UDBSocketSerial:
 		{
 			unsigned long bytesTransferred = 0;
-			//DWORD dwRetFlag;
-			//char ErrorString[80];
 
 			if (socket->hComms != INVALID_HANDLE_VALUE)
 			{

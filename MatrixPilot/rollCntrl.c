@@ -86,7 +86,7 @@ void normalRollCntrl(void)
 	}
 
 #ifdef TestGains
-	state_flags._.pitch_feedback = 1;
+	state_flags._.pitch_feedback = 1; // (TestGains)
 #endif
 	if (settings._.RollStabilizaionAilerons && state_flags._.pitch_feedback)
 	{
