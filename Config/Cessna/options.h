@@ -530,9 +530,14 @@
 // Parameters below are used in the computation of angle of attack and pitch trim.
 // ( INVERTED_NEUTRAL_PITCH is no longer used and should not be used.)
 // If these parameters are not defined, angle of attack and pitch trim will be set to zero.
-// REFERENCE_SPEED                      The nominal speed in meters per second at which the parameters are defined. (This is only used to predict the stall speed, being half)
-// ANGLE_OF_ATTACK_NORMAL               Angle of attack in degrees in the body frame for normal straight and level flight at cruise speed.
-// ANGLE_OF_ATTACK_INVERTED             Angle of attack in degrees in the body frame for inverted straight and level flight at cruise speed.
+//
+// Reference Speed is used by helical turns when predicting expected Angle of Attack,
+// and expected requried Trim for a given airspeed.
+// Reference Speed is used to created a linear interpolation of prediction for AoA and Trim.
+// Helical Turns will disengage it's algorithms when the air speed is less than half of REFERENCE_SPEEED.
+// REFERENCE_SPEED                      The nominal speed in meters per second at which the following parameters are defined.
+// ANGLE_OF_ATTACK_NORMAL               Angle of attack in degrees in the body frame for normal straight and level flight at reference speed.
+// ANGLE_OF_ATTACK_INVERTED             Angle of attack in degrees in the body frame for inverted straight and level flight at reference speed.
 // Note: ANGLE_OF_ATTACK_INVERTED is usually negative, with typical values in the -5 to -10 degree range.
 // ELEVATOR_TRIM_NORMAL                 Elevator trim in fractional servo units (-1.0 to 1.0 ) for normal straight and level flight at cruise speed.
 // ELEVATOR_TRIM_INVERTED               Elevator trim in fractional servo units (-1.0 to 1.0 ) for inverted straight and level flight at cruise speed.
