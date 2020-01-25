@@ -217,9 +217,9 @@ void helicalTurnCntrl(void)
 	int16_t pitchEarthBodyProjection[2];
 	int16_t angleOfAttack;
 #ifdef TestGains
-	state_flags._.GPS_steering = 0;   // turn off navigation
-	state_flags._.pitch_feedback = 1; // turn on stabilization
-	airSpeed = 981; // for testing purposes, an airspeed is needed
+	state_flags._.GPS_steering = 0;   // turn off navigation (TestGains)
+	state_flags._.pitch_feedback = 1; // turn on stabilization (TestGains)
+	airSpeed = 981; // for testing purposes, an airspeed is needed (TestGains)
 #else
 	airSpeed = air_speed_3DIMU;
 	if (airSpeed < TURN_CALC_MINIMUM_AIRSPEED) airSpeed = TURN_CALC_MINIMUM_AIRSPEED;

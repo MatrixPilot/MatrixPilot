@@ -210,7 +210,7 @@ static inline void MissionClearAll(mavlink_message_t* handle_msg)
 	set(PARAM_WP_TOTAL, 0);
 	clear_flightplan();
 
-	// send acknowledgement 3 times to makes sure it is received
+	// send acknowledgement 3 times to make sure it is received
 	for (i = 0; i < 3; i++)
 	{
 		mavlink_msg_mission_ack_send(MAVLINK_COMM_0, handle_msg->sysid, handle_msg->compid, type);

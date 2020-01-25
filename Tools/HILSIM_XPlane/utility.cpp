@@ -17,9 +17,9 @@ double GetDistance(double lat1, double lat2, double lon1, double lon2)
 double GetCTE(double current_lat, double current_lon, double dest_lat, double dest_lon, double track_angle)
 {
 	double cte, dist, bearing;
-	dist = GetDistance(current_lat,dest_lat,current_lon, dest_lon);
-	bearing = GetHeading(current_lat,dest_lat,current_lon, dest_lon);
-	cte = asin(sin(dist/R_EARTH)*sin(bearing-track_angle)) * R_EARTH;
+	dist = GetDistance(current_lat, dest_lat, current_lon, dest_lon);
+	bearing = GetHeading(current_lat, dest_lat, current_lon, dest_lon);
+	cte = asin(sin(dist/R_EARTH) * sin(bearing-track_angle)) * R_EARTH;
 	return cte;
 }
 
