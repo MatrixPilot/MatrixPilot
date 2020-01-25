@@ -106,17 +106,18 @@ void SetupFile::LoadSetupFile(Channels &ChannelInfo, string& CommStr, long& Comm
 	ifstream ChannelFile("HILSIMSetup.txt");
 	if (ChannelFile.is_open())
 	{
-		string FoundLine = string("Found File Line: ");
 		while (!ChannelFile.eof())
 		{
 			getline(ChannelFile, FileLine);
 			size_t endpos = FileLine.find_last_not_of(" \t\r\n");
 			if (string::npos != endpos)
 				FileLine = FileLine.substr(0, endpos + 1);
-			LoggingFile.AppendString(FoundLine);
-			LoggingFile.AppendString(FileLine);
-			LoggingFile.mLogFile << endl;
-			ParseLine(FileLine, ChannelInfo, CommStr, CommSpeed, PortNum, OverideStr);
+			if (FileLine[0] != '#')
+			{
+				Log.Append("Found File Line: ", false);
+				Log.Append(FileLine);
+				ParseLine(FileLine, ChannelInfo, CommStr, CommSpeed, PortNum, OverideStr);
+			}
 		}
 		ChannelFile.close();
 	}
@@ -137,22 +138,22 @@ void SetupFile::ParseLine(string& ParseString, Channels& ChannelInfo, string& Co
 	TypeStr.append(ParseString, 0, iSearchPos);
 	if (TypeStr == ControlString)
 	{
-		LoggingFile.mLogFile << "Parse Control Line :";
+//		Log.Append("Parse Control Line: ", false);
 		ParseControlLine(ParseString, ChannelInfo);
 	}
 	else if (TypeStr == CommString)
 	{
-		LoggingFile.mLogFile << "Parse Comm :";
+//		Log.Append("Parse Comm: ", false);
 		ParseCommLine(ParseString, CommStr, CommSpeed);
 	}
 	else if (TypeStr == PortString)
 	{
-		LoggingFile.mLogFile << "Parse Server Port :";
+//		Log.Append("Parse Server Port: ", false);
 		ParsePortLine(ParseString, PortNum);
 	}
 	else if (TypeStr == EngineString)
 	{
-		LoggingFile.mLogFile << "Parse Engine Line :";
+//		Log.Append("Parse Engine Line: ", false);
 		ParseEngineLine(ParseString, ChannelInfo);
 	}
 	else if (TypeStr == OverideString)
@@ -161,8 +162,7 @@ void SetupFile::ParseLine(string& ParseString, Channels& ChannelInfo, string& Co
 	}
 	else
 	{
-		LoggingFile.mLogFile << "Did not understand information type";
-		LoggingFile.mLogFile << endl;
+		Log.Append("Did not understand information type");
 	}
 }
 
@@ -202,22 +202,19 @@ void SetupFile::ParseControlLine(string& ParseString, Channels &ChannelInfo)
 	{
 		ChannelSetup* pNewSetup = new ChannelSetup(pParseSetup);
 		ChannelInfo.push_back(pNewSetup);
-		LoggingFile.mLogFile << "New channel added: ";
+		Log.Append("New channel added");
 	}
 	else
 	{
-		LoggingFile.mLogFile << "New channel failed: ";
+		Log.Append("New channel failed");
 	}
-	LoggingFile.mLogFile << endl;
 }
 
 // Parse a Control string in the setup file
 void SetupFile::ParseControlString(string& ValueString, int Index, ChannelSetup* pSetup)
 {
-	LoggingFile.mLogFile << Index;
-	LoggingFile.mLogFile << ":";
-	LoggingFile.mLogFile << ValueString;
-	LoggingFile.mLogFile << " ";
+	Log.Append("", Index, false);
+	Log.Append(":", ValueString);
 
 	switch (Index)
 	{
@@ -261,7 +258,6 @@ void SetupFile::ParseEngineLine(string& ParseString, Channels &ChannelInfo)
 	ChannelSetup* pParseSetup = (ChannelSetup*)&ParseSetup; // new ChannelSetup();
 
 	string FindStr;
-	string TypeStr;
 	FindStr.resize(60);
 	do {
 		FindStr.erase();
@@ -286,20 +282,18 @@ void SetupFile::ParseEngineLine(string& ParseString, Channels &ChannelInfo)
 	{
 		ChannelSetup* pNewSetup = new ChannelSetup(pParseSetup);
 		ChannelInfo.push_back(pNewSetup);
-		LoggingFile.mLogFile << "New engine added: ";
+		Log.Append("New engine added");
 	}
 	else
 	{
-		LoggingFile.mLogFile << "New engine failed: ";
+		Log.Append("New engine failed");
 	}
 }
 
 void SetupFile::ParseEngineString(string& ValueString, int Index, ChannelSetup* pSetup)
 {
-	LoggingFile.mLogFile << Index;
-	LoggingFile.mLogFile << ":";
-	LoggingFile.mLogFile << ValueString;
-	LoggingFile.mLogFile << " ";
+	Log.Append("", Index, false);
+	Log.Append(":", ValueString);
 
 	switch (Index)
 	{
@@ -354,11 +348,8 @@ void SetupFile::ParseCommLine(string& ParseString, string& CommStr, long& CommSp
 		CommStr.append(ParseString,iSearchPos, sSearchPos-iSearchPos-1);
 		CommSpeed = strtol(ParseString.substr(sSearchPos, ParseString.length() - sSearchPos).data(), NULL, 10);
 	}
-	LoggingFile.mLogFile << "Comm port set for :";
-	LoggingFile.mLogFile << CommStr;
-	LoggingFile.mLogFile << " at ";
-	LoggingFile.mLogFile << CommSpeed;
-	LoggingFile.mLogFile << endl;
+	Log.Append("Comm port set for:", CommStr, false);
+	Log.Append(" at ", CommSpeed);
 }
 
 void SetupFile::ParsePortLine(string& ParseString, uint16_t& PortNum)
@@ -370,9 +361,7 @@ void SetupFile::ParsePortLine(string& ParseString, uint16_t& PortNum)
 
 	iSearchPos++;
 	PortNum = (uint16_t)strtol(ParseString.substr(iSearchPos, ParseString.length() - iSearchPos).data(), NULL, 10);
-	LoggingFile.mLogFile << "Server port set for: ";
-	LoggingFile.mLogFile << PortNum;
-	LoggingFile.mLogFile << endl;
+	Log.Append("Server port set for: ", PortNum);
 }
 
 void SetupFile::ParseOverideLine(string& ParseString, string& OverideStr)
@@ -385,9 +374,7 @@ void SetupFile::ParseOverideLine(string& ParseString, string& OverideStr)
 	iSearchPos++;
 	OverideStr.clear();
 	OverideStr.append(ParseString, iSearchPos, ParseString.length() - iSearchPos);
-	LoggingFile.mLogFile << "Overide set for :";
-	LoggingFile.mLogFile << OverideStr;
-	LoggingFile.mLogFile << endl;
+	Log.Append("Overide set for: ", OverideStr);
 }
 
 LogFile::LogFile()
@@ -400,9 +387,28 @@ LogFile::~LogFile()
 	if (mLogFile.is_open()) mLogFile.close();
 }
 
-void LogFile::AppendString(string& AddString)
+void LogFile::Append(const string& message, bool newline)
 {
-	mLogFile << AddString << endl;
+	mLogFile << message;
+	newline ? mLogFile << endl : mLogFile;
 }
 
-LogFile LoggingFile;
+void LogFile::Append(const string& message, const string& value, bool newline)
+{
+	mLogFile << message << value;
+	newline ? mLogFile << endl : mLogFile;
+}
+
+void LogFile::Append(const string& message, long value, bool newline)
+{
+	mLogFile << message << value;
+	newline ? mLogFile << endl : mLogFile;
+}
+
+void LogFile::Append(const string& message, int value, bool newline)
+{
+	mLogFile << message << value;
+	newline ? mLogFile << endl : mLogFile;
+}
+
+LogFile Log;

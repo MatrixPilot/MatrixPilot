@@ -1,11 +1,12 @@
+#    UNAME_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 UNAME_S := $(shell uname -s)
 $(info Development Environment is $(UNAME_S))
 ifeq ($(OS),Windows_NT)
     DEFINES := -DAPL=0 -DIBM=1 -DLIN=0 -DWIN=1
     TARGET  := HILSIM-win
     ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
-        DEFINES  += -DMINGW
-        FRAMEWORK := 
+        DEFINES   += -DMINGW
+        FRAMEWORK :=
         RM        := rm -rf
         PLUGINS   := /c/users/$(USER)/'X-Plane 10'/Resources/plugins
         LIBS      := -static-libgcc -lws2_32 -L$(PLUGINS) -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
@@ -16,10 +17,10 @@ ifeq ($(OS),Windows_NT)
         EXPORTS   := -Wl,--version-script=exports.txt
     else
         RM        := del /Q /F
-	$(error This make file must be run under MSYS2 on the Windows platform)
-    endif    
+		$(error This make file must be run under MSYS2 on the Windows platform)
+    endif
 else
-    RM        := rm -rf
+    RM := rm -rf
     ifeq ($(UNAME_S),Linux)
         PLUGINS   := ~/'X-Plane 10'/Resources/plugins
         DEFINES   := -DAPL=0 -DIBM=0 -DLIN=1 -DNIX=1
@@ -42,8 +43,16 @@ BUILDDIR :=	./build
 SRC_BASE :=	.
 
 SOURCES = \
-	HILSIM.cpp SerialIO.cpp Setup.cpp stdafx.cpp utility.cpp UDBSocketUnix.c UDBSocketWin.c
-
+	HILSIM.cpp \
+	Display.cpp \
+	SendUBX.cpp \
+	SerialIO.cpp \
+	Servos.cpp \
+	Setup.cpp \
+	stdafx.cpp \
+	utility.cpp \
+	UDBSocketWin.c \
+	UDBSocketUnix.c
 
 INCLUDES = \
 	-I$(SRC_BASE)/include

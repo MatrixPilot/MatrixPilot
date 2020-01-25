@@ -8,20 +8,15 @@
 #define NUMLOOPS 6
 #define R_EARTH 6371000
 
-
 #ifdef WIN32
-
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #include <Windows.h>
 #include <GL/gl.h>          // Win32
-
 #elif NIX                   // Ubuntu Linux
 #include <GL/gl.h>
 #else
-
 #include <OpenGL/OpenGL.h>  // Mac
 #include <OpenGL/gl.h>
-
 #endif
 
 #if (!defined(WIN32) || defined(WIN))
@@ -41,9 +36,4 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
-
-#include "utility.h"
-#include "Setup.h"
-#include "SerialIO.h"
 
