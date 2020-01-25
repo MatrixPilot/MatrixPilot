@@ -82,7 +82,7 @@ extern const mavlink_parameter mavlink_parameters_list[];
 extern const uint16_t count_of_parameters_list;
 
 // callback type for data services user
-// TODO : MODE THIS FROM HERE????
+// TODO : MOVE THIS FROM HERE????
 //typedef void (*DSRV_callbackFunc)(boolean);
 
 typedef struct tag_mavlink_parameter_block

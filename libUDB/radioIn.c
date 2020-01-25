@@ -90,7 +90,7 @@ void radioIn_init(void) // was called udb_init_capture(void)
 	{	
 		for (i = 0; i <= NUM_INPUTS; i++)
 	#if (FIXED_TRIMPOINT == 1)
-			if (i == THROTTLE_OUTPUT_CHANNEL)
+			if (i == THROTTLE_OUTPUT_CHANNEL) // TODO: Shouldn't this be THROTTLE_INPUT_CHANNEL? RobD.
 				udb_pwTrim[i] = udb_pwIn[i] = THROTTLE_TRIMPOINT;
 			else
 				udb_pwTrim[i] = udb_pwIn[i] = CHANNEL_TRIMPOINT;

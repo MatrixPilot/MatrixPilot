@@ -244,14 +244,6 @@ static void normalAltitudeCntrl(void)
 		if (state_flags._.GPS_steering)
 		{
 			desiredHeight = navigate_desired_height();
-//			if (desired_behavior._.takeoff || desired_behavior._.altitude)
-//			{
-//				desiredHeight = goal.height;
-//			}
-//			else
-//			{
-//				desiredHeight = goal.fromHeight + (((goal.height - goal.fromHeight) * (int32_t)progress_to_goal) >> 12);
-//			}
 		}
 		else
 		{
@@ -267,7 +259,7 @@ static void normalAltitudeCntrl(void)
 				// In stabilized mode using full altitude hold, use the throttle stick value to determine desiredHeight,
 				desiredHeight = ((__builtin_mulss((int16_t)(HEIGHTTHROTTLEGAIN), throttleInOffset - ((int16_t)(DEADBAND)))) >> 11)
 				                + (int16_t)(altit.HeightTargetMin);
-}
+			}
 //#endif
 			if (desiredHeight < (int16_t)(altit.HeightTargetMin)) desiredHeight = (int16_t)(altit.HeightTargetMin);
 			if (desiredHeight > (int16_t)(altit.HeightTargetMax)) desiredHeight = (int16_t)(altit.HeightTargetMax);

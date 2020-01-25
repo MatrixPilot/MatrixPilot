@@ -91,6 +91,7 @@ endif
 # add or replace existing objects only if newer
 ARFLAGS := -r
 
+WARN = -Wall -Wextra -Wno-unused-parameter
 
 ################################################################################
 # From current directory determine relative path to makefile (source root)
@@ -262,23 +263,23 @@ endif
 # This omits prerequisites on system header files.
 
 %.d: %.c
-	$(Q) $(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(Q) $(CC) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) $(WARN) -M $< | \
 	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
 	$(Q) $(MV) $@.tmp $@
 
 %.o: %.c
-	$(Q) $(CC) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+	$(Q) $(CC) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) $(WARN) -o $@ $<
 
 %.d: %.cpp
-	$(Q) $(CPP) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(Q) $(CPP) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) $(WARN) -M $< | \
 	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
 	$(Q) $(MV) $@.tmp $@
 
 %.o: %.cpp
-	$(Q) $(CPP) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+	$(Q) $(CPP) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) $(WARN) -o $@ $<
 
 %.d: %.s
-	$(Q) $(CC) $(TARGET_ARCH) $(AFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(Q) $(CC) $(TARGET_ARCH) $(AFLAGS) $(DEFINES) $(INCLUDES) $(WARN) -M $< | \
 	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
 	$(Q) $(MV) $@.tmp $@
 
@@ -287,7 +288,7 @@ endif
 #	$(Q) $(ASM) $(TARGET_ARCH) $(AFLAGS) -c $< -o $@ $(INCLUDES) 
 
 %.o: %.s
-	$(Q) $(ASM) $(TARGET_ARCH) -c $< -o $@ $(AFLAGS) $(INCLUDES) 
+	$(Q) $(ASM) $(TARGET_ARCH) -c $< -o $@ $(AFLAGS) $(INCLUDES) $(WARN) 
 
 # NOTE: this version may be needed to support the C8/MC16 microchip assembler
 #%.o: %.s

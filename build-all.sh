@@ -36,7 +36,7 @@ if ! make -j 8 -f ../../../makefile TARGET_NAME=MPSIM DEVICE=SIL CONFIG=EasyStar
 	command_failed=true
 fi
 cd ..; mkdir -p AUAV3; cd AUAV3
-if ! make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=UDB5 CONFIG=Cessna
+if ! make -j 8 -f ../../../makefile TARGET_NAME=MatrixPilot DEVICE=AUAV3 CONFIG=Cessna
 	then
 	command_failed=true
 fi
@@ -135,10 +135,12 @@ cd ../..
 cd ..
 echo
 echo "The following output files now exist:"
-find _build | grep hex
-find _build | grep "\.out"
-find _build | grep xpl
-find _build | grep px4
+echo
+find _build | grep hex > _build/targetlist.txt
+find _build | grep "\.out" >> _build/targetlist.txt
+find _build | grep xpl >> _build/targetlist.txt
+find _build | grep px4 >> _build/targetlist.txt
+xargs md5sum < _build/targetlist.txt
 
 echo 
 echo "$0" complete.

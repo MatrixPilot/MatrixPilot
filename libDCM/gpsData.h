@@ -18,6 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef __GPS_DATA_H__
+#define __GPS_DATA_H__
 
 #ifdef USE_EXTENDED_NAV
 extern struct relative3D_32 GPSlocation;
@@ -50,3 +52,5 @@ extern volatile union intbb sog_gps;                                // speed ove
 extern volatile union uintbb cog_gps;                               // course over ground
 extern volatile union intbb climb_gps;                              // climb
 extern volatile union longbbbb tow;
+
+#endif // __GPS_DATA_H__

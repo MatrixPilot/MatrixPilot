@@ -160,7 +160,7 @@ new for helicalTurns:
 #define FEED_FORWARD                         1.0
 #define TURN_RATE_NAV                       30.0
 #define TURN_RATE_FBW                       60.0
-#define CRUISE_SPEED                        12.0
+#define CRUISE_SPEED                        12.0 // Not used
 #define ANGLE_OF_ATTACK_NORMAL              -0.8
 #define ANGLE_OF_ATTACK_INVERTED            -7.2
 #define ELEVATOR_TRIM_NORMAL                -0.03

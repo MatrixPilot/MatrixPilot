@@ -18,7 +18,10 @@
 // You should have received a copy of the GNU General Public License
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef __ESTLOCATION_H__
+#define __ESTLOCATION_H__
 
 void estLocation_init(void);
 void estLocation(void);
 
+#endif // __ESTLOCATION_H__

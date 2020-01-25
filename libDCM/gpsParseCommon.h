@@ -28,24 +28,15 @@ extern volatile union longbbbb tow;
 extern volatile uint8_t hdop;               // horizontal dilution of precision
 extern volatile uint8_t vdop;               // vertical  dilution of precision
 extern volatile uint8_t svs;                // number of satellites
-//extern union longbbbb as_sim_;
 extern union longbbbb xpg, ypg, zpg;        // gps x, y, z position
 extern union intbb xvg, yvg, zvg;           // gps x, y, z velocity
-//extern uint8_t mode1, mode2;              // gps mode1, mode2
 extern int16_t cos_lat;
 
 // the following variables are shared internally between the various GPS parsing modules only
 //
-//extern union intbb payloadlength;
-//extern int16_t store_index;
-//extern uint8_t un;
-//extern uint8_t svs_;
 extern union longbbbb lat_gps_;
 extern union longbbbb lon_gps_;
 extern union longbbbb alt_sl_gps_;
-//extern union longbbbb sog_gps_;
-//extern union longbbbb cog_gps_;
-//extern union longbbbb climb_gps_;
 extern union intbb hdop_;
 extern union intbb vdop_;
 extern union longbbbb tow_;

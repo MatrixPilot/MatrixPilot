@@ -332,8 +332,6 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 		case UDBSocketSerial:
 		{
 			unsigned long bytesTransferred = 0;
-			//DWORD dwRetFlag;
-			//char ErrorString[80];
 
 			if (socket->hComms != INVALID_HANDLE_VALUE)
 			{
@@ -343,8 +341,6 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 					COMSTAT comStat;
 					unsigned long dwErrors;
 
-					//sprintf(ErrorString, "ReadFile Error = %d", GetLastError());
-					//ShowMessage(ErrorString);
 					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "ReadFile() failed");
 					ClearCommError(socket->hComms, &dwErrors, &comStat);
 					return -1;

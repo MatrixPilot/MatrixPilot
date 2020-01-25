@@ -362,8 +362,11 @@ static void data_services_read_done(void)
 static void data_services_read_callback(boolean success)
 {
 	if (success)
+	{
 		data_service_state = DATA_SERVICE_STATE_READ_DONE;
+	}
 	else
+	{
 		if (data_services_do_all_areas == true)
 		{
 			data_services_table_index++;
@@ -375,6 +378,7 @@ static void data_services_read_callback(boolean success)
 			data_services_user_callback = NULL;
 			data_service_state = DATA_SERVICE_STATE_WAITING;
 		}
+	}
 }
 
 // Serialise a list of data items/variables to the buffer
@@ -392,7 +396,7 @@ static uint16_t serialise_items_to_buffer(uint16_t table_index)
 	uint16_t block_start = mavlink_parameter_blocks[table_index].block_start_index;
 	uint16_t item_count = mavlink_parameter_blocks[table_index].block_size;
 
-	for(item_index = 0; item_index < item_count; item_index++)
+	for (item_index = 0; item_index < item_count; item_index++)
 	{
 		pParameter = &mavlink_parameters_list[block_start + item_index];
 		pData      = pParameter->pparam;
@@ -421,7 +425,7 @@ static uint16_t serialise_buffer_to_items(uint16_t table_index)
 	uint16_t block_start = mavlink_parameter_blocks[table_index].block_start_index;
 	uint16_t item_count = mavlink_parameter_blocks[table_index].block_size;
 
-	for(item_index = 0; item_index < item_count; item_index++)
+	for (item_index = 0; item_index < item_count; item_index++)
 	{
 		pParameter = &mavlink_parameters_list[block_start + item_index];
 		pData      = pParameter->pparam;
@@ -439,7 +443,7 @@ static uint16_t data_services_get_table_index(uint16_t data_storage_handle)
 {
 	int16_t index;
 
-	for(index = 0; index < mavlink_parameter_block_count; index++)
+	for (index = 0; index < mavlink_parameter_block_count; index++)
 	{
 		if (mavlink_parameter_blocks[index].data_storage_area == data_storage_handle)
 		{

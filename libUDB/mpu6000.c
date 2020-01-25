@@ -104,11 +104,11 @@ void MPU6000_init16(callback_fptr_t fptr)
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
 
 #if (ACCEL_RANGE == 2)
-	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192
+	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scale 2g, g = 8192
 #elif (ACCEL_RANGE == 4)
-	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 4096
+	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale 4g = 4096
 #elif (ACCEL_RANGE == 8)
-	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 2048
+	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale 8g = 2048
 #else
 #error "Invalid ACCEL_RANGE"
 #endif
@@ -163,12 +163,12 @@ void MPU6000_init16(callback_fptr_t fptr)
 	_INT1EP = 1; // Setup INT1 pin to interrupt on falling edge
 	_INT1IP = INT_PRI_INT1;
 	_INT1IF = 0; // Reset INT1 interrupt flag
-	_INT1IE = 1; // Enable INT1 Interrupt Service Routine 
+	_INT1IE = 1; // Enable INT1 Interrupt Service Routine
 #elif (MPU_SPI == 2)
 	_INT3EP = 1; // Setup INT3 pin to interrupt on falling edge
 	_INT3IP = INT_PRI_INT3;
 	_INT3IF = 0; // Reset INT3 interrupt flag
-	_INT3IE = 1; // Enable INT3 Interrupt Service Routine 
+	_INT3IE = 1; // Enable INT3 Interrupt Service Routine
 #endif
 }
 
@@ -236,7 +236,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 void MPU6000_print(void)
 {
 	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
-	    mpuCnt,      mpu_data[0], mpu_data[1], mpu_data[2], 
+	    mpuCnt,      mpu_data[0], mpu_data[1], mpu_data[2],
 	    mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
 }
 
