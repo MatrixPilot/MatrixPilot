@@ -93,20 +93,22 @@ void MPU6000_init16(callback_fptr_t fptr)
 	// Wake up device and select GyroZ clock (better performance)
 	writeMPUSPIreg16(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
 
-	// Disable I2C bus (recommended on datasheet)
-	writeMPUSPIreg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
-
-	// Disable I2C communications on the ICM_20689
-	uint8_t v = readMPUSPIreg16(MPUREG_INT_PIN_CFG) | BIT_INT_RD_CLEAR | BIT_LATCH_INT_EN;
-	v &= BIT_I2C_BYPASS_EN;
-	writeMPUSPIreg16(MPUREG_INT_PIN_CFG, v);
-
-	// SAMPLE RATE
-	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
-
 	// Which chip is this?
 	uint16_t mpu_whoami = readMPUSPIreg16(MPUREG_WHOAMI);
 	is_ICM_20689 = (mpu_whoami == WHOAMI_ICM_20689);
+
+	// Disable I2C bus (recommended on datasheet)
+	writeMPUSPIreg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
+
+	if (is_ICM_20689) {
+		// Disable I2C communications on the ICM_20689
+		uint8_t v = readMPUSPIreg16(MPUREG_INT_PIN_CFG) | BIT_INT_RD_CLEAR | BIT_LATCH_INT_EN;
+		v &= BIT_I2C_BYPASS_EN;
+		writeMPUSPIreg16(MPUREG_INT_PIN_CFG, v);
+	}
+
+	// SAMPLE RATE
+	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
 
 	// scaling & DLPF
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
