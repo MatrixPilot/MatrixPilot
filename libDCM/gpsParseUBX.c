@@ -229,6 +229,7 @@ const uint8_t config_NAV5[] = {
 	0x24, 0x00, // Payload length
 	0xFF, 0xFF, // Bit Mask, 0XFF means apply all of the config below
 	0x08,       // Dynamic Model Number, Airborne with <4g Acceleration
+//	0x06,       // Dynamic Model Number, Airborne with <1g Acceleration
 	0x02,       // Position Fixing Mode. 3D only.
 	0x00, 0x00, // Fixed altitude (mean sea level) for 2D fix mode only.
 	0x00, 0x00, // Part of fixed altitude above (4 bytes in total)
@@ -246,7 +247,8 @@ const uint8_t config_NAV5[] = {
 	0x00, 0x00, // Reserved
 	0x00, 0x00, // Reserved
 	0x00, 0x00, // Reserved
-	0x17, 0xFF  // Checksum
+	0x17, 0xFF  // Checksum 4G
+//	0x15, 0xBB  // Checksum 1G
 };
 
 const uint16_t set_rate_length = 14;
@@ -264,7 +266,7 @@ static uint8_t un;
 //static union longbbbb xpg_, ypg_, zpg_;
 //static union longbbbb xvg_, yvg_, zvg_;
 //static uint8_t mode1_, mode2_;
-static uint8_t svs_, nav_valid_;
+static uint8_t svs_, nav_valid_, flags_;
 //static union longbbbb lat_gps_, lon_gps_, alt_sl_gps_;
 static union longbbbb sog_gps_, cog_gps_, climb_gps_;
 //static union longbbbb tow_;
@@ -298,7 +300,7 @@ uint8_t* const msg_SOL_parse[] = {
 	&un, &un, &un, &un,                                 // fTOW
 	&week_no_._.B0, &week_no_._.B1,                     // week
 	&nav_valid_,                                        // gpsFix
-	&un,                                                // flags
+	&flags_,                                                // flags
 	&un, &un, &un, &un,                                 // ecefX
 	&un, &un, &un, &un,                                 // ecefY
 	&un, &un, &un, &un,                                 // ecefZ
@@ -431,6 +433,11 @@ void gps_startup_sequence(int16_t gpscount)
 boolean gps_nav_valid(void)
 {
 	return (nav_valid_ == 3);
+}
+
+boolean differential_gps(void)
+{
+	return ( (flags_ & 2 )== 2) ;
 }
 
 /*
@@ -862,8 +869,29 @@ void gps_update_basic_data(void)
 	svs             = svs_;
 }
 
+extern int db_index ;
+extern char debug_buffer[] ;
+
+void print_gps_data( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
+{
+	db_index = 0 ;
+	sprintf(debug_buffer, "%i , %i , %li , %li , %li , %u , %u , %i\r\n" ,
+			differential_flag ,
+			sats ,
+			lat ,
+			lon ,
+			alt ,
+			sog ,
+			cog ,
+			climb ) ; 
+	udb_serial_start_sending_data() ;
+	
+}
+
 void gps_commit_data(void)
 {
+	udb_led_toggle(LED_ORANGE);
+	if ( differential_gps()) udb_led_toggle(LED_BLUE) ;
 	//bin_out(0xFF);
 	week_no         = week_no_;
 	tow             = tow_;
@@ -891,6 +919,8 @@ void gps_commit_data(void)
 //	mode1           = mode1_;
 //	mode2           = mode2_;
 	svs             = svs_;
+
+	print_gps_data( differential_gps() , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
 
 #if (HILSIM == 1 && MAG_YAW_DRIFT == 1)
 	HILSIM_MagData(mag_drift_callback); // run the magnetometer computations

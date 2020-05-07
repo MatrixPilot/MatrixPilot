@@ -51,6 +51,11 @@ extern fractional magFieldEarth[3];
 extern fractional magAlignment[4];
 extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 
+void send_debug_line( void )
+{
+	
+}
+/*
 // Prepare a line of serial output and start it sending
 void send_debug_line( void )
 {
@@ -173,7 +178,7 @@ void send_debug_line( void )
 	
 	return ;
 }
-
+*/
 /*
 extern int gplane[] ;
 // Prepare a line of serial output and start it sending

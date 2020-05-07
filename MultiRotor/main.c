@@ -43,7 +43,11 @@ int commanded_tilt_gain ;
 int main (void)
 {
 	// Set up the libraries
-	mcu_init();
+	if ( GPS_TYPE != GPS_NONE)
+	{
+		gps_init() ;
+	}
+	mcu_init() ;
 	udb_init() ;
 	dcm_init() ;
 	
@@ -141,11 +145,11 @@ void dcm_heartbeat_callback(void)
 	// Update the Green LED to show RC radio status
 	if (udb_flags._.radio_on)
 	{
-		LED_GREEN = LED_ON ;
+		//LED_GREEN = LED_ON ;
 	}
 	else
 	{
-		LED_GREEN = LED_OFF ;
+		//LED_GREEN = LED_OFF ;
 	}
 	
 	// Serial output one fifth of SERVO_HZ  

@@ -158,7 +158,7 @@ void udb_heartbeat_callback(void)
 		{
 			dcm_run_calib_step(udb_pulse_counter / (HEARTBEAT_HZ / 40));
 		}
-		if (!dcm_flags._.init_finished)
+		if ((!dcm_flags._.init_finished)&&(GPS_TYPE != GPS_NONE))
 		{
 			dcm_flags._.init_finished = gps_run_init_step(udb_pulse_counter / (HEARTBEAT_HZ / 40));
 		}

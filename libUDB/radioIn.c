@@ -156,7 +156,7 @@ void radioIn_init(void) // was called udb_init_capture(void)
 void radioIn_failsafe_check(void)
 {
 		udb_flags._.radio_on = 1;
-		led_on(LED_GREEN);
+		//led_on(LED_GREEN);
 }
 #else
 // called from heartbeat pulse at 20Hz
@@ -171,13 +171,13 @@ void radioIn_failsafe_check(void)
 			udb_flags._.radio_on = 0;
 			udb_callback_radio_did_turn_off();
 		}
-		led_off(LED_GREEN);
+		//led_off(LED_GREEN);
 		badPWMPulseCount = 0; // reset count of noise pulses
 	}
 	else
 	{
 		udb_flags._.radio_on = 1;
-		led_on(LED_GREEN);
+		//led_on(LED_GREEN);
 	}
 	goodPWMPulseCount = 0;
 }

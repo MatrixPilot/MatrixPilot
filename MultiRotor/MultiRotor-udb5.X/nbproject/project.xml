@@ -13,6 +13,23 @@
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <asminc-extensions>inc</asminc-extensions>
             <make-dep-projects/>
+            <sourceRootList>
+                <sourceRootElem>../../libDCM</sourceRootElem>
+                <sourceRootElem>../../libUDB</sourceRootElem>
+                <sourceRootElem>../../libVectorMatrix</sourceRootElem>
+                <sourceRootElem>../../MAVLink</sourceRootElem>
+                <sourceRootElem>../../Config</sourceRootElem>
+                <sourceRootElem>..</sourceRootElem>
+            </sourceRootList>
+            <confList>
+                <confElem>
+                    <name>default</name>
+                    <type>2</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
         </data>
     </configuration>
 </project>

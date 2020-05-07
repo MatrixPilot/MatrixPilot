@@ -449,7 +449,6 @@ void align_roll_pitch(fractional tilt_mat[])
 {
 	fractional vertical[3] ;
 	fractional Z , one_plus_Z ;
-	udb_led_toggle(LED_BLUE) ;
 	vertical[0] = gravity_vector_plane[0] ;
 	vertical[1] = gravity_vector_plane[1] ;
 	vertical[2] = gravity_vector_plane[2] ;

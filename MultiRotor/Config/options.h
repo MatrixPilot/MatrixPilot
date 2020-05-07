@@ -84,9 +84,9 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
-//#define desktest
+#define desktest
 //#define draganflier
-#define spedix
+//#define spedix
 //#define arduCopter
 
 #ifdef arduCopter
@@ -187,9 +187,9 @@
 #endif
 
 #ifdef desktest
-#define MAG_YAW_DRIFT						1
-#define NO_RADIO						1
-#define DEBUG_MAG						1
+#define MAG_YAW_DRIFT						0
+#define NO_RADIO						0
+#define DEBUG_MAG						0
 #define NO_GAIN 0.0
 #define BOOST_GAIN 4.0 
 #define TILT_KI 0.01*NO_GAIN
@@ -236,7 +236,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
-#define GPS_TYPE							GPS_STD
+//#define GPS_TYPE							GPS_STD
+#define GPS_TYPE							GPS_UBX_4HZ
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 

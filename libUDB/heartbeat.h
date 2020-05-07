@@ -41,8 +41,8 @@
 
 // PWM rate for ESCs (Quadcopter support)
 //#define ESC_HZ 400
-#define ESC_HZ 100
-//#define ESC_HZ 50
+//#define ESC_HZ 100
+#define ESC_HZ 50
 
 // servicing rate for LIDAR interface
 #define LIDAR_HZ 50
