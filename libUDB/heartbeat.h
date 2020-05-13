@@ -25,7 +25,7 @@
 
 // number of heartbeats per second
 #if (BOARD_TYPE == UDB4_BOARD)
-#define HEARTBEAT_HZ 40
+#define HEARTBEAT_HZ 200
 #else
 #define HEARTBEAT_HZ 200
 #endif // (BOARD_TYPE != UDB4_BOARD)
