@@ -27,6 +27,7 @@
 #include "mag_drift.h"
 #include "rmat.h"
 #include "hilsim.h"
+#include "../libUDB/servoOutPins.h"
 
 #if (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)
 
@@ -996,6 +997,7 @@ void HILSIM_set_omegagyro(void)
 
 void init_gps_ubx(void)
 {
+	led_off(SERVO_OUT_PIN_5);
 }
 
 #endif // (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ || GPS_TYPE == GPS_ALL)

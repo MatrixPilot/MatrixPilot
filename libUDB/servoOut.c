@@ -365,10 +365,10 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			break;
 		case 4:
 			SERVO_OUT_PIN_4 = 0;
-			HANDLE_SERVO_OUT(5, SERVO_OUT_PIN_5);
+	//		HANDLE_SERVO_OUT(5, SERVO_OUT_PIN_5);
 			break;
 		case 5:
-			SERVO_OUT_PIN_5 = 0;
+	//		SERVO_OUT_PIN_5 = 0;
 			HANDLE_SERVO_OUT(6, SERVO_OUT_PIN_6);
 			break;
 		case 6:

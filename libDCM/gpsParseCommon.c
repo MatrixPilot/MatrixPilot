@@ -31,6 +31,7 @@
 #include "../libUDB/interrupt.h"
 #include "../libUDB/serialIO.h"
 #include <string.h>
+#include "../libUDB/servoOutPins.h"
 
 // GPS parser modules variables
 union longbbbb lat_gps_, lon_gps_;
@@ -136,14 +137,24 @@ boolean gps_nav_capable_check_set(void)
 	return dcm_flags._.nav_capable;
 }
 
+extern boolean differential_gps(void) ;
+
 static void gps_parse_common_callback(void)
 {
 	dirOverGndHrmat[0] = rmat[1];
 	dirOverGndHrmat[1] = rmat[4];
 	dirOverGndHrmat[2] = 0;
-	udb_led_toggle(LED_GREEN);
+//	udb_led_toggle(LED_GREEN);
 	if (gps_nav_valid())
 	{
+		if ( differential_gps())
+		{
+			udb_led_toggle(SERVO_OUT_PIN_5);
+		}
+		else
+		{
+			led_on(SERVO_OUT_PIN_5) ;
+		}
 		gps_commit_data();
 		gps_data_age = 0;
 		dcm_callback_gps_location_updated();
@@ -162,6 +173,7 @@ static void gps_parse_common_callback(void)
 	}
 	else
 	{
+		led_off(SERVO_OUT_PIN_5) ;
 		gps_data_age = GPS_DATA_MAX_AGE+1;
 
 		dirOverGndHGPS[0] = dirOverGndHrmat[0];
