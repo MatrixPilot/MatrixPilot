@@ -32,9 +32,11 @@
 // Used for serial debug output
 #include <stdio.h>
 
+extern boolean differential_gps(void) ;
+
 boolean didCalibrate = 0 ;
 
-void send_debug_line( void ) ;
+void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb ) ;
 void motorCntrl( void ) ;
 
 const int max_tilt = (int) (MAX_TILT*.7111) ;  // maximum tilt in byte cicular
@@ -153,11 +155,14 @@ void dcm_heartbeat_callback(void)
 	}
 	
 	// Serial output one fifth of SERVO_HZ  
-	if ((udb_heartbeat_counter % (5*HEARTBEAT_HZ/SERVO_HZ)) == 0)
+	// if ((udb_heartbeat_counter % (5*HEARTBEAT_HZ/SERVO_HZ)) == 0)
+	// Serial output one tenth of SERVO_HZ  (5 Hz)
+	if ((udb_heartbeat_counter % (10*HEARTBEAT_HZ/SERVO_HZ)) == 0)
+
 	{
 		if ( didCalibrate )
 		{
-			send_debug_line() ;
+			send_debug_line(differential_gps() , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
 		}
 	}
 	

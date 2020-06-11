@@ -31,7 +31,7 @@
 // Used for serial debug output
 #include <stdio.h>
 
-char debug_buffer[512] ;
+char debug_buffer[1024] ;
 int db_index = 0 ;
 boolean hasWrittenHeader = 0 ;
 int header_line = 0 ;
@@ -51,13 +51,14 @@ extern fractional magFieldEarth[3];
 extern fractional magAlignment[4];
 extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 
-void send_debug_line( void )
+/*void send_debug_line( void )
 {
 	
-}
-/*
+}*/
+
 // Prepare a line of serial output and start it sending
-void send_debug_line( void )
+// GPS data needs to be passed in
+void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
 {
 	db_index = 0 ;
 	
@@ -130,7 +131,7 @@ void send_debug_line( void )
 			}
 #else
 			{
-				sprintf(debug_buffer, "mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+				sprintf(debug_buffer, "dgps, sats , lat , lon , alt , sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			}
 #endif // DEBUG_MAG
 			hasWrittenHeader = 1 ;
@@ -155,7 +156,8 @@ void send_debug_line( void )
 		}
 #else
 		{
-			sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			sprintf(debug_buffer, "%i , %i , %li , %li , %li , %u , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			differential_flag , sats , lat , lon , alt , sog , cog , climb ,
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,
 			target_rate[0] , target_rate[1] , target_rate[2] , 
@@ -178,7 +180,6 @@ void send_debug_line( void )
 	
 	return ;
 }
-*/
 /*
 extern int gplane[] ;
 // Prepare a line of serial output and start it sending

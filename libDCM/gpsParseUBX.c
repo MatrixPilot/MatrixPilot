@@ -873,7 +873,12 @@ void gps_update_basic_data(void)
 extern int db_index ;
 extern char debug_buffer[] ;
 
-void print_gps_data( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
+void print_gps_data(int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb)
+{
+	
+}
+
+/*void print_gps_data( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
 {
 	db_index = 0 ;
 	sprintf(debug_buffer, "%i , %i , %li , %li , %li , %u , %u , %i\r\n" ,
@@ -887,7 +892,7 @@ void print_gps_data( int8_t differential_flag , uint16_t sats , int32_t lat , in
 			climb ) ; 
 	udb_serial_start_sending_data() ;
 	
-}
+}*/
 
 void gps_commit_data(void)
 {
