@@ -182,8 +182,33 @@ void motorCntrl(void)
 		MatrixRotate( yaw_rmat , yaw_vector ) ;
 		matrix_normalize( yaw_rmat ) ;
 		
+		if( dcm_flags._.fpv_tilt_req == 1 )
 		// multiply commanded yaw matrix by commanded tilt matrix to get overall target matrix
-		MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;	
+		// this if for commanded tilt in body frame 
+			{	
+				MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;
+			}
+		else
+		{
+			if (dcm_flags._.earth_frame_tilt_req == 1)
+		
+		// multiply commanded tilt matrix by commanded yaw matrix to get overall target matrix
+		// this if for commanded tilt in earth frame 
+			{
+				MatrixMultiply ( 3 , 3 , 3 , target_rmat , tilt_rmat , yaw_rmat ) ;
+			}
+			else
+			{
+				if ( dcm_flags._.position_hold_req )
+				{
+					MatrixMultiply ( 3 , 3 , 3 , target_rmat , tilt_rmat , yaw_rmat ) ; // stub, just for now
+				}
+				else
+				{
+					MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ; // stub, just for now
+				}
+			}
+		}
 		MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
 		
 		// compute feed forward

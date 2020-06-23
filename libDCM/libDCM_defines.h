@@ -27,11 +27,13 @@
 
 struct dcm_flag_bits {
 #ifdef CATAPULT_LAUNCH_ENABLE
+#error "catapult launch not allowed with multirotor"
 	uint16_t unused                 : 2;
 	uint16_t launch_detected        : 1;
-#else
-	uint16_t unused                 : 3;
-#endif
+#endif // catapult launch
+	uint16_t fpv_tilt_req		: 1;
+	uint16_t earth_frame_tilt_req	: 1;
+	uint16_t position_hold_req	: 1;
 	uint16_t rollpitch_req          : 1;
 	uint16_t gps_history_valid      : 1;
 	uint16_t dead_reckon_enable     : 1;

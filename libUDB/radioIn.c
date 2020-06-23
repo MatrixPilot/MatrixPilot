@@ -25,6 +25,7 @@
 #include "radioIn.h"
 #include "cll_io.h"
 #include "../MatrixPilot/states.h"
+#include "../libDCM/libDCM.h"
 
 int lidar_pulses = 0 ;
 int lidar_pulse_width = 0 ;
@@ -264,6 +265,49 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC5Interrupt(void)
 	interrupt_restore_corcon;
 	unset_ipl_on_output_pin;
 }
+void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
+{
+	indicate_loading_inter;
+	set_ipl_on_output_pin;
+	interrupt_save_set_corcon;
+	static uint16_t rise = 0;
+	uint16_t time = 0;
+	uint16_t pw ;
+	_IC6IF = 0;
+	while (IC6CONbits.ICBNE)
+		time = IC6BUF;
+	if (IC_PIN6)
+		rise = time;
+	else
+	{
+		pw = time - rise ;
+		set_udb_pwIn(pw , 6);
+		if ( pw > 2666 )
+		{
+			if ( pw > 3333 )
+			{
+				dcm_flags._.fpv_tilt_req = 0 ;
+				dcm_flags._.earth_frame_tilt_req = 0 ;
+				dcm_flags._.position_hold_req = 1 ;		
+			}
+			else
+			{
+				dcm_flags._.fpv_tilt_req = 0 ;
+				dcm_flags._.earth_frame_tilt_req = 1 ;
+				dcm_flags._.position_hold_req = 0 ;					
+			}
+		}
+		else 
+		{
+			dcm_flags._.fpv_tilt_req = 1 ;
+			dcm_flags._.earth_frame_tilt_req = 0 ;
+			dcm_flags._.position_hold_req = 0 ;
+		}
+	}
+	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
+}
+
 
 #define _IC_HANDLER(x, y, z) \
 void __attribute__((__interrupt__,__no_auto_psv__)) _IC##x##Interrupt(void) \
@@ -290,7 +334,7 @@ IC_HANDLER(2, REGTOK1, IC_PIN2);
 IC_HANDLER(3, REGTOK1, IC_PIN3);
 IC_HANDLER(4, REGTOK1, IC_PIN4);
 //IC_HANDLER(5, REGTOK1, IC_PIN5);
-IC_HANDLER(6, REGTOK1, IC_PIN6);
+//IC_HANDLER(6, REGTOK1, IC_PIN6);
 IC_HANDLER(7, REGTOK1, IC_PIN7);
 #if (USE_SONAR_INPUT != 8 && USE_CASTLE_LINK_THROTTLE != 1)
 IC_HANDLER(8, REGTOK1, IC_PIN8);

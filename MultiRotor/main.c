@@ -94,8 +94,29 @@ void udb_background_callback_periodic(void)
 	}
 	else
 	{
-		// No longer calibrating: solid RED
-		LED_RED = LED_ON ;
+		// No longer calibrating, indicate command status
+		if ( dcm_flags._.fpv_tilt_req == 1) 
+		{
+			LED_RED = LED_OFF ;
+		}
+		else
+		{
+			if (dcm_flags._.earth_frame_tilt_req == 1)
+			{
+				LED_RED = LED_ON ;
+			}
+			else
+			{
+				if ( dcm_flags._.position_hold_req == 1)
+				{
+					udb_led_toggle(LED_RED) ; 
+				}
+				else // just in case PWM6 gets disconnected
+				{
+					LED_RED = LED_OFF ;
+				}			
+			}
+		}
 	}
 	
 	return ;

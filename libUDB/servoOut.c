@@ -95,7 +95,7 @@ void servoOut_init(void)
 	OC2CONbits.OCM = 6 ;
 	OC3CONbits.OCM = 6 ;
 	OC4CONbits.OCM = 6 ;
-	OC5CONbits.OCM = 6 ;
+	//OC5CONbits.OCM = 6 ;
 	OC6CONbits.OCM = 6 ;
 	OC7CONbits.OCM = 6 ;
 	OC8CONbits.OCM = 6 ;
@@ -105,7 +105,7 @@ void servoOut_init(void)
 	OC2CONbits.OCTSEL = 1 ;
 	OC3CONbits.OCTSEL = 1 ;
 	OC4CONbits.OCTSEL = 1 ;
-	OC5CONbits.OCTSEL = 1 ;
+	//OC5CONbits.OCTSEL = 1 ;
 	OC6CONbits.OCTSEL = 1 ;
 	OC7CONbits.OCTSEL = 1 ;
 	OC8CONbits.OCTSEL = 1 ;
