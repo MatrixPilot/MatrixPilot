@@ -131,7 +131,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			}
 #else
 			{
-				sprintf(debug_buffer, "dgps, sats , lat , lon , alt , sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+				sprintf(debug_buffer, "mode, dgps, sats , lat , lon , alt , sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			}
 #endif // DEBUG_MAG
 			hasWrittenHeader = 1 ;
@@ -156,7 +156,8 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		}
 #else
 		{
-			sprintf(debug_buffer, "%i , %i , %li , %li , %li , %u , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			sprintf(debug_buffer, "%i , %i , %i , %li , %li , %li , %u , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %u , %i , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			udb_pwIn[6] ,
 			differential_flag , sats , lat , lon , alt , sog , cog , climb ,
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,

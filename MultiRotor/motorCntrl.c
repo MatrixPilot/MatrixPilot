@@ -49,9 +49,9 @@ int roll_control ;
 int pitch_control ;
 int yaw_control ;
 int altitude_control = 0;
-int altitude = 0 ;
+uint16_t altitude = 0 ;
 int previous_altitude = 0 ;
-int climb_rate = 0 ;
+int32_t climb_rate = 0 ;
 int accel_feedback ;
 int theta_previous[2] = { 0 , 0 } ;
 int theta_delta[2] ;
@@ -413,7 +413,10 @@ void compute_altitude_control(void)
 		altitude = __builtin_divsd( __builtin_mulss( udb_pwIn[5] , rmat[8] ) , RMAX)/2 ;
 		altitude_change = altitude - previous_altitude ;
 		previous_altitude = altitude ;
-		climb_rate = SERVO_HZ*altitude_change ; // it is actually 1/50 of climb rate
+		climb_rate = __builtin_mulsu ( altitude_change , SERVO_HZ ) ;
+		// perform saturation to block the noise during takeoff and landing
+		if ( climb_rate > 3000 ) climb_rate = 3000 ;
+		if ( climb_rate < -3000 ) climb_rate = -3000 ;
 	}
 	rate_control = - IMU_climb/IMU_CLIMB_RATE_DIVISOR ;
 	proportional_control = (TARGET_ALTITUDE-IMU_altitude)/IMU_ALT_DIVISOR ; 
