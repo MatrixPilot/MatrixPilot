@@ -55,7 +55,7 @@ extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 {
 	
 }*/
-
+extern void serial_output(const char* format, ...);
 // Prepare a line of serial output and start it sending
 // GPS data needs to be passed in
 void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
@@ -67,71 +67,71 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		header_line ++ ;
 		switch ( header_line ) {
 		case 1:
-			sprintf(debug_buffer, "\r\n") ;
+			serial_output("\r\n") ;
 			break ;
 		case 2:
-			sprintf(debug_buffer, "RCON=0x%X , TRAP_FLAGS=0x%X , TRAP_SOURCE=0x%lX , ALARMS=%i\r\n",
+			serial_output( "RCON=0x%X , TRAP_FLAGS=0x%X , TRAP_SOURCE=0x%lX , ALARMS=%i\r\n",
 			    get_reset_flags(), trap_flags, trap_source, osc_fail_count);
 			break ;
 		case 3:
-			sprintf(debug_buffer, "MAX_TILT = %i\r\n" , MAX_TILT ) ;
+			serial_output( "MAX_TILT = %i\r\n" , MAX_TILT ) ;
 			break ;	
 		case 4:
-			sprintf(debug_buffer, "TILT_KP = %5f, YAW_KP = %5f\r\n" ,
+			serial_output( "TILT_KP = %5f, YAW_KP = %5f\r\n" ,
 				TILT_KP ,
 				YAW_KP  ) ;
 			break ;	
 		case 5:
-			sprintf(debug_buffer, "TILT_KI = %5f, YAW_KI = %5f\r\n" ,
+			serial_output( "TILT_KI = %5f, YAW_KI = %5f\r\n" ,
 				TILT_KI ,
 				YAW_KI  ) ;
 			break ;
 		case 6:
-			sprintf(debug_buffer, "TILT_KD = %5f, YAW_KD = %5f\r\n" ,
+			serial_output( "TILT_KD = %5f, YAW_KD = %5f\r\n" ,
 				TILT_KD ,
 				YAW_KD ) ;
 			break ;
 		case 7:
-			sprintf(debug_buffer, "TILT_FF = %5f, TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
+			serial_output( "TILT_FF = %5f, TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
 					TILT_FF ,
 					TILT_KDD ,
 				ACCEL_K ) ;
 			break ;			
 		case 8:
-			sprintf(debug_buffer, ROTOR_CRAFT );
+			serial_output( ROTOR_CRAFT );
 			break ;
 		case 9:
-			sprintf(debug_buffer, "ESC_HZ = %i , PID_HZ = %i , SERVO_HZ = %i , DR_TAU = %5f\r\n" , ESC_HZ , PID_HZ , SERVO_HZ , DR_TAU );
+			serial_output( "ESC_HZ = %i , PID_HZ = %i , SERVO_HZ = %i , DR_TAU = %5f\r\n" , ESC_HZ , PID_HZ , SERVO_HZ , DR_TAU );
 			break ;
 		case 10:
-			sprintf(debug_buffer, "USE_LIDAR = %i , MAX_ALT_RATE_CONTROL = %i , MAX_ALT_PROP_CONTROL = %i\r\n" ,
+			serial_output( "USE_LIDAR = %i , MAX_ALT_RATE_CONTROL = %i , MAX_ALT_PROP_CONTROL = %i\r\n" ,
 				USE_LIDAR ,
 				MAX_ALT_RATE_CONTROL ,
 				MAX_ALT_PROP_CONTROL ) ;
 			break ;			
 		case 11:
-			sprintf(debug_buffer, "MIN_LIDAR_PULSE_THRESH = %i, IMU_CLIMB_RATE_DIVISOR = %i\r\n" ,
+			serial_output( "MIN_LIDAR_PULSE_THRESH = %i, IMU_CLIMB_RATE_DIVISOR = %i\r\n" ,
 				MIN_LIDAR_PULSE_THRESH ,
 				IMU_CLIMB_RATE_DIVISOR ) ;
 			break ;				
 		case 12:
-			sprintf(debug_buffer, "IMU_ALT_DIVISOR = %i, TARGET_ALTITUDE = %i\r\n" ,
+			serial_output( "IMU_ALT_DIVISOR = %i, TARGET_ALTITUDE = %i\r\n" ,
 				IMU_ALT_DIVISOR ,
 				TARGET_ALTITUDE ) ;
 			break ;	
 		case 13:
-			sprintf(debug_buffer, "offsets = %i , %i , %i , %i , %i , %i\r\n " ,
+			serial_output( "offsets = %i , %i , %i , %i , %i , %i\r\n " ,
 					udb_xaccel.offset , udb_yaccel.offset , udb_zaccel.offset ,
 					udb_xrate.offset , udb_yrate.offset , udb_zrate.offset ) ;
 			break ;
 		case 14:
 #if (DEBUG_MAG == 1)
 			{
-				sprintf(debug_buffer, "rmat1 , rmat4 , yw_err_z , magBdyx , magBdyy , magBdyz , mErthx , mErthy , mErthz , offx , offy , offz , algn0 , algn1 , algn2 , algn3 , gain0 , gain1 , gain2\r\n") ;
+				serial_output( "rmat1 , rmat4 , yw_err_z , magBdyx , magBdyy , magBdyz , mErthx , mErthy , mErthz , offx , offy , offz , algn0 , algn1 , algn2 , algn3 , gain0 , gain1 , gain2\r\n") ;
 			}
 #else
 			{
-				sprintf(debug_buffer, "mode, dgps, sats , lat , lon , alt , sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+				serial_output( "mode, dgps, sats , lat , lon , alt , sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			}
 #endif // DEBUG_MAG
 			hasWrittenHeader = 1 ;
@@ -145,7 +145,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 	{
 #if (DEBUG_MAG == 1)
 		{
-			sprintf(debug_buffer, "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			serial_output( "%i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 			rmat[1] , rmat[4] , errorYawplane[2] , 
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			magFieldEarth[0] , magFieldEarth[1] , magFieldEarth[2] , 
@@ -156,7 +156,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		}
 #else
 		{
-			sprintf(debug_buffer, "%i , %i , %i , %li , %li , %li , %u , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %u , %i , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			serial_output( "%i , %i , %i , %li , %li , %li , %u , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %u , %i , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
 			udb_pwIn[6] ,
 			differential_flag , sats , lat , lon , alt , sog , cog , climb ,
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
@@ -176,8 +176,6 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 #endif // DEBUG_MAG
 	
 	}
-	
-	udb_serial_start_sending_data() ;
 	
 	return ;
 }
@@ -206,7 +204,26 @@ void send_debug_line( void )
 	return ;
 }
 */
+int16_t sb_index = 0 ;
+extern int16_t end_index ;
+extern char serial_buffer[] ;
+int16_t udb_serial_callback_get_byte_to_send(void)
+{
+	uint8_t txchar = serial_buffer[ sb_index++ ];
 
+	if (txchar)
+	{
+		return txchar;
+	}
+	else
+	{
+		sb_index = 0;
+		end_index = 0;
+	}
+	return -1;
+}
+
+/*
 // Return one character at a time, as requested.
 // Requests will stop after we send back a -1 end-of-data marker.
 int udb_serial_callback_get_byte_to_send(void)
@@ -217,7 +234,7 @@ int udb_serial_callback_get_byte_to_send(void)
 	
 	return c ;
 }
-
+*/
 
 // Don't respond to serial input
 void udb_serial_callback_received_byte(uint8_t rxchar)

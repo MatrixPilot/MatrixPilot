@@ -39,7 +39,7 @@
 static int16_callback_fptr_t gps_callback_get_byte_to_send_fptr = NULL;
 static callback_uint8_fptr_t gps_callback_received_byte_fptr = NULL;
 
-static boolean udb_serial_stop_sending_flag = 0;
+//static boolean udb_serial_stop_sending_flag = 0;
 
 void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 {
@@ -158,8 +158,8 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U1RXInterrupt(void)
 /////////////////////////////////////////////////////////////////////////////////////////
 // Serial
 
-static int16_callback_fptr_t serial_callback_get_byte_to_send = NULL;
-static callback_uint8_fptr_t serial_callback_received_byte = NULL;
+int16_callback_fptr_t serial_callback_get_byte_to_send = NULL;
+callback_uint8_fptr_t serial_callback_received_byte = NULL;
 
 void udb_init_USART(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 {
@@ -220,7 +220,7 @@ boolean udb_serial_check_rate(int32_t rate)
 {
 	return (U2BRG == UDB_BAUD(rate));
 }
-
+/*
 void udb_serial_start_sending_data(void)
 {
 	 udb_serial_stop_sending_flag = false;
@@ -231,8 +231,8 @@ void udb_serial_stop_sending_data(void)
 {
 	udb_serial_stop_sending_flag  = true; 
 }
-
-void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
+*/
+/*void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
 {
 	_U2TXIF = 0; // clear the interrupt
     // prevent losing a character when stop and start sending data
@@ -256,6 +256,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) _U2TXInterrupt(void)
         unset_ipl_on_output_pin;
     }
 }
+*/
 
 void __attribute__((__interrupt__, __no_auto_psv__)) _U2RXInterrupt(void)
 {
