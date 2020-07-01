@@ -282,9 +282,9 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _IC6Interrupt(void)
 	{
 		pw = time - rise ;
 		set_udb_pwIn(pw , 6);
-		if ( pw > 2666 )
+		if ( udb_pwIn[6] > 2666 )
 		{
-			if ( pw > 3333 )
+			if ( udb_pwIn[6] > 3333 )
 			{
 				dcm_flags._.fpv_tilt_req = 0 ;
 				dcm_flags._.earth_frame_tilt_req = 0 ;

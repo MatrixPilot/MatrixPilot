@@ -204,6 +204,7 @@ void start_pwm_outputs(void)
 // Call this to start sending out pulses to all the PWM output channels sequentially
 void start_pwm_ESC_outputs(void)
 {
+#if ( MIPS == 16)
 	OC1RS = udb_pwOut[1] ;
 	OC2RS = udb_pwOut[2] ;
 	OC3RS = udb_pwOut[3] ;
@@ -212,6 +213,18 @@ void start_pwm_ESC_outputs(void)
 	OC6RS = udb_pwOut[6] ;
 	OC7RS = udb_pwOut[7] ;
 	OC8RS = udb_pwOut[8] ;
+#elif ( MIPS == 32)
+	OC1RS = 2*udb_pwOut[1] ;
+	OC2RS = 2*udb_pwOut[2] ;
+	OC3RS = 2*udb_pwOut[3] ;
+	OC4RS = 2*udb_pwOut[4] ;
+	OC5RS = 2*udb_pwOut[5] ;
+	OC6RS = 2*udb_pwOut[6] ;
+	OC7RS = 2*udb_pwOut[7] ;
+	OC8RS = 2*udb_pwOut[8] ;
+#else
+#error "MIPS must be 16 or 32"
+#endif // MIPS
 }
 
 #if (RECORD_FREE_STACK_SPACE == 1)
