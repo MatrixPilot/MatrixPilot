@@ -53,8 +53,7 @@ int main (void)
 	udb_init() ;
 	dcm_init() ;
 	
-//	udb_serial_set_rate(57600) ;
-	udb_serial_set_rate(115200) ;
+	udb_serial_set_rate(19200) ;
 	
 	LED_GREEN = LED_OFF ;
 #if (CONSOLE_UART != 2)

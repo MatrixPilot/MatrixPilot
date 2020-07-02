@@ -46,10 +46,10 @@
 #define INT_PRI_DMA1    5   // AT45D_DMA.c
 #define INT_PRI_DMA2    5   // AT45D_DMA.c
 
-#define INT_PRI_U1TX    4   // serialIO.c : mid range priority, no urgent reason
-#define INT_PRI_U1RX    4   // serialIO.c : mid range priority, no urgent reason
-#define INT_PRI_U2TX    4   // serialIO.c : mid range priority, no urgent reason
-#define INT_PRI_U2RX    4   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U1TX    3   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U1RX    3   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U2TX    3   // serialIO.c : mid range priority, no urgent reason
+#define INT_PRI_U2RX    3   // serialIO.c : mid range priority, no urgent reason
 
 #define INT_PRI_USB1    4   // USB available only on AUAV3
 
