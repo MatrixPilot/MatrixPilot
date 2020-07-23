@@ -191,10 +191,11 @@ uint16_t vect3_16_mag(const vect3_16t* v)
 uint16_t vect2_16_norm(vect2_16t* result, const vect2_16t* v)
 {
 	uint16_t mag = vect2_16_mag(v);
-	if (mag > 0)
+	uint16_t half_mag = mag/2 ;
+	if (half_mag > 0)
 	{
-		result->x = __builtin_divsd(__builtin_mulss(RMAX, v->x), mag);
-		result->y = __builtin_divsd(__builtin_mulss(RMAX, v->y), mag);
+		result->x = __builtin_divsd(__builtin_mulss(RMAX/2, v->x), half_mag);
+		result->y = __builtin_divsd(__builtin_mulss(RMAX/2, v->y), half_mag);
 	}
 	else
 	{
@@ -206,11 +207,12 @@ uint16_t vect2_16_norm(vect2_16t* result, const vect2_16t* v)
 uint16_t vect3_16_norm(vect3_16t* result, const vect3_16t* v)
 {
 	uint16_t mag = vect3_16_mag(v);
-	if (mag > 0)
+	uint16_t half_mag = mag/2 ;
+	if (half_mag > 0)
 	{
-		result->x = __builtin_divsd(__builtin_mulss(RMAX, v->x), mag);
-		result->y = __builtin_divsd(__builtin_mulss(RMAX, v->y), mag);
-		result->z = __builtin_divsd(__builtin_mulss(RMAX, v->z), mag);
+		result->x = __builtin_divsd(__builtin_mulss(RMAX/2, v->x), half_mag);
+		result->y = __builtin_divsd(__builtin_mulss(RMAX/2, v->y), half_mag);
+		result->z = __builtin_divsd(__builtin_mulss(RMAX/2, v->z), half_mag);
 	}
 	else
 	{
