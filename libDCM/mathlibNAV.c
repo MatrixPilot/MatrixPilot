@@ -273,7 +273,7 @@ uint16_t sqrt_int(uint16_t sqr)
 	// based on Heron's algorithm
 	uint16_t binary_point = 0;
 	uint16_t result = 255;
-	int16_t iterations = 3;
+	int16_t iterations = 5;
 
 	if (sqr == 0)
 	{
@@ -299,7 +299,7 @@ uint16_t sqrt_long(uint32_t sqr)
 	// based on Heron's algorithm
 	uint16_t binary_point = 0;
 	uint16_t result = 65535;    // need to start high and work down to avoid overflow in divud
-	int16_t iterations = 3;     // thats all you need
+	int16_t iterations = 5;     // thats all you need
 
 	if (sqr < 65536)            // use the 16 bit square root
 	{
@@ -345,8 +345,8 @@ uint16_t vector2_normalize(int16_t result[], int16_t input[])
 	half_magnitude = magnitude/2 ; // needed because divsd requires two signed values
 	if (half_magnitude > 0)
 	{
-		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]/2), half_magnitude);
-		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]/2), half_magnitude);
+		result[0] = __builtin_divsd(__builtin_mulss(RMAX/2, input[0]), half_magnitude);
+		result[1] = __builtin_divsd(__builtin_mulss(RMAX/2, input[1]), half_magnitude);
 	}
 	else
 	{
@@ -364,9 +364,9 @@ uint16_t vector3_normalize(int16_t result[], int16_t input[])
 	half_magnitude = magnitude/2; // needed because divsd requires two signed values
 	if (half_magnitude > 0)
 	{
-		result[0] = __builtin_divsd(__builtin_mulss(RMAX, input[0]/2), half_magnitude);
-		result[1] = __builtin_divsd(__builtin_mulss(RMAX, input[1]/2), half_magnitude);
-		result[2] = __builtin_divsd(__builtin_mulss(RMAX, input[2]/2), half_magnitude);
+		result[0] = __builtin_divsd(__builtin_mulss(RMAX/2, input[0]), half_magnitude);
+		result[1] = __builtin_divsd(__builtin_mulss(RMAX/2, input[1]), half_magnitude);
+		result[2] = __builtin_divsd(__builtin_mulss(RMAX/2, input[2]), half_magnitude);
 	}
 	else
 	{
