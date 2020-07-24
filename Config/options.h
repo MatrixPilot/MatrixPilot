@@ -70,12 +70,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
+// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, GPS_UBX_4HZ, GPS_UBX_10HZ, GPS_MTEK, GPS_NMEA, or GPS_NONE)
 // gfm quad 
 //#define GPS_TYPE                            GPS_NMEA
 //#define DEFAULT_GPS_BAUD                    4800   // added for GPS_UBX_4HZ support
-#define GPS_TYPE                            GPS_NONE
-#define DEFAULT_GPS_BAUD                    9600   // added for GPS_UBX_4HZ support
+#define GPS_TYPE                            GPS_UBX_10HZ
+#define DEFAULT_GPS_BAUD                    115200   // added for differential GNSS ZED-F9P support
 
 ////////////////////////////////////////////////////////////////////////////////
 // You can specify a level of good GNSS reception before MatrixPilot accepts "GPS ACQUIRED".

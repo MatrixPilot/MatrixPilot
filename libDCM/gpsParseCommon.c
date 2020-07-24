@@ -36,7 +36,7 @@
 union longbbbb lat_gps_, lon_gps_;
 union longbbbb alt_sl_gps_;
 union longbbbb tow_;
-extern union intbb week_no_;
+union intbb week_no_;
 union intbb hdop_;
 union intbb vdop_;
 union longbbbb date_gps_, time_gps_;
@@ -67,7 +67,7 @@ void gps_init(void)
 {
 #if (GPS_TYPE == GPS_STD)
 	init_gps_std();
-#elif (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ)
+#elif (GPS_TYPE == GPS_UBX_2HZ || GPS_TYPE == GPS_UBX_4HZ|| GPS_TYPE == GPS_UBX_10HZ)
 	init_gps_ubx();
 #elif (GPS_TYPE == GPS_MTEK)
 	init_gps_mtek();
@@ -260,7 +260,7 @@ boolean gps_check_startup_metrics(void)
 	return(true);
 #endif
 	if ((hdop <= GNSS_HDOP_REQUIRED_FOR_STARTUP) && 
-#if ((GPS_TYPE == GPS_UBX_4HZ) || (GPS_TYPE == GPS_UBX_2HZ))
+#if ((GPS_TYPE == GPS_UBX_4HZ) || (GPS_TYPE == GPS_UBX_2HZ)|| (GPS_TYPE == GPS_UBX_10HZ))
 		(vdop <= GNSS_VDOP_REQUIRED_FOR_STARTUP) &&
 #endif
 		(svs  >=  GNSS_SVS_REQUIRED_FOR_STARTUP))

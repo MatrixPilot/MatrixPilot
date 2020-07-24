@@ -457,11 +457,11 @@ void motorCntrl(void) {
 
         // Compute the signals that are common to all 4 motors
         // Mix in the yaw, pitch, and roll signals into the motors
-        if (state_flags._.man_req)
+        if (state_flags._.man_req){
         if (!state_flags._.altitude_hold_throttle )
             motorOut(pwManual[THROTTLE_INPUT_CHANNEL], &adv_RPY);
         else
             motorOut(udb_pwTrim[THROTTLE_INPUT_CHANNEL]+(int)throttle_control, &adv_RPY);
-
+        }
     }
 }
