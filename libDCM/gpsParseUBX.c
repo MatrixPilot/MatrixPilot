@@ -66,18 +66,18 @@ uint8_t  AID_INI[] = {
 };
 
 // PVT Variables needed
-union intbb year_;
+union intbb year_, pdop_;
 uint8_t month_, day_, hour_, min_, sec_;
 union longbbbb nano_;
 uint8_t fixtype_,flags_,flags2_;
 union longbbbb height_;
 union longbbbb vAcc_;
-union longbbbb velN_,velE_,velD_,gSpeed_,headMot_,sAcc_,headAcc_, pdop_;
+union longbbbb velN_,velE_,velD_,gSpeed_,headMot_,sAcc_,headAcc_;
 // RelPosNED Variables needed
 union longbbbb 	relposN_,relposE_,relposD_,relposLength_,relposHead_;
 uint8_t relposHPN_,relposHPE_,relposHPD_,relposHPL_;     // High-precision components of relative position vector.
 union longbbbb 	accN_,accE_,accD_,accL_,accH_;
-union longbbbb 	Flags_;     // 
+union longbbbb 	FlagsRPN_;     // 
 
 // fin ajout gfm
 
@@ -627,10 +627,10 @@ uint8_t* const msg_PVT_parse[] = {
 	&tow_.__.B0, &tow_.__.B1, &tow_.__.B2, &tow_.__.B3,// iTOW
     &year_._.B0,&year_._.B1,&month_, &day_,//Date
     &hour_,&min_,&sec_,//time
-    &nav_valid_,//
+    &un,//time valid
     &time_Acc_.__.B0,&time_Acc_.__.B1,&time_Acc_.__.B2,&time_Acc_.__.B3,// time accuracy (ns))
     &nano_.__.B0,&nano_.__.B1,&nano_.__.B2,&nano_.__.B3,//
-    &fixtype_,&flags_,&flags2_,//
+    &nav_valid_,&flags_,&flags2_,//nav_valid to replace FixType
     &svs_,
 	&lon_gps_.__.B0, &lon_gps_.__.B1,&lon_gps_.__.B2, &lon_gps_.__.B3, // lon
 	&lat_gps_.__.B0, &lat_gps_.__.B1,&lat_gps_.__.B2, &lat_gps_.__.B3, // lat
@@ -645,11 +645,11 @@ uint8_t* const msg_PVT_parse[] = {
 	&headMot_.__.B0, &headMot_.__.B1, &headMot_.__.B2, &headMot_.__.B3,     // Heading motio
 	&sAcc_.__.B0, &sAcc_.__.B1, &sAcc_.__.B2, &sAcc_.__.B3,     // Speed Accuracy
 	&headAcc_.__.B0, &headAcc_.__.B1, &headAcc_.__.B2, &headAcc_.__.B3,     // vertical Accuracy
-	&pdop_.__.B0, &pdop_.__.B1, &pdop_.__.B2, &pdop_.__.B3,     // position dilution of precision
+	&pdop_._.B0, &pdop_._.B1,     // position dilution of precision
 	&un, &un, &un, &un, &un, &un,                                 // reserved
 	&un, &un, &un, &un,                                 // HeadVeh
-	&un, &un, &un, &un,                                 // Mag Declination
-	&un, &un, &un, &un,                                 // Mag Accuracy
+	&un, &un,                                 // Mag Declination
+	&un, &un                                 // Mag Accuracy
 };
 uint8_t* const msg_RELPOSNED_parse[] = {
     &un,// version
@@ -669,7 +669,7 @@ uint8_t* const msg_RELPOSNED_parse[] = {
 	&accL_.__.B0, &accL_.__.B1,	&accL_.__.B2, &accL_.__.B3,// Accuracy of relative position Length
 	&accH_.__.B0, &accH_.__.B1, &accH_.__.B2, &accH_.__.B3,     // Accuracy of relative position Heading
 	&un, &un, &un, &un,                                 // reserved
-	&Flags_.__.B0, &Flags_.__.B1, &Flags_.__.B2, &Flags_.__.B3     // 
+	&FlagsRPN_.__.B0, &FlagsRPN_.__.B1, &FlagsRPN_.__.B2, &FlagsRPN_.__.B3     // Flags RelPosNED
 };
 // fin modif gfm
 
@@ -933,7 +933,19 @@ static void msg_PL1(uint8_t gpschar)
 					break;
 				}
 // modif gfm
-                                        case 0x0B : { // AID-INI message
+				case 0x07 : { // NAV_PVT message
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_SOL_parse))
+					{
+						msg_parse = &msg_PVT;
+					}
+					else
+					{
+						gps_parse_errors++;
+						msg_parse = &msg_B3;    // error condition
+					}
+					break;
+				}
+                case 0x0B : { // AID-INI message
 					if (payloadlength.BB  == NUM_POINTERS_IN(msg_AID_INI_parse))
 					{
 						msg_parse = &msg_AID_INI;
@@ -944,6 +956,18 @@ static void msg_PL1(uint8_t gpschar)
 					}
 					msg_parse = &msg_AID_INI;    // TODO: this does not look right (wipes out error setting above) - RobD
 					break;
+				case 0x3C : { // NAV_RELPOSNED message
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_SOL_parse))
+					{
+						msg_parse = &msg_RELPOSNED;
+					}
+					else
+					{
+						gps_parse_errors++;
+						msg_parse = &msg_B3;    // error condition
+					}
+					break;
+				}
 // fin modif gfm
 				}
 #if (HILSIM == 1)
@@ -1252,7 +1276,6 @@ static void msg_CS1(uint8_t gpschar)
 
 void gps_update_basic_data(void)
 {
-	week_no         = week_no_;
 	svs             = svs_;
 }
 
@@ -1264,15 +1287,24 @@ void gps_commit_data(void)
 	lat_gps         = lat_gps_;
 	lon_gps         = lon_gps_;
 	alt_sl_gps.WW   = alt_sl_gps_.WW / 10;          // SIRF provides altMSL in cm, UBX provides it in mm
+#if (GPS_TYPE == GPS_UBX_10HZ)
+	sog_gps.BB      = gSpeed_._.W0 / 10;                // SIRF uses 2 byte SOG, UBX PVT in mm/s (max 65 m/s)
+	cog_gps.BB      = (uint16_t)(headMot_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX PVT 10^-5 deg in centième de degré, (max 655 degrés)
+	climb_gps.BB    = - velD_._.W0;            // SIRF uses 2 byte climb rate, UBX provides 4 bytes
+	hdop            = (uint8_t)(hdop_.BB / 20);     // SIRF scales HDOP by 5, UBX by 10^-2
+	vdop		= (uint8_t)(vAcc_.WW / 20);    // Vertical accuracy is not vertical DOP but can be used instead
+#else    
 	sog_gps.BB      = sog_gps_._.W0;                // SIRF uses 2 byte SOG, UBX provides 4 bytes
-#if (HILSIM == 1)
-	hilsim_airspeed.BB = as_sim_._.W0;              // provided by HILSIM, simulated airspeed
-#endif
 	cog_gps.BB      = (uint16_t)(cog_gps_.WW / 1000);// SIRF uses 2 byte COG, 10^-2 deg, UBX provides 4 bytes, 10^-5 deg
-
 	climb_gps.BB    = - climb_gps_._.W0;            // SIRF uses 2 byte climb rate, UBX provides 4 bytes
 	hdop            = (uint8_t)(hdop_.BB / 20);     // SIRF scales HDOP by 5, UBX by 10^-2
 	vdop		= (uint8_t)(vdop_.BB / 20);
+#endif
+    
+#if (HILSIM == 1)
+	hilsim_airspeed.BB = as_sim_._.W0;              // provided by HILSIM, simulated airspeed
+#endif
+
 	// SIRF provides position in m, UBX provides cm
 //	xpg.WW          = xpg_.WW / 100;
 //	ypg.WW          = ypg_.WW / 100;
@@ -1304,9 +1336,9 @@ void init_gps_data(void)
 	clkd_.WW     =0;
         clkd_Acc_.WW =0;           // ClkD Accuracy
 	Flags_.__.B0 =0x21;
-        Flags_.__.B1 =0;
+    Flags_.__.B1 =0;
 	Flags_.__.B2 =0;
-        Flags_.__.B3 =0;            // Flags
+    Flags_.__.B3 =0;            // Flags
 
 	lat_gps_         = lat_origin;
 	lon_gps_        = lon_origin;

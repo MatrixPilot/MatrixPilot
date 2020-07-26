@@ -39,8 +39,8 @@ uint16_t air_speed_magnitudeXY = 0;
 uint16_t air_speed_3DGPS = 0;
 int8_t calculated_heading;           // takes into account wind velocity
 
-//union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
-//union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
+union longbbbb xpg, ypg, zpg;                     // gps x, y, z position
+union intbb    xvg, yvg, zvg;                     // gps x, y, z velocity
 //uint8_t mode1, mode2;                             // gps mode1, mode2
 volatile union intbb hilsim_airspeed;  // referenced in estWind and deadReckoning modules
 

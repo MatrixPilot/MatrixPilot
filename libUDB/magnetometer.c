@@ -66,8 +66,9 @@ uint8_t magreg[6];              // magnetometer read-write buffer
 static uint8_t magreg[6];       // magnetometer read-write buffer
 
 static uint8_t hmc5883read_index[]  = { 0x03 }; // Address of the first register to read
-static uint8_t hmc5883write_index[] = { 0x00 }; // Address of the first register to read
-static uint8_t hmc5883mode_index[] = { 0x02 }; // Address of the first register to read
+static uint8_t hmc5883write_index[] = { 0x00 }; // Address of the first register to write
+// mode register is not used, default value are kept
+//static uint8_t hmc5883mode_index[] = { 0x02 }; // Address of the mode register to read or write
 
 static uint8_t enableMagRead[]        = { 0x10 , 0x20 , 0x00 }; // Continuous measurement
 static uint8_t enableMagCalibration[] = { 0x11 , 0x20 , 0x01 }; // Positive bias (Self Test) and single measurement
