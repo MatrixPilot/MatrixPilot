@@ -245,6 +245,7 @@ void udb_callback_read_sensors(void)
 	read_accel();
 }
 
+/*
 static int16_t omegaSOG(int16_t omega, int16_t speed)
 {
 	// multiplies omega times speed, and scales appropriately
@@ -268,7 +269,16 @@ static int16_t omegaSOG(int16_t omega, int16_t speed)
 		return working._.W1;
 	}
 }
+*/
+// no centrifugal adjustment for multirotor
+static void adj_accel(int16_t angleOfAttack)
+{
+	gravity_vector_plane[0] = gplane[0];
+	gravity_vector_plane[1] = gplane[1];
+	gravity_vector_plane[2] = gplane[2];
+}
 
+/*
 static void adj_accel(int16_t angleOfAttack)
 {
 	// Performs centrifugal compensation without a GPS.
@@ -359,6 +369,7 @@ static void adj_accel(int16_t angleOfAttack)
 	gravity_vector_plane[1] = gravity_vector_plane[1] - omegaSOG(omegaAccum[0], air_speed_z) + ((uint16_t)(ACCELSCALE)) * forward_acceleration;
 
 }
+*/
 
 // The update algorithm!!
 static void rupdate(void)

@@ -137,7 +137,7 @@ void dcm_callback_gps_location_updated(void)
 	return ;
 }
 
-
+extern boolean origin_recorded ;
 
 // Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
@@ -180,7 +180,7 @@ void dcm_heartbeat_callback(void)
 	if ((udb_heartbeat_counter % (10*HEARTBEAT_HZ/SERVO_HZ)) == 0)
 
 	{
-		if ( didCalibrate )
+		if ( didCalibrate && origin_recorded )
 		{
 			send_debug_line(differential_gps() , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
 		}

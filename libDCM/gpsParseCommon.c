@@ -139,6 +139,9 @@ boolean gps_nav_capable_check_set(void)
 
 extern boolean differential_gps(void) ;
 
+boolean origin_recorded = false ;
+#define LOCK_DELAY_COUNT 240
+uint16_t lock_count = 0 ;
 static void gps_parse_common_callback(void)
 {
 	dirOverGndHrmat[0] = rmat[1];
@@ -158,7 +161,16 @@ static void gps_parse_common_callback(void)
 		gps_commit_data();
 		gps_data_age = 0;
 		dcm_callback_gps_location_updated();
-
+		
+		if (!origin_recorded&&(lock_count > LOCK_DELAY_COUNT ))
+		{
+			dcm_set_origin_location( lon_gps.WW , lat_gps.WW, alt_sl_gps.WW ) ;
+			origin_recorded = true ;
+		}
+		else
+		{
+			lock_count ++ ;
+		}
 		estLocation();
 		estWind(GetAofA());
 		estAltitude();

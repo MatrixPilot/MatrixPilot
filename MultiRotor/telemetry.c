@@ -120,9 +120,10 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 				TARGET_ALTITUDE ) ;
 			break ;	
 		case 13:
-			serial_output( "offsets = %i , %i , %i , %i , %i , %i\r\n " ,
+			serial_output( "offsets = %i , %i , %i , %i , %i , %i\r\no_lat, o_lon, o_alt , %li , %li , %li\r\n " ,
 					udb_xaccel.offset , udb_yaccel.offset , udb_zaccel.offset ,
-					udb_xrate.offset , udb_yrate.offset , udb_zrate.offset ) ;
+					udb_xrate.offset , udb_yrate.offset , udb_zrate.offset ,
+					lat , lon , alt ) ;
 			break ;
 		case 14:
 #if (DEBUG_MAG == 1)
@@ -156,7 +157,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		}
 #else
 		{
-			serial_output( "%i , %i , %i , %li , %li , %li , %u , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %u , %i , %u , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i , %i\r\n" ,
+			serial_output( "%i,%i,%i,%li,%li,%li,%u,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%i,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
 			udb_pwIn[6] ,
 			differential_flag , sats , lat , lon , alt , sog , cog , climb ,
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,

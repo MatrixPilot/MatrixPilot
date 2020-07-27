@@ -42,13 +42,18 @@
 //#define DR_TAU 2.0
 
 // GRAVITYM is 980 cm/sec^2, GRAVITY is 2000 counts
-// dx/dt^2 * ACCEL2DELTAV = mm/sec
-#define ACCEL2DELTAV ((DR_TIMESTEP*10.0*GRAVITYM*MAX16)/GRAVITY)
+// XY: dx/dt^2 * ACCEL2DELTAV_XY = cm/sec
+#define ACCEL2DELTAV_XY ((DR_TIMESTEP*GRAVITYM*MAX16)/GRAVITY)
+// Z: dx/dt^2 * ACCEL2DELTAV_Z = mm/sec
+#define ACCEL2DELTAV_Z ((DR_TIMESTEP*10.0*GRAVITYM*MAX16)/GRAVITY)
 
-// velocity in mm/sec, location in mm
-#define VELOCITY2LOCATION (DR_TIMESTEP*MAX16*16.0)
+//  X and Y velocity in cm/sec, location in meters
+#define VELOCITY2LOCATION_XY (DR_TIMESTEP*.01*MAX16*16.0)
 // The factor of 16 is so that the gain is more precise.
 // There is a subsequent right shift by 4 to cancel the multiply by 16.
+
+// Z velocity in mm/sec,  Z location in mm
+#define VELOCITY2LOCATION_Z (DR_TIMESTEP*MAX16*16.0)
 
 // dimensionless
 #define DR_FILTER_GAIN (int16_t)(DR_TIMESTEP*MAX16/DR_TAU)
@@ -141,9 +146,9 @@ void dead_reckon(void)
 		IMUintegralAccelerationz.WW += __builtin_mulss(((int16_t)(DR_I_GAIN)), velocityErrorEarth[2]);
 
 		// integrate the raw acceleration
-		IMUvelocityx.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[0]);
-		IMUvelocityy.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[1]);
-		IMUvelocityz.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV)), accelEarth[2]);
+		IMUvelocityx.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV_XY)), accelEarth[0]);
+		IMUvelocityy.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV_XY)), accelEarth[1]);
+		IMUvelocityz.WW += __builtin_mulss(((int16_t)(ACCEL2DELTAV_Z)), accelEarth[2]);
 		
 		// apply the proportional term for the acceleration bias compensation
 		IMUvelocityx.WW += __builtin_mulss(2*DR_FILTER_GAIN, velocityErrorEarth[0]);
@@ -156,9 +161,9 @@ void dead_reckon(void)
 		IMUvelocityz.WW += __builtin_mulss(DR_TIMESTEP*MAX16,IMUintegralAccelerationz._.W1);
 		
 		// integrate IMU velocity to update the IMU location	
-		IMUlocationx.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUvelocityx._.W1)>>4);
-		IMUlocationy.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUvelocityy._.W1)>>4);
-		IMUlocationz.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION)), IMUvelocityz._.W1)>>4);
+		IMUlocationx.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION_XY)), IMUvelocityx._.W1)>>4);
+		IMUlocationy.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION_XY)), IMUvelocityy._.W1)>>4);
+		IMUlocationz.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION_Z)), IMUvelocityz._.W1)>>4);
 
 		// apply the location bias compensation
 		IMUlocationx.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[0]);
