@@ -32,6 +32,7 @@
 #include "../libUDB/serialIO.h"
 #include <string.h>
 #include "../libUDB/servoOutPins.h"
+#include "../libUDB/heartbeat.h"
 
 // GPS parser modules variables
 union longbbbb lat_gps_, lon_gps_;
@@ -139,6 +140,9 @@ boolean gps_nav_capable_check_set(void)
 
 extern boolean differential_gps(void) ;
 
+#define DR_PERIOD (int16_t)((HEARTBEAT_HZ/GPS_RATE)+16)
+int16_t dead_reckon_clock = DR_PERIOD ;
+
 boolean origin_recorded = false ;
 #define LOCK_DELAY_COUNT 240
 uint16_t lock_count = 0 ;
@@ -150,6 +154,7 @@ static void gps_parse_common_callback(void)
 //	udb_led_toggle(LED_GREEN);
 	if (gps_nav_valid())
 	{
+		dead_reckon_clock = DR_PERIOD ;
 		if ( differential_gps())
 		{
 			udb_led_toggle(SERVO_OUT_PIN_5);
@@ -171,17 +176,20 @@ static void gps_parse_common_callback(void)
 		{
 			lock_count ++ ;
 		}
-		estLocation();
-		estWind(GetAofA());
-		estAltitude();
-		estYawDrift();
+		if (origin_recorded)
+		{
+			estLocation();
+			//estWind(GetAofA());
+			//estAltitude();
+			//estYawDrift();
 
-		dcm_flags._.yaw_req = 1;       // request yaw drift correction
-		dcm_flags._.reckon_req = 1;    // request dead reckoning correction
-		dcm_flags._.rollpitch_req = 1;
+			//dcm_flags._.yaw_req = 1;       // request yaw drift correction
+			dcm_flags._.reckon_req = 1;    // request dead reckoning correction
+			//dcm_flags._.rollpitch_req = 1;
 #if (DEADRECKONING == 0)
-		navigate_process_flightplan();
+			navigate_process_flightplan();
 #endif
+		}
 	}
 	else
 	{
