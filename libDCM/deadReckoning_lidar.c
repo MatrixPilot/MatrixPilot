@@ -45,8 +45,8 @@
 // Z: dx/dt^2 * ACCEL2DELTAV_Z = mm/sec
 #define ACCEL2DELTAV_Z ((DR_TIMESTEP*10.0*GRAVITYM*MAX16)/GRAVITY)
 
-//  X and Y velocity in cm/sec, location in meters
-#define VELOCITY2LOCATION_XY (DR_TIMESTEP*.01*MAX16*16.0)
+//  X and Y velocity in cm/sec, location in cm
+#define VELOCITY2LOCATION_XY (DR_TIMESTEP*MAX16*16.0)
 // The factor of 16 is so that the gain is more precise.
 // There is a subsequent right shift by 4 to cancel the multiply by 16.
 

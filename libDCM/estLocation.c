@@ -48,9 +48,9 @@ static void location_plane(int16_t* location)
 {
 	union longbbbb accum_nav;
 
-	accum_nav.WW = ((lat_gps.WW - lat_origin.WW)/90); // in meters, range is about 20 miles
+	accum_nav.WW = ((100*(lat_gps.WW - lat_origin.WW))/90); // in cm, range is about 1000 feet
 	location[1] = accum_nav._.W0;
-	accum_nav.WW = long_scale((lon_gps.WW - lon_origin.WW)/90, cos_lat);
+	accum_nav.WW = long_scale((100*(lon_gps.WW - lon_origin.WW))/90, cos_lat);
 	location[0] = accum_nav._.W0;
 #if (USE_BAROMETER_ALTITUDE == 1 ) 
 #warning "using pressure altitude instead of GPS altitude"
@@ -58,7 +58,7 @@ static void location_plane(int16_t* location)
 	// longword result = (longword/10 - longword)/100 : range
 	accum_nav.WW = ((get_barometer_altitude()/10) - alt_origin.WW)/100; // height in meters
 #else
-	accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW)/100; // height in meters
+	accum_nav.WW = (alt_sl_gps.WW - alt_origin.WW); // height in cm
 #endif // USE_BAROMETER_ALTITUDE
 	location[2] = accum_nav._.W0;
 }
