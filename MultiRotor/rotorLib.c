@@ -3,7 +3,17 @@
 #include "../libDCM/mathlib.h"
 #include "../libDCM/mathlibNAV.h"
 
-int fractional_product ( int x , int y )
+int16_t multiply_saturate ( int16_t x , int16_t y , int16_t maximum )
+{
+	int32_t product , max_32 ;
+	max_32 = (int32_t) maximum ;
+	product = __builtin_mulss( x , y ) ;
+	if (product > max_32 ) product = maximum ;
+	if (product <  (-max_32 )) product =(-maximum) ;
+	return ((int16_t) product) ;
+}
+
+int16_t fractional_product ( int16_t x , int16_t y )
 {
 	union longww long_accum ;
 	long_accum.WW = __builtin_mulss( x , y ) ;
@@ -16,7 +26,7 @@ int fractional_product ( int x , int y )
 //  but it should eventually be updated
 #define RMAX15 24576 //0b0110000000000000   // 1.5 in 2.14 format
 #define RMAX 16384
-void matrix_normalize(int matrix[])
+void matrix_normalize(int16_t matrix[])
 //	This is the routine that maintains the orthogonality of the
 //	direction cosine matrix, which is expressed by the identity
 //	relationship that the cosine matrix multiplied by its
@@ -57,7 +67,7 @@ void matrix_normalize(int matrix[])
 }
 
 
-void MatrixRotate( int matrix[] , int angle[] )
+void MatrixRotate( int16_t matrix[] , int16_t angle[] )
 {
 	int rup[9] ;
 	int rbuff[9] ;

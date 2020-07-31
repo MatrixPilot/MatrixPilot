@@ -37,6 +37,8 @@
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 5 // prevent Tx pulse variation from causing yaw drift
 
+extern union longww IMUlocationx , IMUlocationy , IMUvelocityx , IMUvelocityy ;
+
 int theta[3] ;
 extern boolean didCalibrate ;
 extern int commanded_tilt_gain ;
@@ -62,6 +64,8 @@ int pwManual[NUM_INPUTS+1] ;
 int commanded_roll ;
 int commanded_pitch ;
 int commanded_yaw ;
+int x_velocity_feedback ;
+int y_velocity_feedback ;
 
 int roll_error ;
 int pitch_error ;
@@ -171,8 +175,20 @@ void motorCntrl(void)
 		{
 			commanded_yaw = 0 ;
 		}
-
-		compute_tilt_rmat( tilt_rmat , commanded_roll , commanded_pitch ) ;
+		
+		
+		x_velocity_feedback = multiply_saturate ( -IMUvelocityx._.W1 , LATERAL_RATE_GAIN , RMAX ) ;
+		y_velocity_feedback = multiply_saturate ( -IMUvelocityy._.W1 , LATERAL_RATE_GAIN , RMAX ) ;	
+		
+		if ( dcm_flags._.position_hold_req )
+		{
+			compute_tilt_rmat( tilt_rmat , commanded_roll+x_velocity_feedback , commanded_pitch+y_velocity_feedback ) ;	
+		}
+		else
+		{
+			compute_tilt_rmat( tilt_rmat , commanded_roll , commanded_pitch ) ;
+		}
+		
 	
 		// update yaw matrix
 		yaw_step = (commanded_yaw/4) * yaw_command_gain;
