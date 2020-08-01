@@ -66,6 +66,9 @@ int commanded_pitch ;
 int commanded_yaw ;
 int x_velocity_feedback ;
 int y_velocity_feedback ;
+int16_t x_velocity_target , y_velocity_target ;
+int16_t x_position_target = 0 , y_position_target = 0 ;
+int16_t delta_position[3] ;
 
 int roll_error ;
 int pitch_error ;
@@ -90,6 +93,13 @@ const uint16_t yaw_command_gain = ((long) MAX_YAW_RATE )*(4.8/PID_HZ) ;
 //static fractional ggain_control[] =  { GGAIN_CONTROL, GGAIN_CONTROL, GGAIN_CONTROL };
 int yaw_rmat[9] = { RMAX , 0 , 0 , 0 , RMAX , 0 , 0 , 0 , RMAX } ;
 int tilt_rmat[9] ;
+
+int16_t mult_Q2_14( int16_t x , int16_t y)
+{
+	int32_t product ;
+	product = (__builtin_mulss(x,y))>>14 ;
+	return (int16_t) product ;
+}
 
 void motorCntrl(void)
 {
@@ -176,6 +186,14 @@ void motorCntrl(void)
 			commanded_yaw = 0 ;
 		}
 		
+		delta_position[0] = x_position_target - IMUlocationx._.W1 ;
+		delta_position[1] = y_position_target - IMUlocationy._.W1 ;
+		delta_position[2] = MAX_DISTANCE ;
+		
+		vector3_normalize(delta_position,delta_position) ;
+		
+		x_velocity_target = mult_Q2_14 ( delta_position[0], MAX_SPEED );
+		y_velocity_target = mult_Q2_14 ( delta_position[1], MAX_SPEED );
 		
 		x_velocity_feedback = multiply_saturate ( -IMUvelocityx._.W1 , LATERAL_RATE_GAIN , RMAX ) ;
 		y_velocity_feedback = multiply_saturate ( -IMUvelocityy._.W1 , LATERAL_RATE_GAIN , RMAX ) ;	

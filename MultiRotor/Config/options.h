@@ -171,7 +171,9 @@
 #define MAX_YAW_RATE 51  
 // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45
-#define LATERAL_RATE_GAIN 16
+#define LATERAL_RATE_GAIN 32
+#define MAX_SPEED 500 // cm/sec
+#define MAX_DISTANCE 2000 // cm
 
 #define USE_LIDAR 1
 #define ROTOR_CRAFT "spedix, July 31, 2020\r\n"

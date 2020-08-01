@@ -47,6 +47,7 @@ extern int16_t IMU_climb , IMU_altitude ;
 extern int16_t target_rate[3] ;
 extern union longww IMUlocationx , IMUlocationy , IMUvelocityx , IMUvelocityy ;
 extern int16_t x_velocity_feedback , y_velocity_feedback ;
+extern int16_t x_velocity_target , y_velocity_target ;
 extern int16_t udb_magFieldBody[3] ;
 extern fractional magFieldEarth[3];
 extern fractional magAlignment[4];
@@ -88,10 +89,10 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 				YAW_KI  ) ;
 			break ;
 		case 6:
-			serial_output( "TILT_KD = %5f, YAW_KD = %5f, LAT_RATE_GAIN = %i\r\n" ,
+			serial_output( "TILT_KD = %5f, YAW_KD = %5f\r\nLAT_RATE_GAIN = %i, MAX_V = %i, MAX_D = %i\r\n" ,
 				TILT_KD ,
 				YAW_KD ,
-				LATERAL_RATE_GAIN ) ;
+				LATERAL_RATE_GAIN , MAX_SPEED , MAX_DISTANCE ) ;
 			break ;
 		case 7:
 			serial_output( "TILT_FF = %5f, TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
@@ -134,7 +135,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			}
 #else
 			{
-				serial_output( "roll_cmd , pitch_cmd , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+				serial_output( "roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			}
 #endif // DEBUG_MAG
 			hasWrittenHeader = 1 ;
@@ -159,8 +160,9 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		}
 #else
 		{
-			serial_output( "%i,%i,%i,%i,%i,%i,%u,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%i,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i,%u,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%i,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
 			commanded_roll , commanded_pitch ,
+			x_velocity_target , y_velocity_target ,
 			x_velocity_feedback , y_velocity_feedback ,
 			udb_pwIn[6] ,
 			differential_flag ,
