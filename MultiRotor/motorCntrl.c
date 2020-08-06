@@ -101,6 +101,7 @@ int16_t mult_Q2_14( int16_t x , int16_t y)
 	return (int16_t) product ;
 }
 
+boolean target_position_recorded = false ;
 void motorCntrl(void)
 {
 	int temp ;
@@ -186,28 +187,6 @@ void motorCntrl(void)
 			commanded_yaw = 0 ;
 		}
 		
-		delta_position[0] = x_position_target - IMUlocationx._.W1 ;
-		delta_position[1] = y_position_target - IMUlocationy._.W1 ;
-		delta_position[2] = MAX_DISTANCE ;
-		
-		vector3_normalize(delta_position,delta_position) ;
-		
-		x_velocity_target = mult_Q2_14 ( delta_position[0], MAX_SPEED );
-		y_velocity_target = mult_Q2_14 ( delta_position[1], MAX_SPEED );
-		
-		x_velocity_feedback = multiply_saturate ( -IMUvelocityx._.W1 , LATERAL_RATE_GAIN , RMAX ) ;
-		y_velocity_feedback = multiply_saturate ( -IMUvelocityy._.W1 , LATERAL_RATE_GAIN , RMAX ) ;	
-		
-		if ( dcm_flags._.position_hold_req )
-		{
-			compute_tilt_rmat( tilt_rmat , commanded_roll+x_velocity_feedback , commanded_pitch+y_velocity_feedback ) ;	
-		}
-		else
-		{
-			compute_tilt_rmat( tilt_rmat , commanded_roll , commanded_pitch ) ;
-		}
-		
-	
 		// update yaw matrix
 		yaw_step = (commanded_yaw/4) * yaw_command_gain;
 		yaw_vector[0] = 0 ;
@@ -219,31 +198,52 @@ void motorCntrl(void)
 		if( dcm_flags._.fpv_tilt_req == 1 )
 		// multiply commanded yaw matrix by commanded tilt matrix to get overall target matrix
 		// this if for commanded tilt in body frame 
-			{	
-				MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;
-			}
-		else
-		{
-			if (dcm_flags._.earth_frame_tilt_req == 1)
+		{	
+			compute_tilt_rmat( tilt_rmat , commanded_roll , commanded_pitch ) ;
+			MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;
+			MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
+		}
+			
+		if (dcm_flags._.earth_frame_tilt_req == 1)
 		
 		// multiply commanded tilt matrix by commanded yaw matrix to get overall target matrix
 		// this if for commanded tilt in earth frame 
-			{
-				MatrixMultiply ( 3 , 3 , 3 , target_rmat , tilt_rmat , yaw_rmat ) ;
-			}
-			else
-			{
-				if ( dcm_flags._.position_hold_req )
-				{
-					MatrixMultiply ( 3 , 3 , 3 , target_rmat , tilt_rmat , yaw_rmat ) ; // stub, just for now
-				}
-				else
-				{
-					MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ; // stub, just for now
-				}
-			}
+		{
+			x_velocity_feedback = multiply_saturate ( -IMUvelocityx._.W1 , LATERAL_RATE_GAIN , RMAX ) ;
+			y_velocity_feedback = multiply_saturate ( -IMUvelocityy._.W1 , LATERAL_RATE_GAIN , RMAX ) ;	
+			compute_tilt_rmat( tilt_rmat , commanded_roll+x_velocity_feedback , commanded_pitch+y_velocity_feedback ) ;	
+			MatrixMultiply ( 3 , 3 , 3 , target_rmat , tilt_rmat , yaw_rmat ) ;
+			MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
 		}
-		MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
+		
+		if ( dcm_flags._.position_hold_req )
+		{
+			if (target_position_recorded == false )
+			{
+				x_position_target = IMUlocationx._.W1 ;
+				y_position_target = IMUlocationy._.W1 ;
+				target_position_recorded = true ;
+			}
+			delta_position[0] = x_position_target - IMUlocationx._.W1 ;
+			delta_position[1] = y_position_target - IMUlocationy._.W1 ;
+			delta_position[2] = MAX_DISTANCE ;
+		
+			vector3_normalize(delta_position,delta_position) ;
+					
+			x_velocity_target = mult_Q2_14 ( delta_position[0], MAX_SPEED );
+			y_velocity_target = mult_Q2_14 ( delta_position[1], MAX_SPEED );
+		
+			x_velocity_feedback = multiply_saturate ( x_velocity_target-IMUvelocityx._.W1 , LATERAL_RATE_GAIN , RMAX ) ;
+			y_velocity_feedback = multiply_saturate ( y_velocity_target-IMUvelocityy._.W1 , LATERAL_RATE_GAIN , RMAX ) ;	
+			
+			compute_tilt_rmat( tilt_rmat , commanded_roll+x_velocity_feedback , commanded_pitch+y_velocity_feedback ) ;	
+			MatrixMultiply ( 3 , 3 , 3 , target_rmat , tilt_rmat , yaw_rmat ) ;
+			MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
+		}
+		else
+		{
+			target_position_recorded = false ;
+		}
 		
 		// compute feed forward
 		MatrixMultiply( 3 , 3 , 3 , target_rmat_change , target_rmat_prev_transpose , target_rmat ) ;
