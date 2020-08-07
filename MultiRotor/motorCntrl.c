@@ -203,20 +203,28 @@ void motorCntrl(void)
 			MatrixMultiply ( 3 , 3 , 3 , target_rmat , yaw_rmat , tilt_rmat ) ;
 			MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
 		}
-			
-		if (dcm_flags._.earth_frame_tilt_req == 1)
 		
-		// multiply commanded tilt matrix by commanded yaw matrix to get overall target matrix
-		// this if for commanded tilt in earth frame 
+		if (dcm_flags._.position_hold_req == 1)
 		{
-			x_velocity_feedback = multiply_saturate ( -IMUvelocityx._.W1 , LATERAL_RATE_GAIN , RMAX ) ;
-			y_velocity_feedback = multiply_saturate ( -IMUvelocityy._.W1 , LATERAL_RATE_GAIN , RMAX ) ;	
+			
+			delta_position[0] =  - IMUlocationx._.W1 ;
+			delta_position[1] =  - IMUlocationy._.W1 ;
+			delta_position[2] = MAX_DISTANCE ;
+		
+			vector3_normalize(delta_position,delta_position) ;
+					
+			x_velocity_target = mult_Q2_14 ( delta_position[0], MAX_SPEED );
+			y_velocity_target = mult_Q2_14 ( delta_position[1], MAX_SPEED );
+		
+			x_velocity_feedback = multiply_saturate ( x_velocity_target-IMUvelocityx._.W1 , LATERAL_RATE_GAIN , RMAX ) ;
+			y_velocity_feedback = multiply_saturate ( y_velocity_target-IMUvelocityy._.W1 , LATERAL_RATE_GAIN , RMAX ) ;	
+			
 			compute_tilt_rmat( tilt_rmat , commanded_roll+x_velocity_feedback , commanded_pitch+y_velocity_feedback ) ;	
 			MatrixMultiply ( 3 , 3 , 3 , target_rmat , tilt_rmat , yaw_rmat ) ;
 			MatrixAdd( 3 , 3 , target_rmat , target_rmat , target_rmat ) ;
 		}
 		
-		if ( dcm_flags._.position_hold_req )
+		if ( dcm_flags._.earth_frame_tilt_req == 1 )
 		{
 			if (target_position_recorded == false )
 			{
