@@ -58,7 +58,7 @@
 #include "MAVMission.h"
 #include "MAVFlexiFunctions.h"
 #include "MAVUDBExtra.h"
-#include "../MAVLink/MAVFTP.h"
+//#include "../MAVLink/MAVFTP.h"
 
 //#if (SILSIM != 1)
 #include "../libUDB/libUDB.h" // Needed for access to RCON
@@ -631,6 +631,40 @@ void MAVLinkSetMode(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_SET_MODE:
 	}
 }
 
+static void MAVLinkRTCMData(mavlink_message_t* handle_msg) // MAVLINK_MSG_ID_GPS_RTCM_DATA
+{
+    uint8_t flag; /*< LSB: 1 means message is fragmented*/
+    int16_t length; /*< data length*/
+	mavlink_gps_rtcm_data_t gps_rtcm_data_msg;
+	mavlink_msg_gps_rtcm_data_decode(handle_msg, &gps_rtcm_data_msg);
+
+	DPRINT("MAVLINK_MSG_ID_GPS_RTCM_DATA %u\r\n", handle_msg->msgid);
+	//send_text((const uint8_t*) "Action: Request data stream\r\n");
+	// QgroundControl sends data stream request to component ID 1, which is not our component for UDB.
+    flag = gps_rtcm_data_msg.flags;
+    length = (int16_t)gps_rtcm_data_msg.len;
+    // Dans un premier temps, on va transmettre le packet tel quel, sans chercher à reformer le message
+    // à partir des sous-ensembles indexés dans flags et de longueur len
+    gpsoutbin(length, gps_rtcm_data_msg.data);
+ }
+/* PX4 implementation of msessage-rtcm_data
+MavlinkReceiver::handle_message_gps_rtcm_data(mavlink_message_t *msg)
+{
+	mavlink_gps_rtcm_data_t gps_rtcm_data_msg;
+	mavlink_msg_gps_rtcm_data_decode(msg, &gps_rtcm_data_msg);
+
+	gps_inject_data_s gps_inject_data_topic{};
+
+	gps_inject_data_topic.len = math::min((int)sizeof(gps_rtcm_data_msg.data),
+					      (int)sizeof(uint8_t) * gps_rtcm_data_msg.len);
+	gps_inject_data_topic.flags = gps_rtcm_data_msg.flags;
+	memcpy(gps_inject_data_topic.data, gps_rtcm_data_msg.data,
+	       math::min((int)sizeof(gps_inject_data_topic.data), (int)sizeof(uint8_t) * gps_inject_data_topic.len));
+
+	_gps_inject_data_pub.publish(gps_inject_data_topic);
+}
+*/
+
 // Portions of the following code in handlesmessage() are templated off source code written by James Goppert for the
 // ArdupilotMega, and are used by his kind permission and also in accordance with the GPS V3 licensing
 // of that code.
@@ -649,7 +683,7 @@ static void handleMessage(void)
 		handle_msg = &msg[0];
 	}
 
-//	DPRINT("MAV MSG 0x%x\r\n", handle_msg->msgid);
+	DPRINT("MAV MSG 0x%x\r\n", handle_msg->msgid);
 
 	handling_of_message_completed |= MAVParamsHandleMessage(handle_msg);
 	handling_of_message_completed |= MAVMissionHandleMessage(handle_msg);
@@ -677,6 +711,10 @@ static void handleMessage(void)
 //		case 11:
 		case MAVLINK_MSG_ID_SET_MODE:
 			MAVLinkSetMode(handle_msg);
+			break;
+		case MAVLINK_MSG_ID_GPS_RTCM_DATA:
+			MAVLinkRTCMData(handle_msg);
+            udb_led_toggle(LED_BLUE);
 			break;
 		default:
 //			DPRINT("handle_msg->msgid %u NOT HANDLED\r\n", handle_msg->msgid);
@@ -859,6 +897,7 @@ extern int control_mode;
 		}
         //gfm control lode displayed on the bit 2 of mavlink_base_mode
         if (control_mode != TILT_MODE) mavlink_base_mode  = mavlink_base_mode +2;
+        mavlink_base_mode = dcm_flags._.dead_reckon_enable;
 //		mavlink_msg_heartbeat_send(MAVLINK_COMM_0, MAV_TYPE_FIXED_WING, MAV_AUTOPILOT_UDB, mavlink_base_mode, mavlink_custom_mode, MAV_STATE_ACTIVE);
 //gfm IMU altitude sent instead of custom_mode,gps_fix_type instead of MAV_TYPE_QUADROTOR
                 //udb_cpu_load() instead of MAV_AUTOPILOT_UDB and Lidar/32 instead of MAV_STATE_ACTIVE
@@ -914,7 +953,7 @@ extern int control_mode;
 //		relative_alt =IMUlocationz._.W1 * 1000;
 //		relative_alt =(int32_t)IMUlocationz.WW >> 6;
 //gfm		alt = relative_alt + (alt_origin.WW * 10);          // In millimeters; more accurate if used IMUlocationz._.W0
-//gfm alt is relaced by the altitude fusion output and relative_alt by the baro output
+//gfm alt is replaced by the altitude fusion output and relative_alt by the baro output
         baro = (int32_t) barometer_agl_altitude;
 
 		mavlink_heading = get_geo_heading_angle() * 100;    // mavlink global position expects heading value x 100

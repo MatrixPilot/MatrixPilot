@@ -28,7 +28,7 @@ const mavlink_parameter_parser mavlink_parameter_parsers[] = {
 	{ &mavlink_send_frame_anglerate, &mavlink_set_frame_anglerate, MAVLINK_TYPE_INT32_T},
 	{ &mavlink_send_dcm_angle, &mavlink_set_dcm_angle, MAVLINK_TYPE_INT32_T},
 	{ &mavlink_send_param_float, &mavlink_set_param_float, MAVLINK_TYPE_FLOAT},
-    //       { &mavlink_send_gps_position, &mavlink_set_gps_position, MAVLINK_TYPE_INT32_T},
+    { &mavlink_send_gps_position, &mavlink_set_gps_position, MAVLINK_TYPE_INT32_T}
  	};
 
 #ifdef _MSC_VER
@@ -36,14 +36,6 @@ mavlink_parameter mavlink_parameters_list[] = {
 #else
 const mavlink_parameter mavlink_parameters_list[] = {
 #endif // _MSC_VER
-   // Modif gfm GPS parameters creation
-/*    {"GPS_LATITUDE" , {.param_int32=-900000000} , {.param_int32=900000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &lat_gps, sizeof(lat_gps) },
-    {"GPS_LONGITUDE" , {.param_int32=-1800000000} , {.param_int32=1800000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &lon_gps, sizeof(lon_gps) },
-    {"GPS_ALTITUDE" , {.param_int32=-1000000} , {.param_int32=1000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &alt_sl_gps, sizeof(alt_sl_gps) },
-    {"GPS_WEEK_NO" , {.param_int32=0} , {.param_int32=10000} , UDB_TYPE_INT, PARAMETER_READWRITE, (void*) &week_no, sizeof(week_no) },
-    {"GPS_TOW" , {.param_int32=0} , {.param_int32=605000000} , UDB_TYPE_GPS_POSITION, PARAMETER_READWRITE, (void*) &tow, sizeof(tow) },
-*/
-    // fin modif gfm GPS
 	{"PID_ROLLKP", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rollkp, sizeof(rollkp) },
 	{"PID_ROLLKD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&rollkd, sizeof(rollkd) },
 	{"PID_ROLLKA", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&rollka, sizeof(rollka) },
@@ -53,10 +45,10 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"PID_YAWKPRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&yawkprud, sizeof(yawkprud) },
 	{"PID_YAWKDRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkdrud, sizeof(yawkdrud) },
 	{"PID_YAWKARUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkarud, sizeof(yawkarud) },
-         {"PID_THROTTLEKP" , {.param_float=0.0} , {.param_float=10.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttlekp, sizeof(throttlekp) },
-         {"PID_THROTTLEKI" , {.param_float=0.0} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttleki, sizeof(throttleki) },
-         {"PID_THROTTLEKD" , {.param_float=0.0} , {.param_float=10.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttlekd, sizeof(throttlekd) },
-         {"PID_THROTTLEKA" , {.param_float=-2.0} , {.param_float=2.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttleka, sizeof(throttleka) },
+    {"PID_THROTTLEKP" , {.param_float=0.0} , {.param_float=10.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttlekp, sizeof(throttlekp) },
+    {"PID_THROTTLEKI" , {.param_float=0.0} , {.param_float=1.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttleki, sizeof(throttleki) },
+    {"PID_THROTTLEKD" , {.param_float=0.0} , {.param_float=10.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttlekd, sizeof(throttlekd) },
+    {"PID_THROTTLEKA" , {.param_float=-2.0} , {.param_float=2.0} , UDB_TYPE_Q14, PARAMETER_READWRITE, (void*) &throttleka, sizeof(throttleka) },
 /*	{"PID_YAWKPAIL", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&yawkpail, sizeof(yawkpail) },
 	{"PID_YAWKDAIL", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_GYROSCALE_Q14, PARAMETER_READWRITE, (void*)&yawkdail, sizeof(yawkdail) },
 	{"PID_ROLLKPRUD", {.param_float=0.0}, {.param_float=0.5}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&rollkprud, sizeof(rollkprud) },
@@ -89,7 +81,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"PWTRIM_CAMPITCH", {.param_float=800.0}, {.param_float=2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL], sizeof(udb_pwTrim[CAMERA_PITCH_INPUT_CHANNEL]) },
 	{"PWTRIM_CAM_YAW", {.param_float=800.0}, {.param_float=2200.0}, UDB_TYPE_PWTRIM, PARAMETER_READWRITE, (void*)&udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL], sizeof(udb_pwTrim[CAMERA_YAW_INPUT_CHANNEL]) },
 */
-	{"IMU_XACCEL_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_xaccel.offset, sizeof(udb_xaccel.offset) },
+/*	{"IMU_XACCEL_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_xaccel.offset, sizeof(udb_xaccel.offset) },
 	{"IMU_YACCEL_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_yaccel.offset, sizeof(udb_yaccel.offset) },
 	{"IMU_ZACCEL_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_zaccel.offset, sizeof(udb_zaccel.offset) },
 	{"IMU_XGYRO_OFF", {.param_int32=-32767}, {.param_int32=32767}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&udb_xrate.offset, sizeof(udb_xrate.offset) },
@@ -102,7 +94,7 @@ const mavlink_parameter mavlink_parameters_list[] = {
 	{"TH_H_MARGIN", {.param_int32=1}, {.param_int32=500}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&height_margin, sizeof(height_margin) },
 	{"TH_T_HOLD_MIN", {.param_float=0}, {.param_float=1}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&alt_hold_throttle_min, sizeof(alt_hold_throttle_min) },
 	{"TH_T_HOLD_MAX", {.param_float=0}, {.param_float=1}, UDB_TYPE_Q14, PARAMETER_READWRITE, (void*)&alt_hold_throttle_max, sizeof(alt_hold_throttle_max) },
-/*	{"TH_P_HOLD_MIN", {.param_int32=-89}, {.param_int32=0}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_min, sizeof(alt_hold_pitch_min) },
+	{"TH_P_HOLD_MIN", {.param_int32=-89}, {.param_int32=0}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_min, sizeof(alt_hold_pitch_min) },
 	{"TH_P_HOLD_MAX", {.param_int32=0}, {.param_int32=89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_max, sizeof(alt_hold_pitch_max) },
 	{"TH_P_HIGH", {.param_int32=0}, {.param_int32=89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&alt_hold_pitch_high, sizeof(alt_hold_pitch_high) },
 	{"TH_P_RTL_DOWN", {.param_int32=0}, {.param_int32=89}, UDB_TYPE_INT, PARAMETER_READWRITE, (void*)&rtl_pitch_down, sizeof(rtl_pitch_down) },

@@ -40,6 +40,7 @@ static int16_callback_fptr_t gps_callback_get_byte_to_send_fptr = NULL;
 static callback_uint8_fptr_t gps_callback_received_byte_fptr = NULL;
 
 static boolean udb_serial_stop_sending_flag = 1;
+static boolean udb_gps_stop_sending_flag = 1;
 
 void udb_init_GPS(int16_callback_fptr_t tx_fptr, callback_uint8_fptr_t rx_fptr)
 {
@@ -105,7 +106,13 @@ boolean udb_gps_check_rate(int32_t rate)
 
 void udb_gps_start_sending_data(void)
 {
+	 udb_gps_stop_sending_flag = false;
 	_U1TXIF = 1; // fire the tx interrupt
+}
+
+void udb_gps_stop_sending_data(void)
+{
+	udb_gps_stop_sending_flag  = true; 
 }
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
@@ -118,7 +125,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _U1TXInterrupt(void)
 	int16_t txchar = -1;
 #if (HILSIM_USB != 1)
 //	txchar = udb_gps_callback_get_byte_to_send();
-	if (gps_callback_get_byte_to_send_fptr)
+	if (gps_callback_get_byte_to_send_fptr && ! udb_serial_stop_sending_flag)
 	{
 		txchar = gps_callback_get_byte_to_send_fptr();
 	}

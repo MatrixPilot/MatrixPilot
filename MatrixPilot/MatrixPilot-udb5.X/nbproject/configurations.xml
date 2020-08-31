@@ -161,7 +161,7 @@
         <itemPath>../../MatrixPilot/states.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry.h</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.h</itemPath>
-        <itemPath>../../../MP5/MatrixPilot/motorCntrl.h</itemPath>
+        <itemPath>../motorCntrl.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
@@ -527,7 +527,7 @@
         <itemPath>../../MatrixPilot/telemetry.c</itemPath>
         <itemPath>../../MatrixPilot/telemetry_log.c</itemPath>
         <itemPath>../../MatrixPilot/yawCntrl.c</itemPath>
-        <itemPath>../../../MP5/MatrixPilot/motorCntrl.c</itemPath>
+        <itemPath>../motorCntrl.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MAVLink" displayName="MAVLink" projectFiles="true">
         <logicalFolder name="include" displayName="include" projectFiles="true">
@@ -772,6 +772,7 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

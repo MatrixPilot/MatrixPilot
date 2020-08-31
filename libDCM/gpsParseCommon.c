@@ -43,7 +43,10 @@ union longbbbb date_gps_, time_gps_;
 
 extern void (*msg_parse)(uint8_t gpschar);
 
-static const uint8_t* gps_out_buffer = 0;
+#define GPS_BUFFER_SIZE 1023
+static uint8_t gps_out_buffer[GPS_BUFFER_SIZE+1];
+static int16_t end_index = 0;
+//static const uint8_t* gps_out_buffer = 0;
 static int16_t gps_out_buffer_length = 0;
 static int16_t gps_out_index = 0;
 uint16_t gps_parse_errors = 0;
@@ -94,12 +97,27 @@ void (*msg_parse)(uint8_t) = &gps_parse_none;
 
 void gpsoutbin(int16_t length, const uint8_t msg[]) // output a binary message to the GPS
 {
-	gps_out_buffer = 0; // clear the buffer pointer first, for safety, in case we're interrupted
+    //modif gfm : il faut empiler les messages tant qu'ils n'ont pas été tous envoyés
+    //Ancien code
+/*	gps_out_buffer = 0; // clear the buffer pointer first, for safety, in case we're interrupted
 	gps_out_index = 0;
 	gps_out_buffer_length = length;
 	gps_out_buffer = (uint8_t*)msg;
-
-	udb_gps_start_sending_data();
+*/
+    //Nouveau code
+	int16_t start_index;
+	int16_t remaining;
+    int16_t i;
+	start_index = end_index;
+	remaining = GPS_BUFFER_SIZE - start_index;
+	if (remaining > length)
+	{
+        gps_out_buffer_length += length;
+		udb_gps_stop_sending_data();
+		for(i=0;i<length;i++) {gps_out_buffer[start_index+i] = msg[i];}
+		end_index = start_index + length;
+		udb_gps_start_sending_data();
+	}
 }
 
 void gpsoutline(const char *message) // output one NMEA line to the GPS
@@ -109,7 +127,7 @@ void gpsoutline(const char *message) // output one NMEA line to the GPS
 
 int16_t udb_gps_callback_get_byte_to_send(void)
 {
-	if (gps_out_buffer != 0 && gps_out_index < gps_out_buffer_length)
+	if (gps_out_index <= gps_out_buffer_length)
 	{
 		// We have a byte to send
 		return (uint8_t)(gps_out_buffer[gps_out_index++]);
@@ -117,7 +135,12 @@ int16_t udb_gps_callback_get_byte_to_send(void)
 	else
 	{
 		// No byte to send, so clear the link to the buffer
-		gps_out_buffer = 0;
+//       gps_out_buffer = 0;
+       //modif gfm : Remise à zero des paramètres de la pile
+       end_index = 0;
+       gps_out_index = 0;
+       gps_out_buffer_length = 0;// remise à zéro du nombre de data dans la pile
+    //fin modif gfm 
 	}
 	return -1;
 }

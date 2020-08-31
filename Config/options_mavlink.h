@@ -44,13 +44,13 @@
 #define MAVLINK_SYSID                                    55
 
 // Common data rates
-#define MAVLINK_RATE_RC_CHAN                   40   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |
+#define MAVLINK_RATE_RC_CHAN                   10   // RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW |
 #define MAVLINK_RATE_IMU_RAW                   0   // ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT. |
 #define MAVLINK_RATE_POSITION                  10   // LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages. |
 #define MAVLINK_RATE_RAW_SENSORS               10   // IMU_RAW, GPS_RAW, GPS_STATUS packets.
 
 // Fixed data rates
-#define MAVLINK_RATE_HEARTBEAT                 40
+#define MAVLINK_RATE_HEARTBEAT                 1
 #define MAVLINK_RATE_SYSTEM_STATUS             0
 
 // Matrixpilot specific data rates

@@ -458,30 +458,31 @@ static void MAVParamsSet(const mavlink_message_t* handle_msg)
 // modif gfm send GPS init into GPS
                                         // looking for GPS param
                                             union longww temp;
+                                            boolean flag = false;//Envoie d'un seul message pour ne pas les écraser
 //                                      // compare key with parameter name
                                             if (!strcmp(packet.param_id,"GPS_LATITUDE" )) // If QGC is setting a GPS value
                                                 {
                                                 lat_gps.WW=(int32_t)param.param_int32;
                                                 send_msg_AID_INI(AID_INI);
-                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                flag = true;
                                                 }
                                             if (!strcmp(packet.param_id,"GPS_LONGITUDE" )) // If QGC is setting a GPS value
                                                 {
                                                 lon_gps.WW=(int32_t)param.param_int32;
                                                 send_msg_AID_INI(AID_INI);
-                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                flag = true;
                                                 }
                                             if (!strcmp(packet.param_id,"GPS_ALTITUDE" )) // If QGC is setting a GPS value
                                                 {
                                                 alt_sl_gps.WW=(int32_t)param.param_int32;
                                                 send_msg_AID_INI(AID_INI);
-                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                flag = true;
                                                 }
                                             if (!strcmp(packet.param_id,"GPS_WEEK_NO" )) // If QGC is setting a GPS value
                                                 {
                                                 week_no.BB=(int16_t)param.param_int32;
                                                 send_msg_AID_INI(AID_INI);
-                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                flag = true;
                                                 }
                                             if (!strcmp(packet.param_id,"GPS_TOW" )) // If QGC is setting a GPS value
                                                 {
@@ -491,8 +492,9 @@ static void MAVParamsSet(const mavlink_message_t* handle_msg)
                                                 tow.__.B2=(uint8_t)(temp._.W1&0x00FF);
                                                 tow.__.B3=(uint8_t)(temp._.W1 >> 8);
                                                 send_msg_AID_INI(AID_INI);
-                                                gpsoutbin(AID_INI_length, AID_INI);
+                                                flag = true;
                                                 }
+                                                if (flag) gpsoutbin(AID_INI_length, AID_INI);
 // fin modif gfm
 		}
 		else

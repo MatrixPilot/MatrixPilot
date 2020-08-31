@@ -75,7 +75,7 @@
 //#define GPS_TYPE                            GPS_NMEA
 //#define DEFAULT_GPS_BAUD                    4800   // added for GPS_UBX_4HZ support
 #define GPS_TYPE                            GPS_UBX_10HZ
-#define DEFAULT_GPS_BAUD                    115200   // added for differential GNSS ZED-F9P support
+#define DEFAULT_GPS_BAUD                    57600   // added for differential GNSS ZED-F9P support
 
 ////////////////////////////////////////////////////////////////////////////////
 // You can specify a level of good GNSS reception before MatrixPilot accepts "GPS ACQUIRED".
@@ -176,7 +176,7 @@
 
 // Define USE_LIDAR_ALTITUDE to be 1 to use Lidar Lite V3 for altitude correction.
 #ifndef USE_LIDAR_ALTITUDE
-#define USE_LIDAR_ALTITUDE                  1
+#define USE_LIDAR_ALTITUDE                  0
 #endif
 
 // Racing Mode
@@ -191,7 +191,7 @@
 // recommended that you actually use this option, since you'd have no manual control to fall
 // back on if things go wrong.  It may not even be legal in your area.
 #ifndef NORADIO
-#define NORADIO                             0
+#define NORADIO                             1
 #endif
 
 
@@ -388,7 +388,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Serial Output BAUD rate for either standard telemetry streams or MAVLink
 //  19200, 38400, 57600, 115200, 230400, 460800, 921600 // yes, it really will work at this rate
-#define SERIAL_BAUDRATE                     115200
+#define SERIAL_BAUDRATE                     57600
 
 
 // NUM_ANALOG_INPUTS:
@@ -782,8 +782,8 @@
 
 #define USE_FIXED_ORIGIN	    1
 //#define FIXED_ORIGIN_LOCATION	    { -1219950467, 374124664, 30.0 }	// A point in Baylands Park in Sunnyvale, CA
-//#define FIXED_ORIGIN_LOCATION	    { 113480854, 472580108, 578 }	// Innsbruck, useful for X-Plane flight simulator
-#define FIXED_ORIGIN_LOCATION	    { -020362500, 486154800, 35 }	// St Malo, useful gfm development
+//#define FIXED_ORIGIN_LOCATION	    { 113480854, 472580108, 578.0 }	// Innsbruck, useful for X-Plane flight simulator
+#define FIXED_ORIGIN_LOCATION	    { -20073850, 486224327, 47.0 }	// St Malo, useful gfm development
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Vehicle and Pilot Identification

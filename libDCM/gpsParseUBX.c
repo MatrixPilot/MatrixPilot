@@ -695,9 +695,10 @@ void gps_startup_sequence(int16_t gpscount)
 #if (HILSIM == 1)
 		udb_gps_set_rate(HILSIM_BAUD);
 #else
-		udb_gps_set_rate(9600);
+		udb_gps_set_rate(57600);
 #endif
 	}
+#if (GPS_TYPE != GPS_UBX_10HZ)
 	else if (dcm_flags._.nmea_passthrough && gpscount == 200)
 		gpsoutline(disable_GSV);
 	else if (dcm_flags._.nmea_passthrough && gpscount == 190)
@@ -712,11 +713,10 @@ void gps_startup_sequence(int16_t gpscount)
 	else if (!dcm_flags._.nmea_passthrough && gpscount == 160)
 		// set the UBX to use binary mode
 		gpsoutline(bin_mode_nonmea); // Set GPS baud rate 19200
-#if (HILSIM != 1)
+	#if (HILSIM != 1)
         else if (gpscount == 150)
 	         udb_gps_set_rate(19200);// UART1 baudrate = 19200 instead of default value 9600 of GT-635T default baudrate
-#endif
-	else if (gpscount == 140)
+    else if (gpscount == 140)
 		gpsoutbin(set_rate_length, set_rate); // Is this command redundant with bin_mode_nonmea?
 	else if (dcm_flags._.nmea_passthrough && gpscount == 130)
 		gpsoutbin(enable_UBX_only_length, enable_UBX_NMEA);
@@ -730,27 +730,21 @@ void gps_startup_sequence(int16_t gpscount)
 	else if (gpscount == 100)
 		gpsoutbin(enable_NAV_VELNED_length, enable_NAV_VELNED);
 	else if (gpscount == 90)
-#if (GPS_TYPE == GPS_UBX_4HZ)
 		gpsoutbin(enable_NAV_DOP_length, enable_NAV_DOP);
-#elif (GPS_TYPE == GPS_UBX_10HZ)
-		gpsoutbin(enable_NAV_DOP_length, enable_NAV_PVT);
-#endif
-#if (GPS_TYPE == GPS_UBX_10HZ)
-	else if (gpscount == 85)
-		gpsoutbin(enable_NAV_DOP_length, enable_NAV_RELPOSNED);
-#endif
 	else if (gpscount == 80)
 		gpsoutbin(enable_SBAS_length, enable_SBAS);
 	else if (gpscount == 70)
 		gpsoutbin(config_NAV5_length, config_NAV5);
        // modif gfm
 	else if (gpscount == 60) 
-        { // Ne faut-ilpas envoyer AID_INI que lorsque l'heure est envoyée par le GCS?
+       { // Ne faut-ilpas envoyer AID_INI que lorsque l'heure est envoyée par le GCS?
 //        send_msg_AID_INI(AID_INI);
 //  		gpsoutbin(AID_INI_length, AID_INI);
         
         }
-// fin modif gfm
+#endif
+#endif
+ // fin modif gfm
 }
 
 boolean gps_nav_valid(void)
@@ -934,7 +928,7 @@ static void msg_PL1(uint8_t gpschar)
 				}
 // modif gfm
 				case 0x07 : { // NAV_PVT message
-					if (payloadlength.BB  == NUM_POINTERS_IN(msg_SOL_parse))
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_PVT_parse))
 					{
 						msg_parse = &msg_PVT;
 					}
@@ -957,7 +951,7 @@ static void msg_PL1(uint8_t gpschar)
 					msg_parse = &msg_AID_INI;    // TODO: this does not look right (wipes out error setting above) - RobD
 					break;
 				case 0x3C : { // NAV_RELPOSNED message
-					if (payloadlength.BB  == NUM_POINTERS_IN(msg_SOL_parse))
+					if (payloadlength.BB  == NUM_POINTERS_IN(msg_RELPOSNED_parse))
 					{
 						msg_parse = &msg_RELPOSNED;
 					}
@@ -1247,11 +1241,7 @@ static void msg_CS1(uint8_t gpschar)
 	checksum._.B0 = gpschar;
 	if ((checksum._.B1 == CK_A) && (checksum._.B0 == CK_B))
 	{
-		if (msg_id == 0x12)
-		{
-			// correct checksum for VELNED message
 			gps_parse_common(); // parsing is complete, schedule navigation
-		}
 #if (HILSIM == 1)
 		else if (msg_id == 0xAB)
 		{
