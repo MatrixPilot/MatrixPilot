@@ -135,7 +135,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			}
 #else
 			{
-				serial_output( "roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			}
 #endif // DEBUG_MAG
 			hasWrittenHeader = 1 ;
@@ -160,8 +160,9 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		}
 #else
 		{
-			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i,%u,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%i,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
-			commanded_roll , commanded_pitch ,
+			serial_output( "%li,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%i,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			alt ,
+			pwManual[THROTTLE_INPUT_CHANNEL] , commanded_roll , commanded_pitch ,
 			x_velocity_target , y_velocity_target ,
 			x_velocity_feedback , y_velocity_feedback ,
 			udb_pwIn[6] ,
