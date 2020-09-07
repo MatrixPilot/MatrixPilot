@@ -77,7 +77,8 @@
 #define MAG_STATIC_OFFSETS
 
 #define MAG_STATIC_OFFSET_X       -160
-#define MAG_STATIC_OFFSET_Y       155
+//#define MAG_STATIC_OFFSET_Y       155
+#define MAG_STATIC_OFFSET_Y       130
 #define MAG_STATIC_OFFSET_Z       -17
 
 // ************************************************************************

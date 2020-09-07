@@ -164,7 +164,7 @@
 #define TILT_KD 2.0
 #define TILT_FF 0.2*0.0
 #define TILT_KDD 0.0
-#define YAW_KI 0.5*0.0
+#define YAW_KI 0.04
 #define YAW_KP 0.3
 #define YAW_KD 3.0
 #define ACCEL_K 0.2*0.0
@@ -172,11 +172,12 @@
 // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45
 #define LATERAL_RATE_GAIN 32
-#define MAX_SPEED 1000 // cm/sec
+//#define MAX_SPEED 1000 // cm/sec
+#define MAX_SPEED 500 // cm/sec
 #define MAX_DISTANCE 1000 // cm
 
 #define USE_LIDAR 1
-#define ROTOR_CRAFT "spedix, August 7, 2020\r\n"
+#define ROTOR_CRAFT "spedix, Sept 7, 2020\r\n"
 #define NUM_INPUTS	6
 #define NUM_OUTPUTS	4
 // spedix offsets
