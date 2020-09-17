@@ -108,6 +108,7 @@
 //#define BIT_INT_ANYRD_2CLEAR        0x10
 //#define BIT_RAW_RDY_EN              0x01
 #define BIT_I2C_IF_DIS              0x10
+#define BIT_SAMPLE_RATE_200_HZ      0x04
 
 // Register 55 - INT Pin / Bypass Enable Configuration (INT_PIN_CFG)
 #define BIT_INT_LEVEL               0x80
