@@ -9,68 +9,50 @@ $(warning **********************************************************************
 endif
 
 CONFIG  ?= .
-UNAME_S := $(shell uname -s)
-$(info Development Environment is $(UNAME_S))
 
 ifeq ($(OS),Windows_NT)
-    DEFINES    = -DWIN=1
-    BINARY     = .exe
-    OSOBJS     = UDBSocketWin.o
-    OSLIB      = ws2_32
-    ARCH_FLAGS = 
-    WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
-    ifeq ($(findstring MINGW,$(UNAME_S)),MINGW) 
-	DEFINES += -DMINGW
-	RM     = rm -rf
-    else
-    	RM     = del /Q /F
-        $(error This make file must be run under the MSYS2 development environment on Windows)
-    endif
+DEFINES  = -DWIN=1
+BINARY   = .exe
+OSOBJS   = UDBSocketWin.o
+OSLIB    = ws2_32
+RM       = del /Q /F
 else
-    ARCH       := $(shell getconf LONG_BIT)
-    ARCH_FLAGS := -DMP_WORDSIZE=$(ARCH) -m$(ARCH)
-    DEFINES  = -DNIX=1
-    BINARY   =
-    OSOBJS   = UDBSocketUnix.o
-    OSLIB    = m
-    RM       = rm -rf
-    UNAME_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
-    ifeq ($(UNAME_S),Linux)
-        DEFINES = -DAPL=0 -DIBM=0 -DLIN=1 -DNIX=1
-        WARN    = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
-    endif
-    ifeq ($(UNAME_S),Darwin)
-        DEFINES = -DAPL=1 -DIBM=0 -DLIN=0 -DNIX=1
-        WARN    = -Wall -Wextra -Wno-unused-parameter -Wno-address-of-packed-member -Wno-unused-const-variable
-    endif
+DEFINES  = -DNIX=1
+BINARY   =
+OSOBJS   = UDBSocketUnix.o
+OSLIB    = m
+RM       = rm -rf
 endif
 
+DEFINES += -DJSB=1
+
 CC       = gcc
-CPP	     = g++
-CFLAGS   = -pipe -O0 $(DEFINES) $(WARN) $(ARCH_FLAGS)
-INCPATH  = -I. -I../../Config/$(CONFIG) -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
+CPP      = g++
+WARN     = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
+CFLAGS   = -pipe -O0 $(DEFINES) $(WARN)
+INCPATH  = -I. -I../../Config/$(CONFIG) -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot -I../MatrixPilot-SIL -I/usr/local/include/JSBSim
 LFLAGS   =
-LIBS     = -l$(OSLIB)
+LIBS     = -l$(OSLIB) -lc -lJSBSim
 
 OBJECTS_DIR = ./
 
 
-MPSIL_TARGET  = matrixpilot$(BINARY)
+TARGET = matrixpilot$(BINARY)
 
-MP_HEADERS = \
+HEADERS = \
 ../../Config/$(CONFIG)/options.h \
 
-#../../Config/$(CONFIG)/flightplan-waypoints.h \
-#../../Config/$(CONFIG)/flightplan-logo.h
-
-MPSIL_OBJECTS = \
-SIL-udb.o \
-SIL-ui-mp-term.o \
-SIL-serial.o \
-SIL-dsp.o \
-SIL-eeprom.o \
-SIL-events.o \
-$(OSOBJS) \
+OBJECTS = \
+JSBSim.o \
+JSBSimSIL.o \
+ \
+../MatrixPilot-SIL/SIL-udb.o \
+../MatrixPilot-SIL/SIL-ui-mp-term.o \
+../MatrixPilot-SIL/SIL-serial.o \
+../MatrixPilot-SIL/SIL-dsp.o \
+../MatrixPilot-SIL/SIL-eeprom.o \
+../MatrixPilot-SIL/SIL-events.o \
+../MatrixPilot-SIL/$(OSOBJS) \
  \
 ../../libDCM/deadReckoning.o \
 ../../libDCM/estAltitude.o \
@@ -124,31 +106,20 @@ $(OSOBJS) \
 ../../MatrixPilot/yawCntrl.o
 
 
-MPCAT_TARGET   = silcat$(BINARY)
-MPCAT_OBJECTS  = SILcat.o $(OSOBJS)
-
-
 first: all
 
-%.o: %.c $(MP_HEADERS)
+%.o: %.c $(HEADERS)
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
-%.o: %.cpp $(MP_HEADERS)
+%.o: %.cpp $(HEADERS)
 	$(CPP) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
-all: $(MPSIL_TARGET) $(MPCAT_TARGET)
+all: $(TARGET)
 
-sil: $(MPSIL_TARGET)
-
-cat: $(MPCAT_TARGET)
-
-$(MPSIL_TARGET): $(MPSIL_OBJECTS)
-	$(CC) $(LFLAGS) -o $(MPSIL_TARGET) $(MPSIL_OBJECTS) $(LIBS)
-
-$(MPCAT_TARGET): $(MPCAT_OBJECTS)
-	$(CPP) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
+$(TARGET): $(OBJECTS)
+	$(CPP) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
 
 clean:
-	-$(RM) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)
-	-$(RM) $(MPSIL_TARGET) $(MPCAT_TARGET)
+	-$(RM) $(OBJECTS)
+	-$(RM) $(TARGET)
 

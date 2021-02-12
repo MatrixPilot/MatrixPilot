@@ -131,11 +131,11 @@ static void log_open(void)
 	if (log_error) return;
 
 	log_close();            // just in case the calling code is dumb..
-	if (!fs_nextlog(logfile_name))
+//	if (!fs_nextlog(logfile_name))
 	{
-		strcpy(logfile_name, "fp_log.txt");
+		strcpy(logfile_name, "log00.txt");
 	}
-	fsp = fopen(logfile_name, "a");
+	fsp = fopen(logfile_name, "w");
 	if (fsp != NULL)
 	{
 		lb1_end_index = 0;  // empty the logfile ping-pong buffers
