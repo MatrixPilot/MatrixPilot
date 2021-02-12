@@ -100,8 +100,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HILSIM.cpp" />
-    <ClCompile Include="SerialIO.cpp" />
-    <ClCompile Include="Setup.cpp" />
+ 	<ClCompile Include="Display.cpp" />
+	<ClCompile Include="SendUBX.cpp" />
+	<ClCompile Include="SerialIO.cpp" />
+	<ClCompile Include="Servos.cpp" />
+	<ClCompile Include="Setup.cpp" />
+	<ClCompile Include="utility.cpp" />
+	<ClCompile Include="UDBSocketWin.c" />
+	<ClCompile Include="UDBSocketUnix.c" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -115,7 +121,11 @@
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Display.h" />
+    <ClInclude Include="SendUBX.h" />
     <ClInclude Include="SerialIO.h" />
+    <ClInclude Include="Servos.h" />
+    <ClInclude Include="Setup.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="stdint-win.h" />
     <ClInclude Include="UDBSocket.h" />
