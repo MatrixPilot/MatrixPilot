@@ -19,8 +19,8 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-//extern int16_t udb_pwm_sonar;          // pulse width of sonar signal
+//extern uint16_t udb_pwm_sonar;          // pulse width of sonar signal
 
-int16_t get_sonar_value(void);   // Get the raw pwm units from the sonar device driver
+uint16_t get_sonar_value(void);   // Get the raw pwm units from the sonar device driver
 uint16_t get_sonar_count(void);
 void udb_init_sonar(void);
