@@ -195,12 +195,12 @@ static void set_udb_pwIn(uint16_t pwm, uint16_t index)
 #if ( TMR_FACTOR == 1)
 	pwm = pwm / 2 ;
 #elif ( TMR_FACTOR == 2)
+// pwm does not need to be rescaled
 #elif ( TMR_FACTOR == 4)
 	pwm = pwm * 2 ;
 #else
 #error "invalid TMR_FACTOR"
 #endif // TMR_FACTOR 
-	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
 
 	if (FAILSAFE_INPUT_CHANNEL == index)
 	{
