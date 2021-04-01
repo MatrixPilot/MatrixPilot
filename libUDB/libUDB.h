@@ -182,19 +182,19 @@ void cpu_load_calc(void);
 //! These are the values of the radio input channels.  Each channel will be a
 //! value between approximately 2000 and 4000, with 3000 being the center.
 //! Treat udb_pwIn values as readonly.
-extern int16_t udb_pwIn[];                  // pulse widths of radio inputs
+extern uint16_t udb_pwIn[];                  // pulse widths of radio inputs
 
 //! These are the recorded trim values of the radio input channels.
 //! These values are recorded when you call the udb_servo_record_trims()
 //! function.
 //! Each channel will be a value between approximately 2000 and 4000.
 //! Treat udb_pwTrim values as readonly.
-extern int16_t udb_pwTrim[];                // initial pulse widths for trimming
+extern uint16_t udb_pwTrim[];                // initial pulse widths for trimming
 
 //! These are the servo channel values that will be sent out to the servos.
 //! Set these values in your implementation of the udb_heartbeat_callback()
 //! Each channel should be set to a value between 2000 and 4000.
-extern int16_t udb_pwOut[];                 // pulse widths for servo outputs
+extern uint16_t udb_pwOut[];                 // pulse widths for servo outputs
 
 //! This read-only value holds flags that tell you, among other things,
 //! whether the receiver is currently receiving values from the transmitter.
