@@ -37,7 +37,7 @@
 #error Invalid MIPS Configuration
 #endif
 
-int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
+uint16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 static volatile int16_t outputNum;
 
 
