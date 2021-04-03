@@ -6,11 +6,17 @@
 //  Copyright (c) 2013 MatrixPilot. All rights reserved.
 //
 
-#if (WIN == 1 || WIN32 == 1) // WIN defined in GGC builds, WIN32 defined in VC++
+#if (WIN == 1 || WIN32 == 1) // WIN defined in GCC builds, WIN32 defined in VC++
 
 #include "UDBSocket.h"
 
-#ifdef WIN32
+
+/* MSVC 14 does have snprintf() and doesn't allow defining it.  Also MinGW32
+   starting with GCC 6.3 has changed _snprintf so that it is no longer suitable.
+   It does have snprintf, so just use it. */
+#if defined (__MINGW32__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ > 2))
+  /* do nothing*/
+#elif !defined(_MSC_VER) || _MSC_VER < 1900
 #define snprintf _snprintf
 #else
 #include <Windows.h> // don't include if building with Visual Studio
@@ -51,7 +57,7 @@ void SetTermIOs(void)
 	setvbuf(stdin, NULL, _IONBF, 0);
 }
 
-UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, char* serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, const char* UDP_host, const char* serial_port, long serial_baud)
 {
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket)
@@ -332,8 +338,6 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 		case UDBSocketSerial:
 		{
 			unsigned long bytesTransferred = 0;
-			//DWORD dwRetFlag;
-			//char ErrorString[80];
 
 			if (socket->hComms != INVALID_HANDLE_VALUE)
 			{
