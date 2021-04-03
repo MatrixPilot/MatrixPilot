@@ -320,7 +320,8 @@ void sil_reset(void)
 #ifdef _MSC_VER
 	const char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 #else
-	char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+	const char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+//	char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 #endif
 
 	sil_ui_will_reset();
@@ -354,7 +355,6 @@ void sleep_milliseconds(uint16_t ms)
 #ifdef WIN
 	// windows implementation
 	Sleep(ms);
-
 #else
 	// *nix / mac implementation
 	usleep(1000*ms);
