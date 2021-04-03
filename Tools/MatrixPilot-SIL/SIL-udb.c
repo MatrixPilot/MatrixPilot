@@ -317,10 +317,15 @@ uint16_t get_reset_flags(void)
 
 void sil_reset(void)
 {
-#ifdef _MSC_VER
+/* MSVC 14 does have snprintf() and doesn't allow defining it.  Also MinGW32
+   starting with GCC 6.3 has changed _snprintf so that it is no longer suitable.
+   It does have snprintf, so just use it. */
+#if defined (__MINGW32__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ > 2))
+	char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+#elif !defined(_MSC_VER) || _MSC_VER < 1900
 	const char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 #else
-	char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
+	const char* const args[3] = {mp_argv[0], UDB_HW_RESET_ARG, 0};
 #endif
 
 	sil_ui_will_reset();
@@ -354,7 +359,6 @@ void sleep_milliseconds(uint16_t ms)
 #ifdef WIN
 	// windows implementation
 	Sleep(ms);
-
 #else
 	// *nix / mac implementation
 	usleep(1000*ms);

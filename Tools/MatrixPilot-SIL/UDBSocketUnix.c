@@ -53,7 +53,7 @@ void SetTermIOs(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
 }
 
-UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, char* serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, const char* UDP_host, const char* serial_port, long serial_baud)
 {
 #if (LIN == 1)
 	speed_t BAUD;
