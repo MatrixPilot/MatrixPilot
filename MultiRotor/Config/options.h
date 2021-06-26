@@ -177,7 +177,7 @@
 #define MAX_DISTANCE 1000 // cm
 
 #define USE_LIDAR 1
-#define ROTOR_CRAFT "spedix, Sept 7, 2020\r\n"
+#define ROTOR_CRAFT "spedix, June 24, 2021\r\n"
 #define NUM_INPUTS	6
 #define NUM_OUTPUTS	4
 // spedix offsets

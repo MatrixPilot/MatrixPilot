@@ -20,6 +20,7 @@
 
 
 #include "../libDCM/libDCM.h"
+#include "../libDCM/libDCM_defines.h"
 #include "../libDCM/mathlibNAV.h"
 #include "../libDCM/gpsData.h"
 #include "../libDCM/gpsParseCommon.h"

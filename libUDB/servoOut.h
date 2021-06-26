@@ -20,7 +20,7 @@
 
 //	routines to drive the PWM pins for the servos,
 
-extern int16_t udb_pwOut[]; // pulse widths for servo outputs
+extern uint16_t udb_pwOut[]; // pulse widths for servo outputs
 
 
 //void udb_init_pwm(void)
@@ -29,7 +29,7 @@ void servoOut_init(void); // was called udb_init_pwm()
 // saturation logic to maintain pulse width within bounds
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int16_t udb_servo_pulsesat(int32_t pw);
+uint16_t udb_servo_pulsesat(uint32_t pw);
 void udb_set_action_state(boolean newValue);
 
 // Call this to start sending out pulses to all the PWM output channels sequentially

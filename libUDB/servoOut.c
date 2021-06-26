@@ -38,7 +38,7 @@
 #error Invalid MIPS Configuration
 #endif
 
-int16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
+uint16_t udb_pwOut[NUM_OUTPUTS+1];   // pulse widths for servo outputs
 static volatile int16_t outputNum;
 
 #if ((USE_ESC_RATE == 1)&&!(BOARD_TYPE == UDB5_BOARD ))
@@ -176,11 +176,11 @@ void servoOut_init(void) // was called udb_init_pwm()
 // saturation logic to maintain pulse width within bounds
 // This takes a servo out value, and clips it to be within
 // 3000-1000*SERVOSAT and 3000+1000*SERVOSAT (2000-4000 by default).
-int16_t udb_servo_pulsesat(int32_t pw)
+uint16_t udb_servo_pulsesat(uint32_t pw)
 {
 	if (pw > SERVOMAX) pw = SERVOMAX;
 	if (pw < SERVOMIN) pw = SERVOMIN;
-	return (int16_t)pw;
+	return (uint16_t)pw;
 }
 
 void udb_set_action_state(boolean newValue)

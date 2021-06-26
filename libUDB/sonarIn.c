@@ -25,8 +25,8 @@
 
 #if (USE_SONAR_INPUT != 0)
 
-int16_t udb_pwm_sonar;          // pulse width of sonar signal
-static int16_t udb_pwm_sonar_rise;
+uint16_t udb_pwm_sonar;          // pulse width of sonar signal
+static uint16_t udb_pwm_sonar_rise;
 static uint16_t sonar_pwm_count;
 
 int16_t get_sonar_value(void)
