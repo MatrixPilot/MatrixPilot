@@ -277,7 +277,11 @@ void motorCntrl(void)
 		min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ACCEL_K ) , accelEarth[2] ) ;
 		accel_feedback = long_accum._.W1 ;
-		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback ;
+		int16_t thrust =  pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback ;
+		motor_A = thrust ;
+		motor_B = thrust ;
+		motor_C = thrust ;
+		motor_D = thrust ;
 
 //		Compute the error intetgrals
 		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/PID_HZ), roll_error ))>>5) ;
@@ -394,10 +398,13 @@ void motorCntrl(void)
 			compute_altitude_control();
 		}
 		// Mix in the yaw, pitch, and roll signals into the motors
-		motor_A += altitude_control - yaw_control + ( - pitch_control + roll_control )/2 ;
-		motor_B += altitude_control + yaw_control + ( - pitch_control - roll_control )/2 ;
-		motor_C += altitude_control - yaw_control + ( + pitch_control - roll_control )/2 ;
-		motor_D += altitude_control + yaw_control + ( + pitch_control + roll_control )/2 ;
+		thrust += altitude_control ;
+		if(thrust > MAX_THRUST) thrust = MAX_THRUST ;
+		if(thrust < MIN_THRUST) thrust = MIN_THRUST ;
+		motor_A = thrust - yaw_control + ( - pitch_control + roll_control )/2 ;
+		motor_B = thrust + yaw_control + ( - pitch_control - roll_control )/2 ;
+		motor_C = thrust - yaw_control + ( + pitch_control - roll_control )/2 ;
+		motor_D = thrust + yaw_control + ( + pitch_control + roll_control )/2 ;
 #endif
 
 #ifdef desktest		

@@ -34,13 +34,15 @@
 //#define TARGET_ALTITUDE 900
 //#define DR_TAU 2.0
 
-#define MAX_ALT_RATE_CONTROL 400
+#define MAX_ALT_RATE_CONTROL 800
 #define MAX_ALT_PROP_CONTROL 400
 #define MIN_LIDAR_PULSE_THRESH 2
-#define IMU_CLIMB_RATE_DIVISOR 2
-#define IMU_ALT_DIVISOR 20
-#define TARGET_ALTITUDE 900
+#define IMU_CLIMB_RATE_DIVISOR 1
+#define IMU_ALT_DIVISOR 5
+#define TARGET_ALTITUDE -1000
 #define DR_TAU 2.5
+#define MIN_THRUST 2500
+#define MAX_THRUST 3200
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -177,17 +179,17 @@
 #define MAX_DISTANCE 1000 // cm
 
 #define USE_LIDAR 1
-#define ROTOR_CRAFT "spedix, June 24, 2021\r\n"
+#define ROTOR_CRAFT "spedix, Sept 25, 2021, with C_rate_mult\r\n"
 #define NUM_INPUTS	6
 #define NUM_OUTPUTS	4
 // spedix offsets
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 227 )
-#define YACCEL_OFFSET	( 28 )
-#define ZACCEL_OFFSET	( -694 )
-#define XRATE_OFFSET	( -304 )
-#define YRATE_OFFSET	( -46 )
-#define ZRATE_OFFSET	( -24 )
+#define XACCEL_OFFSET	( 355 )
+#define YACCEL_OFFSET	( -281 )
+#define ZACCEL_OFFSET	( 0 )
+#define XRATE_OFFSET	( -388 )
+#define YRATE_OFFSET	( 122 )
+#define ZRATE_OFFSET	( 23 )
 #endif
 
 #ifdef desktest
