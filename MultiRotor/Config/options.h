@@ -34,15 +34,17 @@
 //#define TARGET_ALTITUDE 900
 //#define DR_TAU 2.0
 
-#define MAX_ALT_RATE_CONTROL 800
+#define MAX_ALT_RATE_CONTROL 400
 #define MAX_ALT_PROP_CONTROL 400
 #define MIN_LIDAR_PULSE_THRESH 2
-#define IMU_CLIMB_RATE_DIVISOR 1
-#define IMU_ALT_DIVISOR 5
-#define TARGET_ALTITUDE -1000
+#define IMU_CLIMB_RATE_DIVISOR 2
+#define IMU_ALT_DIVISOR 20
+#define TARGET_ALTITUDE 900
 #define DR_TAU 2.5
-#define MIN_THRUST 2500
-#define MAX_THRUST 3200
+//#define MIN_THRUST 2500
+//#define MAX_THRUST 3200
+#define MIN_THRUST 2000
+#define MAX_THRUST 4000
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -185,7 +187,7 @@
 // spedix offsets
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 355 )
-#define YACCEL_OFFSET	( -281 )
+#define YACCEL_OFFSET	( -189 )
 #define ZACCEL_OFFSET	( 0 )
 #define XRATE_OFFSET	( -388 )
 #define YRATE_OFFSET	( 122 )

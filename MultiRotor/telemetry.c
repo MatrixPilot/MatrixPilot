@@ -60,6 +60,8 @@ extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 extern void serial_output(const char* format, ...);
 // Prepare a line of serial output and start it sending
 // GPS data needs to be passed in
+extern int16_t yaw_rmat[];
+extern void initialize_yaw_rmat(void) ;
 void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
 {
 	db_index = 0 ;
@@ -68,7 +70,8 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 	{
 		header_line ++ ;
 		switch ( header_line ) {
-		case 1:
+			case 1:
+			initialize_yaw_rmat();
 			serial_output("\r\n") ;
 			break ;
 		case 2:
@@ -135,7 +138,10 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			}
 #else
 			{
-				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+/*				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+*/
+				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , yaw_in , yaw_rmat[1] , rmat[1] , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+			
 			}
 #endif // DEBUG_MAG
 			hasWrittenHeader = 1 ;
@@ -171,7 +177,8 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			sog , cog , climb ,
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,
-			target_rate[0] , target_rate[1] , target_rate[2] , 
+//			target_rate[0] , target_rate[1] , target_rate[2] , 
+			commanded_yaw , yaw_rmat[1] , rmat[1] ,
 			number_pulses , IMU_altitude , altitude , IMU_climb  , climb_rate , altitude_control , 
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		

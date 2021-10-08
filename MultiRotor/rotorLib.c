@@ -104,3 +104,21 @@ void MatrixRotate( int16_t matrix[] , int16_t angle[] )
 	MatrixAdd( 3 , 3 , matrix , rbuff , rbuff ) ; 
 	return ;
 }
+
+extern int16_t rmat[];
+extern int16_t yaw_rmat[];
+void initialize_yaw_rmat(void)
+{
+	int16_t sine , cosine ;
+	cosine = __builtin_divsd(__builtin_mulsu(rmat[0] + rmat[4], RMAX),RMAX+rmat[8]);
+	sine = __builtin_divsd(__builtin_mulsu(rmat[1] - rmat[3], RMAX),RMAX+rmat[8]);
+	yaw_rmat[0]=cosine;
+	yaw_rmat[4]=cosine;
+	yaw_rmat[1]=sine ;
+	yaw_rmat[3]=-sine ;
+	yaw_rmat[2]= 0 ;
+	yaw_rmat[5]= 0 ;
+	yaw_rmat[6]= 0 ;
+	yaw_rmat[7]= 0 ;
+	yaw_rmat[8]= RMAX ;
+}

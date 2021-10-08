@@ -114,9 +114,10 @@ static void align_rmat_to_mag(void)
 }
 
 #else // horizontal initialization for usual cases
-static void align_rmat_to_mag(void)
+uint8_t theta_yaw;
+void align_rmat_to_mag(void)
 {
-	uint8_t theta;
+//	uint8_t theta_yaw;
 	struct relative2D initialBodyField;
 //	int16_t costheta;
 //	int16_t sintheta;
@@ -126,16 +127,16 @@ static void align_rmat_to_mag(void)
 	initialBodyField.x = magFieldEarth[0];
 	initialBodyField.y = magFieldEarth[1];
 #if(DECLINATIONANGLE_VARIABLE == 1)
-	theta = rect_to_polar(&initialBodyField) -64 - (dcm_declination_angle._.B1);
+	theta_yaw = rect_to_polar(&initialBodyField) -64 - (dcm_declination_angle._.B1);
 #else
-	theta = rect_to_polar(&initialBodyField) -64 - (DECLINATIONANGLE >> 8);
+	theta_yaw = rect_to_polar(&initialBodyField) -64 - (DECLINATIONANGLE >> 8);
 #endif
-//	costheta = cosine(theta);
-//	sintheta = sine(theta);
+//	costheta = cosine(theta_yaw);
+//	sintheta = sine(theta_yaw);
 //	rmat[0] = rmat[4] = costheta;
 //	rmat[1] = sintheta;
 //	rmat[3] = - sintheta;
-	align_rmat(cosine(theta), sine(theta));
+	align_rmat(cosine(theta_yaw), sine(theta_yaw));
 }
 #endif // INITIALIZE_VERTICAL
 
