@@ -59,6 +59,8 @@ int theta_previous[2] = { 0 , 0 } ;
 int theta_delta[2] ;
 extern int IMU_climb ;
 extern int IMU_altitude ;
+int16_t target_climb_rate ;
+int16_t target_altitude ;
 
 int pwManual[NUM_INPUTS+1] ;
 int commanded_roll ;
@@ -99,6 +101,28 @@ int16_t mult_Q2_14( int16_t x , int16_t y)
 	int32_t product ;
 	product = (__builtin_mulss(x,y))>>14 ;
 	return (int16_t) product ;
+}
+
+void compute_target_climb_rate(void)
+{
+	int16_t altitude_error ;
+	target_altitude = TARGET_MIN_ALTITUDE + IMU_ALT_DIVISOR*(pwManual[THROTTLE_INPUT_CHANNEL]-WEIGHT);
+	altitude_error = IMU_altitude - target_altitude ;
+	if(abs(altitude_error)<MAX_ALT_ERROR)
+	{
+		target_climb_rate = __builtin_divsd(__builtin_mulsu(-altitude_error,MAX_CLIMB_RATE ) , MAX_ALT_ERROR) ;
+	}
+	else
+	{
+		if (altitude_error > 0 )
+		{
+			target_climb_rate = - MAX_CLIMB_RATE ;
+		}
+		else
+		{
+			target_climb_rate =  MAX_CLIMB_RATE ;
+		}
+	}
 }
 
 boolean target_position_recorded = false ;
@@ -467,8 +491,9 @@ void compute_altitude_control(void)
 		if ( climb_rate > 3000 ) climb_rate = 3000 ;
 		if ( climb_rate < -3000 ) climb_rate = -3000 ;
 	}
-	rate_control = - IMU_climb/IMU_CLIMB_RATE_DIVISOR ;
-	proportional_control = (TARGET_ALTITUDE-IMU_altitude)/IMU_ALT_DIVISOR ; 
+	compute_target_climb_rate();
+	rate_control = (target_climb_rate - IMU_climb)/IMU_CLIMB_RATE_DIVISOR ;
+	proportional_control = (TARGET_MIN_ALTITUDE-IMU_altitude)/IMU_ALT_DIVISOR ; 
 	if(rate_control>MAX_ALT_RATE_CONTROL)
 	{
 		rate_control = MAX_ALT_RATE_CONTROL ;

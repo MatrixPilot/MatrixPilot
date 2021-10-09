@@ -34,17 +34,18 @@
 //#define TARGET_ALTITUDE 900
 //#define DR_TAU 2.0
 
-#define MAX_ALT_RATE_CONTROL 400
-#define MAX_ALT_PROP_CONTROL 400
+#define MAX_ALT_RATE_CONTROL 1300
+#define MAX_ALT_PROP_CONTROL 1300
 #define MIN_LIDAR_PULSE_THRESH 2
 #define IMU_CLIMB_RATE_DIVISOR 2
-#define IMU_ALT_DIVISOR 20
-#define TARGET_ALTITUDE 900
+#define IMU_ALT_DIVISOR 5
+#define TARGET_MIN_ALTITUDE -1000
 #define DR_TAU 2.5
-//#define MIN_THRUST 2500
-//#define MAX_THRUST 3200
-#define MIN_THRUST 2000
-#define MAX_THRUST 4000
+#define MIN_THRUST 2600
+#define MAX_THRUST 3000
+#define WEIGHT 2800
+#define MAX_CLIMB_RATE 1000
+#define MAX_ALT_ERROR 1000
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type

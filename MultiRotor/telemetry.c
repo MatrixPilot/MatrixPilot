@@ -61,6 +61,7 @@ extern void serial_output(const char* format, ...);
 // Prepare a line of serial output and start it sending
 // GPS data needs to be passed in
 extern int16_t yaw_rmat[];
+extern int16_t target_altitude , target_climb_rate ;
 extern void initialize_yaw_rmat(void) ;
 void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
 {
@@ -98,10 +99,11 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 				LATERAL_RATE_GAIN , MAX_SPEED , MAX_DISTANCE ) ;
 			break ;
 		case 7:
-			serial_output( "TILT_FF = %5f, TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
+	/*		serial_output( "TILT_FF = %5f, TILT_KDD = %5f, ACCEL_K = %5f\r\n" ,
 					TILT_FF ,
 					TILT_KDD ,
-				ACCEL_K ) ;
+				ACCEL_K ) ; */
+			serial_output( "min, max thrust : %i , %i\r\n", MIN_THRUST, MAX_THRUST ) ;
 			break ;			
 		case 8:
 			serial_output( ROTOR_CRAFT );
@@ -121,9 +123,9 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 				IMU_CLIMB_RATE_DIVISOR ) ;
 			break ;				
 		case 12:
-			serial_output( "IMU_ALT_DIVISOR = %i, TARGET_ALTITUDE = %i\r\n" ,
+			serial_output( "IMU_ALT_DIVISOR = %i, TARGET_MIN_ALTITUDE = %i\r\n" ,
 				IMU_ALT_DIVISOR ,
-				TARGET_ALTITUDE ) ;
+				TARGET_MIN_ALTITUDE ) ;
 			break ;	
 		case 13:
 			serial_output( "offsets = %i , %i , %i , %i , %i , %i\r\no_lat, o_lon, o_alt , %li , %li , %li\r\n " ,
@@ -140,7 +142,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			{
 /*				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , ffx , ffy , ffz , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 */
-				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , yaw_in , yaw_rmat[1] , rmat[1] , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
+				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , x_vel_fdbk , y_vel_fdbk , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , yaw_in , targ_alt , target_climb , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr\r\n" ) ;
 			
 			}
 #endif // DEBUG_MAG
@@ -178,7 +180,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			udb_magFieldBody[0] , udb_magFieldBody[1] , udb_magFieldBody[2] ,
 			IMUlocationx._.W1 , IMUlocationy._.W1 , IMUvelocityx._.W1 , IMUvelocityy._.W1 ,
 //			target_rate[0] , target_rate[1] , target_rate[2] , 
-			commanded_yaw , yaw_rmat[1] , rmat[1] ,
+			commanded_yaw , target_altitude , target_climb_rate ,
 			number_pulses , IMU_altitude , altitude , IMU_climb  , climb_rate , altitude_control , 
 			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] ,		
