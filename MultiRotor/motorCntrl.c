@@ -165,7 +165,23 @@ void motorCntrl(void)
 	
 	if ( (udb_pwIn[7]>1800)&&(udb_pwIn[7]<4200) )
 	{
-		THROTTLE_COMMAND = THROTTLE_COMMAND_IN ;
+		if (udb_pwIn[7]<3000) // pre-flight and landing
+		{
+			THROTTLE_COMMAND = THROTTLE_COMMAND_IN ;
+		}
+		else
+		{
+			throttle_accum.WW += __builtin_mulsu(THROTTLE_COMMAND_IN-3000 , COMMAND_STEP_RATE_MULTIPLIER ) ;
+			
+			if (THROTTLE_COMMAND>4000)
+			{
+				THROTTLE_COMMAND = 4000 ;
+			}
+			if (THROTTLE_COMMAND<MIN_THROTTLE_COMMAND)
+			{
+				THROTTLE_COMMAND = MIN_THROTTLE_COMMAND ;
+			}	
+		}
 	}
 	else
 	{
