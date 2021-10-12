@@ -43,6 +43,7 @@ int theta[3] ;
 extern boolean didCalibrate ;
 extern int commanded_tilt_gain ;
 extern void compute_tilt_rmat( int [] , int , int );
+extern void initialize_yaw_rmat(void);
 void compute_altitude_control(void);
 extern int lidar_pulses ;
 int number_pulses = 0 ;
@@ -103,10 +104,11 @@ int16_t mult_Q2_14( int16_t x , int16_t y)
 	return (int16_t) product ;
 }
 
+extern union longww throttle_accum ;
 void compute_target_climb_rate(void)
 {
 	int16_t altitude_error ;
-	target_altitude = TARGET_MIN_ALTITUDE + IMU_ALT_DIVISOR*(pwManual[THROTTLE_INPUT_CHANNEL]-WEIGHT);
+	target_altitude = TARGET_MIN_ALTITUDE + IMU_ALT_DIVISOR*(THROTTLE_COMMAND-WEIGHT);
 	altitude_error = IMU_altitude - target_altitude ;
 	if(abs(altitude_error)<MAX_ALT_ERROR)
 	{
@@ -126,6 +128,10 @@ void compute_target_climb_rate(void)
 }
 
 boolean target_position_recorded = false ;
+
+union longww throttle_accum = {0};
+
+
 void motorCntrl(void)
 {
 	int temp ;
@@ -157,6 +163,14 @@ void motorCntrl(void)
 		else
 			pwManual[temp] = udb_pwTrim[temp];
 	
+	if ( (udb_pwIn[7]>1800)&&(udb_pwIn[7]<4200) )
+	{
+		THROTTLE_COMMAND = THROTTLE_COMMAND_IN ;
+	}
+	else
+	{
+		THROTTLE_COMMAND = 0 ;
+	}
 	
 	if (!didCalibrate)
 	{
@@ -166,10 +180,13 @@ void motorCntrl(void)
 		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
 		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;
 	}
-	else if (abs(pwManual[THROTTLE_INPUT_CHANNEL]-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< MANUAL_DEADBAND )
+	else if (abs(THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< MANUAL_DEADBAND )
 	{
-
-		motor_A = motor_B = motor_C = motor_D = pwManual[THROTTLE_INPUT_CHANNEL] ;
+		initialize_yaw_rmat();
+		motor_A = THROTTLE_COMMAND ;
+		motor_B = THROTTLE_COMMAND ;
+		motor_C = THROTTLE_COMMAND ;
+		motor_D = THROTTLE_COMMAND ;
 
 		commanded_roll =  ( pwManual[ROLL_INPUT_CHANNEL] 
 						- udb_pwTrim[ROLL_INPUT_CHANNEL]) ;
@@ -301,7 +318,7 @@ void motorCntrl(void)
 		min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ACCEL_K ) , accelEarth[2] ) ;
 		accel_feedback = long_accum._.W1 ;
-		int16_t thrust =  pwManual[THROTTLE_INPUT_CHANNEL] - accel_feedback ;
+		int16_t thrust =  THROTTLE_COMMAND - accel_feedback ;
 		motor_A = thrust ;
 		motor_B = thrust ;
 		motor_C = thrust ;
@@ -512,7 +529,7 @@ void compute_altitude_control(void)
 		proportional_control = -MAX_ALT_PROP_CONTROL ;
 	}
 #if  ( USE_LIDAR == 1 )		
-	if((IMU_altitude > 0 )&&(pwManual[THROTTLE_INPUT_CHANNEL]>2300))
+	if((IMU_altitude > 0 )&&(THROTTLE_COMMAND>2300))
 	{
 		altitude_control = rate_control + proportional_control ;
 		//altitude_control = 0 ;

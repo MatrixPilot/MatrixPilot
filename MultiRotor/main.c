@@ -181,7 +181,7 @@ void dcm_heartbeat_callback(void)
 	if ((udb_heartbeat_counter % (10*HEARTBEAT_HZ/SERVO_HZ)) == 0)
 
 	{
-		if ( didCalibrate && origin_recorded )
+		if (( didCalibrate && origin_recorded ) || ( FULL_OUTPUT == 1 ))
 		{
 			send_debug_line(differential_gps() , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
 		}

@@ -94,6 +94,7 @@ fractional velocityErrorEarth[] = { 0, 0, 0 };
 
 extern boolean origin_recorded ;
 extern int16_t dead_reckon_clock ;
+extern union longww throttle_accum ;
 void dead_reckon(void)
 {
 	int16_t air_speed_x, air_speed_y, air_speed_z;
@@ -101,7 +102,7 @@ void dead_reckon(void)
 		// compute location and velocity errors
 		// for Z use LIDAR
 		// wait until takeoff to use altitude information, LIDAR does not work on the ground	
-		if (abs(pwManual[THROTTLE_INPUT_CHANNEL]-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< 200 )
+		if (abs(THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< 200 )
 		{
 			// sitting on the ground
 			IMUlocationz.WW = 0 ;

@@ -46,6 +46,10 @@
 #define WEIGHT 2800
 #define MAX_CLIMB_RATE 1000
 #define MAX_ALT_ERROR 1000
+#define FULL_OUTPUT 1
+
+#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
+#define THROTTLE_COMMAND throttle_accum._.W1 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -183,7 +187,7 @@
 
 #define USE_LIDAR 1
 #define ROTOR_CRAFT "spedix, Sept 25, 2021, with C_rate_mult\r\n"
-#define NUM_INPUTS	6
+#define NUM_INPUTS	7
 #define NUM_OUTPUTS	4
 // spedix offsets
 #define CUSTOM_OFFSETS
