@@ -131,6 +131,7 @@ boolean target_position_recorded = false ;
 
 union longww throttle_accum = {0};
 
+int16_t land_enable = 0 ;
 
 void motorCntrl(void)
 {
@@ -167,10 +168,26 @@ void motorCntrl(void)
 	{
 		if (udb_pwIn[7]<3000) // pre-flight and landing
 		{
-			THROTTLE_COMMAND = THROTTLE_COMMAND_IN ;
+			if (land_enable==0)
+			{
+				THROTTLE_COMMAND = THROTTLE_COMMAND_IN ;
+			}
+			else
+			{
+				if (THROTTLE_COMMAND>THROTTLE_CUTOUT )
+				{
+					throttle_accum.WW+=__builtin_mulsu(-250,COMMAND_STEP_RATE_MULTIPLIER);	
+				}
+				else
+				{
+					THROTTLE_COMMAND = 2000 ;
+					if (THROTTLE_COMMAND_IN<2200) land_enable = 0 ;
+				}
+			}
 		}
 		else
 		{
+			land_enable = 1 ;
 			throttle_accum.WW += __builtin_mulsu(THROTTLE_COMMAND_IN-3000 , COMMAND_STEP_RATE_MULTIPLIER ) ;
 			
 			if (THROTTLE_COMMAND>4000)

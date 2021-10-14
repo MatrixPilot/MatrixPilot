@@ -74,7 +74,10 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		switch ( header_line ) {
 			case 1:
 			initialize_yaw_rmat();
-			serial_output("\r\n") ;
+			serial_output("weight=%i , max_clmb_rate=%i, max_alt_err=%i\r\n",
+					WEIGHT,
+					MAX_CLIMB_RATE,
+					MAX_ALT_ERROR) ;
 			break ;
 		case 2:
 			serial_output( "RCON=0x%X , TRAP_FLAGS=0x%X , TRAP_SOURCE=0x%lX , ALARMS=%i\r\n",
@@ -104,7 +107,9 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 					TILT_FF ,
 					TILT_KDD ,
 				ACCEL_K ) ; */
-			serial_output( "min, max thrust : %i , %i\r\n", MIN_THRUST, MAX_THRUST ) ;
+			serial_output( "min_thrust=%i, max_thrust=%i\r\ncmd_step_rate=%i, min_throt_cmd=%i, throt_cutout=%i\r\n", 
+					MIN_THRUST, MAX_THRUST , COMMAND_STEP_RATE_MULTIPLIER ,
+					MIN_THROTTLE_COMMAND , THROTTLE_CUTOUT ) ;
 			break ;			
 		case 8:
 			serial_output( ROTOR_CRAFT );
