@@ -50,6 +50,9 @@
 #define MIN_THROTTLE_COMMAND 3260
 #define THROTTLE_CUTOUT 3000
 #define FULL_OUTPUT 0
+#define ROLL_TRIM -43
+#define PITCH_TRIM 68
+#define YAW_TRIM -70
 
 #define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
 #define THROTTLE_COMMAND throttle_accum._.W1 

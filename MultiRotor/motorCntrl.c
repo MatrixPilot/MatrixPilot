@@ -475,10 +475,13 @@ void motorCntrl(void)
 		thrust += altitude_control ;
 		if(thrust > MAX_THRUST) thrust = MAX_THRUST ;
 		if(thrust < MIN_THRUST) thrust = MIN_THRUST ;
-		motor_A = thrust - yaw_control + ( - pitch_control + roll_control )/2 ;
-		motor_B = thrust + yaw_control + ( - pitch_control - roll_control )/2 ;
-		motor_C = thrust - yaw_control + ( + pitch_control - roll_control )/2 ;
-		motor_D = thrust + yaw_control + ( + pitch_control + roll_control )/2 ;
+		int16_t yaw_total = yaw_control + YAW_TRIM ;
+		int16_t pitch_total = pitch_control + PITCH_TRIM ;
+		int16_t roll_total = roll_control + ROLL_TRIM ;
+		motor_A = thrust - yaw_total + ( - pitch_total + roll_total )/2 ;
+		motor_B = thrust + yaw_total + ( - pitch_total - roll_total )/2 ;
+		motor_C = thrust - yaw_total + ( + pitch_total - roll_total )/2 ;
+		motor_D = thrust + yaw_total + ( + pitch_total + roll_total )/2 ;
 #endif
 
 #ifdef desktest		
