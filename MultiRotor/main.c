@@ -72,6 +72,7 @@ int main (void)
 	return 0 ;
 }
 
+void align_rmat_to_mag(void);
 // Called every 1/2 second at high priority
 void udb_background_callback_periodic(void)
 {
@@ -79,7 +80,8 @@ void udb_background_callback_periodic(void)
 	if (!didCalibrate)
 	{
 		// If still calibrating, blink RED
-		udb_led_toggle(LED_RED) ;	
+		udb_led_toggle(LED_RED) ;
+		align_rmat_to_mag();
 		if (udb_flags._.radio_on && dcm_flags._.calib_finished)
 		{
 			udb_servo_record_trims() ;

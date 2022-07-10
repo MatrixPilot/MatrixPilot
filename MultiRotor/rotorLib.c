@@ -110,8 +110,8 @@ extern int16_t yaw_rmat[];
 void initialize_yaw_rmat(void)
 {
 	int16_t sine , cosine ;
-	cosine = __builtin_divsd(__builtin_mulsu(rmat[0] + rmat[4], RMAX),RMAX+rmat[8]);
-	sine = __builtin_divsd(__builtin_mulsu(rmat[1] - rmat[3], RMAX),RMAX+rmat[8]);
+	cosine = __builtin_divsd(__builtin_mulsu(rmat[0]/2 + rmat[4]/2, RMAX),RMAX/2+rmat[8]/2);
+	sine = __builtin_divsd(__builtin_mulsu(rmat[1]/2 - rmat[3]/2, RMAX),RMAX/2+rmat[8]/2);
 	yaw_rmat[0]=cosine;
 	yaw_rmat[4]=cosine;
 	yaw_rmat[1]=sine ;
