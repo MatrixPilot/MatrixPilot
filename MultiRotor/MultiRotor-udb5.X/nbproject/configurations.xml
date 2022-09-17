@@ -57,6 +57,7 @@
         <itemPath>../../libUDB/sonarIn.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../libUDB/rangeIn.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix"
                      displayName="libVectorMatrix"
@@ -73,6 +74,7 @@
           <itemPath>../../MultiRotor/Config/options_ports.h</itemPath>
         </logicalFolder>
         <itemPath>../rotorLib.h</itemPath>
+        <itemPath>../alt_agl.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MultiRotor/Config"
                      displayName="MultiRotor/Config"
@@ -139,6 +141,7 @@
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
+        <itemPath>../../libUDB/rangeIn.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix"
                      displayName="libVectorMatrix"
@@ -169,6 +172,7 @@
         <itemPath>../rotorLib.c</itemPath>
         <itemPath>../rotorTilt.c</itemPath>
         <itemPath>../serial_output.c</itemPath>
+        <itemPath>../alt_agl.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
