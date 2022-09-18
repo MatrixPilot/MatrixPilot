@@ -129,8 +129,7 @@ typedef uint8_t boolean;
 #define false                   0
 
 struct udb_flag_bits {
-	uint16_t unused                 : 11;
-	uint16_t range_update_request	: 1;
+	uint16_t unused                 : 12;
 	uint16_t a2d_read               : 1;
 	uint16_t radio_on               : 1;
 	uint16_t sonar_updated          : 1;
