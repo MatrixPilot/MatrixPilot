@@ -81,7 +81,9 @@ void udb_background_callback_periodic(void)
 	{
 		// If still calibrating, blink RED
 		udb_led_toggle(LED_RED) ;
+#if (MAG_YAW_DRIFT == 1)
 		align_rmat_to_mag();
+#endif // MAG_YAW_DRIFT
 		if (udb_flags._.radio_on && dcm_flags._.calib_finished)
 		{
 			udb_servo_record_trims() ;
@@ -185,7 +187,11 @@ void dcm_heartbeat_callback(void)
 	{
 		if (( didCalibrate && origin_recorded ) || ( FULL_OUTPUT == 1 ))
 		{
+#if ( GPS_TYPE == GPS_UBX_4HZ)
 			send_debug_line(differential_gps() , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
+#else
+			send_debug_line(0 , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
+#endif // GPS_UBX_4HZ
 		}
 	}
 	

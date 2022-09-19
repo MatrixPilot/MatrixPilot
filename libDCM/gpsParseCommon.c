@@ -154,7 +154,9 @@ static void gps_parse_common_callback(void)
 //	udb_led_toggle(LED_GREEN);
 	if (gps_nav_valid())
 	{
+		
 		dead_reckon_clock = DR_PERIOD ;
+#if (GPS_TYPE == GPS_UBX_4HZ )		
 		if ( differential_gps())
 		{
 			udb_led_toggle(SERVO_OUT_PIN_5);
@@ -163,6 +165,7 @@ static void gps_parse_common_callback(void)
 		{
 			led_on(SERVO_OUT_PIN_5) ;
 		}
+#endif // GPS_UBX_4HZ
 		gps_commit_data();
 		gps_data_age = 0;
 		dcm_callback_gps_location_updated();

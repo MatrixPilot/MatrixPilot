@@ -100,8 +100,8 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-//#define draganflier
-#define spedix
+#define draganflier
+//#define spedix
 //#define arduCopter
 
 #ifdef arduCopter
@@ -138,6 +138,7 @@
 #endif
 
 #ifdef draganflier
+#define GPS_TYPE						GPS_NONE
 #define NO_RADIO						0
 #define MAG_YAW_DRIFT 						0
 #define DEBUG_MAG						0
@@ -154,9 +155,12 @@
 #define MAX_YAW_RATE 51  
 // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45
-#define USE_LIDAR 0
-#define ROTOR_CRAFT "draganflier, Jan. 27, 2018\r\n"
-#define NUM_INPUTS	4
+#define USE_LIDAR 1
+#define MAX_SPEED 500 // cm/sec
+#define MAX_DISTANCE 1000 // cm
+#define LATERAL_RATE_GAIN 32
+#define ROTOR_CRAFT "draganflier, Sept. 19, 2022\r\n"
+#define NUM_INPUTS	7
 #define NUM_OUTPUTS	4
 
 // draganflier offsets
@@ -170,6 +174,7 @@
 #endif
 
 #ifdef spedix
+#define GPS_TYPE							GPS_UBX_4HZ
 #define NO_RADIO						0
 #define MAG_YAW_DRIFT 						1
 #define DEBUG_MAG						0
@@ -256,7 +261,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
 //#define GPS_TYPE							GPS_STD
-#define GPS_TYPE							GPS_UBX_4HZ
+//#define GPS_TYPE							GPS_UBX_4HZ
 
 // Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
 
