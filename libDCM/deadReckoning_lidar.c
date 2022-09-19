@@ -141,7 +141,12 @@ void dead_reckon(void)
 			// apply the location bias compensation
 			IMUlocationz.WW += __builtin_mulss(DR_FILTER_GAIN, locationErrorEarth[2]);
 		}
-	
+#if ( GPS_TYPE == GPS_NONE )
+		IMUvelocityx.WW = 0 ;
+		IMUvelocityy.WW = 0 ;
+		IMUlocationx.WW = 0 ;
+		IMUlocationy.WW = 0 ;		
+#else
 		// use GPS for X and Y
 		if(origin_recorded&&(dead_reckon_clock>0))
 		{
@@ -183,6 +188,7 @@ void dead_reckon(void)
 			IMUlocationx.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION_XY)), IMUvelocityx._.W1)>>4);
 			IMUlocationy.WW += (__builtin_mulss(((int16_t)(VELOCITY2LOCATION_XY)), IMUvelocityy._.W1)>>4);
 		}
+#endif // GPS_TYPE
 	}
 	
 	// the following used to include an adjustment for the wind
