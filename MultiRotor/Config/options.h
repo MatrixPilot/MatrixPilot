@@ -34,28 +34,6 @@
 //#define TARGET_ALTITUDE 900
 //#define DR_TAU 2.0
 
-#define MAX_ALT_RATE_CONTROL 1300
-#define MAX_ALT_PROP_CONTROL 1300
-#define MIN_LIDAR_PULSE_THRESH 2
-#define IMU_CLIMB_RATE_DIVISOR 2
-#define IMU_ALT_DIVISOR 5
-#define TARGET_MIN_ALTITUDE -1000
-#define DR_TAU 2.5
-#define MIN_THRUST 2600
-#define MAX_THRUST 3000
-#define WEIGHT 2800
-#define MAX_CLIMB_RATE 1000
-#define MAX_ALT_ERROR 1000
-#define COMMAND_STEP_RATE_MULTIPLIER 256
-#define MIN_THROTTLE_COMMAND 3260
-#define THROTTLE_CUTOUT 3000
-#define FULL_OUTPUT 0
-#define ROLL_TRIM -43
-#define PITCH_TRIM 68
-#define YAW_TRIM -70
-
-#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
-#define THROTTLE_COMMAND throttle_accum._.W1 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Board Type
@@ -105,6 +83,29 @@
 //#define arduCopter
 
 #ifdef arduCopter
+#define MAX_ALT_RATE_CONTROL 1300
+#define MAX_ALT_PROP_CONTROL 1300
+#define MIN_LIDAR_PULSE_THRESH 2
+#define IMU_CLIMB_RATE_DIVISOR 2
+#define IMU_ALT_DIVISOR 5
+#define TARGET_MIN_ALTITUDE -1000
+#define DR_TAU 2.5
+#define MIN_THRUST 2600
+#define MAX_THRUST 3000
+#define WEIGHT 2800
+#define MAX_CLIMB_RATE 1000
+#define MAX_ALT_ERROR 1000
+#define COMMAND_STEP_RATE_MULTIPLIER 256
+#define MIN_THROTTLE_COMMAND 3260
+#define THROTTLE_CUTOUT 3000
+#define FULL_OUTPUT 0
+#define ROLL_TRIM -43
+#define PITCH_TRIM 68
+#define YAW_TRIM -70
+
+#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
+#define THROTTLE_COMMAND throttle_accum._.W1 
+
 #define NO_RADIO						0
 #define MAG_YAW_DRIFT 						0
 #define DEBUG_MAG						0
@@ -138,14 +139,41 @@
 #endif
 
 #ifdef draganflier
+#define MAX_ALT_RATE_CONTROL 1300
+#define MAX_ALT_PROP_CONTROL 1300
+#define MIN_LIDAR_PULSE_THRESH 2
+#define IMU_CLIMB_RATE_DIVISOR 2
+//#define IMU_ALT_DIVISOR 5
+#define IMU_ALT_DIVISOR 2
+#define TARGET_MIN_ALTITUDE -1000
+#define DR_TAU 2.5
+#define MIN_THRUST 2400
+#define MAX_THRUST 3000
+#define WEIGHT 2800
+//#define MAX_CLIMB_RATE 1000
+#define MAX_CLIMB_RATE 200
+#define MAX_ALT_ERROR 1000
+#define COMMAND_STEP_RATE_MULTIPLIER 256
+#define MIN_THROTTLE_COMMAND 3260
+#define THROTTLE_CUTOUT 3000
+#define FULL_OUTPUT 0
+#define ROLL_TRIM 0
+#define PITCH_TRIM 0
+#define YAW_TRIM 0
+
+#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
+#define THROTTLE_COMMAND throttle_accum._.W1 
+
 #define GPS_TYPE						GPS_NONE
 #define NO_RADIO						0
 #define MAG_YAW_DRIFT 						0
 #define DEBUG_MAG						0
 #define TEST_ONOFF 1.0
 #define TILT_KI ( 0.01 * TEST_ONOFF )
-#define TILT_KP ( 0.08 * TEST_ONOFF )
-#define TILT_KD ( 2.0 * TEST_ONOFF )
+//#define TILT_KP ( 0.08 * TEST_ONOFF )
+#define TILT_KP ( 0.02 * TEST_ONOFF )
+//#define TILT_KD ( 2.0 * TEST_ONOFF )
+#define TILT_KD ( 1.0 * TEST_ONOFF )
 #define TILT_FF 0.2
 #define TILT_KDD 0.0
 #define YAW_KI 0.5*0.0
@@ -159,7 +187,7 @@
 #define MAX_SPEED 500 // cm/sec
 #define MAX_DISTANCE 1000 // cm
 #define LATERAL_RATE_GAIN 32
-#define ROTOR_CRAFT "draganflier, Sept. 19, 2022\r\n"
+#define ROTOR_CRAFT "draganflier, Sept. 24, 2022\r\n"
 #define NUM_INPUTS	7
 #define NUM_OUTPUTS	4
 
@@ -174,6 +202,29 @@
 #endif
 
 #ifdef spedix
+#define MAX_ALT_RATE_CONTROL 1300
+#define MAX_ALT_PROP_CONTROL 1300
+#define MIN_LIDAR_PULSE_THRESH 2
+#define IMU_CLIMB_RATE_DIVISOR 2
+#define IMU_ALT_DIVISOR 5
+#define TARGET_MIN_ALTITUDE -1000
+#define DR_TAU 2.5
+#define MIN_THRUST 2600
+#define MAX_THRUST 3000
+#define WEIGHT 2800
+#define MAX_CLIMB_RATE 1000
+#define MAX_ALT_ERROR 1000
+#define COMMAND_STEP_RATE_MULTIPLIER 256
+#define MIN_THROTTLE_COMMAND 3260
+#define THROTTLE_CUTOUT 3000
+#define FULL_OUTPUT 0
+#define ROLL_TRIM -43
+#define PITCH_TRIM 68
+#define YAW_TRIM -70
+
+#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
+#define THROTTLE_COMMAND throttle_accum._.W1 
+
 #define GPS_TYPE							GPS_UBX_4HZ
 #define NO_RADIO						0
 #define MAG_YAW_DRIFT 						1

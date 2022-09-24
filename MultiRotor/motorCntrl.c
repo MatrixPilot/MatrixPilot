@@ -458,12 +458,15 @@ void motorCntrl(void)
 		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
 		{
 			compute_altitude_control();
-		}		
+		}
+		thrust += altitude_control ;
+		if(thrust > MAX_THRUST) thrust = MAX_THRUST ;
+		if(thrust < MIN_THRUST) thrust = MIN_THRUST ;		
 		// Mix in the yaw, pitch, and roll signals into the motors
-		motor_A += + yaw_control - pitch_control ;
-		motor_B += - yaw_control - roll_control ;
-		motor_C += + yaw_control + pitch_control ;
-		motor_D += - yaw_control + roll_control ;
+		motor_A = thrust + yaw_control - pitch_control ;
+		motor_B = thrust - yaw_control - roll_control ;
+		motor_C = thrust + yaw_control + pitch_control ;
+		motor_D = thrust - yaw_control + roll_control ;
 #endif
 
 #ifdef spedix
