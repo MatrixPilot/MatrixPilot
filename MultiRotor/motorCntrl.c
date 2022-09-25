@@ -419,7 +419,7 @@ void motorCntrl(void)
 		//long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[1] ) << 2 ;
 		//roll_control += long_accum._.W1 ;
 
-		roll_control += roll_error_integral._.W1 ;
+		roll_control += roll_error_integral._.W1 + ROLL_TRIM ;
 
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KP) , pitch_error ) ;
 		pitch_control = long_accum._.W1 ;
@@ -428,7 +428,7 @@ void motorCntrl(void)
 		pitch_control += long_accum._.W1 ;
 		
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_FF*SERVO_HZ/50.0) , target_rate[0] ) ;
-		pitch_control += long_accum._.W1 ;
+		pitch_control += long_accum._.W1 + PITCH_TRIM ;
 
 		//long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*TILT_KDD) , -theta_delta[0] ) << 2 ;
 		//pitch_control += long_accum._.W1 ;
@@ -441,7 +441,7 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*YAW_KD*SCALEGYRO/26.0) , -omegagyro[2] ) ;
 		yaw_control += long_accum._.W1 ;
 
-		yaw_control += yaw_error_integral._.W1 ;
+		yaw_control += yaw_error_integral._.W1 + YAW_TRIM ;
 #ifdef arduCopter
 		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
 		{
