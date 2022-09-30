@@ -78,9 +78,9 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-#define draganflier
+//#define draganflier
 //#define spedix
-//#define arduCopter
+#define arduCopter
 
 #ifdef arduCopter
 #define MAX_ALT_RATE_CONTROL 1300
@@ -105,6 +105,7 @@
 
 #define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
 #define THROTTLE_COMMAND throttle_accum._.W1 
+#define GPS_TYPE						GPS_NONE
 
 #define NO_RADIO						0
 #define MAG_YAW_DRIFT 						0
@@ -124,18 +125,22 @@
 // maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
 #define MAX_TILT 45
 
+#define MAX_SPEED 500 // cm/sec
+#define MAX_DISTANCE 1000 // cm
+#define LATERAL_RATE_GAIN 32
+
 #define USE_LIDAR 0
-#define ROTOR_CRAFT "arduCopter, March 12, 2019\r\n"
-#define NUM_INPUTS	4
+#define ROTOR_CRAFT "arduCopter, Sept 30, 2022\r\n"
+#define NUM_INPUTS	7
 #define NUM_OUTPUTS	4
 // arduCopter offsets
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 270 )
-#define YACCEL_OFFSET	( 56 )
-#define ZACCEL_OFFSET	( -390 )
-#define XRATE_OFFSET	( -189 )
-#define YRATE_OFFSET	( 43 )
-#define ZRATE_OFFSET	( -21 )
+#define XACCEL_OFFSET	( 325 )
+#define YACCEL_OFFSET	( 419 )
+#define ZACCEL_OFFSET	( -431 )
+#define XRATE_OFFSET	( -170 )
+#define YRATE_OFFSET	( 39 )
+#define ZRATE_OFFSET	( 50 )
 #endif
 
 #ifdef draganflier
