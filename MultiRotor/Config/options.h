@@ -83,6 +83,7 @@
 #define arduCopter
 
 #ifdef arduCopter
+#define TEST_MOTORS 1
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300
 #define MIN_LIDAR_PULSE_THRESH 2

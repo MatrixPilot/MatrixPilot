@@ -446,7 +446,13 @@ void motorCntrl(void)
 		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
 		{
 			compute_altitude_control();
-		}		
+		}
+#if (TEST_MOTORS == 1)	
+		motor_A = thrust ;
+		motor_B = thrust ;
+		motor_C = thrust ;
+		motor_D = thrust ;
+#else
 		// Mix in the thrust, altitude, yaw, pitch, and roll signals into the motors
 		thrust += altitude_control ;
 		if(thrust > MAX_THRUST) thrust = MAX_THRUST ;
@@ -456,7 +462,8 @@ void motorCntrl(void)
 		motor_B = thrust - yaw_control - roll_control ;
 		motor_C = thrust + yaw_control + pitch_control ;
 		motor_D = thrust - yaw_control + roll_control ;
-#endif
+#endif // TEST_MOTORS
+#endif // arducopter
 		
 #ifdef draganflier
 		if((udb_heartbeat_counter%(HEARTBEAT_HZ/SERVO_HZ))==0)
