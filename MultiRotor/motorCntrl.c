@@ -63,6 +63,8 @@ extern int IMU_altitude ;
 int16_t target_climb_rate ;
 int16_t target_altitude ;
 
+uint16_t mission_time = MISSION_TIME ;
+
 int pwManual[NUM_INPUTS+1] ;
 int commanded_roll ;
 int commanded_pitch ;
@@ -155,7 +157,18 @@ void motorCntrl(void)
 	int rmat_transposed[9] ;
 	int correction_matrix[9] ;
 	int tilt_rmat[9] ;
-
+	
+	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
+	{
+		if ((mission_time>0)&&((abs(THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])> MANUAL_DEADBAND )))
+		{
+			mission_time = mission_time - 1 ;
+		}
+		if ( mission_time == 0 )
+		{
+			land_enable = 1 ;
+		}
+	}
 	
 	// If radio is off, use udb_pwTrim values instead of the udb_pwIn values
 	for (temp = 0; temp <= NUM_INPUTS; temp++)
@@ -166,38 +179,51 @@ void motorCntrl(void)
 	
 	if ( (udb_pwIn[7]>1800)&&(udb_pwIn[7]<4200) )
 	{
-		if (udb_pwIn[7]<3000) // pre-flight and landing
-		{
-			if (land_enable==0)
+		if ( mission_time > 0)
+			if (udb_pwIn[7]<3000) // pre-flight and landing
 			{
-				THROTTLE_COMMAND = THROTTLE_COMMAND_IN ;
+				if (land_enable==0)
+				{
+					THROTTLE_COMMAND = THROTTLE_COMMAND_IN ;
+				}
+				else
+				{
+					if (THROTTLE_COMMAND>THROTTLE_CUTOUT )
+					{
+						throttle_accum.WW+=__builtin_mulsu(-250,COMMAND_STEP_RATE_MULTIPLIER);	
+					}
+					else
+					{
+						THROTTLE_COMMAND = 2000 ;
+						if (THROTTLE_COMMAND_IN<2200) land_enable = 0 ;
+					}
+				}
 			}
 			else
 			{
-				if (THROTTLE_COMMAND>THROTTLE_CUTOUT )
+				land_enable = 1 ;
+				throttle_accum.WW += __builtin_mulsu(THROTTLE_COMMAND_IN-3000 , COMMAND_STEP_RATE_MULTIPLIER ) ;
+			
+				if (THROTTLE_COMMAND>4000)
+				{
+					THROTTLE_COMMAND = 4000 ;
+				}
+				if (THROTTLE_COMMAND<MIN_THROTTLE_COMMAND)
+				{
+					THROTTLE_COMMAND = MIN_THROTTLE_COMMAND ;
+				}	
+			}
+		else
+		{
+			if (THROTTLE_COMMAND>THROTTLE_CUTOUT )
 				{
 					throttle_accum.WW+=__builtin_mulsu(-250,COMMAND_STEP_RATE_MULTIPLIER);	
 				}
 				else
 				{
 					THROTTLE_COMMAND = 2000 ;
-					if (THROTTLE_COMMAND_IN<2200) land_enable = 0 ;
+					land_enable = 0 ;
 				}
-			}
-		}
-		else
-		{
-			land_enable = 1 ;
-			throttle_accum.WW += __builtin_mulsu(THROTTLE_COMMAND_IN-3000 , COMMAND_STEP_RATE_MULTIPLIER ) ;
-			
-			if (THROTTLE_COMMAND>4000)
-			{
-				THROTTLE_COMMAND = 4000 ;
-			}
-			if (THROTTLE_COMMAND<MIN_THROTTLE_COMMAND)
-			{
-				THROTTLE_COMMAND = MIN_THROTTLE_COMMAND ;
-			}	
 		}
 	}
 	else

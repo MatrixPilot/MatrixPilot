@@ -78,12 +78,13 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-//#define draganflier
+#define draganflier
 //#define spedix
-#define arduCopter
+//#define arduCopter
 
 #ifdef arduCopter
-#define TEST_MOTORS 1
+#define MISSION_TIME 180
+#define TEST_MOTORS 0
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300
 #define MIN_LIDAR_PULSE_THRESH 2
@@ -145,6 +146,7 @@
 #endif
 
 #ifdef draganflier
+#define MISSION_TIME 180
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300
 #define MIN_LIDAR_PULSE_THRESH 2
@@ -204,6 +206,7 @@
 #endif
 
 #ifdef spedix
+#define MISSION_TIME 180
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300
 #define MIN_LIDAR_PULSE_THRESH 2
