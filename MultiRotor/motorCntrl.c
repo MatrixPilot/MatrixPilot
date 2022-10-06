@@ -135,6 +135,8 @@ union longww throttle_accum = {0};
 
 int16_t land_enable = 0 ;
 
+int16_t flipped_over = 0 ;
+
 void motorCntrl(void)
 {
 	int temp ;
@@ -157,6 +159,8 @@ void motorCntrl(void)
 	int rmat_transposed[9] ;
 	int correction_matrix[9] ;
 	int tilt_rmat[9] ;
+
+	if (rmat[8]<0 ) flipped_over = 1 ;
 	
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
 	{
@@ -258,11 +262,21 @@ void motorCntrl(void)
 		motor_B += - commanded_yaw - commanded_roll ;
 		motor_C += + commanded_yaw + commanded_pitch ;
 		motor_D += - commanded_yaw + commanded_roll ;
-
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
-		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
-		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
-		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
+		
+		if ( flipped_over == 0 )
+		{
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
+		}
+		else
+		{
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 0 ;
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;		
+		}
 
 	}
 	else
@@ -545,10 +559,20 @@ void motorCntrl(void)
 #endif
 
 //		Send the signals out to the motors
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
-		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
-		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
-		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
+		if ( flipped_over == 0 )
+		{
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
+		}
+		else
+		{
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 0 ;
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;		
+		}
 	}
 }
 
