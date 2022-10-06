@@ -78,12 +78,12 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-#define draganflier
+//#define draganflier
 //#define spedix
-//#define arduCopter
+#define arduCopter
 
 #ifdef arduCopter
-#define MISSION_TIME 180
+#define MISSION_TIME 45
 #define TEST_MOTORS 0
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300

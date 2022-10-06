@@ -33,7 +33,7 @@
 // Used for serial debug output
 #include <stdio.h>
 
-#define MANUAL_DEADBAND 200 // amount of throttle before fly-by-wire controls engage
+#define MANUAL_DEADBAND 300 // amount of throttle before fly-by-wire controls engage
 #define MAXIMUM_ERROR_INTEGRAL ((long int) 32768000 )
 #define YAW_DEADBAND 5 // prevent Tx pulse variation from causing yaw drift
 
@@ -164,7 +164,7 @@ void motorCntrl(void)
 	
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
 	{
-		if ((mission_time>0)&&((abs(THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])> MANUAL_DEADBAND )))
+		if ((mission_time>0)&&((THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL]> MANUAL_DEADBAND )))
 		{
 			mission_time = mission_time - 1 ;
 		}
@@ -198,8 +198,8 @@ void motorCntrl(void)
 					}
 					else
 					{
-						THROTTLE_COMMAND = 2000 ;
-						if (THROTTLE_COMMAND_IN<2200) land_enable = 0 ;
+						THROTTLE_COMMAND = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
+						if (THROTTLE_COMMAND_IN<udb_pwTrim[THROTTLE_INPUT_CHANNEL]+300) land_enable = 0 ;
 					}
 				}
 			}
@@ -225,8 +225,9 @@ void motorCntrl(void)
 				}
 				else
 				{
-					THROTTLE_COMMAND = 2000 ;
+					THROTTLE_COMMAND = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
 					land_enable = 0 ;
+					flipped_over = 1 ;
 				}
 		}
 	}
@@ -392,10 +393,10 @@ void motorCntrl(void)
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ACCEL_K ) , accelEarth[2] ) ;
 		accel_feedback = long_accum._.W1 ;
 		int16_t thrust =  THROTTLE_COMMAND - accel_feedback ;
-		motor_A = thrust ;
-		motor_B = thrust ;
-		motor_C = thrust ;
-		motor_D = thrust ;
+//		motor_A = thrust ;
+//		motor_B = thrust ;
+//		motor_C = thrust ;
+//		motor_D = thrust ;
 
 //		Compute the error intetgrals
 		roll_error_integral.WW += ((__builtin_mulus ( (unsigned int ) (32.0*RMAX*TILT_KI/PID_HZ), roll_error ))>>5) ;
