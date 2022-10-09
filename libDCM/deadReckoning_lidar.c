@@ -102,7 +102,7 @@ void dead_reckon(void)
 		// compute location and velocity errors
 		// for Z use LIDAR
 		// wait until takeoff to use altitude information, LIDAR does not work on the ground	
-		if (abs(THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< 200 )
+		if (abs((int16_t)THROTTLE_COMMAND-(int16_t)udb_pwTrim[THROTTLE_INPUT_CHANNEL])< 200 )
 		{
 			// sitting on the ground
 			IMUlocationz.WW = 0 ;

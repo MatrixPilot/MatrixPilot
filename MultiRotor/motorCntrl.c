@@ -164,7 +164,7 @@ void motorCntrl(void)
 	
 	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)&&didCalibrate)
 	{
-		if ((mission_time>0)&&((THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])> MANUAL_DEADBAND))
+		if ((mission_time>0)&&(((int16_t)THROTTLE_COMMAND-(int16_t)udb_pwTrim[THROTTLE_INPUT_CHANNEL])>(int16_t) MANUAL_DEADBAND))
 		{
 			mission_time = mission_time - 1 ;
 		}
@@ -199,7 +199,7 @@ void motorCntrl(void)
 					else
 					{
 						THROTTLE_COMMAND = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
-						if (THROTTLE_COMMAND_IN<udb_pwTrim[THROTTLE_INPUT_CHANNEL]+300) land_enable = 0 ;
+						if ((int16_t)THROTTLE_COMMAND_IN<(int16_t)udb_pwTrim[THROTTLE_INPUT_CHANNEL]+300) land_enable = 0 ;
 					}
 				}
 			}
@@ -244,7 +244,7 @@ void motorCntrl(void)
 		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
 		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;
 	}
-	else if (abs(THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])< MANUAL_DEADBAND )
+	else if (abs((int16_t)THROTTLE_COMMAND-(int16_t)udb_pwTrim[THROTTLE_INPUT_CHANNEL])< (int16_t)MANUAL_DEADBAND )
 	{
 		initialize_yaw_rmat();
 		motor_A = THROTTLE_COMMAND ;
@@ -252,12 +252,12 @@ void motorCntrl(void)
 		motor_C = THROTTLE_COMMAND ;
 		motor_D = THROTTLE_COMMAND ;
 
-		commanded_roll =  ( pwManual[ROLL_INPUT_CHANNEL] 
-						- udb_pwTrim[ROLL_INPUT_CHANNEL]) ;
-		commanded_pitch = ( pwManual[PITCH_INPUT_CHANNEL] 
-						- udb_pwTrim[PITCH_INPUT_CHANNEL] ) ;
-		commanded_yaw = ( pwManual[YAW_INPUT_CHANNEL] 
-						- udb_pwTrim[YAW_INPUT_CHANNEL] )  ;
+		commanded_roll =  ( (int16_t)pwManual[ROLL_INPUT_CHANNEL] 
+						- (int16_t)udb_pwTrim[ROLL_INPUT_CHANNEL]) ;
+		commanded_pitch = ( (int16_t)pwManual[PITCH_INPUT_CHANNEL] 
+						- (int16_t)udb_pwTrim[PITCH_INPUT_CHANNEL] ) ;
+		commanded_yaw = ( (int16_t)pwManual[YAW_INPUT_CHANNEL] 
+						- (int16_t)udb_pwTrim[YAW_INPUT_CHANNEL] )  ;
 
 		motor_A += + commanded_yaw - commanded_pitch ;
 		motor_B += - commanded_yaw - commanded_roll ;
@@ -282,12 +282,12 @@ void motorCntrl(void)
 	}
 	else
 	{
-		commanded_roll =  ( pwManual[ROLL_INPUT_CHANNEL] 
-						- udb_pwTrim[ROLL_INPUT_CHANNEL])*commanded_tilt_gain ;
-		commanded_pitch = ( pwManual[PITCH_INPUT_CHANNEL] 
-						- udb_pwTrim[PITCH_INPUT_CHANNEL] )*commanded_tilt_gain  ;
-		commanded_yaw = ( pwManual[YAW_INPUT_CHANNEL] 
-						- udb_pwTrim[YAW_INPUT_CHANNEL] )  ;
+		commanded_roll =  ( (int16_t)pwManual[ROLL_INPUT_CHANNEL] 
+						- (int16_t)udb_pwTrim[ROLL_INPUT_CHANNEL])*commanded_tilt_gain ;
+		commanded_pitch = ( (int16_t)pwManual[PITCH_INPUT_CHANNEL] 
+						- (int16_t)udb_pwTrim[PITCH_INPUT_CHANNEL] )*commanded_tilt_gain  ;
+		commanded_yaw = ( (int16_t)pwManual[YAW_INPUT_CHANNEL] 
+						- (int16_t)udb_pwTrim[YAW_INPUT_CHANNEL] )  ;
 
 		if ( commanded_yaw >= YAW_DEADBAND )
 		{
