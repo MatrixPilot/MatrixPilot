@@ -162,9 +162,9 @@ void motorCntrl(void)
 
 	if (rmat[8]<0 ) flipped_over = 1 ;
 	
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)&&didCalibrate)
 	{
-		if ((mission_time>0)&&((THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL]> MANUAL_DEADBAND )))
+		if ((mission_time>0)&&((THROTTLE_COMMAND-udb_pwTrim[THROTTLE_INPUT_CHANNEL])> MANUAL_DEADBAND))
 		{
 			mission_time = mission_time - 1 ;
 		}
@@ -181,7 +181,7 @@ void motorCntrl(void)
 		else
 			pwManual[temp] = udb_pwTrim[temp];
 	
-	if ( (udb_pwIn[7]>1800)&&(udb_pwIn[7]<4200) )
+	if ( (udb_pwIn[7]>1800)&&(udb_pwIn[7]<4200)&&didCalibrate )
 	{
 		if ( mission_time > 0)
 			if (udb_pwIn[7]<3000) // pre-flight and landing

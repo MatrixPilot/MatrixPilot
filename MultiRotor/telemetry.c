@@ -52,6 +52,7 @@ extern int16_t udb_magFieldBody[3] ;
 extern fractional magFieldEarth[3];
 extern fractional magAlignment[4];
 extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
+extern uint16_t mission_time ;
 
 /*void send_debug_line( void )
 {
@@ -147,7 +148,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			}
 #else
 			{
-				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , targ_alt , target_climb , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr, tkoff_flg, thrtle_cmd, rmat0 , yaw_mat0\r\n" ) ;
+				serial_output( "gps_alt , thrust_cmd , roll_cmd , pitch_cmd , x_vel_target , y_vel_target , mode, dgps, sog , cog , svert, mx, my, mz, X , Y , VX , VY , targ_alt , target_climb , pulses, IMU_alt , alt , IMU_climb , clmb_r , alt_cntrl , hrtbt , cpu , mtra , mtrb , mtrc ,mtrd , r6 , r7 , w0 , w1 , w2 , rfb , pfb , yfb , rerr, perr, yerr, tkoff_flg, thrtle_cmd, m_time\r\n" ) ;
 			
 			}
 #endif // DEBUG_MAG
@@ -173,7 +174,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 		}
 #else
 		{
-			serial_output( "%li,%i,%i,%i,%i,%i,%i,%i,%u,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%i,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output( "%li,%i,%i,%i,%i,%i,%i,%i,%u,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%u,%i,%u,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
 			alt ,
 			pwManual[THROTTLE_INPUT_CHANNEL] , commanded_roll , commanded_pitch ,
 			x_velocity_target , y_velocity_target ,
@@ -195,7 +196,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 			omegagyro[0] , omegagyro[1] , omegagyro[2] , 
 			roll_control , pitch_control, yaw_control ,
 			roll_error , pitch_error , yaw_error ,
-			udb_pwIn[7]	, THROTTLE_COMMAND , rmat[0] , yaw_rmat[0]	) ;	
+			udb_pwIn[7]	, THROTTLE_COMMAND , mission_time	) ;	
 		}
 #endif // DEBUG_MAG
 	
