@@ -83,29 +83,27 @@
 #define arduCopter
 
 #ifdef arduCopter
-#define MISSION_TIME 45
+#define MISSION_TIME 180
 #define TEST_MOTORS 0
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300
 #define MIN_LIDAR_PULSE_THRESH 2
 #define IMU_CLIMB_RATE_DIVISOR 2
 #define IMU_ALT_DIVISOR 2
-#define TARGET_MIN_ALTITUDE 1000
+#define TARGET_MIN_ALTITUDE 400
 #define DR_TAU 2.5
-#define MIN_THRUST 2500
+#define MIN_THRUST 2400
 #define MAX_THRUST 3500
 #define WEIGHT 3000
 #define MAX_CLIMB_RATE 200
 #define MAX_ALT_ERROR 1000
 #define COMMAND_STEP_RATE_MULTIPLIER 256
-//#define MIN_THROTTLE_COMMAND 3260
-//#define THROTTLE_CUTOUT 2800
 #define MIN_THROTTLE_COMMAND 3000
-#define THROTTLE_CUTOUT 2400
+#define THROTTLE_CUTOUT 2500
 #define FULL_OUTPUT 0
-#define ROLL_TRIM 0
-#define PITCH_TRIM 0
-#define YAW_TRIM 0
+#define ROLL_TRIM -14
+#define PITCH_TRIM 1
+#define YAW_TRIM 16
 
 #define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
 #define THROTTLE_COMMAND throttle_accum._.W1 
@@ -134,7 +132,7 @@
 #define LATERAL_RATE_GAIN 32
 
 #define USE_LIDAR 1
-#define ROTOR_CRAFT "arduCopter, Oct 1, 2022\r\n"
+#define ROTOR_CRAFT "arduCopter, Oct 10, 2022\r\n"
 #define NUM_INPUTS	7
 #define NUM_OUTPUTS	4
 // arduCopter offsets

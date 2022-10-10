@@ -233,16 +233,16 @@ void motorCntrl(void)
 	}
 	else
 	{
-		THROTTLE_COMMAND = 0 ;
+		THROTTLE_COMMAND = 2000 ;
 	}
 	
 	if (!didCalibrate)
 	{
 		// Leave at 0 (no PWM pulses) until calibrated.
-		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;
-		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 0 ;
-		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
-		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;
+		udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 2000 ;
+		udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 2000 ;
+		udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 2000 ;
+		udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 2000 ;
 	}
 	else if (abs((int16_t)THROTTLE_COMMAND-(int16_t)udb_pwTrim[THROTTLE_INPUT_CHANNEL])< (int16_t)MANUAL_DEADBAND )
 	{
@@ -273,10 +273,10 @@ void motorCntrl(void)
 		}
 		else
 		{
-			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;		
-			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 0 ;
-			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
-			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;		
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 2000 ;		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 2000 ;
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 2000 ;
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 2000 ;		
 		}
 
 	}
@@ -489,10 +489,10 @@ void motorCntrl(void)
 			compute_altitude_control();
 		}
 #if (TEST_MOTORS == 1)	
-		motor_A = thrust ;
-		motor_B = thrust ;
-		motor_C = thrust ;
-		motor_D = thrust ;
+		motor_A = pwManual[THROTTLE_INPUT_CHANNEL] ;
+		motor_B = pwManual[THROTTLE_INPUT_CHANNEL] ;
+		motor_C = pwManual[THROTTLE_INPUT_CHANNEL] ;
+		motor_D = pwManual[THROTTLE_INPUT_CHANNEL] ;
 #else
 		// Mix in the thrust, altitude, yaw, pitch, and roll signals into the motors
 		thrust += altitude_control ;
@@ -569,10 +569,10 @@ void motorCntrl(void)
 		}
 		else
 		{
-			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 0 ;		
-			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 0 ;
-			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 0 ;
-			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 0 ;		
+			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = 2000 ;		
+			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = 2000 ;
+			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = 2000 ;
+			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = 2000 ;		
 		}
 	}
 }
