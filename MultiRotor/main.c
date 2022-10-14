@@ -55,8 +55,14 @@ int main (void)
 	dcm_init() ;
 	
 	udb_serial_set_rate(19200) ;
-	
+#if ( TEST_LIDAR == 0)	
 	LED_GREEN = LED_OFF ;
+#else
+	LED_GREEN = LED_ON ;
+	LED_BLUE = LED_ON ;
+	LED_ORANGE = LED_ON ;
+	LED_RED = LED_ON ;
+#endif // TEST_LIDAR
 #if (CONSOLE_UART != 2)
 	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
 #endif
@@ -80,7 +86,10 @@ void udb_background_callback_periodic(void)
 	if (!didCalibrate)
 	{
 		// If still calibrating, blink RED
+#if (TEST_LIDAR == 0 )
 		udb_led_toggle(LED_RED) ;
+#else
+#endif // TEST_LIDAR
 #if (MAG_YAW_DRIFT == 1)
 		align_rmat_to_mag();
 #endif // MAG_YAW_DRIFT
@@ -98,6 +107,7 @@ void udb_background_callback_periodic(void)
 	}
 	else
 	{
+#if ( TEST_LIDAR == 0)
 		// No longer calibrating, indicate command status
 		if ( dcm_flags._.fpv_tilt_req == 1) 
 		{
@@ -121,8 +131,8 @@ void udb_background_callback_periodic(void)
 				}			
 			}
 		}
-	}
-	
+#endif // TEST_LIDAR
+	}	
 	return ;
 }
 
@@ -143,12 +153,53 @@ void dcm_callback_gps_location_updated(void)
 }
 
 extern boolean origin_recorded ;
+extern uint16_t number_pulses ;
+extern uint16_t altitude ;
 
 // Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
 {
 	if((udb_heartbeat_counter%(HEARTBEAT_HZ/PID_HZ))==0)
 	{
+#if ( TEST_LIDAR == 1)
+		udb_pwOut[5] = udb_servo_pulsesat( 2000 + ((udb_pwIn[5])/2) ) ;
+		if (number_pulses == 0)
+		{
+			LED_RED = LED_OFF ;
+			LED_GREEN = LED_OFF ;
+			LED_ORANGE = LED_OFF ;
+			LED_BLUE = LED_OFF ;
+		}
+		if (number_pulses == 1)
+		{
+			LED_RED = LED_ON ;
+			LED_GREEN = LED_OFF ;
+			LED_ORANGE = LED_OFF ;
+			LED_BLUE = LED_OFF ;	
+		}
+		if (number_pulses == 2)
+		{
+			LED_RED = LED_ON ;
+			LED_GREEN = LED_ON ;
+			LED_ORANGE = LED_OFF ;
+			LED_BLUE = LED_OFF ;			
+		}
+		if (number_pulses == 3)
+		{
+			LED_RED = LED_ON ;
+			LED_GREEN = LED_ON ;
+			LED_ORANGE = LED_ON ;
+			LED_BLUE = LED_OFF ;				
+		}
+		if (number_pulses > 3)
+		{
+			LED_RED = LED_ON ;
+			LED_GREEN = LED_ON ;
+			LED_ORANGE = LED_ON ;
+			LED_BLUE = LED_ON ;					
+		}
+#endif // TEST_LIDAR
+		
 #ifdef DEBUG_MAGNETOMETER
 		int motor_A, motor_B, motor_C, motor_D ;
 		union longww long_accum ;

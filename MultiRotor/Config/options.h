@@ -78,9 +78,9 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 //#define desktest
-//#define draganflier
+#define draganflier
 //#define spedix
-#define arduCopter
+//#define arduCopter
 
 #ifdef arduCopter
 #define MISSION_TIME 180
@@ -101,9 +101,12 @@
 #define MIN_THROTTLE_COMMAND 3000
 #define THROTTLE_CUTOUT 2500
 #define FULL_OUTPUT 0
-#define ROLL_TRIM -14
-#define PITCH_TRIM 1
-#define YAW_TRIM 16
+//#define ROLL_TRIM -14
+//#define PITCH_TRIM 1
+//#define YAW_TRIM 16
+#define ROLL_TRIM 0
+#define PITCH_TRIM 0
+#define YAW_TRIM 0
 
 #define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
 #define THROTTLE_COMMAND throttle_accum._.W1 
@@ -146,6 +149,7 @@
 #endif
 
 #ifdef draganflier
+#define TEST_LIDAR 1
 #define MISSION_TIME 180
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300
@@ -193,7 +197,11 @@
 #define LATERAL_RATE_GAIN 32
 #define ROTOR_CRAFT "draganflier, Sept. 24, 2022\r\n"
 #define NUM_INPUTS	7
+#if (TEST_LIDAR == 0 )
 #define NUM_OUTPUTS	4
+#else
+#define NUM_OUTPUTS 5
+#endif
 
 // draganflier offsets
 #define CUSTOM_OFFSETS

@@ -376,13 +376,21 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T4Interrupt(void)
 			SERVO_OUT_PIN_3 = 0;
 			HANDLE_SERVO_OUT(4, SERVO_OUT_PIN_4);
 			break;
+#if ( TEST_LIDAR == 0)
 		case 4:
 			SERVO_OUT_PIN_4 = 0;
-	//		HANDLE_SERVO_OUT(5, SERVO_OUT_PIN_5);
+			_T4IE = 0; 
+			break;	
+#else
+		case 4:
+			SERVO_OUT_PIN_4 = 0;
+			HANDLE_SERVO_OUT(5, SERVO_OUT_PIN_5);
 			break;
+		
+#endif // TEST_LIDAR
 		case 5:
-	//		SERVO_OUT_PIN_5 = 0;
-			HANDLE_SERVO_OUT(6, SERVO_OUT_PIN_6);
+			SERVO_OUT_PIN_5 = 0;
+			_T4IE = 0;              // disable timer 4 interrupt
 			break;
 		case 6:
 			SERVO_OUT_PIN_6 = 0;

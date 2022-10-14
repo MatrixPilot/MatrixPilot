@@ -159,6 +159,11 @@ void radioIn_failsafe_check(void)
 		udb_flags._.radio_on = 1;
 		led_on(LED_GREEN);
 }
+#elif ( TEST_LIDAR == 1)
+void radioIn_failsafe_check(void)
+{
+		udb_flags._.radio_on = 1;
+}
 #else
 // called from heartbeat pulse at 20Hz
 void radioIn_failsafe_check(void)
@@ -182,7 +187,7 @@ void radioIn_failsafe_check(void)
 	}
 	goodPWMPulseCount = 0;
 }
-#endif // NORADIO
+#endif // NORADIO or TEST_LIDAR
 
 void radioIn_bad_pulse_count_reset(void)
 {
