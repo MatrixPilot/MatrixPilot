@@ -65,7 +65,8 @@ extern union dcm_fbts_word { struct dcm_flag_bits _; int16_t W; } dcm_flags;
 // Calibrate for 10 seconds before moving servos
 //#define DCM_CALIB_COUNT 200 // 5 seconds
 //#define DCM_CALIB_COUNT  400    // 10 seconds at 40 Hz
-#define DCM_CALIB_COUNT  800    // 20 seconds at 40 Hz
+//#define DCM_CALIB_COUNT  800    // 20 seconds at 40 Hz
+#define DCM_CALIB_COUNT 80 // 2 seconds at 40 Hz
 #define DCM_GPS_COUNT    1000   // 25 seconds at 40 Hz
 
 #endif // LIB_DCM_H

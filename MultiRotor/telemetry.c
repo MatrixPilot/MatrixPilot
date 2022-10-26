@@ -58,6 +58,7 @@ extern uint16_t mission_time ;
 {
 	
 }*/
+extern int16_t gplane[];
 extern void serial_output(const char* format, ...);
 // Prepare a line of serial output and start it sending
 // GPS data needs to be passed in
@@ -65,6 +66,66 @@ extern int16_t yaw_rmat[];
 extern int16_t target_altitude , target_climb_rate ;
 extern union longww throttle_accum ;
 extern void initialize_yaw_rmat(void) ;
+void send_imu_data(void)
+{
+	db_index = 0 ;
+	
+	if (!hasWrittenHeader)
+	{
+		header_line ++ ;
+		switch ( header_line ) {
+			case 1:
+			initialize_yaw_rmat();
+			break ;
+		case 2:
+			break ;
+		case 3:
+			break ;	
+		case 4:
+			break ;	
+		case 5:
+			break ;
+		case 6:
+			break ;
+		case 7:
+			break ;			
+		case 8:
+			break ;
+		case 9:
+			break ;
+		case 10:
+			break ;			
+		case 11:
+			break ;				
+		case 12:
+			break ;	
+		case 13:
+			break ;
+		case 14:
+
+			{
+				serial_output( "hrtbt , cpu , w0 , w1 , w2\r\n" ) ;
+			}
+			hasWrittenHeader = 1 ;
+			break ;
+		default:
+			hasWrittenHeader = 1 ;
+			break ;
+		}
+	}
+	else
+	{
+
+		{
+			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			udb_heartbeat_counter , (int) udb_cpu_load() ,
+			gplane[0] , gplane[1] ,gplane[2] ,
+			omegagyro[0] , omegagyro[1] , omegagyro[2] 
+			) ;	
+		}
+	}
+	return ;
+}
 void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb )
 {
 	db_index = 0 ;

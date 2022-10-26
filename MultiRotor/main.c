@@ -38,6 +38,7 @@ extern boolean differential_gps(void) ;
 boolean didCalibrate = 0 ;
 
 void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb ) ;
+void send_imu_data(void);
 void motorCntrl( void ) ;
 
 const int max_tilt = (int) (MAX_TILT*.7111) ;  // maximum tilt in byte cicular
@@ -159,90 +160,14 @@ extern uint16_t altitude ;
 // Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
 {
-	if((udb_heartbeat_counter%(HEARTBEAT_HZ/PID_HZ))==0)
-	{
-#if ( TEST_LIDAR == 1)
-		udb_pwOut[5] = udb_servo_pulsesat( 2000 + ((udb_pwIn[5])/2) ) ;
-		if (number_pulses == 0)
-		{
-			LED_RED = LED_OFF ;
-			LED_GREEN = LED_OFF ;
-			LED_ORANGE = LED_OFF ;
-			LED_BLUE = LED_OFF ;
-		}
-		if (number_pulses == 1)
-		{
-			LED_RED = LED_ON ;
-			LED_GREEN = LED_OFF ;
-			LED_ORANGE = LED_OFF ;
-			LED_BLUE = LED_OFF ;	
-		}
-		if (number_pulses == 2)
-		{
-			LED_RED = LED_ON ;
-			LED_GREEN = LED_ON ;
-			LED_ORANGE = LED_OFF ;
-			LED_BLUE = LED_OFF ;			
-		}
-		if (number_pulses == 3)
-		{
-			LED_RED = LED_ON ;
-			LED_GREEN = LED_ON ;
-			LED_ORANGE = LED_ON ;
-			LED_BLUE = LED_OFF ;				
-		}
-		if (number_pulses > 3)
-		{
-			LED_RED = LED_ON ;
-			LED_GREEN = LED_ON ;
-			LED_ORANGE = LED_ON ;
-			LED_BLUE = LED_ON ;					
-		}
-#endif // TEST_LIDAR
-		
-#ifdef DEBUG_MAGNETOMETER
-		int motor_A, motor_B, motor_C, motor_D ;
-		union longww long_accum ;
-		long_accum.WW = __builtin_mulss(rmat[1], 4000);
-		motor_A=(3000 + long_accum._.W1);	
-		long_accum.WW = __builtin_mulss(rmat[4], 4000);
-		motor_B=(3000 + long_accum._.W1);	
-		long_accum.WW = __builtin_mulss(rmat[6], 4000);
-		motor_C=(3000 + long_accum._.W1);
-		long_accum.WW = __builtin_mulss(rmat[7], 4000);
-		motor_D = (3000 + long_accum._.W1) ;
-		udb_pwOut[1] = udb_servo_pulsesat( motor_A ) ;		
-		udb_pwOut[2] = udb_servo_pulsesat( motor_B ) ;
-		udb_pwOut[3] = udb_servo_pulsesat( motor_C ) ;
-		udb_pwOut[4] = udb_servo_pulsesat( motor_D ) ;
-#else
-		motorCntrl() ;
-#endif // debug magnetometer
-	}
 	
-	// Update the Green LED to show RC radio status
-	if (udb_flags._.radio_on)
-	{
-		//LED_GREEN = LED_ON ;
-	}
-	else
-	{
-		//LED_GREEN = LED_OFF ;
-	}
-	
-	// Serial output one fifth of SERVO_HZ  
-	// if ((udb_heartbeat_counter % (5*HEARTBEAT_HZ/SERVO_HZ)) == 0)
-	// Serial output one tenth of SERVO_HZ  (5 Hz)
-	if ((udb_heartbeat_counter % (10*HEARTBEAT_HZ/SERVO_HZ)) == 0)
+	// Serial output SERVO_HZ  (40 Hz)
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ)) == 0)
 
 	{
 		if ( didCalibrate && ( (origin_recorded || (GPS_TYPE==GPS_NONE ) ) || ( FULL_OUTPUT == 1 )))
 		{
-#if ( GPS_TYPE == GPS_UBX_4HZ)
-			send_debug_line(differential_gps() , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
-#else
-			send_debug_line(0 , svs , lat_gps.WW , lon_gps.WW , alt_sl_gps.WW , sog_gps.BB , cog_gps.BB , climb_gps.BB ) ;
-#endif // GPS_UBX_4HZ
+			send_imu_data();
 		}
 	}
 	

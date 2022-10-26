@@ -31,8 +31,8 @@
 #endif // (BOARD_TYPE != UDB4_BOARD)
 
 // number of servo updates per second
-//#define SERVO_HZ 40
-#define SERVO_HZ 50
+#define SERVO_HZ 40
+//#define SERVO_HZ 50
 //#define SERVO_HZ 100
 
 // frequency of PID loop (HEARTBEAT_HZ / PID_HZ must be an integer)

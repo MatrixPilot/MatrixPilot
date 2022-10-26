@@ -149,7 +149,7 @@
 #endif
 
 #ifdef draganflier
-#define TEST_LIDAR 1
+#define TEST_LIDAR 0
 #define MISSION_TIME 180
 #define MAX_ALT_RATE_CONTROL 1300
 #define MAX_ALT_PROP_CONTROL 1300
@@ -175,7 +175,7 @@
 #define THROTTLE_COMMAND throttle_accum._.W1 
 
 #define GPS_TYPE						GPS_NONE
-#define NO_RADIO						0
+#define NO_RADIO						1
 #define MAG_YAW_DRIFT 						0
 #define DEBUG_MAG						0
 #define TEST_ONOFF 1.0

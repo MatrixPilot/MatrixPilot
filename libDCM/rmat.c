@@ -121,7 +121,7 @@ static fractional gplane[] = { 0, -GRAVITY, 0 };
 static fractional gravit_vector_plane[] = { 0, -GRAVITY, 0 };
 int16_t aero_force[] = { 0 , GRAVITY , 0 };
 #else  // horizontal initialization
-static fractional gplane[] = { 0, 0, GRAVITY };
+fractional gplane[] = { 0, 0, GRAVITY };
 static fractional gravity_vector_plane[] = { 0, 0, GRAVITY };
 int16_t aero_force[] = { 0 , 0 , -GRAVITY };
 #endif
