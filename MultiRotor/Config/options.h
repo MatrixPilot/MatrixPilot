@@ -205,12 +205,12 @@
 
 // draganflier offsets
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 340 )
-#define YACCEL_OFFSET	( 231 )
-#define ZACCEL_OFFSET	( -1279 )
-#define XRATE_OFFSET	( -123 )
-#define YRATE_OFFSET	( -118 )
-#define ZRATE_OFFSET	( -99 )
+#define XACCEL_OFFSET	( 0 )
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
 #endif
 
 #ifdef spedix

@@ -105,7 +105,7 @@ void send_imu_data(void)
 		case 14:
 
 			{
-				serial_output( "hrtbt , cpu , ax , ay , az , wx , wy , wz\r\n" ) ;
+				serial_output( "ax , ay , az , wx , wy , wz\r\n" ) ;
 			}
 			hasWrittenHeader = 1 ;
 			break ;
@@ -118,8 +118,8 @@ void send_imu_data(void)
 	{
 
 		{
-			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
-			udb_heartbeat_counter , (int) udb_cpu_load() ,
+			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
+//			udb_heartbeat_counter , (int) udb_cpu_load() ,
 			aero_force[1] , - aero_force[0] ,aero_force[2] ,
 			omegagyro[1] , - omegagyro[0] , omegagyro[2] 
 			) ;	

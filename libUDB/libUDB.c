@@ -94,16 +94,16 @@ void udb_init(void)
 	flexiFunctionServiceInit();
 #endif
 	udb_init_clock();
-	radioIn_init(); // was udb_init_capture();
+//	radioIn_init(); // was udb_init_capture();
 #if (MAG_YAW_DRIFT == 1 && HILSIM != 1)
 //	udb_init_I2C();
 #endif
-	servoOut_init(); // was udb_init_pwm()
-	osd_init();
+//	servoOut_init(); // was udb_init_pwm()
+//	osd_init();
 
 //FIXME: add AUAV3 support
 #if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
-	udb_eeprom_init();
+//	udb_eeprom_init();
 #endif
 
 #if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
