@@ -30,6 +30,30 @@
 
 // Used for serial debug output
 #include <stdio.h>
+#if ( GYRO_RANGE == 250 )
+#define GYRO_FACTOR ((double)(65.5))
+#elif ( GYRO_RANGE == 500 )
+#define GYRO_FACTOR ((double)(32.75))
+#elif ( GYRO_RANGE == 1000 )
+#define GYRO_FACTOR ((double)(16.375))
+#elif ( GYRO_RANGE == 2000 )
+#define GYRO_FACTOR ((double)(8.1875))
+#else
+#error "invalid GYRO_RANGE"
+#endif // GYRO_RANGE 	
+		
+#if ( ACCEL_RANGE == 2 )
+#define ACCEL_FACTOR ((double)(8192.0))
+#elif ( ACCEL_RANGE == 4 )
+#define ACCEL_FACTOR ((double)(4096.0))
+#elif ( ACCEL_RANGE == 8 )
+#define ACCEL_FACTOR ((double)(2048.0))
+#elif ( ACCEL_RANGE == 16 )
+#define ACCEL_FACTOR ((double)(1024.0))
+#else
+#error "invalid ACCEL_RANGE"
+#endif // ACCEL_RANGE 	
+
 
 char debug_buffer[1024] ;
 int db_index = 0 ;
@@ -122,35 +146,16 @@ void send_imu_data(void)
 	}
 	else
 	{
-#ifdef RECORD_OFFSETS
-		
+#if ( RECORD_OFFSETS == 1)
+		{	
+			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
+			udb_xaccel.value , udb_yaccel.value , udb_zaccel.value ,
+			udb_xrate.value , udb_yrate.value , udb_zrate.value ) ;
+		}
  
 		
-#else // RECORD_OFFSETS
-#if ( GYRO_RANGE == 250 )
-#define GYRO_FACTOR ((double)(65.5))
-#elif ( GYRO_RANGE == 500 )
-#define GYRO_FACTOR ((double)(32.75))
-#elif ( GYRO_RANGE == 1000 )
-#define GYRO_FACTOR ((double)(16.375))
-#elif ( GYRO_RANGE == 2000 )
-#define GYRO_FACTOR ((double)(8.1875))
-#else
-#error "invalid GYRO_RANGE"
-#endif // GYRO_RANGE 	
+#else //  not RECORD_OFFSETS	
 		
-#if ( ACCEL_RANGE == 2 )
-#define ACCEL_FACTOR ((double)(8192.0))
-#elif ( ACCEL_RANGE == 4 )
-#define ACCEL_FACTOR ((double)(4096.0))
-#elif ( ACCEL_RANGE == 8 )
-#define ACCEL_FACTOR ((double)(2048.0))
-#elif ( ACCEL_RANGE == 16 )
-#define ACCEL_FACTOR ((double)(1024.0))
-#else
-#error "invalid ACCEL_RANGE"
-#endif // ACCEL_RANGE 	
-	
 		{
 			serial_output( "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n" ,
 //			udb_heartbeat_counter , (int) udb_cpu_load() ,

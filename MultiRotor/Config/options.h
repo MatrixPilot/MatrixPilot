@@ -138,6 +138,7 @@
 #endif
 
 // draganflier offsets
+#define RECORD_OFFSETS	    (0)
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 0 )
 #define YACCEL_OFFSET	( 0 )
