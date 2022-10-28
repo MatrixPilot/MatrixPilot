@@ -392,7 +392,7 @@ void motorCntrl(void)
 		min_throttle = udb_pwTrim[THROTTLE_INPUT_CHANNEL] ;
 		long_accum.WW = __builtin_mulus ( (unsigned int) (RMAX*ACCEL_K ) , accelEarth[2] ) ;
 		accel_feedback = long_accum._.W1 ;
-		int16_t thrust =  THROTTLE_COMMAND - accel_feedback ;
+//		int16_t thrust =  THROTTLE_COMMAND - accel_feedback ;
 //		motor_A = thrust ;
 //		motor_B = thrust ;
 //		motor_C = thrust ;
@@ -562,10 +562,10 @@ void motorCntrl(void)
 //		Send the signals out to the motors
 		if ( flipped_over == 0 )
 		{
-			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
-			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
-			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
-			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
+//			udb_pwOut[MOTOR_A_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_A ) ;		
+//			udb_pwOut[MOTOR_B_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_B ) ;
+//			udb_pwOut[MOTOR_C_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_C ) ;
+//			udb_pwOut[MOTOR_D_OUTPUT_CHANNEL] = udb_servo_pulsesat( motor_D ) ;
 		}
 		else
 		{

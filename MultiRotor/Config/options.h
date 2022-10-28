@@ -77,78 +77,12 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
-//#define desktest
-#define draganflier
-//#define spedix
-//#define arduCopter
 
-#ifdef arduCopter
-#define MISSION_TIME 180
-#define TEST_MOTORS 0
-#define MAX_ALT_RATE_CONTROL 1300
-#define MAX_ALT_PROP_CONTROL 1300
-#define MIN_LIDAR_PULSE_THRESH 2
-#define IMU_CLIMB_RATE_DIVISOR 2
-#define IMU_ALT_DIVISOR 2
-#define TARGET_MIN_ALTITUDE 400
-#define DR_TAU 2.5
-#define MIN_THRUST 2400
-#define MAX_THRUST 3500
-#define WEIGHT 3000
-#define MAX_CLIMB_RATE 200
-#define MAX_ALT_ERROR 1000
-#define COMMAND_STEP_RATE_MULTIPLIER 256
-#define MIN_THROTTLE_COMMAND 3000
-#define THROTTLE_CUTOUT 2500
-#define FULL_OUTPUT 0
-//#define ROLL_TRIM -14
-//#define PITCH_TRIM 1
-//#define YAW_TRIM 16
-#define ROLL_TRIM 0
-#define PITCH_TRIM 0
-#define YAW_TRIM 0
+#define luge
 
-#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
-#define THROTTLE_COMMAND throttle_accum._.W1 
-#define GPS_TYPE						GPS_NONE
-
-#define NO_RADIO						0
-#define MAG_YAW_DRIFT 						0
-#define DEBUG_MAG						0
-#define USE_ESC_RATE 1
-#define TEST_ONOFF 1.0
-#define TILT_KI ( 0.01 * TEST_ONOFF )
-#define TILT_KP ( 0.08 * TEST_ONOFF )
-#define TILT_KD ( 2.0 * TEST_ONOFF )
-#define TILT_FF 0.2
-#define TILT_KDD 0.0
-#define YAW_KI 0.5*0.0
-#define YAW_KP ( 0.3* TEST_ONOFF )
-#define YAW_KD ( 3.0* TEST_ONOFF )
-#define ACCEL_K 0.2*0.0
-#define MAX_YAW_RATE 51  
-// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-#define MAX_TILT 45
-
-#define MAX_SPEED 500 // cm/sec
-#define MAX_DISTANCE 1000 // cm
-#define LATERAL_RATE_GAIN 32
-
-#define USE_LIDAR 1
-#define ROTOR_CRAFT "arduCopter, Oct 10, 2022\r\n"
-#define NUM_INPUTS	7
-#define NUM_OUTPUTS	4
-// arduCopter offsets
-#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 325 )
-#define YACCEL_OFFSET	( 419 )
-#define ZACCEL_OFFSET	( -431 )
-#define XRATE_OFFSET	( -170 )
-#define YRATE_OFFSET	( 39 )
-#define ZRATE_OFFSET	( 50 )
-#endif
-
-#ifdef draganflier
+#ifdef luge
+#define ACCEL_RANGE         4
+#define GYRO_RANGE	    1000
 #define TEST_LIDAR 0
 #define MISSION_TIME 180
 #define MAX_ALT_RATE_CONTROL 1300
@@ -213,145 +147,7 @@
 #define ZRATE_OFFSET	( 0 )
 #endif
 
-#ifdef spedix
-#define MISSION_TIME 180
-#define MAX_ALT_RATE_CONTROL 1300
-#define MAX_ALT_PROP_CONTROL 1300
-#define MIN_LIDAR_PULSE_THRESH 2
-#define IMU_CLIMB_RATE_DIVISOR 2
-#define IMU_ALT_DIVISOR 5
-#define TARGET_MIN_ALTITUDE -1000
-#define DR_TAU 2.5
-#define MIN_THRUST 2600
-#define MAX_THRUST 3000
-#define WEIGHT 2800
-#define MAX_CLIMB_RATE 1000
-#define MAX_ALT_ERROR 1000
-#define COMMAND_STEP_RATE_MULTIPLIER 256
-#define MIN_THROTTLE_COMMAND 3260
-#define THROTTLE_CUTOUT 3000
-#define FULL_OUTPUT 0
-#define ROLL_TRIM -43
-#define PITCH_TRIM 68
-#define YAW_TRIM -70
 
-#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
-#define THROTTLE_COMMAND throttle_accum._.W1 
-
-#define GPS_TYPE							GPS_UBX_4HZ
-#define NO_RADIO						0
-#define MAG_YAW_DRIFT 						1
-#define DEBUG_MAG						0
-#define USE_ESC_RATE 1
-#define TILT_KI 0.01
-#define TILT_KP 0.08
-#define TILT_KD 2.0
-#define TILT_FF 0.2*0.0
-#define TILT_KDD 0.0
-#define YAW_KI 0.04
-#define YAW_KP 0.3
-#define YAW_KD 3.0
-#define ACCEL_K 0.2*0.0
-#define MAX_YAW_RATE 51  
-// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-#define MAX_TILT 45
-#define LATERAL_RATE_GAIN 32
-//#define MAX_SPEED 1000 // cm/sec
-#define MAX_SPEED 500 // cm/sec
-#define MAX_DISTANCE 1000 // cm
-
-#define USE_LIDAR 1
-#define ROTOR_CRAFT "spedix, Sept 25, 2021, with C_rate_mult\r\n"
-#define NUM_INPUTS	7
-#define NUM_OUTPUTS	4
-// spedix offsets
-#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 355 )
-#define YACCEL_OFFSET	( -189 )
-#define ZACCEL_OFFSET	( 0 )
-#define XRATE_OFFSET	( -388 )
-#define YRATE_OFFSET	( 122 )
-#define ZRATE_OFFSET	( 23 )
-#endif
-
-#ifdef desktest
-#define MAG_YAW_DRIFT						0
-#define NO_RADIO						1
-#define DEBUG_MAG						0
-#define NO_GAIN 0.0
-#define BOOST_GAIN 4.0 
-#define TILT_KI 0.01*NO_GAIN
-#define TILT_KP 0.08*BOOST_GAIN
-#define TILT_KD 2.0*NO_GAIN
-#define TILT_KDD 0.0
-#define TILT_FF 0.2
-#define YAW_KI 0.5*NO_GAIN
-#define YAW_KP 0.3*BOOST_GAIN
-#define YAW_KD 3.0*NO_GAIN
-#define ACCEL_K 0.2*0.0
-#define MAX_YAW_RATE 51  
-// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-#define MAX_TILT 45
-
-#define USE_LIDAR 0
-#define ROTOR_CRAFT "desk, Feb 10, 2019\r\n"
-#define NUM_INPUTS	5
-#define NUM_OUTPUTS	6
-// desk UDB offsets
-/*#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 438 )
-#define YACCEL_OFFSET	( 81 )
-#define ZACCEL_OFFSET	( -1317 )
-#define XRATE_OFFSET	( -118 )
-#define YRATE_OFFSET	( -118 )
-#define ZRATE_OFFSET	( -103 )*/
-// mag tester offsets
-#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 304 )
-#define YACCEL_OFFSET	( 143 )
-#define ZACCEL_OFFSET	( -1284 )
-#define XRATE_OFFSET	( 101 )
-#define YRATE_OFFSET	( 167 )
-#define ZRATE_OFFSET	( -16 )
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// Select + or X flying configuration by defining exactly one of the following
-
-//#define CONFIG_PLUS
-//#define CONFIG_X
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Set this value to your GPS type.  (Set to GPS_STD, GPS_UBX_2HZ, or GPS_UBX_4HZ)
-//#define GPS_TYPE							GPS_STD
-//#define GPS_TYPE							GPS_UBX_4HZ
-
-// Note: As of MatrixPilot 3.0, Dead Reckoning and Wind Estimation are automatically enabled.
-
-// Define MAG_YAW_DRIFT to be 1 to use magnetometer for yaw drift correction.
-// Otherwise, if set to 0 the GPS will be used.
-//#define MAG_YAW_DRIFT 						0
-
-// Set this to 1 if you want the UAV Dev Board to fly your plane without a radio transmitter or
-// receiver. (Totally autonomous.)  This is just meant for debugging.  It is not recommended that
-// you actually use this since there is no automatic landing code yet, and you'd have no manual
-// control to fall back on if things go wrong.  It may not even be legal in your area.
-//#define NORADIO								0
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Configure Input and Output Channels
-
-// Use a single PPM input connection from the RC receiver to the UDB on RC input channel 4.
-// This frees up RC inputs 3, 2, and 1 to act as RC outputs 4, 5, and 6.
-// If you're not sure, leave USE_PPM_INPUT set to 0.
-// PPM_NUMBER_OF_CHANNELS is the number of channels sent on the PWM signal.  This is
-// often different from the NUM_INPUTS value below, and should usually be left at 8.
-// If PPM_ALT_OUTPUT_PINS is set to 0, the 9 available RC outputs will be sent to the
-// following pins, in this order: Out1, Out2, Out3, In3, In2, In1, RE0, RE2, RE4.
-// With it set to 1, the RC outputs will be in this alternate configuration:
-// Out1, Out2, Out3, RE0, RE2, RE4, In3, In2, In1.
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
 #define PPM_SIGNAL_INVERTED					0
@@ -411,19 +207,6 @@
 // set it to 1.0 if you want full servo throw, otherwise set it to the portion that you want
 #define SERVOSAT							1.0
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Control gains.
-// All gains should be positive real numbers.
-
-
-// Baseline Tilt PID(DD) control gains
-/*
-#define TILT_KI 0.05
-#define TILT_KP 0.08
-#define TILT_KD 0.5
-#define TILT_KDD 0.8
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware In the Loop Simulation

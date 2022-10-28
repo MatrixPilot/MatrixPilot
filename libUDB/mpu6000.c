@@ -99,9 +99,17 @@ void MPU6000_init16(callback_fptr_t fptr)
 
 	// scaling & DLPF
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
-
-	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_1000DPS);  // Gyro scale 1000º/s
-//	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
+#if (GYRO_RANGE == 250 )
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_250DPS);  // Gyro scale 250º/s
+#elif (GYRO_RANGE == 500 )
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS);  // Gyro scale 500º/s
+#elif (GYRO_RANGE == 1000 )
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_1000DPS); // Gyro scale 1000º/s
+#elif (GYRO_RANGE == 2000 )
+	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_2000DPS); // Gyro scale 2000º/s
+#else
+#error "Invalid GYRO_RANGE"
+#endif // GYRO_RANGE 
 
 #if (ACCEL_RANGE == 2)
 	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scele 2g, g = 8192

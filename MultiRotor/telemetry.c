@@ -85,8 +85,14 @@ void send_imu_data(void)
 		case 4:
 			break ;	
 		case 5:
+			{
+				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
+			}
 			break ;
 		case 6:
+			{
+				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
+			}
 			break ;
 		case 7:
 			break ;			
