@@ -81,8 +81,8 @@
 #define luge
 
 #ifdef luge
-#define ACCEL_RANGE         4
-#define GYRO_RANGE	    1000
+#define ACCEL_RANGE         2
+#define GYRO_RANGE	    250
 #define TEST_LIDAR 0
 #define MISSION_TIME 180
 #define MAX_ALT_RATE_CONTROL 1300

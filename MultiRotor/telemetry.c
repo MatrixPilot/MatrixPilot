@@ -122,14 +122,47 @@ void send_imu_data(void)
 	}
 	else
 	{
-
+#ifdef RECORD_OFFSETS
+		
+ 
+		
+#else // RECORD_OFFSETS
+#if ( GYRO_RANGE == 250 )
+#define GYRO_FACTOR ((double)(65.5))
+#elif ( GYRO_RANGE == 500 )
+#define GYRO_FACTOR ((double)(32.75))
+#elif ( GYRO_RANGE == 1000 )
+#define GYRO_FACTOR ((double)(16.375))
+#elif ( GYRO_RANGE == 2000 )
+#define GYRO_FACTOR ((double)(8.1875))
+#else
+#error "invalid GYRO_RANGE"
+#endif // GYRO_RANGE 	
+		
+#if ( ACCEL_RANGE == 2 )
+#define ACCEL_FACTOR ((double)(8192.0))
+#elif ( ACCEL_RANGE == 4 )
+#define ACCEL_FACTOR ((double)(4096.0))
+#elif ( ACCEL_RANGE == 8 )
+#define ACCEL_FACTOR ((double)(2048.0))
+#elif ( ACCEL_RANGE == 16 )
+#define ACCEL_FACTOR ((double)(1024.0))
+#else
+#error "invalid ACCEL_RANGE"
+#endif // ACCEL_RANGE 	
+	
 		{
-			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output( "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n" ,
 //			udb_heartbeat_counter , (int) udb_cpu_load() ,
-			aero_force[1] , - aero_force[0] ,aero_force[2] ,
-			omegagyro[1] , - omegagyro[0] , omegagyro[2] 
+				((double)(aero_force[1]))/ACCEL_FACTOR ,
+				((double)(- aero_force[0]))/ACCEL_FACTOR ,
+				((double)(aero_force[2]))/ACCEL_FACTOR ,
+				((double)(omegagyro[1]))/GYRO_FACTOR ,
+				((double)(- omegagyro[0]))/GYRO_FACTOR , 
+				((double)(omegagyro[2]))/GYRO_FACTOR 
 			) ;	
 		}
+#endif // RECORD_OFFSETS
 	}
 	return ;
 }
