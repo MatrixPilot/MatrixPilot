@@ -43,13 +43,13 @@
 #endif // GYRO_RANGE 	
 		
 #if ( ACCEL_RANGE == 2 )
-#define ACCEL_FACTOR ((double)(8192.0))
+#define ACCEL_FACTOR ((double)(8192.0/32.17))
 #elif ( ACCEL_RANGE == 4 )
-#define ACCEL_FACTOR ((double)(4096.0))
+#define ACCEL_FACTOR ((double)(4096.0/32.17))
 #elif ( ACCEL_RANGE == 8 )
-#define ACCEL_FACTOR ((double)(2048.0))
+#define ACCEL_FACTOR ((double)(2048.0/32.17))
 #elif ( ACCEL_RANGE == 16 )
-#define ACCEL_FACTOR ((double)(1024.0))
+#define ACCEL_FACTOR ((double)(1024.0/32.17))
 #else
 #error "invalid ACCEL_RANGE"
 #endif // ACCEL_RANGE 	
@@ -103,10 +103,19 @@ void send_imu_data(void)
 			initialize_yaw_rmat();
 			break ;
 		case 2:
+			{
+				serial_output("3 axis IMU in north-east-down body frame.\r\n") ;
+			}
 			break ;
 		case 3:
+			{
+				serial_output("specific forces in feet/sec^2.\r\n") ;
+			}
 			break ;	
 		case 4:
+			{
+				serial_output("CCW rotation rates in deg/sec.\r\n");
+			}
 			break ;	
 		case 5:
 			{
@@ -119,6 +128,15 @@ void send_imu_data(void)
 			}
 			break ;
 		case 7:
+			{
+				serial_output( "mems binary offsets = %i,%i,%i,%i,%i,%i\r\n",
+					XACCEL_OFFSET ,
+					YACCEL_OFFSET , 
+					ZACCEL_OFFSET ,
+					XRATE_OFFSET ,
+					YRATE_OFFSET ,
+					ZRATE_OFFSET );	
+			}
 			break ;			
 		case 8:
 			break ;
@@ -129,14 +147,13 @@ void send_imu_data(void)
 		case 11:
 			break ;				
 		case 12:
+			{
+				serial_output( "x_force , y_force , z_force , x_gyro , y_gyro , z_gyro\r\n" ) ;
+			}
 			break ;	
 		case 13:
 			break ;
 		case 14:
-
-			{
-				serial_output( "ax , ay , az , wx , wy , wz\r\n" ) ;
-			}
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
