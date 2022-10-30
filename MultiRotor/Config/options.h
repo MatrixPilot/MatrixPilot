@@ -78,11 +78,15 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 
-#define luge
-
-#ifdef luge
+#define HIGH_RANGES
+#ifdef HIGH_RANGES
+#define ACCEL_RANGE         4
+#define GYRO_RANGE	    1000
+#endif // HIGH_RANGES
+#ifdef LOW_RANGES
 #define ACCEL_RANGE         2
 #define GYRO_RANGE	    250
+#endif // LOW_RANGES
 #define TEST_LIDAR 0
 #define MISSION_TIME 180
 #define MAX_ALT_RATE_CONTROL 1300
@@ -137,17 +141,27 @@
 #define NUM_OUTPUTS 5
 #endif
 
-// draganflier offsets
+#ifdef LOW_RANGES
 #define RECORD_OFFSETS	    (0)
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 0 )
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
-#endif
+#define XACCEL_OFFSET	( 362 )
+#define YACCEL_OFFSET	( -17 )
+#define ZACCEL_OFFSET	( -792 )
+#define XRATE_OFFSET	( -301 )
+#define YRATE_OFFSET	( 163 )
+#define ZRATE_OFFSET	( -64 )
+#endif //LOW_RANGES
 
+#ifdef HIGH_RANGES
+#define RECORD_OFFSETS	    (0)
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 161 )
+#define YACCEL_OFFSET	( -103 )
+#define ZACCEL_OFFSET	( 614 )
+#define XRATE_OFFSET	( -48 )
+#define YRATE_OFFSET	( 25 )
+#define ZRATE_OFFSET	( -58 )
+#endif //LOW_RANGES
 
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8

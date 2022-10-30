@@ -174,13 +174,13 @@ void send_imu_data(void)
 #else //  not RECORD_OFFSETS	
 		
 		{
-			serial_output( "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n" ,
+			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
 //			udb_heartbeat_counter , (int) udb_cpu_load() ,
+				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
-				((double)(- aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
-				((double)(omegagyro[1]))/GYRO_FACTOR ,
-				((double)(- omegagyro[0]))/GYRO_FACTOR , 
+				((double)(omegagyro[0]))/GYRO_FACTOR ,
+				((double)(omegagyro[1]))/GYRO_FACTOR , 
 				((double)(omegagyro[2]))/GYRO_FACTOR 
 			) ;	
 		}
