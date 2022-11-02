@@ -104,30 +104,36 @@ void send_imu_data(void)
 			break ;
 		case 2:
 			{
-				serial_output("3 axis IMU in north-east-down body frame.\r\n") ;
+				serial_output("WOLF-PAC SN%i%i%i IMU ", SERIAL_NUMBERD1 , SERIAL_NUMBERD2 , SERIAL_NUMBERD3 ) ;
 			}
 			break ;
+		
 		case 3:
 			{
-				serial_output("specific forces in feet/sec^2.\r\n") ;
+				serial_output("in north-east-down body frame.\r\n") ;
 			}
 			break ;	
 		case 4:
 			{
-				serial_output("CCW rotation rates in deg/sec.\r\n");
+				serial_output("specific forces in feet/sec^2.\r\n") ;
 			}
 			break ;	
 		case 5:
 			{
+				serial_output("CCW rotation rates in deg/sec.\r\n");
+			}
+			break ;	
+		case 6:
+			{
 				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
-		case 6:
+		case 7:
 			{
 				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
 			}
 			break ;
-		case 7:
+		case 8:
 			{
 				serial_output( "mems binary offsets = %i,%i,%i,%i,%i,%i\r\n",
 					XACCEL_OFFSET ,
@@ -138,22 +144,22 @@ void send_imu_data(void)
 					ZRATE_OFFSET );	
 			}
 			break ;			
-		case 8:
-			break ;
 		case 9:
 			break ;
 		case 10:
-			break ;			
+			break ;
 		case 11:
-			break ;				
+			break ;			
 		case 12:
+			break ;				
+		case 13:
 			{
 				serial_output( "x_force , y_force , z_force , x_gyro , y_gyro , z_gyro\r\n" ) ;
 			}
 			break ;	
-		case 13:
-			break ;
 		case 14:
+			break ;
+		case 15:
 			hasWrittenHeader = 1 ;
 			break ;
 		default:

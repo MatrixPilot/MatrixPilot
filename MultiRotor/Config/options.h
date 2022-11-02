@@ -80,10 +80,16 @@
 
 #define HIGH_RANGES
 #ifdef HIGH_RANGES
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         4
 #define GYRO_RANGE	    1000
 #endif // HIGH_RANGES
 #ifdef LOW_RANGES
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 1
 #define ACCEL_RANGE         2
 #define GYRO_RANGE	    250
 #endif // LOW_RANGES
