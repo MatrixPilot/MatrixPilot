@@ -154,9 +154,9 @@ void estLocation(void)
 	location_previous[1] = location[1];
 	location_previous[2] = location[2];
 
-	velocity_thru_air.y = GPSvelocity.y - estimatedWind[1];
-	velocity_thru_air.x = GPSvelocity.x - estimatedWind[0];
-	velocity_thru_airz  = GPSvelocity.z - estimatedWind[2];
+	velocity_thru_air.y = GPSvelocity.y ;
+	velocity_thru_air.x = GPSvelocity.x ;
+	velocity_thru_airz  = GPSvelocity.z ;
 
 	air_speed_3DGPS = vector3_mag(velocity_thru_air.x, velocity_thru_air.y, velocity_thru_airz);
 

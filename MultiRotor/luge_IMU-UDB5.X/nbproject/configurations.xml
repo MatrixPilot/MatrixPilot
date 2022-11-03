@@ -85,11 +85,8 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="libDCM" displayName="libDCM" projectFiles="true">
-        <itemPath>../../libDCM/estAirspeed.c</itemPath>
         <itemPath>../../libDCM/estAltitude.c</itemPath>
         <itemPath>../../libDCM/estLocation.c</itemPath>
-        <itemPath>../../libDCM/estWind.c</itemPath>
-        <itemPath>../../libDCM/estYawDrift.c</itemPath>
         <itemPath>../../libDCM/gpsData.c</itemPath>
         <itemPath>../../libDCM/gpsParseCommon.c</itemPath>
         <itemPath>../../libDCM/gpsParseMTEK.c</itemPath>
