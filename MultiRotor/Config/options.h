@@ -94,58 +94,16 @@
 #define GYRO_RANGE	    250
 #endif // LOW_RANGES
 #define TEST_LIDAR 0
-#define MISSION_TIME 180
-#define MAX_ALT_RATE_CONTROL 1300
-#define MAX_ALT_PROP_CONTROL 1300
-#define MIN_LIDAR_PULSE_THRESH 2
-#define IMU_CLIMB_RATE_DIVISOR 2
-#define IMU_ALT_DIVISOR 2
-#define TARGET_MIN_ALTITUDE -1000
-#define DR_TAU 2.5
-#define MIN_THRUST 2400
-#define MAX_THRUST 3100
-#define WEIGHT 2800
-#define MAX_CLIMB_RATE 200
-#define MAX_ALT_ERROR 1000
-#define COMMAND_STEP_RATE_MULTIPLIER 640
-#define MIN_THROTTLE_COMMAND 3500
-#define THROTTLE_CUTOUT 3100
-#define FULL_OUTPUT 0
-#define ROLL_TRIM -10
-#define PITCH_TRIM -16
-#define YAW_TRIM -35
 
-#define THROTTLE_COMMAND_IN pwManual[THROTTLE_INPUT_CHANNEL]
-#define THROTTLE_COMMAND throttle_accum._.W1 
+#define DR_TAU 2.5
 
 #define GPS_TYPE						GPS_NONE
 #define NO_RADIO						1
 #define MAG_YAW_DRIFT 						0
 #define DEBUG_MAG						0
-#define TEST_ONOFF 1.0
-#define TILT_KI ( 0.01 * TEST_ONOFF )
-#define TILT_KP ( 0.02 * TEST_ONOFF )
-#define TILT_KD ( 1.0 * TEST_ONOFF )
-#define TILT_FF 0.2
-#define TILT_KDD 0.0
-#define YAW_KI 0.5*0.0
-#define YAW_KP ( 0.3* TEST_ONOFF )
-#define YAW_KD ( 3.0* TEST_ONOFF )
-#define ACCEL_K 0.2*0.0
-#define MAX_YAW_RATE 51  
-// maximum yaw rate, degrees per second, must be between 50 and 500 degrees/second
-#define MAX_TILT 45
-#define USE_LIDAR 1
-#define MAX_SPEED 500 // cm/sec
-#define MAX_DISTANCE 1000 // cm
-#define LATERAL_RATE_GAIN 32
-#define ROTOR_CRAFT "draganflier, Sept. 24, 2022\r\n"
+
 #define NUM_INPUTS	7
-#if (TEST_LIDAR == 0 )
 #define NUM_OUTPUTS	4
-#else
-#define NUM_OUTPUTS 5
-#endif
 
 #ifdef LOW_RANGES
 #define RECORD_OFFSETS	    (0)

@@ -271,12 +271,12 @@ static int16_t omegaSOG(int16_t omega, int16_t speed)
 }
 */
 // no centrifugal adjustment for multirotor
-static void adj_accel(int16_t angleOfAttack)
+/*static void adj_accel(int16_t angleOfAttack)
 {
 	gravity_vector_plane[0] = gplane[0];
 	gravity_vector_plane[1] = gplane[1];
 	gravity_vector_plane[2] = gplane[2];
-}
+}*/
 
 /*
 static void adj_accel(int16_t angleOfAttack)
@@ -661,8 +661,8 @@ void dcm_run_imu_step(int16_t angleOfAttack)
 {
 	// update the matrix, renormalize it, adjust for roll and
 	// pitch drift, and send it to the servos.
-	dead_reckon();              // in libDCM:deadReconing.c
-	adj_accel(angleOfAttack);   // local
+//	dead_reckon();              // in libDCM:deadReconing.c
+//	adj_accel(angleOfAttack);   // local
 	rupdate();                  // local
 	normalize();                // local
 	roll_pitch_drift();         // local

@@ -41,7 +41,7 @@ void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , i
 void send_imu_data(void);
 void motorCntrl( void ) ;
 
-const int max_tilt = (int) (MAX_TILT*.7111) ;  // maximum tilt in byte cicular
+const int max_tilt = 0 ;  // maximum tilt in byte cicular
 int commanded_tilt_gain ;
 
 int main (void)
@@ -165,7 +165,7 @@ void dcm_heartbeat_callback(void)
 	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ)) == 0)
 
 	{
-		if ( didCalibrate && ( (origin_recorded || (GPS_TYPE==GPS_NONE ) ) || ( FULL_OUTPUT == 1 )))
+		if ( didCalibrate && ( (origin_recorded || (GPS_TYPE==GPS_NONE ) ) ))
 		{
 			send_imu_data();
 		}

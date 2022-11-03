@@ -106,7 +106,7 @@ void MatrixRotate( int16_t matrix[] , int16_t angle[] )
 }
 
 extern int16_t rmat[];
-extern int16_t yaw_rmat[];
+int16_t yaw_rmat[9];
 void initialize_yaw_rmat(void)
 {
 	int16_t sine , cosine ;

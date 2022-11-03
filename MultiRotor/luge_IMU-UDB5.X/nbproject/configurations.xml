@@ -99,7 +99,6 @@
         <itemPath>../../libDCM/mathlib.c</itemPath>
         <itemPath>../../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../../libDCM/rmat.c</itemPath>
-        <itemPath>../../libDCM/deadReckoning_lidar.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ADchannel.c</itemPath>
@@ -154,9 +153,8 @@
         <itemPath>../../libVectorMatrix/vsub.s</itemPath>
         <itemPath>../../libVectorMatrix/vzpad.s</itemPath>
       </logicalFolder>
-      <logicalFolder name="MultiRotor" displayName="MultiRotor" projectFiles="true">
+      <logicalFolder name="MultiRotor" displayName="luge_imu" projectFiles="true">
         <itemPath>../../MultiRotor/main.c</itemPath>
-        <itemPath>../motorCntrl.c</itemPath>
         <itemPath>../telemetry.c</itemPath>
         <itemPath>../rotorLib.c</itemPath>
         <itemPath>../rotorTilt.c</itemPath>
