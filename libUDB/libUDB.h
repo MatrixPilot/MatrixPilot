@@ -78,14 +78,6 @@
 #undef  USE_MSD
 #define USE_MSD                             0
 #endif
-#ifdef AUAV3
-#define BOARD_TYPE                          AUAV3_BOARD
-#include "options_auav3.h"
-#endif
-#ifdef PX4
-#define BOARD_TYPE                          PX4_BOARD
-#include "libSTM.h"
-#endif
 
 #ifndef BOARD_TYPE
 #if (SILSIM == 0)
@@ -109,7 +101,7 @@ void mav_printf(const char * format, ...);
 #include "fixDeps.h"
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 #include "libUDB_defines.h"
-#include "options_nv_memory.h"
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// libUDB.h defines the API for accessing the UDB hardware through libUDB.

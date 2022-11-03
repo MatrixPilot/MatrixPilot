@@ -66,9 +66,7 @@
       <logicalFolder name="MultiRotor" displayName="MultiRotor" projectFiles="true">
         <logicalFolder name="Config" displayName="Config" projectFiles="true">
           <itemPath>../../MultiRotor/Config/options.h</itemPath>
-          <itemPath>../../MultiRotor/Config/options_auav3.h</itemPath>
           <itemPath>../../MultiRotor/Config/options_magnetometer.h</itemPath>
-          <itemPath>../../MultiRotor/Config/options_nv_memory.h</itemPath>
           <itemPath>../../MultiRotor/Config/options_osd.h</itemPath>
           <itemPath>../../MultiRotor/Config/options_ports.h</itemPath>
         </logicalFolder>
@@ -107,10 +105,7 @@
         <itemPath>../../libDCM/deadReckoning_lidar.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
-        <itemPath>../../libUDB/24LC256.c</itemPath>
         <itemPath>../../libUDB/ADchannel.c</itemPath>
-        <itemPath>../../libUDB/analog2digital_auav3.c</itemPath>
-        <itemPath>../../libUDB/analog2digital_udb4.c</itemPath>
         <itemPath>../../libUDB/analog2digital_udb5.c</itemPath>
         <itemPath>../../libUDB/analogs.c</itemPath>
         <itemPath>../../libUDB/background.c</itemPath>
