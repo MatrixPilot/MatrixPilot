@@ -91,6 +91,8 @@ extern int16_t yaw_rmat[];
 extern int16_t target_altitude , target_climb_rate ;
 extern union longww throttle_accum ;
 extern void initialize_yaw_rmat(void) ;
+uint16_t record_number = 0 ;
+#define DIGITS_5 -12805
 void send_imu_data(void)
 {
 	db_index = 0 ;
@@ -171,9 +173,11 @@ void send_imu_data(void)
 	{
 #if ( RECORD_OFFSETS == 1)
 		{	
-			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
-			udb_xaccel.value , udb_yaccel.value , udb_zaccel.value ,
-			udb_xrate.value , udb_yrate.value , udb_zrate.value ) ;
+			serial_output( "%i,%i,%i,%i,%i\r\n", record_number++ , udb_cpu_load(),
+					DIGITS_5 , DIGITS_5 , DIGITS_5  ) ;
+//			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
+//			udb_xaccel.value , udb_yaccel.value , udb_zaccel.value ,
+//			udb_xrate.value , udb_yrate.value , udb_zrate.value ) ;
 		}
  
 		

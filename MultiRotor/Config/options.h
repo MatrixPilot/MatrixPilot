@@ -117,7 +117,7 @@
 #endif //LOW_RANGES
 
 #ifdef HIGH_RANGES
-#define RECORD_OFFSETS	    (0)
+#define RECORD_OFFSETS	    (1)
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 161 )
 #define YACCEL_OFFSET	( -103 )

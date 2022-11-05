@@ -55,7 +55,8 @@ int main (void)
 	udb_init() ;
 	dcm_init() ;
 	
-	udb_serial_set_rate(19200) ;
+	udb_serial_set_rate(57600) ;
+//	udb_serial_set_rate(19200) ;
 #if ( TEST_LIDAR == 0)	
 	LED_GREEN = LED_OFF ;
 #else
@@ -162,8 +163,8 @@ void dcm_heartbeat_callback(void)
 {
 	
 	// Serial output SERVO_HZ  (40 Hz)
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ)) == 0)
-
+	//if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ)) == 0)
+	// Serial output at Heartbeat_hz
 	{
 		if ( didCalibrate && ( (origin_recorded || (GPS_TYPE==GPS_NONE ) ) ))
 		{
