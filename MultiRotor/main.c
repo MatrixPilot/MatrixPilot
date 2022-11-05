@@ -56,19 +56,12 @@ int main (void)
 	dcm_init() ;
 	
 	udb_serial_set_rate(57600) ;
-//	udb_serial_set_rate(19200) ;
-#if ( TEST_LIDAR == 0)	
+
 	LED_GREEN = LED_OFF ;
-#else
-	LED_GREEN = LED_ON ;
-	LED_BLUE = LED_ON ;
-	LED_ORANGE = LED_ON ;
-	LED_RED = LED_ON ;
-#endif // TEST_LIDAR
+
 #if (CONSOLE_UART != 2)
 	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
 #endif
-
 	commanded_tilt_gain = sine ( max_tilt ) / 1000 ;
 	
 	// Start it up!
@@ -87,17 +80,8 @@ void udb_background_callback_periodic(void)
 	int gplane[3];
 	if (!didCalibrate)
 	{
-		// If still calibrating, blink RED
-#if (TEST_LIDAR == 0 )
-		udb_led_toggle(LED_RED) ;
-#else
-#endif // TEST_LIDAR
-#if (MAG_YAW_DRIFT == 1)
-		align_rmat_to_mag();
-#endif // MAG_YAW_DRIFT
 		if (udb_flags._.radio_on && dcm_flags._.calib_finished)
 		{
-			udb_servo_record_trims() ;
 			dcm_calibrate() ;	
 			// record vertical
 			gplane[0] = XACCEL_VALUE;
@@ -107,35 +91,6 @@ void udb_background_callback_periodic(void)
 			didCalibrate = 1 ;	
 		}
 	}
-	else
-	{
-#if ( TEST_LIDAR == 0)
-		// No longer calibrating, indicate command status
-		if ( dcm_flags._.fpv_tilt_req == 1) 
-		{
-			LED_RED = LED_OFF ;
-		}
-		else
-		{
-			if (dcm_flags._.earth_frame_tilt_req == 1)
-			{
-				LED_RED = LED_ON ;
-			}
-			else
-			{
-				if ( dcm_flags._.position_hold_req == 1)
-				{
-					udb_led_toggle(LED_RED) ; 
-				}
-				else // just in case PWM6 gets disconnected
-				{
-					LED_RED = LED_OFF ;
-				}			
-			}
-		}
-#endif // TEST_LIDAR
-	}	
-	return ;
 }
 
 void udb_heartbeat_40hz_callback(void)
@@ -163,10 +118,9 @@ void dcm_heartbeat_callback(void)
 {
 	
 	// Serial output SERVO_HZ  (40 Hz)
-	//if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ)) == 0)
-	// Serial output at Heartbeat_hz
+	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
 	{
-		if ( didCalibrate && ( (origin_recorded || (GPS_TYPE==GPS_NONE ) ) ))
+		if ( didCalibrate )
 		{
 			send_imu_data();
 		}

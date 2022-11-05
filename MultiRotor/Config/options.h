@@ -1,58 +1,3 @@
-// This file is part of the MatrixPilotQuad firmware.
-//
-//    http://code.google.com/p/gentlenav/
-//
-// Copyright 2009-2011 MatrixPilot Team
-// See the AUTHORS.TXT file for a list of authors of MatrixPilot.
-//
-// MatrixPilot is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// MatrixPilot is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
-
-
-////////////////////////////////////////////////////////////////////////////////
-// options.h
-// Bill Premerlani's UAV Dev Board
-// 
-// This file includes all of the user-configuration for this firmware,
-// with the exception of waypoints, which live in the waypoints.h file.
-// 
-//#define MAX_ALT_RATE_CONTROL 200
-//#define MAX_ALT_PROP_CONTROL 50
-//#define MIN_LIDAR_PULSE_THRESH 3
-//#define IMU_CLIMB_RATE_DIVISOR 2
-//#define IMU_ALT_DIVISOR 10
-//#define TARGET_ALTITUDE 900
-//#define DR_TAU 2.0
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Set Up Board Type
-// GREEN_BOARD - Board is green and includes 2 vertical gyro daugter-boards.
-// RED_BOARD   - Board is red, and includes 2 vertical gyro daugter-boards.
-// UDB3_BOARD  - Board is red, and includes a single, flat, multi-gyro daugter-board.
-// See the MatrixPilot wiki for more details on different UDB boards.
-// If building for UDB4, use the RollPitchYaw-udb4.mcp project file.
-//#define BOARD_TYPE 							UDB5_BOARD
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Select Clock Configuration (Set to CRYSTAL_CLOCK or FRC8X_CLOCK)
-// CRYSTAL_CLOCK is the 16 MHz crystal.  This is the speed used in the past, and may be
-// more compatible with other add-ons. The CRYSTAL_CLOCK supports a maximum baud rate of 19200 bps.
-// FRC8X_CLOCK runs the fast RC clock (7.3728 MHz) with 8X PLL multiplier, and supports much
-// faster baud rates.
-//#define CLOCK_CONFIG 						CRYSTAL_CLOCK
-//#define CLOCK_CONFIG 						FRC8X_CLOCK
 
 
 #define GNSS_HDOP_REQUIRED_FOR_STARTUP      200  //  Horizontal Dilution of Precision
@@ -77,6 +22,20 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
+// the following defines select what gets sent to the logger. define one of them and undef the others
+#define LOG_IMU
+#undef RECORD_OFFSETS
+#undef TEST_LOGGER_HZ
+#undef LOG_RMAT
+
+// the following selects a full record (x,y and z acceleration and gyro)
+// or a partial record (x and z acceleration and y gyro, which is pitch rate)
+// define one and undef the other
+#define FULL_RECORD
+#undef PARTIAL_RECORD
+
+// set the logger hertz
+#define LOGGER_HZ   40
 
 #define HIGH_RANGES
 #ifdef HIGH_RANGES
@@ -106,7 +65,6 @@
 #define NUM_OUTPUTS	4
 
 #ifdef LOW_RANGES
-#define RECORD_OFFSETS	    (0)
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 362 )
 #define YACCEL_OFFSET	( -17 )
@@ -117,7 +75,6 @@
 #endif //LOW_RANGES
 
 #ifdef HIGH_RANGES
-#define RECORD_OFFSETS	    (1)
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 161 )
 #define YACCEL_OFFSET	( -103 )

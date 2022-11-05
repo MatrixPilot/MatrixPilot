@@ -71,19 +71,6 @@ inline uint16_t heartbeat_cnt(void)
 //              outside of this module, so it could be moved up.
 inline void heartbeat(void) // called from ISR
 {
-#if ( USE_ESC_RATE == 1 )
-	// Start the sequential servo pulses at frequency ESC_HZ
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/ESC_HZ) == 0)
-	{
-		start_pwm_ESC_outputs();
-	}
-#else
-	// Start the sequential servo pulses at frequency SERVO_HZ
-	if (udb_heartbeat_counter % (HEARTBEAT_HZ/SERVO_HZ) == 0)
-	{
-		start_pwm_outputs();
-	}
-#endif
 	// Capture cpu_timer once per second.
 	if (udb_heartbeat_counter % (HEARTBEAT_HZ/1) == 0)
 	{
@@ -115,50 +102,12 @@ inline void heartbeat(void) // called from ISR
 // This is a good place to eventually compute pulse widths for servos.
 static void heartbeat_pulse(void)
 {
-	//led_off(LED_BLUE);  // indicates logfile activity
-#if (BOARD_TYPE == UDB4_BOARD) 
-	// IDG500 and ISZ500 Gyros settle at least 200 milliseconds after startup
-	// Auto-zero the UDB4 gyros 1 second before calibration of offsets
-	if (((udb_pulse_counter / (HEARTBEAT_HZ / 40)) > ( DCM_CALIB_COUNT - 40 )) 
-		&& (udb_gyros_autozero_latched_up == false ))
-	{
-		udb_gyros_auto_zero_latch_up();
-		udb_gyros_autozero_latched_up = true;
-	}
-	if (((udb_pulse_counter / (HEARTBEAT_HZ / 40)) > (DCM_CALIB_COUNT - 39))  
-		&& (udb_gyros_autozero_latched_down == false ))
-	{
-		udb_gyros_auto_zero_latch_down();
-		udb_gyros_autozero_latched_down = true;
-	}
-	// Gyros need 20 milliseconds to settle after auto-zero, before being used by DCM
-#endif 
-#if (NORADIO != 1)
-	// 5 Hz testing of radio link
-        // Changed from 20 Hz to 5 Hz to provide more security.
-        // At 20 Hz a single missed or faulty pulse will trigger failsafe.
-        // At 5 Hz missing pulses will be detected in 0.2 seconds while
-        // faulty pulses will be detected separately according to faulty pulse rules
-	if ((udb_pulse_counter % (HEARTBEAT_HZ/5)) == 1)
-	{
-		radioIn_failsafe_check();
-	}
-	// Computation of noise rate
-	// Noise pulses are counted when they are detected, and reset once a second
-	if (udb_pulse_counter % (HEARTBEAT_HZ/1) == 1)
-	{
-		radioIn_bad_pulse_count_reset();
-	}
-#else
+
 	udb_flags._.radio_on = 1;
 	led_on(LED_GREEN);
-#endif // NORADIO
 
-#ifdef VREF
-	vref_adj = (udb_vref.offset>>1) - (udb_vref.value>>1);
-#else
+
 	vref_adj = 0;
-#endif // VREF
 
 	udb_callback_read_sensors();
 	if ((udb_pulse_counter % (HEARTBEAT_HZ/40)) == 0)

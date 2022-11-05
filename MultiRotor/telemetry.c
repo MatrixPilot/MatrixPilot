@@ -110,32 +110,32 @@ void send_imu_data(void)
 			}
 			break ;
 		
-		case 3:
+		case 4:
 			{
 				serial_output("in north-east-down body frame.\r\n") ;
 			}
 			break ;	
-		case 4:
+		case 6:
 			{
 				serial_output("specific forces in feet/sec^2.\r\n") ;
 			}
 			break ;	
-		case 5:
+		case 8:
 			{
 				serial_output("CCW rotation rates in deg/sec.\r\n");
 			}
 			break ;	
-		case 6:
+		case 10:
 			{
 				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
-		case 7:
+		case 12:
 			{
 				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
 			}
 			break ;
-		case 8:
+		case 14:
 			{
 				serial_output( "mems binary offsets = %i,%i,%i,%i,%i,%i\r\n",
 					XACCEL_OFFSET ,
@@ -145,33 +145,26 @@ void send_imu_data(void)
 					YRATE_OFFSET ,
 					ZRATE_OFFSET );	
 			}
-			break ;			
-		case 9:
-			break ;
-		case 10:
-			break ;
-		case 11:
-			break ;			
-		case 12:
-			break ;				
-		case 13:
+			break;
+		case 16:
 			{
+#ifdef LOG_IMU
+#ifdef FULL_RECORD
 				serial_output( "x_force , y_force , z_force , x_gyro , y_gyro , z_gyro\r\n" ) ;
+#endif // FULL_RECORD
+#endif // LOG_IMU
 			}
 			break ;	
-		case 14:
-			break ;
-		case 15:
+		case 18:
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
-			hasWrittenHeader = 1 ;
 			break ;
 		}
 	}
 	else
 	{
-#if ( RECORD_OFFSETS == 1)
+#ifdef RECORD_OFFSETS 
 		{	
 			serial_output( "%i,%i,%i,%i,%i\r\n", record_number++ , udb_cpu_load(),
 					DIGITS_5 , DIGITS_5 , DIGITS_5  ) ;
@@ -184,6 +177,9 @@ void send_imu_data(void)
 #else //  not RECORD_OFFSETS	
 		
 		{
+#ifdef LOG_IMU
+#ifdef FULL_RECORD
+
 			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
 //			udb_heartbeat_counter , (int) udb_cpu_load() ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
@@ -193,6 +189,9 @@ void send_imu_data(void)
 				((double)(omegagyro[1]))/GYRO_FACTOR , 
 				((double)(omegagyro[2]))/GYRO_FACTOR 
 			) ;	
+						
+#endif // FULL_RECORD
+#endif // LOG_IMU
 		}
 #endif // RECORD_OFFSETS
 	}
