@@ -22,19 +22,19 @@
 
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
-// the following defines select what gets sent to the logger. define one of them and undef the others
-#undef LOG_IMU
-#define RECORD_OFFSETS
-#undef TEST_LOGGER_HZ
-#undef LOG_RMAT
+// the following defines select what gets sent to the logger. define one of them
+//#define LOG_IMU
+//#define RECORD_OFFSETS
+//#define TEST_LOGGER_HZ
+#define LOG_RMAT
 
 // the following selects a full record (x,y and z acceleration and gyro)
 // or a partial record (x and z acceleration and y gyro, which is pitch rate)
-// define one and undef the other
+// select one
 #define FULL_RECORD
-#undef PARTIAL_RECORD
+//define PARTIAL_RECORD
 
-// set the logger hertz
+// set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
 #define LOGGER_HZ   40
 
 #define HIGH_RANGES

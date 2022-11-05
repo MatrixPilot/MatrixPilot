@@ -146,6 +146,11 @@ void send_imu_data(void)
 					ZRATE_OFFSET );	
 			}
 			break;
+			case 15:
+			{
+				serial_output("data rate = %i records/sec\r\n", LOGGER_HZ );
+			}
+			break;
 		case 16:
 			{
 #ifdef LOG_IMU
@@ -153,6 +158,17 @@ void send_imu_data(void)
 				serial_output( "x_force , y_force , z_force , x_gyro , y_gyro , z_gyro\r\n" ) ;
 #endif // FULL_RECORD
 #endif // LOG_IMU
+				
+#ifdef RECORD_OFFSETS
+				serial_output("x, y, z accel and gyro raw binary\r\n");
+#endif // RECORD_OFFSETS
+				
+#ifdef TEST_LOGGER_HZ
+				serial_output("logger bandwidth test\r\n");
+#endif // TEST_LOGGER_HZ
+#ifdef LOG_RMAT
+				serial_output("rmat[6],rmat[7],rmat[8]\r\n") ;
+#endif // LOG_RMAT
 			}
 			break ;	
 		case 18:
@@ -172,11 +188,22 @@ void send_imu_data(void)
 		}
 #endif // RECORD_OFFSETS
 
-		
+#ifdef TEST_LOGGER_HZ
+#ifdef PARTIAL_RECORD		
 		{
+			serial_output("22 chars test string\r\n") ;
+		}
+#endif // PARTIAL_RECORD
+#ifdef FULL_RECORD
+		{
+			serial_output("43 chars test string 43 chars test string\r\n") ;
+		}
+#endif	
+#endif // TEST_LOGGER_HZ
+
 #ifdef LOG_IMU
 #ifdef FULL_RECORD
-
+		{
 			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
 //			udb_heartbeat_counter , (int) udb_cpu_load() ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
@@ -184,12 +211,16 @@ void send_imu_data(void)
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
 				((double)(omegagyro[0]))/GYRO_FACTOR ,
 				((double)(omegagyro[1]))/GYRO_FACTOR , 
-				((double)(omegagyro[2]))/GYRO_FACTOR 
-			) ;	
-						
+				((double)(omegagyro[2]))/GYRO_FACTOR ) ;	
+		}				
 #endif // FULL_RECORD
 #endif // LOG_IMU
-		}
+#ifdef LOG_RMAT
+		{	
+			serial_output( "%i,%i,%i\r\n" ,
+			rmat[6] , rmat[7] , rmat[8]) ;
+		}	
+#endif // LOG_RMAT
 	}
 	return ;
 }
