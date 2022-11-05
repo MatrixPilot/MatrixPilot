@@ -166,15 +166,12 @@ void send_imu_data(void)
 	{
 #ifdef RECORD_OFFSETS 
 		{	
-			serial_output( "%i,%i,%i,%i,%i\r\n", record_number++ , udb_cpu_load(),
-					DIGITS_5 , DIGITS_5 , DIGITS_5  ) ;
-//			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
-//			udb_xaccel.value , udb_yaccel.value , udb_zaccel.value ,
-//			udb_xrate.value , udb_yrate.value , udb_zrate.value ) ;
+			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
+			udb_xaccel.value , udb_yaccel.value , udb_zaccel.value ,
+			udb_xrate.value , udb_yrate.value , udb_zrate.value ) ;
 		}
- 
-		
-#else //  not RECORD_OFFSETS	
+#endif // RECORD_OFFSETS
+
 		
 		{
 #ifdef LOG_IMU
@@ -193,7 +190,6 @@ void send_imu_data(void)
 #endif // FULL_RECORD
 #endif // LOG_IMU
 		}
-#endif // RECORD_OFFSETS
 	}
 	return ;
 }

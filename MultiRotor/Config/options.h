@@ -23,8 +23,8 @@
 #define BOARD_ORIENTATION					ORIENTATION_FORWARDS
 
 // the following defines select what gets sent to the logger. define one of them and undef the others
-#define LOG_IMU
-#undef RECORD_OFFSETS
+#undef LOG_IMU
+#define RECORD_OFFSETS
 #undef TEST_LOGGER_HZ
 #undef LOG_RMAT
 
