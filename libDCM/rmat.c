@@ -1,5 +1,4 @@
 
-
 #include "libDCM_internal.h"
 #include "mathlibNAV.h"
 #include "deadReckoning.h"
@@ -7,6 +6,7 @@
 #include "../libUDB/magnetometer.h"
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/ADchannel.h"
+#include <math.h>
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane
@@ -843,4 +843,23 @@ void dcm_run_imu_step(void)
 #endif
 	PI_feedback();              // local
 //	calibrate_gyros();          // local
+}
+float roll_angle , pitch_angle , yaw_angle ;
+float rmat_f[9];
+#define DEG_PER_RAD 57.296
+void compute_euler(void)
+{
+	rmat_f[0]=(float)rmat[0] ;
+	rmat_f[1]=(float)rmat[1] ;
+	rmat_f[2]=(float)rmat[2] ;
+	rmat_f[3]=(float)rmat[3] ;
+	rmat_f[4]=(float)rmat[4] ;
+	rmat_f[5]=(float)rmat[5] ;
+	rmat_f[6]=(float)rmat[6] ;
+	rmat_f[7]=(float)rmat[7] ;
+	rmat_f[8]=(float)rmat[8] ;
+
+	pitch_angle = DEG_PER_RAD*atan2f(-rmat_f[6],sqrtf(rmat_f[7]*rmat_f[7]+rmat_f[8]*rmat_f[8]));
+	roll_angle = DEG_PER_RAD*atan2f(rmat_f[7],rmat_f[8]);
+	yaw_angle = DEG_PER_RAD*atan2f(rmat_f[3],rmat_f[0]);
 }

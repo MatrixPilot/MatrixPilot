@@ -35,7 +35,7 @@
 //define PARTIAL_RECORD
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ   40
+#define LOGGER_HZ   100
 
 #define UDB5_TEST_BOARD
 #ifdef UDB5_TEST_BOARD

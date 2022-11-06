@@ -77,6 +77,9 @@ extern fractional magFieldEarth[3];
 extern fractional magAlignment[4];
 extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 extern uint16_t mission_time ;
+extern void compute_euler(void);
+extern float roll_angle , pitch_angle , yaw_angle ;
+
 
 /*void send_debug_line( void )
 {
@@ -216,9 +219,10 @@ void send_imu_data(void)
 #endif // FULL_RECORD
 #endif // LOG_IMU
 #ifdef LOG_RMAT
-		{	
-			serial_output( "%i,%i,%i\r\n" ,
-			rmat[6] , rmat[7] , rmat[8]) ;
+		{	compute_euler();
+			serial_output("%i , %6.1f , %6.1f , %6.1f\r\n", udb_cpu_load() , yaw_angle , pitch_angle , roll_angle);
+//			serial_output( "%i,%i,%i\r\n" ,
+//			rmat[6] , rmat[7] , rmat[8]) ;
 		}	
 #endif // LOG_RMAT
 	}
