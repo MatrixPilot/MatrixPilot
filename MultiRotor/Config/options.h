@@ -37,15 +37,22 @@
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
 #define LOGGER_HZ   40
 
-#define HIGH_RANGES
-#ifdef HIGH_RANGES
+#define UDB5_TEST_BOARD
+#ifdef UDB5_TEST_BOARD
+#define SERIAL_NUMBERD1	3
+#define SERIAL_NUMBERD2	4
+#define SERIAL_NUMBERD3 3
+#define ACCEL_RANGE         4
+#define GYRO_RANGE	    1000
+#endif // UDB5
+#ifdef SN002
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         4
 #define GYRO_RANGE	    1000
 #endif // HIGH_RANGES
-#ifdef LOW_RANGES
+#ifdef SN001
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 1
@@ -64,7 +71,7 @@
 #define NUM_INPUTS	7
 #define NUM_OUTPUTS	4
 
-#ifdef LOW_RANGES
+#ifdef SN001
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 362 )
 #define YACCEL_OFFSET	( -17 )
@@ -74,7 +81,7 @@
 #define ZRATE_OFFSET	( -64 )
 #endif //LOW_RANGES
 
-#ifdef HIGH_RANGES
+#ifdef SN002
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 161 )
 #define YACCEL_OFFSET	( -103 )
@@ -83,6 +90,16 @@
 #define YRATE_OFFSET	( 25 )
 #define ZRATE_OFFSET	( -58 )
 #endif //LOW_RANGES
+
+#ifdef UDB5_TEST_BOARD
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 549 )
+#define YACCEL_OFFSET	( -73 )
+#define ZACCEL_OFFSET	( 123 )
+#define XRATE_OFFSET	( -175 )
+#define YRATE_OFFSET	( -9 )
+#define ZRATE_OFFSET	( -42 )
+#endif // UDB5
 
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
