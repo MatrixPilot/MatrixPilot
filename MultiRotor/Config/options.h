@@ -38,7 +38,7 @@
 #define LOGGER_HZ	20
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
-#define TILT_STOP	45
+#define TILT_STOP	450
 
 #define UDB5_TEST_BOARD
 #ifdef UDB5_TEST_BOARD

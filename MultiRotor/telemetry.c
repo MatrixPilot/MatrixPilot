@@ -99,6 +99,7 @@ uint16_t record_number = 0 ;
 extern float tilt_angle ;
 extern boolean start_log , stop_log ;
 boolean logging_on = 0 ;
+extern int16_t omega_dot_rmat6 ;
 void send_imu_data(void)
 {
 	if (start_log == 1)
@@ -243,14 +244,24 @@ void send_imu_data(void)
 //				((double)(omegaAccum[0]))/GYRO_FACTOR ,
 //				((double)(omegaAccum[1]))/GYRO_FACTOR , 
 //				((double)(omegaAccum[2]))/GYRO_FACTOR ) ;
-			serial_output( "%i,%i,%i,%i,%i,%i,%6.1f\r\n",
-				aero_force[0] ,
-				aero_force[1] ,
-				aero_force[2] ,
-				aero_force_filtered[0]._.W1 ,
-				aero_force_filtered[1]._.W1 ,
-				aero_force_filtered[2]._.W1 ,
-					tilt_angle
+//			serial_output( "%i,%i,%i,%i,%i,%i,%6.1f\r\n",
+//				aero_force[0] ,
+//				aero_force[1] ,
+//				aero_force[2] ,
+//				aero_force_filtered[0]._.W1 ,
+//				aero_force_filtered[1]._.W1 ,
+//				aero_force_filtered[2]._.W1 ,
+//					tilt_angle
+//					);
+			serial_output("%i,%i,%i,%i,%i,%i,%i\r\n",
+					omegagyro[0],
+					omegagyro[1],
+					omegagyro[2],
+					rmat[6],
+					rmat[7],
+					rmat[8],
+					omega_dot_rmat6
+					
 					);
 		}	
 #endif // LOG_RMAT
