@@ -35,14 +35,14 @@
 //define PARTIAL_RECORD
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ   100
+#define LOGGER_HZ   50
 
 #define UDB5_TEST_BOARD
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
 #define SERIAL_NUMBERD2	4
 #define SERIAL_NUMBERD3 3
-#define ACCEL_RANGE         4
+#define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // UDB5
 #ifdef SN002

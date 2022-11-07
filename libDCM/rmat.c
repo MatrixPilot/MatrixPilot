@@ -29,40 +29,13 @@
 fractional ggain[] =  { GGAIN, GGAIN, GGAIN };
 
 uint16_t spin_rate = 0;
-//fractional spin_axis[] = { 0, 0, RMAX };
 
-#if (BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == UDB5_BOARD)
-// modified gains for MPU6000
-// stock gains:
-//#define KPROLLPITCH (ACCEL_RANGE * 1280/3)
-//#define KIROLLPITCH (ACCEL_RANGE * 3400 / HEARTBEAT_HZ)
-
-// rocket gains:
-
-//#define KPROLLPITCH (ACCEL_RANGE * 900)
-//#define KIROLLPITCH ((uint32_t) ACCEL_RANGE * (uint32_t) 10240 / (uint32_t) HEARTBEAT_HZ)
-
-//#define KPROLLPITCH (ACCEL_RANGE * 1800)
-//#define KPROLLPITCH ( 4096 )
+// the gains are constant because the gravity vector is normalized
 #define KPROLLPITCH ( 2*2048 )
-//#define KIROLLPITCH ((uint32_t) ACCEL_RANGE * (uint32_t) 40960 / (uint32_t) HEARTBEAT_HZ)
-//#define KIROLLPITCH ((uint32_t) ACCEL_RANGE * (uint32_t) 2560 / (uint32_t) HEARTBEAT_HZ)
 #define KIROLLPITCH ( (uint32_t) 4*2560 / (uint32_t) HEARTBEAT_HZ)
 
-#elif (BOARD_TYPE == UDB4_BOARD)
-// Paul's gains for 6G accelerometers
-#define KPROLLPITCH (256*5)
-#define KIROLLPITCH (10240/HEARTBEAT_HZ) // 256
 
-#else
-#error Unsupported BOARD_TYPE
-#endif // BOARD_TYPE
-
-//#define KPYAW 256*4
-//#define KPYAW ( 4096 )
 #define KPYAW ( 2*2048 )
-//#define KIYAW 32
-//#define KIYAW (1280/HEARTBEAT_HZ)
 #define KIYAW (4*2560/HEARTBEAT_HZ)
 
 #define GYROSAT 15000
@@ -359,57 +332,36 @@ extern int16_t accelEarthVertical ;
 extern int32_t velocityEarthVertical ;
 int16_t launch_count ;
 
-#define LAUNCH_ACCELERATION ( 2.0 ) // times gravity
-#define LAUNCH_VELOCITY ( 10.0 ) // miles per hour
-#define LAUNCH_ACCELERATION_BINARY (( int16_t) ( GRAVITY*LAUNCH_ACCELERATION ))
-#define EARTH_GRAVITY ( 9.81 ) // meters per second per second
-#define FRAME_RATE ( 40.0 ) // computations are done 40 times per second
-#define METERSPERSECONDPERMPH ( 4.0/9.0 ) // conversion from MPH to meters/second
-#define LAUNCH_VELOCITY_BINARY ( ( int32_t ) ( LAUNCH_VELOCITY*GRAVITY*FRAME_RATE*METERSPERSECONDPERMPH/ EARTH_GRAVITY ) )
-#define LAUNCH_DETECT_COUNT ( 20 )
-#define GROUND_TEST
+//#define LAUNCH_ACCELERATION ( 2.0 ) // times gravity
+//#define LAUNCH_VELOCITY ( 10.0 ) // miles per hour
+//#define LAUNCH_ACCELERATION_BINARY (( int16_t) ( GRAVITY*LAUNCH_ACCELERATION ))
+//#define EARTH_GRAVITY ( 9.81 ) // meters per second per second
+//#define FRAME_RATE ( 40.0 ) // computations are done 40 times per second
+//#define METERSPERSECONDPERMPH ( 4.0/9.0 ) // conversion from MPH to meters/second
+//#define LAUNCH_VELOCITY_BINARY ( ( int32_t ) ( LAUNCH_VELOCITY*GRAVITY*FRAME_RATE*METERSPERSECONDPERMPH/ EARTH_GRAVITY ) )
+//#define LAUNCH_DETECT_COUNT ( 20 )
+//#define GROUND_TEST
 static void roll_pitch_drift(void)
 {
-	uint16_t gplaneMagnitude  ;
-	uint16_t acceleration ;	
-	gplaneMagnitude = vector3_mag( gplane[0] , gplane[1] , gplane[2]   ) ;
-	acceleration = abs ( gplaneMagnitude - GRAVITY ) ;
-	if ( acceleration < ( GRAVITY ))  // thrust must be at least 2 times gravity
-	{
-		if ( launch_count > 0 )
-		{
-			launch_count -- ;
-		}
-	}
-	else
-	{
-		if ( launch_count < LAUNCH_DETECT_COUNT )
-		{
-			launch_count ++ ;
-		}
-	}
-
-	if ( launch_count == LAUNCH_DETECT_COUNT )
-	{
-		launched = 1 ;
-	}
-#ifndef GROUND_TEST
-#error ground_test
-#endif
-
-	if (  ( acceleration < ( GRAVITY/4 ))&& (launched == 0 ) )
-
+	//uint16_t gplaneMagnitude  ;
+	//uint16_t acceleration ;	
+//	gplaneMagnitude = vector3_mag( gplane[0] , gplane[1] , gplane[2]   ) ;
+//	acceleration = abs ( gplaneMagnitude - GRAVITY ) ;
+	
+	if(1) // this is where the logic goes to turn off compensation
 	{
 		accelOn = 1 ;
 		int16_t gplane_nomalized[3] ;
 		vector3_normalize( gplane_nomalized , gplane ) ;
 		VectorCross(errorRP, gplane_nomalized, &rmat[6]);
-		dirOverGndHrmat[0] = rmat[0] ;
-		dirOverGndHrmat[1] = rmat[3] ;
+		dirOverGndHrmat[0] = (rmat[0])/2 + (rmat[4])/2 ;
+		dirOverGndHrmat[1] = (rmat[3])/2 - (rmat[1])/2 ;
 		dirOverGndHrmat[2] = 0 ;
 		dirOverGndHGPS[0] = RMAX ;
 		dirOverGndHGPS[1] = 0 ;
 		dirOverGndHGPS[2] = 0 ;
+		VectorCross(errorYawground, dirOverGndHrmat , dirOverGndHGPS );
+		/*
 		if ( rmat[0] > 0 ) // less than 90 degree roll
 		{
 			VectorCross(errorYawground, dirOverGndHrmat , dirOverGndHGPS );
@@ -427,6 +379,7 @@ static void roll_pitch_drift(void)
 				errorYawground[2] = RMAX ;
 			}
 		}
+		 */
 			// convert to plane frame:
 			// *** Note: this accomplishes multiplication rmat transpose times errorYawground!!
 		MatrixMultiply(1, 3, 3, errorYawplane, errorYawground, rmat) ;
@@ -444,294 +397,6 @@ static void roll_pitch_drift(void)
 
 }
 
-
-#if (MAG_YAW_DRIFT == 1)
-
-fractional magFieldEarth[3];
-//extern fractional udb_magFieldBody[3];
-//extern fractional udb_magOffset[3];
-fractional rmatPrevious[9];
-fractional magFieldEarthNormalizedPrevious[3];
-fractional magAlignment[4] = { 0, 0, 0, RMAX };
-fractional magFieldBodyMagnitudePrevious;
-fractional magFieldBodyPrevious[3];
-
-#ifdef INITIALIZE_VERTICAL // vertical initialization for VTOL
-static void align_rmat_to_mag(void)
-{
-	uint8_t theta;
-	struct relative2D initialBodyField;
-	int16_t costheta;
-	int16_t sintheta;
-	initialBodyField.x = udb_magFieldBody[0];
-	initialBodyField.y = udb_magFieldBody[2];
-#if(DECLINATIONANGLE_VARIABLE == 1)
-	theta = rect_to_polar(&initialBodyField) -64 - (dcm_declination_angle._.B1);
-#else
-	theta = rect_to_polar(&initialBodyField) -64 - (DECLINATIONANGLE >> 8);
-#endif
-	costheta = cosine(theta);
-	sintheta = sine(theta);
-	rmat[0] = rmat[5] = costheta;
-	rmat[2] = sintheta;
-	rmat[3] = - sintheta;
-}
-
-#else // horizontal initialization for usual cases
-static void align_rmat_to_mag(void)
-{
-	uint8_t theta;
-	struct relative2D initialBodyField;
-	int16_t costheta;
-	int16_t sintheta;
-	initialBodyField.x = udb_magFieldBody[0];
-	initialBodyField.y = udb_magFieldBody[1];
-#if(DECLINATIONANGLE_VARIABLE == 1)
-	theta = rect_to_polar(&initialBodyField) -64 - (dcm_declination_angle._.B1);
-#else
-	theta = rect_to_polar(&initialBodyField) -64 - (DECLINATIONANGLE >> 8);
-#endif
-	costheta = cosine(theta);
-	sintheta = sine(theta);
-	rmat[0] = rmat[4] = costheta;
-	rmat[1] = sintheta;
-	rmat[3] = - sintheta;
-}
-#endif // INITIALIZE_VERTICAL
-
-static void quaternion_adjust(fractional quaternion[], fractional direction[])
-{
-	// performs an adjustment to a quaternion representation of re-alignement.
-	// the cross product is left out, theory and test both show it should not be used.
-	fractional delta_cos;
-	fractional vector_buffer[3];
-	fractional increment[3];
-	uint32_t magnitudesqr;
-	unsigned magnitude;
-	increment[0] = direction[0]>>3;
-	increment[1] = direction[1]>>3;
-	increment[2] = direction[2]>>3;
-	// change is cosine is 1/2 of the dot product of first 3 elements of quaternion
-	// with the increment. The 1/2 is built into the dot product.
-	delta_cos = - VectorDotProduct(3, quaternion, increment);
-	// the change in the first 3 elements is 1/2 of the 4 element times the increment.
-	// There is a 1/2 built into the VectorScale 
-	VectorScale(3, vector_buffer, increment, quaternion[3]);
-	// Update the first three components
-	VectorAdd(3, quaternion, quaternion, vector_buffer);
-	// Update the 4th component
-	quaternion[3] += delta_cos;
-	// Renormalize
-	magnitudesqr = __builtin_mulss(quaternion[0], quaternion[0])
-	             + __builtin_mulss(quaternion[1], quaternion[1])
-	             + __builtin_mulss(quaternion[2], quaternion[2])
-	             + __builtin_mulss(quaternion[3], quaternion[3]);
-	magnitude = sqrt_long(magnitudesqr);
-
-	quaternion[0] = __builtin_divsd(__builtin_mulsu(quaternion[0], RMAX), magnitude);
-	quaternion[1] = __builtin_divsd(__builtin_mulsu(quaternion[1], RMAX), magnitude);
-	quaternion[2] = __builtin_divsd(__builtin_mulsu(quaternion[2], RMAX), magnitude);
-	quaternion[3] = __builtin_divsd(__builtin_mulsu(quaternion[3], RMAX), magnitude);
-}
-
-static void RotVector2RotMat(fractional rotation_matrix[], fractional rotation_vector[])
-{
-	// rotation vector represents a rotation in vector form
-	// around an axis equal to the normalized value of the vector.
-	// It is assumed that rotation_vector already includes a factor of sin(alpha/2)
-	// maximum rotation is plus minus 180 degrees.
-	fractional cos_alpha;
-	fractional cos_half_alpha;
-	fractional cos_half_alpha_rotation_vector[3];
-	union longww sin_half_alpha_sqr = { 0 };
-	int16_t matrix_index;
-
-	cos_half_alpha = rotation_vector[3];
-
-	// compute the square of sine of half alpha
-	for (matrix_index = 0; matrix_index < 3; matrix_index++)
-	{
-		sin_half_alpha_sqr.WW += __builtin_mulss(rotation_vector[matrix_index], rotation_vector[matrix_index]);
-	}
-	if (sin_half_alpha_sqr.WW > ((int32_t)RMAX*RMAX - 1))
-	{
-		sin_half_alpha_sqr.WW = (int32_t)RMAX*RMAX - 1;
-	}
-
-	// compute cos_alpha
-	sin_half_alpha_sqr.WW *= 8;
-	cos_alpha = RMAX - sin_half_alpha_sqr._.W1;
-
-	// scale rotation_vector by 2*cos_half_alpha
-	VectorScale (3, cos_half_alpha_rotation_vector,  rotation_vector, cos_half_alpha);
-	for (matrix_index = 0; matrix_index < 3; matrix_index++)
-	{
-		cos_half_alpha_rotation_vector[matrix_index] *= 4;
-	}
-
-	// compute 2 times rotation_vector times its transpose
-	MatrixMultiply(3, 1, 3, rotation_matrix, rotation_vector, rotation_vector);
-	for (matrix_index = 0; matrix_index < 9; matrix_index++)
-	{
-		rotation_matrix[matrix_index] *= 4;
-	}
-
-	rotation_matrix[0] += cos_alpha;
-	rotation_matrix[4] += cos_alpha;
-	rotation_matrix[8] += cos_alpha;
-
-	rotation_matrix[1] -= cos_half_alpha_rotation_vector[2];
-	rotation_matrix[2] += cos_half_alpha_rotation_vector[1];
-	rotation_matrix[3] += cos_half_alpha_rotation_vector[2];
-	rotation_matrix[5] -= cos_half_alpha_rotation_vector[0];
-	rotation_matrix[6] -= cos_half_alpha_rotation_vector[1];
-	rotation_matrix[7] += cos_half_alpha_rotation_vector[0];
-}
-
-#define MAG_LATENCY 0.085 // seconds
-#define MAG_LATENCY_COUNT ((int16_t)(HEARTBEAT_HZ * MAG_LATENCY))
-
-// Since mag_drift is called every heartbeat the first assignment to rmatDelayCompensated
-// will occur at udb_heartbeat_counter = (.25 - MAG_LATENCY) seconds.
-// Since rxMagnetometer is called  at multiples of .25 seconds, this initial
-// delay offsets the 4Hz updates of rmatDelayCompensated by MAG_LATENCY seconds.
-static int16_t mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT;
-
-static void mag_drift(void)
-{
-	int16_t mag_error;
-	fractional magFieldEarthNormalized[3];
-	fractional magFieldEarthHorzNorm[2];
-	fractional magAlignmentError[3];
-	fractional rmat2Transpose[9];
-	fractional R2TR1RotationVector[3];
-	fractional R2TAlignmentErrorR1[3];
-	fractional rmatBufferA[9];
-	fractional rmatBufferB[9];
-	fractional magAlignmentAdjustment[3];
-	fractional vectorBuffer[3];
-	fractional magFieldBodyMagnitude;
-	fractional offsetEstimate[3];
-
-	// the following compensates for magnetometer drift by adjusting the timing
-	// of when rmat is read
-	mag_latency_counter --;
-	if (mag_latency_counter == 0)
-	{
-		VectorCopy(9, rmatDelayCompensated, rmat);
-		mag_latency_counter = (HEARTBEAT_HZ / 4);   // not really needed, but its good insurance
-		// mag_latency_counter is assigned in the next block
-	}
-	
-	if (dcm_flags._.mag_drift_req)
-	{
-		// Compute magnetic offsets
-		magFieldBodyMagnitude =	vector3_mag(udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
-		VectorSubtract(3, vectorBuffer, udb_magFieldBody, magFieldBodyPrevious);
-		vector3_normalize(vectorBuffer, vectorBuffer);
-		VectorScale(3, offsetEstimate, vectorBuffer, magFieldBodyMagnitude - magFieldBodyMagnitudePrevious);
-		VectorCopy (3, magFieldBodyPrevious, udb_magFieldBody);
-		magFieldBodyMagnitudePrevious = magFieldBodyMagnitude;
-
-		// Compute and apply the magnetometer alignment adjustment in the body frame
-		RotVector2RotMat(rmatBufferA, magAlignment);
-		vectorBuffer[0] = VectorDotProduct(3, &rmatBufferA[0], udb_magFieldBody) << 1; 
-		vectorBuffer[1] = VectorDotProduct(3, &rmatBufferA[3], udb_magFieldBody) << 1; 
-		vectorBuffer[2] = VectorDotProduct(3, &rmatBufferA[6], udb_magFieldBody) << 1; 
-		VectorCopy(3, udb_magFieldBody, vectorBuffer);
-
-		if (dcm_flags._.first_mag_reading == 1)
-		{
-			align_rmat_to_mag();
-			VectorCopy (9, rmatDelayCompensated, rmat);
-		}
-
-		mag_latency_counter = (HEARTBEAT_HZ / 4) - MAG_LATENCY_COUNT; // setup for the next reading
-
-		// Compute the mag field in the earth frame
-
-		magFieldEarth[0] = VectorDotProduct(3, &rmatDelayCompensated[0], udb_magFieldBody)<<1;
-		magFieldEarth[1] = VectorDotProduct(3, &rmatDelayCompensated[3], udb_magFieldBody)<<1;
-		magFieldEarth[2] = VectorDotProduct(3, &rmatDelayCompensated[6], udb_magFieldBody)<<1;
-
-		// Normalize the magnetic vector to RMAT
-		vector3_normalize(magFieldEarthNormalized, magFieldEarth);
-		vector2_normalize(magFieldEarthHorzNorm, magFieldEarth);
-
-		// Use the magnetometer to detect yaw drift
-#if (DECLINATIONANGLE_VARIABLE == 1)
-		declinationVector[0] = cosine(dcm_declination_angle._.B1);
-		declinationVector[1] = sine(dcm_declination_angle._.B1);
-#endif
-		mag_error = VectorDotProduct(2, magFieldEarthHorzNorm, declinationVector);
-		VectorScale(3, errorYawplane, &rmat[6], mag_error); // Scalegain = 1/2
-
-		// Do the computations needed to compensate for magnetometer misalignment
-
-		// Determine the apparent shift in the earth's magnetic field:
-		VectorCross(magAlignmentError, magFieldEarthNormalizedPrevious, magFieldEarthNormalized);
-
-		// Compute R2 transpose
-		MatrixTranspose(3, 3, rmat2Transpose, rmatDelayCompensated);
-
-		// Compute 1/2 of R2tranpose times R1
-		MatrixMultiply(3, 3, 3, rmatBufferA, rmat2Transpose, rmatPrevious);
-
-		// Convert to a rotation vector, take advantage of 1/2 from the previous step
-		R2TR1RotationVector[0] = rmatBufferA[7] - rmatBufferA[5];
-		R2TR1RotationVector[1] = rmatBufferA[2] - rmatBufferA[6];
-		R2TR1RotationVector[2] = rmatBufferA[3] - rmatBufferA[1];
-
-		// Compute 1/4 of RT2*Matrix(error-vector)*R1
-		rmatBufferA[0] = rmatBufferA[4] = rmatBufferA[8]=0;
-		rmatBufferA[7] =  magAlignmentError[0];
-		rmatBufferA[5] = -magAlignmentError[0];
-		rmatBufferA[2] =  magAlignmentError[1];
-		rmatBufferA[6] = -magAlignmentError[1];
-		rmatBufferA[3] =  magAlignmentError[2];
-		rmatBufferA[1] = -magAlignmentError[2];
-		MatrixMultiply(3, 3, 3, rmatBufferB, rmatBufferA, rmatDelayCompensated);
-		MatrixMultiply(3, 3, 3, rmatBufferA, rmat2Transpose, rmatBufferB);
-
-		// taking advantage of factor of 1/4 in the two matrix multiplies, compute
-		// 1/2 of the vector representation of the rotation
-		R2TAlignmentErrorR1[0] = (rmatBufferA[7] - rmatBufferA[5]);
-		R2TAlignmentErrorR1[1] = (rmatBufferA[2] - rmatBufferA[6]);
-		R2TAlignmentErrorR1[2] = (rmatBufferA[3] - rmatBufferA[1]);
-
-		// compute the negative of estimate of the residual misalignment
-		VectorCross(magAlignmentAdjustment, R2TAlignmentErrorR1, R2TR1RotationVector);
-		
-		if (dcm_flags._.first_mag_reading == 0)
-		{
-			udb_magOffset[0] = udb_magOffset[0] + ((offsetEstimate[0] + 2) >> 2);
-			udb_magOffset[1] = udb_magOffset[1] + ((offsetEstimate[1] + 2) >> 2);
-			udb_magOffset[2] = udb_magOffset[2] + ((offsetEstimate[2] + 2) >> 2);
-			quaternion_adjust(magAlignment, magAlignmentAdjustment);
-		}
-		else
-		{
-			dcm_flags._.first_mag_reading = 0;
-		}
-
-		VectorCopy(3, magFieldEarthNormalizedPrevious, magFieldEarthNormalized);
-		VectorCopy(9, rmatPrevious, rmatDelayCompensated);
-
-		dcm_flags._.mag_drift_req = 0;
-	}
-}
-
-void udb_magnetometer_callback(void)
-{
-	dcm_flags._.mag_drift_req = 1;
-//#define USE_DEBUG_IO
-#ifdef USE_DEBUG_IO
-//	printf("magno %u %u %u\r\n", udb_magFieldBody[0], udb_magFieldBody[1], udb_magFieldBody[2]);
-#endif
-}
-
-#endif // MAG_YAW_DRIFT
-
 #define MAXIMUM_SPIN_DCM_INTEGRAL 20.0 // degrees per second
 
 static void PI_feedback(void)
@@ -743,21 +408,11 @@ static void PI_feedback(void)
 	// boost the KPs at high spin rate, to compensate for increased error due to calibration error
 	// above 50 degrees/second, scale by rotation rate divided by 50
 
-	if (spin_rate < ((uint16_t)(50.0 * DEGPERSEC)))
 	{
 		kpyaw = KPYAW;
 		kprollpitch = KPROLLPITCH;
 	}
-	else if (spin_rate < ((uint16_t)(500.0 * DEGPERSEC)))
-	{
-		kpyaw = ((uint16_t)((KPYAW * 8.0) / (50.0 * DEGPERSEC))) * (spin_rate >> 3);
-		kprollpitch = ((uint16_t)((KPROLLPITCH * 8.0) / (50.0 * DEGPERSEC))) * (spin_rate >> 3);
-	}
-	else
-	{
-		kpyaw = (int16_t)(10.0 * KPYAW);
-		kprollpitch = (int16_t)(10.0 * KPROLLPITCH);
-	}
+	
 	VectorScale(3, omegacorrP, errorYawplane, kpyaw);   // Scale gain = 2
 	VectorScale(3, errorRPScaled, errorRP, kprollpitch);// Scale gain = 2
 	VectorAdd(3, omegacorrP, omegacorrP, errorRPScaled);
@@ -765,7 +420,6 @@ static void PI_feedback(void)
 	// turn off the offset integrator while spinning, it doesn't work in that case,
 	// and it only causes trouble.
 
-	if (spin_rate < ((uint16_t) (MAXIMUM_SPIN_DCM_INTEGRAL * DEGPERSEC)))
 	{	
 		gyroCorrectionIntegral[0].WW += (__builtin_mulsu(errorRP[0], KIROLLPITCH)>>3);
 		gyroCorrectionIntegral[1].WW += (__builtin_mulsu(errorRP[1], KIROLLPITCH)>>3);

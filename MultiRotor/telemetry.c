@@ -219,10 +219,14 @@ void send_imu_data(void)
 #endif // FULL_RECORD
 #endif // LOG_IMU
 #ifdef LOG_RMAT
-		{	compute_euler();
-			serial_output("%i , %6.1f , %6.1f , %6.1f\r\n", udb_cpu_load() , yaw_angle , pitch_angle , roll_angle);
+		{	//compute_euler();
+			//serial_output("%i , %6.1f , %6.1f , %6.1f\r\n", udb_cpu_load() , yaw_angle , pitch_angle , roll_angle);
 //			serial_output( "%i,%i,%i\r\n" ,
 //			rmat[6] , rmat[7] , rmat[8]) ;
+			serial_output("%.1f,%.1f,%.1f\r\n" ,
+				((double)(omegaAccum[0]))/GYRO_FACTOR ,
+				((double)(omegaAccum[1]))/GYRO_FACTOR , 
+				((double)(omegaAccum[2]))/GYRO_FACTOR ) ;	
 		}	
 #endif // LOG_RMAT
 	}
