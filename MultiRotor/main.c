@@ -113,11 +113,41 @@ void dcm_callback_gps_location_updated(void)
 extern boolean origin_recorded ;
 extern uint16_t number_pulses ;
 extern uint16_t altitude ;
+
 #define DEG_PER_RAD 57.296
 float tilt_angle ;
+boolean start_log = 0 , stop_log = 0 , slide_in_progress = 0 ;
 void update_slide_detection(void)
 {
-	tilt_angle = DEG_PER_RAD*atan2f(sqrtf(((float)aero_force_filtered[0]._.W1)*((float)aero_force_filtered[0]._.W1)+((float)aero_force_filtered[1]._.W1)*((float)aero_force_filtered[1]._.W1)),-(float)aero_force_filtered[2]._.W1);	
+	int16_t tilt_angle_int ;
+	tilt_angle = DEG_PER_RAD*atan2f(sqrtf(((float)aero_force_filtered[0]._.W1)*((float)aero_force_filtered[0]._.W1)+((float)aero_force_filtered[1]._.W1)*((float)aero_force_filtered[1]._.W1)),-(float)aero_force_filtered[2]._.W1);
+	tilt_angle_int = (int16_t)tilt_angle ;
+	if ( slide_in_progress == 1)
+		{
+		if ( tilt_angle_int > TILT_STOP )
+			{
+				stop_log = 1 ;
+				slide_in_progress = 0 ;
+				LED_RED = LED_OFF ;
+			}
+		else
+			{
+				LED_RED = LED_ON ;
+			}
+		}
+	else
+		{
+		if ( tilt_angle_int < TILT_START )
+			{
+				start_log = 1 ;
+				slide_in_progress = 1 ;
+				LED_RED = LED_ON ;
+			}
+		else
+			{
+				LED_RED = LED_OFF ;
+			}
+		}
 }
 
 // Called at heartbeat Hz, before sending servo pulses

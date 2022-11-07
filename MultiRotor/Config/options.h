@@ -37,6 +37,8 @@
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
 #define LOGGER_HZ	20
 #define SLIDE_DET_HZ	10
+#define TILT_START	15
+#define TILT_STOP	45
 
 #define UDB5_TEST_BOARD
 #ifdef UDB5_TEST_BOARD

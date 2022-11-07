@@ -97,8 +97,23 @@ extern void initialize_yaw_rmat(void) ;
 uint16_t record_number = 0 ;
 #define DIGITS_5 -12805
 extern float tilt_angle ;
+extern boolean start_log , stop_log ;
+boolean logging_on = 0 ;
 void send_imu_data(void)
 {
+	if (start_log == 1)
+	{
+		hasWrittenHeader = 0 ;
+		header_line = 0 ;
+		start_log = 0 ;
+		logging_on = 1 ;
+	}
+	if ( stop_log == 1)
+	{
+		stop_log = 0 ;
+		logging_on = 0 ;
+	}
+	if (logging_on == 0 ) return ;
 	db_index = 0 ;
 	
 	if (!hasWrittenHeader)
