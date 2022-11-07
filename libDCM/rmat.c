@@ -88,13 +88,10 @@ static union longww gyroCorrectionIntegral[] =  { { 0 }, { 0 },  { 0 } };
 fractional omegaAccum[] = { 0, 0, 0 };
 
 // gravity, as measured in plane coordinate system
-#ifdef INITIALIZE_VERTICAL // VTOL vertical initialization
-fractional gplane[] = { 0, -GRAVITY, 0 };
-int16_t aero_force[] = { 0 , GRAVITY , 0 };
-#else  // horizontal initialization 
+
 fractional gplane[] = { 0, 0, GRAVITY };
 int16_t aero_force[] = { 0 , 0 , -GRAVITY };
-#endif
+union longww aero_force_filtered[3];
 
 // horizontal velocity over ground, as measured by GPS (Vz = 0)
 fractional dirOverGndHGPS[] = { 0, RMAX, 0 };
@@ -156,29 +153,31 @@ static inline void read_gyros(void)
 	omegagyro[2] = ZRATE_VALUE;
 #endif
 }
-
+boolean first_accel = 1 ;
 inline void read_accel(void)
 {
-#if (HILSIM == 1)
-	HILSIM_set_gplane();
-//	gplane[0] = g_a_x_sim.BB;
-//	gplane[1] = g_a_y_sim.BB;
-//	gplane[2] = g_a_z_sim.BB;
-#else
+
 	gplane[0] = XACCEL_VALUE;
 	gplane[1] = YACCEL_VALUE;
 	gplane[2] = ZACCEL_VALUE;
 	aero_force[0] = - gplane[0] ;
 	aero_force[1] = - gplane[1] ;
 	aero_force[2] = - gplane[2] ;
-#endif
-
-#ifdef CATAPULT_LAUNCH_ENABLE
-	if (gplane[1] < -(GRAVITY/2))
+	if (first_accel == 1 )
 	{
-		dcm_flags._.launch_detected = 1;
+		aero_force_filtered[0]._.W1 = aero_force[0] ;
+		aero_force_filtered[1]._.W1 = aero_force[1] ;
+		aero_force_filtered[2]._.W1 = aero_force[2] ;
+		first_accel = 0 ;
 	}
-#endif
+	else
+	{
+		aero_force_filtered[0].WW += (((int32_t)aero_force[0])<<10)-((aero_force_filtered[0].WW)>>6);
+		aero_force_filtered[1].WW += (((int32_t)aero_force[1])<<10)-((aero_force_filtered[1].WW)>>6);
+		aero_force_filtered[2].WW += (((int32_t)aero_force[2])<<10)-((aero_force_filtered[2].WW)>>6);
+	}
+
+
 
         // gplane is a vector that represents the gravity vector minus the acceleration vector,
         // as seen in the body frame. Taking the dot products of gplane with the rows of the

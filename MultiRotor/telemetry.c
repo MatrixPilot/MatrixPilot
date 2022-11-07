@@ -96,6 +96,7 @@ extern union longww throttle_accum ;
 extern void initialize_yaw_rmat(void) ;
 uint16_t record_number = 0 ;
 #define DIGITS_5 -12805
+extern float tilt_angle ;
 void send_imu_data(void)
 {
 	db_index = 0 ;
@@ -223,10 +224,19 @@ void send_imu_data(void)
 			//serial_output("%i , %6.1f , %6.1f , %6.1f\r\n", udb_cpu_load() , yaw_angle , pitch_angle , roll_angle);
 //			serial_output( "%i,%i,%i\r\n" ,
 //			rmat[6] , rmat[7] , rmat[8]) ;
-			serial_output("%.1f,%.1f,%.1f\r\n" ,
-				((double)(omegaAccum[0]))/GYRO_FACTOR ,
-				((double)(omegaAccum[1]))/GYRO_FACTOR , 
-				((double)(omegaAccum[2]))/GYRO_FACTOR ) ;	
+//			serial_output("%.1f,%.1f,%.1f\r\n" ,
+//				((double)(omegaAccum[0]))/GYRO_FACTOR ,
+//				((double)(omegaAccum[1]))/GYRO_FACTOR , 
+//				((double)(omegaAccum[2]))/GYRO_FACTOR ) ;
+			serial_output( "%i,%i,%i,%i,%i,%i,%6.1f\r\n",
+				aero_force[0] ,
+				aero_force[1] ,
+				aero_force[2] ,
+				aero_force_filtered[0]._.W1 ,
+				aero_force_filtered[1]._.W1 ,
+				aero_force_filtered[2]._.W1 ,
+					tilt_angle
+					);
 		}	
 #endif // LOG_RMAT
 	}

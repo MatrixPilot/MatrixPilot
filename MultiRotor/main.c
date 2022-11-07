@@ -29,6 +29,7 @@
 #include "../libUDB/serialIO.h"
 #include "../libUDB/servoOut.h"
 #include "../libUDB/ADchannel.h"
+#include <math.h>
 
 // Used for serial debug output
 #include <stdio.h>
@@ -112,19 +113,30 @@ void dcm_callback_gps_location_updated(void)
 extern boolean origin_recorded ;
 extern uint16_t number_pulses ;
 extern uint16_t altitude ;
+#define DEG_PER_RAD 57.296
+float tilt_angle ;
+void update_slide_detection(void)
+{
+	tilt_angle = DEG_PER_RAD*atan2f(sqrtf(((float)aero_force_filtered[0]._.W1)*((float)aero_force_filtered[0]._.W1)+((float)aero_force_filtered[1]._.W1)*((float)aero_force_filtered[1]._.W1)),-(float)aero_force_filtered[2]._.W1);	
+}
 
 // Called at heartbeat Hz, before sending servo pulses
 void dcm_heartbeat_callback(void)
 {
-	
-	// Serial output SERVO_HZ  (40 Hz)
-	if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
+	if ( didCalibrate )
 	{
-		if ( didCalibrate )
+		if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SLIDE_DET_HZ)) == 0)
+		{
+			update_slide_detection();
+		}
+		if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
 		{
 			send_imu_data();
 		}
+		
 	}
+	// Serial output SERVO_HZ  (40 Hz)
+	
 	
 	return ;
 }
