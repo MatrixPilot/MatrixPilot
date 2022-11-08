@@ -35,10 +35,10 @@
 //define PARTIAL_RECORD
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	1
+#define LOGGER_HZ	20
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
-#define TILT_STOP	450
+#define TILT_STOP	45
 
 #define UDB5_TEST_BOARD
 #ifdef UDB5_TEST_BOARD
@@ -100,13 +100,13 @@
 #define YACCEL_OFFSET	( -73 )
 #define ZACCEL_OFFSET	( 123 )
 //real offsets:
-//#define XRATE_OFFSET	( -175 )
-//#define YRATE_OFFSET	( -9 )
-//#define ZRATE_OFFSET	( -42 )
+#define XRATE_OFFSET	( -138 )
+#define YRATE_OFFSET	( 48 )
+#define ZRATE_OFFSET	( 24 )
 // fake offsets for testing 
-#define XRATE_OFFSET	( 200 )
-#define YRATE_OFFSET	( 150 )
-#define ZRATE_OFFSET	( -100 )
+//#define XRATE_OFFSET	( 0 )
+//#define YRATE_OFFSET	( 0 )
+//#define ZRATE_OFFSET	( 0 )
 #endif // UDB5
 
 #define USE_PPM_INPUT						0

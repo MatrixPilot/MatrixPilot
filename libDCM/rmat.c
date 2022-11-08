@@ -337,24 +337,37 @@ int16_t launch_count ;
 int16_t omega_dot_rmat6 ;
 int16_t omega_scaled[3] ;
 int16_t omega_yaw_drift[3] ;
+uint16_t omega_magnitude ;
+extern boolean logging_on ;
+#define MAX_OMEGA 1000
 static void roll_pitch_drift(void)
 {	
-	if(1) // this is where the logic goes to turn off compensation
+	if(logging_on == 0) // this is where the logic goes to turn off compensation
 	{
 		accelOn = 1 ;
 		int16_t gplane_nomalized[3] ;
 		vector3_normalize( gplane_nomalized , gplane ) ;
 		VectorCross(errorRP, gplane_nomalized, &rmat[6]);
 		
-		omega_scaled[0] = (omegaAccum[0])<<4 ;
-		omega_scaled[1] = (omegaAccum[1])<<4 ;
-		omega_scaled[2] = (omegaAccum[2])<<4 ;
-		omega_dot_rmat6 = 2*VectorDotProduct(3,omega_scaled, &rmat[6]);
-		VectorScale(3,omega_yaw_drift,&rmat[6],- omega_dot_rmat6);
+		omega_magnitude = vector3_mag(omegagyro[0],omegagyro[1],omegagyro[2]);
+		if (omega_magnitude<MAX_OMEGA )
+		{
+			omega_scaled[0] = (omegaAccum[0])<<4 ;
+			omega_scaled[1] = (omegaAccum[1])<<4 ;
+			omega_scaled[2] = (omegaAccum[2])<<4 ;
+			omega_dot_rmat6 = 2*VectorDotProduct(3,omega_scaled, &rmat[6]);
+			VectorScale(3,omega_yaw_drift,&rmat[6],- omega_dot_rmat6);
 		
-		errorYawplane[0] = 2*omega_yaw_drift[0] ;
-		errorYawplane[1] = 2*omega_yaw_drift[1] ;
-		errorYawplane[2] = 2*omega_yaw_drift[2] ;
+			errorYawplane[0] = 2*omega_yaw_drift[0] ;
+			errorYawplane[1] = 2*omega_yaw_drift[1] ;
+			errorYawplane[2] = 2*omega_yaw_drift[2] ;
+		}
+		else
+		{
+			errorYawplane[0] = 0 ;
+			errorYawplane[1] = 0 ;
+			errorYawplane[2] = 0 ;
+		}
 	}
 	else
 	{

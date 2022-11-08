@@ -79,7 +79,8 @@ extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 extern uint16_t mission_time ;
 extern void compute_euler(void);
 extern float roll_angle , pitch_angle , yaw_angle ;
-
+extern int16_t omegacorrI[];
+extern uint16_t omega_magnitude ;
 
 /*void send_debug_line( void )
 {
@@ -238,8 +239,8 @@ void send_imu_data(void)
 #endif // FULL_RECORD
 #endif // LOG_IMU
 #ifdef LOG_RMAT
-		{	//compute_euler();
-			//serial_output("%i , %6.1f , %6.1f , %6.1f\r\n", udb_cpu_load() , yaw_angle , pitch_angle , roll_angle);
+		{	compute_euler();
+			serial_output("%i , %6.1f , %6.1f , %6.1f\r\n", udb_cpu_load() , yaw_angle , pitch_angle , roll_angle);
 //			serial_output( "%i,%i,%i\r\n" ,
 //			rmat[6] , rmat[7] , rmat[8]) ;
 //			serial_output("%.1f,%.1f,%.1f\r\n" ,
@@ -255,18 +256,19 @@ void send_imu_data(void)
 //				aero_force_filtered[2]._.W1 ,
 //					tilt_angle
 //					);
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-					omegaAccum[0],
-					omegaAccum[1],
-					omegaAccum[2],
-					rmat[6],
-					rmat[7],
-					rmat[8],
-					omega_dot_rmat6 ,
-					omega_yaw_drift[0],
-					omega_yaw_drift[1],
-					omega_yaw_drift[2]
-					);
+//			serial_output("%i,%i,%i,%i,%i,%i,%i\r\n",
+//					omegacorrI[0],
+//					omegacorrI[1],
+//					omegacorrI[2],
+//					rmat[6],
+//					rmat[7],
+//					rmat[8],
+//					omega_magnitude
+//					omega_dot_rmat6 ,
+//					omega_yaw_drift[0],
+//					omega_yaw_drift[1],
+//					omega_yaw_drift[2]
+//					);
 		}	
 #endif // LOG_RMAT
 	}
