@@ -100,6 +100,8 @@ extern float tilt_angle ;
 extern boolean start_log , stop_log ;
 boolean logging_on = 0 ;
 extern int16_t omega_dot_rmat6 ;
+extern int16_t omega_scaled[];
+extern int16_t omega_yaw_drift[];
 void send_imu_data(void)
 {
 	if (start_log == 1)
@@ -253,15 +255,17 @@ void send_imu_data(void)
 //				aero_force_filtered[2]._.W1 ,
 //					tilt_angle
 //					);
-			serial_output("%i,%i,%i,%i,%i,%i,%i\r\n",
-					omegagyro[0],
-					omegagyro[1],
-					omegagyro[2],
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+					omegaAccum[0],
+					omegaAccum[1],
+					omegaAccum[2],
 					rmat[6],
 					rmat[7],
 					rmat[8],
-					omega_dot_rmat6
-					
+					omega_dot_rmat6 ,
+					omega_yaw_drift[0],
+					omega_yaw_drift[1],
+					omega_yaw_drift[2]
 					);
 		}	
 #endif // LOG_RMAT

@@ -35,8 +35,9 @@ uint16_t spin_rate = 0;
 #define KIROLLPITCH ( (uint32_t) 4*2560 / (uint32_t) HEARTBEAT_HZ)
 
 
-#define KPYAW ( 2*2048 )
-#define KIYAW (4*2560/HEARTBEAT_HZ)
+//#define KPYAW ( 2*2048 )
+#define KPYAW ( 0 )
+#define KIYAW ((uint32_t) 4*2560/(uint32_t)HEARTBEAT_HZ)
 
 #define GYROSAT 15000
 // threshold at which gyros may be saturated
@@ -334,6 +335,8 @@ int16_t launch_count ;
 //#define LAUNCH_DETECT_COUNT ( 20 )
 //#define GROUND_TEST
 int16_t omega_dot_rmat6 ;
+int16_t omega_scaled[3] ;
+int16_t omega_yaw_drift[3] ;
 static void roll_pitch_drift(void)
 {	
 	if(1) // this is where the logic goes to turn off compensation
@@ -342,7 +345,16 @@ static void roll_pitch_drift(void)
 		int16_t gplane_nomalized[3] ;
 		vector3_normalize( gplane_nomalized , gplane ) ;
 		VectorCross(errorRP, gplane_nomalized, &rmat[6]);
-		omega_dot_rmat6 = VectorDotProduct(3,omegagyro, &rmat[6]);
+		
+		omega_scaled[0] = (omegaAccum[0])<<4 ;
+		omega_scaled[1] = (omegaAccum[1])<<4 ;
+		omega_scaled[2] = (omegaAccum[2])<<4 ;
+		omega_dot_rmat6 = 2*VectorDotProduct(3,omega_scaled, &rmat[6]);
+		VectorScale(3,omega_yaw_drift,&rmat[6],- omega_dot_rmat6);
+		
+		errorYawplane[0] = 2*omega_yaw_drift[0] ;
+		errorYawplane[1] = 2*omega_yaw_drift[1] ;
+		errorYawplane[2] = 2*omega_yaw_drift[2] ;
 	}
 	else
 	{
