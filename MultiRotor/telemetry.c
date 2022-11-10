@@ -155,24 +155,24 @@ void send_imu_data(void)
 				serial_output("CCW rotation rates in d/s.\r\n");
 			}
 			break ;	
-		case 7:
+		case 6:
 			{
 				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
-		case 9:
+		case 8:
 			{
 				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
 			}
 			break ;
-		case 11:
+		case 10:
 			{
 				serial_output("Gyro calibrations, x, y, z = %6.4f,%6.4f,%6.4f\r\n", 
 						CALIBRATIONX ,CALIBRATIONY,CALIBRATIONZ );
 			
 			}
 			break ;		
-		case 13:
+		case 12:
 			{
 				serial_output("tilt start, stop angles = %i,%i degrees\r\n", TILT_START , TILT_STOP);
 			}
@@ -186,7 +186,7 @@ void send_imu_data(void)
 					 );	
 			}
 			break;
-			case 15:
+		case 15:
 			{
 				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
 			}
@@ -194,9 +194,12 @@ void send_imu_data(void)
 		case 16:
 			{
 #ifdef LOG_IMU
-#ifdef FULL_RECORD
-				serial_output( "x_force , y_force , z_force , x_gyro , y_gyro , z_gyro\r\n" ) ;
-#endif // FULL_RECORD
+#ifdef LOG_RATE
+				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
+#endif // LOG_RATE
+#ifdef LOG_EULER
+				serial_output( "x_force , y , z , roll_angle , pitch , yaw\r\n" ) ;			
+#endif // LOG_EULER				
 #endif // LOG_IMU
 				
 #ifdef RECORD_OFFSETS
@@ -243,18 +246,26 @@ void send_imu_data(void)
 #endif // TEST_LOGGER_HZ
 
 #ifdef LOG_IMU
-#ifdef FULL_RECORD
+#ifdef LOG_RATE
 		{
 			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
-//			udb_heartbeat_counter , (int) udb_cpu_load() ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
-				((double)(omegagyro[0]))/GYRO_FACTOR ,
-				((double)(omegagyro[1]))/GYRO_FACTOR , 
-				((double)(omegagyro[2]))/GYRO_FACTOR ) ;	
-		}				
-#endif // FULL_RECORD
+				((double)(omegaAccum[0]))/GYRO_FACTOR ,
+				((double)(omegaAccum[1]))/GYRO_FACTOR , 
+				((double)(omegaAccum[2]))/GYRO_FACTOR ) ;	
+		}
+#endif // LOG_RATE
+#ifdef LOG_EULER
+		{
+			serial_output( "%.1f,%.1f,%.1f,%6.1f , %6.1f , %6.1f\r\n" ,
+				((double)(aero_force[0]))/ACCEL_FACTOR ,
+				((double)(aero_force[1]))/ACCEL_FACTOR ,
+				((double)(aero_force[2]))/ACCEL_FACTOR ,
+				bill_angle_x , bill_angle_y , bill_angle_z ) ;	
+		}
+#endif // LOG_EULER
 #endif // LOG_IMU
 #ifdef GYRO_CALIB
 

@@ -1,22 +1,23 @@
 
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
+#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
-#define GYRO_CALIB
+//#define GYRO_CALIB
 
-// the following selects a full record (x,y and z acceleration and gyro)
-// or a partial record (x and z acceleration and y gyro, which is pitch rate)
-// select one
-#define FULL_RECORD
-//define PARTIAL_RECORD
+// for IMU log, there are two options related to the gyros. pick one or the other
+// LOG_RATE reports the gyro rates, degrees/sec
+// LOG_EULER reports roll, pitch and yaw Euler angles in NED
+#define LOG_RATE
+//#define LOG_EULER
+
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	10
+#define LOGGER_HZ	100
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
-#define TILT_STOP	900
+#define TILT_STOP	60
 
 //#define UDB5_TEST_BOARD
 #define SN004
