@@ -19,7 +19,7 @@
 #define TILT_STOP	900
 
 //#define UDB5_TEST_BOARD
-#define SN003
+#define SN004
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
 #define SERIAL_NUMBERD2	4
@@ -33,21 +33,28 @@
 #define SERIAL_NUMBERD3 3
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // HIGH_RANGES
+#endif // SN003
+#ifdef SN004
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 4
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // SN004
 #ifdef SN002
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // HIGH_RANGES
+#endif // SN002
 #ifdef SN001
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 1
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // LOW_RANGES
+#endif // SN001
 #define TEST_LIDAR 0
 
 #define DR_TAU 2.5
@@ -94,10 +101,23 @@
 #define XRATE_OFFSET	( 0 )
 #define YRATE_OFFSET	( 0 )
 #define ZRATE_OFFSET	( 0 )
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define CALIBRATIONX	1.0099
+#define CALIBRATIONY	1.0081
+#define CALIBRATIONZ	1.0022
 #endif //SN3
+
+#ifdef SN004
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 132 )
+#define YACCEL_OFFSET	( 56 )
+#define ZACCEL_OFFSET	( -330 )
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
+#define CALIBRATIONX	1.0056
+#define CALIBRATIONY	1.0095
+#define CALIBRATIONZ	0.9969
+#endif //SN4
 
 #ifdef UDB5_TEST_BOARD
 #define CUSTOM_OFFSETS
