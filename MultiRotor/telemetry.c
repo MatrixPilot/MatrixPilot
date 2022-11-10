@@ -259,11 +259,12 @@ void send_imu_data(void)
 #endif // LOG_RATE
 #ifdef LOG_EULER
 		{
+			compute_euler();
 			serial_output( "%.1f,%.1f,%.1f,%6.1f , %6.1f , %6.1f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
-				bill_angle_x , bill_angle_y , bill_angle_z ) ;	
+				roll_angle , pitch_angle , yaw_angle ) ;	
 		}
 #endif // LOG_EULER
 #endif // LOG_IMU
