@@ -154,6 +154,9 @@ void send_imu_data(void)
 #ifdef LOG_EULER
 				serial_output("euler angle version\r\n");
 #endif // LOG_EULER
+#ifdef LOG_RATE_AND_EULER
+			serial_output("gyro rates and euler angles version\r\n");	
+#endif // LOG_RATE_AND_EULER
 			}
 			break ;
 		case 5:
@@ -210,7 +213,10 @@ void send_imu_data(void)
 #endif // LOG_RATE
 #ifdef LOG_EULER
 				serial_output( "x_force , y , z , roll_angle , pitch , yaw\r\n" ) ;			
-#endif // LOG_EULER				
+#endif // LOG_EULER	
+#ifdef LOG_RATE_AND_EULER
+				serial_output( "x_rate , y_rate , z_rate , roll_angle , p_angle , y_angle\r\n" ) ;		
+#endif // LOG_RATE_AND_EULER
 #endif // LOG_IMU
 				
 #ifdef RECORD_OFFSETS
@@ -271,13 +277,23 @@ void send_imu_data(void)
 #ifdef LOG_EULER
 		{
 			compute_euler();
-			serial_output( "%.1f,%.1f,%.1f,%6.1f , %6.1f , %6.1f\r\n" ,
+			serial_output( "%.1f,%.1f,%.1f,%.1f , %.1f , %.1f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
 				roll_angle , pitch_angle , yaw_angle ) ;	
 		}
 #endif // LOG_EULER
+#ifdef LOG_RATE_AND_EULER
+		{
+			compute_euler();
+			serial_output( "%.1f,%.1f,%.1f,%.1f , %.1f , %.1f\r\n" ,
+				((double)(omegaAccum[0]))/GYRO_FACTOR ,
+				((double)(omegaAccum[1]))/GYRO_FACTOR , 
+				((double)(omegaAccum[2]))/GYRO_FACTOR ,
+				roll_angle , pitch_angle , yaw_angle ) ;	
+		}
+#endif // LOG_RATE_AND_EULER
 #endif // LOG_IMU
 #ifdef GYRO_CALIB
 

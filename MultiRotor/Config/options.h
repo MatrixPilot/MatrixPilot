@@ -10,7 +10,8 @@
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
 //#define LOG_RATE
-#define LOG_EULER
+//#define LOG_EULER
+#define LOG_RATE_AND_EULER
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
