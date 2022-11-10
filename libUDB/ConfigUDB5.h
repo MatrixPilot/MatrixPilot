@@ -27,7 +27,8 @@
 //#define ACCEL_RANGE         4       // 4 g range
 
 // note : it is possible to use other accelerometer ranges on the MPU6000
-#define SCALEGYRO           3.0016  // 500 degree/second range
+//#define SCALEGYRO           3.0016  // 500 degree/second range
+#define SCALEGYRO	    2.882  // 500 d/s range, updated, wjp, 11/9/2022
 //#define SCALEACCEL          1.29    // 4 g range
 #define SCALEACCEL          1.27    // 4 g range measured by WJP on a few UDB5s
 

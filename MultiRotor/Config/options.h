@@ -1,32 +1,10 @@
 
 
-#define GNSS_HDOP_REQUIRED_FOR_STARTUP      200  //  Horizontal Dilution of Precision
-#define GNSS_VDOP_REQUIRED_FOR_STARTUP	    200  //  Vertical Dilution of Precision
-#define GNSS_SVS_REQUIRED_FOR_STARTUP	      4  //  Number of Sattelites in View
-#define CONSOLE_UART                        0
-////////////////////////////////////////////////////////////////////////////////
-// Use board orientation to change the mounting direction of the board.
-// The following 4 orientations have the board parallel with the ground.
-// ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
-// ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
-// ORIENTATION_INVERTED:  Component-side down, GPS connector front
-// ORIENTATION_FLIPPED:   Component-side down, GPS connector back
-// The following 2 orientations are "knife edge" mountings
-// ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
-//		from point of view of the pilot
-// ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
-//		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
-//		so that the GPS connector points toward the tail of the plane
-// ********** NOTE: orientations are withrespect to the front motor for + configuration,  *******
-// or with respect to left front motor, for X configuration
-
-#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
-
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
-#define LOG_RMAT
+#define GYRO_CALIB
 
 // the following selects a full record (x,y and z acceleration and gyro)
 // or a partial record (x and z acceleration and y gyro, which is pitch rate)
@@ -35,12 +13,13 @@
 //define PARTIAL_RECORD
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	20
+#define LOGGER_HZ	10
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
-#define TILT_STOP	45
+#define TILT_STOP	900
 
-#define UDB5_TEST_BOARD
+//#define UDB5_TEST_BOARD
+#define SN003
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
 #define SERIAL_NUMBERD2	4
@@ -48,19 +27,26 @@
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // UDB5
+#ifdef SN003
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 3
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // HIGH_RANGES
 #ifdef SN002
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 2
-#define ACCEL_RANGE         4
+#define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // HIGH_RANGES
 #ifdef SN001
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 1
-#define ACCEL_RANGE         2
-#define GYRO_RANGE	    250
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
 #endif // LOW_RANGES
 #define TEST_LIDAR 0
 
@@ -76,13 +62,16 @@
 
 #ifdef SN001
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 362 )
-#define YACCEL_OFFSET	( -17 )
-#define ZACCEL_OFFSET	( -792 )
-#define XRATE_OFFSET	( -301 )
-#define YRATE_OFFSET	( 163 )
-#define ZRATE_OFFSET	( -64 )
-#endif //LOW_RANGES
+#define XACCEL_OFFSET	( 88 )
+#define YACCEL_OFFSET	( -8 )
+#define ZACCEL_OFFSET	( -257 )
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
+#define CALIBRATIONX	1.0140
+#define CALIBRATIONY	1.0180
+#define CALIBRATIONZ	1.0156
+#endif //SN1
 
 #ifdef SN002
 #define CUSTOM_OFFSETS
@@ -92,22 +81,49 @@
 #define XRATE_OFFSET	( -48 )
 #define YRATE_OFFSET	( 25 )
 #define ZRATE_OFFSET	( -58 )
-#endif //LOW_RANGES
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#endif //SN2
+
+#ifdef SN003
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 158 )
+#define YACCEL_OFFSET	( -29 )
+#define ZACCEL_OFFSET	( -287 )
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#endif //SN3
 
 #ifdef UDB5_TEST_BOARD
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 549 )
 #define YACCEL_OFFSET	( -73 )
 #define ZACCEL_OFFSET	( 123 )
-//real offsets:
-#define XRATE_OFFSET	( -138 )
-#define YRATE_OFFSET	( 48 )
-#define ZRATE_OFFSET	( 24 )
-// fake offsets for testing 
-//#define XRATE_OFFSET	( 0 )
-//#define YRATE_OFFSET	( 0 )
-//#define ZRATE_OFFSET	( 0 )
+#define CALIBRATIONX	0.9999
+#define CALIBRATIONY	0.9999
+#define CALIBRATIONZ	0.9999
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
 #endif // UDB5
+
+#ifdef GYRO_CALIB
+#undef LOGGER_HZ
+#define LOGGER_HZ 10
+#endif // GYRO_CALIB
+
+#ifdef RECORD_OFFSETS
+#undef LOGGER_HZ
+#define LOGGER_HZ 10
+#ifndef ALWAYS_LOG
+#define ALWAYS_LOG
+#endif // ALWAYS_LOG
+#endif // RECORD_OFFSETS
 
 #define USE_PPM_INPUT						0
 #define PPM_NUMBER_OF_CHANNELS				8
@@ -175,3 +191,27 @@
 // Requires setting GPS_TYPE to GPS_UBX_4HZ.
 // See the MatrixPilot wiki for more info on using HILSIM.
 #define HILSIM 								0
+
+
+#define GNSS_HDOP_REQUIRED_FOR_STARTUP      200  //  Horizontal Dilution of Precision
+#define GNSS_VDOP_REQUIRED_FOR_STARTUP	    200  //  Vertical Dilution of Precision
+#define GNSS_SVS_REQUIRED_FOR_STARTUP	      4  //  Number of Sattelites in View
+#define CONSOLE_UART                        0
+////////////////////////////////////////////////////////////////////////////////
+// Use board orientation to change the mounting direction of the board.
+// The following 4 orientations have the board parallel with the ground.
+// ORIENTATION_FORWARDS:  Component-side up,   GPS connector front
+// ORIENTATION_BACKWARDS: Component-side up,   GPS connector back
+// ORIENTATION_INVERTED:  Component-side down, GPS connector front
+// ORIENTATION_FLIPPED:   Component-side down, GPS connector back
+// The following 2 orientations are "knife edge" mountings
+// ORIENTATION_ROLLCW: Rick's picture #9, board rolled 90 degrees clockwise,
+//		from point of view of the pilot
+// ORIENTATION_ROLLCW180: Rick's pitcure #11, board rolled 90 degrees clockwise,
+//		from point of view of the pilot, then rotate the board 180 around the Z axis of the plane,
+//		so that the GPS connector points toward the tail of the plane
+// ********** NOTE: orientations are withrespect to the front motor for + configuration,  *******
+// or with respect to left front motor, for X configuration
+
+#define BOARD_ORIENTATION					ORIENTATION_FORWARDS
+

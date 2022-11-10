@@ -78,7 +78,9 @@ extern fractional magAlignment[4];
 extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 extern uint16_t mission_time ;
 extern void compute_euler(void);
+extern void compute_bill_angles(void);
 extern float roll_angle , pitch_angle , yaw_angle ;
+extern float bill_angle_x , bill_angle_y , bill_angle_z ;
 extern int16_t omegacorrI[];
 extern uint16_t omega_magnitude ;
 
@@ -105,6 +107,7 @@ extern int16_t omega_scaled[];
 extern int16_t omega_yaw_drift[];
 void send_imu_data(void)
 {
+#ifndef ALWAYS_LOG
 	if (start_log == 1)
 	{
 		hasWrittenHeader = 0 ;
@@ -117,6 +120,10 @@ void send_imu_data(void)
 		stop_log = 0 ;
 		logging_on = 0 ;
 	}
+#else
+	logging_on = 1 ;
+#endif // not recording offsets
+	
 	if (logging_on == 0 ) return ;
 	db_index = 0 ;
 	
@@ -133,45 +140,55 @@ void send_imu_data(void)
 			}
 			break ;
 		
-		case 4:
+		case 3:
 			{
 				serial_output("in north-east-down body frame.\r\n") ;
 			}
 			break ;	
-		case 6:
+		case 4:
 			{
-				serial_output("specific forces in feet/sec^2.\r\n") ;
+				serial_output("specific forces in ft/s^2.\r\n") ;
 			}
 			break ;	
-		case 8:
+		case 5:
 			{
-				serial_output("CCW rotation rates in deg/sec.\r\n");
+				serial_output("CCW rotation rates in d/s.\r\n");
 			}
 			break ;	
-		case 10:
+		case 7:
 			{
 				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
-		case 12:
+		case 9:
 			{
 				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
 			}
 			break ;
+		case 11:
+			{
+				serial_output("Gyro calibrations, x, y, z = %6.4f,%6.4f,%6.4f\r\n", 
+						CALIBRATIONX ,CALIBRATIONY,CALIBRATIONZ );
+			
+			}
+			break ;		
+		case 13:
+			{
+				serial_output("tilt start, stop angles = %i,%i degrees\r\n", TILT_START , TILT_STOP);
+			}
+			break ;
 		case 14:
 			{
-				serial_output( "mems binary offsets = %i,%i,%i,%i,%i,%i\r\n",
+				serial_output( "accel binary offsets = %i,%i,%i\r\n",
 					XACCEL_OFFSET ,
 					YACCEL_OFFSET , 
-					ZACCEL_OFFSET ,
-					XRATE_OFFSET ,
-					YRATE_OFFSET ,
-					ZRATE_OFFSET );	
+					ZACCEL_OFFSET 
+					 );	
 			}
 			break;
 			case 15:
 			{
-				serial_output("data rate = %i records/sec\r\n", LOGGER_HZ );
+				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
 			}
 			break;
 		case 16:
@@ -183,15 +200,15 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef RECORD_OFFSETS
-				serial_output("x, y, z accel and gyro raw binary\r\n");
+				serial_output("x, y, z accel, raw binary\r\n");
 #endif // RECORD_OFFSETS
 				
 #ifdef TEST_LOGGER_HZ
 				serial_output("logger bandwidth test\r\n");
 #endif // TEST_LOGGER_HZ
-#ifdef LOG_RMAT
-				serial_output("rmat[6],rmat[7],rmat[8]\r\n") ;
-#endif // LOG_RMAT
+#ifdef GYRO_CALIB
+				serial_output("X, Y, Z calib angles\r\n") ;
+#endif // GYRO_CALIB
 			}
 			break ;	
 		case 18:
@@ -207,7 +224,8 @@ void send_imu_data(void)
 		{	
 			serial_output( "%i,%i,%i,%i,%i,%i\r\n" ,
 			udb_xaccel.value , udb_yaccel.value , udb_zaccel.value ,
-			udb_xrate.value , udb_yrate.value , udb_zrate.value ) ;
+			aero_force[0] , aero_force[1] ,aero_force[2]				
+			 ) ;
 		}
 #endif // RECORD_OFFSETS
 
@@ -238,39 +256,13 @@ void send_imu_data(void)
 		}				
 #endif // FULL_RECORD
 #endif // LOG_IMU
-#ifdef LOG_RMAT
-		{	compute_euler();
-			serial_output("%i , %6.1f , %6.1f , %6.1f\r\n", udb_cpu_load() , yaw_angle , pitch_angle , roll_angle);
-//			serial_output( "%i,%i,%i\r\n" ,
-//			rmat[6] , rmat[7] , rmat[8]) ;
-//			serial_output("%.1f,%.1f,%.1f\r\n" ,
-//				((double)(omegaAccum[0]))/GYRO_FACTOR ,
-//				((double)(omegaAccum[1]))/GYRO_FACTOR , 
-//				((double)(omegaAccum[2]))/GYRO_FACTOR ) ;
-//			serial_output( "%i,%i,%i,%i,%i,%i,%6.1f\r\n",
-//				aero_force[0] ,
-//				aero_force[1] ,
-//				aero_force[2] ,
-//				aero_force_filtered[0]._.W1 ,
-//				aero_force_filtered[1]._.W1 ,
-//				aero_force_filtered[2]._.W1 ,
-//					tilt_angle
-//					);
-//			serial_output("%i,%i,%i,%i,%i,%i,%i\r\n",
-//					omegacorrI[0],
-//					omegacorrI[1],
-//					omegacorrI[2],
-//					rmat[6],
-//					rmat[7],
-//					rmat[8],
-//					omega_magnitude
-//					omega_dot_rmat6 ,
-//					omega_yaw_drift[0],
-//					omega_yaw_drift[1],
-//					omega_yaw_drift[2]
-//					);
+#ifdef GYRO_CALIB
+
+		{	compute_bill_angles();
+			serial_output("%6.1f , %6.1f , %6.1f\r\n", bill_angle_x , bill_angle_y , bill_angle_z);
+
 		}	
-#endif // LOG_RMAT
+#endif // GYRO_CALIB
 	}
 	return ;
 }
