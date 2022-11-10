@@ -147,37 +147,48 @@ void send_imu_data(void)
 			break ;	
 		case 4:
 			{
-				serial_output("specific forces in ft/s^2.\r\n") ;
+#ifdef LOG_RATE
+				serial_output("gyro rate version\r\n");
+#endif // LOG_RATE
+				
+#ifdef LOG_EULER
+				serial_output("euler angle version\r\n");
+#endif // LOG_EULER
 			}
-			break ;	
+			break ;
 		case 5:
 			{
-				serial_output("CCW rotation rates in d/s.\r\n");
+				serial_output("specific forces in ft/s^2.\r\n") ;
 			}
 			break ;	
 		case 6:
 			{
+				serial_output("CCW rotation rates in d/s.\r\n");
+			}
+			break ;	
+		case 7:
+			{
 				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
-		case 8:
+		case 9:
 			{
 				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
 			}
 			break ;
-		case 10:
+		case 11:
 			{
 				serial_output("Gyro calibrations, x, y, z = %6.4f,%6.4f,%6.4f\r\n", 
 						CALIBRATIONX ,CALIBRATIONY,CALIBRATIONZ );
 			
 			}
 			break ;		
-		case 12:
+		case 13:
 			{
 				serial_output("tilt start, stop angles = %i,%i degrees\r\n", TILT_START , TILT_STOP);
 			}
 			break ;
-		case 14:
+		case 15:
 			{
 				serial_output( "accel binary offsets = %i,%i,%i\r\n",
 					XACCEL_OFFSET ,
@@ -186,12 +197,12 @@ void send_imu_data(void)
 					 );	
 			}
 			break;
-		case 15:
+		case 16:
 			{
 				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
 			}
 			break;
-		case 16:
+		case 17:
 			{
 #ifdef LOG_IMU
 #ifdef LOG_RATE
@@ -214,7 +225,7 @@ void send_imu_data(void)
 #endif // GYRO_CALIB
 			}
 			break ;	
-		case 18:
+		case 19:
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
