@@ -5,9 +5,11 @@
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
+#define LOG_VELOCITY
 
-//#define LOG_VELOCITY
+// options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
+//#define ALWAYS_SYNC_GYROS
 
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec

@@ -117,24 +117,33 @@ void send_imu_data(void)
 		header_line = 0 ;
 		start_log = 0 ;
 		logging_on = 1 ;
+#ifdef		ALWAYS_SYNC_GYROS
+		gyro_locking_on = 1 ;
+#else
+		gyro_locking_on = 0 ;
+#endif // ALWAYS_SYNC_GYROS	
 	}
 	if ( stop_log == 1)
 	{
 		stop_log = 0 ;
 		logging_on = 0 ;
+		gyro_locking_on = 1 ;
 	}
 	if (logging_on == 0 ) return ;
 #else
+	logging_on = 1 ;
 	if (start_log == 1)
 	{
 		start_log = 0 ;
-		logging_on = 1 ;
+#ifdef		ALWAYS_SYNC_GYROS
+		gyro_locking_on = 1 ;
+#else
 		gyro_locking_on = 0 ;
+#endif // ALWAYS_SYNC_GYROS	
 	}
 	if ( stop_log == 1)
 	{
 		stop_log = 0 ;
-		logging_on = 0 ;
 		gyro_locking_on = 1 ;
 	}
 #endif // ALWAYS_LOG
@@ -243,7 +252,7 @@ void send_imu_data(void)
 				serial_output("X, Y, Z calib angles\r\n") ;
 #endif // GYRO_CALIB
 #ifdef LOG_VELOCITY
-				serial_output( "log_on , wx, wy, wz, fx, fy, fz, gx, gy, gz, ax, ay, az\r\n");
+				serial_output( "gyro_sync , wx, wy, wz, fx, fy, fz, gx, gy, gz, ax, ay, az\r\n");
 #endif // LOG_VELOCITY
 			}
 			break ;	
@@ -321,7 +330,7 @@ void send_imu_data(void)
 #ifdef LOG_VELOCITY
 		{
 			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-					logging_on ,
+					gyro_locking_on ,
 					omegaAccum[0] , omegaAccum[1] , omegaAccum[2] ,
 					aero_force[0] , aero_force[1] ,aero_force[2] ,
 					gravity_estimate[0] , gravity_estimate[1] , gravity_estimate[2] ,
