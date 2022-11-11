@@ -6,12 +6,15 @@
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 
+//#define LOG_VELOCITY
+//#define ALWAYS_LOG
+
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
 //#define LOG_RATE
-//#define LOG_EULER
-#define LOG_RATE_AND_EULER
+#define LOG_EULER
+//#define LOG_RATE_AND_EULER
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
@@ -80,6 +83,10 @@
 #define CALIBRATIONX	1.0140
 #define CALIBRATIONY	1.0180
 #define CALIBRATIONZ	1.0156
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4089
+#define CAL_GRAV_Y	4088
+#define CAL_GRAV_Z	4162
 #endif //SN1
 
 #ifdef SN002
@@ -93,6 +100,10 @@
 #define CALIBRATIONX	1.0000
 #define CALIBRATIONY	1.0000
 #define CALIBRATIONZ	1.0000
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4096
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4096
 #endif //SN2
 
 #ifdef SN003
@@ -106,6 +117,10 @@
 #define CALIBRATIONX	1.0099
 #define CALIBRATIONY	1.0081
 #define CALIBRATIONZ	1.0022
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4103
+#define CAL_GRAV_Y	4082
+#define CAL_GRAV_Z	4174
 #endif //SN3
 
 #ifdef SN004
@@ -119,6 +134,10 @@
 #define CALIBRATIONX	1.0056
 #define CALIBRATIONY	1.0095
 #define CALIBRATIONZ	0.9969
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4123
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4198
 #endif //SN4
 
 #ifdef UDB5_TEST_BOARD

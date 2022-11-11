@@ -105,6 +105,9 @@ boolean logging_on = 0 ;
 extern int16_t omega_dot_rmat6 ;
 extern int16_t omega_scaled[];
 extern int16_t omega_yaw_drift[];
+extern int16_t gravity_estimate[];
+extern int16_t acceleration[];
+boolean gyro_locking_on = 1;
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
@@ -120,11 +123,21 @@ void send_imu_data(void)
 		stop_log = 0 ;
 		logging_on = 0 ;
 	}
-#else
-	logging_on = 1 ;
-#endif // not recording offsets
-	
 	if (logging_on == 0 ) return ;
+#else
+	if (start_log == 1)
+	{
+		start_log = 0 ;
+		logging_on = 1 ;
+		gyro_locking_on = 0 ;
+	}
+	if ( stop_log == 1)
+	{
+		stop_log = 0 ;
+		logging_on = 0 ;
+		gyro_locking_on = 1 ;
+	}
+#endif // ALWAYS_LOG
 	db_index = 0 ;
 	
 	if (!hasWrittenHeader)
@@ -229,6 +242,9 @@ void send_imu_data(void)
 #ifdef GYRO_CALIB
 				serial_output("X, Y, Z calib angles\r\n") ;
 #endif // GYRO_CALIB
+#ifdef LOG_VELOCITY
+				serial_output( "log_on , wx, wy, wz, fx, fy, fz, gx, gy, gz, ax, ay, az\r\n");
+#endif // LOG_VELOCITY
 			}
 			break ;	
 		case 19:
@@ -302,6 +318,17 @@ void send_imu_data(void)
 
 		}	
 #endif // GYRO_CALIB
+#ifdef LOG_VELOCITY
+		{
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+					logging_on ,
+					omegaAccum[0] , omegaAccum[1] , omegaAccum[2] ,
+					aero_force[0] , aero_force[1] ,aero_force[2] ,
+					gravity_estimate[0] , gravity_estimate[1] , gravity_estimate[2] ,
+					acceleration[0] , acceleration[1] , acceleration[2] 
+					);
+		}
+#endif // LOG_VELOCITY
 	}
 	return ;
 }

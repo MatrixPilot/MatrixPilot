@@ -123,6 +123,8 @@ static fractional declinationVector[2];
 union intbb dcm_declination_angle;
 #endif
 
+void estimate_velocity(void);
+
 void yaw_drift_reset(void)
 {
 	errorYawground[0] = errorYawground[1] = errorYawground[2] = 0; // turn off yaw drift
@@ -159,9 +161,10 @@ boolean first_accel = 1 ;
 inline void read_accel(void)
 {
 
-	gplane[0] = XACCEL_VALUE;
-	gplane[1] = YACCEL_VALUE;
-	gplane[2] = ZACCEL_VALUE;
+	gplane[0] = __builtin_divsd(__builtin_mulss(XACCEL_VALUE,CALIB_GRAVITY),CAL_GRAV_X);
+	gplane[1] = __builtin_divsd(__builtin_mulss(YACCEL_VALUE,CALIB_GRAVITY),CAL_GRAV_Y);
+	gplane[2] = __builtin_divsd(__builtin_mulss(ZACCEL_VALUE,CALIB_GRAVITY),CAL_GRAV_Z);
+	
 	aero_force[0] = - gplane[0] ;
 	aero_force[1] = - gplane[1] ;
 	aero_force[2] = - gplane[2] ;
@@ -340,10 +343,11 @@ int16_t omega_scaled[3] ;
 int16_t omega_yaw_drift[3] ;
 uint16_t omega_magnitude ;
 extern boolean logging_on ;
-#define MAX_OMEGA 1000
+#define MAX_OMEGA 500
+extern boolean gyro_locking_on ;
 static void roll_pitch_drift(void)
 {	
-	if(logging_on == 0) // this is where the logic goes to turn off compensation
+	if(gyro_locking_on == 1) // this is where the logic goes to turn off compensation
 	{
 		accelOn = 1 ;
 		int16_t gplane_nomalized[3] ;
@@ -429,6 +433,7 @@ void dcm_run_imu_step(void)
 	normalize();                // local
 	roll_pitch_drift();         // local
 	PI_feedback();              // local
+	estimate_velocity();
 }
 float roll_angle , pitch_angle , yaw_angle ;
 float bill_angle_x , bill_angle_y , bill_angle_z ;
@@ -466,5 +471,22 @@ void compute_bill_angles(void)
 	bill_angle_x = DEG_PER_RAD*atan2f(rmat_f[2],rmat_f[1]);
 	bill_angle_y = DEG_PER_RAD*atan2f(rmat_f[0],rmat_f[2]);
 	bill_angle_z = DEG_PER_RAD*atan2f(rmat_f[1],rmat_f[0]);
+}
+
+int16_t gravity_estimate[3];
+union longww gravity_long[3];
+int16_t acceleration[3];
+
+void estimate_velocity(void)
+{
+	gravity_long[0].WW= __builtin_mulss(rmat[6],2*CALIB_GRAVITY);
+	gravity_long[1].WW= __builtin_mulss(rmat[7],2*CALIB_GRAVITY);
+	gravity_long[2].WW= __builtin_mulss(rmat[8],2*CALIB_GRAVITY);
+	gravity_estimate[0] = gravity_long[0]._.W1 ;
+	gravity_estimate[1] = gravity_long[1]._.W1 ;
+	gravity_estimate[2] = gravity_long[2]._.W1 ;
+	acceleration[0] = gravity_estimate[0] + aero_force[0] ;
+	acceleration[1] = gravity_estimate[1] + aero_force[1] ;
+	acceleration[2] = gravity_estimate[2] + aero_force[2] ;
 }
 
