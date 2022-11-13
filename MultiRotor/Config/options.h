@@ -1,8 +1,8 @@
 
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
-//#define RECORD_OFFSETS
+//#define LOG_IMU
+#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -16,8 +16,9 @@
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
 //#define LOG_RATE
-#define LOG_EULER
+//#define LOG_EULER
 //#define LOG_RATE_AND_EULER
+//#define LOG_PITCH_AND_TWO_FORCES
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
@@ -27,7 +28,7 @@
 #define TILT_STOP	60
 
 //#define UDB5_TEST_BOARD
-#define SN001
+#define SN002
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
 #define SERIAL_NUMBERD2	4
@@ -94,12 +95,12 @@
 
 #ifdef SN002
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 161 )
-#define YACCEL_OFFSET	( -103 )
-#define ZACCEL_OFFSET	( 614 )
-#define XRATE_OFFSET	( -48 )
-#define YRATE_OFFSET	( 25 )
-#define ZRATE_OFFSET	( -58 )
+#define XACCEL_OFFSET	( 0 )
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
 #define CALIBRATIONX	1.0000
 #define CALIBRATIONY	1.0000
 #define CALIBRATIONZ	1.0000
@@ -178,6 +179,11 @@
 #undef LOGGER_HZ
 #define LOGGER_HZ 1
 #endif // TEST_GYRO_LOCK
+
+#ifdef LOG_PITCH_AND_TWO_FORCES
+#undef LOGGER_HZ
+#define LOGGER_HZ 200
+#endif // LOG_PITCH_AND_TWO_FORCES
 
 
 #define CONSOLE_UART            0
