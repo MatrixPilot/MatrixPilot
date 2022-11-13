@@ -1,10 +1,10 @@
 
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
+#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
-#define GYRO_CALIB
+//#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define TEST_GYRO_LOCK
 
@@ -83,9 +83,9 @@
 #define XRATE_OFFSET	( 0 )
 #define YRATE_OFFSET	( 0 )
 #define ZRATE_OFFSET	( 0 )
-#define CALIBRATIONX	1.0140
-#define CALIBRATIONY	1.0180
-#define CALIBRATIONZ	1.0156
+#define CALIBRATIONX	1.0159
+#define CALIBRATIONY	1.0100
+#define CALIBRATIONZ	1.0119
 #define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4089
 #define CAL_GRAV_Y	4088
