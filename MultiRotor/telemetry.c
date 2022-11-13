@@ -108,6 +108,8 @@ extern int16_t omega_yaw_drift[];
 extern int16_t gravity_estimate[];
 extern int16_t acceleration[];
 boolean gyro_locking_on = 1;
+extern int16_t errorYawplane[];
+extern int16_t errorRP[];
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
@@ -224,20 +226,29 @@ void send_imu_data(void)
 			break;
 		case 16:
 			{
-				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
+				serial_output( "accel binary calibrations = %i,%i,%i\r\n",
+					CAL_GRAV_X ,
+					CAL_GRAV_Y , 
+					CAL_GRAV_Z 
+					 );
 			}
 			break;
 		case 17:
+			{
+				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
+			}
+			break;
+		case 18:
 			{
 #ifdef LOG_IMU
 #ifdef LOG_RATE
 				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
 #endif // LOG_RATE
 #ifdef LOG_EULER
-				serial_output( "x_force , y , z , roll_angle , pitch , yaw\r\n" ) ;			
+				serial_output( "x_force , y , z , yaw_angle , pitch , roll\r\n" ) ;			
 #endif // LOG_EULER	
 #ifdef LOG_RATE_AND_EULER
-				serial_output( "x_rate , y_rate , z_rate , roll_angle , p_angle , y_angle\r\n" ) ;		
+				serial_output( "x_rate , y_rate , z_rate , yaw_angle , pitch , roll\r\n" ) ;		
 #endif // LOG_RATE_AND_EULER
 #endif // LOG_IMU
 				
@@ -254,9 +265,12 @@ void send_imu_data(void)
 #ifdef LOG_VELOCITY
 				serial_output( "gyro_sync , wx, wy, wz, fx, fy, fz, gx, gy, gz, ax, ay, az\r\n");
 #endif // LOG_VELOCITY
+#ifdef TEST_GYRO_LOCK
+				serial_output("o_dot_r6, errYx , errYy , errYz , errRPx , errRPy , errRPz , wx , wy , wz\r\n" );
+#endif // TEST_GYRO_LOCK
 			}
 			break ;	
-		case 19:
+		case 20:
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -306,7 +320,7 @@ void send_imu_data(void)
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
-				roll_angle , pitch_angle , yaw_angle ) ;	
+				yaw_angle ,  pitch_angle , roll_angle  ) ;	
 		}
 #endif // LOG_EULER
 #ifdef LOG_RATE_AND_EULER
@@ -316,7 +330,7 @@ void send_imu_data(void)
 				((double)(omegaAccum[0]))/GYRO_FACTOR ,
 				((double)(omegaAccum[1]))/GYRO_FACTOR , 
 				((double)(omegaAccum[2]))/GYRO_FACTOR ,
-				roll_angle , pitch_angle , yaw_angle ) ;	
+				yaw_angle ,  pitch_angle , roll_angle ) ;	
 		}
 #endif // LOG_RATE_AND_EULER
 #endif // LOG_IMU
@@ -331,13 +345,24 @@ void send_imu_data(void)
 		{
 			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 					gyro_locking_on ,
-					omegaAccum[0] , omegaAccum[1] , omegaAccum[2] ,
+					omegacorrI[0] , omegacorrI[1] , omegacorrI[2] ,
 					aero_force[0] , aero_force[1] ,aero_force[2] ,
 					gravity_estimate[0] , gravity_estimate[1] , gravity_estimate[2] ,
 					acceleration[0] , acceleration[1] , acceleration[2] 
 					);
 		}
 #endif // LOG_VELOCITY
+		
+#ifdef TEST_GYRO_LOCK
+		{
+			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+					omega_dot_rmat6 ,
+					errorYawplane[0] , errorYawplane[1] , errorYawplane[2] , 
+					errorRP[0] , errorRP[1] , errorRP[2] , 
+					omegaAccum[0] , omegaAccum[1] , omegaAccum[2] 
+					) ;
+		}
+#endif // 
 	}
 	return ;
 }

@@ -32,9 +32,11 @@ fractional ggain[] =  { GGAINX, GGAINY, GGAINZ };
 uint16_t spin_rate = 0;
 
 // the gains are constant because the gravity vector is normalized
-#define KPROLLPITCH ( 2*2048 )
-#define KIROLLPITCH ( (uint32_t) 4*2560 / (uint32_t) HEARTBEAT_HZ)
+//#define KPROLLPITCH ( 2*2048 )
+//#define KIROLLPITCH ( (uint32_t) 4*2560 / (uint32_t) HEARTBEAT_HZ)
 
+#define KPROLLPITCH ( 8*2048 )
+#define KIROLLPITCH ( (uint32_t) 64*2560 / (uint32_t) HEARTBEAT_HZ)
 
 //#define KPYAW ( 2*2048 )
 #define KPYAW ( 0 )
@@ -108,9 +110,9 @@ fractional dirOverGndHrmat[] = { 0, RMAX, 0 };
 //fractional rbuff[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 // vector buffer
-static fractional errorRP[] = { 0, 0, 0 };
-static fractional errorYawground[] = { 0, 0, 0 };
-static fractional errorYawplane[]  = { 0, 0, 0 };
+fractional errorRP[] = { 0, 0, 0 };
+fractional errorYawground[] = { 0, 0, 0 };
+fractional errorYawplane[]  = { 0, 0, 0 };
 
 // measure of error in orthogonality, used for debugging purposes:
 static fractional error = 0;
