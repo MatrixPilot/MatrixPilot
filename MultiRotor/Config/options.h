@@ -1,8 +1,8 @@
 
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
-#define RECORD_OFFSETS
+#define LOG_IMU
+//#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -18,7 +18,7 @@
 //#define LOG_RATE
 //#define LOG_EULER
 //#define LOG_RATE_AND_EULER
-//#define LOG_PITCH_AND_TWO_FORCES
+#define LOG_PITCH_AND_TWO_FORCES
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
@@ -95,19 +95,19 @@
 
 #ifdef SN002
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 0 )
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
+#define XACCEL_OFFSET	( 84 )
+#define YACCEL_OFFSET	( -48 )
+#define ZACCEL_OFFSET	( 248 )
 #define XRATE_OFFSET	( 0 )
 #define YRATE_OFFSET	( 0 )
 #define ZRATE_OFFSET	( 0 )
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define CALIBRATIONX	1.0389
+#define CALIBRATIONY	1.0389
+#define CALIBRATIONZ	1.0206
 #define CALIB_GRAVITY	4096
-#define CAL_GRAV_X	4096
-#define CAL_GRAV_Y	4096
-#define CAL_GRAV_Z	4096
+#define CAL_GRAV_X	4124
+#define CAL_GRAV_Y	4085
+#define CAL_GRAV_Z	4140
 #endif //SN2
 
 #ifdef SN003
