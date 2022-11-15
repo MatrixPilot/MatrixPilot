@@ -279,6 +279,9 @@ void send_imu_data(void)
 //				serial_output("gx,gy,gyz, gxfilt, gyfilt, gzfilt, ax, ay, az, axfilt, ayfilt, azfilt\r\n");
 				serial_output("cpu_load, gxfilt, gyfilt, gzfilt, gIx, gIy, gIz, errx, erry, errz\r\n");
 #endif // GYRO_DRIFT
+#ifdef ROAD_TEST
+		serial_output("gx,gy,gyz,ax,ay,az\r\n");
+#endif // ROAD_TEST
 			}
 			break ;	
 		case 20:
@@ -391,6 +394,20 @@ void send_imu_data(void)
 					);
 		
 #endif // GYRO_DRIFT
+
+#ifdef ROAD_TEST
+		serial_output("%i,%i,%i,%i,%i,%i\r\n",
+				omegagyro[0],
+				omegagyro[1],
+				omegagyro[2] ,
+				aero_force[0] ,
+				aero_force[1] ,
+				aero_force[2]  
+					);
+	
+#endif // GYRO_DRIFT
+
+
 #ifdef LOG_VELOCITY
 		{
 			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",

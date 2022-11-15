@@ -7,11 +7,12 @@
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define TEST_GYRO_LOCK
-#define GYRO_DRIFT
+//#define GYRO_DRIFT
+#define ROAD_TEST
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 #define ALWAYS_LOG
-#define ALWAYS_SYNC_GYROS
+//#define ALWAYS_SYNC_GYROS
 
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec
@@ -23,13 +24,13 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	1
+#define LOGGER_HZ	50
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
 #define TILT_STOP	600
 
 //#define UDB5_TEST_BOARD
-#define MINI5
+#define MINI6
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
 #define SERIAL_NUMBERD2	4
@@ -44,6 +45,13 @@
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5
+#ifdef MINI6
+#define SERIAL_NUMBERD1	6
+#define SERIAL_NUMBERD2	6
+#define SERIAL_NUMBERD3 6
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI6
 #ifdef SN003
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
@@ -169,6 +177,22 @@
 #define CAL_GRAV_Z	4096
 #endif // MINI5
 
+#ifdef MINI6
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 83 )
+#define YACCEL_OFFSET	( -15 )
+#define ZACCEL_OFFSET	( -16 )
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
+#define CALIBRATIONX	1.0088
+#define CALIBRATIONY	1.0099
+#define CALIBRATIONZ	1.0066
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4101
+#define CAL_GRAV_Y	4099
+#define CAL_GRAV_Z	4153
+#endif // MINI6
 #ifdef UDB5_TEST_BOARD
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 549 )
@@ -209,6 +233,13 @@
 #undef LOGGER_HZ
 #define LOGGER_HZ 200
 #endif // LOG_PITCH_AND_TWO_FORCES
+
+#ifdef ROAD_TEST
+#undef ALWAYS_LOG
+#undef LOGGER_HZ
+#define ALWAYS_LOG
+#define LOGGER_HZ 50
+#endif // ROAD_TEST
 
 
 #define CONSOLE_UART            0
