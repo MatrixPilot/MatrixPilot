@@ -143,21 +143,26 @@ void dcm_init_rmat(void)
 #endif
 }
 
+union longww omegagyro_filtered[] = { { 0 }, { 0 },  { 0 } };
+
+
 static inline void read_gyros(void)
 {
 	// fetch the gyro signals and subtract the baseline offset, 
 	// and adjust for variations in supply voltage
 	
-#if (HILSIM == 1)
-	HILSIM_set_omegagyro();
-//	omegagyro[0] = q_sim.BB;
-//	omegagyro[1] = p_sim.BB;
-//	omegagyro[2] = r_sim.BB;
-#else
+
 	omegagyro[0] = XRATE_VALUE;
 	omegagyro[1] = YRATE_VALUE;
 	omegagyro[2] = ZRATE_VALUE;
-#endif
+	union longww accum32 ;
+	
+	accum32._.W1 = omegagyro[0] ;
+	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>8) -((int32_t)(omegagyro_filtered[0].WW )>>12) ;
+	accum32._.W1 = omegagyro[1] ;
+	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>8) -((int32_t)(omegagyro_filtered[1].WW )>>12) ;
+	accum32._.W1 = omegagyro[2] ;
+	omegagyro_filtered[2].WW += ((int32_t)(accum32.WW)>>8) -((int32_t)(omegagyro_filtered[2].WW )>>12) ;
 }
 boolean first_accel = 1 ;
 inline void read_accel(void)

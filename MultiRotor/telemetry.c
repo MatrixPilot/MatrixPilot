@@ -83,6 +83,7 @@ extern float roll_angle , pitch_angle , yaw_angle ;
 extern float bill_angle_x , bill_angle_y , bill_angle_z ;
 extern int16_t omegacorrI[];
 extern uint16_t omega_magnitude ;
+extern union longww omegagyro_filtered[];
 
 /*void send_debug_line( void )
 {
@@ -274,6 +275,10 @@ void send_imu_data(void)
 #ifdef TEST_GYRO_LOCK
 				serial_output("o_dot_r6, errYx , errYy , errYz , errRPx , errRPy , errRPz , wx , wy , wz\r\n" );
 #endif // TEST_GYRO_LOCK
+#ifdef GYRO_DRIFT
+//				serial_output("gx,gy,gyz, gxfilt, gyfilt, gzfilt, ax, ay, az, axfilt, ayfilt, azfilt\r\n");
+				serial_output("cpu_load, gxfilt, gyfilt, gzfilt, gIx, gIy, gIz, errx, erry, errz\r\n");
+#endif // GYRO_DRIFT
 			}
 			break ;	
 		case 20:
@@ -356,6 +361,36 @@ void send_imu_data(void)
 
 		}	
 #endif // GYRO_CALIB
+#ifdef GYRO_DRIFT
+/*		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+				omegagyro[0],
+				omegagyro[1],
+				omegagyro[2] ,
+				omegagyro_filtered[0]._.W1 ,
+				omegagyro_filtered[1]._.W1 ,
+				omegagyro_filtered[2]._.W1 ,
+				aero_force[0] ,
+				aero_force[1] ,
+				aero_force[2] ,
+				aero_force_filtered[0]._.W1 ,
+				aero_force_filtered[1]._.W1 ,
+				aero_force_filtered[2]._.W1 
+					);*/
+		
+		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+				udb_cpu_load(),
+				omegagyro_filtered[0]._.W1 ,
+				omegagyro_filtered[1]._.W1 ,
+				omegagyro_filtered[2]._.W1 ,
+				omegacorrI[0] ,
+				omegacorrI[1] ,
+				omegacorrI[2] ,
+				errorRP[0] ,
+				errorRP[1] ,
+				errorRP[2]
+					);
+		
+#endif // GYRO_DRIFT
 #ifdef LOG_VELOCITY
 		{
 			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",

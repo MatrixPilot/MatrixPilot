@@ -1,16 +1,17 @@
 
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
+//#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define TEST_GYRO_LOCK
+#define GYRO_DRIFT
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
-//#define ALWAYS_LOG
-//#define ALWAYS_SYNC_GYROS
+#define ALWAYS_LOG
+#define ALWAYS_SYNC_GYROS
 
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec
@@ -18,17 +19,17 @@
 //#define LOG_RATE
 //#define LOG_EULER
 //#define LOG_RATE_AND_EULER
-#define LOG_PITCH_AND_TWO_FORCES
+//#define LOG_PITCH_AND_TWO_FORCES
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	100
+#define LOGGER_HZ	1
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
-#define TILT_STOP	60
+#define TILT_STOP	600
 
 //#define UDB5_TEST_BOARD
-#define SN002
+#define MINI5
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
 #define SERIAL_NUMBERD2	4
@@ -36,6 +37,13 @@
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // UDB5
+#ifdef MINI5
+#define SERIAL_NUMBERD1	1
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 0
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI5
 #ifdef SN003
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
@@ -143,6 +151,23 @@
 #define CAL_GRAV_Y	4096
 #define CAL_GRAV_Z	4198
 #endif //SN4
+
+#ifdef MINI5
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 0 )
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define XRATE_OFFSET	( 0 )
+#define YRATE_OFFSET	( 0 )
+#define ZRATE_OFFSET	( 0 )
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4096
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4096
+#endif // MINI5
 
 #ifdef UDB5_TEST_BOARD
 #define CUSTOM_OFFSETS
