@@ -280,7 +280,7 @@ void send_imu_data(void)
 				serial_output("cpu_load, gxfilt, gyfilt, gzfilt, gIx, gIy, gIz, errx, erry, errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef ROAD_TEST
-		serial_output("gx,gy,gyz,ax,ay,az\r\n");
+		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
 #endif // ROAD_TEST
 			}
 			break ;	
@@ -396,13 +396,17 @@ void send_imu_data(void)
 #endif // GYRO_DRIFT
 
 #ifdef ROAD_TEST
-		serial_output("%i,%i,%i,%i,%i,%i\r\n",
-				omegagyro[0],
-				omegagyro[1],
-				omegagyro[2] ,
+		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+				gyro_locking_on ,
+				omegaAccum[0],
+				omegaAccum[1],
+				omegaAccum[2] ,
 				aero_force[0] ,
 				aero_force[1] ,
-				aero_force[2]  
+				aero_force[2] ,
+				rmat[6] ,
+				rmat[7] ,
+				rmat[8] 
 					);
 	
 #endif // GYRO_DRIFT
