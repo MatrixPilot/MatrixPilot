@@ -277,7 +277,7 @@ void send_imu_data(void)
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
 //				serial_output("gx,gy,gyz, gxfilt, gyfilt, gzfilt, ax, ay, az, axfilt, ayfilt, azfilt\r\n");
-				serial_output("cpu_load, gxfilt, gyfilt, gzfilt, gIx, gIy, gIz, errx, erry, errz\r\n");
+				serial_output("synch, cpu_load, gxfilt, gyfilt, gzfilt, gIx, gIy, gIz, errx, erry, errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
@@ -380,7 +380,8 @@ void send_imu_data(void)
 				aero_force_filtered[2]._.W1 
 					);*/
 		
-		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+				gyro_locking_on ,
 				udb_cpu_load(),
 				omegagyro_filtered[0]._.W1 ,
 				omegagyro_filtered[1]._.W1 ,

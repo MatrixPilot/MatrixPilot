@@ -11,7 +11,7 @@
 //#define ROAD_TEST
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
-#define ALWAYS_LOG
+//#define ALWAYS_LOG
 //#define ALWAYS_SYNC_GYROS
 
 // for IMU log, there are two options related to the gyros. pick one or the other
@@ -221,9 +221,9 @@
 #undef ALWAYS_LOG
 #define ALWAYS_LOG
 #undef ALWAYS_SYNC_GYROS
-#define ALWAYS_SYNC_GYROS
+//#define ALWAYS_SYNC_GYROS
 #undef TILT_STOP
-#define TILT_STOP 500
+#define TILT_STOP 60
 #endif // GYRO_DRIFT
 
 #ifdef RECORD_OFFSETS
