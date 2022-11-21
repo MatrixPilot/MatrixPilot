@@ -86,7 +86,8 @@ fractional accelEarth[] = { 0, 0, 0 };
 //union longww accelEarthFiltered[] = { { 0 }, { 0 },  { 0 } };
 
 // correction vector integrators;
-static union longww gyroCorrectionIntegral[] =  { { 0 }, { 0 },  { 0 } };
+union longww gyroCorrectionIntegral[] =  { { 0 }, { 0 },  { 0 } };
+union longww gyro_fraction[] =  { { 0 }, { 0 },  { 0 } };
 
 // accumulator for computing adjusted omega:
 fractional omegaAccum[] = { 0, 0, 0 };
@@ -237,7 +238,24 @@ static void rupdate(void)
 
 	fractional rbuff[9];
 		
-	VectorAdd(3, omegaAccum, omegagyro, omegacorrI);
+//	VectorAdd(3, omegaAccum, omegagyro, omegacorrI);
+	
+	gyro_fraction[0]._.W1 = omegagyro[0] ;
+	gyro_fraction[1]._.W1 = omegagyro[1] ;
+	gyro_fraction[2]._.W1 = omegagyro[2] ;
+	
+	gyro_fraction[0].WW = gyro_fraction[0].WW + gyroCorrectionIntegral[0].WW ;
+	gyro_fraction[1].WW = gyro_fraction[1].WW + gyroCorrectionIntegral[1].WW ;
+	gyro_fraction[2].WW = gyro_fraction[2].WW + gyroCorrectionIntegral[2].WW ;
+	
+	omegaAccum[0] = gyro_fraction[0]._.W1 ;
+	omegaAccum[1] = gyro_fraction[1]._.W1 ;
+	omegaAccum[2] = gyro_fraction[2]._.W1 ;
+	
+	gyro_fraction[0]._.W1 = 0 ;
+	gyro_fraction[1]._.W1 = 0 ;
+	gyro_fraction[2]._.W1 = 0 ;
+	
 	VectorAdd(3, omega, omegaAccum, omegacorrP);
 	//	scale by the integration factors:
 	VectorMultiply(3, theta, omega, ggain); // Scalegain of 2
@@ -412,18 +430,18 @@ static void PI_feedback(void)
 	VectorAdd(3, omegacorrP, omegacorrP, errorRPScaled);
 
 	{	
-		gyroCorrectionIntegral[0].WW += (__builtin_mulsu(errorRP[0], KIROLLPITCH)>>3);
-		gyroCorrectionIntegral[1].WW += (__builtin_mulsu(errorRP[1], KIROLLPITCH)>>3);
-		gyroCorrectionIntegral[2].WW += (__builtin_mulsu(errorRP[2], KIROLLPITCH)>>3);
+		gyroCorrectionIntegral[0].WW += (__builtin_mulsu(errorRP[0], KIROLLPITCH)>>6);
+		gyroCorrectionIntegral[1].WW += (__builtin_mulsu(errorRP[1], KIROLLPITCH)>>6);
+		gyroCorrectionIntegral[2].WW += (__builtin_mulsu(errorRP[2], KIROLLPITCH)>>6);
 
-		gyroCorrectionIntegral[0].WW += (__builtin_mulsu(errorYawplane[0], KIYAW)>>3);
-		gyroCorrectionIntegral[1].WW += (__builtin_mulsu(errorYawplane[1], KIYAW)>>3);
-		gyroCorrectionIntegral[2].WW += (__builtin_mulsu(errorYawplane[2], KIYAW)>>3);
+		gyroCorrectionIntegral[0].WW += (__builtin_mulsu(errorYawplane[0], KIYAW)>>6);
+		gyroCorrectionIntegral[1].WW += (__builtin_mulsu(errorYawplane[1], KIYAW)>>6);
+		gyroCorrectionIntegral[2].WW += (__builtin_mulsu(errorYawplane[2], KIYAW)>>6);
 	}
 
-	omegacorrI[0] = gyroCorrectionIntegral[0]._.W1>>3;
-	omegacorrI[1] = gyroCorrectionIntegral[1]._.W1>>3;
-	omegacorrI[2] = gyroCorrectionIntegral[2]._.W1>>3;
+	omegacorrI[0] = gyroCorrectionIntegral[0]._.W1;
+	omegacorrI[1] = gyroCorrectionIntegral[1]._.W1;
+	omegacorrI[2] = gyroCorrectionIntegral[2]._.W1;
 }
 
 void dcm_run_imu_step(void)
