@@ -36,6 +36,7 @@ uint16_t spin_rate = 0;
 //#define KIROLLPITCH ( (uint32_t) 4*2560 / (uint32_t) HEARTBEAT_HZ)
 
 #define KPROLLPITCH ( 8*2048 )
+//#define KPROLLPITCH ( 2048 )
 #define KIROLLPITCH ( (uint32_t) 64*2560 / (uint32_t) HEARTBEAT_HZ)
 
 //#define KPYAW ( 2*2048 )
@@ -146,7 +147,7 @@ void dcm_init_rmat(void)
 
 union longww omegagyro_filtered[] = { { 0 }, { 0 },  { 0 } };
 
-
+extern int16_t accelOn ;
 static inline void read_gyros(void)
 {
 	// fetch the gyro signals and subtract the baseline offset, 
@@ -158,12 +159,15 @@ static inline void read_gyros(void)
 	omegagyro[2] = ZRATE_VALUE;
 	union longww accum32 ;
 	
-	accum32._.W1 = omegagyro[0] ;
-	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>8) -((int32_t)(omegagyro_filtered[0].WW )>>12) ;
-	accum32._.W1 = omegagyro[1] ;
-	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>8) -((int32_t)(omegagyro_filtered[1].WW )>>12) ;
-	accum32._.W1 = omegagyro[2] ;
-	omegagyro_filtered[2].WW += ((int32_t)(accum32.WW)>>8) -((int32_t)(omegagyro_filtered[2].WW )>>12) ;
+	if (accelOn == 1)
+	{
+	accum32._.W1 = -omegagyro[0] ;
+	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>14) -((int32_t)(omegagyro_filtered[0].WW )>>14) ;
+	accum32._.W1 = -omegagyro[1] ;
+	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>14) -((int32_t)(omegagyro_filtered[1].WW )>>14) ;
+	accum32._.W1 = -omegagyro[2] ;
+	omegagyro_filtered[2].WW += ((int32_t)(accum32.WW)>>14) -((int32_t)(omegagyro_filtered[2].WW )>>14) ;
+	}
 }
 boolean first_accel = 1 ;
 inline void read_accel(void)
@@ -244,9 +248,18 @@ static void rupdate(void)
 	gyro_fraction[1]._.W1 = omegagyro[1] ;
 	gyro_fraction[2]._.W1 = omegagyro[2] ;
 	
-	gyro_fraction[0].WW = gyro_fraction[0].WW + gyroCorrectionIntegral[0].WW ;
-	gyro_fraction[1].WW = gyro_fraction[1].WW + gyroCorrectionIntegral[1].WW ;
-	gyro_fraction[2].WW = gyro_fraction[2].WW + gyroCorrectionIntegral[2].WW ;
+	if (accelOn == 1 )
+	{
+		gyro_fraction[0].WW = gyro_fraction[0].WW + gyroCorrectionIntegral[0].WW ;
+		gyro_fraction[1].WW = gyro_fraction[1].WW + gyroCorrectionIntegral[1].WW ;
+		gyro_fraction[2].WW = gyro_fraction[2].WW + gyroCorrectionIntegral[2].WW ;
+	}
+	else
+	{
+		gyro_fraction[0].WW = gyro_fraction[0].WW + omegagyro_filtered[0].WW ;	
+		gyro_fraction[1].WW = gyro_fraction[1].WW + omegagyro_filtered[1].WW ;
+		gyro_fraction[2].WW = gyro_fraction[2].WW + omegagyro_filtered[2].WW ;
+	}
 	
 	omegaAccum[0] = gyro_fraction[0]._.W1 ;
 	omegaAccum[1] = gyro_fraction[1]._.W1 ;
@@ -368,27 +381,52 @@ int16_t omega_scaled[3] ;
 int16_t omega_yaw_drift[3] ;
 uint16_t omega_magnitude ;
 extern boolean logging_on ;
-#define MAX_OMEGA 200
+#if (GYRO_RANGE==1000)
+#define MAX_OMEGA 50
+#elif (GYRO_RANGE==500)
+#define MAX_OMEGA 100
+#else
+#error "invalid GYRO_RANGE"
+#endif // GYRO_RANGE
+#if (ACCEL_RANGE==8)
+#define MAX_ACCEL 100
+#elif (ACCEL_RANGE==4)
+#define MAX_ACCEL 1024
+#else
+#error "invalid ACCEL_RANGE"
+#endif //ACCEL_RANGE
 extern boolean gyro_locking_on ;
+int16_t motion_reset_counter = 500 ;
+int16_t motion_detect = 1 ;
 static void roll_pitch_drift(void)
 {	
-	omega_magnitude = vector3_mag(omegagyro[0],omegagyro[1],omegagyro[2]);
-	if((gyro_locking_on == 1)|| (omega_magnitude<MAX_OMEGA ))
+	omega_magnitude = vector3_mag(omegagyro[0],omegagyro[1],0); // z has large drift, x and y are more stable
+	if(omega_magnitude<MAX_OMEGA )	
+	{
+		if (motion_reset_counter == 0 )
+		{
+			motion_detect = 0 ;
+		}
+		else
+		{
+			motion_reset_counter = motion_reset_counter - 1;
+		}
+	}
+	else
+	{
+		motion_reset_counter = 500 ;
+		motion_detect = 1 ;
+	}
+	if((gyro_locking_on == 1)&&(motion_detect == 0))
 	{
 		accelOn = 1 ;
 		int16_t gplane_nomalized[3] ;
 		vector3_normalize( gplane_nomalized , gplane ) ;
 		VectorCross(errorRP, gplane_nomalized, &rmat[6]);
 		
-		omega_scaled[0] = (omegaAccum[0])<<4 ;
-		omega_scaled[1] = (omegaAccum[1])<<4 ;
-		omega_scaled[2] = (omegaAccum[2])<<4 ;
-		omega_dot_rmat6 = 2*VectorDotProduct(3,omega_scaled, &rmat[6]);
-		VectorScale(3,omega_yaw_drift,&rmat[6],- omega_dot_rmat6);
-		
-		errorYawplane[0] = 2*omega_yaw_drift[0] ;
-		errorYawplane[1] = 2*omega_yaw_drift[1] ;
-		errorYawplane[2] = 2*omega_yaw_drift[2] ;
+		errorYawplane[0] = 0 ;
+		errorYawplane[1] = 0 ;
+		errorYawplane[2] = 0 ;
 	}
 	else
 	{

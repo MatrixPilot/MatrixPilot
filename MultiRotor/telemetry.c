@@ -109,8 +109,10 @@ extern int16_t omega_yaw_drift[];
 extern int16_t gravity_estimate[];
 extern int16_t acceleration[];
 boolean gyro_locking_on = 1;
+extern int16_t accelOn ;
 extern int16_t errorYawplane[];
 extern int16_t errorRP[];
+extern union longww gyroCorrectionIntegral[];
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
@@ -277,7 +279,7 @@ void send_imu_data(void)
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
 //				serial_output("gx,gy,gyz, gxfilt, gyfilt, gzfilt, ax, ay, az, axfilt, ayfilt, azfilt\r\n");
-				serial_output("synch, cpu_load, gxfilt, gyfilt, gzfilt, gIx, gIy, gIz, errx, erry, errz\r\n");
+				serial_output("synch, cpu_load, rm6, rm7, rm8, gxlp, gylp, gzlp, errx, erry, errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
@@ -381,14 +383,14 @@ void send_imu_data(void)
 					);*/
 		
 		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-				gyro_locking_on ,
+				accelOn ,
 				udb_cpu_load(),
-				omegagyro_filtered[0]._.W1 ,
-				omegagyro_filtered[1]._.W1 ,
-				omegagyro_filtered[2]._.W1 ,
-				omegacorrI[0] ,
-				omegacorrI[1] ,
-				omegacorrI[2] ,
+				rmat[6] ,
+				rmat[7] ,
+				rmat[8] ,
+				(int16_t)((omegagyro_filtered[0].WW)>>12) ,
+				(int16_t)((omegagyro_filtered[1].WW)>>12) ,
+				(int16_t)((omegagyro_filtered[2].WW)>>12) ,
 				errorRP[0] ,
 				errorRP[1] ,
 				errorRP[2]
