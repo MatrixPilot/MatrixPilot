@@ -162,11 +162,11 @@ static inline void read_gyros(void)
 	if (accelOn == 1)
 	{
 	accum32._.W1 = -omegagyro[0] ;
-	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>14) -((int32_t)(omegagyro_filtered[0].WW )>>14) ;
+	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>13) -((int32_t)(omegagyro_filtered[0].WW )>>13) ;
 	accum32._.W1 = -omegagyro[1] ;
-	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>14) -((int32_t)(omegagyro_filtered[1].WW )>>14) ;
+	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>13) -((int32_t)(omegagyro_filtered[1].WW )>>13) ;
 	accum32._.W1 = -omegagyro[2] ;
-	omegagyro_filtered[2].WW += ((int32_t)(accum32.WW)>>14) -((int32_t)(omegagyro_filtered[2].WW )>>14) ;
+	omegagyro_filtered[2].WW += ((int32_t)(accum32.WW)>>13) -((int32_t)(omegagyro_filtered[2].WW )>>13) ;
 	}
 }
 boolean first_accel = 1 ;
@@ -388,20 +388,15 @@ extern boolean logging_on ;
 #else
 #error "invalid GYRO_RANGE"
 #endif // GYRO_RANGE
-#if (ACCEL_RANGE==8)
-#define MAX_ACCEL 100
-#elif (ACCEL_RANGE==4)
-#define MAX_ACCEL 1024
-#else
-#error "invalid ACCEL_RANGE"
-#endif //ACCEL_RANGE
+#
 extern boolean gyro_locking_on ;
 int16_t motion_reset_counter = 500 ;
 int16_t motion_detect = 1 ;
 static void roll_pitch_drift(void)
 {	
+	uint16_t accel_magnitude = vector3_mag(gplane[0],gplane[1],gplane[2]);
 	omega_magnitude = vector3_mag(omegagyro[0],omegagyro[1],0); // z has large drift, x and y are more stable
-	if(omega_magnitude<MAX_OMEGA )	
+	if((omega_magnitude<MAX_OMEGA )	&& (abs(accel_magnitude-CALIB_GRAVITY/2)<CALIB_GRAVITY/8))
 	{
 		if (motion_reset_counter == 0 )
 		{
