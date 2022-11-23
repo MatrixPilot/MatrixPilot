@@ -47,6 +47,16 @@ int16_t GetAofA(void)
 	return angleOfAttack;
 }
 
+void offsets_init(void)
+{
+	
+	udb_xaccel.offset = XACCEL_OFFSET ;
+	udb_yaccel.offset = YACCEL_OFFSET ;
+	udb_zaccel.offset = ZACCEL_OFFSET ;
+	udb_xrate.offset  = XRATE_OFFSET;
+	udb_yrate.offset  = YRATE_OFFSET;
+	udb_zrate.offset  = ZRATE_OFFSET;
+}
 void dcm_init(void)
 {
 	dcm_flags.W = 0;
@@ -175,11 +185,7 @@ void udb_heartbeat_callback(void)
 // and 2nd time is at a time the user knows to keep the plane steady before a flight.
 void dcm_calibrate(void)
 {
-	// Don't allow re/calibrating before the initial calibration period has finished
-	if (dcm_flags._.calib_finished)
-	{
-		udb_a2d_record_offsets();
-	}
+	
 }
 
 void dcm_set_origin_location(int32_t o_lon, int32_t o_lat, int32_t o_alt)

@@ -147,6 +147,8 @@ void dcm_init_rmat(void)
 
 union longww omegagyro_filtered[] = { { 0 }, { 0 },  { 0 } };
 
+#define GYRO_FILTER_SHIFT 12
+
 extern int16_t accelOn ;
 static inline void read_gyros(void)
 {
@@ -162,11 +164,11 @@ static inline void read_gyros(void)
 	if (accelOn == 1)
 	{
 	accum32._.W1 = -omegagyro[0] ;
-	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>13) -((int32_t)(omegagyro_filtered[0].WW )>>13) ;
+	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>GYRO_FILTER_SHIFT) -((int32_t)(omegagyro_filtered[0].WW )>>GYRO_FILTER_SHIFT) ;
 	accum32._.W1 = -omegagyro[1] ;
-	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>13) -((int32_t)(omegagyro_filtered[1].WW )>>13) ;
+	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>GYRO_FILTER_SHIFT) -((int32_t)(omegagyro_filtered[1].WW )>>GYRO_FILTER_SHIFT) ;
 	accum32._.W1 = -omegagyro[2] ;
-	omegagyro_filtered[2].WW += ((int32_t)(accum32.WW)>>13) -((int32_t)(omegagyro_filtered[2].WW )>>13) ;
+	omegagyro_filtered[2].WW += ((int32_t)(accum32.WW)>>GYRO_FILTER_SHIFT) -((int32_t)(omegagyro_filtered[2].WW )>>GYRO_FILTER_SHIFT) ;
 	}
 }
 boolean first_accel = 1 ;

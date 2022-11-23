@@ -41,12 +41,14 @@ boolean didCalibrate = 0 ;
 void send_debug_line( int8_t differential_flag , uint16_t sats , int32_t lat , int32_t lon , int32_t alt , int16_t sog , int16_t  cog , int16_t climb ) ;
 void send_imu_data(void);
 void motorCntrl( void ) ;
+void offsets_init(void) ;
 
 const int max_tilt = 0 ;  // maximum tilt in byte cicular
 int commanded_tilt_gain ;
 
 int main (void)
 {
+	offsets_init();
 	// Set up the libraries
 	if ( GPS_TYPE != GPS_NONE)
 	{

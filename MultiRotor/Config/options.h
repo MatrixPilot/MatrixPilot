@@ -5,9 +5,9 @@
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
-//#define LOG_VELOCITY
+#define LOG_VELOCITY
 //#define TEST_GYRO_LOCK
-#define GYRO_DRIFT
+//#define GYRO_DRIFT
 //#define ROAD_TEST
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
@@ -19,12 +19,12 @@
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
 //#define LOG_RATE
 //#define LOG_EULER
-#define LOG_RATE_AND_EULER
+//#define LOG_RATE_AND_EULER
 //#define LOG_PITCH_AND_TWO_FORCES
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	4
+#define LOGGER_HZ	20
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
 #define TILT_STOP	600
@@ -182,9 +182,9 @@
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -15 )
 #define ZACCEL_OFFSET	( -16 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
+#define XRATE_OFFSET	( 6 )
+#define YRATE_OFFSET	( -6 )
+#define ZRATE_OFFSET	( -26 )
 #define CALIBRATIONX	1.0109
 #define CALIBRATIONY	1.0171
 #define CALIBRATIONZ	1.0066
@@ -233,6 +233,12 @@
 #define ALWAYS_LOG
 #endif // ALWAYS_LOG
 #endif // RECORD_OFFSETS
+
+#ifdef LOG_VELOCITY
+#undef LOGGER_HZ
+#define LOGGER_HZ 20
+#undef ALWAYS_LOG
+#endif // LOG_VELOCITY
 
 #ifdef TEST_GYRO_LOCK 
 #define ALWAYS_SYNC_GYROS
