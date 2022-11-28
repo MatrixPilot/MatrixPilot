@@ -212,16 +212,21 @@ void send_imu_data(void)
 		case 11:
 			{
 				serial_output("Gyro calibrations, x, y, z = %6.4f,%6.4f,%6.4f\r\n", 
-						CALIBRATIONX ,CALIBRATIONY,CALIBRATIONZ );
-			
+						CALIBRATIONX ,CALIBRATIONY,CALIBRATIONZ );		
 			}
-			break ;		
+			break ;
 		case 13:
+			{
+				serial_output("Initial x, y, z binary gyro offsets = %i,%i,%i\r\n", 
+						XRATE_OFFSET , YRATE_OFFSET, ZRATE_OFFSET );		
+			}
+			break ;
+		case 15:
 			{
 				serial_output("tilt start, stop angles = %i,%i degrees\r\n", TILT_START , TILT_STOP);
 			}
 			break ;
-		case 15:
+		case 17:
 			{
 				serial_output( "accel binary offsets = %i,%i,%i\r\n",
 					XACCEL_OFFSET ,
@@ -230,7 +235,7 @@ void send_imu_data(void)
 					 );	
 			}
 			break;
-		case 16:
+		case 18:
 			{
 				serial_output( "accel binary calibrations = %i,%i,%i\r\n",
 					CAL_GRAV_X ,
@@ -239,12 +244,12 @@ void send_imu_data(void)
 					 );
 			}
 			break;
-		case 17:
+		case 19:
 			{
 				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
 			}
 			break;
-		case 18:
+		case 20:
 			{
 #ifdef LOG_IMU
 #ifdef LOG_RATE
@@ -286,7 +291,7 @@ void send_imu_data(void)
 #endif // ROAD_TEST
 			}
 			break ;	
-		case 20:
+		case 22:
 			hasWrittenHeader = 1 ;
 			break ;
 		default:
@@ -333,7 +338,7 @@ void send_imu_data(void)
 #ifdef LOG_EULER
 		{
 			compute_euler();
-			serial_output( "%.1f,%.1f,%.1f,%.1f , %.1f , %.1f\r\n" ,
+			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
@@ -343,7 +348,7 @@ void send_imu_data(void)
 #ifdef LOG_RATE_AND_EULER
 		{
 			compute_euler();
-			serial_output( "%.1f,%.1f,%.1f,%.1f , %.1f , %.1f\r\n" ,
+			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
 				((double)(omegaAccum[0]))/GYRO_FACTOR ,
 				((double)(omegaAccum[1]))/GYRO_FACTOR , 
 				((double)(omegaAccum[2]))/GYRO_FACTOR ,
@@ -353,7 +358,7 @@ void send_imu_data(void)
 #ifdef LOG_PITCH_AND_TWO_FORCES
 		{
 			compute_euler();
-			serial_output( "%.1f , %.1f , %.1f\r\n" ,
+			serial_output( "%.1f,%.1f,%.1f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
 				pitch_angle   ) ;	
@@ -363,7 +368,7 @@ void send_imu_data(void)
 #ifdef GYRO_CALIB
 
 		{	compute_bill_angles();
-			serial_output("%6.1f , %6.1f , %6.1f\r\n", bill_angle_x , bill_angle_y , bill_angle_z);
+			serial_output("%6.1f,%6.1f,%6.1f\r\n", bill_angle_x , bill_angle_y , bill_angle_z);
 
 		}	
 #endif // GYRO_CALIB
