@@ -1,10 +1,10 @@
 
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
+//#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
-//#define GYRO_CALIB
+#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define TEST_GYRO_LOCK
 //#define GYRO_DRIFT
@@ -20,17 +20,17 @@
 //#define LOG_RATE
 //#define LOG_EULER
 //#define LOG_RATE_AND_EULER
-#define LOG_PITCH_AND_TWO_FORCES
+//#define LOG_PITCH_AND_TWO_FORCES
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	200
+#define LOGGER_HZ	4
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
-#define TILT_STOP	60
+#define TILT_STOP	600
 
 //#define UDB5_TEST_BOARD
-#define MINI6_SN5
+#define MINI6_SN6
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
 #define SERIAL_NUMBERD2	4
@@ -49,6 +49,13 @@
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 5
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI6_SN5
+#ifdef MINI6_SN6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 6
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI6_SN5
@@ -193,6 +200,22 @@
 #define CAL_GRAV_Y	4099
 #define CAL_GRAV_Z	4153
 #endif // MINI6_SN5
+#ifdef MINI6_SN6
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 90 )
+#define YACCEL_OFFSET	( -45 )
+#define ZACCEL_OFFSET	( 37 )
+#define XRATE_OFFSET	( 21 )
+#define YRATE_OFFSET	( 22 )
+#define ZRATE_OFFSET	( 2 )
+#define CALIBRATIONX	1.0141
+#define CALIBRATIONY	1.0056
+#define CALIBRATIONZ	1.0127
+#define CALIB_GRAVITY	4048
+#define CAL_GRAV_X	4102
+#define CAL_GRAV_Y	4104
+#define CAL_GRAV_Z	4112
+#endif // MINI6_SN6
 #ifdef UDB5_TEST_BOARD
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 549 )
