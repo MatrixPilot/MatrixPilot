@@ -201,6 +201,11 @@ void send_imu_data(void)
 			break ;	
 		case 7:
 			{
+				serial_output( BOARD );
+			}
+		break ;
+		case 8:
+			{
 				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
@@ -280,11 +285,11 @@ void send_imu_data(void)
 				serial_output( "gyro_sync , wx, wy, wz, fx, fy, fz, gx, gy, gz, ax, ay, az\r\n");
 #endif // LOG_VELOCITY
 #ifdef TEST_GYRO_LOCK
-				serial_output("o_dot_r6, errYx , errYy , errYz , errRPx , errRPy , errRPz , wx , wy , wz\r\n" );
+				serial_output("o_dot_r6,errYx,errYy,errYz,errRPx,errRPy,errRPz,wx,wy,wz\r\n" );
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
-//				serial_output("gx,gy,gyz, gxfilt, gyfilt, gzfilt, ax, ay, az, axfilt, ayfilt, azfilt\r\n");
-				serial_output("synch, cpu_load, rm6, rm7, rm8, gx, gy, gz, gxlp, gylp, gzlp, errx, erry, errz\r\n");
+//				serial_output("gx,gy,gyz,gxfilt,gyfilt,gzfilt,ax,ay,az,axfilt,ayfilt,azfilt\r\n");
+				serial_output("synch,cpu_load,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
@@ -387,13 +392,11 @@ void send_imu_data(void)
 				aero_force_filtered[1]._.W1 ,
 				aero_force_filtered[2]._.W1 
 					);*/
-		
-		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+		compute_euler();
+		serial_output("%i,%i,%.1f,%.1f,%.1f,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 				accelOn ,
 				udb_cpu_load(),
-				rmat[6] ,
-				rmat[7] ,
-				rmat[8] ,
+				yaw_angle , pitch_angle , roll_angle ,
 				omegagyro[0],
 				omegagyro[1],
 				omegagyro[2],
