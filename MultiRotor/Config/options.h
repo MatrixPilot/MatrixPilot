@@ -3,12 +3,12 @@
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
-#define RECORD_OFFSETS
+//#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define TEST_GYRO_LOCK
-//#define GYRO_DRIFT
+#define GYRO_DRIFT
 //#define ROAD_TEST
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
@@ -254,19 +254,19 @@
 
 #ifdef MINI6_SN7
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 0 )
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define XACCEL_OFFSET	( 58 )
+#define YACCEL_OFFSET	( -34 )
+#define ZACCEL_OFFSET	( -77 )
+#define XRATE_OFFSET	( 10 )
+#define YRATE_OFFSET	( 6 )
+#define ZRATE_OFFSET	( 78 )
+#define CALIBRATIONX	1.0135
+#define CALIBRATIONY	1.0009
+#define CALIBRATIONZ	1.0067
 #define CALIB_GRAVITY	4048
-#define CAL_GRAV_X	4048
-#define CAL_GRAV_Y	4048
-#define CAL_GRAV_Z	4048
+#define CAL_GRAV_X	4100
+#define CAL_GRAV_Y	4104
+#define CAL_GRAV_Z	4148
 #endif // MINI6_SN7
 
 #ifdef MINI6_SN8
