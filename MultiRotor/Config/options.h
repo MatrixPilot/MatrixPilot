@@ -7,7 +7,6 @@
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
-//#define TEST_GYRO_LOCK
 #define GYRO_DRIFT
 //#define ROAD_TEST
 
@@ -30,7 +29,7 @@
 #define TILT_START	15
 #define TILT_STOP	600
 
-#define MINI6_SN7
+#define MINI6_SN8
 
 #ifdef UDB5_TEST_BOARD
 #define SERIAL_NUMBERD1	3
@@ -270,19 +269,19 @@
 #endif // MINI6_SN7
 
 #ifdef MINI6_SN8
-#define XACCEL_OFFSET	( 0 )
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define XACCEL_OFFSET	( 83 )
+#define YACCEL_OFFSET	( -50 )
+#define ZACCEL_OFFSET	( -21 )
+#define XRATE_OFFSET	( 8 )
+#define YRATE_OFFSET	( 25 )
+#define ZRATE_OFFSET	( 41 )
+#define CALIBRATIONX	1.0112
+#define CALIBRATIONY	1.0043
+#define CALIBRATIONZ	1.0067
 #define CALIB_GRAVITY	4048
-#define CAL_GRAV_X	4048
-#define CAL_GRAV_Y	4048
-#define CAL_GRAV_Z	4048
+#define CAL_GRAV_X	4105
+#define CAL_GRAV_Y	4098
+#define CAL_GRAV_Z	4122
 #endif // MINI6_SN8
 
 #ifdef UDB5_TEST_BOARD
