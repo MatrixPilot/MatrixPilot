@@ -113,6 +113,11 @@ extern int16_t accelOn ;
 extern int16_t errorYawplane[];
 extern int16_t errorRP[];
 extern union longww gyroCorrectionIntegral[];
+extern float aero_force_float[];
+extern float gravity_float[];
+extern float acceleration_float[];
+extern float omegaAccum_float[];
+extern float velocity ;
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
@@ -282,7 +287,7 @@ void send_imu_data(void)
 				serial_output("X, Y, Z calib angles\r\n") ;
 #endif // GYRO_CALIB
 #ifdef LOG_VELOCITY
-				serial_output( "gyro_sync , wx, wy, wz, fx, fy, fz, gx, gy, gz, ax, ay, az\r\n");
+				serial_output( "gyro_sync,cpu,wx,wy,wz,fx,fy,fz,gx,gy,gz,ax,ay,az,vel\r\n");
 #endif // LOG_VELOCITY
 #ifdef TEST_GYRO_LOCK
 				serial_output("o_dot_r6,errYx,errYy,errYz,errRPx,errRPy,errRPz,wx,wy,wz\r\n" );
@@ -429,14 +434,14 @@ void send_imu_data(void)
 
 #ifdef LOG_VELOCITY
 		{
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-					accelOn ,
-					omegagyro_filtered[0]._.W1 ,
-					omegagyro_filtered[1]._.W1 , 
-					omegagyro_filtered[2]._.W1 ,
-					aero_force[0] , aero_force[1] ,aero_force[2] ,
-					gravity_estimate[0] , gravity_estimate[1] , gravity_estimate[2] ,
-					acceleration[0] , acceleration[1] , acceleration[2] 
+			serial_output("%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+					accelOn , udb_cpu_load() ,
+					omegaAccum_float[0] ,
+					omegaAccum_float[1] , 
+					omegaAccum_float[2] ,
+					aero_force_float[0] , aero_force_float[1] , aero_force_float[2] ,
+					gravity_float[0] , gravity_float[1] , gravity_float[2] ,
+					acceleration_float[0] , acceleration_float[1] , acceleration_float[2] , velocity 
 					);
 		}
 #endif // LOG_VELOCITY

@@ -6,8 +6,8 @@
 //#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
-//#define LOG_VELOCITY
-#define GYRO_DRIFT
+#define LOG_VELOCITY
+//#define GYRO_DRIFT
 //#define ROAD_TEST
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
@@ -308,7 +308,7 @@
 
 #ifdef GYRO_DRIFT
 #undef LOGGER_HZ
-#define LOGGER_HZ 4
+#define LOGGER_HZ 1
 #undef ALWAYS_LOG
 #define ALWAYS_LOG
 #undef ALWAYS_SYNC_GYROS

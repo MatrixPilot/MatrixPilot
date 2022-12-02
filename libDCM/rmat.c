@@ -527,17 +527,53 @@ void compute_bill_angles(void)
 int16_t gravity_estimate[3];
 union longww gravity_long[3];
 int16_t acceleration[3];
+float gravity_float[3] ;
+float aero_force_float[3] ;
+float acceleration_float[3];
+float omegaAccum_float[3] ;
+float velocity ;
+
+#define MINIMUM_OMEGA_SQUARE 0.0625 // 14 degrees/second
 
 void estimate_velocity(void)
 {
+	float omega_square ;
+	
+	omegaAccum_float[0] = (((float)omegaAccum[0])*((float)GYRO_RANGE))/(57.296*((float)16384)) ;
+	omegaAccum_float[1] = (((float)omegaAccum[1])*((float)GYRO_RANGE))/(57.296*((float)16384)) ;
+	omegaAccum_float[2] = (((float)omegaAccum[2])*((float)GYRO_RANGE))/(57.296*((float)16384)) ;
+			
 	gravity_long[0].WW= __builtin_mulss(rmat[6],2*CALIB_GRAVITY);
 	gravity_long[1].WW= __builtin_mulss(rmat[7],2*CALIB_GRAVITY);
 	gravity_long[2].WW= __builtin_mulss(rmat[8],2*CALIB_GRAVITY);
+	
 	gravity_estimate[0] = gravity_long[0]._.W1 ;
 	gravity_estimate[1] = gravity_long[1]._.W1 ;
 	gravity_estimate[2] = gravity_long[2]._.W1 ;
-	acceleration[0] = gravity_estimate[0] + aero_force[0] ;
-	acceleration[1] = gravity_estimate[1] + aero_force[1] ;
-	acceleration[2] = gravity_estimate[2] + aero_force[2] ;
+	
+	//note: CALIB_GRAVITY has a factor of 2 built
+	
+	gravity_float[0] = ((float)gravity_estimate[0])*(((float)19.6)/((float)CALIB_GRAVITY));
+	gravity_float[1] = ((float)gravity_estimate[1])*(((float)19.6)/((float)CALIB_GRAVITY));
+	gravity_float[2] = ((float)gravity_estimate[2])*(((float)19.6)/((float)CALIB_GRAVITY));
+	
+	aero_force_float[0] = ((float)aero_force[0])*(((float)19.6)/((float)CALIB_GRAVITY));
+	aero_force_float[1] = ((float)aero_force[1])*(((float)19.6)/((float)CALIB_GRAVITY));
+	aero_force_float[2] = ((float)aero_force[2])*(((float)19.6)/((float)CALIB_GRAVITY));
+	
+	acceleration_float[0] = gravity_float[0] + aero_force_float[0] ;
+	acceleration_float[1] = gravity_float[1] + aero_force_float[1] ;
+	acceleration_float[2] = gravity_float[2] + aero_force_float[2] ;
+	
+	omega_square = omegaAccum_float[1]*omegaAccum_float[1] + omegaAccum_float[2]*omegaAccum_float[2] ;
+	if (omega_square>MINIMUM_OMEGA_SQUARE )
+	{
+		velocity = fabsf((omegaAccum_float[2]*acceleration_float[1]-omegaAccum_float[1]*acceleration_float[2])/omega_square);
+	}
+	else
+	{
+		velocity = 0 ;
+	}
+	
 }
 
