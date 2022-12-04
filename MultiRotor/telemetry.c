@@ -163,7 +163,7 @@ void send_imu_data(void)
 	{
 		header_line ++ ;
 		switch ( header_line ) {
-			case 1:
+		case 1:
 			initialize_yaw_rmat();
 			break ;
 		case 2:
@@ -171,13 +171,17 @@ void send_imu_data(void)
 				serial_output("WOLF-PAC SN%i%i%i IMU ", SERIAL_NUMBERD1 , SERIAL_NUMBERD2 , SERIAL_NUMBERD3 ) ;
 			}
 			break ;
-		
 		case 3:
+			{
+				serial_output(DATE);
+			}
+			break;
+		case 4:
 			{
 				serial_output("in north-east-down body frame.\r\n") ;
 			}
 			break ;	
-		case 4:
+		case 5:
 			{
 #ifdef LOG_RATE
 				serial_output("gyro rate version\r\n");
@@ -194,49 +198,49 @@ void send_imu_data(void)
 #endif // LOG_PITCH_AND_TWO_FORCES
 			}
 			break ;
-		case 5:
+		case 6:
 			{
 				serial_output("specific forces in ft/s^2.\r\n") ;
 			}
 			break ;	
-		case 6:
+		case 7:
 			{
 				serial_output("CCW rotation rates in d/s.\r\n");
 			}
 			break ;	
-		case 7:
+		case 8:
 			{
 				serial_output( BOARD );
 			}
 		break ;
-		case 8:
+		case 9:
 			{
 				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
-		case 9:
+		case 10:
 			{
 				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
 			}
 			break ;
-		case 11:
+		case 12:
 			{
 				serial_output("Gyro calibrations, x, y, z = %6.4f,%6.4f,%6.4f\r\n", 
 						CALIBRATIONX ,CALIBRATIONY,CALIBRATIONZ );		
 			}
 			break ;
-		case 13:
+		case 14:
 			{
 				serial_output("Initial x, y, z binary gyro offsets = %i,%i,%i\r\n", 
 						XRATE_OFFSET , YRATE_OFFSET, ZRATE_OFFSET );		
 			}
 			break ;
-		case 15:
+		case 16:
 			{
 				serial_output("tilt start, stop angles = %i,%i degrees\r\n", TILT_START , TILT_STOP);
 			}
 			break ;
-		case 17:
+		case 18:
 			{
 				serial_output( "accel binary offsets = %i,%i,%i\r\n",
 					XACCEL_OFFSET ,
@@ -245,7 +249,7 @@ void send_imu_data(void)
 					 );	
 			}
 			break;
-		case 18:
+		case 19:
 			{
 				serial_output( "accel binary calibrations = %i,%i,%i\r\n",
 					CAL_GRAV_X ,
@@ -254,12 +258,12 @@ void send_imu_data(void)
 					 );
 			}
 			break;
-		case 19:
+		case 20:
 			{
 				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
 			}
 			break;
-		case 20:
+		case 21:
 			{
 #ifdef LOG_IMU
 #ifdef LOG_RATE
@@ -301,7 +305,7 @@ void send_imu_data(void)
 #endif // ROAD_TEST
 			}
 			break ;	
-		case 22:
+		case 23:
 			hasWrittenHeader = 1 ;
 			break ;
 		default:

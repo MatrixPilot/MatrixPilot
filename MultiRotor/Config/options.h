@@ -1,6 +1,8 @@
 #define MINI5 "UDBmini5 hardware.\r\n"
 #define MINI6 "UDBmini6 hardware.\r\n"
 
+#define DATE "rev. 1.0, 12/4/2022\r\n"
+
 // the following defines select what gets sent to the logger. define one of them
 #define LOG_IMU
 //#define RECORD_OFFSETS
@@ -29,110 +31,81 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN8
+#define MINI6_SN4
 
-#ifdef UDB5_TEST_BOARD
-#define SERIAL_NUMBERD1	3
-#define SERIAL_NUMBERD2	4
+#ifdef MINI6_SN1
+#define BOARD MINI6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 1
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI6_SN1
+
+#ifdef MINI6_SN2
+#define BOARD MINI6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 2
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI6_SN2
+
+#ifdef MINI6_SN3
+#define BOARD MINI6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 3
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // UDB5
+#endif // MINI6_SN3
 
-#ifdef MINI5_SN100
-#define BOARD MINI5
-#define SERIAL_NUMBERD1	1
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 0
-#define ACCEL_RANGE         8
-#define GYRO_RANGE	    1000
-#endif // MINI5
-
-#ifdef MINI6_SN5
+#ifdef MINI6_SN4
 #define BOARD MINI6
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 5
+#define SERIAL_NUMBERD3 4
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // MINI6_SN5
+#endif // MINI6_SN4
 
-#ifdef MINI6_SN6
-#define BOARD MINI6
-#define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 6
-#define ACCEL_RANGE         8
-#define GYRO_RANGE	    1000
-#endif // MINI6_SN6
-
-#ifdef MINI6_SN7
-#define BOARD MINI6
-#define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 7
-#define ACCEL_RANGE         8
-#define GYRO_RANGE	    1000
-#endif // MINI6_SN7
-
-#ifdef MINI6_SN8
-#define BOARD MINI6
-#define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 8
-#define ACCEL_RANGE         8
-#define GYRO_RANGE	    1000
-#endif // MINI6_SN8
-
-#ifdef SN003
+#ifdef MINI5_SN3
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 3
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // SN003
+#endif // MINI5_SN3
 
-#ifdef SN004
+#ifdef MINI5_SN4
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 4
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // SN004
+#endif // MINI5_SN4
 
-#ifdef SN002
+#ifdef MINI5_SN2
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#endif // SN002
+#endif // MINI5_SN2
 
-#ifdef SN001
+#ifdef MINI5_SN1
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 1
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    500
-#endif // SN001
+#endif // MINI5_SN1
 
-#define TEST_LIDAR 0
-
-#define DR_TAU 2.5
-
-#define GPS_TYPE						GPS_NONE
-#define NO_RADIO						1
-#define MAG_YAW_DRIFT 						0
-#define DEBUG_MAG						0
-
-#define NUM_INPUTS	7
-#define NUM_OUTPUTS	4
-
-#ifdef SN001
+#ifdef MINI5_SN1
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 88 )
 #define YACCEL_OFFSET	( -8 )
@@ -147,9 +120,9 @@
 #define CAL_GRAV_X	4089
 #define CAL_GRAV_Y	4088
 #define CAL_GRAV_Z	4162
-#endif //SN1
+#endif //MINI5_SN1
 
-#ifdef SN002
+#ifdef MINI5_SN2
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 84 )
 #define YACCEL_OFFSET	( -48 )
@@ -164,9 +137,9 @@
 #define CAL_GRAV_X	4124
 #define CAL_GRAV_Y	4085
 #define CAL_GRAV_Z	4140
-#endif //SN2
+#endif //MINI5_SN2
 
-#ifdef SN003
+#ifdef MINI5_SN3
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 158 )
 #define YACCEL_OFFSET	( -29 )
@@ -181,9 +154,9 @@
 #define CAL_GRAV_X	4103
 #define CAL_GRAV_Y	4082
 #define CAL_GRAV_Z	4174
-#endif //SN3
+#endif //MINI5_SN3
 
-#ifdef SN004
+#ifdef MINI5_SN4
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 132 )
 #define YACCEL_OFFSET	( 56 )
@@ -198,26 +171,9 @@
 #define CAL_GRAV_X	4123
 #define CAL_GRAV_Y	4096
 #define CAL_GRAV_Z	4198
-#endif //SN4
+#endif //MINI5_SN4
 
-#ifdef MINI5_SN100
-#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 0 )
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
-#define CALIB_GRAVITY	4048
-#define CAL_GRAV_X	4048
-#define CAL_GRAV_Y	4048
-#define CAL_GRAV_Z	4048
-#endif // MINI5_SN100
-
-#ifdef MINI6_SN5
+#ifdef MINI6_SN1
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -15 )
@@ -232,9 +188,9 @@
 #define CAL_GRAV_X	4101
 #define CAL_GRAV_Y	4099
 #define CAL_GRAV_Z	4153
-#endif // MINI6_SN5
+#endif // MINI6_SN1
 
-#ifdef MINI6_SN6
+#ifdef MINI6_SN2
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 90 )
 #define YACCEL_OFFSET	( -45 )
@@ -249,9 +205,9 @@
 #define CAL_GRAV_X	4102
 #define CAL_GRAV_Y	4104
 #define CAL_GRAV_Z	4112
-#endif // MINI6_SN6
+#endif // MINI6_SN2
 
-#ifdef MINI6_SN7
+#ifdef MINI6_SN3
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 58 )
 #define YACCEL_OFFSET	( -34 )
@@ -266,9 +222,9 @@
 #define CAL_GRAV_X	4100
 #define CAL_GRAV_Y	4104
 #define CAL_GRAV_Z	4148
-#endif // MINI6_SN7
+#endif // MINI6_SN3
 
-#ifdef MINI6_SN8
+#ifdef MINI6_SN4
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -50 )
 #define ZACCEL_OFFSET	( -21 )
@@ -282,20 +238,7 @@
 #define CAL_GRAV_X	4105
 #define CAL_GRAV_Y	4098
 #define CAL_GRAV_Z	4122
-#endif // MINI6_SN8
-
-#ifdef UDB5_TEST_BOARD
-#define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 549 )
-#define YACCEL_OFFSET	( -73 )
-#define ZACCEL_OFFSET	( 123 )
-#define CALIBRATIONX	0.9999
-#define CALIBRATIONY	0.9999
-#define CALIBRATIONZ	0.9999
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
-#endif // UDB5
+#endif // MINI6_SN4
 
 #ifdef GYRO_CALIB
 #undef LOGGER_HZ
@@ -350,6 +293,18 @@
 #define LOGGER_HZ 40
 #endif // ROAD_TEST
 
+
+#define TEST_LIDAR 0
+
+#define DR_TAU 2.5
+
+#define GPS_TYPE						GPS_NONE
+#define NO_RADIO						1
+#define MAG_YAW_DRIFT 						0
+#define DEBUG_MAG						0
+
+#define NUM_INPUTS	7
+#define NUM_OUTPUTS	4
 
 #define CONSOLE_UART            0
 #define HILSIM			0
