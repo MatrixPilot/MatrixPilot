@@ -172,6 +172,9 @@ static inline void read_gyros(void)
 	}
 }
 boolean first_accel = 1 ;
+int16_t aero_force_new[] = { 0 , 0 , 0 } ;
+int16_t aero_force_previous[] = { 0 , 0 , 0 } ;
+
 inline void read_accel(void)
 {
 
@@ -179,9 +182,31 @@ inline void read_accel(void)
 	gplane[1] = __builtin_divsd(__builtin_mulss(YACCEL_VALUE,CALIB_GRAVITY),CAL_GRAV_Y);
 	gplane[2] = __builtin_divsd(__builtin_mulss(ZACCEL_VALUE,CALIB_GRAVITY),CAL_GRAV_Z);
 	
-	aero_force[0] = - gplane[0] ;
-	aero_force[1] = - gplane[1] ;
-	aero_force[2] = - gplane[2] ;
+	aero_force_new[0] = - gplane[0] ;
+	aero_force_new[1] = - gplane[1] ;
+	aero_force_new[2] = - gplane[2] ;
+	
+	if (first_accel == 1 )
+	{
+		aero_force[0] = aero_force_new[0] ;
+		aero_force[1] = aero_force_new[1] ;
+		aero_force[2] = aero_force_new[2] ;
+	
+		aero_force_previous[0] = aero_force_new[0] ;
+		aero_force_previous[1] = aero_force_new[1] ;
+		aero_force_previous[2] = aero_force_new[2] ;
+	}
+	else
+	{
+		aero_force[0] = (aero_force_new[0] + aero_force_previous[0])/2 ;
+		aero_force[1] = (aero_force_new[1] + aero_force_previous[1])/2 ;
+		aero_force[2] = (aero_force_new[2] + aero_force_previous[2])/2 ;
+	
+		aero_force_previous[0] = aero_force_new[0] ;
+		aero_force_previous[1] = aero_force_new[1] ;
+		aero_force_previous[2] = aero_force_new[2] ;
+	}
+	
 	if (first_accel == 1 )
 	{
 		aero_force_filtered[0]._.W1 = aero_force[0] ;
