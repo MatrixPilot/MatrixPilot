@@ -19,8 +19,8 @@
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
-//#define LOG_RATE
-#define LOG_EULER
+#define LOG_RATE
+//#define LOG_EULER
 //#define LOG_RATE_AND_EULER
 //#define LOG_PITCH_AND_TWO_FORCES
 
@@ -31,7 +31,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN4
+#define MINI6_SN3
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -293,6 +293,7 @@
 #define LOGGER_HZ 40
 #endif // ROAD_TEST
 
+#define FILTERING "Force data is filtered by averaging pairs of 200 Hz samples.\r\n"
 
 #define TEST_LIDAR 0
 

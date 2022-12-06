@@ -265,6 +265,11 @@ void send_imu_data(void)
 			break;
 		case 21:
 			{
+				serial_output(FILTERING);
+			}
+			break;
+		case 22:
+			{
 #ifdef LOG_IMU
 #ifdef LOG_RATE
 				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
