@@ -168,7 +168,11 @@ void send_imu_data(void)
 			break ;
 		case 2:
 			{
+#ifndef NAME
 				serial_output("WOLF-PAC SN%i%i%i IMU ", SERIAL_NUMBERD1 , SERIAL_NUMBERD2 , SERIAL_NUMBERD3 ) ;
+#else
+				serial_output("WOLF-PAC SN%i%i%i IMU, %s, ", SERIAL_NUMBERD1 , SERIAL_NUMBERD2 , SERIAL_NUMBERD3, NAME ) ;
+#endif
 			}
 			break ;
 		case 3:

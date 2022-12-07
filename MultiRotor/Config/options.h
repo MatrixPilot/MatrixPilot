@@ -19,7 +19,7 @@
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
-#define LOG_RATE
+//#define LOG_RATE
 //#define LOG_EULER
 //#define LOG_RATE_AND_EULER
 //#define LOG_PITCH_AND_TWO_FORCES
@@ -31,15 +31,17 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN3
+#define MINI6_SN1
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
+#define NAME "Tucker West"
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 1
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
+#define LOG_EULER
 #endif // MINI6_SN1
 
 #ifdef MINI6_SN2
@@ -49,6 +51,7 @@
 #define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
+#define LOG_EULER
 #endif // MINI6_SN2
 
 #ifdef MINI6_SN3
@@ -58,6 +61,7 @@
 #define SERIAL_NUMBERD3 3
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
+#define LOG_RATE
 #endif // MINI6_SN3
 
 #ifdef MINI6_SN4
@@ -67,6 +71,7 @@
 #define SERIAL_NUMBERD3 4
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
+#define LOG_EULER
 #endif // MINI6_SN4
 
 #ifdef MINI5_SN3
