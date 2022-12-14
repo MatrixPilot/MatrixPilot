@@ -31,7 +31,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN1
+#define MINI6_SN3
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -61,7 +61,7 @@
 #define SERIAL_NUMBERD3 3
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#define LOG_RATE
+#define LOG_EULER
 #endif // MINI6_SN3
 
 #ifdef MINI6_SN4
