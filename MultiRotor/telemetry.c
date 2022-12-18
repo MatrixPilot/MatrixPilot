@@ -84,6 +84,7 @@ extern float bill_angle_x , bill_angle_y , bill_angle_z ;
 extern int16_t omegacorrI[];
 extern uint16_t omega_magnitude ;
 extern union longww omegagyro_filtered[];
+extern struct ADchannel mpu_temp;
 
 /*void send_debug_line( void )
 {
@@ -290,7 +291,7 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef RECORD_OFFSETS
-				serial_output("ax,ay,az,gx_val,gy_val,gz_val,gyr_x,gyr_y,gyr_z\r\n");
+				serial_output("tmptur,ax,ay,az,gx_val,gy_val,gz_val,gyr_x,gyr_y,gyr_z\r\n");
 #endif // RECORD_OFFSETS
 				
 #ifdef TEST_LOGGER_HZ
@@ -307,7 +308,7 @@ void send_imu_data(void)
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
 //				serial_output("gx,gy,gyz,gxfilt,gyfilt,gzfilt,ax,ay,az,axfilt,ayfilt,azfilt\r\n");
-				serial_output("synch,cpu_load,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
+				serial_output("tmptur,synch,cpu_load,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
@@ -325,7 +326,8 @@ void send_imu_data(void)
 	{
 #ifdef RECORD_OFFSETS 
 		{	
-			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			mpu_temp.value,
 			udb_xaccel.value , udb_yaccel.value , udb_zaccel.value ,
 			udb_xrate.value , udb_yrate.value , udb_zrate.value	,
 			omegagyro[0],omegagyro[1],omegagyro[2]
@@ -411,7 +413,8 @@ void send_imu_data(void)
 				aero_force_filtered[2]._.W1 
 					);*/
 		compute_euler();
-		serial_output("%i,%i,%.1f,%.1f,%.1f,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+		serial_output("%i,%i,%i,%.1f,%.1f,%.1f,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+				mpu_temp.value,
 				accelOn ,
 				udb_cpu_load(),
 				yaw_angle , pitch_angle , roll_angle ,

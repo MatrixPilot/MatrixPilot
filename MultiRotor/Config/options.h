@@ -4,8 +4,8 @@
 #define DATE "rev. 1.0, 12/4/2022\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
-//#define RECORD_OFFSETS
+//#define LOG_IMU
+#define RECORD_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -31,7 +31,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN3
+#define MINI6_SN4
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
