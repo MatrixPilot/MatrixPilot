@@ -5,7 +5,8 @@
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
-#define RECORD_OFFSETS
+//#define RECORD_OFFSETS
+#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -253,6 +254,17 @@
 #define TILT_STOP 500
 #define UPSIDE_DOWN
 #endif // GYRO_CALIB
+
+#ifdef GYRO_OFFSETS
+#undef LOGGER_HZ
+#define LOGGER_HZ 40
+#undef ALWAYS_LOG
+#define ALWAYS_LOG
+#undef ALWAYS_SYNC_GYROS
+//#define ALWAYS_SYNC_GYROS
+#undef TILT_STOP
+#define TILT_STOP 600
+#endif // GYRO_OFFSETS
 
 #ifdef GYRO_DRIFT
 #undef LOGGER_HZ

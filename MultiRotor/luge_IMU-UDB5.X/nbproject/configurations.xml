@@ -111,6 +111,7 @@
         <itemPath>../../libUDB/traps_asm.s</itemPath>
         <itemPath>../../libUDB/uart.c</itemPath>
         <itemPath>../../libUDB/write.c</itemPath>
+        <itemPath>../../libUDB/gyro_offsets_table.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix"
                      displayName="libVectorMatrix"

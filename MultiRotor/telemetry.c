@@ -334,6 +334,15 @@ void send_imu_data(void)
 			 ) ;
 		}
 #endif // RECORD_OFFSETS
+		
+#ifdef GYRO_OFFSETS
+		{
+			serial_output( "%i,%i,%i,%i\r\n" ,
+			mpu_temp.value,
+			udb_xrate.value , udb_yrate.value , udb_zrate.value	
+			 ) ;
+		}
+#endif // 
 
 #ifdef TEST_LOGGER_HZ
 #ifdef PARTIAL_RECORD		
