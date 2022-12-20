@@ -73,9 +73,9 @@ void lookup_gyro_offsets(void)
 			right_minus_left[1]= gyro_offset_table[index_msb+1].y - left_entry[1] ;
 			right_minus_left[2]= gyro_offset_table[index_msb+1].z - left_entry[2] ;
 			
-			gyro_offset[0] = left_entry[0] + __builtin_divsd(__builtin_mulss(right_minus_left[0],index_msb),1024);
-			gyro_offset[1] = left_entry[1] + __builtin_divsd(__builtin_mulss(right_minus_left[1],index_msb),1024);
-			gyro_offset[2] = left_entry[2] + __builtin_divsd(__builtin_mulss(right_minus_left[2],index_msb),1024);
+			gyro_offset[0] = left_entry[0] + __builtin_divsd(__builtin_mulss(right_minus_left[0],index_lsb),1024);
+			gyro_offset[1] = left_entry[1] + __builtin_divsd(__builtin_mulss(right_minus_left[1],index_lsb),1024);
+			gyro_offset[2] = left_entry[2] + __builtin_divsd(__builtin_mulss(right_minus_left[2],index_lsb),1024);
 		}
 	}
 }
