@@ -129,6 +129,8 @@ union intbb dcm_declination_angle;
 
 void estimate_velocity(void);
 
+void lookup_gyro_offsets(void);
+
 void yaw_drift_reset(void)
 {
 	errorYawground[0] = errorYawground[1] = errorYawground[2] = 0; // turn off yaw drift
@@ -150,12 +152,16 @@ union longww omegagyro_filtered[] = { { 0 }, { 0 },  { 0 } };
 #define GYRO_FILTER_SHIFT 12
 
 extern int16_t accelOn ;
+extern int16_t gyro_offset[];
 static inline void read_gyros(void)
 {
 	// fetch the gyro signals and subtract the baseline offset, 
 	// and adjust for variations in supply voltage
 	
-
+	lookup_gyro_offsets();
+	udb_xrate.offset = (gyro_offset[0])>>6 ;
+	udb_yrate.offset = (gyro_offset[1])>>6 ;
+	udb_zrate.offset = (gyro_offset[2])>>6 ;
 	omegagyro[0] = XRATE_VALUE;
 	omegagyro[1] = YRATE_VALUE;
 	omegagyro[2] = ZRATE_VALUE;

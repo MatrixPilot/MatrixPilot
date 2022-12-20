@@ -257,7 +257,7 @@
 
 #ifdef GYRO_OFFSETS
 #undef LOGGER_HZ
-#define LOGGER_HZ 40
+#define LOGGER_HZ 4
 #undef ALWAYS_LOG
 #define ALWAYS_LOG
 #undef ALWAYS_SYNC_GYROS

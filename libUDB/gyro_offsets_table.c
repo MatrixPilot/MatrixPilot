@@ -54,7 +54,7 @@ void lookup_gyro_offsets(void)
 	}
 	else
 	{
-		index_lsb = temperature && 0x03FF ;
+		index_lsb = temperature & 0x03FF ;
 		index_msb = temperature >> 10 ; 
 		number_entries = (sizeof (gyro_offset_table))/(sizeof (gyro_offset_table_entry)) ;
 		if ( index_msb >= (number_entries - 1 ))
