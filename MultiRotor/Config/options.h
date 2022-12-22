@@ -6,11 +6,11 @@
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
-//#define GYRO_DRIFT
+#define GYRO_DRIFT
 //#define ROAD_TEST
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
@@ -268,7 +268,7 @@
 
 #ifdef GYRO_DRIFT
 #undef LOGGER_HZ
-#define LOGGER_HZ 1
+#define LOGGER_HZ 10
 #undef ALWAYS_LOG
 #define ALWAYS_LOG
 #undef ALWAYS_SYNC_GYROS

@@ -503,15 +503,7 @@ static void PI_feedback(void)
 
 void dcm_run_imu_step(void)
 {
-
-#if ( GYRO_RANGE == 500 )
 	rupdate();                  // local
-#elif ( GYRO_RANGE == 1000 )
-	rupdate();                  // local
-	rupdate();                  // local
-#else
-#error set GYRO_RANGE to 500 or 1000 in options.h
-#endif // GYRO_RANGE
 	normalize();                // local
 	roll_pitch_drift();         // local
 	PI_feedback();              // local

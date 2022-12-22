@@ -61,6 +61,7 @@ int main (void)
 	udb_serial_set_rate(57600) ;
 
 	LED_GREEN = LED_OFF ;
+	LED_RED = LED_OFF ;
 
 #if (CONSOLE_UART != 2)
 	udb_init_USART(&udb_serial_callback_get_byte_to_send, &udb_serial_callback_received_byte);
@@ -131,10 +132,12 @@ void update_slide_detection(void)
 				stop_log = 1 ;
 				slide_in_progress = 0 ;
 				LED_RED = LED_OFF ;
+				udb_led_toggle(LED_GREEN);
 			}
 		else
 			{
-				LED_RED = LED_ON ;
+				udb_led_toggle(LED_RED);
+				LED_GREEN = LED_OFF ;
 			}
 		}
 	else
@@ -143,11 +146,13 @@ void update_slide_detection(void)
 			{
 				start_log = 1 ;
 				slide_in_progress = 1 ;
-				LED_RED = LED_ON ;
+				udb_led_toggle(LED_RED);
+				LED_GREEN = LED_OFF ;
 			}
 		else
 			{
 				LED_RED = LED_OFF ;
+				udb_led_toggle(LED_GREEN);
 			}
 		}
 }

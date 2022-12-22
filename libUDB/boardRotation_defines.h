@@ -135,9 +135,17 @@
 #endif
 
 #if ((BOARD_ORIENTATION == ORIENTATION_FORWARDS)||(BOARD_ORIENTATION == ORIENTATION_BACKWARDS)||(BOARD_ORIENTATION == ORIENTATION_FLIPPED)||(BOARD_ORIENTATION == ORIENTATION_INVERTED))
-#define XRATE_VALUE	 (XRATE_SIGN_ORIENTED (((udb_xrate.value)>>1) - (udb_xrate.offset>>1) + vref_adj))
-#define YRATE_VALUE	 (YRATE_SIGN_ORIENTED (((udb_yrate.value)>>1) - (udb_yrate.offset>>1) + vref_adj))
-#define ZRATE_VALUE	 (ZRATE_SIGN_ORIENTED (((udb_zrate.value)>>1) - (udb_zrate.offset>>1) + vref_adj)) 
+#if (GYRO_RANGE == 500)
+#define XRATE_VALUE	 (XRATE_SIGN_ORIENTED (((udb_xrate.value)>>1) - (udb_xrate.offset>>1)))
+#define YRATE_VALUE	 (YRATE_SIGN_ORIENTED (((udb_yrate.value)>>1) - (udb_yrate.offset>>1)))
+#define ZRATE_VALUE	 (ZRATE_SIGN_ORIENTED (((udb_zrate.value)>>1) - (udb_zrate.offset>>1)))
+#elif (GYRO_RANGE == 1000)
+#define XRATE_VALUE	 (XRATE_SIGN_ORIENTED (((udb_xrate.value)) - (udb_xrate.offset)))
+#define YRATE_VALUE	 (YRATE_SIGN_ORIENTED (((udb_yrate.value)) - (udb_yrate.offset)))
+#define ZRATE_VALUE	 (ZRATE_SIGN_ORIENTED (((udb_zrate.value)) - (udb_zrate.offset)))
+#else
+#error "GYRO_RANGE must be either 500 or 1000"
+#endif
 #define XACCEL_VALUE (XACCEL_SIGN_ORIENTED ((udb_xaccel.value>>1) - (udb_xaccel.offset>>1)))
 #define YACCEL_VALUE (YACCEL_SIGN_ORIENTED ((udb_yaccel.value>>1) - (udb_yaccel.offset>>1)))
 #define ZACCEL_VALUE (ZACCEL_SIGN_ORIENTED ((udb_zaccel.value>>1) - (udb_zaccel.offset>>1)))

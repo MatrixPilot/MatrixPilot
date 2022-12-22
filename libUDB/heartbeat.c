@@ -104,8 +104,6 @@ static void heartbeat_pulse(void)
 {
 
 	udb_flags._.radio_on = 1;
-	led_on(LED_GREEN);
-
 
 	vref_adj = 0;
 
