@@ -95,6 +95,9 @@ int32_t xx_bar = 0 ;
 int32_t xy_bar[] = { 0 , 0 , 0  } ;
 int16_t x_bar = 0 ;
 int16_t y_bar[] = { 0 , 0 , 0  } ;
+int64_t xx_bar_minus_x_bar_x_bar ;
+int16_t offset_left[3] ;
+int16_t offset_right[3] ;
 
 extern uint8_t udb_cpu_load(void);
 extern void serial_output(const char* format, ...);
@@ -103,9 +106,9 @@ void update_offset_table(void)
 {
 	if (adjusted_temperature < STEP_SIZE)
 	{
-		gyro_offset_entry[0]= udb_xrate.value ;
-		gyro_offset_entry[1]= udb_yrate.value ;
-		gyro_offset_entry[2]= udb_zrate.value ;
+		gyro_offset_entry[0]= 64*udb_xrate.value ;
+		gyro_offset_entry[1]= 64*udb_yrate.value ;
+		gyro_offset_entry[2]= 64*udb_zrate.value ;
 		
 		xx_sum += (uint64_t) __builtin_mulss( adjusted_temperature,adjusted_temperature) ;
 		
@@ -139,13 +142,54 @@ void update_offset_table(void)
 			y_bar[1] = (int16_t)(y_sum[1]/samples_32t);
 			y_bar[2] = (int16_t)(y_sum[2]/samples_32t);
 			
-			serial_output("%i,%i,%i,%i,%i,%i,%li,%li,%li,%li\r\n",
+			xx_bar_minus_x_bar_x_bar = (int64_t)(xx_bar - x_bar*x_bar) ;
+			
+			offset_left[0] = (int16_t) ((
+					((int64_t)y_bar[0])*((int64_t)xx_bar)
+					-((int64_t)x_bar)*((int64_t)xy_bar[0])		
+					)/xx_bar_minus_x_bar_x_bar );
+			
+			offset_left[1] = (int16_t) ((
+					((int64_t)y_bar[1])*((int64_t)xx_bar)
+					-((int64_t)x_bar)*((int64_t)xy_bar[1])		
+					)/xx_bar_minus_x_bar_x_bar );
+			
+			offset_left[2] = (int16_t) ((
+					((int64_t)y_bar[2])*((int64_t)xx_bar)
+					-((int64_t)x_bar)*((int64_t)xy_bar[2])		
+					)/xx_bar_minus_x_bar_x_bar );
+			
+			offset_right[0] = (int16_t)((
+					
+					((int64_t)y_bar[0])*(((int64_t)xx_bar)-(((int64_t)STEP_SIZE)*((int64_t)x_bar)))
+					-
+					((int64_t)xy_bar[0])*(((int64_t)x_bar)-((int64_t)STEP_SIZE))
+					)/xx_bar_minus_x_bar_x_bar);
+			
+			offset_right[1] = (int16_t)((
+					
+					((int64_t)y_bar[1])*(((int64_t)xx_bar)-(((int64_t)STEP_SIZE)*((int64_t)x_bar)))
+					-
+					((int64_t)xy_bar[1])*(((int64_t)x_bar)-((int64_t)STEP_SIZE))
+					)/xx_bar_minus_x_bar_x_bar);
+			
+			offset_right[2] = (int16_t)((
+					
+					((int64_t)y_bar[2])*(((int64_t)xx_bar)-(((int64_t)STEP_SIZE)*((int64_t)x_bar)))
+					-
+					((int64_t)xy_bar[2])*(((int64_t)x_bar)-((int64_t)STEP_SIZE))
+					)/xx_bar_minus_x_bar_x_bar);
+			
+			serial_output("%i,%i,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i\r\n",
 				udb_cpu_load(),
 				samples,
 				x_bar,
 				y_bar[0],y_bar[1],y_bar[2],
 				xx_bar,
-				xy_bar[0], xy_bar[1],xy_bar[2]);
+				xy_bar[0], xy_bar[1],xy_bar[2],
+				(int32_t)xx_bar_minus_x_bar_x_bar ,
+				offset_left[0],offset_left[1],offset_left[2],
+				offset_right[0],offset_right[1],offset_right[2]);
 			
 			samples = 0 ;
 			adjusted_temperature = 0 ;
