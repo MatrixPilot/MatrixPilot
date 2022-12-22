@@ -79,12 +79,26 @@ extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 extern uint16_t mission_time ;
 extern void compute_euler(void);
 extern void compute_bill_angles(void);
+extern void update_offset_table(void);
 extern float roll_angle , pitch_angle , yaw_angle ;
 extern float bill_angle_x , bill_angle_y , bill_angle_z ;
 extern int16_t omegacorrI[];
 extern uint16_t omega_magnitude ;
 extern union longww omegagyro_filtered[];
 extern struct ADchannel mpu_temp;
+extern uint16_t samples ;
+extern uint64_t samples_64t ;
+extern uint32_t samples_32t ;
+extern int16_t adjusted_temperature ;
+extern int16_t gyro_offset_entry[] ;
+extern uint64_t xx_sum ;
+extern int64_t xy_sum[] ;
+extern int32_t x_sum ;
+extern int32_t y_sum[] ;
+extern uint32_t xx_bar ;
+extern int32_t xy_bar[] ;
+extern int16_t x_bar ;
+extern int16_t y_bar[] ;
 
 /*void send_debug_line( void )
 {
@@ -317,6 +331,9 @@ void send_imu_data(void)
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
 #endif // ROAD_TEST
+#ifdef BUILD_OFFSET_TABLE
+		serial_output("cpu,samples,X_bar,Y_bar_x,Y_bar_y,Y_bar_z,XX_bar,XY_bar_x,XY_bar_y,XY_bar_z\r\n");
+#endif //BUILD_OFFSET_TABLE
 			}
 			break ;	
 		case 23:
@@ -446,6 +463,12 @@ void send_imu_data(void)
 					);
 		
 #endif // GYRO_DRIFT
+		
+#ifdef BUILD_OFFSET_TABLE
+		update_offset_table();
+	
+		
+#endif //
 
 #ifdef ROAD_TEST
 		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",

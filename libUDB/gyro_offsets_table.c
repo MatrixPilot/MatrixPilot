@@ -80,3 +80,83 @@ void lookup_gyro_offsets(void)
 	}
 }
 
+#define STEP_SIZE 256
+
+int16_t samples = 0 ;
+int64_t samples_64t = 0 ;
+int32_t samples_32t = 0 ;
+int16_t adjusted_temperature = 0 ;
+int16_t gyro_offset_entry[] = { 0 , 0 , 0 } ;
+int64_t xx_sum = 0 ;
+int64_t xy_sum[] = { 0 , 0 , 0  } ;
+int32_t x_sum = 0 ;
+int32_t y_sum[] = { 0 , 0 , 0  } ;
+int32_t xx_bar = 0 ;
+int32_t xy_bar[] = { 0 , 0 , 0  } ;
+int16_t x_bar = 0 ;
+int16_t y_bar[] = { 0 , 0 , 0  } ;
+
+extern uint8_t udb_cpu_load(void);
+extern void serial_output(const char* format, ...);
+
+void update_offset_table(void)
+{
+	if (adjusted_temperature < STEP_SIZE)
+	{
+		gyro_offset_entry[0]= udb_xrate.value ;
+		gyro_offset_entry[1]= udb_yrate.value ;
+		gyro_offset_entry[2]= udb_zrate.value ;
+		
+		xx_sum += (uint64_t) __builtin_mulss( adjusted_temperature,adjusted_temperature) ;
+		
+		xy_sum[0] += (int64_t)	__builtin_mulss( adjusted_temperature,gyro_offset_entry[0]) ;
+		xy_sum[1] += (int64_t)	__builtin_mulss( adjusted_temperature,gyro_offset_entry[1]) ;
+		xy_sum[2] += (int64_t)	__builtin_mulss( adjusted_temperature,gyro_offset_entry[2]) ;
+		
+		x_sum += (int32_t ) adjusted_temperature ;
+		
+		y_sum[0] += (int32_t ) gyro_offset_entry[0] ;
+		y_sum[1] += (int32_t ) gyro_offset_entry[1] ;
+		y_sum[2] += (int32_t ) gyro_offset_entry[2] ;
+		
+		samples ++ ;
+		adjusted_temperature ++ ;
+		
+		if ( adjusted_temperature >= STEP_SIZE )
+		{
+			samples_64t = (int64_t)samples ;
+			samples_32t = (int32_t)samples ;	
+			
+			xx_bar = (int32_t)(xx_sum /samples_64t) ;
+			
+			xy_bar[0] = (int32_t)(xy_sum[0] /samples_64t) ;
+			xy_bar[1] = (int32_t)(xy_sum[1] /samples_64t) ;
+			xy_bar[2] = (int32_t)(xy_sum[2] /samples_64t) ;
+			
+			x_bar = (int16_t)(x_sum/samples_32t);
+			
+			y_bar[0] = (int16_t)(y_sum[0]/samples_32t);
+			y_bar[1] = (int16_t)(y_sum[1]/samples_32t);
+			y_bar[2] = (int16_t)(y_sum[2]/samples_32t);
+			
+			serial_output("%i,%i,%i,%i,%i,%i,%li,%li,%li,%li\r\n",
+				udb_cpu_load(),
+				samples,
+				x_bar,
+				y_bar[0],y_bar[1],y_bar[2],
+				xx_bar,
+				xy_bar[0], xy_bar[1],xy_bar[2]);
+			
+			samples = 0 ;
+			adjusted_temperature = 0 ;
+			xx_sum = 0 ;
+			x_sum = 0 ;
+			xy_sum[0] = 0 ;
+			xy_sum[1] = 0 ;
+			xy_sum[2] = 0 ;
+			y_sum[0] = 0 ;
+			y_sum[1] = 0 ;
+			y_sum[2] = 0 ;
+		}
+	}		
+}

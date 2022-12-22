@@ -10,8 +10,9 @@
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
-#define GYRO_DRIFT
+//#define GYRO_DRIFT
 //#define ROAD_TEST
+#define BUILD_OFFSET_TABLE
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
@@ -309,6 +310,11 @@
 //#define ALWAYS_LOG
 #define LOGGER_HZ 40
 #endif // ROAD_TEST
+
+#ifdef BUILD_OFFSET_TABLE
+#define ALWAYS_LOG
+#define BUILD_OFFSET_HZ 10
+#endif // 
 
 #define FILTERING "Force data is filtered by averaging pairs of 200 Hz samples.\r\n"
 
