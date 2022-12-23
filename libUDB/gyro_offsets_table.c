@@ -22,7 +22,7 @@
 typedef struct gyro_offset_table_entry { int16_t x ; int16_t y ; int16_t z ; } gyro_offset_table_entry ;
 
 
-#define TABLE_ORIGIN 9292
+#define TABLE_ORIGIN -9292
 
 struct gyro_offset_table_entry gyro_offset_table[] = {
 	{3817,-3692,4307},
@@ -56,7 +56,7 @@ uint16_t number_entries ;
 
 void lookup_gyro_offsets(void)
 {
-	temperature_index = mpu_temp.value + TABLE_ORIGIN ;
+	temperature_index = mpu_temp.value - TABLE_ORIGIN ;
 	if (temperature_index < 0)
 	{
 		gyro_offset[0] = gyro_offset_table[0].x ;
@@ -233,7 +233,7 @@ void update_offset_table(void)
 			}
 			if (initial_temp_reported == 1)
 			{
-				serial_output("%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+/*				serial_output("%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 					udb_cpu_load(),
 					samples_32t,
 					x_bar,
@@ -246,6 +246,12 @@ void update_offset_table(void)
 					(offset_previous[0]+ offset_left[0])/2 ,
 					(offset_previous[1]+ offset_left[1])/2 ,
 					(offset_previous[2]+ offset_left[2])/2 ) ;
+ */
+				serial_output("{ %i , %i , %i } , \r\n",
+					(offset_previous[0]+ offset_left[0])/2 ,
+					(offset_previous[1]+ offset_left[1])/2 ,
+					(offset_previous[2]+ offset_left[2])/2 ) ;	
+		
 				offset_previous[0] = offset_right[0] ;
 				offset_previous[1] = offset_right[1] ;
 				offset_previous[2] = offset_right[2] ;
@@ -254,7 +260,7 @@ void update_offset_table(void)
 			else
 			{
 				initial_temp_reported = 1 ;
-				serial_output("initial temperature = %i\r\n%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+/*				serial_output("initial temperature = %i\r\n%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 					initial_temperature ,
 					udb_cpu_load(),
 					samples_32t,
@@ -266,6 +272,11 @@ void update_offset_table(void)
 					offset_left[0],offset_left[1],offset_left[2],
 					offset_right[0],offset_right[1],offset_right[2],
 					offset_left[0],offset_left[1],offset_left[2]);
+ */
+				serial_output("initial temperature = %i\r\n{ %i , %i , %i } , \r\n",
+					initial_temperature ,
+					offset_left[0],offset_left[1],offset_left[2]	
+						);
 				offset_previous[0] = offset_right[0] ;
 				offset_previous[1] = offset_right[1] ;
 				offset_previous[2] = offset_right[2] ;
