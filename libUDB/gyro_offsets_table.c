@@ -82,7 +82,6 @@ void lookup_gyro_offsets(void)
 
 #define STEP_SIZE 256
 
-int16_t samples = 0 ;
 int64_t samples_64t = 0 ;
 int32_t samples_32t = 0 ;
 int16_t adjusted_temperature = 0 ;
@@ -122,14 +121,14 @@ void update_offset_table(void)
 		y_sum[1] += (int32_t ) gyro_offset_entry[1] ;
 		y_sum[2] += (int32_t ) gyro_offset_entry[2] ;
 		
-		samples ++ ;
+		samples_32t ++ ;
 		adjusted_temperature ++ ;
 		
 		if ( adjusted_temperature >= STEP_SIZE )
 		{
-			samples_64t = (int64_t)samples ;
-			samples_32t = (int32_t)samples ;	
-			
+			samples_64t = (int64_t)samples_32t ;
+			if (samples_32t>0)
+			{
 			xx_bar = (int32_t)(xx_sum /samples_64t) ;
 			
 			xy_bar[0] = (int32_t)(xy_sum[0] /samples_64t) ;
@@ -143,6 +142,9 @@ void update_offset_table(void)
 			y_bar[2] = (int16_t)(y_sum[2]/samples_32t);
 			
 			xx_bar_minus_x_bar_x_bar = (int64_t)(xx_bar - x_bar*x_bar) ;
+			
+			// prevent division by 0, also, in theory xx_bar_minus_x_bar_x_bar must be positive
+			if (xx_bar_minus_x_bar_x_bar <= ((int64_t)0)) xx_bar_minus_x_bar_x_bar = 1 ;
 			
 			offset_left[0] = (int16_t) ((
 					((int64_t)y_bar[0])*((int64_t)xx_bar)
@@ -179,10 +181,29 @@ void update_offset_table(void)
 					-
 					((int64_t)xy_bar[2])*(((int64_t)x_bar)-((int64_t)STEP_SIZE))
 					)/xx_bar_minus_x_bar_x_bar);
+			}
+			else
+			{
+				x_bar = 0 ;
+				y_bar[0] = 0 ;
+				y_bar[1] = 0 ;
+				y_bar[2] = 0 ;
+				xx_bar = 0 ;
+				xy_bar[0] = 0 ;
+				xy_bar[1] = 0 ;
+				xy_bar[2] = 0 ;
+				xx_bar_minus_x_bar_x_bar = 0 ;
+				offset_left[0] = 0 ;
+				offset_left[1] = 0 ;
+				offset_left[2] = 0 ;
+				offset_right[0] = 0 ;
+				offset_right[1] = 0 ;
+				offset_right[2] = 0 ;
+			}
 			
-			serial_output("%i,%i,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i\r\n",
+			serial_output("%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i\r\n",
 				udb_cpu_load(),
-				samples,
+				samples_32t,
 				x_bar,
 				y_bar[0],y_bar[1],y_bar[2],
 				xx_bar,
@@ -191,7 +212,7 @@ void update_offset_table(void)
 				offset_left[0],offset_left[1],offset_left[2],
 				offset_right[0],offset_right[1],offset_right[2]);
 			
-			samples = 0 ;
+			samples_32t = 0 ;
 			adjusted_temperature = 0 ;
 			xx_sum = 0 ;
 			x_sum = 0 ;
