@@ -164,7 +164,9 @@ void dcm_heartbeat_callback(void)
 	{
 		if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SLIDE_DET_HZ)) == 0)
 		{
+#ifndef BUILD_OFFSET_TABLE
 			update_slide_detection();
+#endif
 		}
 		if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
 		{

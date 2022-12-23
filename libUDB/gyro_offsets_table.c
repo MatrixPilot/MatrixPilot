@@ -6,7 +6,18 @@
  */
 
 #include <stdint.h>
-#include "../libUDB/ADchannel.h"	
+#include "../libDCM/libDCM.h"
+#include "../libDCM/libDCM_defines.h"
+#include "../libDCM/mathlibNAV.h"
+#include "../libDCM/gpsData.h"
+#include "../libDCM/gpsParseCommon.h"
+#include "../libDCM/rmat.h"
+#include "../libUDB/heartbeat.h"
+#include "../libUDB/serialIO.h"
+#include "../libUDB/servoOut.h"
+#include "../libUDB/ADchannel.h"
+#include <math.h>
+
 
 typedef struct gyro_offset_table_entry { int16_t x ; int16_t y ; int16_t z ; } gyro_offset_table_entry ;
 
@@ -33,7 +44,7 @@ struct gyro_offset_table_entry gyro_offset_table[] = {
 
 extern struct ADchannel mpu_temp;
 
-int16_t temperature ;
+int16_t temperature_index ;
 
 int16_t gyro_offset[3] ;
 
@@ -45,8 +56,8 @@ uint16_t number_entries ;
 
 void lookup_gyro_offsets(void)
 {
-	temperature = mpu_temp.value + TABLE_ORIGIN ;
-	if (temperature < 0)
+	temperature_index = mpu_temp.value + TABLE_ORIGIN ;
+	if (temperature_index < 0)
 	{
 		gyro_offset[0] = gyro_offset_table[0].x ;
 		gyro_offset[1] = gyro_offset_table[0].y ;
@@ -54,8 +65,8 @@ void lookup_gyro_offsets(void)
 	}
 	else
 	{
-		index_lsb = temperature & 0x03FF ;
-		index_msb = temperature >> 10 ; 
+		index_lsb = temperature_index & 0x03FF ;
+		index_msb = temperature_index >> 10 ; 
 		number_entries = (sizeof (gyro_offset_table))/(sizeof (gyro_offset_table_entry)) ;
 		if ( index_msb >= (number_entries - 1 ))
 		{
@@ -84,7 +95,6 @@ void lookup_gyro_offsets(void)
 
 int64_t samples_64t = 0 ;
 int32_t samples_32t = 0 ;
-int16_t adjusted_temperature = 0 ;
 int16_t gyro_offset_entry[] = { 0 , 0 , 0 } ;
 int64_t xx_sum = 0 ;
 int64_t xy_sum[] = { 0 , 0 , 0  } ;
@@ -97,13 +107,31 @@ int16_t y_bar[] = { 0 , 0 , 0  } ;
 int64_t xx_bar_minus_x_bar_x_bar ;
 int16_t offset_left[3] ;
 int16_t offset_right[3] ;
+int16_t offset_previous[3];
+
+int16_t adjusted_temperature = 0 ;
+int16_t temperature_offset = 0 ;
+int16_t initial_temperature = 0 ;
+int16_t reported_temperature = -8000 ;
+
+int16_t initial_temp_recorded = 0 ;
+int16_t initial_temp_reported = 0 ;
 
 extern uint8_t udb_cpu_load(void);
 extern void serial_output(const char* format, ...);
 
 void update_offset_table(void)
 {
-	if (adjusted_temperature < STEP_SIZE)
+	reported_temperature = mpu_temp.value ;
+	if ( initial_temp_recorded == 0 )
+	{
+		initial_temperature = reported_temperature ;
+		temperature_offset = initial_temperature ;
+		initial_temp_recorded = 1 ;
+		LED_RED = LED_ON ;
+		LED_GREEN = LED_OFF ;
+	}
+	adjusted_temperature = reported_temperature - temperature_offset ;
 	{
 		gyro_offset_entry[0]= 64*udb_xrate.value ;
 		gyro_offset_entry[1]= 64*udb_yrate.value ;
@@ -122,60 +150,63 @@ void update_offset_table(void)
 		y_sum[2] += (int32_t ) gyro_offset_entry[2] ;
 		
 		samples_32t ++ ;
-		adjusted_temperature ++ ;
+		reported_temperature ++ ;
 		
 		if ( adjusted_temperature >= STEP_SIZE )
 		{
+			udb_led_toggle(LED_GREEN);
+			udb_led_toggle(LED_RED);
+			temperature_offset += STEP_SIZE ;
 			samples_64t = (int64_t)samples_32t ;
 			if (samples_32t>0)
 			{
-			xx_bar = (int32_t)(xx_sum /samples_64t) ;
+				xx_bar = (int32_t)(xx_sum /samples_64t) ;
 			
-			xy_bar[0] = (int32_t)(xy_sum[0] /samples_64t) ;
-			xy_bar[1] = (int32_t)(xy_sum[1] /samples_64t) ;
-			xy_bar[2] = (int32_t)(xy_sum[2] /samples_64t) ;
+				xy_bar[0] = (int32_t)(xy_sum[0] /samples_64t) ;
+				xy_bar[1] = (int32_t)(xy_sum[1] /samples_64t) ;
+				xy_bar[2] = (int32_t)(xy_sum[2] /samples_64t) ;
 			
-			x_bar = (int16_t)(x_sum/samples_32t);
+				x_bar = (int16_t)(x_sum/samples_32t);
 			
-			y_bar[0] = (int16_t)(y_sum[0]/samples_32t);
-			y_bar[1] = (int16_t)(y_sum[1]/samples_32t);
-			y_bar[2] = (int16_t)(y_sum[2]/samples_32t);
+				y_bar[0] = (int16_t)(y_sum[0]/samples_32t);
+				y_bar[1] = (int16_t)(y_sum[1]/samples_32t);
+				y_bar[2] = (int16_t)(y_sum[2]/samples_32t);
 			
-			xx_bar_minus_x_bar_x_bar = (int64_t)(xx_bar - x_bar*x_bar) ;
+				xx_bar_minus_x_bar_x_bar = (int64_t)(xx_bar - x_bar*x_bar) ;
 			
-			// prevent division by 0, also, in theory xx_bar_minus_x_bar_x_bar must be positive
-			if (xx_bar_minus_x_bar_x_bar <= ((int64_t)0)) xx_bar_minus_x_bar_x_bar = 1 ;
+				// prevent division by 0, also, in theory xx_bar_minus_x_bar_x_bar must be positive
+				if (xx_bar_minus_x_bar_x_bar <= ((int64_t)0)) xx_bar_minus_x_bar_x_bar = 1 ;
 			
-			offset_left[0] = (int16_t) ((
+				offset_left[0] = (int16_t) ((
 					((int64_t)y_bar[0])*((int64_t)xx_bar)
 					-((int64_t)x_bar)*((int64_t)xy_bar[0])		
 					)/xx_bar_minus_x_bar_x_bar );
 			
-			offset_left[1] = (int16_t) ((
+				offset_left[1] = (int16_t) ((
 					((int64_t)y_bar[1])*((int64_t)xx_bar)
 					-((int64_t)x_bar)*((int64_t)xy_bar[1])		
 					)/xx_bar_minus_x_bar_x_bar );
 			
-			offset_left[2] = (int16_t) ((
+				offset_left[2] = (int16_t) ((
 					((int64_t)y_bar[2])*((int64_t)xx_bar)
 					-((int64_t)x_bar)*((int64_t)xy_bar[2])		
 					)/xx_bar_minus_x_bar_x_bar );
 			
-			offset_right[0] = (int16_t)((
+				offset_right[0] = (int16_t)((
 					
 					((int64_t)y_bar[0])*(((int64_t)xx_bar)-(((int64_t)STEP_SIZE)*((int64_t)x_bar)))
 					-
 					((int64_t)xy_bar[0])*(((int64_t)x_bar)-((int64_t)STEP_SIZE))
 					)/xx_bar_minus_x_bar_x_bar);
 			
-			offset_right[1] = (int16_t)((
+				offset_right[1] = (int16_t)((
 					
 					((int64_t)y_bar[1])*(((int64_t)xx_bar)-(((int64_t)STEP_SIZE)*((int64_t)x_bar)))
 					-
 					((int64_t)xy_bar[1])*(((int64_t)x_bar)-((int64_t)STEP_SIZE))
 					)/xx_bar_minus_x_bar_x_bar);
 			
-			offset_right[2] = (int16_t)((
+				offset_right[2] = (int16_t)((
 					
 					((int64_t)y_bar[2])*(((int64_t)xx_bar)-(((int64_t)STEP_SIZE)*((int64_t)x_bar)))
 					-
@@ -200,20 +231,47 @@ void update_offset_table(void)
 				offset_right[1] = 0 ;
 				offset_right[2] = 0 ;
 			}
-			
-			serial_output("%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i\r\n",
-				udb_cpu_load(),
-				samples_32t,
-				x_bar,
-				y_bar[0],y_bar[1],y_bar[2],
-				xx_bar,
-				xy_bar[0], xy_bar[1],xy_bar[2],
-				(int32_t)xx_bar_minus_x_bar_x_bar ,
-				offset_left[0],offset_left[1],offset_left[2],
-				offset_right[0],offset_right[1],offset_right[2]);
+			if (initial_temp_reported == 1)
+			{
+				serial_output("%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+					udb_cpu_load(),
+					samples_32t,
+					x_bar,
+					y_bar[0],y_bar[1],y_bar[2],
+					xx_bar,
+					xy_bar[0], xy_bar[1],xy_bar[2],
+					(int32_t)xx_bar_minus_x_bar_x_bar ,
+					offset_left[0],offset_left[1],offset_left[2],
+					offset_right[0],offset_right[1],offset_right[2],
+					(offset_previous[0]+ offset_left[0])/2 ,
+					(offset_previous[1]+ offset_left[1])/2 ,
+					(offset_previous[2]+ offset_left[2])/2 ) ;
+				offset_previous[0] = offset_right[0] ;
+				offset_previous[1] = offset_right[1] ;
+				offset_previous[2] = offset_right[2] ;
+						
+			}
+			else
+			{
+				initial_temp_reported = 1 ;
+				serial_output("initial temperature = %i\r\n%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+					initial_temperature ,
+					udb_cpu_load(),
+					samples_32t,
+					x_bar,
+					y_bar[0],y_bar[1],y_bar[2],
+					xx_bar,
+					xy_bar[0], xy_bar[1],xy_bar[2],
+					(int32_t)xx_bar_minus_x_bar_x_bar ,
+					offset_left[0],offset_left[1],offset_left[2],
+					offset_right[0],offset_right[1],offset_right[2],
+					offset_left[0],offset_left[1],offset_left[2]);
+				offset_previous[0] = offset_right[0] ;
+				offset_previous[1] = offset_right[1] ;
+				offset_previous[2] = offset_right[2] ;
+			}
 			
 			samples_32t = 0 ;
-			adjusted_temperature = 0 ;
 			xx_sum = 0 ;
 			x_sum = 0 ;
 			xy_sum[0] = 0 ;
