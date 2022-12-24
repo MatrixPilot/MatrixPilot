@@ -251,8 +251,7 @@ void send_imu_data(void)
 			break ;
 		case 14:
 			{
-				serial_output("Initial x, y, z binary gyro offsets = %i,%i,%i\r\n", 
-						XRATE_OFFSET , YRATE_OFFSET, ZRATE_OFFSET );		
+				
 			}
 			break ;
 		case 16:
@@ -431,20 +430,6 @@ void send_imu_data(void)
 		}	
 #endif // GYRO_CALIB
 #ifdef GYRO_DRIFT
-/*		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-				omegagyro[0],
-				omegagyro[1],
-				omegagyro[2] ,
-				omegagyro_filtered[0]._.W1 ,
-				omegagyro_filtered[1]._.W1 ,
-				omegagyro_filtered[2]._.W1 ,
-				aero_force[0] ,
-				aero_force[1] ,
-				aero_force[2] ,
-				aero_force_filtered[0]._.W1 ,
-				aero_force_filtered[1]._.W1 ,
-				aero_force_filtered[2]._.W1 
-					);*/
 		compute_euler();
 		serial_output("%i,%i,%i,%.1f,%.1f,%.1f,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 				mpu_temp.value,

@@ -47,6 +47,7 @@ int16_t GetAofA(void)
 	return angleOfAttack;
 }
 
+/*
 void offsets_init(void)
 {
 	
@@ -57,6 +58,8 @@ void offsets_init(void)
 	udb_yrate.offset  = YRATE_OFFSET;
 	udb_zrate.offset  = ZRATE_OFFSET;
 }
+*/
+
 void dcm_init(void)
 {
 	dcm_flags.W = 0;

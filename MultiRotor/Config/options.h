@@ -6,11 +6,11 @@
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
-//#define GYRO_DRIFT
+#define GYRO_DRIFT
 //#define ROAD_TEST
 //#define BUILD_OFFSET_TABLE
 
@@ -37,10 +37,9 @@
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
-#define NAME "Tucker West"
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 1
+#define SERIAL_NUMBERD3 4
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #define LOG_EULER
@@ -68,9 +67,10 @@
 
 #ifdef MINI6_SN4
 #define BOARD MINI6
+#define NAME "Tucker West"
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 4
+#define SERIAL_NUMBERD3 1
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #define LOG_EULER
@@ -117,9 +117,7 @@
 #define XACCEL_OFFSET	( 88 )
 #define YACCEL_OFFSET	( -8 )
 #define ZACCEL_OFFSET	( -257 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
 #define CALIBRATIONX	1.0159
 #define CALIBRATIONY	1.0100
 #define CALIBRATIONZ	1.0119
@@ -134,9 +132,7 @@
 #define XACCEL_OFFSET	( 84 )
 #define YACCEL_OFFSET	( -48 )
 #define ZACCEL_OFFSET	( 248 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
 #define CALIBRATIONX	1.0389
 #define CALIBRATIONY	1.0389
 #define CALIBRATIONZ	1.0206
@@ -151,9 +147,7 @@
 #define XACCEL_OFFSET	( 158 )
 #define YACCEL_OFFSET	( -29 )
 #define ZACCEL_OFFSET	( -287 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
 #define CALIBRATIONX	1.0120
 #define CALIBRATIONY	1.0185
 #define CALIBRATIONZ	1.0090
@@ -167,10 +161,8 @@
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 132 )
 #define YACCEL_OFFSET	( 56 )
-#define ZACCEL_OFFSET	( -330 )
-#define XRATE_OFFSET	( 0 )
-#define YRATE_OFFSET	( 0 )
-#define ZRATE_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( -330 
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h")
 #define CALIBRATIONX	1.0072
 #define CALIBRATIONY	1.0057
 #define CALIBRATIONZ	1.0039
@@ -185,9 +177,7 @@
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -15 )
 #define ZACCEL_OFFSET	( -16 )
-#define XRATE_OFFSET	( 6 )
-#define YRATE_OFFSET	( -6 )
-#define ZRATE_OFFSET	( -26 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
 #define CALIBRATIONX	1.0109
 #define CALIBRATIONY	1.0171
 #define CALIBRATIONZ	1.0066
@@ -202,9 +192,7 @@
 #define XACCEL_OFFSET	( 90 )
 #define YACCEL_OFFSET	( -45 )
 #define ZACCEL_OFFSET	( 37 )
-#define XRATE_OFFSET	( 21 )
-#define YRATE_OFFSET	( 22 )
-#define ZRATE_OFFSET	( 2 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
 #define CALIBRATIONX	1.0141
 #define CALIBRATIONY	1.0056
 #define CALIBRATIONZ	1.0127
@@ -219,9 +207,7 @@
 #define XACCEL_OFFSET	( 58 )
 #define YACCEL_OFFSET	( -34 )
 #define ZACCEL_OFFSET	( -77 )
-#define XRATE_OFFSET	( 10 )
-#define YRATE_OFFSET	( 6 )
-#define ZRATE_OFFSET	( 78 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
 #define CALIBRATIONX	1.0135
 #define CALIBRATIONY	1.0009
 #define CALIBRATIONZ	1.0067
@@ -235,10 +221,7 @@
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -50 )
 #define ZACCEL_OFFSET	( -21 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_2.h"
-#define XRATE_OFFSET	( 8 )
-#define YRATE_OFFSET	( 25 )
-#define ZRATE_OFFSET	( 41 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
 #define CALIBRATIONX	1.0112
 #define CALIBRATIONY	1.0043
 #define CALIBRATIONZ	1.0067

@@ -48,7 +48,7 @@ int commanded_tilt_gain ;
 
 int main (void)
 {
-	offsets_init();
+//	offsets_init();
 	// Set up the libraries
 	if ( GPS_TYPE != GPS_NONE)
 	{
