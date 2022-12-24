@@ -21,26 +21,7 @@
 
 typedef struct gyro_offset_table_entry { int16_t x ; int16_t y ; int16_t z ; } gyro_offset_table_entry ;
 
-
-#define TABLE_ORIGIN -9292
-
-struct gyro_offset_table_entry gyro_offset_table[] = {
-	{3817,-3692,4307},
-	{3515,-3092,4082},
-	{3201,-2515,3924},
-	{2863,-1944,3775},
-	{2488,-1531,3670},
-	{2129,-1195,3554},
-	{1734,-795,3440},
-	{1268,-290,3367},
-	{857,210,3332},
-	{596,689,3356},
-	{429,1186,3359},
-	{280,1702,3365},
-	{169,2209,3382},
-	{45,2749,3432},
-	{-89,3292,3504}
-};
+#include GYRO_OFFSET_TABLE
 
 extern struct ADchannel mpu_temp;
 
@@ -65,8 +46,8 @@ void lookup_gyro_offsets(void)
 	}
 	else
 	{
-		index_lsb = temperature_index & 0x03FF ;
-		index_msb = temperature_index >> 10 ; 
+		index_lsb = temperature_index & LOOKUP_LSB_MASK ;
+		index_msb = temperature_index >> MSB_SHIFT ; 
 		number_entries = (sizeof (gyro_offset_table))/(sizeof (gyro_offset_table_entry)) ;
 		if ( index_msb >= (number_entries - 1 ))
 		{

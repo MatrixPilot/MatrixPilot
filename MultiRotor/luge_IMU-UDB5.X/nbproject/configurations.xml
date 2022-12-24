@@ -23,6 +23,10 @@
         <itemPath>../../libDCM/deadReckoning_lidar.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
+        <logicalFolder name="f1" displayName="gyro_tables" projectFiles="true">
+          <itemPath>../../libUDB/gyro_tables/table_1.h</itemPath>
+          <itemPath>../../libUDB/gyro_tables/table_2.h</itemPath>
+        </logicalFolder>
         <itemPath>../../libUDB/ADchannel.h</itemPath>
         <itemPath>../../libUDB/analogs.h</itemPath>
         <itemPath>../../libUDB/barometer.h</itemPath>
@@ -367,6 +371,7 @@
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
