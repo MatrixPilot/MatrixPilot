@@ -188,7 +188,7 @@ void send_imu_data(void)
 #ifndef NAME
 				serial_output("WOLF-PAC SN%i%i%i IMU ", SERIAL_NUMBERD1 , SERIAL_NUMBERD2 , SERIAL_NUMBERD3 ) ;
 #else
-				serial_output("WOLF-PAC SN%i%i%i IMU, %s, ", SERIAL_NUMBERD1 , SERIAL_NUMBERD2 , SERIAL_NUMBERD3, NAME ) ;
+				serial_output("WOLF-PAC SN%i%i%i IMU, assigned to %s, ", SERIAL_NUMBERD1 , SERIAL_NUMBERD2 , SERIAL_NUMBERD3, NAME ) ;
 #endif
 			}
 			break ;
@@ -199,7 +199,7 @@ void send_imu_data(void)
 			break;
 		case 4:
 			{
-				serial_output("in north-east-down body frame.\r\n") ;
+				serial_output("Measurements expressed in north-east-down body frame.\r\n") ;
 			}
 			break ;	
 		case 5:
@@ -209,7 +209,7 @@ void send_imu_data(void)
 #endif // LOG_RATE
 				
 #ifdef LOG_EULER
-				serial_output("euler angle version\r\n");
+				serial_output("Euler angle version.\r\n");
 #endif // LOG_EULER
 #ifdef LOG_RATE_AND_EULER
 			serial_output("gyro rates and euler angles version\r\n");	
@@ -221,7 +221,7 @@ void send_imu_data(void)
 			break ;
 		case 6:
 			{
-				serial_output("specific forces in ft/s^2.\r\n") ;
+				serial_output("Specific forces in ft/s^2.\r\n") ;
 			}
 			break ;	
 		case 7:
@@ -236,17 +236,17 @@ void send_imu_data(void)
 		break ;
 		case 9:
 			{
-				serial_output( "Accelerometer range = %i times gravity\r\n" , ACCEL_RANGE ) ;
+				serial_output( "Accelerometer range is %i times gravity.\r\n" , ACCEL_RANGE ) ;
 			}
 			break ;
 		case 10:
 			{
-				serial_output( "Gyro range = %i degrees per second\r\n" , GYRO_RANGE ) ;
+				serial_output( "Gyro range is %i deg/sec.\r\n" , GYRO_RANGE ) ;
 			}
 			break ;
 		case 12:
 			{
-				serial_output("Gyro calibrations, x, y, z = %6.4f,%6.4f,%6.4f\r\n", 
+				serial_output("Gyro calibrations are x=%6.4f, y=%6.4f, z=%6.4f.\r\n", 
 						CALIBRATIONX ,CALIBRATIONY,CALIBRATIONZ );		
 			}
 			break ;
@@ -257,12 +257,12 @@ void send_imu_data(void)
 			break ;
 		case 16:
 			{
-				serial_output("tilt start, stop angles = %i,%i degrees\r\n", TILT_START , TILT_STOP);
+				serial_output("Tilt start angle = %i deg, stop = %i deg.\r\n", TILT_START , TILT_STOP);
 			}
 			break ;
 		case 18:
 			{
-				serial_output( "accel binary offsets = %i,%i,%i\r\n",
+				serial_output( "Accel offsets are x=%i, y=%i, z=%i.\r\n",
 					XACCEL_OFFSET ,
 					YACCEL_OFFSET , 
 					ZACCEL_OFFSET 
@@ -271,7 +271,7 @@ void send_imu_data(void)
 			break;
 		case 19:
 			{
-				serial_output( "accel binary calibrations = %i,%i,%i\r\n",
+				serial_output( "Accel calibrations are x=%i, y=%i, z=%i.\r\n",
 					CAL_GRAV_X ,
 					CAL_GRAV_Y , 
 					CAL_GRAV_Z 
@@ -280,7 +280,7 @@ void send_imu_data(void)
 			break;
 		case 20:
 			{
-				serial_output("data rate = %i records/s\r\n", LOGGER_HZ );
+				serial_output("Data rate is %i records/s.\r\n", LOGGER_HZ );
 			}
 			break;
 		case 21:

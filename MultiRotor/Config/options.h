@@ -1,7 +1,7 @@
 #define MINI5 "UDBmini5 hardware.\r\n"
 #define MINI6 "UDBmini6 hardware.\r\n"
 
-#define DATE "rev. 2.0, 12/24/2022\r\n"
+#define DATE "rev. 2.0, 12/25/2022\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
 #define LOG_IMU
