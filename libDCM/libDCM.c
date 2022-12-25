@@ -47,18 +47,18 @@ int16_t GetAofA(void)
 	return angleOfAttack;
 }
 
-/*
+
 void offsets_init(void)
 {
 	
 	udb_xaccel.offset = XACCEL_OFFSET ;
 	udb_yaccel.offset = YACCEL_OFFSET ;
 	udb_zaccel.offset = ZACCEL_OFFSET ;
-	udb_xrate.offset  = XRATE_OFFSET;
-	udb_yrate.offset  = YRATE_OFFSET;
-	udb_zrate.offset  = ZRATE_OFFSET;
+//	udb_xrate.offset  = XRATE_OFFSET;
+//	udb_yrate.offset  = YRATE_OFFSET;
+//	udb_zrate.offset  = ZRATE_OFFSET;
 }
-*/
+
 
 void dcm_init(void)
 {

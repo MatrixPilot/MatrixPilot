@@ -54,6 +54,7 @@ int main (void)
 	{
 		gps_init() ;
 	}
+	offsets_init() ;
 	mcu_init() ;
 	udb_init() ;
 	dcm_init() ;
