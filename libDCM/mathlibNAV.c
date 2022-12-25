@@ -273,7 +273,8 @@ uint16_t sqrt_int(uint16_t sqr)
 	// based on Heron's algorithm
 	uint16_t binary_point = 0;
 	uint16_t result = 255;
-	int16_t iterations = 3;
+//	int16_t iterations = 3;
+	int16_t iterations = 6; // for more precision
 
 	if (sqr == 0)
 	{
@@ -299,8 +300,8 @@ uint16_t sqrt_long(uint32_t sqr)
 	// based on Heron's algorithm
 	uint16_t binary_point = 0;
 	uint16_t result = 65535;    // need to start high and work down to avoid overflow in divud
-	int16_t iterations = 3;     // thats all you need
-
+//	int16_t iterations = 3;     // thats all you need
+	int16_t iterations = 6;		// lets improve the precision for luge IMU
 	if (sqr < 65536)            // use the 16 bit square root
 	{
 		return sqrt_int((uint16_t)sqr);

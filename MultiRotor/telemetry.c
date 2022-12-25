@@ -323,7 +323,7 @@ void send_imu_data(void)
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
 //				serial_output("gx,gy,gyz,gxfilt,gyfilt,gzfilt,ax,ay,az,axfilt,ayfilt,azfilt\r\n");
-				serial_output("tmptur,synch,cpu_load,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
+				serial_output("tmptur,synch,cpu_load,w_mag,acc_mag,aw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef GYRO_OFFSETS
 				serial_output("tmptr,ind_msb,ind_lsb,w_mag,acc_mag,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
@@ -434,10 +434,12 @@ void send_imu_data(void)
 #endif // GYRO_CALIB
 #ifdef GYRO_DRIFT
 		compute_euler();
-		serial_output("%i,%i,%i,%.1f,%.1f,%.1f,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+		serial_output("%i,%i,%i,%i,%i,%.1f,%.1f,%.1f,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 				mpu_temp.value,
 				accelOn ,
 				udb_cpu_load(),
+				omega_magnitude ,
+				accel_magnitude ,
 				yaw_angle , pitch_angle , roll_angle ,
 				omegagyro[0],
 				omegagyro[1],
