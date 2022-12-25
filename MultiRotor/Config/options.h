@@ -4,13 +4,13 @@
 #define DATE "rev. 2.0, 12/24/2022\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
+#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
-#define GYRO_DRIFT
+//#define GYRO_DRIFT
 //#define ROAD_TEST
 //#define BUILD_OFFSET_TABLE
 
@@ -22,7 +22,7 @@
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
 //#define LOG_RATE
-//#define LOG_EULER
+#define LOG_EULER
 //#define LOG_RATE_AND_EULER
 //#define LOG_PITCH_AND_TWO_FORCES
 
@@ -121,7 +121,7 @@
 #define CALIBRATIONX	1.0159
 #define CALIBRATIONY	1.0100
 #define CALIBRATIONZ	1.0119
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4089
 #define CAL_GRAV_Y	4088
 #define CAL_GRAV_Z	4162
@@ -136,7 +136,7 @@
 #define CALIBRATIONX	1.0389
 #define CALIBRATIONY	1.0389
 #define CALIBRATIONZ	1.0206
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4124
 #define CAL_GRAV_Y	4085
 #define CAL_GRAV_Z	4140
@@ -151,7 +151,7 @@
 #define CALIBRATIONX	1.0120
 #define CALIBRATIONY	1.0185
 #define CALIBRATIONZ	1.0090
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4103
 #define CAL_GRAV_Y	4082
 #define CAL_GRAV_Z	4174
@@ -166,7 +166,7 @@
 #define CALIBRATIONX	1.0072
 #define CALIBRATIONY	1.0057
 #define CALIBRATIONZ	1.0039
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4123
 #define CAL_GRAV_Y	4096
 #define CAL_GRAV_Z	4198
@@ -181,7 +181,7 @@
 #define CALIBRATIONX	1.0109
 #define CALIBRATIONY	1.0171
 #define CALIBRATIONZ	1.0066
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4101
 #define CAL_GRAV_Y	4099
 #define CAL_GRAV_Z	4153
@@ -196,7 +196,7 @@
 #define CALIBRATIONX	1.0141
 #define CALIBRATIONY	1.0056
 #define CALIBRATIONZ	1.0127
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4102
 #define CAL_GRAV_Y	4104
 #define CAL_GRAV_Z	4112
@@ -211,7 +211,7 @@
 #define CALIBRATIONX	1.0135
 #define CALIBRATIONY	1.0009
 #define CALIBRATIONZ	1.0067
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4100
 #define CAL_GRAV_Y	4104
 #define CAL_GRAV_Z	4148
@@ -225,7 +225,7 @@
 #define CALIBRATIONX	1.0112
 #define CALIBRATIONY	1.0043
 #define CALIBRATIONZ	1.0067
-#define CALIB_GRAVITY	4048
+#define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4105
 #define CAL_GRAV_Y	4098
 #define CAL_GRAV_Z	4122
