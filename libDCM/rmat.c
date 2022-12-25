@@ -400,24 +400,15 @@ extern int16_t accelEarthVertical ;
 extern int32_t velocityEarthVertical ;
 int16_t launch_count ;
 
-//#define LAUNCH_ACCELERATION ( 2.0 ) // times gravity
-//#define LAUNCH_VELOCITY ( 10.0 ) // miles per hour
-//#define LAUNCH_ACCELERATION_BINARY (( int16_t) ( GRAVITY*LAUNCH_ACCELERATION ))
-//#define EARTH_GRAVITY ( 9.81 ) // meters per second per second
-//#define FRAME_RATE ( 40.0 ) // computations are done 40 times per second
-//#define METERSPERSECONDPERMPH ( 4.0/9.0 ) // conversion from MPH to meters/second
-//#define LAUNCH_VELOCITY_BINARY ( ( int32_t ) ( LAUNCH_VELOCITY*GRAVITY*FRAME_RATE*METERSPERSECONDPERMPH/ EARTH_GRAVITY ) )
-//#define LAUNCH_DETECT_COUNT ( 20 )
-//#define GROUND_TEST
 int16_t omega_dot_rmat6 ;
 int16_t omega_scaled[3] ;
 int16_t omega_yaw_drift[3] ;
 uint16_t omega_magnitude ;
 extern boolean logging_on ;
 #if (GYRO_RANGE==1000)
-#define MAX_OMEGA 50
-#elif (GYRO_RANGE==500)
 #define MAX_OMEGA 100
+#elif (GYRO_RANGE==500)
+#define MAX_OMEGA 200
 #else
 #error "invalid GYRO_RANGE"
 #endif // GYRO_RANGE
@@ -425,9 +416,10 @@ extern boolean logging_on ;
 extern boolean gyro_locking_on ;
 int16_t motion_reset_counter = 500 ;
 int16_t motion_detect = 1 ;
+uint16_t accel_magnitude ;
 static void roll_pitch_drift(void)
 {	
-	uint16_t accel_magnitude = vector3_mag(gplane[0],gplane[1],gplane[2]);
+	accel_magnitude = vector3_mag(gplane[0],gplane[1],gplane[2]);
 	omega_magnitude = vector3_mag(omegagyro[0],omegagyro[1],0); // z has large drift, x and y are more stable
 	if((omega_magnitude<MAX_OMEGA )	&& (abs(accel_magnitude-CALIB_GRAVITY/2)<CALIB_GRAVITY/8))
 	{

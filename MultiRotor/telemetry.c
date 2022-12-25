@@ -84,6 +84,7 @@ extern float roll_angle , pitch_angle , yaw_angle ;
 extern float bill_angle_x , bill_angle_y , bill_angle_z ;
 extern int16_t omegacorrI[];
 extern uint16_t omega_magnitude ;
+extern uint16_t accel_magnitude ;
 extern union longww omegagyro_filtered[];
 extern struct ADchannel mpu_temp;
 extern uint16_t samples ;
@@ -325,7 +326,7 @@ void send_imu_data(void)
 				serial_output("tmptur,synch,cpu_load,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef GYRO_OFFSETS
-				serial_output("tmptr,ind_msb,ind_lsb,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
+				serial_output("tmptr,ind_msb,ind_lsb,w_mag,acc_mag,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
 #endif //				
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
@@ -357,9 +358,11 @@ void send_imu_data(void)
 		
 #ifdef GYRO_OFFSETS
 		{
-			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output( "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
 				mpu_temp.value,
 				index_msb , index_lsb ,
+				omega_magnitude ,
+				accel_magnitude ,
 				udb_xrate.value , udb_yrate.value , udb_zrate.value	,
 				udb_xrate.offset , udb_yrate.offset ,udb_zrate.offset ,
 				omegagyro[0] , omegagyro[1], omegagyro[2]

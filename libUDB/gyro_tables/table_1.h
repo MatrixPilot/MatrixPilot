@@ -13,6 +13,9 @@
 #define LOOKUP_LSB_MASK 0x03FF
 #define MSB_SHIFT 10
 
+int16_t residual_offset[] = { -896 , -384 , 2176 } ;
+//int16_t residual_offset[] = { 0 , 0 , 0 } ;
+
 struct gyro_offset_table_entry gyro_offset_table[] = {
 	{3817,-3692,4307},
 	{3515,-3092,4082},
