@@ -29,8 +29,8 @@ int16_t temperature_index ;
 
 int16_t gyro_offset[3] ;
 
-uint16_t index_msb ;
-uint16_t index_lsb ;
+uint16_t index_msb = 0 ;
+uint16_t index_lsb = 0 ;
 int16_t left_entry[3];
 int16_t right_minus_left[3];
 uint16_t number_entries ;
@@ -40,9 +40,11 @@ void lookup_gyro_offsets(void)
 	temperature_index = mpu_temp.value - TABLE_ORIGIN ;
 	if (temperature_index < 0)
 	{
-		gyro_offset[0] = gyro_offset_table[0].x ;
-		gyro_offset[1] = gyro_offset_table[0].y ;
-		gyro_offset[2] = gyro_offset_table[0].z ;
+		index_msb = 0 ;
+		index_lsb = 0 ;
+		gyro_offset[0] = residual_offset[0]+ gyro_offset_table[0].x ;
+		gyro_offset[1] = residual_offset[1]+ gyro_offset_table[0].y ;
+		gyro_offset[2] = residual_offset[2]+ gyro_offset_table[0].z ;
 	}
 	else
 	{
@@ -51,9 +53,9 @@ void lookup_gyro_offsets(void)
 		number_entries = (sizeof (gyro_offset_table))/(sizeof (gyro_offset_table_entry)) ;
 		if ( index_msb >= (number_entries - 1 ))
 		{
-			gyro_offset[0] = gyro_offset_table[number_entries - 1].x ;
-			gyro_offset[1] = gyro_offset_table[number_entries - 1].y ;
-			gyro_offset[2] = gyro_offset_table[number_entries - 1].z ;
+			gyro_offset[0] = residual_offset[0]+ gyro_offset_table[number_entries - 1].x ;
+			gyro_offset[1] = residual_offset[1]+ gyro_offset_table[number_entries - 1].y ;
+			gyro_offset[2] = residual_offset[2]+ gyro_offset_table[number_entries - 1].z ;
 		}
 		else
 		{
