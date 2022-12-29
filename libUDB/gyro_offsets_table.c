@@ -80,7 +80,7 @@ void lookup_gyro_offsets(void)
 	}
 }
 
-#define STEP_SIZE 256
+#define STEP_SIZE 1024
 
 int64_t samples_64t = 0 ;
 int32_t samples_32t = 0 ;
