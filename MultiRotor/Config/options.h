@@ -6,11 +6,11 @@
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
-//#define GYRO_DRIFT
+#define GYRO_DRIFT
 //#define ROAD_TEST
 //#define BUILD_OFFSET_TABLE
 
@@ -263,31 +263,31 @@
 #endif // MINI6_SN4
 
 #ifdef MINI6_SN5
-#define XACCEL_OFFSET	( 0 )
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
+#define XACCEL_OFFSET	( 58 )
+#define YACCEL_OFFSET	( -30 )
+#define ZACCEL_OFFSET	( -104 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_5.h"
 #define CALIBRATIONX	1.0000
 #define CALIBRATIONY	1.0000
 #define CALIBRATIONZ	1.0000
 #define CALIB_GRAVITY	4096
-#define CAL_GRAV_X	4096
-#define CAL_GRAV_Y	4096
-#define CAL_GRAV_Z	4096
+#define CAL_GRAV_X	4097
+#define CAL_GRAV_Y	4106
+#define CAL_GRAV_Z	4124
 #endif // MINI6_SN5
 
 #ifdef MINI6_SN6
-#define XACCEL_OFFSET	( 0 )
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
+#define XACCEL_OFFSET	( 135 )
+#define YACCEL_OFFSET	( -37 )
+#define ZACCEL_OFFSET	( -100 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_6.h"
 #define CALIBRATIONX	1.0000
 #define CALIBRATIONY	1.0000
 #define CALIBRATIONZ	1.0000
 #define CALIB_GRAVITY	4096
-#define CAL_GRAV_X	4096
-#define CAL_GRAV_Y	4096
-#define CAL_GRAV_Z	4096
+#define CAL_GRAV_X	4098
+#define CAL_GRAV_Y	4108
+#define CAL_GRAV_Z	4134
 #endif // MINI6_SN6
 
 
