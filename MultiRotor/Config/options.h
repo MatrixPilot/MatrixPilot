@@ -6,13 +6,13 @@
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
 //#define RECORD_OFFSETS
-//#define GYRO_OFFSETS
+#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
-#define BUILD_OFFSET_TABLE
+//#define BUILD_OFFSET_TABLE
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
@@ -33,7 +33,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN2
+#define MINI6_SN6
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -75,6 +75,37 @@
 #define GYRO_RANGE	    1000
 #define LOG_EULER
 #endif // MINI6_SN4
+
+#ifdef MINI6_SN4
+#define BOARD MINI6
+#define NAME "Tucker West"
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 1
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#define LOG_EULER
+#endif // MINI6_SN4
+
+#ifdef MINI6_SN5
+#define BOARD MINI6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 5
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#define LOG_EULER
+#endif // MINI6_SN5
+
+#ifdef MINI6_SN6
+#define BOARD MINI6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 6
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#define LOG_EULER
+#endif // MINI6_SN6
 
 #ifdef MINI5_SN3
 #define BOARD MINI5
@@ -192,7 +223,7 @@
 #define XACCEL_OFFSET	( 72 )
 #define YACCEL_OFFSET	( -42 )
 #define ZACCEL_OFFSET	( 26 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_4.h"
 #define CALIBRATIONX	1.0141
 #define CALIBRATIONY	1.0056
 #define CALIBRATIONZ	1.0127
@@ -230,6 +261,35 @@
 #define CAL_GRAV_Y	4098
 #define CAL_GRAV_Z	4122
 #endif // MINI6_SN4
+
+#ifdef MINI6_SN5
+#define XACCEL_OFFSET	( 0 )
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_5.h"
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4096
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4096
+#endif // MINI6_SN5
+
+#ifdef MINI6_SN6
+#define XACCEL_OFFSET	( 0 )
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_6.h"
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4096
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4096
+#endif // MINI6_SN6
+
 
 #ifdef GYRO_CALIB
 #undef LOGGER_HZ

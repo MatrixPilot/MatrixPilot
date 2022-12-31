@@ -26,6 +26,9 @@
         <logicalFolder name="f1" displayName="gyro_tables" projectFiles="true">
           <itemPath>../../libUDB/gyro_tables/table_1.h</itemPath>
           <itemPath>../../libUDB/gyro_tables/table_2.h</itemPath>
+          <itemPath>../../libUDB/gyro_tables/table_3.h</itemPath>
+          <itemPath>../../libUDB/gyro_tables/table_4.h</itemPath>
+          <itemPath>../../libUDB/gyro_tables/table_5.h</itemPath>
         </logicalFolder>
         <itemPath>../../libUDB/ADchannel.h</itemPath>
         <itemPath>../../libUDB/analogs.h</itemPath>
