@@ -8,9 +8,9 @@
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
-//#define GYRO_CALIB
+#define GYRO_CALIB
 //#define LOG_VELOCITY
-#define GYRO_DRIFT
+//#define GYRO_DRIFT
 //#define ROAD_TEST
 //#define BUILD_OFFSET_TABLE
 
@@ -267,9 +267,9 @@
 #define YACCEL_OFFSET	( -30 )
 #define ZACCEL_OFFSET	( -104 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_5.h"
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define CALIBRATIONX	1.0146
+#define CALIBRATIONY	1.0009
+#define CALIBRATIONZ	1.0061
 #define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4097
 #define CAL_GRAV_Y	4106
@@ -281,9 +281,9 @@
 #define YACCEL_OFFSET	( -37 )
 #define ZACCEL_OFFSET	( -100 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_6.h"
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define CALIBRATIONX	1.0145
+#define CALIBRATIONY	1.0037
+#define CALIBRATIONZ	1.0055
 #define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4098
 #define CAL_GRAV_Y	4108
