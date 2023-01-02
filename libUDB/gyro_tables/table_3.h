@@ -1,12 +1,9 @@
-/* 
- * File:   table_1.h
- * Author: bill
- *
- * Created on December 24, 2022, 11:37 AM
- */
+
 
 #ifndef TABLE_3_H
 #define	TABLE_3_H
+
+// not used
 
 #define TABLE_ORIGIN -10891
 

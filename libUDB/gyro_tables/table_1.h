@@ -1,12 +1,8 @@
-/* 
- * File:   table_1.h
- * Author: bill
- *
- * Created on December 24, 2022, 11:37 AM
- */
 
 #ifndef TABLE_1_H
 #define	TABLE_1_H
+
+// used by MINI6_SN4
 
 #define TABLE_ORIGIN -9292
 

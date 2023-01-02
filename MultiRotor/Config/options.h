@@ -163,7 +163,7 @@
 #define XACCEL_OFFSET	( 84 )
 #define YACCEL_OFFSET	( -48 )
 #define ZACCEL_OFFSET	( 248 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#error "gyro table not defined"
 #define CALIBRATIONX	1.0389
 #define CALIBRATIONY	1.0389
 #define CALIBRATIONZ	1.0206
@@ -193,7 +193,7 @@
 #define XACCEL_OFFSET	( 132 )
 #define YACCEL_OFFSET	( 56 )
 #define ZACCEL_OFFSET	( -330 
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h")
+#error "gyro table not defined"
 #define CALIBRATIONX	1.0072
 #define CALIBRATIONY	1.0057
 #define CALIBRATIONZ	1.0039
@@ -208,7 +208,7 @@
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -15 )
 #define ZACCEL_OFFSET	( -16 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#error "gyro table not defined"
 #define CALIBRATIONX	1.0109
 #define CALIBRATIONY	1.0171
 #define CALIBRATIONZ	1.0066
@@ -238,7 +238,7 @@
 #define XACCEL_OFFSET	( 58 )
 #define YACCEL_OFFSET	( -34 )
 #define ZACCEL_OFFSET	( -77 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#error "gyro table not defined"
 #define CALIBRATIONX	1.0135
 #define CALIBRATIONY	1.0009
 #define CALIBRATIONZ	1.0067

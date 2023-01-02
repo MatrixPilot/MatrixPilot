@@ -1,16 +1,9 @@
-/* 
- * File:   table_1.h
- * Author: bill
- *
- * Created on December 24, 2022, 11:37 AM
- */
-
 
 
 #ifndef TABLE_7_H
 #define	TABLE_7_H
 
-// mini5 sn1
+// used in MINI5_SN1
 
 #define LOOKUP_LSB_MASK 0x00FF
 #define MSB_SHIFT 8
