@@ -5,8 +5,8 @@
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
-//#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+#define RECORD_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -145,16 +145,16 @@
 
 #ifdef MINI5_SN1
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 88 )
-#define YACCEL_OFFSET	( -8 )
-#define ZACCEL_OFFSET	( -257 )
+#define XACCEL_OFFSET	( 80 )
+#define YACCEL_OFFSET	( -17 )
+#define ZACCEL_OFFSET	( -288 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_7.h"
 #define CALIBRATIONX	1.0159
 #define CALIBRATIONY	1.0100
 #define CALIBRATIONZ	1.0119
 #define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4089
-#define CAL_GRAV_Y	4088
+#define CAL_GRAV_Y	4074
 #define CAL_GRAV_Z	4162
 #endif //MINI5_SN1
 
