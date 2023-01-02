@@ -1,7 +1,7 @@
 #define MINI5 "UDBmini5 hardware.\r\n"
 #define MINI6 "UDBmini6 hardware.\r\n"
 
-#define DATE "rev. 2.0, 12/28/2022\r\n"
+#define DATE "rev. 2.0, 12/31/2022\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
@@ -22,7 +22,7 @@
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
 //#define LOG_RATE
-#define LOG_EULER
+//#define LOG_EULER
 //#define LOG_RATE_AND_EULER
 //#define LOG_PITCH_AND_TWO_FORCES
 
@@ -33,7 +33,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN6
+#define MINI5_SN3
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -52,7 +52,7 @@
 #define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-#define LOG_EULER
+//#define LOG_EULER
 #endif // MINI6_SN2
 
 #ifdef MINI6_SN3
@@ -140,7 +140,7 @@
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 1
 #define ACCEL_RANGE         8
-#define GYRO_RANGE	    500
+#define GYRO_RANGE	    1000
 #endif // MINI5_SN1
 
 #ifdef MINI5_SN1
@@ -148,7 +148,7 @@
 #define XACCEL_OFFSET	( 88 )
 #define YACCEL_OFFSET	( -8 )
 #define ZACCEL_OFFSET	( -257 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_7.h"
 #define CALIBRATIONX	1.0159
 #define CALIBRATIONY	1.0100
 #define CALIBRATIONZ	1.0119
@@ -178,7 +178,7 @@
 #define XACCEL_OFFSET	( 158 )
 #define YACCEL_OFFSET	( -29 )
 #define ZACCEL_OFFSET	( -287 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_8.h"
 #define CALIBRATIONX	1.0120
 #define CALIBRATIONY	1.0185
 #define CALIBRATIONZ	1.0090
