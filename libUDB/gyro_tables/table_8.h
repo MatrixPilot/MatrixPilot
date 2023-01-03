@@ -86,5 +86,5 @@ struct gyro_offset_table_entry gyro_offset_table[] = {
 { -4796 , 1949 , -1082 }
 };
 
-#endif	/* TABLE_7_H */
+#endif	/* TABLE_8_H */
 

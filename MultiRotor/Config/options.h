@@ -5,10 +5,10 @@
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
-#define RECORD_OFFSETS
+//#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
-//#define GYRO_CALIB
+#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
@@ -64,17 +64,6 @@
 #define GYRO_RANGE	    1000
 #define LOG_EULER
 #endif // MINI6_SN3
-
-#ifdef MINI6_SN4
-#define BOARD MINI6
-#define NAME "Tucker West"
-#define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 1
-#define ACCEL_RANGE         8
-#define GYRO_RANGE	    1000
-#define LOG_EULER
-#endif // MINI6_SN4
 
 #ifdef MINI6_SN4
 #define BOARD MINI6
