@@ -4,11 +4,11 @@
 #define DATE "rev. 2.0, 12/31/2022\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
+#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
-#define GYRO_CALIB
+//#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
@@ -22,7 +22,7 @@
 // LOG_RATE reports the gyro rates, degrees/sec
 // LOG_EULER reports roll, pitch and yaw Euler angles in NED
 //#define LOG_RATE
-//#define LOG_EULER
+#define LOG_EULER
 //#define LOG_RATE_AND_EULER
 //#define LOG_PITCH_AND_TWO_FORCES
 

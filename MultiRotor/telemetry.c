@@ -135,6 +135,10 @@ extern float acceleration_float[];
 extern float omegaAccum_float[];
 extern float velocity ;
 extern uint16_t index_msb , index_lsb ;
+float yaw_previous ;
+float heading ;
+float heading_previous ;
+float delta_yaw ;
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
@@ -175,7 +179,6 @@ void send_imu_data(void)
 	}
 #endif // ALWAYS_LOG
 	db_index = 0 ;
-	
 	if (!hasWrittenHeader)
 	{
 		header_line ++ ;
@@ -251,8 +254,11 @@ void send_imu_data(void)
 			}
 			break ;
 		case 14:
+			// initialize the unwrapping of yaw angle
 			{
-				
+				compute_euler();
+				yaw_previous = yaw_angle ;
+				heading_previous = 0.0 ;
 			}
 			break ;
 		case 16:
@@ -398,11 +404,26 @@ void send_imu_data(void)
 #ifdef LOG_EULER
 		{
 			compute_euler();
+			delta_yaw = yaw_angle - yaw_previous ;
+			if (abs(delta_yaw)<90.0)
+			{
+				heading = heading_previous + delta_yaw ;
+			}
+			else if(delta_yaw>0)
+			{
+				heading = heading_previous + delta_yaw - 360.0 ;
+			}
+			else
+			{
+				heading = heading_previous + delta_yaw + 360.0 ;
+			}
+			heading_previous = heading ;
+			yaw_previous = yaw_angle ;
 			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
-				yaw_angle ,  pitch_angle , roll_angle  ) ;	
+				heading ,  pitch_angle , roll_angle  ) ;	
 		}
 #endif // LOG_EULER
 #ifdef LOG_RATE_AND_EULER
