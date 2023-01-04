@@ -1,12 +1,12 @@
 #define MINI5 "UDBmini5 hardware.\r\n"
 #define MINI6 "UDBmini6 hardware.\r\n"
 
-#define DATE "rev. 2.0, 12/31/2022\r\n"
+#define DATE "rev. 2.1, 1/4/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
+//#define LOG_IMU
 //#define RECORD_OFFSETS
-//#define GYRO_OFFSETS
+#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -97,37 +97,41 @@
 #endif // MINI6_SN6
 
 #ifdef MINI5_SN3
+// was sn3
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 3
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 0
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN3
 
 #ifdef MINI5_SN4
+// was SN4
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 4
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 1
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN4
 
 #ifdef MINI5_SN2
+// was SN2
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 2
+#define SERIAL_NUMBERD3 9
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN2
 
 #ifdef MINI5_SN1
+// was SN1
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 1
+#define SERIAL_NUMBERD3 8
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN1
