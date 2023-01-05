@@ -33,7 +33,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN3
+#define MINI5_SN1
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -141,7 +141,8 @@
 #define XACCEL_OFFSET	( 80 )
 #define YACCEL_OFFSET	( -17 )
 #define ZACCEL_OFFSET	( -288 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_7.h"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_9.h"
+//#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_7.h"
 #define CALIBRATIONX	1.0159
 #define CALIBRATIONY	1.0100
 #define CALIBRATIONZ	1.0119

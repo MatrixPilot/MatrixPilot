@@ -3,7 +3,7 @@
 #ifndef TABLE_7_H
 #define	TABLE_7_H
 
-// used in MINI5_SN1
+// used in MINI5_SN1, now SN8
 
 #define LOOKUP_LSB_MASK 0x00FF
 #define MSB_SHIFT 8
