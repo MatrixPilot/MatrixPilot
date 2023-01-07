@@ -33,6 +33,8 @@
           <itemPath>../../libUDB/gyro_tables/table_7.h</itemPath>
           <itemPath>../../libUDB/gyro_tables/table_8.h</itemPath>
           <itemPath>../../libUDB/gyro_tables/table_9.h</itemPath>
+          <itemPath>../../libUDB/gyro_tables/table_10.h</itemPath>
+          <itemPath>../../libUDB/gyro_tables/table_11.h</itemPath>
         </logicalFolder>
         <itemPath>../../libUDB/ADchannel.h</itemPath>
         <itemPath>../../libUDB/analogs.h</itemPath>

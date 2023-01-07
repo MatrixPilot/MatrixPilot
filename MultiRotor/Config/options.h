@@ -1,12 +1,12 @@
 #define MINI5 "UDBmini5 hardware.\r\n"
 #define MINI6 "UDBmini6 hardware.\r\n"
 
-#define DATE "rev. 2.1, 1/4/2023\r\n"
+#define DATE "rev. 2.2, 1/7/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
+#define LOG_IMU
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -33,7 +33,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN1
+#define MINI5_SN4
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -186,8 +186,8 @@
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 132 )
 #define YACCEL_OFFSET	( 56 )
-#define ZACCEL_OFFSET	( -330 
-#error "gyro table not defined"
+#define ZACCEL_OFFSET	( -330 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_11.h"
 #define CALIBRATIONX	1.0072
 #define CALIBRATIONY	1.0057
 #define CALIBRATIONZ	1.0039
@@ -232,7 +232,7 @@
 #define XACCEL_OFFSET	( 58 )
 #define YACCEL_OFFSET	( -34 )
 #define ZACCEL_OFFSET	( -77 )
-#error "gyro table not defined"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_10.h"
 #define CALIBRATIONX	1.0135
 #define CALIBRATIONY	1.0009
 #define CALIBRATIONZ	1.0067

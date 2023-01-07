@@ -419,7 +419,7 @@ void send_imu_data(void)
 			}
 			heading_previous = heading ;
 			yaw_previous = yaw_angle ;
-			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
+			serial_output( "%.2f,%.1f,%.1f,%.1f,%.2f,%.1f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
@@ -429,7 +429,7 @@ void send_imu_data(void)
 #ifdef LOG_RATE_AND_EULER
 		{
 			compute_euler();
-			serial_output( "%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" ,
+			serial_output( "%.1f,%.1f,%.1f,%.1f,%.2f,%.1f\r\n" ,
 				((double)(omegaAccum[0]))/GYRO_FACTOR ,
 				((double)(omegaAccum[1]))/GYRO_FACTOR , 
 				((double)(omegaAccum[2]))/GYRO_FACTOR ,
@@ -439,7 +439,7 @@ void send_imu_data(void)
 #ifdef LOG_PITCH_AND_TWO_FORCES
 		{
 			compute_euler();
-			serial_output( "%.1f,%.1f,%.1f\r\n" ,
+			serial_output( "%.2f,%.1f,%.2f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
 				pitch_angle   ) ;	
