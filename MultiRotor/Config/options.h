@@ -4,11 +4,11 @@
 #define DATE "rev. 2.2, 1/7/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
+#define LOG_IMU
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
-#define GYRO_CALIB
+//#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
@@ -29,6 +29,7 @@
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
 #define LOGGER_HZ	100
+#define HEADER_HZ	20
 #define SLIDE_DET_HZ	10
 #define TILT_START	15
 #define TILT_STOP	60

@@ -101,10 +101,6 @@ extern int32_t xy_bar[] ;
 extern int16_t x_bar ;
 extern int16_t y_bar[] ;
 
-/*void send_debug_line( void )
-{
-	
-}*/
 extern int16_t gplane[];
 extern int16_t aero_force[];
 extern void serial_output(const char* format, ...);
@@ -139,13 +135,22 @@ float yaw_previous ;
 float heading ;
 float heading_previous ;
 float delta_yaw ;
+boolean is_first_header = 1;
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
 	if (start_log == 1)
 	{
 		hasWrittenHeader = 0 ;
-		header_line = 0 ;
+		if ( is_first_header)
+		{
+			header_line = 0 ;
+			is_first_header = 0 ;
+		}
+		else
+		{	
+			header_line = 22 ;
+		}
 		start_log = 0 ;
 		logging_on = 1 ;
 #ifdef		ALWAYS_SYNC_GYROS
@@ -294,14 +299,14 @@ void send_imu_data(void)
 				serial_output(FILTERING);
 			}
 			break;
-		case 22:
+		case 23:
 			{
 #ifdef LOG_IMU
 #ifdef LOG_RATE
 				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
 #endif // LOG_RATE
 #ifdef LOG_EULER
-				serial_output( "x_force , y , z , yaw_angle , pitch , roll\r\n" ) ;			
+				serial_output( "\r\n\r\nx_force_xx,y_force_xx,z_force_xx,yaw_angle_xx,pitch_angle_xx,roll_angle_xx\r\n" ) ;			
 #endif // LOG_EULER	
 #ifdef LOG_RATE_AND_EULER
 				serial_output( "x_rate , y_rate , z_rate , yaw_angle , pitch , roll\r\n" ) ;		
@@ -342,7 +347,7 @@ void send_imu_data(void)
 #endif //BUILD_OFFSET_TABLE
 			}
 			break ;	
-		case 23:
+		case 25:
 			hasWrittenHeader = 1 ;
 			break ;
 		default:

@@ -35,6 +35,7 @@
 #include <stdio.h>
 
 extern boolean differential_gps(void) ;
+extern boolean hasWrittenHeader ;
 
 boolean didCalibrate = 0 ;
 
@@ -169,11 +170,20 @@ void dcm_heartbeat_callback(void)
 			update_slide_detection();
 #endif
 		}
-		if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
+		if (!hasWrittenHeader)
 		{
-			send_imu_data();
+			if ((udb_heartbeat_counter % (HEARTBEAT_HZ/HEADER_HZ)) == 0)
+			{
+				send_imu_data();
+			}
 		}
-		
+		else
+		{
+			if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
+			{
+				send_imu_data();
+			}
+		}
 	}
 	// Serial output SERVO_HZ  (40 Hz)
 	
