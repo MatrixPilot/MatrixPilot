@@ -122,6 +122,7 @@ extern uint16_t altitude ;
 #define DEG_PER_RAD 57.296
 float tilt_angle ;
 boolean start_log = 0 , stop_log = 0 , slide_in_progress = 0 ;
+uint16_t stop_count = 0 ;
 void update_slide_detection(void)
 {
 	int16_t tilt_angle_int ;
@@ -130,14 +131,22 @@ void update_slide_detection(void)
 	if ( slide_in_progress == 1)
 		{
 		if ( tilt_angle_int > TILT_STOP )
+			if ( stop_count == SLIDE_DET_HZ*TILT_STOP_DELAY)
 			{
 				stop_log = 1 ;
 				slide_in_progress = 0 ;
 				LED_RED = LED_OFF ;
 				udb_led_toggle(LED_GREEN);
 			}
+			else
+			{
+				stop_count ++ ;
+				LED_RED = LED_ON ;
+				LED_GREEN = LED_OFF ;
+			}
 		else
 			{
+				stop_count = 0 ;
 				udb_led_toggle(LED_RED);
 				LED_GREEN = LED_OFF ;
 			}
@@ -146,6 +155,7 @@ void update_slide_detection(void)
 		{
 		if ( tilt_angle_int < TILT_START )
 			{
+				stop_count = 0 ;
 				start_log = 1 ;
 				slide_in_progress = 1 ;
 				udb_led_toggle(LED_RED);

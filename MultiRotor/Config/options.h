@@ -1,7 +1,7 @@
 #define MINI5 "UDBmini5 hardware.\r\n"
 #define MINI6 "UDBmini6 hardware.\r\n"
 
-#define DATE "rev. 2.2, 1/7/2023\r\n"
+#define DATE "rev. 2.3, 1/14/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
 #define LOG_IMU
@@ -31,6 +31,7 @@
 #define LOGGER_HZ	100
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	10
+#define TILT_STOP_DELAY 10 // seconds 
 #define TILT_START	15
 #define TILT_STOP	60
 
