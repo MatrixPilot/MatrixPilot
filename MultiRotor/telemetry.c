@@ -306,13 +306,13 @@ void send_imu_data(void)
 				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
 #endif // LOG_RATE
 #ifdef LOG_EULER
-				serial_output( "\r\n\r\nx_force_xx,y_force_xx,z_force_xx,yaw_angle_xx,pitch_angle_xx,roll_angle_xx\r\n" ) ;			
+				serial_output( "\r\n\r\nx_force_xx,y_force_xx,z_force_xx,yaw_xx,pitch_xx,roll_xx\r\n" ) ;			
 #endif // LOG_EULER	
 #ifdef LOG_RATE_AND_EULER
-				serial_output( "x_rate , y_rate , z_rate , yaw_angle , pitch , roll\r\n" ) ;		
+				serial_output( "\r\n\r\nx_rate_xx,y_rate_xx,z_rate_xx,yaw_xx,pitch_xx,roll_xx\r\n" ) ;		
 #endif // LOG_RATE_AND_EULER
 #ifdef LOG_PITCH_AND_TWO_FORCES
-				serial_output( "x_force,z_force,pitch_angle\r\n" ) ;	
+				serial_output( "\r\n\r\nx_force_xx,z_force,pitch_xx\r\n" ) ;	
 #endif // LOG_PITCH_AND_TWO_FORCES
 #endif // LOG_IMU
 				
