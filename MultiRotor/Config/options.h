@@ -4,9 +4,9 @@
 #define DATE "rev. 2.3, 1/14/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
+//#define LOG_IMU
 //#define RECORD_OFFSETS
-//#define GYRO_OFFSETS
+#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -35,7 +35,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN12
+#define MINI5_SN13
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -54,7 +54,7 @@
 #define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
-//#define LOG_EULER
+#define LOG_EULER
 #endif // MINI6_SN2
 
 #ifdef MINI6_SN3
@@ -98,16 +98,6 @@
 #define LOG_EULER
 #endif // MINI6_SN6
 
-#ifdef MINI5_SN3
-// was sn3
-#define BOARD MINI5
-#define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	1
-#define SERIAL_NUMBERD3 0
-#define ACCEL_RANGE         8
-#define GYRO_RANGE	    1000
-#endif // MINI5_SN3
-
 #ifdef MINI5_SN4
 // was SN4
 #define BOARD MINI5
@@ -118,6 +108,15 @@
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN4
 
+#ifdef MINI5_SN7
+#define BOARD MINI5
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 7
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI5_SN7
+
 #ifdef MINI5_SN12
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
@@ -126,6 +125,15 @@
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN12
+
+#ifdef MINI5_SN13
+#define BOARD MINI5
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 3
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI5_SN13
 
 #ifdef MINI5_SN2
 // was SN2
@@ -222,6 +230,36 @@
 #define CAL_GRAV_Y	4077
 #define CAL_GRAV_Z	4186
 #endif //MINI5_SN12
+
+#ifdef MINI5_SN13
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 0)
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_13.h"
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4096
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4096
+#endif //MINI5_SN13
+
+#ifdef MINI5_SN7
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 0)
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_14.h"
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4096
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4096
+#endif //MINI5_SN13
 
 #ifdef MINI6_SN1
 #define CUSTOM_OFFSETS
