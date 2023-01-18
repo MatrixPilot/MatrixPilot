@@ -6,13 +6,13 @@
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
-//#define BUILD_OFFSET_TABLE
+#define BUILD_OFFSET_TABLE
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
@@ -218,17 +218,17 @@
 
 #ifdef MINI5_SN12
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 162)
-#define YACCEL_OFFSET	( 24 )
-#define ZACCEL_OFFSET	( -134 )
+#define XACCEL_OFFSET	( 163 )
+#define YACCEL_OFFSET	( 20 )
+#define ZACCEL_OFFSET	( -156 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_12.h"
 #define CALIBRATIONX	1.0051
 #define CALIBRATIONY	1.0101
 #define CALIBRATIONZ	1.0190
 #define CALIB_GRAVITY	4096
-#define CAL_GRAV_X	4103
-#define CAL_GRAV_Y	4077
-#define CAL_GRAV_Z	4186
+#define CAL_GRAV_X	4105
+#define CAL_GRAV_Y	4075
+#define CAL_GRAV_Z	4190
 #endif //MINI5_SN12
 
 #ifdef MINI5_SN13
@@ -248,18 +248,18 @@
 
 #ifdef MINI5_SN7
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 0)
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
+#define XACCEL_OFFSET	( 133)
+#define YACCEL_OFFSET	( 40 )
+#define ZACCEL_OFFSET	( 52 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_14.h"
 #define CALIBRATIONX	1.0000
 #define CALIBRATIONY	1.0000
 #define CALIBRATIONZ	1.0000
 #define CALIB_GRAVITY	4096
-#define CAL_GRAV_X	4096
-#define CAL_GRAV_Y	4096
-#define CAL_GRAV_Z	4096
-#endif //MINI5_SN13
+#define CAL_GRAV_X	4127
+#define CAL_GRAV_Y	4078
+#define CAL_GRAV_Z	4192
+#endif //MINI5_SN7
 
 #ifdef MINI6_SN1
 #define CUSTOM_OFFSETS

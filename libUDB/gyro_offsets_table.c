@@ -139,7 +139,6 @@ void update_offset_table(void)
 		y_sum[2] += (int32_t ) gyro_offset_entry[2] ;
 		
 		samples_32t ++ ;
-		reported_temperature ++ ;
 		
 		if ( adjusted_temperature >= STEP_SIZE )
 		{
@@ -161,7 +160,7 @@ void update_offset_table(void)
 				y_bar[1] = (int16_t)(y_sum[1]/samples_32t);
 				y_bar[2] = (int16_t)(y_sum[2]/samples_32t);
 			
-				xx_bar_minus_x_bar_x_bar = (int64_t)(xx_bar - x_bar*x_bar) ;
+				xx_bar_minus_x_bar_x_bar = (int64_t)(((int64_t)xx_bar) - ((int64_t)x_bar)*((int64_t)x_bar)) ;
 			
 				// prevent division by 0, also, in theory xx_bar_minus_x_bar_x_bar must be positive
 				if (xx_bar_minus_x_bar_x_bar <= ((int64_t)0)) xx_bar_minus_x_bar_x_bar = 1 ;
