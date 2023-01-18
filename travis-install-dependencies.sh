@@ -80,7 +80,8 @@ echo
 # Install Microchip Peripheral Libraries (PLIBS) v2.00
 echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
 echo "- Downloading Microchip PLIBS v2.00"
-wget http://ww1.microchip.com/downloads/en/DeviceDoc/peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
+#wget http://ww1.microchip.com/downloads/en/DeviceDoc/peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
+wget http://ww1.microchip.com/downloads/en//softwarelibrary/pic24%20mcu%20dspic%20peripheral%20lib/peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
 echo "- Download finished..."
 echo "- Adding excecution rights..."
 chmod +x peripheral-libraries-for-pic24-and-dspic-v2.00-linux-installer.run
