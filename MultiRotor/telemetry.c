@@ -100,6 +100,7 @@ extern uint32_t xx_bar ;
 extern int32_t xy_bar[] ;
 extern int16_t x_bar ;
 extern int16_t y_bar[] ;
+extern int16_t gyro_offset[];
 
 extern int16_t gplane[];
 extern int16_t aero_force[];
@@ -334,7 +335,7 @@ void send_imu_data(void)
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
 //				serial_output("gx,gy,gyz,gxfilt,gyfilt,gzfilt,ax,ay,az,axfilt,ayfilt,azfilt\r\n");
-				serial_output("tmptur,synch,cpu_load,w_mag,acc_mag,aw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
+				serial_output("tmptur,synch,cpu_load,w_mag,acc_mag,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef GYRO_OFFSETS
 				serial_output("tmptr,ind_msb,ind_lsb,w_mag,acc_mag,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
@@ -374,8 +375,8 @@ void send_imu_data(void)
 				index_msb , index_lsb ,
 				omega_magnitude ,
 				accel_magnitude ,
-				udb_xrate.value , udb_yrate.value , udb_zrate.value	,
-				udb_xrate.offset , udb_yrate.offset ,udb_zrate.offset ,
+				64*udb_xrate.value , 64*udb_yrate.value , 64*udb_zrate.value	,	
+				gyro_offset[0] , gyro_offset[1] , gyro_offset[2] ,
 				omegagyro[0] , omegagyro[1], omegagyro[2]
 			 ) ;
 		}

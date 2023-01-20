@@ -153,15 +153,23 @@ union longww omegagyro_filtered[] = { { 0 }, { 0 },  { 0 } };
 
 extern int16_t accelOn ;
 extern int16_t gyro_offset[];
+union longww gyro_offset_32[] = { { 0 }, { 0 },  { 0 } };
 static inline void read_gyros(void)
 {
 	// fetch the gyro signals and subtract the baseline offset, 
 	// and adjust for variations in supply voltage
 	
 	lookup_gyro_offsets();
-	udb_xrate.offset = (gyro_offset[0])>>6 ;
-	udb_yrate.offset = (gyro_offset[1])>>6 ;
-	udb_zrate.offset = (gyro_offset[2])>>6 ;
+	gyro_offset_32[0].WW += ((int32_t)gyro_offset[0]) << 10 ;
+	gyro_offset_32[1].WW += ((int32_t)gyro_offset[1]) << 10 ;
+	gyro_offset_32[2].WW += ((int32_t)gyro_offset[2]) << 10 ;
+	udb_xrate.offset = (gyro_offset_32[0]._.W1) ;
+	udb_yrate.offset = (gyro_offset_32[1]._.W1) ;
+	udb_zrate.offset = (gyro_offset_32[2]._.W1) ;
+	gyro_offset_32[0]._.W1 = 0 ;
+	gyro_offset_32[1]._.W1 = 0 ;
+	gyro_offset_32[2]._.W1 = 0 ;
+
 	omegagyro[0] = XRATE_VALUE;
 	omegagyro[1] = YRATE_VALUE;
 	omegagyro[2] = ZRATE_VALUE;

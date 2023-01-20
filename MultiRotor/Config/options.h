@@ -1,18 +1,18 @@
 #define MINI5 "UDBmini5 hardware.\r\n"
 #define MINI6 "UDBmini6 hardware.\r\n"
 
-#define DATE "rev. 2.3, 1/14/2023\r\n"
+#define DATE "rev. 2.4, 1/20/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
 //#define RECORD_OFFSETS
-//#define GYRO_OFFSETS
+#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
-#define BUILD_OFFSET_TABLE
+//#define BUILD_OFFSET_TABLE
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
