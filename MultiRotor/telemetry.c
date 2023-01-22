@@ -137,6 +137,30 @@ float heading ;
 float heading_previous ;
 float delta_yaw ;
 boolean is_first_header = 1;
+boolean log_residuals = 0 ;
+extern boolean start_residuals ;
+
+void send_residual_data(void)
+{
+	if ( start_residuals == 1)
+	{
+		start_residuals = 0 ;
+		serial_output("\r\n\r\ntemperature_xx,filter_enabled_xx,x_rate_xx,y_rate_xx,z_rate_xx,x_residual_xx,y_residual_xx,z_residual_xx\r\n") ;
+	}
+	else
+	{
+		serial_output("%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+				mpu_temp.value,
+				accelOn ,
+				omegagyro[0],
+				omegagyro[1],
+				omegagyro[2],
+				(int16_t)((omegagyro_filtered[0].WW)>>12) ,
+				(int16_t)((omegagyro_filtered[1].WW)>>12) ,
+				(int16_t)((omegagyro_filtered[2].WW)>>12)	
+					);
+	}
+}
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
@@ -292,6 +316,10 @@ void send_imu_data(void)
 		case 21:
 			{
 				serial_output(FILTERING);
+				stop_log = 1 ;
+				start_residuals = 1 ;
+				hasWrittenHeader = 1 ;
+				
 			}
 			break;
 		case 23:

@@ -121,7 +121,7 @@ extern uint16_t altitude ;
 
 #define DEG_PER_RAD 57.296
 float tilt_angle ;
-boolean start_log = 0 , stop_log = 0 , slide_in_progress = 0 ;
+boolean start_log = 1 , stop_log = 0 , slide_in_progress = 0 ;
 uint16_t stop_count = 0 ;
 void update_slide_detection(void)
 {
@@ -170,16 +170,16 @@ void update_slide_detection(void)
 }
 
 // Called at heartbeat Hz, before sending servo pulses
+extern boolean log_residuals ;
+extern void send_residual_data(void) ;
+boolean stop_residuals = 1 ;
+boolean start_residuals = 0 ;
+extern float yaw_previous , yaw_angle , heading_previous ;
+extern void compute_euler(void);
 void dcm_heartbeat_callback(void)
 {
 	if ( didCalibrate )
 	{
-		if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SLIDE_DET_HZ)) == 0)
-		{
-#ifndef BUILD_OFFSET_TABLE
-			update_slide_detection();
-#endif
-		}
 		if (!hasWrittenHeader)
 		{
 			if ((udb_heartbeat_counter % (HEARTBEAT_HZ/HEADER_HZ)) == 0)
@@ -189,15 +189,43 @@ void dcm_heartbeat_callback(void)
 		}
 		else
 		{
-			if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
+			if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SLIDE_DET_HZ)) == 0)
 			{
-				send_imu_data();
+#ifndef BUILD_OFFSET_TABLE
+				update_slide_detection();
+				if (start_log ==1) 
+				{
+					compute_euler();
+					yaw_previous = yaw_angle ;
+					heading_previous = 0.0 ;
+					log_residuals = 0 ;
+				}
+				if (stop_log ==1 ) 
+				{ 
+					start_residuals = 1 ;
+					log_residuals = 1 ;
+				}
+#endif
+			}
+			
+			{
+				if ((udb_heartbeat_counter % (HEARTBEAT_HZ/LOGGER_HZ)) == 0)
+				{
+					send_imu_data();
+				}
 			}
 		}
-	}
 	// Serial output SERVO_HZ  (40 Hz)
-	
-	
+#ifdef LOG_RESIDUALS
+		if (log_residuals == 1)
+		{
+			if ((udb_heartbeat_counter % (HEARTBEAT_HZ)) == 0)
+			{
+				send_residual_data();
+			}
+		}
+#endif // LOG_RESIDUALS
+	}
 	return ;
 }
 

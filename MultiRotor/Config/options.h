@@ -1,10 +1,11 @@
 #define MINI5 "UDBmini5 hardware, 200 Hz DLPF.\r\n"
 #define MINI6 "UDBmini6 hardware, 200 Hz DLPF.\r\n"
 
-#define DATE "rev. 2.4, 1/21/2023\r\n"
+#define DATE "rev. 2.4, 1/22/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
 #define LOG_IMU
+#define LOG_RESIDUALS
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
@@ -13,6 +14,7 @@
 //#define GYRO_DRIFT
 //#define ROAD_TEST
 //#define BUILD_OFFSET_TABLE
+//#define GYRO_LPF
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
@@ -28,14 +30,15 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	100
+//#define LOGGER_HZ	100
+#define LOGGER_HZ	10
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	10
 #define TILT_STOP_DELAY 10 // seconds 
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN12
+#define MINI5_SN13
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
