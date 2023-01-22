@@ -176,6 +176,7 @@ boolean stop_residuals = 1 ;
 boolean start_residuals = 0 ;
 extern float yaw_previous , yaw_angle , heading_previous ;
 extern void compute_euler(void);
+uint16_t residual_log_counter = 0 ;
 void dcm_heartbeat_callback(void)
 {
 	if ( didCalibrate )
@@ -215,12 +216,14 @@ void dcm_heartbeat_callback(void)
 				}
 			}
 		}
-	// Serial output SERVO_HZ  (40 Hz)
+	//
 #ifdef LOG_RESIDUALS
 		if (log_residuals == 1)
 		{
-			if ((udb_heartbeat_counter % (HEARTBEAT_HZ)) == 0)
+			if ((udb_heartbeat_counter % HEARTBEAT_HZ )== 0) residual_log_counter ++ ;
+			if ( residual_log_counter == 60 ) // once per minute
 			{
+				residual_log_counter = 0 ;
 				send_residual_data();
 			}
 		}

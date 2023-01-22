@@ -145,11 +145,11 @@ void send_residual_data(void)
 	if ( start_residuals == 1)
 	{
 		start_residuals = 0 ;
-		serial_output("\r\n\r\ntemperature_xx,filter_enabled_xx,x_rate_xx,y_rate_xx,z_rate_xx,x_residual_xx,y_residual_xx,z_residual_xx\r\n") ;
+		serial_output("\r\n\r\nimu_temp_yy,filter_en_yy,x_rate_yy,y_rate_yy,z_rate_yy,x_filt_16_yy,y_filt_16_yy,z_filt_16_yy,x_err_yy,y_err_yy,z_err_yy\r\n") ;
 	}
 	else
 	{
-		serial_output("%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 				mpu_temp.value,
 				accelOn ,
 				omegagyro[0],
@@ -157,7 +157,10 @@ void send_residual_data(void)
 				omegagyro[2],
 				(int16_t)((omegagyro_filtered[0].WW)>>12) ,
 				(int16_t)((omegagyro_filtered[1].WW)>>12) ,
-				(int16_t)((omegagyro_filtered[2].WW)>>12)	
+				(int16_t)((omegagyro_filtered[2].WW)>>12) ,
+				omegagyro[0] + omegagyro_filtered[0]._.W1 ,
+				omegagyro[1] + omegagyro_filtered[1]._.W1 ,
+				omegagyro[2] + omegagyro_filtered[2]._.W1
 					);
 	}
 }
