@@ -260,12 +260,6 @@ void send_imu_data(void)
 			}
 			break ;
 		case 14:
-			// initialize the unwrapping of yaw angle
-			{
-				compute_euler();
-				yaw_previous = yaw_angle ;
-				heading_previous = 0.0 ;
-			}
 			break ;
 		case 16:
 			{
@@ -303,6 +297,10 @@ void send_imu_data(void)
 		case 23:
 			{
 #ifdef LOG_IMU
+				// initialize the unwrapping of yaw angle
+				compute_euler();
+				yaw_previous = yaw_angle ;
+				heading_previous = 0.0 ;
 #ifdef LOG_RATE
 				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
 #endif // LOG_RATE

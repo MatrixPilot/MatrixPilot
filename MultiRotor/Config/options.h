@@ -1,12 +1,12 @@
-#define MINI5 "UDBmini5 hardware.\r\n"
-#define MINI6 "UDBmini6 hardware.\r\n"
+#define MINI5 "UDBmini5 hardware, 200 Hz DLPF.\r\n"
+#define MINI6 "UDBmini6 hardware, 200 Hz DLPF.\r\n"
 
-#define DATE "rev. 2.4, 1/20/2023\r\n"
+#define DATE "rev. 2.4, 1/21/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
+#define LOG_IMU
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -35,7 +35,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN13
+#define MINI5_SN12
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
