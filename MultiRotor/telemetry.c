@@ -319,9 +319,11 @@ void send_imu_data(void)
 		case 21:
 			{
 				serial_output(FILTERING);
+#ifndef ALWAYS_LOG
 				stop_log = 1 ;
 				start_residuals = 1 ;
 				hasWrittenHeader = 1 ;
+#endif // ALWAYS_LOG
 				
 			}
 			break;
@@ -364,16 +366,16 @@ void send_imu_data(void)
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
 //				serial_output("gx,gy,gyz,gxfilt,gyfilt,gzfilt,ax,ay,az,axfilt,ayfilt,azfilt\r\n");
-				serial_output("tmptur,synch,cpu_load,w_mag,acc_mag,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
+				serial_output("\r\ntmptur,synch,cpu_load,w_mag,acc_mag,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef GYRO_OFFSETS
-				serial_output("tmptr,ind_msb,ind_lsb,w_mag,acc_mag,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
+				serial_output("\r\ntmptr,ind_msb,ind_lsb,w_mag,acc_mag,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
 #endif //				
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
 #endif // ROAD_TEST
 #ifdef BUILD_OFFSET_TABLE
-		serial_output("cpu,samples,X_bar,Y_bar_x,Y_bar_y,Y_bar_z,XX_bar,XY_bar_x,XY_bar_y,XY_bar_z,denom,lft_o_x,lft_o_y,lft_o_z,rght_o_x,rght_o_y,rght_o_z,offx,offy,offz\r\n");
+		serial_output("\r\ncpu,samples,X_bar,Y_bar_x,Y_bar_y,Y_bar_z,XX_bar,XY_bar_x,XY_bar_y,XY_bar_z,denom,lft_o_x,lft_o_y,lft_o_z,rght_o_x,rght_o_y,rght_o_z,offx,offy,offz\r\n");
 #endif //BUILD_OFFSET_TABLE
 			}
 			break ;	
