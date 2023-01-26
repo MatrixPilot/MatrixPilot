@@ -4,10 +4,10 @@
 #define DATE "rev. 2.4, 1/22/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
-#define LOG_RESIDUALS
+//#define LOG_IMU
+//#define LOG_RESIDUALS
 //#define RECORD_OFFSETS
-//#define GYRO_OFFSETS
+#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
