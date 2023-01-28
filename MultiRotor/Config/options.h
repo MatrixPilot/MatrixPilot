@@ -1,7 +1,7 @@
 #define MINI5 "UDBmini5 hardware, 200 Hz DLPF.\r\n"
 #define MINI6 "UDBmini6 hardware, 200 Hz DLPF.\r\n"
 
-#define DATE "rev. 2.4, 1/22/2023\r\n"
+#define DATE "rev. 2.5, 1/27/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
@@ -13,7 +13,7 @@
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
-//#define BUILD_OFFSET_TABLE
+#define BUILD_OFFSET_TABLE
 //#define GYRO_LPF
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
@@ -37,13 +37,14 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN13
+#define MINI6_SN1
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 4
+// used to be SN1
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #define LOG_EULER
@@ -75,6 +76,7 @@
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 1
+// used to be SN4
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #define LOG_EULER
@@ -178,7 +180,7 @@
 #define XACCEL_OFFSET	( 84 )
 #define YACCEL_OFFSET	( -48 )
 #define ZACCEL_OFFSET	( 248 )
-#error "gyro table not defined"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_16.h"
 #define CALIBRATIONX	1.0389
 #define CALIBRATIONY	1.0389
 #define CALIBRATIONZ	1.0206
@@ -255,8 +257,8 @@
 #define ZACCEL_OFFSET	( 52 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_14.h"
 #define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define CALIBRATIONY	1.0198
+#define CALIBRATIONZ	1.0076
 #define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4127
 #define CAL_GRAV_Y	4078
@@ -268,7 +270,7 @@
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -15 )
 #define ZACCEL_OFFSET	( -16 )
-#error "gyro table not defined"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_15.h"
 #define CALIBRATIONX	1.0109
 #define CALIBRATIONY	1.0171
 #define CALIBRATIONZ	1.0066
