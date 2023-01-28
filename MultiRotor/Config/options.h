@@ -7,7 +7,7 @@
 //#define LOG_IMU
 //#define LOG_RESIDUALS
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY

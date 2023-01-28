@@ -111,8 +111,11 @@ void MPU6000_init16(callback_fptr_t fptr)
 	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
 
 	// scaling & DLPF
-//	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
+#ifdef BUILD_OFFSET_TABLE
+	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);
+#else
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_188HZ);
+#endif // BUILD_OFFSET_TABLE
 #if (GYRO_RANGE == 250 )
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_250DPS);  // Gyro scale 250º/s
 #elif (GYRO_RANGE == 500 )
