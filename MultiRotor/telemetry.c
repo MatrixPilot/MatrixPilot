@@ -100,6 +100,7 @@ extern uint32_t xx_bar ;
 extern int32_t xy_bar[] ;
 extern int16_t x_bar ;
 extern int16_t y_bar[] ;
+extern int16_t gyro_offset[];
 
 extern int16_t gplane[];
 extern int16_t aero_force[];
@@ -137,7 +138,34 @@ float heading ;
 float heading_previous ;
 float delta_yaw ;
 boolean is_first_header = 1;
+boolean log_residuals = 0 ;
+extern boolean start_residuals ;
 
+
+void send_residual_data(void)
+{
+	if ( start_residuals == 1)
+	{
+		start_residuals = 0 ;
+		serial_output("\r\n\r\nimu_temp_yy,filter_en_yy,x_rate_yy,y_rate_yy,z_rate_yy,x_filt_16_yy,y_filt_16_yy,z_filt_16_yy,x_err_yy,y_err_yy,z_err_yy\r\n") ;
+	}
+	else
+	{
+		serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+				mpu_temp.value,
+				accelOn ,
+				omegagyro[0],
+				omegagyro[1],
+				omegagyro[2],
+				(int16_t)((omegagyro_filtered[0].WW)>>12) ,
+				(int16_t)((omegagyro_filtered[1].WW)>>12) ,
+				(int16_t)((omegagyro_filtered[2].WW)>>12) ,
+				omegagyro[0] + omegagyro_filtered[0]._.W1 ,
+				omegagyro[1] + omegagyro_filtered[1]._.W1 ,
+				omegagyro[2] + omegagyro_filtered[2]._.W1
+					);
+	}
+}
 
 void send_imu_data(void)
 {
@@ -267,12 +295,6 @@ void send_imu_data(void)
 			}
 			break ;
 		case 14:
-			// initialize the unwrapping of yaw angle
-			{
-				compute_euler();
-				yaw_previous = yaw_angle ;
-				heading_previous = 0.0 ;
-			}
 			break ;
 		case 16:
 			{
@@ -305,11 +327,21 @@ void send_imu_data(void)
 		case 21:
 			{
 				serial_output(FILTERING);
+#ifndef ALWAYS_LOG
+				stop_log = 1 ;
+				start_residuals = 1 ;
+				hasWrittenHeader = 1 ;
+#endif // ALWAYS_LOG
+				
 			}
 			break;
 		case 23:
 			{
 #ifdef LOG_IMU
+				// initialize the unwrapping of yaw angle
+				compute_euler();
+				yaw_previous = yaw_angle ;
+				heading_previous = 0.0 ;
 #ifdef LOG_RATE
 				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
 #endif // LOG_RATE
@@ -342,16 +374,16 @@ void send_imu_data(void)
 #endif // TEST_GYRO_LOCK
 #ifdef GYRO_DRIFT
 //				serial_output("gx,gy,gyz,gxfilt,gyfilt,gzfilt,ax,ay,az,axfilt,ayfilt,azfilt\r\n");
-				serial_output("tmptur,synch,cpu_load,w_mag,acc_mag,aw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
+				serial_output("\r\ntmptur,synch,cpu_load,w_mag,acc_mag,yaw,pitch,roll,gx,gy,gz,gxlp,gylp,gzlp,errx,erry,errz\r\n");
 #endif // GYRO_DRIFT
 #ifdef GYRO_OFFSETS
-				serial_output("tmptr,ind_msb,ind_lsb,w_mag,acc_mag,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
+				serial_output("\r\ntmptr,ind_msb,ind_lsb,w_mag,acc_mag,xrv,yrv,zrv,xro,yro,zro,wx,wy,wz\r\n");
 #endif //				
 #ifdef ROAD_TEST
 		serial_output("synch,gx,gy,gyz,ax,ay,az,r6,r7,r8\r\n");
 #endif // ROAD_TEST
 #ifdef BUILD_OFFSET_TABLE
-		serial_output("cpu,samples,X_bar,Y_bar_x,Y_bar_y,Y_bar_z,XX_bar,XY_bar_x,XY_bar_y,XY_bar_z,denom,lft_o_x,lft_o_y,lft_o_z,rght_o_x,rght_o_y,rght_o_z,offx,offy,offz\r\n");
+		serial_output("\r\ncpu,samples,X_bar,Y_bar_x,Y_bar_y,Y_bar_z,XX_bar,XY_bar_x,XY_bar_y,XY_bar_z,denom,lft_o_x,lft_o_y,lft_o_z,rght_o_x,rght_o_y,rght_o_z,offx,offy,offz\r\n");
 #endif //BUILD_OFFSET_TABLE
 			}
 			break ;	
@@ -382,8 +414,8 @@ void send_imu_data(void)
 				index_msb , index_lsb ,
 				omega_magnitude ,
 				accel_magnitude ,
-				udb_xrate.value , udb_yrate.value , udb_zrate.value	,
-				udb_xrate.offset , udb_yrate.offset ,udb_zrate.offset ,
+				64*udb_xrate.value , 64*udb_yrate.value , 64*udb_zrate.value	,	
+				gyro_offset[0] , gyro_offset[1] , gyro_offset[2] ,
 				omegagyro[0] , omegagyro[1], omegagyro[2]
 			 ) ;
 		}

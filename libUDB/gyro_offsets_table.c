@@ -221,7 +221,8 @@ void update_offset_table(void)
 			}
 			if (initial_temp_reported == 1)
 			{
-/*				serial_output("%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+#ifdef DEBUG_TABLE_BUILD
+				serial_output("%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 					udb_cpu_load(),
 					samples_32t,
 					x_bar,
@@ -234,7 +235,7 @@ void update_offset_table(void)
 					(offset_previous[0]+ offset_left[0])/2 ,
 					(offset_previous[1]+ offset_left[1])/2 ,
 					(offset_previous[2]+ offset_left[2])/2 ) ;
- */
+#else
 				serial_output("{ %i , %i , %i } , \r\n",
 					(offset_previous[0]+ offset_left[0])/2 ,
 					(offset_previous[1]+ offset_left[1])/2 ,
@@ -243,12 +244,13 @@ void update_offset_table(void)
 				offset_previous[0] = offset_right[0] ;
 				offset_previous[1] = offset_right[1] ;
 				offset_previous[2] = offset_right[2] ;
-						
+#endif // 	DEBUG_TABLE_BUILD					
 			}
 			else
 			{
 				initial_temp_reported = 1 ;
-/*				serial_output("initial temperature = %i\r\n%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+#ifdef DEBUG_TABLE_BUILD
+				serial_output("initial temperature = %i\r\n%i,%li,%i,%i,%i,%i,%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 					initial_temperature ,
 					udb_cpu_load(),
 					samples_32t,
@@ -260,11 +262,12 @@ void update_offset_table(void)
 					offset_left[0],offset_left[1],offset_left[2],
 					offset_right[0],offset_right[1],offset_right[2],
 					offset_left[0],offset_left[1],offset_left[2]);
- */
+#else
 				serial_output("initial temperature = %i\r\n{ %i , %i , %i } , \r\n",
 					initial_temperature ,
 					offset_left[0],offset_left[1],offset_left[2]	
 						);
+#endif // DEBUG_TABLE_BUILD
 				offset_previous[0] = offset_right[0] ;
 				offset_previous[1] = offset_right[1] ;
 				offset_previous[2] = offset_right[2] ;
