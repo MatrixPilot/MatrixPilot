@@ -14,14 +14,20 @@
 // of data for the ESP32 on the receiving end to have uninterrupted time to
 // write the data to flash.
 
+#ifdef USE_PACKETIZED_TELEMERTY
 uint8_t serial_buffer[2][SERIAL_BUFFER_SIZE] ;
 uint16_t end_index[2] = {0, 0};
 uint8_t write_buffer_index = 0;
 uint8_t read_buffer_index = 0;
-
 uint16_t packet_data_start;
 uint16_t packet_data_length;
 uint8_t num_chunks_buffered = 0;
+void finalize_packet();
+#else
+uint8_t serial_buffer[SERIAL_BUFFER_SIZE] ;
+uint16_t end_index = 0;
+#endif
+
 uint16_t sb_index = 0 ;
 
 static boolean udb_serial_stop_sending_flag = 0;
@@ -29,7 +35,6 @@ static boolean udb_serial_stop_sending_flag = 0;
 extern int16_callback_fptr_t serial_callback_get_byte_to_send ;
 extern callback_uint8_fptr_t serial_callback_received_byte ;
 
-void finalize_packet();
 int vsnprintf (char * s, size_t n, const char * format, va_list arg );
 
 
