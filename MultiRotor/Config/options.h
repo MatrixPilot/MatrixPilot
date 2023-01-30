@@ -14,6 +14,10 @@
 //#define ROAD_TEST
 #define BUILD_OFFSET_TABLE
 
+#ifdef LOG_IMU
+    #define USE_PACKETIZED_TELEMERTY
+#endif
+
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
 //#define ALWAYS_SYNC_GYROS

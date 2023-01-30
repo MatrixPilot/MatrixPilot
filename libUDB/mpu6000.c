@@ -31,6 +31,7 @@
 #include "mpu6000.h"
 
 boolean is_ICM_20689 = 0;
+//uint16_t mpu_whoami = 0;
 
 #if (BOARD_TYPE != UDB4_BOARD)
 
@@ -96,11 +97,13 @@ void MPU6000_init16(callback_fptr_t fptr)
 	// Which chip is this?
 	uint16_t mpu_whoami = readMPUSPIreg16(MPUREG_WHOAMI) ;
 	is_ICM_20689 = (mpu_whoami == WHOAMI_ICM_20689) ;
+//	mpu_whoami = readMPUSPIreg16(MPUREG_WHOAMI) ;
 
 	// Disable I2C bus (recommended on datasheet)
 	writeMPUSPIreg16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
 	
 	if (is_ICM_20689) {
+//	if (mpu_whoami == WHOAMI_ICM_20689 || mpu_whoami == WHOAMI_ICM_20600) {
 		// Disable I2C communications on the ICM_20689
 		uint8_t v = readMPUSPIreg16(MPUREG_INT_PIN_CFG) | BIT_INT_RD_CLEAR | BIT_LATCH_INT_EN;
 		v &= BIT_I2C_BYPASS_EN;
@@ -126,6 +129,7 @@ void MPU6000_init16(callback_fptr_t fptr)
 
 	
 	if (is_ICM_20689) {
+//	if (mpu_whoami == WHOAMI_ICM_20689 || mpu_whoami == WHOAMI_ICM_20600) {
 	#if (ACCEL_RANGE == 2)
 		writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, 0<<3); // Accel scele 2g, g = 8192
 	#elif (ACCEL_RANGE == 4)

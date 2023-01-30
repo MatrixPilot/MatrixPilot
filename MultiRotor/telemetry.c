@@ -104,6 +104,7 @@ extern int16_t y_bar[] ;
 extern int16_t gplane[];
 extern int16_t aero_force[];
 extern void serial_output(const char* format, ...);
+void serial_output_start_end_packet(boolean isStart);
 // Prepare a line of serial output and start it sending
 // GPS data needs to be passed in
 extern int16_t yaw_rmat[];
@@ -136,12 +137,18 @@ float heading ;
 float heading_previous ;
 float delta_yaw ;
 boolean is_first_header = 1;
+
+
 void send_imu_data(void)
 {
 #ifndef ALWAYS_LOG
 	if (start_log == 1)
 	{
+        serial_output_start_end_packet(true);
 		hasWrittenHeader = 0 ;
+#ifdef USE_PACKETIZED_TELEMERTY
+        is_first_header = 1;
+#endif
 		if ( is_first_header)
 		{
 			header_line = 0 ;
@@ -164,6 +171,7 @@ void send_imu_data(void)
 		stop_log = 0 ;
 		logging_on = 0 ;
 		gyro_locking_on = 1 ;
+        serial_output_start_end_packet(false);
 	}
 	if (logging_on == 0 ) return ;
 #else
@@ -555,43 +563,4 @@ void send_debug_line( void )
 	return ;
 }
 */
-int16_t sb_index = 0 ;
-extern int16_t end_index ;
-extern char serial_buffer[] ;
-int16_t udb_serial_callback_get_byte_to_send(void)
-{
-	uint8_t txchar = serial_buffer[ sb_index++ ];
-
-	if (txchar)
-	{
-		return txchar;
-	}
-	else
-	{
-		sb_index = 0;
-		end_index = 0;
-	}
-	return -1;
-}
-
-/*
-// Return one character at a time, as requested.
-// Requests will stop after we send back a -1 end-of-data marker.
-int udb_serial_callback_get_byte_to_send(void)
-{
-	unsigned char c = debug_buffer[ db_index++ ] ;
-	
-	if (c == 0) return -1 ;
-	
-	return c ;
-}
-*/
-
-// Don't respond to serial input
-void udb_serial_callback_received_byte(uint8_t rxchar)
-{
-	// Do nothing
-	return ;
-}
-
 

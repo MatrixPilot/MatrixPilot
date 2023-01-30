@@ -60,8 +60,12 @@ int main (void)
 	udb_init() ;
 	dcm_init() ;
 	
+#ifdef USE_PACKETIZED_TELEMERTY
+	udb_serial_set_rate(460800) ;
+#else
 	udb_serial_set_rate(57600) ;
-
+#endif
+    
 	LED_GREEN = LED_OFF ;
 	LED_RED = LED_OFF ;
 
@@ -70,6 +74,12 @@ int main (void)
 #endif
 	commanded_tilt_gain = sine ( max_tilt ) / 1000 ;
 	
+#ifdef ENABLE_ESP32
+    // Pull ESP32 Enable pin high
+    _TRISD15 = 0;
+    _LATD15 = 1;
+#endif
+    
 	// Start it up!
 	while(1)
 	{
