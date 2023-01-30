@@ -4,8 +4,8 @@
 #define DATE "rev. 2.5, 1/27/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
-//#define LOG_RESIDUALS
+#define LOG_IMU
+#define LOG_RESIDUALS
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
@@ -13,7 +13,7 @@
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
-#define BUILD_OFFSET_TABLE
+//#define BUILD_OFFSET_TABLE
 //#define GYRO_LPF
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
@@ -37,7 +37,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN1
+#define MINI5_SN2
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -177,13 +177,13 @@
 
 #ifdef MINI5_SN2
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 84 )
-#define YACCEL_OFFSET	( -48 )
-#define ZACCEL_OFFSET	( 248 )
+#define XACCEL_OFFSET	( 74 )
+#define YACCEL_OFFSET	( -42 )
+#define ZACCEL_OFFSET	( 275 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_16.h"
-#define CALIBRATIONX	1.0389
-#define CALIBRATIONY	1.0389
-#define CALIBRATIONZ	1.0206
+#define CALIBRATIONX	1.0144
+#define CALIBRATIONY	1.0179
+#define CALIBRATIONZ	1.0192
 #define CALIB_GRAVITY	4096
 #define CAL_GRAV_X	4124
 #define CAL_GRAV_Y	4085
