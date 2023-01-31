@@ -36,6 +36,7 @@
 
 extern boolean differential_gps(void) ;
 extern boolean hasWrittenHeader ;
+extern boolean start_log;
 
 boolean didCalibrate = 0 ;
 

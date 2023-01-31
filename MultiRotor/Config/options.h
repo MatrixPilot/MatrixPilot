@@ -5,7 +5,7 @@
 
 // the following defines select what gets sent to the logger. define one of them
 #define LOG_IMU
-//#define LOG_RESIDUALS
+#define LOG_RESIDUALS
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
@@ -16,10 +16,14 @@
 //#define BUILD_OFFSET_TABLE
 //#define GYRO_LPF
 
+//#define ENABLE_ESP32
+#ifdef ENABLE_ESP32
 #ifdef LOG_IMU
+    // When using USE_PACKETIZED_TELEMERTY, baud will be 460800, and some 
+    // non-printable characters are written out, as header bytes for packets.
     #define USE_PACKETIZED_TELEMERTY
 #endif
-#define ENABLE_ESP32
+#endif
 
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets
