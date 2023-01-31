@@ -62,6 +62,8 @@ int main (void)
 	
 #ifdef USE_PACKETIZED_TELEMERTY
 	udb_serial_set_rate(460800) ;
+    start_log = 0;
+    hasWrittenHeader = 1;
 #else
 	udb_serial_set_rate(57600) ;
 #endif

@@ -328,7 +328,9 @@ void send_imu_data(void)
 			{
 				serial_output(FILTERING);
 #ifndef ALWAYS_LOG
+#ifndef USE_PACKETIZED_TELEMERTY
 				stop_log = 1 ;
+#endif
 				start_residuals = 1 ;
 				hasWrittenHeader = 1 ;
 #endif // ALWAYS_LOG
