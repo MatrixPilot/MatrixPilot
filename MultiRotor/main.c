@@ -37,6 +37,7 @@
 extern boolean differential_gps(void) ;
 extern boolean hasWrittenHeader ;
 extern boolean start_log;
+extern boolean logging_on;
 
 boolean didCalibrate = 0 ;
 
@@ -65,6 +66,7 @@ int main (void)
 	udb_serial_set_rate(460800) ;
     start_log = 0;
     hasWrittenHeader = 1;
+    logging_on = 1 ;
 #else
 	udb_serial_set_rate(57600) ;
 #endif
