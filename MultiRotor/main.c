@@ -196,6 +196,7 @@ void dcm_heartbeat_callback(void)
 {
 	if ( didCalibrate )
 	{
+		update_slide_detection();
 		if (!hasWrittenHeader)
 		{
 			if ((udb_heartbeat_counter % (HEARTBEAT_HZ/HEADER_HZ)) == 0)
@@ -208,7 +209,6 @@ void dcm_heartbeat_callback(void)
 			if ((udb_heartbeat_counter % (HEARTBEAT_HZ/SLIDE_DET_HZ)) == 0)
 			{
 #ifndef BUILD_OFFSET_TABLE
-				update_slide_detection();
 				if (start_log ==1) 
 				{
 					compute_euler();
