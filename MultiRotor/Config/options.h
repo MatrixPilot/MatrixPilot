@@ -4,10 +4,10 @@
 #define DATE "rev. 2.5, 1/27/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
-#define LOG_RESIDUALS
+//#define LOG_IMU
+//#define LOG_RESIDUALS
 //#define RECORD_OFFSETS
-//#define GYRO_OFFSETS
+#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -37,7 +37,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN2
+#define MINI6_SN4
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -314,7 +314,7 @@
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -50 )
 #define ZACCEL_OFFSET	( -21 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_17.h"
 #define CALIBRATIONX	1.0112
 #define CALIBRATIONY	1.0043
 #define CALIBRATIONZ	1.0067
