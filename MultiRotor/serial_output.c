@@ -6,8 +6,8 @@
 #include "../libUDB/interrupt.h"
 #include "../libUDB/serialIO.h"
 
-#define SERIAL_BUFFER_SIZE	1024
-#define NUM_CHUNKS_TO_BUFFER 10
+#define SERIAL_BUFFER_SIZE	1536
+#define NUM_CHUNKS_TO_BUFFER 16
 
 // Set up two serial buffers, and swap back and forth between then as we buffer
 // and send long messages in bursts, to create longer times between each burst
