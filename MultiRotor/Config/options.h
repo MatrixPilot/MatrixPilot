@@ -19,6 +19,7 @@
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
 //#define ALWAYS_SYNC_GYROS
+//#define THETA_LOG
 
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec
@@ -37,7 +38,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN4
+#define MINI5_SN14
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -138,6 +139,15 @@
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN13
+
+#ifdef MINI5_SN14
+#define BOARD MINI5
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 4
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI5_SN14
 
 #ifdef MINI5_SN2
 // was SN2
@@ -249,6 +259,22 @@
 #define CAL_GRAV_Y	4096
 #define CAL_GRAV_Z	4096
 #endif //MINI5_SN13
+
+#ifdef MINI5_SN14
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 0)
+#define YACCEL_OFFSET	( 0 )
+#define ZACCEL_OFFSET	( 0 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_18.h"
+#define CALIBRATIONX	1.0000
+#define CALIBRATIONY	1.0000
+#define CALIBRATIONZ	1.0000
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4096
+#define CAL_GRAV_Y	4096
+#define CAL_GRAV_Z	4096
+#endif //MINI5_SN14
+
 
 #ifdef MINI5_SN7
 #define CUSTOM_OFFSETS
