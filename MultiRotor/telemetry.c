@@ -330,9 +330,9 @@ void send_imu_data(void)
 #ifndef ALWAYS_LOG
 #ifndef USE_PACKETIZED_TELEMERTY
 				stop_log = 1 ;
-#endif
 				start_residuals = 1 ;
 				hasWrittenHeader = 1 ;
+#endif
 #endif // ALWAYS_LOG
 				
 			}
@@ -390,7 +390,8 @@ void send_imu_data(void)
 			}
 			break ;	
 		case 25:
-			hasWrittenHeader = 1 ;
+            start_residuals = 1 ;
+            hasWrittenHeader = 1 ;
 			break ;
 		default:
 			break ;

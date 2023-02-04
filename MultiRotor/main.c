@@ -66,7 +66,7 @@ int main (void)
 	udb_serial_set_rate(460800) ;
     start_log = 0;
     hasWrittenHeader = 1;
-    logging_on = 1 ;
+    logging_on = 0 ;
 #else
 	udb_serial_set_rate(57600) ;
 #endif
