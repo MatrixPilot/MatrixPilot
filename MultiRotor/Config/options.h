@@ -4,10 +4,10 @@
 #define DATE "rev. 2.5, 1/27/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
-//#define LOG_RESIDUALS
+#define LOG_IMU
+#define LOG_RESIDUALS
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -38,7 +38,7 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN14
+#define MINI6_SN15
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -98,6 +98,16 @@
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
 #define SERIAL_NUMBERD3 6
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#define LOG_EULER
+#endif // MINI6_SN6
+
+#ifdef MINI6_SN15
+#define BOARD MINI6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 5
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #define LOG_EULER
@@ -262,17 +272,17 @@
 
 #ifdef MINI5_SN14
 #define CUSTOM_OFFSETS
-#define XACCEL_OFFSET	( 0)
-#define YACCEL_OFFSET	( 0 )
-#define ZACCEL_OFFSET	( 0 )
+#define XACCEL_OFFSET	( 159 )
+#define YACCEL_OFFSET	( 38 )
+#define ZACCEL_OFFSET	( -495 )
 #define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_18.h"
-#define CALIBRATIONX	1.0000
-#define CALIBRATIONY	1.0000
-#define CALIBRATIONZ	1.0000
+#define CALIBRATIONX	1.0022
+#define CALIBRATIONY	1.0072
+#define CALIBRATIONZ	1.0104
 #define CALIB_GRAVITY	4096
-#define CAL_GRAV_X	4096
-#define CAL_GRAV_Y	4096
-#define CAL_GRAV_Z	4096
+#define CAL_GRAV_X	4132
+#define CAL_GRAV_Y	4094
+#define CAL_GRAV_Z	4169
 #endif //MINI5_SN14
 
 
@@ -377,6 +387,20 @@
 #define CAL_GRAV_Y	4108
 #define CAL_GRAV_Z	4134
 #endif // MINI6_SN6
+
+#ifdef MINI6_SN15
+#define XACCEL_OFFSET	( 79 )
+#define YACCEL_OFFSET	( -22 )
+#define ZACCEL_OFFSET	( -113 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_19.h"
+#define CALIBRATIONX	1.0115
+#define CALIBRATIONY	1.0019
+#define CALIBRATIONZ	1.0053
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4100
+#define CAL_GRAV_Y	4105
+#define CAL_GRAV_Z	4153
+#endif // MINI6_SN15
 
 
 #ifdef GYRO_CALIB
