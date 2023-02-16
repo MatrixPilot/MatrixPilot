@@ -10,9 +10,19 @@
 
 int16_t residual_offset[] = { 68 , 104 , 185 } ;
 
-#define TABLE_ORIGIN -11391
+#define TABLE_ORIGIN -13951
 
-struct gyro_offset_table_entry gyro_offset_table[] = {
+struct gyro_offset_table_entry gyro_offset_table[] = {    
+{ 5208 , -7014 , 686 } , 
+{ 5172 , -6865 , 686 } , 
+{ 5136 , -6716 , 686 } , 
+{ 5100 , -6567 , 686 } , 
+{ 5064 , -6418 , 686 } ,    
+{ 5028 , -6269 , 686 } , 
+{ 4992 , -6120 , 686 } , 
+{ 4956 , -5971 , 686 } , 
+{ 4920 , -5822 , 686 } , 
+{ 4884 , -5673 , 686 } ,    
 { 4848 , -5524 , 686 } , 
 { 4818 , -5401 , 709 } , 
 { 4804 , -5287 , 720 } , 
