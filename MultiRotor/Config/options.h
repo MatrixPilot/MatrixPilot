@@ -38,10 +38,13 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI6_SN2 // SN2
+//#define MINI6_SN4 // SN1
+//#define MINI6_SN2 // SN2
 //#define MINI6_SN3 // SN3
 //#define MINI5_SN1 // SN8
 //#define MINI5_SN4 // SN11
+#define MINI6_SN15 // SN15
+
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
