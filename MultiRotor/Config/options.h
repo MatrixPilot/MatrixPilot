@@ -4,10 +4,12 @@
 #define DATE "rev. 2.5, 2/14/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
-//#define LOG_RESIDUALS
+#define LOG_IMU
+#define LOG_RESIDUALS
+//#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
+#define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -39,11 +41,12 @@
 #define TILT_STOP	60
 
 //#define MINI6_SN4 // SN1
-//#define MINI6_SN2 // SN2
-//#define MINI6_SN3 // SN3
+//#define MINI6_SN2 // was SN2, now SN14
+#define MINI6_SN3 // SN3
 //#define MINI5_SN1 // SN8
 //#define MINI5_SN4 // SN11
-#define MINI6_SN15 // SN15
+//#define MINI6_SN15 // SN15
+//#define MINI5_SN14 // was SN14, now SN2
 
 
 #ifdef MINI6_SN1
@@ -60,14 +63,15 @@
 #ifdef MINI6_SN2
 #define BOARD MINI6
 #define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 2
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 4
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #define LOG_EULER
 #endif // MINI6_SN2
 
 #ifdef MINI6_SN3
+#define NAME "Bruce Norman"
 #define BOARD MINI6
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
@@ -159,8 +163,8 @@
 #ifdef MINI5_SN14
 #define BOARD MINI5
 #define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	1
-#define SERIAL_NUMBERD3 4
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 2
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN14
