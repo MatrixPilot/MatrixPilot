@@ -8,7 +8,7 @@
 #define LOOKUP_LSB_MASK 0x00FF
 #define MSB_SHIFT 8
 
-int16_t residual_offset[] = { 0 , 0 , 0 } ;
+int16_t residual_offset[] = { -810 , -386 , 1286 } ;
 
 #define TABLE_ORIGIN -20947
 

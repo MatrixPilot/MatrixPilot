@@ -1,11 +1,13 @@
 #define MINI5 "UDBmini5 hardware, 200 Hz DLPF.\r\n"
 #define MINI6 "UDBmini6 hardware, 200 Hz DLPF.\r\n"
 
-#define DATE "rev. 2.5, 1/27/2023\r\n"
+#define DATE "rev. 2.5, 2/14/2023\r\n"
 
 // the following defines select what gets sent to the logger. define one of them
 #define LOG_IMU
 #define LOG_RESIDUALS
+//#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
+#define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
@@ -29,6 +31,7 @@
 // options to override the normal mission logic and always log and/or always remove gyro offsets
 //#define ALWAYS_LOG
 //#define ALWAYS_SYNC_GYROS
+//#define THETA_LOG
 
 // for IMU log, there are two options related to the gyros. pick one or the other
 // LOG_RATE reports the gyro rates, degrees/sec
@@ -47,7 +50,14 @@
 #define TILT_START	15
 #define TILT_STOP	60
 
-#define MINI5_SN2
+//#define MINI6_SN4 // SN1
+//#define MINI6_SN2 // was SN2, now SN14
+#define MINI6_SN3 // SN3
+//#define MINI5_SN1 // SN8
+//#define MINI5_SN4 // SN11
+//#define MINI6_SN15 // SN15
+//#define MINI5_SN14 // was SN14, now SN2
+
 
 #ifdef MINI6_SN1
 #define BOARD MINI6
@@ -63,14 +73,15 @@
 #ifdef MINI6_SN2
 #define BOARD MINI6
 #define SERIAL_NUMBERD1	0
-#define SERIAL_NUMBERD2	0
-#define SERIAL_NUMBERD3 2
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 4
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #define LOG_EULER
 #endif // MINI6_SN2
 
 #ifdef MINI6_SN3
+#define NAME "Bruce Norman"
 #define BOARD MINI6
 #define SERIAL_NUMBERD1	0
 #define SERIAL_NUMBERD2	0
@@ -112,6 +123,16 @@
 #define LOG_EULER
 #endif // MINI6_SN6
 
+#ifdef MINI6_SN15
+#define BOARD MINI6
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	1
+#define SERIAL_NUMBERD3 5
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#define LOG_EULER
+#endif // MINI6_SN6
+
 #ifdef MINI5_SN4
 // was SN4
 #define BOARD MINI5
@@ -148,6 +169,15 @@
 #define ACCEL_RANGE         8
 #define GYRO_RANGE	    1000
 #endif // MINI5_SN13
+
+#ifdef MINI5_SN14
+#define BOARD MINI5
+#define SERIAL_NUMBERD1	0
+#define SERIAL_NUMBERD2	0
+#define SERIAL_NUMBERD3 2
+#define ACCEL_RANGE         8
+#define GYRO_RANGE	    1000
+#endif // MINI5_SN14
 
 #ifdef MINI5_SN2
 // was SN2
@@ -260,6 +290,22 @@
 #define CAL_GRAV_Z	4096
 #endif //MINI5_SN13
 
+#ifdef MINI5_SN14
+#define CUSTOM_OFFSETS
+#define XACCEL_OFFSET	( 159 )
+#define YACCEL_OFFSET	( 38 )
+#define ZACCEL_OFFSET	( -495 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_18.h"
+#define CALIBRATIONX	1.0022
+#define CALIBRATIONY	1.0072
+#define CALIBRATIONZ	1.0104
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4132
+#define CAL_GRAV_Y	4094
+#define CAL_GRAV_Z	4169
+#endif //MINI5_SN14
+
+
 #ifdef MINI5_SN7
 #define CUSTOM_OFFSETS
 #define XACCEL_OFFSET	( 133)
@@ -324,7 +370,7 @@
 #define XACCEL_OFFSET	( 83 )
 #define YACCEL_OFFSET	( -50 )
 #define ZACCEL_OFFSET	( -21 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_1.h"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_17.h"
 #define CALIBRATIONX	1.0112
 #define CALIBRATIONY	1.0043
 #define CALIBRATIONZ	1.0067
@@ -361,6 +407,20 @@
 #define CAL_GRAV_Y	4108
 #define CAL_GRAV_Z	4134
 #endif // MINI6_SN6
+
+#ifdef MINI6_SN15
+#define XACCEL_OFFSET	( 79 )
+#define YACCEL_OFFSET	( -22 )
+#define ZACCEL_OFFSET	( -113 )
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_19.h"
+#define CALIBRATIONX	1.0115
+#define CALIBRATIONY	1.0019
+#define CALIBRATIONZ	1.0053
+#define CALIB_GRAVITY	4096
+#define CAL_GRAV_X	4100
+#define CAL_GRAV_Y	4105
+#define CAL_GRAV_Z	4153
+#endif // MINI6_SN15
 
 
 #ifdef GYRO_CALIB

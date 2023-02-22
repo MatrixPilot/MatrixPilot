@@ -140,6 +140,7 @@ float delta_yaw ;
 boolean is_first_header = 1;
 boolean log_residuals = 0 ;
 extern boolean start_residuals ;
+extern int16_t omega[];
 
 
 void send_residual_data(void)
@@ -348,7 +349,11 @@ void send_imu_data(void)
 				serial_output( "forward_force , lateral , vertical , roll_rate , pitch , yaw\r\n" ) ;
 #endif // LOG_RATE
 #ifdef LOG_EULER
-				serial_output( "\r\n\r\nx_force_xx,y_force_xx,z_force_xx,yaw_xx,pitch_xx,roll_xx\r\n" ) ;			
+#ifndef THETA_LOG
+				serial_output( "\r\n\r\nx_force_xx,y_force_xx,z_force_xx,yaw_xx,pitch_xx,roll_xx\r\n" ) ;
+#else
+				serial_output("\r\r\r\nx_theta,y_theta,x_omega,y_omega,pitch,roll\r\n") ;
+#endif // THETA_LOG
 #endif // LOG_EULER	
 #ifdef LOG_RATE_AND_EULER
 				serial_output( "\r\n\r\nx_rate_xx,y_rate_xx,z_rate_xx,yaw_xx,pitch_xx,roll_xx\r\n" ) ;		
@@ -467,11 +472,18 @@ void send_imu_data(void)
 			}
 			heading_previous = heading ;
 			yaw_previous = yaw_angle ;
+#ifndef THETA_LOG
 			serial_output( "%.2f,%.1f,%.1f,%.1f,%.2f,%.1f\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
 				heading ,  pitch_angle , roll_angle  ) ;	
+#else
+			serial_output("%i,%i,%i,%i,%.2f,%.2f\r\n" ,
+					theta[0] , theta[1] ,
+					omega[0] , omega[1] ,
+					pitch_angle , roll_angle ) ;
+#endif // THETA_LOG
 		}
 #endif // LOG_EULER
 #ifdef LOG_RATE_AND_EULER

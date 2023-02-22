@@ -238,7 +238,7 @@ void dcm_heartbeat_callback(void)
 		if (log_residuals == 1)
 		{
 			if ((udb_heartbeat_counter % HEARTBEAT_HZ )== 0) residual_log_counter ++ ;
-			if ( residual_log_counter == 10 ) // 6 times per minute
+			if ( residual_log_counter == RESIDUAL_LOG_PERIOD ) 
 			{
 				residual_log_counter = 0 ;
 				send_residual_data();
