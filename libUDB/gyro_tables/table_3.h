@@ -7,8 +7,9 @@
 
 #define TABLE_ORIGIN -10891
 
-#define LOOKUP_LSB_MASK 0x03FF
-#define MSB_SHIFT 10
+#define STEP_SIZE 1024
+//#define LOOKUP_LSB_MASK 0x03FF
+//#define MSB_SHIFT 10
 
 int16_t residual_offset[] = { 0 , 0 , 0 } ;
 

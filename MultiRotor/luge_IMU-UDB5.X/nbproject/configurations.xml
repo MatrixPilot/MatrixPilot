@@ -43,6 +43,7 @@
           <itemPath>../../libUDB/gyro_tables/table_17.h</itemPath>
           <itemPath>../../libUDB/gyro_tables/table_18.h</itemPath>
           <itemPath>../../libUDB/gyro_tables/table_19.h</itemPath>
+          <itemPath>../../libUDB/gyro_tables/table_20.h</itemPath>
         </logicalFolder>
         <itemPath>../../libUDB/ADchannel.h</itemPath>
         <itemPath>../../libUDB/analogs.h</itemPath>
@@ -193,8 +194,6 @@
       <packs>
         <pack name="dsPIC33F-GP-MC_DFP" vendor="Microchip" version="1.1.15"/>
       </packs>
-      <ScriptingSettings>
-      </ScriptingSettings>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -212,7 +211,6 @@
       </compileType>
       <makeCustomizationType>
         <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
-        <makeUseCleanTarget>false</makeUseCleanTarget>
         <makeCustomizationPreStep></makeCustomizationPreStep>
         <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
         <makeCustomizationPostStep></makeCustomizationPostStep>
@@ -392,6 +390,7 @@
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

@@ -5,8 +5,9 @@
 
 // not used
 
-#define LOOKUP_LSB_MASK 0x00FF
-#define MSB_SHIFT 8
+#define STEP_SIZE 256
+//#define LOOKUP_LSB_MASK 0x00FF
+//#define MSB_SHIFT 8
 
 int16_t residual_offset[] = { -896 , -384 , 2176 } ;
 //int16_t residual_offset[] = { 0 , 0 , 0 } ;

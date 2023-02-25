@@ -5,8 +5,9 @@
 
 // used in MINI6_SN15 
 
-#define LOOKUP_LSB_MASK 0x00FF
-#define MSB_SHIFT 8
+#define STEP_SIZE 256
+//#define LOOKUP_LSB_MASK 0x00FF
+//#define MSB_SHIFT 8
 
 int16_t residual_offset[] = { -1028 , 46 , 1022 } ;
 

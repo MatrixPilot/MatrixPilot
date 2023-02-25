@@ -23,6 +23,19 @@ typedef struct gyro_offset_table_entry { int16_t x ; int16_t y ; int16_t z ; } g
 
 #include GYRO_OFFSET_TABLE
 
+#if (STEP_SIZE == 1024)
+#define LOOKUP_LSB_MASK 0x03FF
+#define MSB_SHIFT 10
+#eliif ( STEP_SIZE == 256 )
+#define LOOKUP_LSB_MASK 0x00FF
+#define MSB_SHIFT 8
+#elif ( STEP_SIZE == 64 )
+#define LOOKUP_LSB_MASK 0x003F
+#define MSB_SHIFT 6
+#else
+#error "unsupported or undefine STEP_SIZE"
+#endif // STEP_SIZE
+
 extern struct ADchannel mpu_temp;
 
 int16_t temperature_index ;
@@ -79,8 +92,6 @@ void lookup_gyro_offsets(void)
 		}
 	}
 }
-
-#define STEP_SIZE 256
 
 int64_t samples_64t = 0 ;
 int32_t samples_32t = 0 ;

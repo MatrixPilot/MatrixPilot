@@ -8,6 +8,7 @@
 #define LOG_RESIDUALS
 //#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
 #define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
+//#define RESIDUAL_LOG_PERIOD 1  // 60 times per minute
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
@@ -52,11 +53,11 @@
 
 //#define MINI6_SN4 // SN1
 //#define MINI6_SN2 // was SN2, now SN14
-#define MINI6_SN3 // SN3
+//#define MINI6_SN3 // SN3
 //#define MINI5_SN1 // SN8
 //#define MINI5_SN4 // SN11
 //#define MINI6_SN15 // SN15
-//#define MINI5_SN14 // was SN14, now SN2
+#define MINI5_SN14 // was SN14, now SN2
 
 
 #ifdef MINI6_SN1
@@ -295,7 +296,8 @@
 #define XACCEL_OFFSET	( 159 )
 #define YACCEL_OFFSET	( 38 )
 #define ZACCEL_OFFSET	( -495 )
-#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_18.h"
+//#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_18.h"
+#define GYRO_OFFSET_TABLE "../libUDB/gyro_tables/table_20.h"
 #define CALIBRATIONX	1.0022
 #define CALIBRATIONY	1.0072
 #define CALIBRATIONZ	1.0104
