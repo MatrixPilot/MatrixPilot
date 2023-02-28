@@ -270,6 +270,7 @@ void udb_callback_read_sensors(void)
 }
 
 fractional theta[3];
+fractional rup_copy[9];
 // The update algorithm!!
 static void rupdate(void)
 {
@@ -354,6 +355,8 @@ static void rupdate(void)
 	MatrixAdd(3, 3, rup, rup, delta_angle_square_over_2 );
 	MatrixAdd(3, 3, rup, rup, delta_angle_cube_over_6 );
 
+	// for debugging
+	VectorCopy(9,rup_copy,rup);
 	// matrix multiply the rmatrix by the update matrix
 	MatrixMultiply(3, 3, 3, rbuff, rmat, rup);
 	// multiply by 2 and copy back from rbuff to rmat:
@@ -507,7 +510,9 @@ void dcm_run_imu_step(void)
 	normalize();                // local
 	roll_pitch_drift();         // local
 	PI_feedback();              // local
+#ifdef LOG_VELOCITY
 	estimate_velocity();
+#endif // LOG_VELOCITY
 }
 float roll_angle , pitch_angle , yaw_angle ;
 float bill_angle_x , bill_angle_y , bill_angle_z ;

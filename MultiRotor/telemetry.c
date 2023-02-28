@@ -141,6 +141,7 @@ boolean is_first_header = 1;
 boolean log_residuals = 0 ;
 extern boolean start_residuals ;
 extern int16_t omega[];
+extern int16_t rup_copy[];
 
 
 void send_residual_data(void)
@@ -363,6 +364,10 @@ void send_imu_data(void)
 #endif // LOG_PITCH_AND_TWO_FORCES
 #endif // LOG_IMU
 				
+#ifdef LOG_TIC_TOK_TEST
+				serial_output("\r\n\r\nx_omega,y_omega,z_omega,x_up,y_up,z_up,tilt_x,tilt_y,tilt_z\r\n");
+#endif // LOG_TIC_TOK_TEST
+				
 #ifdef RECORD_OFFSETS
 				serial_output("tmptur,ax,ay,az,gx_val,gy_val,gz_val,gyr_x,gyr_y,gyr_z\r\n");
 #endif // RECORD_OFFSETS
@@ -506,6 +511,15 @@ void send_imu_data(void)
 		}	
 #endif // LOG_PITCH_AND_TWO_FORCES
 #endif // LOG_IMU
+#ifdef LOG_TIC_TOK_TEST
+		{
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+					omega[0],omega[1],omega[2],
+					rup_copy[0],rup_copy[3],rup_copy[6],
+					rmat[6],rmat[7],rmat[8]
+			);
+		}
+#endif // LOG_TIC_TOK_TEST
 #ifdef GYRO_CALIB
 
 		{	compute_bill_angles();
