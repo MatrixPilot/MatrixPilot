@@ -32,6 +32,44 @@
 
 //  math libraray
 
+int16_t add_saturate(int16_t x , int16_t y)
+{
+	int32_t total = ((int32_t) x );
+	total = total + ((int32_t) y) ;
+	if ((total<32767)&&(total>-32767))
+	{
+		return ((int16_t)total );
+	}
+	else if ( total > 0 )
+	{
+		return 32767 ;
+	}
+	else
+	{
+		return -32767 ;
+	}
+}
+
+int16_t subtract_saturate(int16_t x , int16_t y)
+{
+	int32_t total = ((int32_t) x );
+	total = total - ((int32_t) y) ;
+	if ((total<32767)&&(total>-32767))
+	{
+		return ((int16_t)total );
+	}
+	else if ( total > 0 )
+	{
+		return 32767 ;
+	}
+	else
+	{
+		return -32767 ;
+	}
+}
+
+
+
 #define RADIANTOCIRCULAR 10430
 
 void vect2_16x16_rotate(vect2_16t* vector, const vect2_16t* rotate)
