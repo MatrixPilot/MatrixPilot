@@ -416,14 +416,7 @@ int16_t omega_scaled[3] ;
 int16_t omega_yaw_drift[3] ;
 uint16_t omega_magnitude ;
 extern boolean logging_on ;
-#if (GYRO_RANGE==1000)
-#define MAX_OMEGA 100
-#elif (GYRO_RANGE==500)
-#define MAX_OMEGA 200
-#else
-#error "invalid GYRO_RANGE"
-#endif // GYRO_RANGE
-#
+
 extern boolean gyro_locking_on ;
 int16_t motion_reset_counter = 500 ;
 int16_t motion_detect = 1 ;
@@ -432,7 +425,7 @@ static void roll_pitch_drift(void)
 {	
 	accel_magnitude = vector3_mag(gplane[0],gplane[1],gplane[2]);
 	omega_magnitude = vector3_mag(omegagyro[0],omegagyro[1],0); // z has large drift, x and y are more stable
-	if((omega_magnitude<MAX_OMEGA )	&& (abs(accel_magnitude-CALIB_GRAVITY/2)<CALIB_GRAVITY/8))
+	if((omega_magnitude<GYRO_OFFSET_MARGIN )	&& (abs(accel_magnitude-CALIB_GRAVITY/2)<CALIB_GRAVITY/8))
 	{
 		if (motion_reset_counter == 0 )
 		{

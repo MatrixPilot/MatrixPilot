@@ -32,39 +32,43 @@
 
 //  math libraray
 
-int16_t add_saturate(int16_t x , int16_t y)
+int16_t add_saturate(int16_t x , int16_t y , uint16_t margin)
 {
 	int32_t total = ((int32_t) x );
 	total = total + ((int32_t) y) ;
-	if ((total<32767)&&(total>-32767))
+	int32_t maximum = ((int32_t)(32767-margin));
+	int32_t minimum = ((int32_t)(-32767+margin));
+	if ((total<=maximum)&&(total>=minimum))
 	{
 		return ((int16_t)total );
 	}
 	else if ( total > 0 )
 	{
-		return 32767 ;
+		return ((int16_t)maximum) ;
 	}
 	else
 	{
-		return -32767 ;
+		return ((int16_t)minimum) ;
 	}
 }
 
-int16_t subtract_saturate(int16_t x , int16_t y)
+int16_t subtract_saturate(int16_t x , int16_t y , uint16_t margin)
 {
 	int32_t total = ((int32_t) x );
 	total = total - ((int32_t) y) ;
-	if ((total<32767)&&(total>-32767))
+	int32_t maximum = ((int32_t)(32767-margin));
+	int32_t minimum = ((int32_t)(-32767+margin));
+	if ((total<=maximum)&&(total>=minimum))
 	{
 		return ((int16_t)total );
 	}
 	else if ( total > 0 )
 	{
-		return 32767 ;
+		return ((int16_t)maximum) ;
 	}
 	else
 	{
-		return -32767 ;
+		return ((int16_t)minimum) ;
 	}
 }
 

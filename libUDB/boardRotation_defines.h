@@ -26,8 +26,8 @@
 // to remove gravity from the offset measurement
 // **************************************************************************************
 
-extern int16_t add_saturate(int16_t x , int16_t y) ;
-extern int16_t subtract_saturate(int16_t x , int16_t y) ;
+extern int16_t add_saturate(int16_t x , int16_t y , uint16_t margin ) ;
+extern int16_t subtract_saturate(int16_t x , int16_t y , uint16_t margin ) ;
 
 // Setup the defines for board orientation
 #if (BOARD_ORIENTATION == ORIENTATION_FORWARDS)
@@ -142,9 +142,9 @@ extern int16_t subtract_saturate(int16_t x , int16_t y) ;
 #define YRATE_VALUE	 (YRATE_SIGN_ORIENTED (((udb_yrate.value)>>1) - (udb_yrate.offset>>1)))
 #define ZRATE_VALUE	 (ZRATE_SIGN_ORIENTED (((udb_zrate.value)>>1) - (udb_zrate.offset>>1)))
 #elif (GYRO_RANGE == 1000)
-#define XRATE_VALUE	 XRATE_SIGN_ORIENTED subtract_saturate(udb_xrate.value, udb_xrate.offset)
-#define YRATE_VALUE	 YRATE_SIGN_ORIENTED subtract_saturate(udb_yrate.value, udb_yrate.offset)
-#define ZRATE_VALUE	 ZRATE_SIGN_ORIENTED subtract_saturate(udb_zrate.value, udb_zrate.offset)
+#define XRATE_VALUE	 XRATE_SIGN_ORIENTED subtract_saturate(udb_xrate.value, udb_xrate.offset,GYRO_OFFSET_MARGIN)
+#define YRATE_VALUE	 YRATE_SIGN_ORIENTED subtract_saturate(udb_yrate.value, udb_yrate.offset,GYRO_OFFSET_MARGIN)
+#define ZRATE_VALUE	 ZRATE_SIGN_ORIENTED subtract_saturate(udb_zrate.value, udb_zrate.offset,GYRO_OFFSET_MARGIN)
 #else
 #error "GYRO_RANGE must be either 500 or 1000"
 #endif

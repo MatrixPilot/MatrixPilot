@@ -512,6 +512,14 @@
 #define CONSOLE_UART            0
 #define HILSIM			0
 
+#if (GYRO_RANGE==1000)
+#define GYRO_OFFSET_MARGIN 100
+#elif (GYRO_RANGE==500)
+#define GYRO_OFFSET_MARGIN 200
+#else
+#error "invalid GYRO_RANGE"
+#endif // GYRO_RANGE
+
 ////////////////////////////////////////////////////////////////////////////////
 // Use board orientation to change the mounting direction of the board.
 // The following 4 orientations have the board parallel with the ground.

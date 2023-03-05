@@ -34,6 +34,6 @@ uint16_t vect3_16_mag(const vect3_16t* vector);
 uint16_t vect2_16_norm(vect2_16t* result, const vect2_16t* vector);
 uint16_t vect3_16_norm(vect3_16t* result, const vect3_16t* vector);
 
-int16_t add_saturate(int16_t x , int16_t y) ;
-int16_t subtract_saturate(int16_t x , int16_t y) ;
+int16_t add_saturate(int16_t x , int16_t y , uint16_t margin) ;
+int16_t subtract_saturate(int16_t x , int16_t y , uint16_t margin) ;
 
