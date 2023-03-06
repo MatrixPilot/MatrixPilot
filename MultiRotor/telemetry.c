@@ -365,7 +365,7 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
-				serial_output("\r\n\r\nx_omega,y_omega,z_omega,x_up,y_up,z_up,tilt_x,tilt_y,tilt_z\r\n");
+				serial_output("\r\n\r\ncpu,x_omega,y_omega,z_omega,x_up,y_up,z_up,tilt_x,tilt_y,tilt_z\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
 #ifdef RECORD_OFFSETS
@@ -513,7 +513,8 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+					udb_cpu_load(),
 					omega[0],omega[1],omega[2],
 					rup_copy[0],rup_copy[3],rup_copy[6],
 					rmat[6],rmat[7],rmat[8]

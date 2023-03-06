@@ -32,7 +32,7 @@
 
 //  math libraray
 
-int16_t add_saturate(int16_t x , int16_t y , uint16_t margin)
+int16_t add_saturate(int16_t x , int16_t y , int16_t margin)
 {
 	int32_t total = ((int32_t) x );
 	total = total + ((int32_t) y) ;
@@ -52,7 +52,7 @@ int16_t add_saturate(int16_t x , int16_t y , uint16_t margin)
 	}
 }
 
-int16_t subtract_saturate(int16_t x , int16_t y , uint16_t margin)
+int16_t subtract_saturate(int16_t x , int16_t y , int16_t margin)
 {
 	int32_t total = ((int32_t) x );
 	total = total - ((int32_t) y) ;

@@ -26,8 +26,8 @@
 // to remove gravity from the offset measurement
 // **************************************************************************************
 
-extern int16_t add_saturate(int16_t x , int16_t y , uint16_t margin ) ;
-extern int16_t subtract_saturate(int16_t x , int16_t y , uint16_t margin ) ;
+extern int16_t add_saturate(int16_t x , int16_t y , int16_t margin ) ;
+extern int16_t subtract_saturate(int16_t x , int16_t y , int16_t margin ) ;
 
 // Setup the defines for board orientation
 #if (BOARD_ORIENTATION == ORIENTATION_FORWARDS)
