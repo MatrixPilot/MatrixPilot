@@ -29,6 +29,7 @@
 #include "ADchannel.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
+#include "../libUDB/udbTypes.h"
 
 boolean is_ICM_20689 = 0;
 //uint16_t mpu_whoami = 0;
@@ -76,7 +77,9 @@ void MPU6000_init16(callback_fptr_t fptr)
 	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
 	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
+//	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
+	// set prescaler for FCY/24 = 1.33 MHz at 32 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);	
 #elif (MIPS == 16)
 	// set prescaler for FCY/24 = 667 kHz at 16MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
@@ -111,13 +114,14 @@ void MPU6000_init16(callback_fptr_t fptr)
 	}
 
 	// SAMPLE RATE
-	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
-
+//	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
+	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 0); // Sample_rate = 8000Hz
 	// scaling & DLPF
 #ifdef BUILD_OFFSET_TABLE
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_5HZ);
 #else
-	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_188HZ);
+//	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_188HZ);
+	writeMPUSPIreg16(MPUREG_CONFIG, 0); // Sample_rate = 8000 Hz
 #endif // BUILD_OFFSET_TABLE
 #if (GYRO_RANGE == 250 )
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_250DPS);  // Gyro scale 250º/s
@@ -216,31 +220,52 @@ void MPU6000_init16(callback_fptr_t fptr)
 #endif
 }
 
+
+int16_t sample_counter = 0 ;
+
+int32_t xaccel32, yaccel32, zaccel32, temp32, xrate32, yrate32, zrate32 ;
+
 static void process_MPU_data(void)
 {
 	mpuDAV = true;
+	
+	xaccel32 += ((int32_t)((int16_t)mpu_data[xaccel_MPU_channel])) ;
+	yaccel32 += ((int32_t)((int16_t)mpu_data[yaccel_MPU_channel])) ;
+	zaccel32 += ((int32_t)((int16_t)mpu_data[zaccel_MPU_channel])) ;
+	
+	temp32 += ((int32_t)((int16_t)mpu_data[temp_MPU_channel])) ;
+	
+	xrate32 += ((int32_t)((int16_t)mpu_data[xrate_MPU_channel])) ;
+	yrate32 += ((int32_t)((int16_t)mpu_data[yrate_MPU_channel])) ;
+	zrate32 += ((int32_t)((int16_t)mpu_data[zrate_MPU_channel])) ;
 
-	udb_xaccel.value = mpu_data[xaccel_MPU_channel];
-	udb_yaccel.value = mpu_data[yaccel_MPU_channel];
-	udb_zaccel.value = mpu_data[zaccel_MPU_channel];
-
-	mpu_temp.value = mpu_data[temp_MPU_channel];
-
-	udb_xrate.value = mpu_data[xrate_MPU_channel];
-	udb_yrate.value = mpu_data[yrate_MPU_channel];
-	udb_zrate.value = mpu_data[zrate_MPU_channel];
-
-//{
-//	static int i = 0;
-//	if (i++ > 10) {
-//		i = 0;
-//		printf("%u %u %u\r\n", udb_xaccel.value, udb_yaccel.value, udb_zaccel.value);
-//	}
-//}
 
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
-	if (callback) callback();   // was directly calling heartbeat()
+	sample_counter = sample_counter+1 ;
+	if (sample_counter == 40)
+	{
+		udb_xaccel.value = __builtin_divsd(xaccel32,40);
+		udb_yaccel.value = __builtin_divsd(yaccel32,40);
+		udb_zaccel.value = __builtin_divsd(zaccel32,40);
+
+		mpu_temp.value = __builtin_divsd(temp32,40);
+
+		udb_xrate.value = __builtin_divsd(xrate32,40);
+		udb_yrate.value = __builtin_divsd(yrate32,40);
+		udb_zrate.value = __builtin_divsd(zrate32,40);
+		
+		xaccel32 = 0 ;
+		yaccel32 = 0 ;
+		zaccel32 = 0 ;
+		temp32 = 0 ;
+		xrate32 = 0 ;
+		yrate32 = 0 ;
+		zrate32 = 0 ;
+
+		sample_counter = 0 ;
+		if (callback) callback();   // was directly calling heartbeat()
+	}
 #else
 #warning mpu6000: no callback mechanism defined
 #endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)

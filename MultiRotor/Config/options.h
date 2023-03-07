@@ -7,8 +7,8 @@
 #define LOG_IMU
 #define LOG_RESIDUALS
 //#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
-#define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
-//#define RESIDUAL_LOG_PERIOD 1  // 60 times per minute
+//#define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
+#define RESIDUAL_LOG_PERIOD 1  // 60 times per minute
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
@@ -45,7 +45,7 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	100
+#define LOGGER_HZ	50
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	200
 #define TILT_STOP_DELAY 10 // seconds 
