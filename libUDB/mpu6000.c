@@ -226,21 +226,49 @@ union longww omega32[3] ;
 union longww angle_cross_omega[3];
 union longww coning_angle_adjustment[3] ;
 
+union longww fractional_32_multiply( union longww x , union longww y )
+{
+	union longlongLL total ;
+	union longww result ;
+	int16_t sign = 1 ;
+	total.LL = 0 ;
+	if ( x.WW < 0 )
+	{
+		sign = - sign ;
+		x.WW = - (x.WW + 1) ;
+	}
+	if ( y.WW < 0)
+	{
+		sign = - sign ;
+		y.WW = - (y.WW + 1 ) ;
+	}
+	total.LL = ((uint64_t)__builtin_muluu ( x._.W0 , y._.W0 ))
+		+ (((uint64_t)__builtin_muluu ( x._.W0 , y._.W1 ))>>16)
+		+ (((uint64_t)__builtin_muluu ( x._.W1 , y._.W0 ))>>16)
+		+ (((uint64_t)__builtin_muluu ( x._.W1 , y._.W1 ))>>32) ;
+	result.WW = total._.L1 ;
+	if ( sign < 0)
+	{
+		result.WW = - result.WW ;
+	}
+	return result ;
+}
+
 void compute_angle_cross_omega(void)
 {
 	union longlongLL product64 ;
 	
 	product64.LL = ((int64_t)coning_angle32[1].WW)*((int64_t)omega32[2].WW) 
 			- ((int64_t)coning_angle32[2].WW)*((int64_t)omega32[1].WW) ;
-	delta_coning_angle32[0].WW = product64._.L0 ;
+	delta_coning_angle32[0].WW = product64._.L1 ;
 	
 	product64.LL = ((int64_t)coning_angle32[2].WW)*((int64_t)omega32[0].WW) 
 			- ((int64_t)coning_angle32[0].WW)*((int64_t)omega32[2].WW) ;
-	delta_coning_angle32[1].WW = product64._.L0 ;
+	delta_coning_angle32[1].WW = product64._.L1 ;
 	
 	product64.LL = ((int64_t)coning_angle32[0].WW)*((int64_t)omega32[1].WW) 
 			- ((int64_t)coning_angle32[1].WW)*((int64_t)omega32[0].WW) ;
-	delta_coning_angle32[2].WW = product64._.L0 ;
+	delta_coning_angle32[2].WW = product64._.L1 ;
 	
 	coning_angle32[0].WW += delta_coning_angle32[0].WW ;
 	coning_angle32[1].WW += delta_coning_angle32[1].WW ;
