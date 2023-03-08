@@ -142,6 +142,9 @@ boolean log_residuals = 0 ;
 extern boolean start_residuals ;
 extern int16_t omega[];
 extern int16_t rup_copy[];
+extern union longww coning_angle_adjustment[];
+extern union longww omega32[];
+					
 
 
 void send_residual_data(void)
@@ -365,7 +368,7 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
-				serial_output("\r\n\r\ncpu,x_omega,y_omega,z_omega,x_up,y_up,z_up,tilt_x,tilt_y,tilt_z\r\n");
+				serial_output("\r\n\r\ncpu,x_w,y_w,z_w,x_theta,y_theta,z_theta,tlt_x,tlt_y,tlt_z,cax,cay,caz\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
 #ifdef RECORD_OFFSETS
@@ -513,11 +516,18 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%li,%li,%li\r\n" ,
 					udb_cpu_load(),
 					omega[0],omega[1],omega[2],
 					rup_copy[0],rup_copy[3],rup_copy[6],
-					rmat[6],rmat[7],rmat[8]
+					rmat[6],rmat[7],rmat[8],
+					omega32[0].WW ,
+					omega32[1].WW ,
+					omega32[2].WW 
+					
+	//				coning_angle_adjustment[0].WW ,
+	//				coning_angle_adjustment[1].WW ,
+	//				coning_angle_adjustment[2].WW
 			);
 		}
 #endif // LOG_TIC_TOK_TEST

@@ -220,6 +220,56 @@ void MPU6000_init16(callback_fptr_t fptr)
 #endif
 }
 
+union longww coning_angle32[3] ;
+union longww delta_coning_angle32[3] ;
+union longww omega32[3] ;
+union longww angle_cross_omega[3];
+union longww coning_angle_adjustment[3] ;
+
+void compute_angle_cross_omega(void)
+{
+	union longlongLL product64 ;
+	
+	product64.LL = ((int64_t)coning_angle32[1].WW)*((int64_t)omega32[2].WW) 
+			- ((int64_t)coning_angle32[2].WW)*((int64_t)omega32[1].WW) ;
+	delta_coning_angle32[0].WW = product64._.L0 ;
+	
+	product64.LL = ((int64_t)coning_angle32[2].WW)*((int64_t)omega32[0].WW) 
+			- ((int64_t)coning_angle32[0].WW)*((int64_t)omega32[2].WW) ;
+	delta_coning_angle32[1].WW = product64._.L0 ;
+	
+	product64.LL = ((int64_t)coning_angle32[0].WW)*((int64_t)omega32[1].WW) 
+			- ((int64_t)coning_angle32[1].WW)*((int64_t)omega32[0].WW) ;
+	delta_coning_angle32[2].WW = product64._.L0 ;
+	
+	coning_angle32[0].WW += delta_coning_angle32[0].WW ;
+	coning_angle32[1].WW += delta_coning_angle32[1].WW ;
+	coning_angle32[2].WW += delta_coning_angle32[2].WW ;
+	
+}
+
+void compute_coning_adjustment(void)
+{
+	omega32[0]._.W1 = XRATE_SIGN_ORIENTED ((((int16_t)mpu_data[xrate_MPU_channel])>>1 )
+			- (udb_xrate.offset>>1));
+	omega32[1]._.W1 = YRATE_SIGN_ORIENTED ((((int16_t)mpu_data[yrate_MPU_channel])>>1 )
+			- (udb_yrate.offset>>1));
+	omega32[2]._.W1 = ZRATE_SIGN_ORIENTED ((((int16_t)mpu_data[zrate_MPU_channel])>>1 )
+			- (udb_zrate.offset>>1));
+	omega32[0]._.W0 = 0 ;
+	omega32[1]._.W0 = 0 ;
+	omega32[2]._.W0 = 0 ;
+	
+	compute_angle_cross_omega();
+		
+}
+
+void reset_coning_adjustment(void)
+{
+	coning_angle32[0].WW = 0 ;
+	coning_angle32[1].WW = 0 ;
+	coning_angle32[2].WW = 0 ;
+}
 
 int16_t sample_counter = 0 ;
 
@@ -239,6 +289,7 @@ static void process_MPU_data(void)
 	yrate32 += ((int32_t)((int16_t)mpu_data[yrate_MPU_channel])) ;
 	zrate32 += ((int32_t)((int16_t)mpu_data[zrate_MPU_channel])) ;
 
+	compute_coning_adjustment();
 
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 	//  trigger synchronous processing of sensor data
@@ -262,7 +313,13 @@ static void process_MPU_data(void)
 		xrate32 = 0 ;
 		yrate32 = 0 ;
 		zrate32 = 0 ;
+		
+		coning_angle_adjustment[0].WW = coning_angle32[0].WW ;
+		coning_angle_adjustment[1].WW = coning_angle32[1].WW ;
+		coning_angle_adjustment[2].WW = coning_angle32[2].WW ;
 
+		reset_coning_adjustment();
+		
 		sample_counter = 0 ;
 		if (callback) callback();   // was directly calling heartbeat()
 	}
