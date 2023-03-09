@@ -220,15 +220,30 @@ void MPU6000_init16(callback_fptr_t fptr)
 #endif
 }
 
+#define SAMPLE_HZ 8000
+#define GGAINX_32 (double)CALIBRATIONX*(double)SCALEGYRO*(double)24*((double)RMAX*((double)1.0/(double)SAMPLE_HZ))
+#define GGAINY_32 (double)CALIBRATIONY*(double)SCALEGYRO*(double)24*((double)RMAX*((double)1.0/(double)SAMPLE_HZ))
+#define GGAINZ_32 (double)CALIBRATIONZ*(double)SCALEGYRO*(double)24*((double)RMAX*((double)1.0/(double)SAMPLE_HZ))
+
+int32_t ggain_32[] =  { (double)256*(double)256*(double)GGAINX_32 , 
+	(double)256*(double)256*GGAINY_32, 
+	(double)256*(double)256*GGAINZ_32 };
+
+
 union longww coning_angle32[3] ;
 union longww delta_coning_angle32[3] ;
 union longww omega32[3] ;
+union longww theta_32[3] ;
+union longww _theta_32[3] ;
 union longww angle_cross_omega[3];
 union longww coning_angle_adjustment[3] ;
 
-union longww fractional_32_multiply( union longww x , union longww y )
+int32_t fractional_32_multiply( int32_t arg1 , int32_t arg2 )
 {
 	union longww result ;
+	union longww x,y;
+	x.WW = arg1 ;
+	y.WW = arg2 ;
 	int16_t sign = 1 ;
 	if ( x.WW < 0 )
 	{
@@ -249,13 +264,14 @@ union longww fractional_32_multiply( union longww x , union longww y )
 	{
 		result.WW = - ( result.WW + 1 ) ;
 	}
-	return result ;
+	return result.WW ;
 }
 
 void test_fractional_32(void)
 {
-	union longww arg, result ;
-	arg.WW = 0 ;
+	int32_t result ;
+	int32_t arg;
+	arg = 0 ;
 	result = fractional_32_multiply(arg,arg);
 	result = fractional_32_multiply(arg,arg);
 	result = fractional_32_multiply(arg,arg);
@@ -299,9 +315,10 @@ void compute_coning_adjustment(void)
 	omega32[1]._.W0 = 0 ;
 	omega32[2]._.W0 = 0 ;
 	
-//	compute_angle_cross_omega();
-	test_fractional_32();
-		
+	_theta_32[0].WW += 	fractional_32_multiply(omega32[0].WW,ggain_32[0]);
+	_theta_32[1].WW += 	fractional_32_multiply(omega32[1].WW,ggain_32[1]);
+	_theta_32[2].WW += 	fractional_32_multiply(omega32[2].WW,ggain_32[2]);
+	
 }
 
 void reset_coning_adjustment(void)
@@ -309,6 +326,10 @@ void reset_coning_adjustment(void)
 	coning_angle32[0].WW = 0 ;
 	coning_angle32[1].WW = 0 ;
 	coning_angle32[2].WW = 0 ;
+	_theta_32[0].WW = 0 ;
+	_theta_32[1].WW = 0 ;
+	_theta_32[2].WW = 0 ;
+	
 }
 
 int16_t sample_counter = 0 ;
@@ -336,15 +357,15 @@ static void process_MPU_data(void)
 	sample_counter = sample_counter+1 ;
 	if (sample_counter == 40)
 	{
-		udb_xaccel.value = __builtin_divsd(xaccel32,20);
-		udb_yaccel.value = __builtin_divsd(yaccel32,20);
-		udb_zaccel.value = __builtin_divsd(zaccel32,20);
+		udb_xaccel.value = __builtin_divsd(xaccel32,40);
+		udb_yaccel.value = __builtin_divsd(yaccel32,40);
+		udb_zaccel.value = __builtin_divsd(zaccel32,40);
 
-		mpu_temp.value = __builtin_divsd(temp32,20);
+		mpu_temp.value = __builtin_divsd(temp32,40);
 
-		udb_xrate.value = __builtin_divsd(xrate32,20);
-		udb_yrate.value = __builtin_divsd(yrate32,20);
-		udb_zrate.value = __builtin_divsd(zrate32,20);
+		udb_xrate.value = __builtin_divsd(xrate32,40);
+		udb_yrate.value = __builtin_divsd(yrate32,40);
+		udb_zrate.value = __builtin_divsd(zrate32,40);
 		
 		xaccel32 = 0 ;
 		yaccel32 = 0 ;
@@ -357,7 +378,11 @@ static void process_MPU_data(void)
 		coning_angle_adjustment[0].WW = coning_angle32[0].WW ;
 		coning_angle_adjustment[1].WW = coning_angle32[1].WW ;
 		coning_angle_adjustment[2].WW = coning_angle32[2].WW ;
-
+		
+		theta_32[0].WW = _theta_32[0].WW ;
+		theta_32[1].WW = _theta_32[1].WW ;
+		theta_32[2].WW = _theta_32[2].WW ;
+		
 		reset_coning_adjustment();
 		
 		sample_counter = 0 ;

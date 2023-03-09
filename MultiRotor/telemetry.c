@@ -144,6 +144,8 @@ extern int16_t omega[];
 extern int16_t rup_copy[];
 extern union longww coning_angle_adjustment[];
 extern union longww omega32[];
+extern union longww theta_32[];
+extern union longww ggain_32[];
 					
 
 
@@ -368,7 +370,7 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
-				serial_output("\r\n\r\ncpu,x_w,y_w,z_w,x_theta,y_theta,z_theta,tlt_x,tlt_y,tlt_z,cax,cay,caz\r\n");
+				serial_output("\r\n\r\ncpu,x_w,y_w,z_w,tlt_x,tlt_y,tlt_z,t32x,t32y,t32z,gain_32\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
 #ifdef RECORD_OFFSETS
@@ -516,14 +518,14 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%li,%li,%li\r\n" ,
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%li,%li,%li,%li\r\n" ,
 					udb_cpu_load(),
-					omega[0],omega[1],omega[2],
-					rup_copy[0],rup_copy[3],rup_copy[6],
+					omega32[0]._.W1,omega32[1]._.W1,omega32[2]._.W1,
 					rmat[6],rmat[7],rmat[8],
-					omega32[0].WW ,
-					omega32[1].WW ,
-					omega32[2].WW 
+					theta_32[0].WW ,
+					theta_32[1].WW ,
+					theta_32[2].WW ,
+					ggain_32[0].WW
 					
 	//				coning_angle_adjustment[0].WW ,
 	//				coning_angle_adjustment[1].WW ,
