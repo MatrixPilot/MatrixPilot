@@ -121,7 +121,7 @@ void MPU6000_init16(callback_fptr_t fptr)
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_5HZ);
 #else
 //	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_188HZ);
-	writeMPUSPIreg16(MPUREG_CONFIG, 0); // Sample_rate = 8000 Hz
+	writeMPUSPIreg16(MPUREG_CONFIG, 0); 
 #endif // BUILD_OFFSET_TABLE
 #if (GYRO_RANGE == 250 )
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_250DPS);  // Gyro scale 250º/s
@@ -228,10 +228,8 @@ union longww coning_angle_adjustment[3] ;
 
 union longww fractional_32_multiply( union longww x , union longww y )
 {
-	union longlongLL total ;
 	union longww result ;
 	int16_t sign = 1 ;
-	total.LL = 0 ;
 	if ( x.WW < 0 )
 	{
 		sign = - sign ;
@@ -242,16 +240,29 @@ union longww fractional_32_multiply( union longww x , union longww y )
 		sign = - sign ;
 		y.WW = - (y.WW + 1 ) ;
 	}
-	total.LL = ((uint64_t)__builtin_muluu ( x._.W0 , y._.W0 ))
-		+ (((uint64_t)__builtin_muluu ( x._.W0 , y._.W1 ))>>16)
-		+ (((uint64_t)__builtin_muluu ( x._.W1 , y._.W0 ))>>16)
-		+ (((uint64_t)__builtin_muluu ( x._.W1 , y._.W1 ))>>32) ;
-	result.WW = total._.L1 ;
+	
+	result.WW = __builtin_muluu( x._.W1 , y._.W1 )
+			+  (__builtin_muluu( x._.W1 , y._.W0 )>>16 )
+			+  (__builtin_muluu( x._.W0 , y._.W1 )>>16 ) ;
+	
 	if ( sign < 0)
 	{
-		result.WW = - result.WW ;
+		result.WW = - ( result.WW + 1 ) ;
 	}
 	return result ;
+}
+
+void test_fractional_32(void)
+{
+	union longww arg, result ;
+	arg.WW = 0 ;
+	result = fractional_32_multiply(arg,arg);
+	result = fractional_32_multiply(arg,arg);
+	result = fractional_32_multiply(arg,arg);
+	result = fractional_32_multiply(arg,arg);
+	result = fractional_32_multiply(arg,arg);
+	result = fractional_32_multiply(arg,arg);
+	result = fractional_32_multiply(arg,arg);						
 }
 
 void compute_angle_cross_omega(void)
@@ -288,7 +299,8 @@ void compute_coning_adjustment(void)
 	omega32[1]._.W0 = 0 ;
 	omega32[2]._.W0 = 0 ;
 	
-	compute_angle_cross_omega();
+//	compute_angle_cross_omega();
+	test_fractional_32();
 		
 }
 
@@ -324,15 +336,15 @@ static void process_MPU_data(void)
 	sample_counter = sample_counter+1 ;
 	if (sample_counter == 40)
 	{
-		udb_xaccel.value = __builtin_divsd(xaccel32,40);
-		udb_yaccel.value = __builtin_divsd(yaccel32,40);
-		udb_zaccel.value = __builtin_divsd(zaccel32,40);
+		udb_xaccel.value = __builtin_divsd(xaccel32,20);
+		udb_yaccel.value = __builtin_divsd(yaccel32,20);
+		udb_zaccel.value = __builtin_divsd(zaccel32,20);
 
-		mpu_temp.value = __builtin_divsd(temp32,40);
+		mpu_temp.value = __builtin_divsd(temp32,20);
 
-		udb_xrate.value = __builtin_divsd(xrate32,40);
-		udb_yrate.value = __builtin_divsd(yrate32,40);
-		udb_zrate.value = __builtin_divsd(zrate32,40);
+		udb_xrate.value = __builtin_divsd(xrate32,20);
+		udb_yrate.value = __builtin_divsd(yrate32,20);
+		udb_zrate.value = __builtin_divsd(zrate32,20);
 		
 		xaccel32 = 0 ;
 		yaccel32 = 0 ;
