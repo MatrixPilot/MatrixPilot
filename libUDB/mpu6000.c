@@ -379,9 +379,9 @@ static void process_MPU_data(void)
 		coning_angle_adjustment[1].WW = coning_angle32[1].WW ;
 		coning_angle_adjustment[2].WW = coning_angle32[2].WW ;
 		
-		theta_32[0].WW = _theta_32[0].WW ;
-		theta_32[1].WW = _theta_32[1].WW ;
-		theta_32[2].WW = _theta_32[2].WW ;
+		theta_32[0].WW = _theta_32[0].WW + 0x00008000 ;
+		theta_32[1].WW = _theta_32[1].WW + 0x00008000 ;
+		theta_32[2].WW = _theta_32[2].WW + 0x00008000 ;
 		
 		reset_coning_adjustment();
 		
