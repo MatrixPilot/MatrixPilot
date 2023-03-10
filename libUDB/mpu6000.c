@@ -235,6 +235,7 @@ union longww omega32[3] ;
 union longww theta_32[3] ;
 union longww _theta_32[3] ;
 union longww omega_dt[3];
+extern union longww omegagyro_filtered[];
 
 int32_t fract_32_mpy( int32_t arg1 , int32_t arg2 )
 {
@@ -246,12 +247,12 @@ int32_t fract_32_mpy( int32_t arg1 , int32_t arg2 )
 	if ( x.WW < 0 )
 	{
 		sign = - sign ;
-		x.WW = - (x.WW + 1) ;
+		x.WW = - (x.WW ) ;
 	}
 	if ( y.WW < 0)
 	{
 		sign = - sign ;
-		y.WW = - (y.WW + 1 ) ;
+		y.WW = - (y.WW ) ;
 	}
 	
 	result.WW = __builtin_muluu( x._.W1 , y._.W1 )
@@ -260,7 +261,7 @@ int32_t fract_32_mpy( int32_t arg1 , int32_t arg2 )
 	
 	if ( sign < 0)
 	{
-		result.WW = - ( result.WW + 1 ) ;
+		result.WW = - ( result.WW ) ;
 	}
 	return result.WW ;
 }
@@ -289,6 +290,10 @@ void compute_coning_adjustment(void)
 	omega32[0]._.W0 = 0 ;
 	omega32[1]._.W0 = 0 ;
 	omega32[2]._.W0 = 0 ;
+	
+	omega32[0].WW += omegagyro_filtered[0].WW ;
+	omega32[1].WW += omegagyro_filtered[1].WW ;
+	omega32[2].WW += omegagyro_filtered[2].WW ;
 	
 	omega_dt[0].WW = fract_32_mpy(omega32[0].WW,ggain_32[0]);
 	omega_dt[1].WW = fract_32_mpy(omega32[1].WW,ggain_32[1]);
@@ -333,15 +338,15 @@ static void process_MPU_data(void)
 	sample_counter = sample_counter+1 ;
 	if (sample_counter == 40)
 	{
-		udb_xaccel.value = __builtin_divsd(xaccel32,40);
-		udb_yaccel.value = __builtin_divsd(yaccel32,40);
-		udb_zaccel.value = __builtin_divsd(zaccel32,40);
+		udb_xaccel.value = __builtin_divsd(xaccel32+20,40);
+		udb_yaccel.value = __builtin_divsd(yaccel32+20,40);
+		udb_zaccel.value = __builtin_divsd(zaccel32+20,40);
 
-		mpu_temp.value = __builtin_divsd(temp32,40);
+		mpu_temp.value = __builtin_divsd(temp32+20,40);
 
-		udb_xrate.value = __builtin_divsd(xrate32,40);
-		udb_yrate.value = __builtin_divsd(yrate32,40);
-		udb_zrate.value = __builtin_divsd(zrate32,40);
+		udb_xrate.value = __builtin_divsd(xrate32+20,40);
+		udb_yrate.value = __builtin_divsd(yrate32+20,40);
+		udb_zrate.value = __builtin_divsd(zrate32+20,40);
 		
 		xaccel32 = 0 ;
 		yaccel32 = 0 ;
@@ -351,9 +356,9 @@ static void process_MPU_data(void)
 		yrate32 = 0 ;
 		zrate32 = 0 ;
 				
-		theta_32[0].WW = _theta_32[0].WW + 0x00008000 ;
-		theta_32[1].WW = _theta_32[1].WW + 0x00008000 ;
-		theta_32[2].WW = _theta_32[2].WW + 0x00008000 ;
+		theta_32[0].WW = _theta_32[0].WW ;
+		theta_32[1].WW = _theta_32[1].WW ;
+		theta_32[2].WW = _theta_32[2].WW ;
 		
 		reset_coning_adjustment();
 		

@@ -370,7 +370,7 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
-				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,tx,ty,tz,t32x,t32y,t32z\r\n");
+				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
 #ifdef RECORD_OFFSETS
@@ -518,13 +518,14 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
 					udb_cpu_load(),
 					rmat[6],rmat[7],rmat[8],
+					omegagyro[0] , omegagyro[1], omegagyro[2],			
 					theta[0],theta[1],theta[2],
-					theta_32[0]._.W1 ,
-					theta_32[1]._.W1 ,
-					theta_32[2]._.W1 
+					(int16_t)((theta_32[0].WW + 0x00008000)>>16) ,
+					(int16_t)((theta_32[1].WW + 0x00008000)>>16) ,
+					(int16_t)((theta_32[2].WW + 0x00008000)>>16)
 					
 	//				coning_angle_adjustment[0].WW ,
 	//				coning_angle_adjustment[1].WW ,
