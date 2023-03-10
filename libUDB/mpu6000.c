@@ -231,6 +231,7 @@ int32_t ggain_32[] =  { (double)256*(double)256*(double)GGAINX_32 ,
 
 
 union longww delta_coning_angle32[3] ;
+int16_t theta_16[3] ;
 union longww omega32[3] ;
 union longww theta_32[3] ;
 union longww _theta_32[3] ;
@@ -359,6 +360,14 @@ static void process_MPU_data(void)
 		theta_32[0].WW = _theta_32[0].WW ;
 		theta_32[1].WW = _theta_32[1].WW ;
 		theta_32[2].WW = _theta_32[2].WW ;
+		
+		_theta_32[0].WW += 0x00008000 ;
+		_theta_32[1].WW += 0x00008000 ;
+		_theta_32[2].WW += 0x00008000 ;
+		
+		theta_16[0] = _theta_32[0]._.W1 ;
+		theta_16[1] = _theta_32[1]._.W1 ;
+		theta_16[2] = _theta_32[2]._.W1 ;
 		
 		reset_coning_adjustment();
 		
