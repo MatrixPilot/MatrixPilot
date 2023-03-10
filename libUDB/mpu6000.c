@@ -230,15 +230,13 @@ int32_t ggain_32[] =  { (double)256*(double)256*(double)GGAINX_32 ,
 	(double)256*(double)256*GGAINZ_32 };
 
 
-union longww coning_angle32[3] ;
 union longww delta_coning_angle32[3] ;
 union longww omega32[3] ;
 union longww theta_32[3] ;
 union longww _theta_32[3] ;
-union longww angle_cross_omega[3];
-union longww coning_angle_adjustment[3] ;
+union longww omega_dt[3];
 
-int32_t fractional_32_multiply( int32_t arg1 , int32_t arg2 )
+int32_t fract_32_mpy( int32_t arg1 , int32_t arg2 )
 {
 	union longww result ;
 	union longww x,y;
@@ -267,40 +265,16 @@ int32_t fractional_32_multiply( int32_t arg1 , int32_t arg2 )
 	return result.WW ;
 }
 
-void test_fractional_32(void)
-{
-	int32_t result ;
-	int32_t arg;
-	arg = 0 ;
-	result = fractional_32_multiply(arg,arg);
-	result = fractional_32_multiply(arg,arg);
-	result = fractional_32_multiply(arg,arg);
-	result = fractional_32_multiply(arg,arg);
-	result = fractional_32_multiply(arg,arg);
-	result = fractional_32_multiply(arg,arg);
-	result = fractional_32_multiply(arg,arg);						
-}
-
 void compute_angle_cross_omega(void)
 {
-	union longlongLL product64 ;
-	
-	product64.LL = ((int64_t)coning_angle32[1].WW)*((int64_t)omega32[2].WW) 
-			- ((int64_t)coning_angle32[2].WW)*((int64_t)omega32[1].WW) ;
-	delta_coning_angle32[0].WW = product64._.L1 ;
-	
-	product64.LL = ((int64_t)coning_angle32[2].WW)*((int64_t)omega32[0].WW) 
-			- ((int64_t)coning_angle32[0].WW)*((int64_t)omega32[2].WW) ;
-	delta_coning_angle32[1].WW = product64._.L1 ;
-	
-	product64.LL = ((int64_t)coning_angle32[0].WW)*((int64_t)omega32[1].WW) 
-			- ((int64_t)coning_angle32[1].WW)*((int64_t)omega32[0].WW) ;
-	delta_coning_angle32[2].WW = product64._.L1 ;
-	
-	coning_angle32[0].WW += delta_coning_angle32[0].WW ;
-	coning_angle32[1].WW += delta_coning_angle32[1].WW ;
-	coning_angle32[2].WW += delta_coning_angle32[2].WW ;
-	
+	delta_coning_angle32[0].WW = 2* ( fract_32_mpy(_theta_32[1].WW,omega_dt[2].WW)
+			- fract_32_mpy(_theta_32[2].WW,omega_dt[1].WW));
+
+	delta_coning_angle32[1].WW = 2* ( fract_32_mpy(_theta_32[2].WW,omega_dt[0].WW)
+			- fract_32_mpy(_theta_32[0].WW,omega_dt[2].WW));
+
+	delta_coning_angle32[2].WW = 2* ( fract_32_mpy(_theta_32[0].WW,omega_dt[1].WW)
+			- fract_32_mpy(_theta_32[1].WW,omega_dt[0].WW));
 }
 
 void compute_coning_adjustment(void)
@@ -311,25 +285,27 @@ void compute_coning_adjustment(void)
 			- (udb_yrate.offset>>1));
 	omega32[2]._.W1 = ZRATE_SIGN_ORIENTED ((((int16_t)mpu_data[zrate_MPU_channel])>>1 )
 			- (udb_zrate.offset>>1));
+
 	omega32[0]._.W0 = 0 ;
 	omega32[1]._.W0 = 0 ;
 	omega32[2]._.W0 = 0 ;
 	
-	_theta_32[0].WW += 	fractional_32_multiply(omega32[0].WW,ggain_32[0]);
-	_theta_32[1].WW += 	fractional_32_multiply(omega32[1].WW,ggain_32[1]);
-	_theta_32[2].WW += 	fractional_32_multiply(omega32[2].WW,ggain_32[2]);
+	omega_dt[0].WW = fract_32_mpy(omega32[0].WW,ggain_32[0]);
+	omega_dt[1].WW = fract_32_mpy(omega32[1].WW,ggain_32[1]);
+	omega_dt[2].WW = fract_32_mpy(omega32[2].WW,ggain_32[2]);
 	
+	compute_angle_cross_omega();
+	
+	_theta_32[0].WW += 	omega_dt[0].WW + delta_coning_angle32[0].WW ;
+	_theta_32[1].WW += 	omega_dt[1].WW + delta_coning_angle32[1].WW ;
+	_theta_32[2].WW += 	omega_dt[2].WW + delta_coning_angle32[2].WW ;	
 }
 
 void reset_coning_adjustment(void)
 {
-	coning_angle32[0].WW = 0 ;
-	coning_angle32[1].WW = 0 ;
-	coning_angle32[2].WW = 0 ;
 	_theta_32[0].WW = 0 ;
 	_theta_32[1].WW = 0 ;
-	_theta_32[2].WW = 0 ;
-	
+	_theta_32[2].WW = 0 ;	
 }
 
 int16_t sample_counter = 0 ;
@@ -374,11 +350,7 @@ static void process_MPU_data(void)
 		xrate32 = 0 ;
 		yrate32 = 0 ;
 		zrate32 = 0 ;
-		
-		coning_angle_adjustment[0].WW = coning_angle32[0].WW ;
-		coning_angle_adjustment[1].WW = coning_angle32[1].WW ;
-		coning_angle_adjustment[2].WW = coning_angle32[2].WW ;
-		
+				
 		theta_32[0].WW = _theta_32[0].WW + 0x00008000 ;
 		theta_32[1].WW = _theta_32[1].WW + 0x00008000 ;
 		theta_32[2].WW = _theta_32[2].WW + 0x00008000 ;
