@@ -332,9 +332,9 @@ static void process_MPU_data(void)
 	yrate32 += ((int32_t)((int16_t)mpu_data[yrate_MPU_channel])) ;
 	zrate32 += ((int32_t)((int16_t)mpu_data[zrate_MPU_channel])) ;
 
+#ifdef CONING_CORRECTION	
 	compute_coning_adjustment();
-
-#if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
+#endif
 	//  trigger synchronous processing of sensor data
 	sample_counter = sample_counter+1 ;
 	if (sample_counter == 40)
@@ -356,7 +356,7 @@ static void process_MPU_data(void)
 		xrate32 = 0 ;
 		yrate32 = 0 ;
 		zrate32 = 0 ;
-				
+#ifdef 	CONING_CORRECTION			
 		theta_32[0].WW = _theta_32[0].WW ;
 		theta_32[1].WW = _theta_32[1].WW ;
 		theta_32[2].WW = _theta_32[2].WW ;
@@ -370,13 +370,10 @@ static void process_MPU_data(void)
 		theta_16[2] = _theta_32[2]._.W1 ;
 		
 		reset_coning_adjustment();
-		
+#endif // CONING_CORRECTION		
 		sample_counter = 0 ;
 		if (callback) callback();   // was directly calling heartbeat()
 	}
-#else
-#warning mpu6000: no callback mechanism defined
-#endif // (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 }
 
 static void MPU6000_read(void)

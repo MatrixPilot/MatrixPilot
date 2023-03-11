@@ -1,7 +1,9 @@
-#define MINI5 "UDBmini5 hardware, 200 Hz DLPF.\r\n"
-#define MINI6 "UDBmini6 hardware, 200 Hz DLPF.\r\n"
+#define MINI5 "UDBmini5 hardware, 8000 Hz sampling.\r\n"
+#define MINI6 "UDBmini6 hardware, 8000 Hz sampling.\r\n"
 
-#define DATE "rev. 2.5, 2/14/2023\r\n"
+#define DATE "rev. 3.0, 3/11/2023\r\n"
+
+#define CONING_CORRECTION
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU

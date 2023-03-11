@@ -146,6 +146,7 @@ extern union longww coning_angle_adjustment[];
 extern union longww omega32[];
 extern union longww theta_32[];
 extern union longww ggain_32[];
+extern int16_t theta_16[];
 					
 
 
@@ -523,9 +524,10 @@ void send_imu_data(void)
 					rmat[6],rmat[7],rmat[8],
 					omegagyro[0] , omegagyro[1], omegagyro[2],			
 					theta[0],theta[1],theta[2],
-					(int16_t)((theta_32[0].WW + 0x00008000)>>16) ,
-					(int16_t)((theta_32[1].WW + 0x00008000)>>16) ,
-					(int16_t)((theta_32[2].WW + 0x00008000)>>16)
+					theta_16[0],theta_16[1],theta_16[2]
+	//				(int16_t)((theta_32[0].WW + 0x00008000)>>16) ,
+	//				(int16_t)((theta_32[1].WW + 0x00008000)>>16) ,
+	//				(int16_t)((theta_32[2].WW + 0x00008000)>>16)
 					
 	//				coning_angle_adjustment[0].WW ,
 	//				coning_angle_adjustment[1].WW ,

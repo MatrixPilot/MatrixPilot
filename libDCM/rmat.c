@@ -274,6 +274,7 @@ void udb_callback_read_sensors(void)
 }
 
 fractional theta[3];
+extern int16_t theta_16[];
 fractional rup_copy[9];
 // The update algorithm!!
 static void rupdate(void)
@@ -329,6 +330,37 @@ static void rupdate(void)
 	rup[6] = 0 ;
 	rup[7] = 0 ;
 
+#ifdef CONING_CORRECTION
+	if (accelOn == 1 )
+	{
+		// construct the delta angle matrix without coning correction
+		// because it includes residual offset compensation
+		// and coning correction is not needed during standby mode
+		delta_angle[0] = 0 ;
+		delta_angle[1] = -theta[2];
+		delta_angle[2] =  theta[1];
+		delta_angle[3] =  theta[2];
+		delta_angle[4] = 0 ;
+		delta_angle[5] = -theta[0];
+		delta_angle[6] = -theta[1];
+		delta_angle[7] =  theta[0];
+		delta_angle[8] = 0 ;
+	}
+	else
+	{
+		// construct the delta angle matrix with coning correction:
+		delta_angle[0] = 0 ;
+		delta_angle[1] = -theta_16[2];
+		delta_angle[2] =  theta_16[1];
+		delta_angle[3] =  theta_16[2];
+		delta_angle[4] = 0 ;
+		delta_angle[5] = -theta_16[0];
+		delta_angle[6] = -theta_16[1];
+		delta_angle[7] =  theta_16[0];
+		delta_angle[8] = 0 ;
+	}
+#else
+	
 	// construct the delta angle matrix:
 	delta_angle[0] = 0 ;
 	delta_angle[1] = -theta[2];
@@ -339,6 +371,7 @@ static void rupdate(void)
 	delta_angle[6] = -theta[1];
 	delta_angle[7] =  theta[0];
 	delta_angle[8] = 0 ;
+#endif // CONING_CORRECTION
 	
 	// compute 1/2 of square of the delta angle matrix
 	// since a matrix multiply divides by 2, we get it for free	
