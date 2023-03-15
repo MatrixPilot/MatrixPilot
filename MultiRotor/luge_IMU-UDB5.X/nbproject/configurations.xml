@@ -21,6 +21,7 @@
         <itemPath>../../libDCM/mathlibNAV.h</itemPath>
         <itemPath>../../libDCM/rmat.h</itemPath>
         <itemPath>../../libDCM/deadReckoning_lidar.h</itemPath>
+        <itemPath>../../libDCM/matrix_vector_32_bit.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <logicalFolder name="f1" displayName="gyro_tables" projectFiles="true">
@@ -113,6 +114,7 @@
         <itemPath>../../libDCM/mathlib.c</itemPath>
         <itemPath>../../libDCM/mathlibNAV.c</itemPath>
         <itemPath>../../libDCM/rmat.c</itemPath>
+        <itemPath>../../libDCM/matrix_vector_32_bit.c</itemPath>
       </logicalFolder>
       <logicalFolder name="libUDB" displayName="libUDB" projectFiles="true">
         <itemPath>../../libUDB/ADchannel.c</itemPath>

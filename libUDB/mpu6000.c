@@ -29,7 +29,8 @@
 #include "ADchannel.h"
 #include "mpu_spi.h"
 #include "mpu6000.h"
-#include "../libUDB/udbTypes.h"
+#include "../libDCM/matrix_vector_32_bit.h"
+//#include "../libUDB/udbTypes.h"
 
 boolean is_ICM_20689 = 0;
 //uint16_t mpu_whoami = 0;
@@ -160,22 +161,6 @@ void MPU6000_init16(callback_fptr_t fptr)
 	#endif
 	}
 
-
-#if 0
-	// Legacy from Mark Whitehorn's testing, we might need it some day.
-	// SAMPLE RATE
-	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 7); // Sample rate = 1KHz  Fsample= 8Khz/(N+1)
-
-	// no DLPF, gyro sample rate 8KHz
-	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_256HZ_NOLPF2);
-
-	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_500DPS); // Gyro scale 500º/s
-
-//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_2G); // Accel scale 2g, g = 16384
-	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_4G); // Accel scale g = 8192
-//	writeMPUSPIreg16(MPUREG_ACCEL_CONFIG, BITS_FS_8G); // Accel scale g = 4096
-#endif
-
 	// INT CFG => Interrupt on Data Ready, totem-pole (push-pull) output
 	writeMPUSPIreg16(MPUREG_INT_PIN_CFG, BIT_INT_LEVEL | BIT_INT_RD_CLEAR); // INT: Clear on any read
 	writeMPUSPIreg16(MPUREG_INT_ENABLE, BIT_DATA_RDY_EN); // INT: Raw data ready
@@ -238,45 +223,12 @@ union longww _theta_32[3] ;
 union longww omega_dt[3];
 extern union longww omegagyro_filtered[];
 
-int32_t fract_32_mpy( int32_t arg1 , int32_t arg2 )
+void compute_one_half_angle_cross_omega(void)
 {
-	union longww result ;
-	union longww x,y;
-	x.WW = arg1 ;
-	y.WW = arg2 ;
-	int16_t sign = 1 ;
-	if ( x.WW < 0 )
-	{
-		sign = - sign ;
-		x.WW = - (x.WW ) ;
-	}
-	if ( y.WW < 0)
-	{
-		sign = - sign ;
-		y.WW = - (y.WW ) ;
-	}
-	
-	result.WW = __builtin_muluu( x._.W1 , y._.W1 )
-			+  (__builtin_muluu( x._.W1 , y._.W0 )>>16 )
-			+  (__builtin_muluu( x._.W0 , y._.W1 )>>16 ) ;
-	
-	if ( sign < 0)
-	{
-		result.WW = - ( result.WW ) ;
-	}
-	return result.WW ;
-}
-
-void compute_angle_cross_omega(void)
-{
-	delta_coning_angle32[0].WW = 2* ( fract_32_mpy(_theta_32[1].WW,omega_dt[2].WW)
-			- fract_32_mpy(_theta_32[2].WW,omega_dt[1].WW));
-
-	delta_coning_angle32[1].WW = 2* ( fract_32_mpy(_theta_32[2].WW,omega_dt[0].WW)
-			- fract_32_mpy(_theta_32[0].WW,omega_dt[2].WW));
-
-	delta_coning_angle32[2].WW = 2* ( fract_32_mpy(_theta_32[0].WW,omega_dt[1].WW)
-			- fract_32_mpy(_theta_32[1].WW,omega_dt[0].WW));
+	cross_product_32(delta_coning_angle32,_theta_32,omega_dt );
+	delta_coning_angle32[0].WW *= 2 ;
+	delta_coning_angle32[1].WW *= 2 ;
+	delta_coning_angle32[2].WW *= 2 ;
 }
 
 void compute_coning_adjustment(void)
@@ -300,7 +252,7 @@ void compute_coning_adjustment(void)
 	omega_dt[1].WW = fract_32_mpy(omega32[1].WW,ggain_32[1]);
 	omega_dt[2].WW = fract_32_mpy(omega32[2].WW,ggain_32[2]);
 	
-	compute_angle_cross_omega();
+	compute_one_half_angle_cross_omega();
 	
 	_theta_32[0].WW += 	omega_dt[0].WW + delta_coning_angle32[0].WW ;
 	_theta_32[1].WW += 	omega_dt[1].WW + delta_coning_angle32[1].WW ;
