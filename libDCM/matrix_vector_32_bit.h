@@ -8,6 +8,9 @@
 #ifndef MATRIX_VECTOR_32_BIT_H
 #define	MATRIX_VECTOR_32_BIT_H
 
+
+void convert_16_bit_to_32_bit(int16_t size , union longww dest[] , int16_t source[]) ;
+void convert_32_bit_to_16_bit(int16_t size , int16_t dest[] , union longww source[]) ;
 void scale_32_by_4 ( int16_t size , union longww result[] ) ;
 int32_t fract_32_mpy( int32_t x , int32_t y ) ;
 void VectorCross_32(union longww result[], union longww vectorx[] ,union longww vectory[] ) ;

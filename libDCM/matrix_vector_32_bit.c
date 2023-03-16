@@ -7,6 +7,28 @@
 #include "../libUDB/udbTypes.h"
 #include "../libDCM/matrix_vector_32_bit.h"
 
+void convert_16_bit_to_32_bit(int16_t size , union longww dest[] , int16_t source[])
+{
+	int16_t index ;
+	for ( index = 0 ; index < size ; index++ )
+	{
+		dest[index]._.W1 = source[index] ;
+		dest[index]._.W0 = 0x8000 ;
+	}
+}
+
+void convert_32_bit_to_16_bit(int16_t size , int16_t dest[] , union longww source[])
+{
+	int16_t index ;
+	union longww temporary ;
+	for ( index = 0 ; index < size ; index++ )
+	{
+		// rounding rather than truncation
+		temporary.WW = source[index].WW + 0x00008000 ;
+		dest[index] = temporary._.W1 ;
+	}	
+}
+
 void scale_32_by_4 ( int16_t size , union longww result[] )
 {
 	int16_t index ;
@@ -35,8 +57,7 @@ int32_t fract_32_mpy( int32_t x , int32_t y )
 	{
 		sign = - sign ;
 		arg2.WW = - (arg2.WW ) ;
-	}
-	
+	}	
 	result.WW = __builtin_muluu( arg1._.W1 , arg2._.W1 )
 			+  (__builtin_muluu( arg1._.W1 , arg2._.W0 )>>16 )
 			+  (__builtin_muluu( arg1._.W0 , arg2._.W1 )>>16 ) ;
@@ -73,8 +94,6 @@ int32_t row_col_dot_fract_32( union longww row[], union longww col[], int16_t ro
 			+fract_32_mpy(row[row_index+2].WW,col[col_index+6].WW) ;
 	return result ;
 }
-
-
 
 void MatrixMultiply_32( union longww dest[] , union longww arg1[] , union longww arg2[] )
 {
