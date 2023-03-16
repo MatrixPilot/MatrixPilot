@@ -9,10 +9,15 @@
 #define	MATRIX_VECTOR_32_BIT_H
 
 int32_t fract_32_mpy( int32_t x , int32_t y ) ;
-void cross_product_32(union longww result[], union longww vectorx[] ,union longww vectory[] ) ;
-int32_t row_col_dot_fract_32( int32_t row[], int32_t col[], int16_t row_index , int16_t col_index ) ;
-int32_t VectorDotProduct_32( int32_t vector1 , int32_t vector2 ) ;
-void MatrixMultiply_32( int32_t dest[] , int32_t arg1[] , int32_t arg2[] ) ;
+void VectorCross_32(union longww result[], union longww vectorx[] ,union longww vectory[] ) ;
+int32_t row_col_dot_fract_32( union longww row[], union longww col[], int16_t row_index , int16_t col_index ) ;
+int32_t VectorDotProduct_32( union longww vector1 , union longww vector2 ) ;
+void MatrixMultiply_32( union longww dest[] , union longww arg1[] , union longww arg2[] ) ;
+void MatrixAdd_32(union longww result[], union longww vectorx[] ,union longww vectory[] ) ;
+void VectorCopy_32(int16_t size , union longww dest[] , union longww source[] ) ;
+void VectorScale_32(int16_t size , union longww dest[] , union longww source[] , int32_t scale );
+void VectorAdd_32(union longww result[], union longww vectorx[] ,union longww vectory[] ) ;
+int32_t VectorPower_32(union longww source[]) ;
 
 #endif	/* MATRIX_VECTOR_32_BIT_H */
 

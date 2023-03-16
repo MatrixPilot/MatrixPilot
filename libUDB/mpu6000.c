@@ -225,7 +225,7 @@ extern union longww omegagyro_filtered[];
 
 void compute_one_half_angle_cross_omega(void)
 {
-	cross_product_32(delta_coning_angle32,_theta_32,omega_dt );
+	VectorCross_32(delta_coning_angle32,_theta_32,omega_dt );
 	delta_coning_angle32[0].WW *= 2 ;
 	delta_coning_angle32[1].WW *= 2 ;
 	delta_coning_angle32[2].WW *= 2 ;
