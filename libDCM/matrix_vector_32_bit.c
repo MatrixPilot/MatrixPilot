@@ -7,6 +7,14 @@
 #include "../libUDB/udbTypes.h"
 #include "../libDCM/matrix_vector_32_bit.h"
 
+void scale_32_by_4 ( int16_t size , union longww result[] )
+{
+	int16_t index ;
+	for ( index = 0 ; index < size ; index++ )
+	{
+		result[index].WW = ((result[index].WW)<<2) ;
+	}
+}
 
 int32_t fract_32_mpy( int32_t x , int32_t y )
 {
@@ -84,33 +92,61 @@ void MatrixMultiply_32( union longww dest[] , union longww arg1[] , union longww
 	dest[8].WW = row_col_dot_fract_32(arg1,arg2,6,2);
 }
 
-int32_t VectorDotProduct_32( union longww vector1 , union longww vector2 )
+int32_t VectorDotProduct_32( union longww vector1[] , union longww vector2[] )
 {
-	return 0 ;
+	int32_t result = 0 ;
+	int16_t index ;
+	for ( index = 0 ; index < 3 ; index++ )
+	{
+		result +=  fract_32_mpy(vector1[index].WW , vector2[index].WW ) ;
+	}
+	return result ;
 }
 
 void MatrixAdd_32(union longww result[], union longww vectorx[] ,union longww vectory[] )
 {
-	
+	int16_t index ;
+	for ( index = 0 ; index < 9 ; index++ )
+	{
+		result[index].WW = vectorx[index].WW + vectory[index].WW ;
+	}
 }
 
 void VectorCopy_32(int16_t size , union longww dest[] , union longww source[] )
 {
-	
+	int16_t index ;
+	for ( index = 0 ; index < size ; index++ )
+	{
+		dest[index].WW = source[index].WW ;
+	}
 }
 
 void VectorScale_32(int16_t size , union longww dest[] , union longww source[] , int32_t scale )
 {
-	
+	int16_t index ;
+	for ( index = 0 ; index < size ; index++ )
+	{
+		dest[index].WW = fract_32_mpy(source[index].WW,scale) ;
+	}
 }
 
-void VectorAdd_32(union longww result[], union longww vectorx[] ,union longww vectory[] )
+void VectorAdd_32(int16_t size , union longww result[], union longww vectorx[] ,union longww vectory[] )
 {
-	
+	int16_t index ;
+	for ( index = 0 ; index < size ; index++ )
+	{
+		result[index].WW = vectorx[index].WW + vectory[index].WW ;
+	}
 }
 
-int32_t VectorPower_32(union longww source[])
+int32_t VectorPower_32(int16_t size , union longww source[])
 {
-	return 0 ;
+	int32_t result = 0 ;
+	int16_t index ;
+	for ( index = 0 ; index < size ; index++ )
+	{
+		result +=  fract_32_mpy(source[index].WW , source[index].WW ) ;
+	}
+	return result ;
 }
 
