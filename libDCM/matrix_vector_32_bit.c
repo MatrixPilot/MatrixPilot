@@ -13,7 +13,7 @@ void convert_16_bit_to_32_bit(int16_t size , union longww dest[] , int16_t sourc
 	for ( index = 0 ; index < size ; index++ )
 	{
 		dest[index]._.W1 = source[index] ;
-		dest[index]._.W0 = 0x8000 ;
+		dest[index]._.W0 = 0 ;
 	}
 }
 
@@ -69,7 +69,7 @@ int32_t fract_32_mpy( int32_t x , int32_t y )
 	return result.WW ;
 }
 
-void VectorCross_32(union longww result[], union longww vectorx[] ,union longww vectory[] )
+void VectorCross_32(union longww result[] , union longww vectorx[] , union longww vectory[] )
 {
 	// computes the cross product of vectorx and vectory, divides by 2^32,
 	// and places the result in result
@@ -83,23 +83,24 @@ void VectorCross_32(union longww result[], union longww vectorx[] ,union longww 
 			- fract_32_mpy(vectorx[1].WW,vectory[0].WW));
 }
 
-int32_t row_col_dot_fract_32( union longww row[], union longww col[], int16_t row_index , int16_t col_index )
+int32_t row_col_dot_fract_32( union longww row[] , union longww col[] , int16_t row_index , int16_t col_index )
 {
-	// primitive operation used in matrix multiply
-	// it computes the dot product of one row and one column, divided by 2^32
+	// primitive operation used in fractional matrix multiply
+	// it computes the dot product of one row and one column, divided by 2^32, multiplied by 4
 	// the rows and columns are embedded in a linear array of 9 elements
 	int32_t result ;
 	result = fract_32_mpy(row[row_index].WW,col[col_index].WW)
 			+fract_32_mpy(row[row_index+1].WW,col[col_index+3].WW)
 			+fract_32_mpy(row[row_index+2].WW,col[col_index+6].WW) ;
-	return result ;
+	return (result<<2) ;
 }
 
 void MatrixMultiply_32( union longww dest[] , union longww arg1[] , union longww arg2[] )
 {
 	// computes the matrix product of two 3X3 matrices, arg1 times arg2,
 	// divides by 2^32 and places the result in dest
-	// for fractional computations, the result must eventually be multiplied by 4
+	// it assumes the matrices are scaled such that 1 radian = 16384*2^16,
+	// so the dot product includes a multiply by 4
 	dest[0].WW = row_col_dot_fract_32(arg1,arg2,0,0);
 	dest[1].WW = row_col_dot_fract_32(arg1,arg2,0,1);
 	dest[2].WW = row_col_dot_fract_32(arg1,arg2,0,2);
@@ -122,7 +123,7 @@ int32_t VectorDotProduct_32( union longww vector1[] , union longww vector2[] )
 	return result ;
 }
 
-void MatrixAdd_32(union longww result[], union longww vectorx[] ,union longww vectory[] )
+void MatrixAdd_32(union longww result[] , union longww vectorx[] , union longww vectory[] )
 {
 	int16_t index ;
 	for ( index = 0 ; index < 9 ; index++ )
@@ -140,7 +141,7 @@ void VectorCopy_32(int16_t size , union longww dest[] , union longww source[] )
 	}
 }
 
-void VectorScale_32(int16_t size , union longww dest[] , union longww source[] , int32_t scale )
+void VectorScale_32(int16_t size, union longww dest[] , union longww source[] , int32_t scale )
 {
 	int16_t index ;
 	for ( index = 0 ; index < size ; index++ )
@@ -149,7 +150,7 @@ void VectorScale_32(int16_t size , union longww dest[] , union longww source[] ,
 	}
 }
 
-void VectorAdd_32(int16_t size , union longww result[], union longww vectorx[] ,union longww vectory[] )
+void VectorAdd_32(int16_t size, union longww result[] , union longww vectorx[] , union longww vectory[] )
 {
 	int16_t index ;
 	for ( index = 0 ; index < size ; index++ )

@@ -27,6 +27,7 @@
 #include "../libUDB/servoOut.h"
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/mcu.h"
+#include "../libDCM/matrix_vector_32_bit.h"
 
 // Used for serial debug output
 #include <stdio.h>
@@ -371,8 +372,9 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
-				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
+//				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
+				serial_output("\r\n\r\ncpu,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,t32_x,t32_y,t32_z\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
@@ -523,13 +525,9 @@ void send_imu_data(void)
 		{
 			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
 					udb_cpu_load(),
-					rmat[6],rmat[7],rmat[8],
-	//				omegagyro[0] , omegagyro[1], omegagyro[2],			
+					omegagyro[0] , omegagyro[1], omegagyro[2],			
 					theta[0],theta[1],theta[2],
 					theta_16[0],theta_16[1],theta_16[2]
-	//				(int16_t)((theta_32[0].WW + 0x00008000)>>16) ,
-	//				(int16_t)((theta_32[1].WW + 0x00008000)>>16) ,
-	//				(int16_t)((theta_32[2].WW + 0x00008000)>>16)
 	//				theta_32[0].WW ,
 	//				theta_32[1].WW ,
 	//				theta_32[2].WW
