@@ -4,6 +4,7 @@
 #define DATE "rev. 3.0, 3/11/2023\r\n"
 
 #define CONING_CORRECTION
+//#define CONING_CORRECTION_IN_RMAT
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
@@ -47,7 +48,8 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	50
+//#define LOGGER_HZ	50
+#define LOGGER_HZ	10
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	200
 #define TILT_STOP_DELAY 10 // seconds 

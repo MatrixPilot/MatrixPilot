@@ -7,6 +7,8 @@
 #include "../libUDB/heartbeat.h"
 #include "../libUDB/ADchannel.h"
 #include <math.h>
+#include "../libDCM/matrix_vector_32_bit.h"
+#include "../libDCM/rmat_32.h"
 
 // These are the routines for maintaining a direction cosine matrix
 // that can be used to transform vectors between the earth and plane
@@ -330,7 +332,8 @@ static void rupdate(void)
 	rup[6] = 0 ;
 	rup[7] = 0 ;
 
-#ifdef CONING_CORRECTION
+#ifdef CONING_CORRECTION_IN_RMAT
+
 	if (accelOn == 1 )
 	{
 		// construct the delta angle matrix without coning correction
@@ -371,7 +374,7 @@ static void rupdate(void)
 	delta_angle[6] = -theta[1];
 	delta_angle[7] =  theta[0];
 	delta_angle[8] = 0 ;
-#endif // CONING_CORRECTION
+#endif // CONING_CORRECTION_IN_RMAT
 	
 	// compute 1/2 of square of the delta angle matrix
 	// since a matrix multiply divides by 2, we get it for free	
@@ -537,6 +540,7 @@ static void PI_feedback(void)
 void dcm_run_imu_step(void)
 {
 	rupdate();                  // local
+	rmat_32_update();
 	normalize();                // local
 	roll_pitch_drift();         // local
 	PI_feedback();              // local

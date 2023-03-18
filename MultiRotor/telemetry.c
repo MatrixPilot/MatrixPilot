@@ -28,6 +28,7 @@
 #include "../libUDB/ADchannel.h"
 #include "../libUDB/mcu.h"
 #include "../libDCM/matrix_vector_32_bit.h"
+#include "../libDCM/rmat_32.h"
 
 // Used for serial debug output
 #include <stdio.h>
@@ -148,6 +149,7 @@ extern union longww omega32[];
 extern union longww theta_32[];
 extern union longww ggain_32[];
 extern int16_t theta_16[];
+extern int16_t rup_copy[];
 					
 
 
@@ -372,9 +374,10 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
+				serial_output("\r\n\r\ncpu,r0,r1,r2,r3,r4,r5,r6,r7,r8,rr0,rr1,rr2,rr3,rr4,rr5,rr6,rr7,rr8\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
-				serial_output("\r\n\r\ncpu,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
+//				serial_output("\r\n\r\ncpu,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,t32_x,t32_y,t32_z\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
@@ -523,11 +526,18 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
+			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 					udb_cpu_load(),
-					omegagyro[0] , omegagyro[1], omegagyro[2],			
-					theta[0],theta[1],theta[2],
-					theta_16[0],theta_16[1],theta_16[2]
+					rup_copy[0],rup_copy[1],rup_copy[2],
+					rup_copy[3],rup_copy[4],rup_copy[5],
+					rup_copy[6],rup_copy[7],rup_copy[8],
+					rupdate_16[0],rupdate_16[1],rupdate_16[2],
+					rupdate_16[3],rupdate_16[4],rupdate_16[5],
+					rupdate_16[6],rupdate_16[7],rupdate_16[8]
+	//				omegagyro[0] , omegagyro[1], omegagyro[2],			
+	//				theta[0],theta[1],theta[2],
+	//				theta_16[0],theta_16[1],theta_16[2]
 	//				theta_32[0].WW ,
 	//				theta_32[1].WW ,
 	//				theta_32[2].WW
