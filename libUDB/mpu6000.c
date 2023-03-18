@@ -206,6 +206,7 @@ void MPU6000_init16(callback_fptr_t fptr)
 }
 
 #define SAMPLE_HZ 8000
+// compute binary calibration factors for each gyro channel
 #define GGAINX_32 (double)CALIBRATIONX*(double)SCALEGYRO*(double)24*((double)RMAX*((double)1.0/(double)SAMPLE_HZ))
 #define GGAINY_32 (double)CALIBRATIONY*(double)SCALEGYRO*(double)24*((double)RMAX*((double)1.0/(double)SAMPLE_HZ))
 #define GGAINZ_32 (double)CALIBRATIONZ*(double)SCALEGYRO*(double)24*((double)RMAX*((double)1.0/(double)SAMPLE_HZ))
@@ -223,27 +224,42 @@ union longww _theta_32[3] ;
 union longww omega_dt[3];
 extern union longww omegagyro_filtered[];
 
+// compute just the coning correction term
 void compute_one_half_angle_cross_omega(void)
 {
+	// Take the integer cross product
 	VectorCross_32(delta_coning_angle32,_theta_32,omega_dt );
+	// The math requires a divide by 2 for this term.
+	// Since a multiply by 4 would be otherwise required after an integer multiply,
+	// the 1/2 combines with the 4 to require a net of a multiply by 2.
 	delta_coning_angle32[0].WW *= 2 ;
 	delta_coning_angle32[1].WW *= 2 ;
 	delta_coning_angle32[2].WW *= 2 ;
 }
 
+// compute the sum of both terms in the equation for the rate of change of rotation angle vector
 void compute_coning_adjustment(void)
 {
-	omega32[0]._.W1 = XRATE_SIGN_ORIENTED ((((int16_t)mpu_data[xrate_MPU_channel])>>1 )
-			- (udb_xrate.offset>>1));
-	omega32[1]._.W1 = YRATE_SIGN_ORIENTED ((((int16_t)mpu_data[yrate_MPU_channel])>>1 )
-			- (udb_yrate.offset>>1));
-	omega32[2]._.W1 = ZRATE_SIGN_ORIENTED ((((int16_t)mpu_data[zrate_MPU_channel])>>1 )
-			- (udb_zrate.offset>>1));
-
-	omega32[0]._.W0 = 0 ;
-	omega32[1]._.W0 = 0 ;
-	omega32[2]._.W0 = 0 ;
+	union longww rate ;
+	union longww offset ;
+	rate._.W1 = XRATE_SIGN_ORIENTED (((int16_t)mpu_data[xrate_MPU_channel]));
+	rate._.W0 = 0 ;
+	offset._.W1 = XRATE_SIGN_ORIENTED (((int16_t)udb_xrate.offset));
+	offset._.W0 = 0 ;
+	omega32[0].WW = (rate.WW>>1)-(offset.WW>>1);
 	
+	rate._.W1 = YRATE_SIGN_ORIENTED (((int16_t)mpu_data[yrate_MPU_channel]));
+	rate._.W0 = 0 ;
+	offset._.W1 = YRATE_SIGN_ORIENTED (((int16_t)udb_yrate.offset));
+	offset._.W0 = 0 ;
+	omega32[1].WW = (rate.WW>>1)-(offset.WW>>1);
+	
+	rate._.W1 = ZRATE_SIGN_ORIENTED (((int16_t)mpu_data[zrate_MPU_channel]));
+	rate._.W0 = 0 ;
+	offset._.W1 = ZRATE_SIGN_ORIENTED (((int16_t)udb_zrate.offset));
+	offset._.W0 = 0 ;
+	omega32[2].WW = (rate.WW>>1)-(offset.WW>>1);
+		
 	omega32[0].WW += omegagyro_filtered[0].WW ;
 	omega32[1].WW += omegagyro_filtered[1].WW ;
 	omega32[2].WW += omegagyro_filtered[2].WW ;
@@ -270,10 +286,12 @@ int16_t sample_counter = 0 ;
 
 int32_t xaccel32, yaccel32, zaccel32, temp32, xrate32, yrate32, zrate32 ;
 
+// executed for each of sample at the 8000 Hz sample rate
 static void process_MPU_data(void)
 {
 	mpuDAV = true;
-	
+
+//	integrate all data for use in upstream calculations other than those that need coning correction	
 	xaccel32 += ((int32_t)((int16_t)mpu_data[xaccel_MPU_channel])) ;
 	yaccel32 += ((int32_t)((int16_t)mpu_data[yaccel_MPU_channel])) ;
 	zaccel32 += ((int32_t)((int16_t)mpu_data[zaccel_MPU_channel])) ;
@@ -289,6 +307,7 @@ static void process_MPU_data(void)
 #endif
 	//  trigger synchronous processing of sensor data
 	sample_counter = sample_counter+1 ;
+	// time to pass the consolidation of 40 samples up to the 200 Hz processes
 	if (sample_counter == 40)
 	{
 		udb_xaccel.value = __builtin_divsd(xaccel32+20,40);
@@ -308,11 +327,13 @@ static void process_MPU_data(void)
 		xrate32 = 0 ;
 		yrate32 = 0 ;
 		zrate32 = 0 ;
-#ifdef 	CONING_CORRECTION			
+#ifdef 	CONING_CORRECTION
+		// theta values used to update the 32 bit direction cosine matrix
 		theta_32[0].WW = _theta_32[0].WW ;
 		theta_32[1].WW = _theta_32[1].WW ;
 		theta_32[2].WW = _theta_32[2].WW ;
 		
+		// round off the 32 bit theta values for the option of logging just the upper 16 bits
 		_theta_32[0].WW += 0x00008000 ;
 		_theta_32[1].WW += 0x00008000 ;
 		_theta_32[2].WW += 0x00008000 ;
@@ -321,9 +342,11 @@ static void process_MPU_data(void)
 		theta_16[1] = _theta_32[1]._.W1 ;
 		theta_16[2] = _theta_32[2]._.W1 ;
 		
+		// get ready for the next batch of 40 samples
 		reset_coning_adjustment();
 #endif // CONING_CORRECTION		
 		sample_counter = 0 ;
+		// perform the 200 Hz IMU calculations
 		if (callback) callback();   // was directly calling heartbeat()
 	}
 }

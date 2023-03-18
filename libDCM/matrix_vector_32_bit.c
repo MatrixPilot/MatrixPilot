@@ -7,6 +7,15 @@
 #include "../libUDB/udbTypes.h"
 #include "../libDCM/matrix_vector_32_bit.h"
 
+// 32 bit vector and matrix routines.
+// Scaling of integers into real values is an extension of the values used
+// in the 16 bit routines that had an unused "guard" bit to prevent integer overflow.
+// In the 16 bit routines, 0x4000 represented a real value of 1, such as 1 radian
+// In the 32 bit routines, 0x40000000 represents a real value of 1.
+// As a consequence of the representation, multiplication of two 32 bit values is achieved by
+// starting with a 32 by 32 bit integer multiply producing a 64 bit result. The final result is then
+// produced by left shifting the 64 bit value by 2 and taking the most significant 32 bits
+
 void convert_16_bit_to_32_bit(int16_t size , union longww dest[] , int16_t source[])
 {
 	int16_t index ;
@@ -29,6 +38,9 @@ void convert_32_bit_to_16_bit(int16_t size , int16_t dest[] , union longww sourc
 	}	
 }
 
+// This routine can be used after any multiplication to produce the left shift by 2.
+// It can be used on vectors or matrices that are stored as arrays by specifying 3
+// for a vector and 9 for a matrix.
 void scale_32_by_4 ( int16_t size , union longww result[] )
 {
 	int16_t index ;
@@ -38,6 +50,7 @@ void scale_32_by_4 ( int16_t size , union longww result[] )
 	}
 }
 
+// returns the upper 32 bits of a 32 bit by 32 bit integer multiplication
 int32_t fract_32_mpy( int32_t x , int32_t y )
 {
 	// computes x*y/(2^32), which is useful in fractional calculations
@@ -69,6 +82,8 @@ int32_t fract_32_mpy( int32_t x , int32_t y )
 	return result.WW ;
 }
 
+// Performs an integer cross product.
+// If the arguments are in 0x40000000 format, the result needs to be left shifted by 2
 void VectorCross_32(union longww result[] , union longww vectorx[] , union longww vectory[] )
 {
 	// computes the cross product of vectorx and vectory, divides by 2^32,
@@ -83,6 +98,7 @@ void VectorCross_32(union longww result[] , union longww vectorx[] , union longw
 			- fract_32_mpy(vectorx[1].WW,vectory[0].WW));
 }
 
+// Performs a dot product of a row one matrix with the column of another matrix, including the left shift
 int32_t row_col_dot_fract_32( union longww row[] , union longww col[] , int16_t row_index , int16_t col_index )
 {
 	// primitive operation used in fractional matrix multiply
@@ -99,7 +115,7 @@ void MatrixMultiply_32( union longww dest[] , union longww arg1[] , union longww
 {
 	// computes the matrix product of two 3X3 matrices, arg1 times arg2,
 	// divides by 2^32 and places the result in dest
-	// it assumes the matrices are scaled such that 1 radian = 16384*2^16,
+	// it assumes the matrices are scaled such that 1 radian = 0x40000000,
 	// so the dot product includes a multiply by 4
 	dest[0].WW = row_col_dot_fract_32(arg1,arg2,0,0);
 	dest[1].WW = row_col_dot_fract_32(arg1,arg2,0,1);
@@ -112,6 +128,7 @@ void MatrixMultiply_32( union longww dest[] , union longww arg1[] , union longww
 	dest[8].WW = row_col_dot_fract_32(arg1,arg2,6,2);
 }
 
+// Performs an integer dot product of two three-component, 32 bit vectors
 int32_t VectorDotProduct_32( union longww vector1[] , union longww vector2[] )
 {
 	int32_t result = 0 ;
@@ -123,6 +140,7 @@ int32_t VectorDotProduct_32( union longww vector1[] , union longww vector2[] )
 	return result ;
 }
 
+// Adds two 3X3 32 bit matrices
 void MatrixAdd_32(union longww result[] , union longww vectorx[] , union longww vectory[] )
 {
 	int16_t index ;
@@ -132,6 +150,7 @@ void MatrixAdd_32(union longww result[] , union longww vectorx[] , union longww 
 	}
 }
 
+// Copies a 32 bit vector of any size
 void VectorCopy_32(int16_t size , union longww dest[] , union longww source[] )
 {
 	int16_t index ;
@@ -141,6 +160,7 @@ void VectorCopy_32(int16_t size , union longww dest[] , union longww source[] )
 	}
 }
 
+// Scales a 32 bit vector of any size. It does not do the left shift.
 void VectorScale_32(int16_t size, union longww dest[] , union longww source[] , int32_t scale )
 {
 	int16_t index ;
@@ -150,6 +170,7 @@ void VectorScale_32(int16_t size, union longww dest[] , union longww source[] , 
 	}
 }
 
+// Adds two 32 bit vectors of any size
 void VectorAdd_32(int16_t size, union longww result[] , union longww vectorx[] , union longww vectory[] )
 {
 	int16_t index ;
@@ -159,6 +180,7 @@ void VectorAdd_32(int16_t size, union longww result[] , union longww vectorx[] ,
 	}
 }
 
+//	Computes the integer square (power) of a 32 bit vector, any size, not including a left shift
 int32_t VectorPower_32(int16_t size , union longww source[])
 {
 	int32_t result = 0 ;
