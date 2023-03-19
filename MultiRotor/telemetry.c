@@ -149,7 +149,9 @@ extern union longww omega32[];
 extern union longww theta_32[];
 extern union longww ggain_32[];
 extern int16_t theta_16[];
-extern int16_t rup_copy[];
+
+extern union longww rmat_32[];
+extern int32_t renorm_32_row_3 ;
 					
 
 
@@ -527,14 +529,19 @@ void send_imu_data(void)
 #ifdef LOG_TIC_TOK_TEST
 		{
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
-			serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+			serial_output("%i,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
 					udb_cpu_load(),
-					rup_copy[0],rup_copy[1],rup_copy[2],
-					rup_copy[3],rup_copy[4],rup_copy[5],
-					rup_copy[6],rup_copy[7],rup_copy[8],
-					rupdate_16[0],rupdate_16[1],rupdate_16[2],
-					rupdate_16[3],rupdate_16[4],rupdate_16[5],
-					rupdate_16[6],rupdate_16[7],rupdate_16[8]
+					renorm_32_row_3 ,
+					rmat[0],rmat[1],rmat[2],rmat[3],rmat[4],rmat[5],rmat[6],rmat[7],rmat[8],
+					rmat_32[0]._.W1 , rmat_32[1]._.W1 , rmat_32[2]._.W1 ,
+					rmat_32[3]._.W1 , rmat_32[4]._.W1 , rmat_32[5]._.W1 ,
+					rmat_32[6]._.W1 , rmat_32[7]._.W1 , rmat_32[8]._.W1
+	//				rup_copy[0],rup_copy[1],rup_copy[2],
+	//				rup_copy[3],rup_copy[4],rup_copy[5],
+	//				rup_copy[6],rup_copy[7],rup_copy[8],
+	//				rupdate_16[0],rupdate_16[1],rupdate_16[2],
+	//				rupdate_16[3],rupdate_16[4],rupdate_16[5],
+	//				rupdate_16[6],rupdate_16[7],rupdate_16[8]
 	//				omegagyro[0] , omegagyro[1], omegagyro[2],			
 	//				theta[0],theta[1],theta[2],
 	//				theta_16[0],theta_16[1],theta_16[2]
