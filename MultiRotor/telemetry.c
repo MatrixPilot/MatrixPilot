@@ -376,11 +376,11 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
-				serial_output("\r\n\r\ncpu,r0,r1,r2,r3,r4,r5,r6,r7,r8,rr0,rr1,rr2,rr3,rr4,rr5,rr6,rr7,rr8\r\n");
+//				serial_output("\r\n\r\ncpu,r0,r1,r2,r3,r4,r5,r6,r7,r8,rr0,rr1,rr2,rr3,rr4,rr5,rr6,rr7,rr8\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
 //				serial_output("\r\n\r\ncpu,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
-//				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,t32_x,t32_y,t32_z\r\n");
+				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,t32_x,t32_y,t32_z\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
 #ifdef RECORD_OFFSETS
@@ -528,13 +528,16 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
-		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" ,
-			serial_output("%i,%li,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+			serial_output("%i,%i,%i,%i,%i,%i,%i\r\n" , // 7 integers
+		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" , // 10 integers
+		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n", // 19 integers
 					udb_cpu_load(),
-					renorm_32_row_3 ,
-					rmat[0],rmat[1],rmat[2],rmat[3],rmat[4],rmat[5],rmat[6],rmat[7],rmat[8],
-					rmat_32[0]._.W1 , rmat_32[1]._.W1 , rmat_32[2]._.W1 ,
-					rmat_32[3]._.W1 , rmat_32[4]._.W1 , rmat_32[5]._.W1 ,
+//					renorm_32_row_3 ,
+//					rmat[0],rmat[1],rmat[2],
+//					rmat[3],rmat[4],rmat[5],
+					rmat[6],rmat[7],rmat[8],
+//					rmat_32[0]._.W1 , rmat_32[1]._.W1 , rmat_32[2]._.W1 ,
+//					rmat_32[3]._.W1 , rmat_32[4]._.W1 , rmat_32[5]._.W1 ,
 					rmat_32[6]._.W1 , rmat_32[7]._.W1 , rmat_32[8]._.W1
 	//				rup_copy[0],rup_copy[1],rup_copy[2],
 	//				rup_copy[3],rup_copy[4],rup_copy[5],

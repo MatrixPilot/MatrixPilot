@@ -184,6 +184,7 @@ static inline void read_gyros(void)
 	if (accelOn == 1)
 	{
 	accum32._.W1 = -omegagyro[0] ;
+	accum32._.W0 = 0 ;
 	omegagyro_filtered[0].WW += ((int32_t)(accum32.WW)>>GYRO_FILTER_SHIFT) -((int32_t)(omegagyro_filtered[0].WW )>>GYRO_FILTER_SHIFT) ;
 	accum32._.W1 = -omegagyro[1] ;
 	omegagyro_filtered[1].WW += ((int32_t)(accum32.WW)>>GYRO_FILTER_SHIFT) -((int32_t)(omegagyro_filtered[1].WW )>>GYRO_FILTER_SHIFT) ;

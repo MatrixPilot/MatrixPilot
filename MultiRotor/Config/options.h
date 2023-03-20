@@ -1,7 +1,7 @@
 #define MINI5 "UDBmini5 hardware, 8000 Hz sampling.\r\n"
 #define MINI6 "UDBmini6 hardware, 8000 Hz sampling.\r\n"
 
-#define DATE "rev. 3.0, 3/11/2023\r\n"
+#define DATE "rev. 3.0, 3/19/2023\r\n"
 
 #define CONING_CORRECTION
 //#define CONING_CORRECTION_IN_RMAT
@@ -10,8 +10,8 @@
 //#define LOG_IMU
 #define LOG_RESIDUALS
 //#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
-//#define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
-#define RESIDUAL_LOG_PERIOD 1  // 60 times per minute
+#define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
+//#define RESIDUAL_LOG_PERIOD 1  // 60 times per minute
 //#define RECORD_OFFSETS
 //#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
@@ -48,8 +48,7 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-//#define LOGGER_HZ	50
-#define LOGGER_HZ	10
+#define LOGGER_HZ	100
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	200
 #define TILT_STOP_DELAY 10 // seconds 
