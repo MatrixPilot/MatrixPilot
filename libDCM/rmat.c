@@ -233,6 +233,9 @@ inline void read_accel(void)
 		aero_force_filtered[0]._.W1 = aero_force[0] ;
 		aero_force_filtered[1]._.W1 = aero_force[1] ;
 		aero_force_filtered[2]._.W1 = aero_force[2] ;
+		aero_force_filtered[0]._.W0 = 0 ;
+		aero_force_filtered[1]._.W0 = 0 ;
+		aero_force_filtered[2]._.W0 = 0 ;
 		first_accel = 0 ;
 	}
 	else
@@ -298,6 +301,8 @@ static void rupdate(void)
 	gyro_fraction[1]._.W1 = omegagyro[1] ;
 	gyro_fraction[2]._.W1 = omegagyro[2] ;
 	
+	// gyro_fraction._.W0 intentionally not zeroed out
+		
 	if (accelOn == 1 )
 	{
 		gyro_fraction[0].WW = gyro_fraction[0].WW + gyroCorrectionIntegral[0].WW ;
