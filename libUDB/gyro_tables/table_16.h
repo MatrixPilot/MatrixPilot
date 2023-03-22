@@ -5,9 +5,7 @@
 
 // used in MINI5_SN2 which is now SN9
 
-#define STEP_SIZE 256
-//#define LOOKUP_LSB_MASK 0x00FF
-//#define MSB_SHIFT 8
+#define STEP_SIZE 64
 
 int16_t residual_offset[] = { 0 , 0 , 0 } ;
 

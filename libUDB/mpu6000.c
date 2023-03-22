@@ -77,10 +77,13 @@ void MPU6000_init16(callback_fptr_t fptr)
 	// set prescaler for FCY/64 = 625 KHz at 40MIPS
 	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
-	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
-//	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
+#ifdef CONING_CORRECTION
 	// set prescaler for FCY/24 = 1.33 MHz at 32 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);	
+	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
+#else
+	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
+#endif // CONING_CORRECTION	
 #elif (MIPS == 16)
 	// set prescaler for FCY/24 = 667 kHz at 16MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
@@ -115,15 +118,17 @@ void MPU6000_init16(callback_fptr_t fptr)
 	}
 
 	// SAMPLE RATE
-//	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
+#ifdef CONING_CORRECTION
 	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 0); // Sample_rate = 8000Hz
+#else
+	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
 	// scaling & DLPF
 #ifdef BUILD_OFFSET_TABLE
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_5HZ);
 #else
-//	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_188HZ);
-	writeMPUSPIreg16(MPUREG_CONFIG, 0); 
-#endif // BUILD_OFFSET_TABLE
+	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_188HZ);
+#endif // BUILD_OFFSET_TABLE	
+#endif // CONING_CORRECTION	
 #if (GYRO_RANGE == 250 )
 	writeMPUSPIreg16(MPUREG_GYRO_CONFIG, BITS_FS_250DPS);  // Gyro scale 250º/s
 #elif (GYRO_RANGE == 500 )
@@ -286,6 +291,27 @@ int16_t sample_counter = 0 ;
 
 int32_t xaccel32, yaccel32, zaccel32, temp32, xrate32, yrate32, zrate32 ;
 
+#ifndef CONING_CORRECTION
+
+static void process_MPU_data(void)
+{
+	mpuDAV = true;
+
+	udb_xaccel.value = mpu_data[xaccel_MPU_channel];
+	udb_yaccel.value = mpu_data[yaccel_MPU_channel];
+	udb_zaccel.value = mpu_data[zaccel_MPU_channel];
+
+	mpu_temp.value = mpu_data[temp_MPU_channel];
+
+	udb_xrate.value = mpu_data[xrate_MPU_channel];
+	udb_yrate.value = mpu_data[yrate_MPU_channel];
+	udb_zrate.value = mpu_data[zrate_MPU_channel];
+
+	if (callback) callback();   // was directly calling heartbeat()
+}
+
+#else
+
 // executed for each of sample at the 8000 Hz sample rate
 static void process_MPU_data(void)
 {
@@ -350,7 +376,7 @@ static void process_MPU_data(void)
 		if (callback) callback();   // was directly calling heartbeat()
 	}
 }
-
+#endif // CONING_CORRECTION
 static void MPU6000_read(void)
 {
 	// burst read guarantees that all registers represent the same sample interval

@@ -26,7 +26,7 @@ typedef struct gyro_offset_table_entry { int16_t x ; int16_t y ; int16_t z ; } g
 #if (STEP_SIZE == 1024)
 #define LOOKUP_LSB_MASK 0x03FF
 #define MSB_SHIFT 10
-#eliif ( STEP_SIZE == 256 )
+#elif ( STEP_SIZE == 256 )
 #define LOOKUP_LSB_MASK 0x00FF
 #define MSB_SHIFT 8
 #elif ( STEP_SIZE == 64 )

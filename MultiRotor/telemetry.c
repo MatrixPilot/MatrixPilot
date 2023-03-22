@@ -382,19 +382,22 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
-/*				compute_euler();
+				compute_euler();
 				yaw_previous = yaw_angle ;
 				heading_previous = 0.0 ;
+#ifdef CONING_CORRECTION
 				compute_euler_8k();
 				yaw_previous_8k = yaw_angle_8k ;
 				heading_previous_8k = 0.0 ;
- */
+#endif // CONING_CORRECTION
+
+				serial_output("\r\n\r\ncpu,wx,wy,wz,yaw_xx,pitch_xx,roll_xx,\r\n");
 //				serial_output("\r\n\r\ncpu,yaw_xx,pitch_xx,roll_xx,yaw_8k_xx,pitch_8k_xx,roll_8k_xx,\r\n") ;
 //				serial_output("\r\n\r\ncpu,r0,r1,r2,r3,r4,r5,r6,r7,r8,rr0,rr1,rr2,rr3,rr4,rr5,rr6,rr7,rr8\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
 //				serial_output("\r\n\r\ncpu,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
-				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,t32_x,t32_y,t32_z\r\n");
+//				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,t32_x,t32_y,t32_z\r\n");
 #endif // LOG_TIC_TOK_TEST
 				
 #ifdef RECORD_OFFSETS
@@ -542,9 +545,7 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
-/*
  			compute_euler();
-			compute_euler_8k();
 			delta_yaw = yaw_angle - yaw_previous ;
 			if (abs(delta_yaw)<90.0)
 			{
@@ -560,7 +561,9 @@ void send_imu_data(void)
 			}
 			heading_previous = heading ;
 			yaw_previous = yaw_angle ;
-			
+#ifdef CONING_CORRECTION
+				
+			compute_euler_8k();
 			delta_yaw_8k = yaw_angle_8k - yaw_previous_8k ;
 			if (abs(delta_yaw_8k)<90.0)
 			{
@@ -576,34 +579,35 @@ void send_imu_data(void)
 			}
 			heading_previous_8k = heading_8k ;
 			yaw_previous_8k = yaw_angle_8k ;
- */
-			serial_output("%i,%i,%i,%i,%i,%i,%i\r\n" , // 7 integers
+ #endif // CONING_CORRECTION	
+ 
+		//	serial_output("%i,%i,%i,%i,%i,%i,%i\r\n" , // 7 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" , // 10 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n", // 19 integers
 		//	serial_output("%i,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" , // 1 integer and 6 floats
+			serial_output("%i,%i,%i,%i,%.1f,%.1f,%.1f\r\n" , // 4 integers and 3 floats
 					udb_cpu_load(),
-//					heading ,  pitch_angle , roll_angle ,
+					omegagyro[0] , omegagyro[1], omegagyro[2],
+					heading ,  pitch_angle , roll_angle 
 //					heading_8k ,  pitch_angle_8k , roll_angle_8k 					
 //					renorm_32_row_3 ,
 //					rmat[0],rmat[1],rmat[2],
 //					rmat[3],rmat[4],rmat[5],
-					rmat[6],rmat[7],rmat[8],
+//					rmat[6],rmat[7],rmat[8],
 //					rmat_32[0]._.W1 , rmat_32[1]._.W1 , rmat_32[2]._.W1 ,
 //					rmat_32[3]._.W1 , rmat_32[4]._.W1 , rmat_32[5]._.W1 ,
-					rmat_32[6]._.W1 , rmat_32[7]._.W1 , rmat_32[8]._.W1
+//					rmat_32[6]._.W1 , rmat_32[7]._.W1 , rmat_32[8]._.W1
 	//				rup_copy[0],rup_copy[1],rup_copy[2],
 	//				rup_copy[3],rup_copy[4],rup_copy[5],
 	//				rup_copy[6],rup_copy[7],rup_copy[8],
 	//				rupdate_16[0],rupdate_16[1],rupdate_16[2],
 	//				rupdate_16[3],rupdate_16[4],rupdate_16[5],
-	//				rupdate_16[6],rupdate_16[7],rupdate_16[8]
-	//				omegagyro[0] , omegagyro[1], omegagyro[2],			
+	//				rupdate_16[6],rupdate_16[7],rupdate_16[8]		
 	//				theta[0],theta[1],theta[2],
 	//				theta_16[0],theta_16[1],theta_16[2]
 	//				theta_32[0].WW ,
 	//				theta_32[1].WW ,
-	//				theta_32[2].WW
-					
+	//				theta_32[2].WW				
 	//				coning_angle_adjustment[0].WW ,
 	//				coning_angle_adjustment[1].WW ,
 	//				coning_angle_adjustment[2].WW

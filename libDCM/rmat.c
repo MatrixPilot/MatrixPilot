@@ -29,7 +29,7 @@
 #define GGAINX CALIBRATIONX*SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ)) // integration multiplier for gyros
 #define GGAINY CALIBRATIONY*SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ)) // integration multiplier for gyros
 #define GGAINZ CALIBRATIONZ*SCALEGYRO*6*(RMAX*(1.0/HEARTBEAT_HZ)) // integration multiplier for gyros
-fractional ggain[] =  { 2*GGAINX, 2*GGAINY, 2*GGAINZ };
+fractional ggain[] =  { GGAINX, GGAINY, GGAINZ };
 
 #if (GYRO_RANGE != 1000)
 #error "only GYRO_RANGE 1000 is presently supported"
@@ -546,7 +546,9 @@ static void PI_feedback(void)
 void dcm_run_imu_step(void)
 {
 	rupdate();                  // local
+#ifdef CONING_CORRECTION
 	rmat_32_update();
+#endif // CONING_CORRECTION
 	normalize();                // local
 	roll_pitch_drift();         // local
 	PI_feedback();              // local
