@@ -555,17 +555,37 @@ void dcm_run_imu_step(void)
 #endif // LOG_VELOCITY
 }
 float roll_angle , pitch_angle , yaw_angle ;
+float roll_angle_8k , pitch_angle_8k , yaw_angle_8k ;
 float bill_angle_x , bill_angle_y , bill_angle_z ;
 float rmat_f[9];
+float rmat_f_8k[9];
+extern int16_t rmat_16[];
 #define DEG_PER_RAD 57.296
+void compute_euler_8k(void)
+{
+	rmat_f_8k[0]=(float)rmat_16[0] ;
+	//rmat_f_8k[1]=(float)rmat_16[1] ;
+	//rmat_f_8k[2]=(float)rmat_16[2] ;
+	rmat_f_8k[3]=(float)rmat_16[3] ;
+	//rmat_f_8k[4]=(float)rmat_16[4] ;
+	//rmat_f_8k[5]=(float)rmat_16[5] ;
+	rmat_f_8k[6]=(float)rmat_16[6] ;
+	rmat_f_8k[7]=(float)rmat_16[7] ;
+	rmat_f_8k[8]=(float)rmat_16[8] ;
+
+	pitch_angle_8k = DEG_PER_RAD*atan2f(-rmat_f_8k[6],sqrtf(rmat_f_8k[7]*rmat_f_8k[7]+rmat_f_8k[8]*rmat_f_8k[8]));
+	roll_angle_8k = DEG_PER_RAD*atan2f(rmat_f_8k[7],rmat_f_8k[8]);
+	yaw_angle_8k = DEG_PER_RAD*atan2f(rmat_f_8k[3],rmat_f_8k[0]);
+}
+
 void compute_euler(void)
 {
 	rmat_f[0]=(float)rmat[0] ;
-	rmat_f[1]=(float)rmat[1] ;
-	rmat_f[2]=(float)rmat[2] ;
+//	rmat_f[1]=(float)rmat[1] ;
+//	rmat_f[2]=(float)rmat[2] ;
 	rmat_f[3]=(float)rmat[3] ;
-	rmat_f[4]=(float)rmat[4] ;
-	rmat_f[5]=(float)rmat[5] ;
+//	rmat_f[4]=(float)rmat[4] ;
+//	rmat_f[5]=(float)rmat[5] ;
 	rmat_f[6]=(float)rmat[6] ;
 	rmat_f[7]=(float)rmat[7] ;
 	rmat_f[8]=(float)rmat[8] ;
@@ -580,12 +600,12 @@ void compute_bill_angles(void)
 	rmat_f[0]=(float)rmat[0] ;
 	rmat_f[1]=(float)rmat[1] ;
 	rmat_f[2]=(float)rmat[2] ;
-	rmat_f[3]=(float)rmat[3] ;
-	rmat_f[4]=(float)rmat[4] ;
-	rmat_f[5]=(float)rmat[5] ;
-	rmat_f[6]=(float)rmat[6] ;
-	rmat_f[7]=(float)rmat[7] ;
-	rmat_f[8]=(float)rmat[8] ;
+//	rmat_f[3]=(float)rmat[3] ;
+//	rmat_f[4]=(float)rmat[4] ;
+//	rmat_f[5]=(float)rmat[5] ;
+//	rmat_f[6]=(float)rmat[6] ;
+//	rmat_f[7]=(float)rmat[7] ;
+//	rmat_f[8]=(float)rmat[8] ;
 
 	bill_angle_x = DEG_PER_RAD*atan2f(rmat_f[2],rmat_f[1]);
 	bill_angle_y = DEG_PER_RAD*atan2f(rmat_f[0],rmat_f[2]);

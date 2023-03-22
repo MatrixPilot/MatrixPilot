@@ -10,7 +10,8 @@ int32_t f1,f2 ;
 int32_t txtx, txty, txtz, tyty, tytz, tztz ;
 union longww rupdate_32[9] ;
 int16_t rupdate_16[9];
-union longww rmat_32[9];
+union longww rmat_32[] = {{0x40000000},{0},{0},{0},{0x40000000},{0},{0},{0},{0x40000000}};
+int16_t rmat_16[] = {0x4000, 0 , 0 , 0 , 0x4000 , 0 , 0 , 0 , 0x4000 } ;
 
 extern int16_t accelOn ;
 extern int16_t rmat[];
@@ -71,6 +72,8 @@ void rmat_32_update(void)
 		MatrixMultiply_32(rmat_32,rmat_32,rupdate_32);
 		
 		normalize_32();
+		
+		convert_32_bit_to_16_bit(9,rmat_16,rmat_32) ;
 	}
 }
 

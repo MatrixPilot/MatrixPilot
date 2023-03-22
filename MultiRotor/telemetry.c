@@ -80,9 +80,11 @@ extern fractional magAlignment[4];
 extern int16_t udb_magOffset[3] , errorYawplane[3] , magGain[3] ;
 extern uint16_t mission_time ;
 extern void compute_euler(void);
+extern void compute_euler_8k(void);
 extern void compute_bill_angles(void);
 extern void update_offset_table(void);
 extern float roll_angle , pitch_angle , yaw_angle ;
+extern float roll_angle_8k , pitch_angle_8k , yaw_angle_8k ;
 extern float bill_angle_x , bill_angle_y , bill_angle_z ;
 extern int16_t omegacorrI[];
 extern uint16_t omega_magnitude ;
@@ -139,6 +141,10 @@ float yaw_previous ;
 float heading ;
 float heading_previous ;
 float delta_yaw ;
+float yaw_previous_8k ;
+float heading_8k ;
+float heading_previous_8k ;
+float delta_yaw_8k ;
 boolean is_first_header = 1;
 boolean log_residuals = 0 ;
 extern boolean start_residuals ;
@@ -376,6 +382,14 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
+/*				compute_euler();
+				yaw_previous = yaw_angle ;
+				heading_previous = 0.0 ;
+				compute_euler_8k();
+				yaw_previous_8k = yaw_angle_8k ;
+				heading_previous_8k = 0.0 ;
+ */
+//				serial_output("\r\n\r\ncpu,yaw_xx,pitch_xx,roll_xx,yaw_8k_xx,pitch_8k_xx,roll_8k_xx,\r\n") ;
 //				serial_output("\r\n\r\ncpu,r0,r1,r2,r3,r4,r5,r6,r7,r8,rr0,rr1,rr2,rr3,rr4,rr5,rr6,rr7,rr8\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
@@ -528,10 +542,48 @@ void send_imu_data(void)
 #endif // LOG_IMU
 #ifdef LOG_TIC_TOK_TEST
 		{
+/*
+ 			compute_euler();
+			compute_euler_8k();
+			delta_yaw = yaw_angle - yaw_previous ;
+			if (abs(delta_yaw)<90.0)
+			{
+				heading = heading_previous + delta_yaw ;
+			}
+			else if(delta_yaw>0)
+			{
+				heading = heading_previous + delta_yaw - 360.0 ;
+			}
+			else
+			{
+				heading = heading_previous + delta_yaw + 360.0 ;
+			}
+			heading_previous = heading ;
+			yaw_previous = yaw_angle ;
+			
+			delta_yaw_8k = yaw_angle_8k - yaw_previous_8k ;
+			if (abs(delta_yaw_8k)<90.0)
+			{
+				heading_8k = heading_previous_8k + delta_yaw_8k ;
+			}
+			else if(delta_yaw_8k>0)
+			{
+				heading_8k = heading_previous_8k + delta_yaw_8k - 360.0 ;
+			}
+			else
+			{
+				heading_8k = heading_previous_8k + delta_yaw_8k + 360.0 ;
+			}
+			heading_previous_8k = heading_8k ;
+			yaw_previous_8k = yaw_angle_8k ;
+ */
 			serial_output("%i,%i,%i,%i,%i,%i,%i\r\n" , // 7 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" , // 10 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n", // 19 integers
+		//	serial_output("%i,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" , // 1 integer and 6 floats
 					udb_cpu_load(),
+//					heading ,  pitch_angle , roll_angle ,
+//					heading_8k ,  pitch_angle_8k , roll_angle_8k 					
 //					renorm_32_row_3 ,
 //					rmat[0],rmat[1],rmat[2],
 //					rmat[3],rmat[4],rmat[5],
