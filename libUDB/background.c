@@ -59,6 +59,16 @@ static inline void init_heartbeat(void)
 	_T1IP = INT_PRI_T1;     // set interrupt priority
 	_T1IF = 0;              // clear the interrupt
 	_T1IE = 1;              // enable the interrupt
+	
+	T2CONbits.TON = 0;      // turn off timer 2
+	TMR2 = 0;
+	_T2IP = INT_PRI_T2;     // set interrupt priority
+	_T2IF = 0;              // clear the interrupt
+	_T2IE = 1;              // enable the interrupt
+	
+	// Timer2 is used to run the 200 Hz computations at a lower priority during 8000 Hz sampling
+	
+	
 
 	// TODO: can we use timer1 to determine the error between the mcu and the mpu 200Hz?
 

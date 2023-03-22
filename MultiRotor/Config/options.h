@@ -6,7 +6,7 @@
 
 // the following defines select what gets sent to the logger. define one of them
 //#define LOG_IMU
-//#define LOG_RESIDUALS
+#define LOG_RESIDUALS
 //#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
 #define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
 //#define RESIDUAL_LOG_PERIOD 1  // 60 times per minute
@@ -17,9 +17,9 @@
 //#define LOG_VELOCITY
 //#define GYRO_DRIFT
 //#define ROAD_TEST
-#define BUILD_OFFSET_TABLE
+//#define BUILD_OFFSET_TABLE
 //#define GYRO_LPF
-//#define LOG_TIC_TOK_TEST
+#define LOG_TIC_TOK_TEST
 
 //#define ENABLE_ESP32
 #ifdef ENABLE_ESP32
@@ -60,8 +60,8 @@
 //#define MINI5_SN4 // SN11
 //#define MINI6_SN15 // SN15
 //#define MINI5_SN2 // SN9
-#define MINI5_SN3 // SN10
-//#define MINI5_SN14 // was SN14, now SN2
+//#define MINI5_SN3 // SN10
+#define MINI5_SN14 // was SN14, now SN2
 
 
 #ifdef MINI6_SN1

@@ -291,6 +291,17 @@ int16_t sample_counter = 0 ;
 
 int32_t xaccel32, yaccel32, zaccel32, temp32, xrate32, yrate32, zrate32 ;
 
+void __attribute__((__interrupt__,__no_auto_psv__)) _T2Interrupt(void)
+{
+	indicate_loading_inter;
+	interrupt_save_set_corcon;
+	set_ipl_on_output_pin;
+	_T2IF = 0;              // clear the interrupt
+	if (callback) callback();
+	interrupt_restore_corcon;
+	unset_ipl_on_output_pin;
+}
+
 #ifndef CONING_CORRECTION
 
 static void process_MPU_data(void)
@@ -307,7 +318,8 @@ static void process_MPU_data(void)
 	udb_yrate.value = mpu_data[yrate_MPU_channel];
 	udb_zrate.value = mpu_data[zrate_MPU_channel];
 
-	if (callback) callback();   // was directly calling heartbeat()
+	_T2IF = 1; // trigger callback at a lower priority
+//	if (callback) callback();   // was directly calling heartbeat()
 }
 
 #else
@@ -373,7 +385,8 @@ static void process_MPU_data(void)
 #endif // CONING_CORRECTION		
 		sample_counter = 0 ;
 		// perform the 200 Hz IMU calculations
-		if (callback) callback();   // was directly calling heartbeat()
+	_T2IF = 1; // trigger callback at a lower priority
+//	if (callback) callback();   // was directly calling heartbeat()	if (callback) callback();   // was directl
 	}
 }
 #endif // CONING_CORRECTION
