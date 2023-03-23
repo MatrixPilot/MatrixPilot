@@ -266,10 +266,13 @@ void compute_coning_adjustment(void)
 	offset._.W1 = ZRATE_SIGN_ORIENTED (((int16_t)udb_zrate.offset));
 	offset._.W0 = 0 ;
 	omega32[2].WW = (rate.WW>>1)-(offset.WW>>1);
+	
+	// if there are >>1 shifts in the offset compensation computations above,
+	// then there must also be >>1 shifts in the filter compensation below
 		
-	omega32[0].WW += omegagyro_filtered[0].WW ;
-	omega32[1].WW += omegagyro_filtered[1].WW ;
-	omega32[2].WW += omegagyro_filtered[2].WW ;
+	omega32[0].WW += ((omegagyro_filtered[0].WW)>>1) ;
+	omega32[1].WW += ((omegagyro_filtered[1].WW)>>1) ;
+	omega32[2].WW += ((omegagyro_filtered[2].WW)>>1) ;
 	
 	omega_dt[0].WW = fract_32_mpy(omega32[0].WW,ggain_32[0]);
 	omega_dt[1].WW = fract_32_mpy(omega32[1].WW,ggain_32[1]);
