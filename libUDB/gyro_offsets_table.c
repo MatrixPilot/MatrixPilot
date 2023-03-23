@@ -82,13 +82,13 @@ void lookup_gyro_offsets(void)
 			
 			gyro_offset[0] = residual_offset[0] 
 					+ left_entry[0] 
-					+ __builtin_divsd(__builtin_mulss(right_minus_left[0],index_lsb),1024);
+					+ __builtin_divsd(__builtin_mulss(right_minus_left[0],index_lsb),STEP_SIZE);
 			gyro_offset[1] = residual_offset[1] 
 					+ left_entry[1] 
-					+ __builtin_divsd(__builtin_mulss(right_minus_left[1],index_lsb),1024);
+					+ __builtin_divsd(__builtin_mulss(right_minus_left[1],index_lsb),STEP_SIZE);
 			gyro_offset[2] = residual_offset[2] 
 					+ left_entry[2] + 
-					__builtin_divsd(__builtin_mulss(right_minus_left[2],index_lsb),1024);
+					__builtin_divsd(__builtin_mulss(right_minus_left[2],index_lsb),STEP_SIZE);
 		}
 	}
 }
