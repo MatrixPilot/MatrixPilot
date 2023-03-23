@@ -46,7 +46,7 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	50
+#define LOGGER_HZ	100
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	200
 #define TILT_STOP_DELAY 10 // seconds 
@@ -508,7 +508,7 @@
 #define BUILD_OFFSET_HZ 200
 #endif // 
 
-//#define CONING_CORRECTION
+#define CONING_CORRECTION
 //#define CONING_CORRECTION_IN_RMAT
 
 #define FILTERING "Force data is filtered by averaging pairs of 200 Hz samples.\r\n"

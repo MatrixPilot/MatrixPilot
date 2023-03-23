@@ -81,8 +81,10 @@ void MPU6000_init16(callback_fptr_t fptr)
 	// set prescaler for FCY/24 = 1.33 MHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
 #else
-	// set prescaler for FCY/48 = 667 kHz at 32 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
+	// set prescaler for FCY/6 = 05.333 MHz at 32 MIPS
+	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_1_1);
+	// set prescaler for FCY/48 = 0.667 MHz at 32 MIPS
+//	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
 #endif // CONING_CORRECTION	
 #elif (MIPS == 16)
 	// set prescaler for FCY/24 = 667 kHz at 16MIPS
