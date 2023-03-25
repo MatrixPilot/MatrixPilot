@@ -299,18 +299,18 @@ uint32_t max_gyro = 0 ;
 
 void compute_max_gyro(void)
 {
-	if (abs(udb_xrate.value)>max_gyro )
+	if (abs(mpu_data[xrate_MPU_channel])>max_gyro )
 	{
-		max_gyro = abs(udb_xrate.value) ;
+		max_gyro = abs(mpu_data[xrate_MPU_channel]) ;
 	}
-	if (abs(udb_yrate.value)>max_gyro )
+	if (abs(mpu_data[yrate_MPU_channel])>max_gyro )
 	{
-		max_gyro = abs(udb_yrate.value) ;
-	}	
-	if (abs(udb_zrate.value)>max_gyro )
+		max_gyro = abs(mpu_data[yrate_MPU_channel]) ;
+	}
+	if (abs(mpu_data[zrate_MPU_channel])>max_gyro )
 	{
-		max_gyro = abs(udb_zrate.value) ;
-	}	
+		max_gyro = abs(mpu_data[zrate_MPU_channel]) ;
+	}
 }
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _T2Interrupt(void)
@@ -319,7 +319,6 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T2Interrupt(void)
 	interrupt_save_set_corcon;
 	set_ipl_on_output_pin;
 	_T2IF = 0;              // clear the interrupt
-	compute_max_gyro();
 	if (callback) callback();
 	interrupt_restore_corcon;
 	unset_ipl_on_output_pin;
@@ -340,7 +339,7 @@ static void process_MPU_data(void)
 	udb_xrate.value = mpu_data[xrate_MPU_channel];
 	udb_yrate.value = mpu_data[yrate_MPU_channel];
 	udb_zrate.value = mpu_data[zrate_MPU_channel];
-
+	
 	_T2IF = 1; // trigger callback at a lower priority
 //	if (callback) callback();   // was directly calling heartbeat()
 }
@@ -351,6 +350,8 @@ static void process_MPU_data(void)
 static void process_MPU_data(void)
 {
 	mpuDAV = true;
+	
+	compute_max_gyro(); // diagnostic to detect gyro saturation
 
 //	integrate all data for use in upstream calculations other than those that need coning correction	
 	xaccel32 += ((int32_t)((int16_t)mpu_data[xaccel_MPU_channel])) ;
