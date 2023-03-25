@@ -1,19 +1,25 @@
-#define MINI5 "UDBmini5 hardware, 200 Hz sampling.\r\n"
-#define MINI6 "UDBmini6 hardware, 200 Hz sampling.\r\n"
 
-#define DATE "rev. 3.0, 3/19/2023\r\n"
+#define DATE "rev. 3.0, 3/25/2023\r\n"
 
 //#define CONING_CORRECTION
 //#define CONING_CORRECTION_IN_RMAT
 
+#ifdef CONING_CORRECTION
+#define MINI5 "UDBmini5 hardware, 8000 Hz sampling.\r\n"
+#define MINI6 "UDBmini6 hardware, 8000 Hz sampling.\r\n"
+#else
+#define MINI5 "UDBmini5 hardware, 200 Hz sampling.\r\n"
+#define MINI6 "UDBmini6 hardware, 200 Hz sampling.\r\n"
+#endif // CONING_CORRECTION
+
 // the following defines select what gets sent to the logger. define one of them
-//#define LOG_IMU
-//#define LOG_RESIDUALS
+#define LOG_IMU
+#define LOG_RESIDUALS
 //#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
 #define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
 //#define RESIDUAL_LOG_PERIOD 1  // 60 times per minute
 //#define RECORD_OFFSETS
-#define GYRO_OFFSETS
+//#define GYRO_OFFSETS
 //#define TEST_LOGGER_HZ
 //#define GYRO_CALIB
 //#define LOG_VELOCITY
@@ -48,7 +54,7 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	10
+#define LOGGER_HZ	100
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	200
 #define TILT_STOP_DELAY 10 // seconds 
@@ -61,8 +67,8 @@
 //#define MINI5_SN1 // SN8
 //#define MINI5_SN4 // SN11
 //#define MINI6_SN15 // SN15
-//#define MINI5_SN2 // SN9
-#define MINI5_SN3 // SN10
+#define MINI5_SN2 // SN9
+//#define MINI5_SN3 // SN10
 //#define MINI5_SN14 // was SN14, now SN2
 
 
@@ -510,8 +516,11 @@
 #define BUILD_OFFSET_HZ 200
 #endif // 
 
-
+#ifdef CONING_CORRECTION
+#define FILTERING "1000 Hz force data is averaged in blocks of 5 samples.\r\n"
+#else
 #define FILTERING "Force data is filtered by averaging pairs of 200 Hz samples.\r\n"
+#endif // CONING_CORRECTION
 
 #define TEST_LIDAR 0
 

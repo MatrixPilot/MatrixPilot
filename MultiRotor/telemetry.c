@@ -105,6 +105,7 @@ extern int32_t xy_bar[] ;
 extern int16_t x_bar ;
 extern int16_t y_bar[] ;
 extern int16_t gyro_offset[];
+extern uint16_t max_gyro ;
 
 extern int16_t gplane[];
 extern int16_t aero_force[];
@@ -382,6 +383,7 @@ void send_imu_data(void)
 #endif // LOG_IMU
 				
 #ifdef LOG_TIC_TOK_TEST
+				max_gyro = 0 ;
 				compute_euler();
 				yaw_previous = yaw_angle ;
 				heading_previous = 0.0 ;
@@ -392,7 +394,7 @@ void send_imu_data(void)
 #endif // CONING_CORRECTION
 
 //				serial_output("\r\n\r\ncpu,wx,wy,wz,yaw_xx,pitch_xx,roll_xx,\r\n");
-				serial_output("\r\n\r\ncpu,yaw_xx,pitch_xx,roll_xx,yaw_8k_xx,pitch_8k_xx,roll_8k_xx,\r\n") ;
+				serial_output("\r\n\r\ncpu,max_gyro_xx,yaw_xx,pitch_xx,roll_xx,yaw_8k_xx,pitch_8k_xx,roll_8k_xx,\r\n") ;
 //				serial_output("\r\n\r\ncpu,r0,r1,r2,r3,r4,r5,r6,r7,r8,rr0,rr1,rr2,rr3,rr4,rr5,rr6,rr7,rr8\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
@@ -584,9 +586,10 @@ void send_imu_data(void)
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i\r\n" , // 7 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" , // 10 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n", // 19 integers
-			serial_output("%i,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" , // 1 integer and 6 floats
+			serial_output("%i,%u,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" , //1 int, 1 uint and 6 floats
 		//	serial_output("%i,%i,%i,%i,%.1f,%.1f,%.1f\r\n" , // 4 integers and 3 floats
 					udb_cpu_load(),
+					max_gyro ,
 //					omegagyro[0] , omegagyro[1], omegagyro[2],
 					heading ,  pitch_angle , roll_angle ,
 					heading_8k ,  pitch_angle_8k , roll_angle_8k 					

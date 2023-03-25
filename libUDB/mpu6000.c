@@ -295,6 +295,23 @@ void reset_coning_adjustment(void)
 int16_t sample_counter = 0 ;
 
 int32_t xaccel32, yaccel32, zaccel32, temp32, xrate32, yrate32, zrate32 ;
+uint32_t max_gyro = 0 ;
+
+void compute_max_gyro(void)
+{
+	if (abs(udb_xrate.value)>max_gyro )
+	{
+		max_gyro = abs(udb_xrate.value) ;
+	}
+	if (abs(udb_yrate.value)>max_gyro )
+	{
+		max_gyro = abs(udb_yrate.value) ;
+	}	
+	if (abs(udb_zrate.value)>max_gyro )
+	{
+		max_gyro = abs(udb_zrate.value) ;
+	}	
+}
 
 void __attribute__((__interrupt__,__no_auto_psv__)) _T2Interrupt(void)
 {
@@ -302,6 +319,7 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T2Interrupt(void)
 	interrupt_save_set_corcon;
 	set_ipl_on_output_pin;
 	_T2IF = 0;              // clear the interrupt
+	compute_max_gyro();
 	if (callback) callback();
 	interrupt_restore_corcon;
 	unset_ipl_on_output_pin;
