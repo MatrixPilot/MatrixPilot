@@ -589,7 +589,7 @@ void send_imu_data(void)
 			serial_output("%i,%u,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" , //1 int, 1 uint and 6 floats
 		//	serial_output("%i,%i,%i,%i,%.1f,%.1f,%.1f\r\n" , // 4 integers and 3 floats
 					udb_cpu_load(),
-					max_gyro ,
+					(max_gyro+234)/1000 ,
 //					omegagyro[0] , omegagyro[1], omegagyro[2],
 					heading ,  pitch_angle , roll_angle ,
 					heading_8k ,  pitch_angle_8k , roll_angle_8k 					
@@ -615,6 +615,7 @@ void send_imu_data(void)
 	//				coning_angle_adjustment[1].WW ,
 	//				coning_angle_adjustment[2].WW
 			);
+			max_gyro = 0 ;
 		}
 #endif // LOG_TIC_TOK_TEST
 #ifdef GYRO_CALIB

@@ -299,6 +299,11 @@ uint32_t max_gyro = 0 ;
 
 void compute_max_gyro(void)
 {
+	// mixed signed and unsigned two's complement arithmetic is a pain in the a!!
+	if ( mpu_data[xrate_MPU_channel] == 0x8000 ) mpu_data[xrate_MPU_channel] = 0x8001 ;
+	if ( mpu_data[yrate_MPU_channel] == 0x8000 ) mpu_data[yrate_MPU_channel] = 0x8001 ;
+	if ( mpu_data[zrate_MPU_channel] == 0x8000 ) mpu_data[zrate_MPU_channel] = 0x8001 ;
+	
 	if (abs(mpu_data[xrate_MPU_channel])>max_gyro )
 	{
 		max_gyro = abs(mpu_data[xrate_MPU_channel]) ;

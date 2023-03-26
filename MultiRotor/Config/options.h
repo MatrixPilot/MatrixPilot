@@ -68,8 +68,8 @@
 //#define MINI5_SN4 // SN11
 //#define MINI6_SN15 // SN15
 //#define MINI5_SN2 // SN9
-//#define MINI5_SN3 // SN10
-#define MINI5_SN14 // was SN14, now SN2
+#define MINI5_SN3 // SN10
+//#define MINI5_SN14 // was SN14, now SN2
 
 
 #ifdef MINI6_SN1
