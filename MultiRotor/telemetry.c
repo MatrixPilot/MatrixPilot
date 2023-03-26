@@ -369,7 +369,7 @@ void send_imu_data(void)
 #endif // LOG_RATE
 #ifdef LOG_EULER
 #ifndef THETA_LOG
-				serial_output( "\r\n\r\nx_force_xx,y_force_xx,z_force_xx,yaw_xx,pitch_xx,roll_xx\r\n" ) ;
+				serial_output( "\r\n\r\nx_force_xx,y_force_xx,z_force_xx,yaw_xx,pitch_xx,roll_xx,max_gyro_xx\r\n" ) ;
 #else
 				serial_output("\r\r\r\nx_theta,y_theta,x_omega,y_omega,pitch,roll\r\n") ;
 #endif // THETA_LOG
@@ -394,7 +394,7 @@ void send_imu_data(void)
 #endif // CONING_CORRECTION
 
 //				serial_output("\r\n\r\ncpu,wx,wy,wz,yaw_xx,pitch_xx,roll_xx,\r\n");
-				serial_output("\r\n\r\ncpu,max_gyro_xx,yaw_xx,pitch_xx,roll_xx,yaw_8k_xx,pitch_8k_xx,roll_8k_xx,\r\n") ;
+				serial_output("\r\n\r\nyaw_xx,pitch_xx,roll_xx,yaw_8k_xx,pitch_8k_xx,roll_8k_xx,max_gyro_xx\r\n") ;
 //				serial_output("\r\n\r\ncpu,r0,r1,r2,r3,r4,r5,r6,r7,r8,rr0,rr1,rr2,rr3,rr4,rr5,rr6,rr7,rr8\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,theta_x,theta_y,theta_z,t16_x,t16_y,t16_z\r\n");
 //				serial_output("\r\n\r\ncpu,tlt_x,tlt_y,tlt_z,wx,wy,wz,theta_x,theta_y,theta_z,t32_x,t32_y,t32_z\r\n");
@@ -512,11 +512,12 @@ void send_imu_data(void)
 			heading_previous = heading ;
 			yaw_previous = yaw_angle ;
 #ifndef THETA_LOG
-			serial_output( "%.2f,%.1f,%.1f,%.1f,%.2f,%.1f\r\n" ,
+			serial_output( "%.2f,%.1f,%.1f,%.1f,%.2f,%.1f,%u\r\n" ,
 				((double)(aero_force[0]))/ACCEL_FACTOR ,
 				((double)(aero_force[1]))/ACCEL_FACTOR ,
 				((double)(aero_force[2]))/ACCEL_FACTOR ,
-				heading ,  pitch_angle , roll_angle  ) ;	
+				heading ,  pitch_angle , roll_angle , (max_gyro+234)/1000  ) ;	
+			max_gyro = 0 ;
 #else
 			serial_output("%i,%i,%i,%i,%.2f,%.2f\r\n" ,
 					theta[0] , theta[1] ,
@@ -586,13 +587,13 @@ void send_imu_data(void)
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i\r\n" , // 7 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n" , // 10 integers
 		//	serial_output("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n", // 19 integers
-			serial_output("%i,%u,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\r\n" , //1 int, 1 uint and 6 floats
+			serial_output("%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%u\r\n" , // 6 floats and 1 uint
 		//	serial_output("%i,%i,%i,%i,%.1f,%.1f,%.1f\r\n" , // 4 integers and 3 floats
-					udb_cpu_load(),
-					(max_gyro+234)/1000 ,
+//					udb_cpu_load(),
 //					omegagyro[0] , omegagyro[1], omegagyro[2],
 					heading ,  pitch_angle , roll_angle ,
-					heading_8k ,  pitch_angle_8k , roll_angle_8k 					
+					heading_8k ,  pitch_angle_8k , roll_angle_8k ,
+					(max_gyro+234)/1000 					
 //					renorm_32_row_3 ,
 //					rmat[0],rmat[1],rmat[2],
 //					rmat[3],rmat[4],rmat[5],

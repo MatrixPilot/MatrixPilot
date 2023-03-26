@@ -334,6 +334,8 @@ void __attribute__((__interrupt__,__no_auto_psv__)) _T2Interrupt(void)
 static void process_MPU_data(void)
 {
 	mpuDAV = true;
+	
+	compute_max_gyro(); // diagnostic to detect gyro saturation
 
 	udb_xaccel.value = mpu_data[xaccel_MPU_channel];
 	udb_yaccel.value = mpu_data[yaccel_MPU_channel];
