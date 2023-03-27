@@ -42,10 +42,10 @@
 #define INT_PRI_I2C1    3   // I2C1.c
 #define INT_PRI_I2C2    3   // I2C2.c
 
-#define INT_PRI_AD1     3   // analog2digital_xxx.c
-#define INT_PRI_DMA0    3   // analog2digital_xxx.c
-#define INT_PRI_DMA1    3   // AT45D_DMA.c
-#define INT_PRI_DMA2    3   // AT45D_DMA.c
+#define INT_PRI_AD1     2   // analog2digital_xxx.c
+#define INT_PRI_DMA0    2   // analog2digital_xxx.c
+#define INT_PRI_DMA1    2   // AT45D_DMA.c
+#define INT_PRI_DMA2    2   // AT45D_DMA.c
 
 #define INT_PRI_U1TX    6  
 #define INT_PRI_U1RX    6   
@@ -54,7 +54,7 @@
 
 #define INT_PRI_USB1    4   // USB available only on AUAV3
 
-#define INT_PRI_EVENTM  2   // events.c : trigger M uses the C1 interrupt
+#define INT_PRI_EVENTM  1   // events.c : trigger M uses the C1 interrupt
 #define INT_PRI_EVENTL  1   // events.c : trigger L uses the C2 interrupt
 
 

@@ -1,7 +1,7 @@
 
 #define DATE "rev. 3.0, 3/26/2023\r\n"
 
-//#define CONING_CORRECTION
+#define CONING_CORRECTION
 //#define CONING_CORRECTION_IN_RMAT
 
 #ifdef CONING_CORRECTION
@@ -13,7 +13,7 @@
 #endif // CONING_CORRECTION
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
+//#define LOG_IMU
 #define LOG_RESIDUALS
 //#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
 #define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
@@ -27,7 +27,7 @@
 //#define ROAD_TEST
 //#define BUILD_OFFSET_TABLE
 //#define GYRO_LPF
-//#define LOG_TIC_TOK_TEST
+#define LOG_TIC_TOK_TEST
 
 //#define ENABLE_ESP32
 #ifdef ENABLE_ESP32

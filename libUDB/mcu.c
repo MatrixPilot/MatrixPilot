@@ -325,6 +325,7 @@ static void init_leds(void)
 #elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
 	_LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
 	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
+	_TRISD0 = 0 ; _TRISD1 = 0 ; _TRISD2 = 0 ; _TRISD3 = 0 ; _TRISD4 = 0 ; _TRISD5 = 0 ; _TRISD6 = 0 ; _TRISD7 = 0 ; 
 #else
 #error Invalid BOARD_TYPE
 #endif // BOARD_TYPE
