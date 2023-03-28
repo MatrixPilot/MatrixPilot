@@ -77,15 +77,9 @@ void MPU6000_init16(callback_fptr_t fptr)
 	// set prescaler for FCY/64 = 625 KHz at 40MIPS
 	initMPUSPI_master16(SEC_PRESCAL_4_1, PRI_PRESCAL_16_1);
 #elif (MIPS == 32)
-#ifdef CONING_CORRECTION
-	// set prescaler for FCY/24 = 1.33 MHz at 32 MIPS
-	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
-#else
+
 	// set prescaler for FCY/6 = 05.333 MHz at 32 MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_1_1);
-	// set prescaler for FCY/48 = 0.667 MHz at 32 MIPS
-//	initMPUSPI_master16(SEC_PRESCAL_3_1, PRI_PRESCAL_16_1);
-#endif // CONING_CORRECTION	
 #elif (MIPS == 16)
 	// set prescaler for FCY/24 = 667 kHz at 16MIPS
 	initMPUSPI_master16(SEC_PRESCAL_6_1, PRI_PRESCAL_4_1);
@@ -121,10 +115,10 @@ void MPU6000_init16(callback_fptr_t fptr)
 
 	// SAMPLE RATE
 #ifdef CONING_CORRECTION
+	writeMPUSPIreg16(MPUREG_CONFIG,0);
 	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 0); // Sample_rate = 8000Hz
 #else
 	writeMPUSPIreg16(MPUREG_SMPLRT_DIV, 4); // Sample rate = 200Hz  Fsample= 1Khz/(N+1) = 200Hz
-	// scaling & DLPF
 #ifdef BUILD_OFFSET_TABLE
 	writeMPUSPIreg16(MPUREG_CONFIG, BITS_DLPF_CFG_5HZ);
 #else
