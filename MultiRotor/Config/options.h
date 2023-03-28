@@ -1,7 +1,7 @@
 
 #define DATE "rev. 3.0, 3/26/2023\r\n"
 
-//#define CONING_CORRECTION
+#define CONING_CORRECTION
 //#define CONING_CORRECTION_IN_RMAT
 
 #ifdef CONING_CORRECTION
@@ -13,7 +13,7 @@
 #endif // CONING_CORRECTION
 
 // the following defines select what gets sent to the logger. define one of them
-#define LOG_IMU
+//#define LOG_IMU
 #define LOG_RESIDUALS
 //#define RESIDUAL_LOG_PERIOD 10  // 6 times per minute
 #define RESIDUAL_LOG_PERIOD 5  // 10 times per minute
@@ -27,7 +27,7 @@
 //#define ROAD_TEST
 //#define BUILD_OFFSET_TABLE
 //#define GYRO_LPF
-//#define LOG_TIC_TOK_TEST
+#define LOG_TIC_TOK_TEST
 
 //#define ENABLE_ESP32
 #ifdef ENABLE_ESP32
@@ -54,7 +54,7 @@
 
 
 // set the logger hertz, allowable values are 1,2,4,5,10,20,25,40,50,100 or 200
-#define LOGGER_HZ	100
+#define LOGGER_HZ	50
 #define HEADER_HZ	20
 #define SLIDE_DET_HZ	200
 #define TILT_STOP_DELAY 10 // seconds 
@@ -68,8 +68,8 @@
 //#define MINI5_SN4 // SN11
 //#define MINI6_SN15 // SN15
 //#define MINI5_SN2 // SN9
-//#define MINI5_SN3 // SN10
-#define MINI5_SN14 // was SN14, now SN2
+#define MINI5_SN3 // SN10
+//#define MINI5_SN14 // was SN14, now SN2
 
 
 #ifdef MINI6_SN1
