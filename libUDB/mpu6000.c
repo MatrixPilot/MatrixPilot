@@ -40,7 +40,8 @@ boolean is_ICM_20689 = 0;
 #include <spi.h>
 
 //Sensor variables
-uint16_t mpu_data[8], mpuCnt = 0;
+union intbb mpu_data[8] ;
+uint16_t mpuCnt = 0 ;
 boolean mpuDAV = false;
 
 //struct ADchannel udb_xaccel, udb_yaccel, udb_zaccel; // x, y, and z accelerometer channels
@@ -242,19 +243,19 @@ void compute_coning_adjustment(void)
 {
 	union longww rate ;
 	union longww offset ;
-	rate._.W1 = XRATE_SIGN_ORIENTED (((int16_t)mpu_data[xrate_MPU_channel]));
+	rate._.W1 = XRATE_SIGN_ORIENTED (((int16_t)mpu_data[xrate_MPU_channel].BB));
 	rate._.W0 = 0 ;
 	offset._.W1 = XRATE_SIGN_ORIENTED (((int16_t)udb_xrate.offset));
 	offset._.W0 = 0 ;
 	omega32[0].WW = (rate.WW>>1)-(offset.WW>>1);
 	
-	rate._.W1 = YRATE_SIGN_ORIENTED (((int16_t)mpu_data[yrate_MPU_channel]));
+	rate._.W1 = YRATE_SIGN_ORIENTED (((int16_t)mpu_data[yrate_MPU_channel].BB));
 	rate._.W0 = 0 ;
 	offset._.W1 = YRATE_SIGN_ORIENTED (((int16_t)udb_yrate.offset));
 	offset._.W0 = 0 ;
 	omega32[1].WW = (rate.WW>>1)-(offset.WW>>1);
 	
-	rate._.W1 = ZRATE_SIGN_ORIENTED (((int16_t)mpu_data[zrate_MPU_channel]));
+	rate._.W1 = ZRATE_SIGN_ORIENTED (((int16_t)mpu_data[zrate_MPU_channel].BB));
 	rate._.W0 = 0 ;
 	offset._.W1 = ZRATE_SIGN_ORIENTED (((int16_t)udb_zrate.offset));
 	offset._.W0 = 0 ;
@@ -293,21 +294,21 @@ uint32_t max_gyro = 0 ;
 void compute_max_gyro(void)
 {
 	// mixed signed and unsigned two's complement arithmetic is a pain in the a!!
-	if ( mpu_data[xrate_MPU_channel] == 0x8000 ) mpu_data[xrate_MPU_channel] = 0x8001 ;
-	if ( mpu_data[yrate_MPU_channel] == 0x8000 ) mpu_data[yrate_MPU_channel] = 0x8001 ;
-	if ( mpu_data[zrate_MPU_channel] == 0x8000 ) mpu_data[zrate_MPU_channel] = 0x8001 ;
+	if ( mpu_data[xrate_MPU_channel].BB == 0x8000 ) mpu_data[xrate_MPU_channel].BB = 0x8001 ;
+	if ( mpu_data[yrate_MPU_channel].BB == 0x8000 ) mpu_data[yrate_MPU_channel].BB = 0x8001 ;
+	if ( mpu_data[zrate_MPU_channel].BB == 0x8000 ) mpu_data[zrate_MPU_channel].BB = 0x8001 ;
 	
-	if (abs(mpu_data[xrate_MPU_channel])>max_gyro )
+	if (abs(mpu_data[xrate_MPU_channel].BB)>max_gyro )
 	{
-		max_gyro = abs(mpu_data[xrate_MPU_channel]) ;
+		max_gyro = abs(mpu_data[xrate_MPU_channel].BB) ;
 	}
-	if (abs(mpu_data[yrate_MPU_channel])>max_gyro )
+	if (abs(mpu_data[yrate_MPU_channel].BB)>max_gyro )
 	{
-		max_gyro = abs(mpu_data[yrate_MPU_channel]) ;
+		max_gyro = abs(mpu_data[yrate_MPU_channel].BB) ;
 	}
-	if (abs(mpu_data[zrate_MPU_channel])>max_gyro )
+	if (abs(mpu_data[zrate_MPU_channel].BB)>max_gyro )
 	{
-		max_gyro = abs(mpu_data[zrate_MPU_channel]) ;
+		max_gyro = abs(mpu_data[zrate_MPU_channel].BB) ;
 	}
 }
 
@@ -330,15 +331,15 @@ static void process_MPU_data(void)
 	
 	compute_max_gyro(); // diagnostic to detect gyro saturation
 
-	udb_xaccel.value = mpu_data[xaccel_MPU_channel];
-	udb_yaccel.value = mpu_data[yaccel_MPU_channel];
-	udb_zaccel.value = mpu_data[zaccel_MPU_channel];
+	udb_xaccel.value = mpu_data[xaccel_MPU_channel].BB;
+	udb_yaccel.value = mpu_data[yaccel_MPU_channel].BB;
+	udb_zaccel.value = mpu_data[zaccel_MPU_channel].BB;
 
-	mpu_temp.value = mpu_data[temp_MPU_channel];
+	mpu_temp.value = mpu_data[temp_MPU_channel].BB;
 
-	udb_xrate.value = mpu_data[xrate_MPU_channel];
-	udb_yrate.value = mpu_data[yrate_MPU_channel];
-	udb_zrate.value = mpu_data[zrate_MPU_channel];
+	udb_xrate.value = mpu_data[xrate_MPU_channel].BB;
+	udb_yrate.value = mpu_data[yrate_MPU_channel].BB;
+	udb_zrate.value = mpu_data[zrate_MPU_channel].BB;
 	
 	_T2IF = 1; // trigger callback at a lower priority
 //	if (callback) callback();   // was directly calling heartbeat()
@@ -354,15 +355,15 @@ static void process_MPU_data(void)
 	compute_max_gyro(); // diagnostic to detect gyro saturation
 
 //	integrate all data for use in upstream calculations other than those that need coning correction	
-	xaccel32 += ((int32_t)((int16_t)mpu_data[xaccel_MPU_channel])) ;
-	yaccel32 += ((int32_t)((int16_t)mpu_data[yaccel_MPU_channel])) ;
-	zaccel32 += ((int32_t)((int16_t)mpu_data[zaccel_MPU_channel])) ;
+	xaccel32 += ((int32_t)((int16_t)mpu_data[xaccel_MPU_channel].BB)) ;
+	yaccel32 += ((int32_t)((int16_t)mpu_data[yaccel_MPU_channel].BB)) ;
+	zaccel32 += ((int32_t)((int16_t)mpu_data[zaccel_MPU_channel].BB)) ;
 	
-	temp32 += ((int32_t)((int16_t)mpu_data[temp_MPU_channel])) ;
+	temp32 += ((int32_t)((int16_t)mpu_data[temp_MPU_channel].BB)) ;
 	
-	xrate32 += ((int32_t)((int16_t)mpu_data[xrate_MPU_channel])) ;
-	yrate32 += ((int32_t)((int16_t)mpu_data[yrate_MPU_channel])) ;
-	zrate32 += ((int32_t)((int16_t)mpu_data[zrate_MPU_channel])) ;
+	xrate32 += ((int32_t)((int16_t)mpu_data[xrate_MPU_channel].BB)) ;
+	yrate32 += ((int32_t)((int16_t)mpu_data[yrate_MPU_channel].BB)) ;
+	zrate32 += ((int32_t)((int16_t)mpu_data[zrate_MPU_channel].BB)) ;
 
 #ifdef CONING_CORRECTION	
 	compute_coning_adjustment();
@@ -448,8 +449,8 @@ void __attribute__((interrupt, no_auto_psv)) _INT3Interrupt(void)
 void MPU6000_print(void)
 {
 	printf("%06u axyz %06i %06i %06i gxyz %06i %06i %06i t %u\r\n",
-	    mpuCnt,      mpu_data[0], mpu_data[1], mpu_data[2], 
-	    mpu_data[4], mpu_data[5], mpu_data[6], mpu_data[3]);
+	    mpuCnt,      mpu_data[0].BB, mpu_data[1].BB, mpu_data[2].BB, 
+	    mpu_data[4].BB, mpu_data[5].BB, mpu_data[6].BB, mpu_data[3].BB);
 }
 
 #endif // (BOARD_TYPE != UDB4_BOARD)

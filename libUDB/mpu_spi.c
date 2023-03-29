@@ -77,9 +77,7 @@
 static void no_call_back(void);
 
 static void (*mpu_call_back)(void) = &no_call_back;
-static uint16_t* SPI_data;
-static uint8_t SPI_high;
-static uint8_t SPI_low;
+static union intbb* SPI_data;
 #ifndef __dsPIC33E__
 static int16_t SPI_i;
 static int16_t SPI_j;
@@ -169,7 +167,7 @@ static void no_call_back(void)
 // SPI module has 8 word FIFOs
 // burst read 2n bytes starting at addr;
 // Since first byte is address, max of 15 data bytes may be transferred with n=7
-void readMPUSPI_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
+void readMPUSPI_burst16n(union intbb data[], int16_t n, uint16_t addr, void (*call_back)(void))
 {
 	uint16_t i;
 
@@ -214,7 +212,7 @@ void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 #else // no SPI FIFO
 
 // burst read 2n bytes starting at addr
-void readMPUSPI_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_back)(void))
+void readMPUSPI_burst16n(union intbb data[], int16_t n, uint16_t addr, void (*call_back)(void))
 {
 	uint16_t spibuf;
 
@@ -232,51 +230,31 @@ void readMPUSPI_burst16n(uint16_t data[], int16_t n, uint16_t addr, void (*call_
 
 void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 {
-	uint16_t spibuf;
+	union intbb spibuf;
 
 	_SPIIF = 0;                 // clear interrupt flag as soon as possible so as to not miss any interrupts
 	indicate_loading_inter;
 	set_ipl_on_output_pin;
 	interrupt_save_set_corcon;
-#if 1
 	if (SPI_i == 0) {
-		spibuf = SPIBUF;                               // could move this to before the conditional
+		spibuf.BB = SPIBUF; 
 		SPIBUF = 0x0000;
-		SPI_high = 0xFF & spibuf;                      // could move this to after the conditional
 		SPI_i = 1;
 	} else if (SPI_i < SPI_n) {
-		spibuf = SPIBUF;                               // could move this to before the conditional
-		SPIBUF = 0x0000;
-		SPI_low = spibuf >> 8;                         // could move this to before the conditional
-		*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low; // could move this to before the conditional
-		SPI_high = 0xFF & spibuf;                      // could move this to after the conditional
+		SPI_data[SPI_j]._.B1 = spibuf._.B0 ;
+		spibuf.BB = SPIBUF;
+		SPI_data[SPI_j]._.B0 = spibuf._.B1 ;
+		SPIBUF = 0x0000;                   
 		SPI_i++;
 		SPI_j++;
 	} else {
-		spibuf = SPIBUF;                               // could move this to before the conditional
-		SPI_low = spibuf >> 8;                         // could move this to before the conditional
-		*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low; // could move this to before the conditional
+		SPI_data[SPI_j]._.B1 = spibuf._.B0 ;
+		spibuf.BB = SPIBUF;
+		SPI_data[SPI_j]._.B0 = spibuf._.B1 ;
 		MPU_SS = 1;
 		_SPIIE = 0;             // turn off SPI interrupts
 		(*mpu_call_back)();
 	}
-#else
-	spibuf = SPIBUF;
-	SPI_low = spibuf >> 8;
-	*(SPI_data + SPI_j) = SPI_high << 8 | SPI_low;
-	SPI_i++;
-	if (SPI_i == 1) {
-		SPIBUF = 0x0000;
-	} else if (SPI_i <= SPI_n) {
-		SPIBUF = 0x0000;
-		SPI_j++;
-	} else {
-		MPU_SS = 1;
-		_SPIIE = 0;             // turn off SPI interrupts
-		(*mpu_call_back)();
-	}
-	SPI_high = 0xFF & spibuf;
-#endif // 0
 	interrupt_restore_corcon;
 	unset_ipl_on_output_pin;
 }
