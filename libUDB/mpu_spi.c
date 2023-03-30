@@ -228,10 +228,9 @@ void readMPUSPI_burst16n(union intbb data[], int16_t n, uint16_t addr, void (*ca
 	_SPIIE = 1;                 // turn on SPI interrupts
 }
 
+union intbb spibuf;
 void __attribute__((__interrupt__, __no_auto_psv__)) SPIInterrupt(void)
 {
-	union intbb spibuf;
-
 	_SPIIF = 0;                 // clear interrupt flag as soon as possible so as to not miss any interrupts
 	indicate_loading_inter;
 	set_ipl_on_output_pin;
