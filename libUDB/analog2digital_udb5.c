@@ -25,7 +25,7 @@
 #include "heartbeat.h"
 #include "ADchannel.h"
 
-#if (BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == UDB7LUGE_BOARD)
 
 #if (NUM_ANALOG_INPUTS >= 1)
 struct ADchannel udb_analogInputs[NUM_ANALOG_INPUTS]; // 0-indexed, unlike servo pwIn/Out/Trim arrays

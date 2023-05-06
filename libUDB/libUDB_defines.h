@@ -50,6 +50,8 @@
 // Include the necessary files for the current board type
 #if (BOARD_TYPE == UDB4_BOARD)
 #include "ConfigUDB4.h"
+#elif (UDB == UDB7LUGE_BOARD)
+#include "ConfigUDB7luge.h"
 #elif (BOARD_TYPE == UDB5_BOARD)
 #include "ConfigUDB5.h"
 #elif (BOARD_TYPE == AUAV3_BOARD)

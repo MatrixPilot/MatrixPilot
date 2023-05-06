@@ -71,13 +71,23 @@
 #undef  USE_MSD
 #define USE_MSD                             0
 #endif
-#ifdef UDB5
-#define BOARD_TYPE                          UDB5_BOARD
+
+#ifdef UDB7LUGE
+#define BOARD_TYPE                          UDB7LUGE_BOARD
 #undef  USE_USB
 #define USE_USB                             0
 #undef  USE_MSD
 #define USE_MSD                             0
+#else
+    #ifdef UDB5
+    #define BOARD_TYPE                          UDB5_BOARD
+    #undef  USE_USB
+    #define USE_USB                             0
+    #undef  USE_MSD
+    #define USE_MSD                             0
+    #endif
 #endif
+
 
 #ifndef BOARD_TYPE
 #if (SILSIM == 0)

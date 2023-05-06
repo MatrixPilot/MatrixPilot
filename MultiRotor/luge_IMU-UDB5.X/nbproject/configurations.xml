@@ -78,6 +78,7 @@
         <itemPath>../../libUDB/sonarIn.h</itemPath>
         <itemPath>../../libUDB/uart.h</itemPath>
         <itemPath>../../libUDB/udbTypes.h</itemPath>
+        <itemPath>../../libUDB/ConfigUDB7luge.h</itemPath>
       </logicalFolder>
       <logicalFolder name="libVectorMatrix"
                      displayName="libVectorMatrix"

@@ -7,9 +7,11 @@
 #ifdef CONING_CORRECTION
 #define MINI5 "UDBmini5 hardware, 8000 Hz sampling.\r\n"
 #define MINI6 "UDBmini6 hardware, 8000 Hz sampling.\r\n"
+#define LUGE7 "UDBluge7 hardware, 8000 Hz sampling.\r\n"
 #else
 #define MINI5 "UDBmini5 hardware, 200 Hz sampling.\r\n"
 #define MINI6 "UDBmini6 hardware, 200 Hz sampling.\r\n"
+#define LUGE7 "UDBluge7 hardware, 200 Hz sampling.\r\n"
 #endif // CONING_CORRECTION
 
 // the following defines select what gets sent to the logger. define one of them
@@ -37,6 +39,14 @@
     #define USE_PACKETIZED_TELEMERTY
 #endif
 #endif
+
+
+// Enable ENABLE_ESP32 here for wireless debugging without packetized telemetry
+//#define ENABLE_ESP32
+
+// Enable UDB7LUGE in a Board definition ifdef block below for new WolfPac1 wifi boards
+//#define UDB7LUGE
+
 
 
 // options to override the normal mission logic and always log and/or always remove gyro offsets

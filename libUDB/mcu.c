@@ -27,7 +27,7 @@
 #include "options_ports.h"
 #include <stdio.h>
 
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == UDB7LUGE_BOARD)
 #include <p33Fxxxx.h>
 #ifdef __XC16__
 #pragma config FNOSC = PRIPLL
@@ -322,7 +322,7 @@ static void init_leds(void)
 #if (BOARD_TYPE == AUAV3_BOARD)
 	_LATB2 = LED_OFF; _LATB3 = LED_OFF; _LATB4 = LED_OFF; _LATB5 = LED_OFF; 
 	_TRISB2 = 0; _TRISB3 = 0; _TRISB4 = 0; _TRISB5 = 0;
-#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#elif (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == UDB7LUGE_BOARD)
 	_LATE1 = LED_OFF; _LATE2 = LED_OFF; _LATE3 = LED_OFF; _LATE4 = LED_OFF;
 	_TRISE1 = 0; _TRISE2 = 0; _TRISE3 = 0; _TRISE4 = 0;
 	_TRISD0 = 0 ; _TRISD1 = 0 ; _TRISD2 = 0 ; _TRISD3 = 0 ; _TRISD4 = 0 ; _TRISD5 = 0 ; _TRISD6 = 0 ; _TRISD7 = 0 ; 
@@ -333,7 +333,7 @@ static void init_leds(void)
 
 static void init_pll(void)
 {
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == UDB7LUGE_BOARD)
 #if (MIPS == 16)
 //No warning given for default MIPS speed
 	CLKDIVbits.PLLPRE = 0;  // PLL prescaler: N1 = 2 (default)

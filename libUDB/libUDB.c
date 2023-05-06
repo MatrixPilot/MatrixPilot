@@ -102,11 +102,11 @@ void udb_init(void)
 //	osd_init();
 
 //FIXME: add AUAV3 support
-#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD)
+#if (BOARD_TYPE == UDB4_BOARD || BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == UDB7LUGE_BOARD)
 //	udb_eeprom_init();
 #endif
 
-#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD)
+#if (BOARD_TYPE == UDB5_BOARD || BOARD_TYPE == AUAV3_BOARD || BOARD_TYPE == UDB7LUGE_BOARD)
 	MPU6000_init16(&heartbeat);
 #endif
 
