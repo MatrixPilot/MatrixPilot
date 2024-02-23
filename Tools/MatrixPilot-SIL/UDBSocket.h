@@ -32,7 +32,7 @@ typedef struct UDBSocket_t* UDBSocket;
 // UDBSocketUDPServer:      specify type, UDP_port
 // UDBSocketSerial:         specify type, serial_port, serial_baud
 
-UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, char* serial_port, long serial_baud);
+UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, const char* UDP_host, const char* serial_port, long serial_baud);
 void UDBSocket_close(UDBSocket socket);
 int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength);
 int UDBSocket_write(UDBSocket socket, const unsigned char* data, int dataLength);
