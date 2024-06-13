@@ -89,9 +89,9 @@ inline int gettimeofday(struct timeval* p, void* tz /* IGNORED */)
 uint16_t udb_heartbeat_counter;
 uint16_t udb_pulse_counter;
 
-int16_t udb_pwIn[MAX_INPUTS+1];   // pulse widths of radio inputs
-int16_t udb_pwTrim[MAX_INPUTS+1]; // initial pulse widths for trimming
-int16_t udb_pwOut[MAX_OUTPUTS+1]; // pulse widths for servo outputs
+uint16_t udb_pwIn[MAX_INPUTS+1];   // pulse widths of radio inputs
+uint16_t udb_pwTrim[MAX_INPUTS+1]; // initial pulse widths for trimming
+uint16_t udb_pwOut[MAX_OUTPUTS+1]; // pulse widths for servo outputs
 
 union udb_fbts_byte udb_flags;
 

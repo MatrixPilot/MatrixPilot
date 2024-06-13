@@ -20,7 +20,7 @@
 
 //	routines to drive the PWM pins for the servos,
 
-extern int16_t udb_pwOut[]; // pulse widths for servo outputs
+extern uint16_t udb_pwOut[]; // pulse widths for servo outputs
 
 
 //void udb_init_pwm(void)

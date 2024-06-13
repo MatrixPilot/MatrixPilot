@@ -64,8 +64,8 @@
 // The pulse width inputs can be directly converted to units of pulse width outputs to control
 // the servos by simply dividing by 2. (need to check validity of this statement - RobD)
 
-int16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
-int16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
+uint16_t udb_pwIn[NUM_INPUTS+1];     // pulse widths of radio inputs
+uint16_t udb_pwTrim[NUM_INPUTS+1];   // initial pulse widths for trimming
 
 static int16_t goodPWMPulseCount = 0;
 static int16_t badPWMPulseCount = 0;
@@ -178,9 +178,17 @@ void radioIn_bad_pulse_count_reset(void)
 }
 
 #if (NORADIO != 1)
-static void set_udb_pwIn(int pwm, int index)
+static void set_udb_pwIn(uint16_t pwm, uint16_t index)
 {
-	pwm = pwm * TMR_FACTOR / 2; // yes we are scaling the parameter up front
+#if (TMR_FACTOR == 1 )
+	pwm = pwm / 2 ;
+#elif (TMR_FACTOR == 2 )
+	// pwm does not need to be scaled
+#elif (TMR_FACTOR == 4 )
+	pwm = pwm * 2 ;
+#else
+#error "invalid TMR_FACTOR, check MIPS setting"
+#endif // TMR_FACTOR 
 
 	if (FAILSAFE_INPUT_CHANNEL == index)
 	{
