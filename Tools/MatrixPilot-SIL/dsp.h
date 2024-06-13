@@ -107,7 +107,7 @@ typedef struct {
 *
 * Preliminary remarks.
 *
-* None of the functions with the exception of SetStackGuard provided within 
+* None of the functions with the exception of SetStackGuard provided within
 * this API allocate memory space.
 *
 ****************************************************************************/
@@ -122,7 +122,7 @@ typedef struct {
 
 /* Generic function prototypes. */
 #define Q15(X) \
-   ((X < 0.0) ? (int)(32768*(X) - 0.5) : (int)(32767*(X) + 0.5)) 
+   ((X < 0.0) ? (int)(32768*(X) - 0.5) : (int)(32767*(X) + 0.5))
 
 #if     DATA_TYPE==FLOATING             /* [ */
 #define Float2Fract(aVal)       (aVal)  /* Identity function */
@@ -1255,21 +1255,21 @@ extern fractcomplex* BitReverseComplex (        /* Bit Reverse Ordering */
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern fractcomplex* FFTComplex (       /* Fast Fourier Transform */
@@ -1309,21 +1309,21 @@ extern fractcomplex* FFTComplex (       /* Fast Fourier Transform */
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern fractcomplex* FFTComplexIP (     /* Fast Fourier Transform */
@@ -1359,21 +1359,21 @@ extern fractcomplex* FFTComplexIP (     /* Fast Fourier Transform */
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern fractcomplex* IFFTComplex (      /* Inverse Fast Fourier Transform */
@@ -1410,21 +1410,21 @@ extern fractcomplex* IFFTComplex (      /* Inverse Fast Fourier Transform */
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern fractcomplex* IFFTComplexIP (    /* Inverse Fast Fourier Transform */
@@ -1456,8 +1456,8 @@ extern fractcomplex* IFFTComplexIP (    /* Inverse Fast Fourier Transform */
 /*...........................................................................*/
 
 extern long toneGen32b(
-		int samp, 
-		int tone, 
+		int samp,
+		int tone,
 		int phase,
 		long *tfBuff
 );
@@ -1465,7 +1465,7 @@ extern long toneGen32b(
 /*...........................................................................*/
 
 extern void BitReverseReal32bIP(
-		int N, 
+		int N,
 		long *ipBuff
 );
 
@@ -1476,27 +1476,27 @@ extern void BitReverseReal32bIP(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern long* FFTReal32bIP(
-			int log2N, 
+			int log2N,
 			int N,
-			long *ipBuff, 
+			long *ipBuff,
 			long *tfBuf,
 			int factPage
 );
@@ -1508,28 +1508,28 @@ extern long* FFTReal32bIP(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern long* FFTReal32b(
-			int log2N, 
+			int log2N,
 			int N,
-			long *opBuff, 
-			long *ipBuff, 
+			long *opBuff,
+			long *ipBuff,
 			long *tfBuf,
 			int factPage
 );
@@ -1541,26 +1541,26 @@ extern long* FFTReal32b(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern void FFTComplex32bIP(
-		int log2N, 
-		long *ipBuff, 
+		int log2N,
+		long *ipBuff,
 		long *tfBuff,
 		int factPage
 );
@@ -1572,26 +1572,26 @@ extern void FFTComplex32bIP(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern void realFft32bIP(
-		int log2N, 
-		long *ipBuff, 
+		int log2N,
+		long *ipBuff,
 		long *tfBuff,
 		int factPage
 );
@@ -1603,27 +1603,27 @@ extern void realFft32bIP(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern long* IFFTReal32bIP(
-			int log2N, 
+			int log2N,
 			int N,
-			long *ipBuff, 
+			long *ipBuff,
 			long *tfBuf,
 			int factPage
 );
@@ -1635,28 +1635,28 @@ extern long* IFFTReal32bIP(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern long* IFFTReal32b(
-			int log2N, 
+			int log2N,
 			int N,
-			long *opBuff, 
-			long *ipBuff, 
+			long *opBuff,
+			long *ipBuff,
 			long *tfBuf,
 			int factPage
 );
@@ -1668,26 +1668,26 @@ extern long* IFFTReal32b(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern void IFFTComplex32bIP(
-		int log2N, 
-		long *ipBuff, 
+		int log2N,
+		long *ipBuff,
 		long *tfBuff,
 		int factPage
 );
@@ -1699,26 +1699,26 @@ extern void IFFTComplex32bIP(
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern void realiFft32bIP(
-		int log2N, 
-		long *ipBuff, 
+		int log2N,
+		long *ipBuff,
 		long *tfBuff,
 		int factPage
 );
@@ -1726,7 +1726,7 @@ extern void realiFft32bIP(
 /*...........................................................................*/
 
 extern void MagnitudeCplx32bIP(
-		int N, 
+		int N,
 		long *ipBuff
 );
 
@@ -1754,21 +1754,21 @@ extern fractcomplex* CosFactorInit (    /* Initialize cosine factors */
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern fractional* DCT (                /* Type II Discrete Cosine Transform */
@@ -1825,21 +1825,21 @@ extern fractional* DCT (                /* Type II Discrete Cosine Transform */
    and SP+TABLE_SIZE < __YDATA_BASE where
    a) SP: Stack Pointer
    b) TABLE_SIZE: Size of table of constants in PSV
-   c) STACK_GUARD: Buffer space on the stack beyond the table of constants 
+   c) STACK_GUARD: Buffer space on the stack beyond the table of constants
                    to be copied from PSV
    d) SPLIM: Stack Pointer Limit
    e) __YDATA_BASE: Base address of Y memory
-   
-   STACK_GUARD has a default value of 1024 words but can be modified with the 
+
+   STACK_GUARD has a default value of 1024 words but can be modified with the
    SetStackGuard function. Care must be taken when modifying the STACK_GUARD.
-   a) Large values imply that more stack space is reserved for interrupts 
-      etc … SPLIM will more likely be exceeded and code will run out of PSV. 
+   a) Large values imply that more stack space is reserved for interrupts
+      etc  SPLIM will more likely be exceeded and code will run out of PSV.
 	  This will increase the cycle count. If this happens, decrease the
 	  STACK_GUARD value.
-   b) Smaller values imply that less stack space is reserved for interrupts 
-      etc … SPLIM is less likely to be exceeded and code will run out of RAM. 
+   b) Smaller values imply that less stack space is reserved for interrupts
+      etc  SPLIM is less likely to be exceeded and code will run out of RAM.
 	  Stack overflows may occur since there is less buffer space. If this
-	  happens, increase the STACK_GUARD value.  
+	  happens, increase the STACK_GUARD value.
 */
 
 extern fractional* DCTIP (              /* Type II Discrete Cosine Transform */

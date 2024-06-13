@@ -151,6 +151,7 @@ const struct waypointDef waypoints[] = {
 		{ {  113579820, 472638400, 350 } , F_ABSOLUTE, CAM_VIEW_LAUNCH } ,
 };
  */
+/*
 // CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
 
 #define CORNER1 500
@@ -181,6 +182,26 @@ const struct waypointDef waypoints[] = {
 		{ {    CORNER3 ,  - CORNER3 , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER3 ,    CORNER3 , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_2 } ,
 		{ {  - CORNER3 ,  - CORNER3 , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_2 } ,
+};
+ */
+// CORNER is the absolute value of the X or Y coordinate at the corners of the course. 
+
+#define CORNER1 1200
+
+// CLEARANCE is an allowance for obstacles.
+#define CLEARANCE 600
+
+
+#define CAM_VIEW_2  { CORNER1, CORNER1, 0 } // Define a Camera ViewPoint to look at 100 ,100, 0
+
+// Here is the T3 course definition:
+
+const struct waypointDef waypoints[] = {
+
+		{ {    CORNER1 ,    CORNER1 , CLEARANCE + 100 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {    CORNER1 ,  - CORNER1 , CLEARANCE +  75 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER1 ,    CORNER1 , CLEARANCE +  50 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
+		{ {  - CORNER1 ,  - CORNER1 , CLEARANCE +  25 } , F_NORMAL, CAM_VIEW_LAUNCH } ,
 };
 
 #else

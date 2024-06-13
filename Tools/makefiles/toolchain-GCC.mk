@@ -1,6 +1,8 @@
 # this file is included from makefile
 
 CC := gcc
+CPP := g++
+
 ifeq ($(OS),Windows_NT) 
 #LIBS += -lws2_32
 TARGET_ARCH :=
@@ -10,3 +12,5 @@ else
 TARGET_ARCH :=
 CFLAGS += -DNIX=1
 endif
+
+WARN += -Wno-unused-but-set-variable

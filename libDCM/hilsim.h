@@ -19,8 +19,7 @@
 // along with MatrixPilot.  If not, see <http://www.gnu.org/licenses/>.
 
 
-int16_t hilsim_input_adjust(char *inChannelName, int delta);
-//int16_t hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta);
+int16_t hilsim_input_adjust(const char* inChannelName, int delta);
 
 void hilsim_handle_key_input(char c);
 

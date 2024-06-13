@@ -27,8 +27,8 @@ ifeq ($(OS),Windows_NT)
         $(error This make file must be run under the MSYS2 development environment on Windows)
     endif
 else
-    ARCH         := $(shell getconf LONG_BIT)
-    ARCH_FLAGS   := -DMP_WORDSIZE=$(ARCH) -m$(ARCH)
+    ARCH       := $(shell getconf LONG_BIT)
+    ARCH_FLAGS := -DMP_WORDSIZE=$(ARCH) -m$(ARCH)
     DEFINES  = -DNIX=1
     BINARY   =
     OSOBJS   = UDBSocketUnix.o
@@ -37,16 +37,16 @@ else
     UNAME_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
     ifeq ($(UNAME_S),Linux)
         DEFINES = -DAPL=0 -DIBM=0 -DLIN=1 -DNIX=1
-        WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
+        WARN    = -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-variable
     endif
     ifeq ($(UNAME_S),Darwin)
         DEFINES = -DAPL=1 -DIBM=0 -DLIN=0 -DNIX=1
-        WARN       = -Wall -Wextra -Wno-unused-parameter -Wno-address-of-packed-member -Wno-unused-const-variable
+        WARN    = -Wall -Wextra -Wno-unused-parameter -Wno-address-of-packed-member -Wno-unused-const-variable
     endif
 endif
 
 CC       = gcc
-CCP	 = g++
+CPP	     = g++
 CFLAGS   = -pipe -O0 $(DEFINES) $(WARN) $(ARCH_FLAGS)
 INCPATH  = -I. -I../../Config/$(CONFIG) -I../../Config -I../../libUDB -I../../libDCM -I../../MatrixPilot
 LFLAGS   =
@@ -134,7 +134,7 @@ first: all
 	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
 %.o: %.cpp $(MP_HEADERS)
-	$(CCP) -c $(CFLAGS) $(INCPATH) -o $@ $<
+	$(CPP) -c $(CFLAGS) $(INCPATH) -o $@ $<
 
 all: $(MPSIL_TARGET) $(MPCAT_TARGET)
 
@@ -146,7 +146,7 @@ $(MPSIL_TARGET): $(MPSIL_OBJECTS)
 	$(CC) $(LFLAGS) -o $(MPSIL_TARGET) $(MPSIL_OBJECTS) $(LIBS)
 
 $(MPCAT_TARGET): $(MPCAT_OBJECTS)
-	$(CCP) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
+	$(CPP) $(LFLAGS) -o $(MPCAT_TARGET) $(MPCAT_OBJECTS) $(LIBS)
 
 clean:
 	-$(RM) $(MPSIL_OBJECTS) $(MPCAT_OBJECTS)

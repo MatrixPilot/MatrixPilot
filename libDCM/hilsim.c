@@ -28,7 +28,7 @@
 
 #if (HILSIM == 1)
 
-static int16_t hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int delta)
+static int16_t hil_rc_input_adjust(const char* inChannelName, int inChannelIndex, int delta)
 {
 	udb_pwIn[inChannelIndex] = udb_servo_pulsesat(udb_pwIn[inChannelIndex] + delta);
 	if (inChannelIndex == THROTTLE_INPUT_CHANNEL) {
@@ -40,7 +40,7 @@ static int16_t hil_rc_input_adjust(char *inChannelName, int inChannelIndex, int 
 	return udb_pwIn[inChannelIndex];
 }
 
-int16_t hilsim_input_adjust(char* inChannelName, int delta)
+int16_t hilsim_input_adjust(const char* inChannelName, int delta)
 {
 	switch (inChannelName[0]) {
 	case 't':
