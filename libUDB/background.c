@@ -52,8 +52,7 @@ static inline void init_heartbeat(void)
 #if (BOARD_TYPE != UDB4_BOARD && HEARTBEAT_HZ == 200)
 
 	// MPU6000 interrupt is used as the HEARTBEAT_HZ heartbeat of libUDB.
-	// Timer1 is not used for heartbeat, but its interrupt flag is set in the
-	// MPU6000 ISR.
+	// Timer1 is not used for heartbeat
 	T1CONbits.TON = 0;      // turn off timer 1
 	TMR1 = 0;
 	_T1IP = INT_PRI_T1;     // set interrupt priority
