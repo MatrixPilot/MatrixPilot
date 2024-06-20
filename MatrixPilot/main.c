@@ -68,6 +68,7 @@ static jmp_buf buf;
 
 int matrixpilot_init(void)
 {
+    dcm_flags._.udb_init_finished = 0;//Se,ding UART message is forbidden
 #if (USE_USB == 1)
 	preflight();    // perhaps this would be better called usb_init()
 #endif
@@ -92,6 +93,7 @@ int matrixpilot_init(void)
 #endif // (USE_MAVLINK == 1)
 #endif // _MSC_VER
 	return 0;
+    dcm_flags._.udb_init_finished = 1;//Se,ding UART message is authorized
 }
 
 int matrixpilot_loop(void)
