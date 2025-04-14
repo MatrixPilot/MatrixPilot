@@ -270,12 +270,12 @@ endif
 	$(Q) $(CC) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
 %.d: %.cpp
-	$(Q) $(CPP) $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
+	$(Q) $(CPP) -std=gnu++11 $(TARGET_ARCH) $(CFLAGS) $(DEFINES) $(INCLUDES) -M $< | \
 	$(SED) $(QT)s,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,$(QT) > $@.tmp
 	$(Q) $(MV) $@.tmp $@
 
 %.o: %.cpp
-	$(Q) $(CPP) $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+	$(Q) $(CPP) -std=gnu++11 $(TARGET_ARCH) -c $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
 %.d: %.s
 	$(Q) $(CC) $(TARGET_ARCH) $(AFLAGS) $(DEFINES) $(INCLUDES) -M $< | \

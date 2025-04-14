@@ -36,6 +36,8 @@ from matrixpilot_lib import matrix_cross_product_vector_3x1
 from matrixpilot_lib import matrix_transpose
 from matrixpilot_lib import matrix_multiply_3x3_3x1
 
+gui = False
+
 def walktree (top = ".", depthfirst = True):
     names = os.listdir(top)
     if not depthfirst:
@@ -178,9 +180,8 @@ def C_pre_processor(C_source_filename):
                 "This is needed for processing wayoint files \n" + \
                 "Currently the location is hardcoded in flan.py." 
             print error_message
-            showerror(title="Error: No C Pre-Processor Available",
-                message = error_message)
-            sys.exit()
+            if (gui): showerror(title="Error: No C Pre-Processor Available", message = error_message)
+            sys.exit(2)
     else:
         mystring = os.path.join(programfiles,'Microchip\\xc16\\v*')
         directory_list = glob.glob(mystring)
@@ -209,8 +210,7 @@ def C_pre_processor(C_source_filename):
         else :
             error_message = "Cannot find the C Pre-Processor\n"
             print error_message
-            showerror(title="Error: No C Pre-Processor Available",
-                    message = error_message)
+            if (gui): showerror(title="Error: No C Pre-Processor Available", message = error_message)
             sys.exit()
     if debug: print "Ouput from C Pre Processor Follows: \n", output
     return(output)
@@ -1740,7 +1740,6 @@ def write_earth_wind_2d_vectors(log_book,flight_origin,filename, flight_clock):
     # This marks the end of the for loop
     print >> filename, "</Folder>"
 
-               
 def write_flight_vectors(log_book,origin, filename, flight_clock,gps_delay) :
     primary_locator = log_book.primary_locator
     print >> filename, """
@@ -1891,7 +1890,7 @@ class origin() :
         STANDBY_PAUSE = 48
         background_timer_resolution = 0.5
         initial_nav_valid_time = 0
-        msec_before_storing_origin =int(STANDBY_PAUSE * background_timer_resolution * 1000)
+        msec_before_storing_origin = int(STANDBY_PAUSE * background_timer_resolution * 1000)
         for entry in log_book.entries :
             if debug : print entry.tm, entry.status
             match = re.match("^.1.*", entry.status ) # nav_valid
@@ -1904,7 +1903,7 @@ class origin() :
             message =  "There does not appear to be any valid GPS positions in this file. So it \n" + \
             "is not possible to plot this file in Google Earth\n"
             
-            showerror(title = "No Valid GPS positions found in this telemetry file", message = message)
+            if (gui): showerror(title = "No Valid GPS positions found in this telemetry file", message = message)
             print message
             return(False) # return Error
         time_to_acquire_origin = initial_nav_valid_time + msec_before_storing_origin
@@ -2057,10 +2056,10 @@ def create_telemetry_kmz(options,log_book):
     f_pos = open(options.GE_filename_kml, 'w')
     flight_origin = origin()
     if log_book.F13 != "Recorded" :
-        if ( flight_origin.calculate(log_book)== True ):# Try to estimate the origin from initial postiions
+        if (flight_origin.calculate(log_book) == True): # Try to estimate the origin from initial positions
             print "Origin calculated - no specific origin sent by telemetry"
         else :
-            f_pos.close() # This currently leave a blank KML file in the file system.
+            f_pos.close() # This currently leaves a blank KML file in the file system.
             return(False) # There were not enough GPS positions to calculate an origin.
     else :
         flight_origin.longitude = log_book.origin_east
@@ -2333,12 +2332,13 @@ def create_log_book(options) :
                         "to which origin can be used for position and altitude.\n"   +
                         "" )
     return(log_book)
-        
+
 def wrap_kml_into_kmz(options):
     flight_pos_kmz = options.GE_filename
     # Try to find a models directory nearby to add to zip files....
     model_dir = []
-    model_dir.append(os.path.join(os.getcwd(), "models"))  
+#    model_dir.append(os.path.join(os.getcwd(), "models")) # RobD
+    model_dir.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "models")) # RobD
     if (os.access(os.path.join(model_dir[0],"waypoint.dae"),os.F_OK)) and \
            (os.access(os.path.join(model_dir[0],"block_plane.dae"),os.F_OK)) and \
            (os.access(os.path.join(model_dir[0],"arrow.dae"),os.F_OK)):
@@ -2348,21 +2348,21 @@ def wrap_kml_into_kmz(options):
             "to be placed, with it's internal file contents, in the directory containing\n" + \
             "flan.py \n" + \
             "Exiting Program"
-        showerror(title = "Missing Models Directory and some associated file", message = message)
+        if (gui): showerror(title = "Missing Models Directory and some associated file", message = message)
         print message
-        exit(0) # We exit the program. Note that we did leave a kml file around
-    waypoint_model  = os.path.join("models","waypoint.dae")
-    block_plane_model = os.path.join("models","block_plane.dae")
-    arrow_model = os.path.join("models","arrow.dae")
-    waypoint2_model = os.path.join("models","waypoint2.dae")
-    mag_arrow_model = os.path.join("models","mag_arrow.dae")
+        exit(1) # We exit the program. Note that we did leave a kml file around
+    waypoint_model  = os.path.join(model_dir[0],"waypoint.dae")
+    block_plane_model = os.path.join(model_dir[0],"block_plane.dae")
+    arrow_model = os.path.join(model_dir[0],"arrow.dae")
+    waypoint2_model = os.path.join(model_dir[0],"waypoint2.dae")
+    mag_arrow_model = os.path.join(model_dir[0],"mag_arrow.dae")
     kmzfile = ZipFile(flight_pos_kmz, "w",ZIP_DEFLATED) # "a" to append, "r" to read
     kmzfile.write(options.GE_filename_kml)
-    kmzfile.write(waypoint_model)
-    kmzfile.write(block_plane_model)
-    kmzfile.write(arrow_model)
-    kmzfile.write(waypoint2_model)
-    kmzfile.write(mag_arrow_model)
+    kmzfile.write(waypoint_model, "models/waypoint.dae")
+    kmzfile.write(block_plane_model, "models/block_plane.dae")
+    kmzfile.write(arrow_model, "models/arrow.dae")
+    kmzfile.write(waypoint2_model, "models/waypoint2.dae")
+    kmzfile.write(mag_arrow_model, "models/mag_arrow.dae")
     kmzfile.close()
     # Remove the temporary kml files, now we have the kmz file
     os.remove(options.GE_filename_kml)
@@ -2498,7 +2498,7 @@ def write_csv(options,log_book):
         if is_level_flight_data(entry, centimeter_cruise_speed):
             aoa_using_pitch_list.append(aoa_using_pitch)
             aoa_using_velocity_list.append(aoa_using_velocity)
-            
+
             wing_loading_list.append(relative_wing_loading)
             elevator_with_trim_removed.append(float(elevator_without_trim) / 1000)
 
@@ -2718,6 +2718,13 @@ class flan_options :
         self.gps_delay_correction = 0
         self.relocate = 0
         self.graph = 0
+
+        self.telemetry_type = 0       # this was previously not explicitly declared
+        self.GE_filename_kml = "None" # this was previously not explicitly declared
+        self.altitude_correction = 0  # this was previously not explicitly declared
+
+        self.verbose = True # added - RobD
+
         pass
 
 def saveObject(filename, object_h) :
@@ -2734,22 +2741,57 @@ def loadObject(filename) :
     file.close()
     return object
 
+#
+#################################################################
+##### Main processing of the MatrixPilot logfiles occurs here
+#
+def cmd_process(options):
+    kml_result = False # Initialise Flag to show whether kml was produced
+    if (options.telemetry_selector == 1):
+        print "Analyzing telemetry and creating flight log book"
+        log_book = create_log_book(options)
+        print "Writing to temporary telemetry kml file"
+        kml_result = create_telemetry_kmz(options, log_book) 
+    elif ((options.waypoint_selector ==1 ) and (options.telemetry_selector == 0)):
+        print "Writing waypoint KML file"
+        create_waypoint_kmz(options)
+    else :
+        print "ERROR: Processing started without an input file being selected"
+        return 1
+    print "Zipping up KML into a KMZ File"
+    wrap_kml_into_kmz(options)
+
+    if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW') \
+        or options.telemetry_filename.endswith('log') or options.telemetry_filename.endswith('LOG')):
+        serial_udb_extra_filename = re.sub("[rRlL][aAoO][wWgG]$","txt",options.telemetry_filename)
+        if os.path.exists(serial_udb_extra_filename):
+            print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
+        else:
+            print "Writing ascii version of SERIAL_UDB_EXTRA to", \
+                  os.path.basename(serial_udb_extra_filename)
+            write_mavlink_to_serial_udb_extra(options.telemetry_filename, \
+                                              serial_udb_extra_filename, \
+                                              options.telemetry_type)
+    if (options.CSV_selector == 1) and (kml_result == True ):
+        write_csv(options,log_book)
+    return (not kml_result)
+
 def process_telemetry():
-    """ Called when start button is pressed. 
+    """ Called when start button is pressed.
     Setup a scrollable text window to report activities, and then call the main
     KML / KMZ conversion routines using the options that the user has chosen"""
     myframe.start_button.configure(state = "disabled")
-    if (( os.path.exists(myframe.GE_filename)) and (myframe.GE_var.get() ==1) ):
+    if ((os.path.exists(myframe.GE_filename)) and (myframe.GE_var.get() ==1) ):
          message = 'The following file already exists.\n'+ myframe.GE_filename + \
-                  '\n Do you want to overwrite it ?'
+                   '\n Do you want to overwrite it ?'
          if askyesno(title = 'Confirm File Overwrite', message = message) :
              pass
          else :
             myframe.start_button.configure(state = "active")
             return
-    if (( os.path.exists(myframe.CSV_filename)) and (myframe.CSV_var.get() == 1)) :
+    if ((os.path.exists(myframe.CSV_filename)) and (myframe.CSV_var.get() == 1)) :
          message = 'The following file already exists.\n'+ myframe.CSV_filename + \
-                  '\n Do you want to overwrite it ?'
+                   '\n Do you want to overwrite it ?'
          if askyesno(title = 'Confirm File Overwrite', message = message) :
              pass
          else :
@@ -2777,7 +2819,7 @@ def process_telemetry():
     
     if (options.waypoint_selector == 1 and options.telemetry_selector == 0):
         if (not waypoints_do_not_need_telemetry(options.waypoint_filename)): # movable origin
-               showinfo(title ="Movable Origin; Select Telemetry file\n" ,      
+               showinfo(title = "Movable Origin; Select Telemetry file\n" ,      
                        message = "It appears that the waypoint file has a movable \n" +
                         "origin (the boot up location of the plane) and so\n"      +
                         "to process this waypoint file, the software needs you\n"  +
@@ -2787,66 +2829,68 @@ def process_telemetry():
                         "If you want to see your relative waypoints in\n"          +
                         "Google Earth without using telemetry, then you can\n"  +    
                         "alter the definition of the origin in waypoints.h to\n"   +
-                        "be Fixed a origin." )
+                        "be a fixed origin.")
                print "Waypoints.h file has a movable origin. Telemetry file required;"
-               print "Or change waypoint origin from movable to Fixed."
+               print "Or change waypoint origin from movable to fixed."
                myframe.start_button.configure(state = 'active')
                return
             
-    print "Processing files, log level",options.loglevel,"..."
+    print "Processing files, log level", options.loglevel, "..."
     if options.loglevel > 1 :
        print "Telemetry Selector", options.telemetry_selector
-       print "Telemetry File" , options.telemetry_filename
+       print "Telemetry File", options.telemetry_filename
        print "Waypoint Selector", options.waypoint_selector
        print "Waypoint Filename", options.waypoint_filename
        print "GE KMZ Filename", options.GE_filename
        print "Name used for temporary kml file is ", options.GE_filename_kml
        print "CSV Selector", options.CSV_selector
-       print "CSV Filename" , options.CSV_filename
-       print "Altitude Correction" , options.altitude_correction
+       print "CSV Filename", options.CSV_filename
+       print "Altitude Correction", options.altitude_correction
        print "GPS Delay Correction", options.gps_delay_correction
        
-    saveObject( "flan_config",options) # save user selected options to a file
+    saveObject("flan_config", options) # save user selected options to a file
 
-
-    
     #################################################################
     ##### Main Control of Flight Analyzer Processing Starts Here ####
-    kml_result = False # Initialise Flag to show whether kml was produced
-    if (options.telemetry_selector == 1):
-        print "Analyzing telemetry and creating flight log book"
-        log_book = create_log_book(options)
-        print "Writing to temporary telemetry kml file"
-        kml_result = create_telemetry_kmz(options, log_book) 
-    elif ((options.waypoint_selector ==1 ) and (options.telemetry_selector == 0)):
-        print "Writing waypoint KML file"
-        create_waypoint_kmz(options)
-    else :
-        print showerror(title="Processing Error",
-                        message = "Processing started without an input file being selected")
-        return
-    print "Zipping up KML into a KMZ File"
-    wrap_kml_into_kmz(options)
+#    kml_result = False # Initialise Flag to show whether kml was produced
+#    if (options.telemetry_selector == 1):
+#        print "Analyzing telemetry and creating flight log book"
+#        log_book = create_log_book(options)
+#        print "Writing to temporary telemetry kml file"
+#        kml_result = create_telemetry_kmz(options, log_book) 
+#    elif ((options.waypoint_selector ==1 ) and (options.telemetry_selector == 0)):
+#        print "Writing waypoint KML file"
+#        create_waypoint_kmz(options)
+#    else :
+#        print showerror(title="Processing Error",
+#                        message = "Processing started without an input file being selected")
+#        return
+#    print "Zipping up KML into a KMZ File"
+#    wrap_kml_into_kmz(options)
 
-    if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW') \
-        or options.telemetry_filename.endswith('log') or options.telemetry_filename.endswith('LOG')):
-        serial_udb_extra_filename = re.sub("[rRlL][aAoO][wWgG]$","txt",options.telemetry_filename)
-        if os.path.exists(serial_udb_extra_filename):
-            print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
-        else:
-            print "Writing ascii version of SERIAL_UDB_EXTRA to", \
-                  os.path.basename(serial_udb_extra_filename)
-            write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
-                                              options.telemetry_type)
-    if (options.CSV_selector == 1) and(kml_result == True ):
-        write_csv(options,log_book)
+#    if (options.telemetry_filename.endswith('raw') or options.telemetry_filename.endswith('RAW') \
+#        or options.telemetry_filename.endswith('log') or options.telemetry_filename.endswith('LOG')):
+#        serial_udb_extra_filename = re.sub("[rRlL][aAoO][wWgG]$","txt",options.telemetry_filename)
+#        if os.path.exists(serial_udb_extra_filename):
+#            print "Not writing ascii version of SERIAL_UDB_EXTRA. File exists."
+#        else:
+#            print "Writing ascii version of SERIAL_UDB_EXTRA to", \
+#                  os.path.basename(serial_udb_extra_filename)
+#            write_mavlink_to_serial_udb_extra(options.telemetry_filename, serial_udb_extra_filename, \
+#                                              options.telemetry_type)
+#    if (options.CSV_selector == 1) and (kml_result == True ):
+#        write_csv(options,log_book)
+
+    if (cmd_process(options) != 0):
+        print showerror(title = "Processing Error",
+                        message = "Processing started without an input file being selected")
     message_text = "Flight Analyzer Processing Completed"
-    showinfo(title  = "Processing Completed", message = message_text)
+    showinfo(title = "Processing Completed", message = message_text)
     print message_text
     myframe.start_button.configure(state = "active")
-    return  
-    
-class  flan_frame(Frame) : # A window frame for the Flight Analyzer
+    return
+
+class flan_frame(Frame) : # A window frame for the Flight Analyzer
     """ Create window frame for the user to select options for the Flight Analyzer"""
     def __init__(self, parent = None):
         """Initialise the main window of flan.py"""
@@ -3250,15 +3294,17 @@ class flan_text_frame(Frame):
 debug = 0 # set this to 1 of you want debug info to be printed.
 GPS = 0
 IMU = 1
-            
-if __name__=="__main__":
 
-    instructions = "flan.py:  Convert a MatrixPilot telemetry and waypoints.h file " + \
-               "to Google Earth Placmarks (kmz) File \n "
+if __name__=="__main__":
+    result = 0
+    instructions = __file__ + ":  Convert a MatrixPilot telemetry log and " + \
+                   "waypoints.h file to Google Earth Placmarks (kmz) File\n"
+
+    flight_clock = clock() # flight_clock is object name with global scope
+    mycolors = colors()    # mycolors is object name with global scope
     
     if len(sys.argv) == 1:
-        flight_clock = clock() # flight_clock is object name with global scope
-        mycolors = colors()    # mycolors is object name with global scope
+        gui = True
         try :
             options = loadObject("flan_config")
             # Allow people that are upgrading their flan
@@ -3280,8 +3326,8 @@ if __name__=="__main__":
         root = Tk()
         root.title("Flight Analyzer")
         myframe = flan_frame()
-        myframe.grid(row = 0,column= 0) 
-        w = Canvas(root, width=600, height=300)
+        myframe.grid(row = 0, column = 0)
+        w = Canvas(root, width = 600, height = 300)
         working_dir = os.getcwd()
         image_dir = "images"
         #image_file = "fa_banner_300x300.gif"
@@ -3289,17 +3335,35 @@ if __name__=="__main__":
         image_full_name = os.path.join(image_dir, image_file)
         try:
             imgobj = PhotoImage(file = image_full_name)
-            w.imgobj = w.create_image(300,150,image = imgobj)
-            
+            w.imgobj = w.create_image(300, 150, image = imgobj)
         except:
             pass
-        w.grid(row = 1,column= 0, sticky = NSEW) 
+        w.grid(row = 1, column= 0, sticky = NSEW) 
         mainloop() # view at process_telemetry() for main telemetry processing
     else:
+        gui = False
         print instructions
 
-root.quit() # close the main window
-    
+        from optparse import OptionParser
+        parser = OptionParser("flan.pyw [options]")
+        parser.add_option("-w", "--way",   dest="wayfile", default="waypoints.h", help="specify input waypoints file", metavar="FILE")
+        parser.add_option("-l", "--log",   dest="logfile", default="logfile.txt", help="specify input telemetry file", metavar="FILE")
+        parser.add_option("-q", "--quiet", dest="verbose", default=True,          help="don't print status messages to stdout", action="store_false")
+        (opts, args) = parser.parse_args()
 
-    
-    
+        options = flan_options()
+        options.telemetry_selector = 1
+#        options.waypoint_selector = 1
+        options.waypoint_selector = 0
+        options.CSV_selector = 1
+        options.telemetry_filename = opts.logfile
+        options.verbose = opts.verbose
+#        options.waypoint_filename = "./Config/Cessna/flightplan-waypoints.h"
+        options.GE_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]$",".kmz", options.telemetry_filename)
+        options.CSV_filename = re.sub("\.[tTlLrR][xXoOaA][tTgGwW]$",".csv", options.telemetry_filename)
+        options.GE_filename_kml = re.sub("\.kmz$",".kml", options.GE_filename)
+        result = cmd_process(options)
+
+    sys.exit(result)
+
+#root.quit() # close the main window

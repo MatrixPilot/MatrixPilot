@@ -148,6 +148,16 @@ void udb_skip_imu_calibration(boolean b)
 }
 #endif
 
+extern int mp_argc;
+extern char **mp_argv;
+#if (JSB == 1)
+int JSBSimSIL_run(void);
+int JSBSimSIL_init(int argc, char* argv[]);
+#else
+int JSBSimSIL_run(void) { return 0; }
+int JSBSimSIL_init(int argc, char* argv[]) { return 0; }
+#endif // (JSB == 1)
+
 void udb_init(void)
 {
 //	int16_t i;
@@ -214,9 +224,14 @@ void udb_run(void)
 			udb_pwTrim[THROTTLE_INPUT_CHANNEL] = 2000;
 		}
 		nextHeartbeatTime = get_current_milliseconds();
+		if (JSBSimSIL_init(mp_argc, mp_argv)) exit(0);
 	}
+	if (JSBSimSIL_run()) exit(0);
 
 //	while (1) {
+#if (JSB == 1)
+		if (1)
+#else
 		if (!handleUDBSockets())
 		{
 			sleep_milliseconds(1);
@@ -227,6 +242,7 @@ void udb_run(void)
 		if (currentTime >= nextHeartbeatTime &&
 		    !(nextHeartbeatTime <= UDB_STEP_TIME && 
 		    currentTime >= UDB_WRAP_TIME-UDB_STEP_TIME))
+#endif // (JSB == 1)
 		{
 			udb_callback_read_sensors();
 
