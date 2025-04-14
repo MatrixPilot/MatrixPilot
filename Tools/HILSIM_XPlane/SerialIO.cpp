@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Setup.h"
 #include "SerialIO.h"
 
 extern "C" {
@@ -36,41 +37,35 @@ void CloseComms(void)
 	if (serialSock) {
 		UDBSocket_close(serialSock);
 		serialSock = NULL;
-		LoggingFile.mLogFile << "Closed serial port" << endl;
-		printf("Closed serial port\n");
+		Log.Append("Closed serial port");
 	}
 	if (udpSock) {
 		UDBSocket_close(udpSock);
 		udpSock = NULL;
-		LoggingFile.mLogFile << "Closed udp port" << endl;
-		printf("Closed udp port\n");
+		Log.Append("Closed UDP port");
 	}
 	activeSock = NULL;
 }
 
 void StartSerial(void)
 {
-	fprintf(stderr, "--- trying comm port %s\n", CommPortString.c_str());
 	serialSock = UDBSocket_init(UDBSocketSerial, 0, NULL, (char*)CommPortString.c_str(), CommPortSpeed);
 	if (serialSock) {
-		LoggingFile.mLogFile << "Opened serial port " << CommPortString.c_str() << endl;
+		Log.Append("Opened COM port ", CommPortString.c_str());
 	} else {
-		LoggingFile.mLogFile << "Open serial port " << CommPortString.c_str() << " failed." << endl;
-		LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
-		printf("%s\n", UDBSocketLastErrorMessage());
+		Log.Append("Failed to open COM port ", CommPortString.c_str());
+		Log.Append(UDBSocketLastErrorMessage());
 	}
 }
 
 void StartServer(void)
 {
-	fprintf(stderr, "--- trying server on port %d\n", PortNum);
 	udpSock = UDBSocket_init(UDBSocketUDPServer, PortNum, NULL, NULL, 0);
 	if (udpSock) {
-		LoggingFile.mLogFile << "Opened UDP server on port " << PortNum << endl;
+		Log.Append("Opened UDP server on port ", PortNum);
 	} else {
-		LoggingFile.mLogFile << "Open UDP server on port " << PortNum << " failed." << endl;
-		LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
-		printf("%s\n", UDBSocketLastErrorMessage());
+		Log.Append("Failed to open UDP server on port ", PortNum);
+		Log.Append(UDBSocketLastErrorMessage());
 	}
 }
 
@@ -79,9 +74,8 @@ void SendToComPort(unsigned long ResponseLength, unsigned char* Buffer)
 	if (activeSock) {
 		int written = UDBSocket_write(activeSock, Buffer, ResponseLength);
 		if (written < 0) {
-			LoggingFile.mLogFile << "serial write failed" << endl;
-			LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
-			printf("%s\n", UDBSocketLastErrorMessage());
+			Log.Append("serial write failed");
+			Log.Append(UDBSocketLastErrorMessage());
 			CloseComms();
 		}
 	}
@@ -99,9 +93,8 @@ int ReceiveFromSocket(UDBSocket sock)
 		while (loops--) {
 			long n = UDBSocket_read(sock, Buffer, BUFLEN);
 			if (n < 0) {
-				LoggingFile.mLogFile << "serial read failed" << endl;
-				LoggingFile.mLogFile << UDBSocketLastErrorMessage() << endl;
-				printf("%s\n", UDBSocketLastErrorMessage());
+				Log.Append("socket read failed");
+				Log.Append(UDBSocketLastErrorMessage());
 				CloseComms();
 				break;
 			} else {
@@ -129,8 +122,7 @@ void ReceiveFromComPort(void)
 			UDBSocket_close(udpSock);
 			udpSock = NULL;
 		}
-		LoggingFile.mLogFile << "Using serial port.  Closed udp port." << endl;
-		printf("Using serial port.  Closed udp port.\n");
+		Log.Append("Using COM port.  Closed UDP port.");
 	}
 	if (ReceiveFromSocket(udpSock) && !activeSock) {
 		activeSock = udpSock;
@@ -138,13 +130,11 @@ void ReceiveFromComPort(void)
 			UDBSocket_close(serialSock);
 			serialSock = NULL;
 		}
-		LoggingFile.mLogFile << "Using udp port.  Closed serial port." << endl;
-		printf("Using udp port.  Closed serial port.\n");
+		Log.Append("Using UDP port.  Closed COM port.");
 	}
 }
 
 void ShowMessage(const char* pErrorString)
 {
-	LoggingFile.mLogFile << "MESSAGE: " << pErrorString << endl;
-	cerr << "MESSAGE: " << pErrorString << endl;
+	Log.Append("MESSAGE: ", pErrorString);
 }

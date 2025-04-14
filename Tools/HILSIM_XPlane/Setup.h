@@ -109,20 +109,20 @@ typedef enum
 class ChannelSetup
 {
 public:
-	ChannelSetup();									// Default constructor
-	ChannelSetup(const ChannelSetup* pCopyChannel);	// Copy constructor
+	ChannelSetup();
+	ChannelSetup(const ChannelSetup* pCopyChannel);
 
-	float GetControlDeflection(int ServoPosition);	// Translate from servo position to control deflection
+	float GetControlDeflection(int ServoPosition);  // Translate from servo position to control deflection
 
-	int mServoChannel;							// Servo channel variables
+	int mServoChannel;      // Servo channel variables
 	int	mChannelOffset;
 	int	mChannelHiTravel;
 	int	mChannelLoTravel;
 
 	XPLMDataRef	mControlSurfaceRef;
 
-	float mMaxDeflection;						// Deflection at channel max.  THIS IS NOT A LIMITER
-	float mMinDeflection;						// Deflection at channel min.  THIS IS NOT A LIMITER
+	float mMaxDeflection;   // Deflection at channel max.  THIS IS NOT A LIMITER
+	float mMinDeflection;   // Deflection at channel min.  THIS IS NOT A LIMITER
 
 	ControlType	mControlType;
 	unsigned int mEngineMask;
@@ -156,10 +156,13 @@ class LogFile
 public:
 	LogFile();
 	~LogFile();
-	void AppendString(string& AddString);
-	
+	void Append(const string& message, bool newline = true);
+	void Append(const string& message, const string& value, bool newline = true);
+	void Append(const string& message, long value, bool newline = true);
+	void Append(const string& message, int value, bool newline = true);
+private:
 	ofstream mLogFile;
 };
 
-extern LogFile LoggingFile;
+extern LogFile Log;
 

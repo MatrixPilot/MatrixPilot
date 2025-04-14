@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "utility.h"
 
 double GetHeading(double lat1, double lat2, double lon1, double lon2)
 {

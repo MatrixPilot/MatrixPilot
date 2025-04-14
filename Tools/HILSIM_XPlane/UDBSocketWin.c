@@ -51,7 +51,7 @@ void SetTermIOs(void)
 	setvbuf(stdin, NULL, _IONBF, 0);
 }
 
-UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, char* serial_port, long serial_baud)
+UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, const char* UDP_host, const char* serial_port, long serial_baud)
 {
 	UDBSocket newSocket = (UDBSocket)malloc(sizeof(UDBSocket_t));
 	if (!newSocket)
@@ -166,8 +166,7 @@ UDBSocket UDBSocket_init(UDBSocketType type, uint16_t UDP_port, char* UDP_host, 
 				{
 					//sprintf(ErrorString, "Could not open comm port");
 					//ShowMessage(ErrorString);
-					//LoggingFile.mLogFile << "Could not open Com Port";
-					//LoggingFile.mLogFile << endl;
+					//Log.Append"Could not open Com Port");
 					snprintf(UDBSocketLastError, LAST_ERR_BUF_SIZE, "Could not open comm port");
 					UDBSocket_close(newSocket);
 					return NULL;
@@ -356,7 +355,7 @@ int UDBSocket_read(UDBSocket socket, unsigned char* buffer, int bufferLength)
 	return -1;
 }
 
-int UDBSocket_write(UDBSocket socket, unsigned char* data, int dataLength)
+int UDBSocket_write(UDBSocket socket, const unsigned char* data, int dataLength)
 {
 	switch (socket->type)
 	{
